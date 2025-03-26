@@ -1,0 +1,104 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(MusicMapMaker VERSION 0.1 LANGUAGES CXX)
+
+# 启用自动处理 Qt 特性
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# 设置 C++ 标准
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+# 查找 Qt 包
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets LinguistTools)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets LinguistTools)
+
+# 设置翻译文件
+set(TS_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/MusicMapMaker_zh_CN.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/MusicMapMaker_en_US.ts
+)
+
+# 项目源文件
+set(PROJECT_SOURCES
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    ${TS_FILES}
+)
+
+# 创建可执行文件
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(MusicMapMaker
+        MANUAL_FINALIZATION
+        ${PROJECT_SOURCES}
+    )
+else()
+    if(ANDROID)
+        add_library(MusicMapMaker SHARED
+            ${PROJECT_SOURCES}
+        )
+    else()
+        add_executable(MusicMapMaker
+            ${PROJECT_SOURCES}
+        )
+    endif()
+endif()
+
+# 链接 Qt 库
+target_link_libraries(MusicMapMaker PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+# 设置翻译系统
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    # Qt6 使用现代翻译工具
+    qt_add_lupdate(MusicMapMaker
+        SOURCES ${PROJECT_SOURCES}
+        TS_FILES ${TS_FILES}
+    )
+
+    qt_add_lrelease(MusicMapMaker
+        TS_FILES ${TS_FILES}
+        QM_FILES_OUTPUT_VARIABLE QM_FILES
+        OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations
+    )
+else()
+    # Qt5 使用旧版翻译工具
+    qt5_add_translation(QM_FILES ${TS_FILES})
+endif()
+
+# 将翻译文件添加到资源系统
+qt_add_resources(MusicMapMaker "translations"
+    PREFIX "/translations"
+    BASE ${CMAKE_CURRENT_BINARY_DIR}/translations
+    FILES ${QM_FILES}
+)
+
+# 设置 macOS 和 Windows 目标属性
+if(${QT_VERSION} VERSION_LESS 6.1.0)
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.MusicMapMaker)
+endif()
+
+set_target_properties(MusicMapMaker PROPERTIES
+    ${BUNDLE_ID_OPTION}
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+# 安装配置
+include(GNUInstallDirs)
+install(TARGETS MusicMapMaker
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# Qt6 最终化处理
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(MusicMapMaker)
+endif()
