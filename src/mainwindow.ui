@@ -280,21 +280,64 @@
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="rightMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>2</number>
             </property>
             <item>
-             <widget class="QStackedWidget" name="stackedWidget">
-              <widget class="QWidget" name="page"/>
-              <widget class="QWidget" name="page_2"/>
+             <widget class="QTabWidget" name="tabWidget">
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="logTab">
+               <attribute name="title">
+                <string>Log</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QTextEdit" name="logTextArea">
+                  <property name="undoRedoEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="tab_2">
+               <attribute name="title">
+                <string>Errors</string>
+               </attribute>
+              </widget>
+              <widget class="QWidget" name="tab_3">
+               <attribute name="title">
+                <string>Commands</string>
+               </attribute>
+              </widget>
              </widget>
             </item>
            </layout>
@@ -344,6 +387,7 @@
      <string>View</string>
     </property>
     <addaction name="actionShow_Logs"/>
+    <addaction name="actionShow_Files"/>
    </widget>
    <widget class="QMenu" name="menuTool">
     <property name="title">
@@ -443,6 +487,17 @@
   <action name="actionCheck_Stack_Object">
    <property name="text">
     <string>Check Stack Object</string>
+   </property>
+  </action>
+  <action name="actionShow_Files">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Files</string>
    </property>
   </action>
  </widget>
