@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
   // 格式如 "zh_CN", "en_US"
   QString languageCode = systemLocale.name();
 
-  qDebug() << "System language:" << languageCode;
+  XINFO("System language:" + languageCode.toStdString());
 
   // 初始化 Qt 自带的标准对话框翻译
   QTranslator qtTranslator;
@@ -45,10 +45,10 @@ int main(int argc, char *argv[]) {
 
   if (loaded) {
     a.installTranslator(&appTranslator);
-    qDebug() << "Loaded translation for:" << languageCode;
+    XINFO("Loaded translation for:" + languageCode.toStdString());
   } else {
-    qDebug() << "Using default language (translation not found for"
-             << languageCode << ")";
+    XWARN("Using default language (translation not found for" +
+          languageCode.toStdString() + ")");
   }
 
   // 初始化gl版本
