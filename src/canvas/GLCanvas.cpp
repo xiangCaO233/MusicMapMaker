@@ -34,7 +34,7 @@ void GLCanvas::paintGL() {
   GLCALL(glUseProgram(shader_program));
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
-  GLCALL(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
+  GLCALL(glDrawArrays(GL_TRIANGLE_FAN, 4, oval_segment));
   GLCALL(glUseProgram(0));
 }
 
