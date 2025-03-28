@@ -17,6 +17,12 @@ class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
   void initializeGL() override;
   void resizeGL(int w, int h) override;
   void paintGL() override;
+
+ private:
+  GLuint VAO;
+  GLuint VBO;
+  GLuint FBO;
+  GLuint UBO;
 };
 
 #endif  // GLCANVAS_H
