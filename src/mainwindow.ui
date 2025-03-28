@@ -264,7 +264,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QOpenGLWidget" name="openGLWidget"/>
+             <widget class="GLCanvas" name="openGLWidget"/>
             </item>
            </layout>
           </widget>
@@ -501,6 +501,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GLCanvas</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">GLCanvas.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
