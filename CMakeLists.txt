@@ -15,6 +15,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+add_subdirectory(./libs/xaudiolib)
+include_directories(./ ./libs/xaudiolib/include)
+
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
                                                   OpenGL LinguistTools)
@@ -64,7 +67,7 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
           Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-          Qt${QT_VERSION_MAJOR}::OpenGL)
+          Qt${QT_VERSION_MAJOR}::OpenGL xaudio)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
