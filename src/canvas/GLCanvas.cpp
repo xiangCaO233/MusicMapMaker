@@ -32,9 +32,13 @@ void GLCanvas::resizeGL(int w, int h) { glViewport(0, 0, w, h); }
 // 绘制画布
 void GLCanvas::paintGL() {
   GLCALL(glUseProgram(shader_program));
+  // 背景色
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
-  GLCALL(glDrawArrays(GL_TRIANGLE_FAN, 4, oval_segment));
+  // 绘制矩形
+  // GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, 1));
+  // 绘制椭圆
+  GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 4, oval_segment, 1));
   GLCALL(glUseProgram(0));
 }
 
