@@ -1,3 +1,5 @@
+#include <qsurfaceformat.h>
+
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
@@ -46,6 +48,15 @@ int main(int argc, char *argv[]) {
     qDebug() << "Using default language (translation not found for"
              << languageCode << ")";
   }
+
+  // 初始化gl版本
+  QSurfaceFormat format;
+  // gl4.1版本
+  format.setVersion(4, 1);
+  // gl核心模式
+  format.setProfile(QSurfaceFormat::CoreProfile);
+  // 应用gl设置
+  QSurfaceFormat::setDefaultFormat(format);
 
   MainWindow w;
   w.show();
