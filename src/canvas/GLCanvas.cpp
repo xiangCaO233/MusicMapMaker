@@ -24,6 +24,8 @@ void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
   initbuffer();
   initshader();
+  GLCALL(glEnable(GL_BLEND));
+  GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));  // 标准混合模式
 }
 void GLCanvas::resizeGL(int w, int h) { glViewport(0, 0, w, h); }
 
