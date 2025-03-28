@@ -13,21 +13,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # 查找 Qt 包
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Qt6OpenGLWidgets LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets LinguistTools)
 
 # 设置翻译文件
 set(TS_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/MusicMapMaker_zh_CN.ts
-    ${CMAKE_CURRENT_SOURCE_DIR}/MusicMapMaker_en_US.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
+    ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts
 )
 
 # 项目源文件
 set(PROJECT_SOURCES
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+    src/main.cpp
+    src/mainwindow.cpp
+    src/mainwindow.h
+    src/mainwindow.ui
     ${TS_FILES}
 )
 
@@ -50,7 +50,7 @@ else()
 endif()
 
 # 链接 Qt 库
-target_link_libraries(MusicMapMaker PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(MusicMapMaker PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6OpenGLWidgets)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
