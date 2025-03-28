@@ -27,6 +27,9 @@ find_package(spdlog REQUIRED)
 # 设置翻译文件
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
              ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
+# 设置着色器文件
+set(GLSL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/fragmentshader.glsl.frag 
+							 ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/vertexshader.glsl.vert)
 
 # 项目源文件
 set(PROJECT_SOURCES
@@ -38,13 +41,16 @@ set(PROJECT_SOURCES
     src/canvas/GLCanvas.cpp
     src/log/colorful-log.h
     src/log/colorful_log.cpp
-    ${TS_FILES})
+		${GLSL_FILES}
+    ${TS_FILES}
+	)
 
 include_directories(./src/canvas ./src/log)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
+  qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
+    resources/glsrcs.qrc)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})

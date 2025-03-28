@@ -7,10 +7,12 @@
 #include <QLocale>
 #include <QTranslator>
 
+#include "log/colorful-log.h"
 #include "mainwindow.h"
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
+  XLogger::init();
 
   // 获取系统语言环境
   QLocale systemLocale = QLocale::system();
