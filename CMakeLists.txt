@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # 查找 Qt 包
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Qt6OpenGLWidgets LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Qt6OpenGLWidgets Qt6OpenGL LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets LinguistTools)
 
 # 设置翻译文件
@@ -28,8 +28,12 @@ set(PROJECT_SOURCES
     src/mainwindow.cpp
     src/mainwindow.h
     src/mainwindow.ui
+		src/canvas/GLCanvas.h
+		src/canvas/GLCanvas.cpp
     ${TS_FILES}
 )
+
+include_directories(./src/canvas)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -50,7 +54,7 @@ else()
 endif()
 
 # 链接 Qt 库
-target_link_libraries(MusicMapMaker PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6OpenGLWidgets)
+target_link_libraries(MusicMapMaker PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6OpenGLWidgets Qt6OpenGL)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
