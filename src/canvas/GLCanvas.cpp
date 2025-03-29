@@ -16,9 +16,27 @@
     }                                                      \
   }
 
-GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {}
+GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {
+  // 启用鼠标跟踪
+  setMouseTracking(true);
+}
 
 GLCanvas::~GLCanvas() = default;
+
+// qt事件
+void GLCanvas::mousePressEvent(QMouseEvent *event) {}
+void GLCanvas::mouseReleaseEvent(QMouseEvent *event) {}
+void GLCanvas::mouseDoubleClickEvent(QMouseEvent *event) {}
+void GLCanvas::mouseMoveEvent(QMouseEvent *event) {}
+void GLCanvas::wheelEvent(QWheelEvent *event) {}
+void GLCanvas::keyPressEvent(QKeyEvent *event) {}
+void GLCanvas::keyReleaseEvent(QKeyEvent *event) {}
+void GLCanvas::focusInEvent(QFocusEvent *event) {}
+void GLCanvas::focusOutEvent(QFocusEvent *event) {}
+void GLCanvas::enterEvent(QEnterEvent *event) {}
+void GLCanvas::leaveEvent(QEvent *event) {}
+void GLCanvas::moveEvent(QMoveEvent *event) {}
+void GLCanvas::resizeEvent(QResizeEvent *event) {}
 
 void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
