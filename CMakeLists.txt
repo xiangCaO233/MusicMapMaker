@@ -5,6 +5,9 @@ project(
   VERSION 0.1
   LANGUAGES CXX)
 
+add_subdirectory(./libs/xaudiolib)
+include_directories(./ ./libs/xaudiolib/include)
+
 # 启用自动处理 Qt 特性
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -15,8 +18,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-add_subdirectory(./libs/xaudiolib)
-include_directories(./ ./libs/xaudiolib/include)
 
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
