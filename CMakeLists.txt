@@ -43,6 +43,10 @@ set(PROJECT_SOURCES
     src/mainwindow.ui
     src/canvas/GLCanvas.h
     src/canvas/GLCanvas.cpp
+		src/canvas/RenderCommand.h
+		src/canvas/RenderCommand.cpp
+		src/canvas/GLRenderer.h
+		src/canvas/GLRenderer.cpp
     src/log/colorful-log.h
     src/log/colorful_log.cpp
 		${GLSL_FILES}
