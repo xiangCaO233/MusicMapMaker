@@ -1,7 +1,11 @@
 #include "GLCanvas.h"
 
+#include <qlogging.h>
+
 #include <QFile>
+#include <QMouseEvent>
 #include <QTextStream>
+#include <string>
 
 #include "colorful-log.h"
 
@@ -24,19 +28,80 @@ GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {
 GLCanvas::~GLCanvas() = default;
 
 // qt事件
-void GLCanvas::mousePressEvent(QMouseEvent *event) {}
-void GLCanvas::mouseReleaseEvent(QMouseEvent *event) {}
-void GLCanvas::mouseDoubleClickEvent(QMouseEvent *event) {}
-void GLCanvas::mouseMoveEvent(QMouseEvent *event) {}
-void GLCanvas::wheelEvent(QWheelEvent *event) {}
-void GLCanvas::keyPressEvent(QKeyEvent *event) {}
-void GLCanvas::keyReleaseEvent(QKeyEvent *event) {}
-void GLCanvas::focusInEvent(QFocusEvent *event) {}
-void GLCanvas::focusOutEvent(QFocusEvent *event) {}
-void GLCanvas::enterEvent(QEnterEvent *event) {}
-void GLCanvas::leaveEvent(QEvent *event) {}
-void GLCanvas::moveEvent(QMoveEvent *event) {}
-void GLCanvas::resizeEvent(QResizeEvent *event) {}
+// 鼠标按下事件
+void GLCanvas::mousePressEvent(QMouseEvent *event) {
+  // 传递事件
+  QOpenGLWidget::mousePressEvent(event);
+}
+
+// 鼠标释放事件
+void GLCanvas::mouseReleaseEvent(QMouseEvent *event) {
+  // 传递事件
+  QOpenGLWidget::mouseReleaseEvent(event);
+}
+
+// 鼠标双击事件
+void GLCanvas::mouseDoubleClickEvent(QMouseEvent *event) {
+  // 传递事件
+  QOpenGLWidget::mouseDoubleClickEvent(event);
+}
+
+// 鼠标移动事件
+void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
+  // 传递事件
+  QOpenGLWidget::mouseMoveEvent(event);
+  auto pos = event->pos();
+  auto info = std::to_string(pos.x()) + "," + std::to_string(pos.y());
+  XINFO(info);
+}
+
+// 鼠标滚动事件
+void GLCanvas::wheelEvent(QWheelEvent *event) {
+  // 传递事件
+  QOpenGLWidget::wheelEvent(event);
+}
+
+// 键盘按下事件
+void GLCanvas::keyPressEvent(QKeyEvent *event) {
+  // 传递事件
+  QOpenGLWidget::keyPressEvent(event);
+}
+
+// 键盘释放事件
+void GLCanvas::keyReleaseEvent(QKeyEvent *event) {
+  // 传递事件
+  QOpenGLWidget::keyReleaseEvent(event);
+}
+
+// 取得焦点事件
+void GLCanvas::focusInEvent(QFocusEvent *event) {
+  // 传递事件
+  QOpenGLWidget::focusInEvent(event);
+}
+
+// 失去焦点事件
+void GLCanvas::focusOutEvent(QFocusEvent *event) {
+  // 传递事件
+  QOpenGLWidget::focusOutEvent(event);
+}
+
+// 进入事件
+void GLCanvas::enterEvent(QEnterEvent *event) {
+  // 传递事件
+  QOpenGLWidget::enterEvent(event);
+}
+
+// 退出事件
+void GLCanvas::leaveEvent(QEvent *event) {
+  // 传递事件
+  QOpenGLWidget::leaveEvent(event);
+}
+
+// 调整尺寸事件
+void GLCanvas::resizeEvent(QResizeEvent *event) {
+  // 传递事件
+  QOpenGLWidget::resizeEvent(event);
+}
 
 void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
@@ -45,7 +110,12 @@ void GLCanvas::initializeGL() {
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));  // 标准混合模式
 }
-void GLCanvas::resizeGL(int w, int h) { glViewport(0, 0, w, h); }
+void GLCanvas::resizeGL(int w, int h) {
+  glViewport(0, 0, w, h);
+
+  auto info = std::to_string(w) + "," + std::to_string(h);
+  XDEBUG(info);
+}
 
 // 绘制画布
 void GLCanvas::paintGL() {

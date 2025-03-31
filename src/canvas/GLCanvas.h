@@ -8,8 +8,12 @@
 
 #include <cstdint>
 
+#include "GLRenderer.h"
+
 class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
  public:
+  // 渲染器
+  GLRenderer renderer;
   // 构造GLCanvas
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
@@ -32,7 +36,6 @@ class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
   void focusOutEvent(QFocusEvent *event) override;
   void enterEvent(QEnterEvent *event) override;
   void leaveEvent(QEvent *event) override;
-  void moveEvent(QMoveEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
 
  private:

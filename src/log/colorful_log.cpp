@@ -92,7 +92,7 @@ void XLogger::init() {
 
   // 创建组合logger
   logger = std::make_shared<spdlog::logger>(
-      "xaudiolib",
+      "MMM",
       spdlog::sinks_init_list{console_sink, file_all_sink, file_error_sink});
 
   // 设置全局日志级别
@@ -108,7 +108,7 @@ void XLogger::init() {
 }
 void XLogger::shutdown() {
   // 销毁 logger
-  spdlog::drop("xaudiolib");
+  spdlog::drop("MMM");
   // 直接销毁 logger 对象
   logger.reset();
   // 销毁所有 logger

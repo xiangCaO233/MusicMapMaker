@@ -14,7 +14,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 # 设置 C++ 标准
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
@@ -27,6 +27,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED
 
 # 查找日志包
 find_package(spdlog REQUIRED)
+# opengl数学包
+find_package(glm REQUIRED)
 
 # 设置翻译文件
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
@@ -72,7 +74,7 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
           Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-          Qt${QT_VERSION_MAJOR}::OpenGL xaudio)
+          Qt${QT_VERSION_MAJOR}::OpenGL xaudio glm)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
