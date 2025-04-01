@@ -1,6 +1,7 @@
 #ifndef GLRENDERER_H
 #define GLRENDERER_H
 
+#include <qcolor.h>
 #include <qrect.h>
 
 #include <cstdint>
@@ -8,14 +9,19 @@
 #include <vector>
 
 #include "RenderCommand.h"
+#include "TexturePool.h"
 
 struct DrawBatch {
-  int32_t texture_id;
+  // 纹理池id
+  int32_t texture_pool_id;
+  // 使用此纹理池id的全部渲染指令
   std::vector<RenderCommand> commands;
 };
 
 class GLRenderer {
-  // 所有渲染批(纹理id-渲染批/纹理id=-1时填充纯色)
+  // 纹理池表
+  std::map<int32_t, TexturePool> texture_pools;
+  // 所有渲染批(纹理池id-渲染批/纹理id=-1时填充纯色)
   std::map<int32_t, DrawBatch> batches;
 
  public:
