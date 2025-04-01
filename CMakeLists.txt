@@ -27,8 +27,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED
 
 # 查找日志包
 find_package(spdlog REQUIRED)
-# opengl数学包
-find_package(glm REQUIRED)
 
 # 设置翻译文件
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
@@ -46,9 +44,10 @@ set(PROJECT_SOURCES
     src/canvas/GLCanvas.h
     src/canvas/GLCanvas.cpp
 		src/canvas/RenderCommand.h
-		src/canvas/RenderCommand.cpp
 		src/canvas/GLRenderer.h
 		src/canvas/GLRenderer.cpp
+		src/canvas/TexturePool.h
+		src/canvas/TexturePool.cpp
     src/log/colorful-log.h
     src/log/colorful_log.cpp
 		${GLSL_FILES}
@@ -74,7 +73,7 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
           Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-          Qt${QT_VERSION_MAJOR}::OpenGL xaudio glm)
+          Qt${QT_VERSION_MAJOR}::OpenGL xaudio)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

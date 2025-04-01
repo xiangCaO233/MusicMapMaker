@@ -50,9 +50,6 @@ void GLCanvas::mouseDoubleClickEvent(QMouseEvent *event) {
 void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   QOpenGLWidget::mouseMoveEvent(event);
-  auto pos = event->pos();
-  auto info = std::to_string(pos.x()) + "," + std::to_string(pos.y());
-  XINFO(info);
 }
 
 // 鼠标滚动事件

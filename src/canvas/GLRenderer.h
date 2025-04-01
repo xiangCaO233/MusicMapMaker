@@ -11,18 +11,22 @@
 #include "RenderCommand.h"
 #include "TexturePool.h"
 
+class GLCanvas;
+
 struct DrawBatch {
   // 纹理池id
   int32_t texture_pool_id;
-  // 使用此纹理池id的全部渲染指令
+  // 使用此纹理池id的可批处理的全部渲染指令
   std::vector<RenderCommand> commands;
 };
 
 class GLRenderer {
   // 纹理池表
   std::map<int32_t, TexturePool> texture_pools;
-  // 所有渲染批(纹理池id-渲染批/纹理id=-1时填充纯色)
-  std::map<int32_t, DrawBatch> batches;
+  // 渲染批列表
+  std::vector<DrawBatch*> batches;
+
+  friend class GLCanvas;
 
  public:
   // 构造GLRenderer
