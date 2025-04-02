@@ -44,8 +44,8 @@ set(PROJECT_SOURCES
     src/canvas/GLCanvas.h
     src/canvas/GLCanvas.cpp
     src/canvas/renderer/RenderCommand.h
-    src/canvas/renderer/static/GLRenderer.h
-    src/canvas/renderer/static/GLRenderer.cpp
+    src/canvas/renderer/static/StaticRenderer.h
+    src/canvas/renderer/static/StaticRenderer.cpp
     src/canvas/texture/TexturePool.h
     src/canvas/texture/TexturePool.cpp
     src/log/colorful-log.h

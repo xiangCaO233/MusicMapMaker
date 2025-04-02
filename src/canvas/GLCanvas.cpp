@@ -104,15 +104,11 @@ void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
   initbuffer();
   initshader();
+  // 标准混合模式
   GLCALL(glEnable(GL_BLEND));
-  GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));  // 标准混合模式
+  GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 }
-void GLCanvas::resizeGL(int w, int h) {
-  glViewport(0, 0, w, h);
-
-  auto info = std::to_string(w) + "," + std::to_string(h);
-  XDEBUG(info);
-}
+void GLCanvas::resizeGL(int w, int h) { glViewport(0, 0, w, h); }
 
 // 绘制画布
 void GLCanvas::paintGL() {
@@ -178,8 +174,8 @@ void GLCanvas::initshader() {
   auto fshader = GLCALL(glCreateShader(GL_FRAGMENT_SHADER));
 
   // 用`:/`前缀访问qrc文件
-  QFile vertfile(":/glsl/vertexshader.glsl.vert");
-  QFile fragfile(":/glsl/fragmentshader.glsl.frag");
+  QFile vertfile(":/glsl/vertexshader-static.glsl.vert");
+  QFile fragfile(":/glsl/fragmentshader-static.glsl.frag");
 
   // 检查文件是否成功打开
   if (!vertfile.open(QIODevice::ReadOnly | QIODevice::Text)) {

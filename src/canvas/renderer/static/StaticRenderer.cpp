@@ -1,6 +1,6 @@
 #include "StaticRenderer.h"
 
-StaticRenderer::StaticRenderer() {}
+StaticRenderer::StaticRenderer() { initializeOpenGLFunctions(); }
 
 StaticRenderer::~StaticRenderer() {}
 // 添加矩形

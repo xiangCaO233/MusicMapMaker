@@ -1,0 +1,4 @@
+#ifndef RENDERER_MANAGER_H
+#define RENDERER_MANAGER_H
+
+#endif  // RENDERER_MANAGER_H
