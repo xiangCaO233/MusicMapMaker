@@ -1,19 +1,18 @@
 #ifndef GLCANVAS_H
 #define GLCANVAS_H
 
-#include <GL/gl.h>
 #include <QtOpenGL/qopenglfunctions_4_1_core.h>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 #include <qwidget.h>
 
 #include <cstdint>
 
-#include "GLRenderer.h"
+#include "renderer/static/StaticRenderer.h"
 
 class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
  public:
   // 渲染器
-  GLRenderer renderer;
+  StaticRenderer renderer;
   // 构造GLCanvas
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
@@ -39,11 +38,15 @@ class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
   void resizeEvent(QResizeEvent *event) override;
 
  private:
+  // 顶点数组对象
   GLuint VAO;
+  // 顶点缓冲对象
   GLuint VBO;
   GLuint instanceBO;
   GLuint EBO;
+  // 帧缓冲对象
   GLuint FBO;
+  // 统一缓冲对象
   GLuint UBO;
   GLuint shader_program;
 

@@ -2,11 +2,12 @@
 #define RENDERCOMMAND_H
 
 #include <qcolor.h>
+#include <qrect.h>
 
 #include <cstdint>
 
 // 形状
-enum class Shape { TRIANGLE, QUAD, OVAL };
+enum class ShapeType { QUAD, OVAL };
 
 // 纹理对齐模式
 enum class TextureAlignMode {
@@ -34,15 +35,33 @@ enum class TextureFillMode {
   TILE,
 };
 
-struct RenderCommand {
-  // 绘制的图元形状
-  Shape instance_shape;
-  // 纹理
+// 纹理信息
+struct TextureInfo {
+  // 纹理(-1时仅填充颜色)
   int32_t texture_id{-1};
+  // 纹理对齐模式
   TextureAlignMode texture_alignmode;
+  // 纹理填充模式
   TextureFillMode texture_fillmode;
-  // 填充颜色(无绑定纹理时或被裁切部分的填充颜色)
-  QColor fill_color;
 };
 
+// 绘制指令
+struct RenderCommand {
+  // 绘制的图元形状
+  ShapeType instance_shape;
+  // 图元边界矩形的位置
+  QRectF instace_position;
+  // 填充颜色(无绑定纹理时或被裁切部分的填充颜色)
+  QColor fill_color;
+  // 纹理信息
+  TextureInfo texture_info;
+};
+
+// 绘制批
+struct DrawBatch {
+  // 纹理池id
+  int32_t texture_pool_id;
+  // 使用此纹理池id的可批处理的全部渲染指令
+  std::vector<RenderCommand> commands;
+};
 #endif  // RENDERCOMMAND_H

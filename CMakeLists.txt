@@ -18,7 +18,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
                                                   OpenGL LinguistTools)
@@ -32,8 +31,9 @@ find_package(spdlog REQUIRED)
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
              ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
 # 设置着色器文件
-set(GLSL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/fragmentshader.glsl.frag 
-							 ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/vertexshader.glsl.vert)
+set(GLSL_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/fragmentshader-static.glsl.frag
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/vertexshader-static.glsl.vert)
 
 # 项目源文件
 set(PROJECT_SOURCES
@@ -43,23 +43,22 @@ set(PROJECT_SOURCES
     src/mainwindow.ui
     src/canvas/GLCanvas.h
     src/canvas/GLCanvas.cpp
-		src/canvas/RenderCommand.h
-		src/canvas/GLRenderer.h
-		src/canvas/GLRenderer.cpp
-		src/canvas/TexturePool.h
-		src/canvas/TexturePool.cpp
+    src/canvas/renderer/RenderCommand.h
+    src/canvas/renderer/static/GLRenderer.h
+    src/canvas/renderer/static/GLRenderer.cpp
+    src/canvas/texture/TexturePool.h
+    src/canvas/texture/TexturePool.cpp
     src/log/colorful-log.h
     src/log/colorful_log.cpp
-		${GLSL_FILES}
-    ${TS_FILES}
-	)
+    ${GLSL_FILES}
+    ${TS_FILES})
 
 include_directories(./src/canvas ./src/log)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-    resources/glsrcs.qrc)
+                    resources/glsrcs.qrc)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})

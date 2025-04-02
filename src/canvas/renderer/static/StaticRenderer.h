@@ -1,6 +1,7 @@
 #ifndef GLRENDERER_H
 #define GLRENDERER_H
 
+#include <QtOpenGL/qopenglfunctions_4_1_core.h>
 #include <qcolor.h>
 #include <qrect.h>
 
@@ -8,19 +9,12 @@
 #include <map>
 #include <vector>
 
-#include "RenderCommand.h"
-#include "TexturePool.h"
+#include "../../texture/TexturePool.h"
+#include "../RenderCommand.h"
 
 class GLCanvas;
 
-struct DrawBatch {
-  // 纹理池id
-  int32_t texture_pool_id;
-  // 使用此纹理池id的可批处理的全部渲染指令
-  std::vector<RenderCommand> commands;
-};
-
-class GLRenderer {
+class StaticRenderer : public QOpenGLFunctions_4_1_Core {
   // 纹理池表
   std::map<int32_t, TexturePool> texture_pools;
   // 渲染批列表
@@ -30,9 +24,9 @@ class GLRenderer {
 
  public:
   // 构造GLRenderer
-  GLRenderer();
+  StaticRenderer();
   // 析构GLRenderer
-  virtual ~GLRenderer();
+  virtual ~StaticRenderer();
 
   // 添加矩形
   void addRect(const QRectF& rect, uint32_t textureId,

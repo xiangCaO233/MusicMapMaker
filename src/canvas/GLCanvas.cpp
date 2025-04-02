@@ -123,7 +123,7 @@ void GLCanvas::paintGL() {
   // 绘制矩形
   // GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, 1));
   // 绘制椭圆
-  GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 4, oval_segment, 1));
+  // GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 4, oval_segment, 1));
   GLCALL(glUseProgram(0));
 }
 
