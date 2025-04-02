@@ -1,10 +1,11 @@
 #ifndef GLRENDERER_H
 #define GLRENDERER_H
 
-#include <QtOpenGL/qopenglfunctions_4_1_core.h>
 #include <qcolor.h>
+#include <qopenglcontext.h>
 #include <qrect.h>
 
+#include <QOpenGLFunctions>
 #include <cstdint>
 #include <map>
 #include <vector>
@@ -14,26 +15,24 @@
 
 class GLCanvas;
 
-class StaticRenderer : public QOpenGLFunctions_4_1_Core {
+class StaticRenderer : protected QOpenGLFunctions {
   // 顶点数组对象
-  GLuint VAO;
+  uint32_t VAO;
   // 顶点缓冲对象
-  GLuint VBO;
-  GLuint instanceBO;
-  GLuint EBO;
+  uint32_t VBO;
+  uint32_t instanceBO;
+  uint32_t EBO;
   // 帧缓冲对象
-  GLuint FBO;
+  uint32_t FBO;
   // 统一缓冲对象
-  GLuint UBO;
+  uint32_t UBO;
   // 着色器程序
-  GLuint shader_program;
+  uint32_t shader_program;
 
   // 纹理池表
   std::map<int32_t, TexturePool> texture_pools;
   // 渲染批列表
   std::vector<DrawBatch*> batches;
-  // 提交当前批次
-  void submitBatch();
 
   friend class GLCanvas;
 
