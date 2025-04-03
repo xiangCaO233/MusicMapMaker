@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
           languageCode.toStdString() + ")");
   }
 
+#ifdef __APPLE__
   // 初始化gl版本
   QSurfaceFormat format;
   // gl4.1版本
@@ -59,8 +60,19 @@ int main(int argc, char *argv[]) {
   format.setProfile(QSurfaceFormat::CoreProfile);
   // 应用gl设置
   QSurfaceFormat::setDefaultFormat(format);
+#else
+  // 初始化gl版本
+  QSurfaceFormat format;
+  // gl4.1版本
+  format.setVersion(4, 5);
+  // gl核心模式
+  format.setProfile(QSurfaceFormat::CoreProfile);
+  // 应用gl设置
+  QSurfaceFormat::setDefaultFormat(format);
+#endif  //__APPLE__
 
   MainWindow w;
   w.show();
+
   return a.exec();
 }
