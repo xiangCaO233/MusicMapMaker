@@ -80,6 +80,8 @@ DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
                            (int)(max_shape_count * 4 * sizeof(float)), nullptr,
                            GL_DYNAMIC_DRAW));
   GLCALL(cvs->glVertexAttribDivisor(7, 1));
+  // 初始化着色器程序
+  init_shader_programe();
 }
 
 DynamicRenderer::~DynamicRenderer() {}
@@ -161,7 +163,7 @@ void DynamicRenderer::init_shader_programe() {
   GLCALL(cvs->glDeleteShader(fshader));
 }
 // 渲染向此渲染器提交的全部图形批
-void DynamicRenderer::render() {
+void DynamicRenderer::render(uint32_t start_shape_index, uint32_t count) {
   GLCALL(cvs->glUseProgram(shader_program));
   GLCALL(cvs->glUseProgram(0));
 }

@@ -8,7 +8,7 @@ class StaticRenderer : public AbstractRenderer {
   // 顶点实例缓冲对象
   uint32_t instanceBO;
   // 初始化着色器程序
-  void init_shader_programe() override;
+  void init_shader_programe();
 
  public:
   // 构造GLRenderer
@@ -17,7 +17,7 @@ class StaticRenderer : public AbstractRenderer {
   ~StaticRenderer() override;
 
   // 渲染向此渲染器提交的全部图形批
-  void render() override;
+  void render(uint32_t start_shape_index, uint32_t count) override;
 };
 
 #endif  // STATIC_RENDERER_H

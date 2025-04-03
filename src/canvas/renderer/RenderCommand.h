@@ -10,29 +10,29 @@
 enum class ShapeType { QUAD, OVAL };
 
 // 纹理对齐模式
-enum class TextureAlignMode {
+enum class TextureAlignMode : int {
   // 对齐左下角
-  ALIGN_TO_LEFT_BOTTOM,
+  ALIGN_TO_LEFT_BOTTOM = 0,
   // 对齐右下角
-  ALIGN_TO_RIGHT_BOTTOM,
+  ALIGN_TO_RIGHT_BOTTOM = 1,
   // 对齐左上角
-  ALIGN_TO_LEFT_TOP,
+  ALIGN_TO_LEFT_TOP = 2,
   // 对齐右上角
-  ALIGN_TO_RIGHT_TOP,
+  ALIGN_TO_RIGHT_TOP = 3,
   // 对齐中心
-  ALIGN_TO_RIGHT_CENTER,
+  ALIGN_TO_RIGHT_CENTER = 4,
 };
 
 // 纹理填充模式
-enum class TextureFillMode {
+enum class TextureFillMode : int {
   // 缩放
-  SCALLING,
+  SCALLING = 0,
   // 缩放并裁切
-  SCALLING_AND_CUT,
+  SCALLING_AND_CUT = 1,
   // 缩放并保持比例
-  SCALLING_AND_KEEP_RATIO,
+  SCALLING_AND_KEEP_RATIO = 2,
   // 平铺
-  TILE,
+  TILE = 3,
 };
 
 struct TextureInstace;

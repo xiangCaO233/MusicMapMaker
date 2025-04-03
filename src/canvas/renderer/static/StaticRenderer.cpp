@@ -64,6 +64,9 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
                            (int)(max_shape_count * 11 * sizeof(float)), nullptr,
                            GL_STATIC_DRAW));
+
+  // 初始化着色器程序
+  init_shader_programe();
 }
 
 StaticRenderer::~StaticRenderer() {}
@@ -145,7 +148,7 @@ void StaticRenderer::init_shader_programe() {
 }
 
 // 渲染向此渲染器提交的全部图形批
-void StaticRenderer::render() {
+void StaticRenderer::render(uint32_t start_shape_index, uint32_t count) {
   GLCALL(cvs->glUseProgram(shader_program));
   GLCALL(cvs->glUseProgram(0));
 }
