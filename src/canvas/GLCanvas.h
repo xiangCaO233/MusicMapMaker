@@ -5,6 +5,8 @@
 #include <QtOpenGLWidgets/qopenglwidget.h>
 #include <qwidget.h>
 
+#include <QMatrix4x4>
+
 #include "renderer/RendererManager.h"
 
 class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
@@ -15,10 +17,15 @@ class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
  public:
   // 渲染器
   RendererManager *renderer_manager;
+  // 投影矩阵
+  QMatrix4x4 proj;
   // 构造GLCanvas
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
   ~GLCanvas() override;
+
+  // 设置垂直同步
+  void set_Vsync(bool flag);
 
  protected:
   void initializeGL() override;

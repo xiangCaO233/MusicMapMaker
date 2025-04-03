@@ -106,6 +106,22 @@ void GLCanvas::resizeEvent(QResizeEvent *event) {
 
 void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
+  // 查询opengl版本
+  auto version = GLCALL(glGetString(GL_VERSION));
+  XINFO("OpenGL Version: " +
+        std::string(reinterpret_cast<const char *>(version)));
+  // 查询最大支持抗锯齿MSAA倍率
+  GLint maxSamples;
+  GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
+
+  XINFO("启用最大抗锯齿倍率: " + std::to_string(maxSamples));
+  // 启用 最大 MSAA
+  context()->format().setSamples(maxSamples);
+
+  XINFO("启用垂直同步");
+  // 启用V-Sync
+  context()->format().setSwapInterval(1);
+
   // 标准混合模式
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -114,7 +130,16 @@ void GLCanvas::initializeGL() {
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
 }
-void GLCanvas::resizeGL(int w, int h) { glViewport(0, 0, w, h); }
+void GLCanvas::resizeGL(int w, int h) {
+  GLCALL(glViewport(0, 0, w, h));
+
+  // 计算正交投影矩阵
+  proj.ortho(-(float)w / 2.0f, (float)w / 2.0f, -(float)h / 2.0f,
+             (float)h / 2.0f, -1.0f, 1.0f);
+
+  // 更新uniform
+  renderer_manager->set_uniform_mat4("projection_mat", proj);
+}
 
 // 绘制画布
 void GLCanvas::paintGL() {
@@ -123,4 +148,9 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   renderer_manager->renderAll();
+}
+// 设置垂直同步
+void GLCanvas::set_Vsync(bool flag) {
+  // 切换V-Sync
+  context()->format().setSwapInterval(flag ? 1 : 0);
 }
