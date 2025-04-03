@@ -84,7 +84,7 @@ void AbstractRenderer::set_uniform_float(const char* location_name,
 
 // 设置uniform矩阵(4x4)
 void AbstractRenderer::set_uniform_mat4(const char* location_name,
-                                        QMatrix4x4& mat) {
+                                        const QMatrix4x4& mat) {
   auto locationit = uniform_locations.find(location_name);
   if (locationit == uniform_locations.end()) {
     // 直接查询
@@ -92,6 +92,8 @@ void AbstractRenderer::set_uniform_mat4(const char* location_name,
         GLCALL(cvs->glGetUniformLocation(shader_program, location_name));
     locationit = uniform_locations.try_emplace(location_name, location).first;
   }
+  // XINFO("更新矩阵->");
+  // qDebug() << mat;
   // 设置uniform
   GLCALL(cvs->glUniformMatrix4fv(locationit->second, 1, GL_FALSE, mat.data()));
 }

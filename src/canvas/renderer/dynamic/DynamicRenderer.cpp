@@ -162,8 +162,46 @@ void DynamicRenderer::init_shader_programe() {
   GLCALL(cvs->glDeleteShader(vshader));
   GLCALL(cvs->glDeleteShader(fshader));
 }
-// 渲染向此渲染器提交的全部图形批
-void DynamicRenderer::render(uint32_t start_shape_index, uint32_t count) {
+
+// 同步数据
+void DynamicRenderer::synchronize_data(InstanceDataType data_type,
+                                       size_t instance_index, void* data) {
+  switch (data_type) {
+    case POSITION: {
+      auto pos = static_cast<QVector2D*>(data);
+      break;
+    }
+    case SIZE: {
+      auto size = static_cast<QVector2D*>(data);
+      break;
+    }
+    case ROTATION: {
+      auto size = static_cast<float*>(data);
+      break;
+    }
+    case TEXTURE_POLICY: {
+      auto texture_policy = static_cast<int16_t*>(data);
+      break;
+    }
+    case TEXTURE_ID: {
+      auto texture_id = static_cast<uint32_t*>(data);
+      break;
+    }
+    case FILL_COLOR: {
+      auto fill_color = static_cast<QVector4D*>(data);
+      break;
+    }
+  }
+}
+
+// 更新gpu数据
+void DynamicRenderer::update_gpu_memory() {
+  // TODO(xiang 2025-04-03): 实现dynamic渲染器更新显存
+}
+
+// 渲染指定图形实例
+void DynamicRenderer::render(const ShapeType& shape, uint32_t start_shape_index,
+                             uint32_t count) {
   GLCALL(cvs->glUseProgram(shader_program));
   GLCALL(cvs->glUseProgram(0));
 }

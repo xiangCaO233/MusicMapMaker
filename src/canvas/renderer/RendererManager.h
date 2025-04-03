@@ -1,15 +1,19 @@
 #ifndef RENDERER_MANAGER_H
 #define RENDERER_MANAGER_H
 
+#include <map>
 #include <memory>
 #include <queue>
 
 #include "../texture/TexturePool.h"
+#include "RenderCommand.h"
 #include "dynamic/DynamicRenderer.h"
 #include "static/StaticRenderer.h"
 
 // 渲染操作
 struct RenderOperation {
+  // 此渲染操作的图形类型
+  ShapeType shape_type;
   // 此渲染操作的渲染器
   std::shared_ptr<AbstractRenderer> renderer;
   // 此渲染操作的起始图形索引

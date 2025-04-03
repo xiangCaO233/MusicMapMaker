@@ -1,6 +1,7 @@
 #include "StaticRenderer.h"
 
 #include <QFile>
+#include <vector>
 
 #include "../../../log/colorful-log.h"
 #include "../../GLCanvas.h"
@@ -81,10 +82,14 @@ void StaticRenderer::init_shader_programe() {
 
   // 检查文件是否成功打开
   if (!vertfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug() << "Failed to open vertex source file:" << vertfile.errorString();
+    auto errormsg = vertfile.errorString();
+    auto errorstr = errormsg.toStdString();
+    XERROR("Failed to open vertex source file:" + errorstr);
   }
   if (!fragfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qDebug() << "Failed to open vertex source file:" << fragfile.errorString();
+    auto errormsg = fragfile.errorString();
+    auto errorstr = errormsg.toStdString();
+    XERROR("Failed to open vertex source file:" + errorstr);
   }
 
   // 用QTextStream读取内容
@@ -147,8 +152,188 @@ void StaticRenderer::init_shader_programe() {
   GLCALL(cvs->glDeleteShader(fshader));
 }
 
-// 渲染向此渲染器提交的全部图形批
-void StaticRenderer::render(uint32_t start_shape_index, uint32_t count) {
-  GLCALL(cvs->glUseProgram(shader_program));
-  GLCALL(cvs->glUseProgram(0));
+// 同步数据
+void StaticRenderer::synchronize_data(InstanceDataType data_type,
+                                      size_t instance_index, void* data) {
+  switch (data_type) {
+    case POSITION: {
+      auto pos = static_cast<QVector2D*>(data);
+      if (position_data.empty()) {
+        position_data.push_back(*pos);
+        synchronize_update_mark(instance_index);
+      } else {
+        if (*pos != position_data.at(instance_index)) {
+          // 位置数据发生变化
+          // 同步更新位置标记
+          synchronize_update_mark(instance_index);
+          // 更新此实例位置数据
+          position_data[instance_index] = *pos;
+        }
+      }
+      break;
+    }
+    case SIZE: {
+      auto size = static_cast<QVector2D*>(data);
+      if (size_data.empty()) {
+        size_data.push_back(*size);
+        synchronize_update_mark(instance_index);
+      } else {
+        if (*size != size_data.at(instance_index)) {
+          // 尺寸数据发生变化
+          // 同步更新位置标记
+          synchronize_update_mark(instance_index);
+          // 更新此实例尺寸数据
+          size_data[instance_index] = *size;
+        }
+      }
+      break;
+    }
+    case ROTATION: {
+      auto rotation = static_cast<float*>(data);
+      if (rotation_data.empty()) {
+        rotation_data.push_back(*rotation);
+        synchronize_update_mark(instance_index);
+      } else {
+        if (*rotation != rotation_data.at(instance_index)) {
+          // 角度数据发生变化
+          // 同步更新位置标记
+          synchronize_update_mark(instance_index);
+          // 更新此实例角度数据
+          rotation_data[instance_index] = *rotation;
+        }
+      }
+      break;
+    }
+    case TEXTURE_POLICY: {
+      auto texture_policy = static_cast<int16_t*>(data);
+      if (texture_policy_data.empty()) {
+        texture_policy_data.push_back(*texture_policy);
+        synchronize_update_mark(instance_index);
+      } else {
+        if (*texture_policy != texture_policy_data.at(instance_index)) {
+          // 贴图策略数据发生变化
+          // 同步更新位置标记
+          synchronize_update_mark(instance_index);
+          // 更新此实例贴图策略数据
+          texture_policy_data[instance_index] = *texture_policy;
+        }
+      }
+      break;
+    }
+    case TEXTURE_ID: {
+      auto texture_id = static_cast<uint32_t*>(data);
+      if (texture_id_data.empty()) {
+        texture_id_data.push_back(*texture_id);
+        synchronize_update_mark(instance_index);
+      } else {
+        if (*texture_id != texture_id_data.at(instance_index)) {
+          // 贴图id数据发生变化
+          // 同步更新位置标记
+          synchronize_update_mark(instance_index);
+          // 更新此实例贴图id数据
+          texture_id_data[instance_index] = *texture_id;
+        }
+      }
+      break;
+    }
+    case FILL_COLOR: {
+      auto fill_color = static_cast<QVector4D*>(data);
+      if (fill_color_data.empty()) {
+        fill_color_data.push_back(*fill_color);
+        synchronize_update_mark(instance_index);
+      } else {
+        if (*fill_color != fill_color_data.at(instance_index)) {
+          // 填充颜色数据发生变化
+          // 同步更新位置标记
+          synchronize_update_mark(instance_index);
+          // 更新此实例填充颜色数据
+          fill_color_data[instance_index] = *fill_color;
+        }
+      }
+      break;
+    }
+  }
+}
+
+// 同步更新位置标记
+void StaticRenderer::synchronize_update_mark(size_t instance_index) {
+  // 同步更新标记
+  auto it = update_mapping.find(instance_index);
+  if (it == update_mapping.end()) {
+    // 不存在,检查是否包含上一更新标记
+    if (instance_index > 0) {
+      // 查询上一更新标记位置
+      auto preit = update_mapping.find(instance_index - 1);
+      if (preit != update_mapping.end()) {
+        // 与上一更新标记连续
+        // 更新连续更新数量
+        preit->second++;
+      }
+    } else {
+      // 不连续,创建标记并更新迭代器
+      it = update_mapping.try_emplace(instance_index, 1).first;
+    }
+  }
+}
+
+// 更新gpu数据
+void StaticRenderer::update_gpu_memory() {
+  for (auto& [instance_start_index, instance_count] : update_mapping) {
+    // 构建内存块
+    std::vector<float> memory_block(instance_count * 11);
+    for (int i = instance_start_index;
+         i < instance_start_index + instance_count; i++) {
+      //// 图形位置数据
+      // std::vector<QVector2D> position_data;
+      memory_block[i * 11] = position_data[i].x();
+      memory_block[i * 11 + 1] = position_data[i].y();
+      //// 图形尺寸
+      // std::vector<QVector2D> size_data;
+      memory_block[i * 11 + 2] = size_data[i].x();
+      memory_block[i * 11 + 3] = size_data[i].y();
+      //// 旋转角度
+      // std::vector<float> rotation_data;
+      memory_block[i * 11 + 4] = rotation_data[i];
+      //// 贴图方式
+      // std::vector<int16_t> texture_policy_data;
+      memory_block[i * 11 + 5] = texture_policy_data[i];
+      //// 贴图id
+      // std::vector<uint32_t> texture_id_data;
+      memory_block[i * 11 + 6] = texture_id_data[i];
+      //// 填充颜色
+      // std::vector<QVector4D> fill_color_data;
+      memory_block[i * 11 + 7] = fill_color_data[i].x();
+      memory_block[i * 11 + 8] = fill_color_data[i].y();
+      memory_block[i * 11 + 9] = fill_color_data[i].z();
+      memory_block[i * 11 + 10] = fill_color_data[i].w();
+
+      // 绑定实例缓冲区
+      GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO));
+      // 上传内存块到显存
+      GLCALL(cvs->glBufferSubData(
+          GL_ARRAY_BUFFER, (int)(instance_start_index * 11 * sizeof(float)),
+          memory_block.size() * sizeof(float), memory_block.data()));
+    }
+  }
+}
+
+// 渲染指定图形实例
+void StaticRenderer::render(const ShapeType& shape, uint32_t start_shape_index,
+                            uint32_t count) {
+#ifdef __APPLE__
+  // TODO(xiang 2025-04-03): 实现apple平台指定实例位置绘制
+#else
+  switch (shape) {
+    case ShapeType::QUAD: {
+      GLCALL(cvs->glDrawArraysInstancedBaseInstance(GL_TRIANGLE_FAN, 0, 4,
+                                                    count, start_shape_index));
+      break;
+    }
+    case ShapeType::OVAL: {
+      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
+          GL_TRIANGLE_FAN, 4, oval_segment, count, start_shape_index));
+      break;
+    }
+  }
+#endif  //__APPLE__
 }

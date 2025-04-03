@@ -12,14 +12,23 @@ class DynamicRenderer : public AbstractRenderer {
   // 初始化着色器程序
   void init_shader_programe();
 
+  // 同步数据
+  void synchronize_data(InstanceDataType data_type, size_t instance_index,
+                        void* data) override;
+  // 更新gpu数据
+  virtual void update_gpu_memory() override;
+
+  friend class RendererManager;
+
  public:
   // 构造GLRenderer
   DynamicRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
   // 析构GLRenderer
   ~DynamicRenderer() override;
 
-  // 渲染向此渲染器提交的全部图形
-  void render(uint32_t start_shape_index, uint32_t count) override;
+  // 渲染指定图形实例
+  void render(const ShapeType& shape, uint32_t start_shape_index,
+              uint32_t count) override;
 };
 
 #endif  // DYNAMIC_RENDERER_H

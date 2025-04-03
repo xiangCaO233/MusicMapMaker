@@ -1,5 +1,7 @@
 #include "RendererManager.h"
 
+#include <qvectornd.h>
+
 RendererManager::RendererManager(GLCanvas* canvas, int oval_segment,
                                  int max_shape_count_per_renderer) {
   // 初始化渲染器
@@ -16,37 +18,117 @@ void RendererManager::finalize() {
   if (command_list_temp.empty()) {
     // 克隆指令列表到缓存
     command_list_temp = command_list;
-    // 直接上传数据到gpu
+    // 遍历指令列表,同步渲染器的数据
+    for (int i = 0; i < command_list.size(); i++) {
+      // 同步数据
+      // 取出指令
+      auto& command = command_list[i];
+      // 区分渲染器
+      auto renderer =
+          (command.is_volatile
+               ? std::dynamic_pointer_cast<AbstractRenderer>(dynamic_renderer)
+               : std::dynamic_pointer_cast<AbstractRenderer>(static_renderer));
+
+      // 更新渲染操作队列
+      if (  // 操作队列为空
+          operation_queue.empty() ||
+          // 操作队列尾渲染器不同
+          operation_queue.back().renderer != renderer ||
+          // 操作队列尾渲染图形类型不同
+          operation_queue.back().shape_type != command.instance_shape) {
+        // 新建渲染操作
+        operation_queue.emplace(command.instance_shape, renderer, i, 1);
+      } else {
+        // 与队尾渲染操作可合并
+        operation_queue.back().render_shape_count++;
+      }
+
+      // virtual void synchronize_data(InstanceDataType data_type,
+      //                              size_t instance_index, void* data) = 0;
+      //
+      // 同步位置数据
+      QVector2D position(command.instace_bound.x(), command.instace_bound.y());
+
+      renderer->synchronize_data(InstanceDataType::POSITION, i, &position);
+      // 同步尺寸数据
+      QVector2D size(command.instace_bound.width(),
+                     command.instace_bound.height());
+      renderer->synchronize_data(InstanceDataType::SIZE, i, &size);
+
+      // 同步角度数据
+      renderer->synchronize_data(InstanceDataType::ROTATION, i,
+                                 &command.rotation);
+
+      // 获取贴图信息
+      auto& texture_info = command.texture_info;
+
+      // 同步贴图方式数据
+      int policy = 0;
+      if (texture_info) {
+        policy = (static_cast<int>(texture_info->texture_fillmode)) |
+                 (static_cast<int>(texture_info->texture_alignmode));
+      }
+      renderer->synchronize_data(InstanceDataType::TEXTURE_POLICY, i, &policy);
+
+      // 同步贴图id数据
+      int texture_id = 0;
+      if (texture_info) {
+        texture_id = texture_info->texture_instance->id;
+      }
+      renderer->synchronize_data(InstanceDataType::TEXTURE_ID, i, &texture_id);
+
+      // 同步填充颜色数据
+      QVector4D fill_color(command.fill_color.red(), command.fill_color.green(),
+                           command.fill_color.blue(),
+                           command.fill_color.alpha());
+      renderer->synchronize_data(InstanceDataType::FILL_COLOR, i, &fill_color);
+    }
+    // 更新显存
+    static_renderer->update_gpu_memory();
 
   } else {
     // 逐一检查缓存队列指令变化情况,分析变化情况
-    while (!command_list_temp.empty()) {
-      if (command_list_temp.front() != command_list.front()) {
-        auto& different_command = command_list.front();
-        // 检查变化的具体内容
-        if (different_command.is_volatile !=
-            command_list_temp.front().is_volatile) {
-          // 图元易变性发生变化,转移渲染器
-        }
+
+    // 遍历指令列表,同步渲染器的数据
+    for (int i = 0; i < command_list_temp.size(); i++) {
+      // 同步数据
+      // 取出指令
+      auto& command = command_list_temp[i];
+      // 区分渲染器
+      auto renderer =
+          (command.is_volatile
+               ? std::dynamic_pointer_cast<AbstractRenderer>(dynamic_renderer)
+               : std::dynamic_pointer_cast<AbstractRenderer>(static_renderer));
+      // 更新渲染操作队列
+      if (  // 操作队列为空
+          operation_queue.empty() ||
+          // 操作队列尾渲染器不同
+          operation_queue.back().renderer != renderer ||
+          // 操作队列尾渲染图形类型不同
+          operation_queue.back().shape_type != command.instance_shape) {
+        // 新建渲染操作
+        operation_queue.emplace(command.instance_shape, renderer, i, 1);
+      } else {
+        // 与队尾渲染操作可合并
+        operation_queue.back().render_shape_count++;
       }
     }
   }
 }
-
 // 添加矩形
 void RendererManager::addRect(const QRectF& rect, TextureInfo* texture_info,
                               const QColor& fill_color, bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(is_volatile, ShapeType::QUAD, rect, fill_color,
-                            texture_info);
+  command_list.emplace_back(is_volatile, ShapeType::QUAD, rect, 0.0f,
+                            fill_color, texture_info);
 }
 // 添加椭圆
 void RendererManager::addEllipse(const QRectF& bounds,
                                  TextureInfo* texture_info,
                                  const QColor& fill_color, bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(is_volatile, ShapeType::QUAD, bounds, fill_color,
-                            texture_info);
+  command_list.emplace_back(is_volatile, ShapeType::OVAL, bounds, 0.0f,
+                            fill_color, texture_info);
 }
 
 // 渲染全部图形
@@ -57,8 +139,11 @@ void RendererManager::renderAll() {
   // 按照队列顺序执行绘制
   while (!operation_queue.empty()) {
     auto& operetion = operation_queue.front();
-    operetion.renderer->render(operetion.start_shape_index,
+    operetion.renderer->bind();
+    operetion.renderer->render(operetion.shape_type,
+                               operetion.start_shape_index,
                                operetion.render_shape_count);
+    operetion.renderer->unbind();
     operation_queue.pop();
   }
 
