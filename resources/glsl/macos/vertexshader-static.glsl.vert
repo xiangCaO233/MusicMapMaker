@@ -1,4 +1,4 @@
-#version 450 core
+#version 410 core
 
 // 投影矩阵
 uniform mat4 projection_mat;

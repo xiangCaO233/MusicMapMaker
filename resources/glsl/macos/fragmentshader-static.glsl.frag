@@ -1,4 +1,4 @@
-#version 450 core
+#version 410 core
 
 // 渲染颜色结果(向后传输着色结果)
 out vec4 FragColor;
