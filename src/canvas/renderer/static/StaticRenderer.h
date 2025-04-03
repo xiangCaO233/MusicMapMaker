@@ -1,7 +1,7 @@
 #ifndef STATIC_RENDERER_H
 #define STATIC_RENDERER_H
 
-#include "../AbstractRendere.h"
+#include "../AbstractRenderer.h"
 
 class StaticRenderer : public AbstractRenderer {
  protected:
@@ -12,7 +12,7 @@ class StaticRenderer : public AbstractRenderer {
 
  public:
   // 构造GLRenderer
-  StaticRenderer(QOpenGLFunctions* glfuntions, int oval_segment);
+  StaticRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
   // 析构GLRenderer
   ~StaticRenderer() override;
 

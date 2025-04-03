@@ -5,11 +5,13 @@
 #include <QtOpenGLWidgets/qopenglwidget.h>
 #include <qwidget.h>
 
-#include <cstdint>
-
 #include "renderer/RendererManager.h"
 
 class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
+  friend class AbstractRenderer;
+  friend class StaticRenderer;
+  friend class DynamicRenderer;
+
  public:
   // 渲染器
   RendererManager *renderer_manager;
@@ -36,25 +38,6 @@ class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
   void enterEvent(QEnterEvent *event) override;
   void leaveEvent(QEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
-
- private:
-  // 顶点数组对象
-  GLuint VAO;
-  // 顶点缓冲对象
-  GLuint VBO;
-  GLuint instanceBO;
-  GLuint EBO;
-  // 帧缓冲对象
-  GLuint FBO;
-  // 统一缓冲对象
-  GLuint UBO;
-  GLuint shader_program;
-
-  // 椭圆分割精度
-  int32_t oval_segment{64};
-
-  void initbuffer();
-  void initshader();
 };
 
 #endif  // GLCANVAS_H

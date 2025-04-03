@@ -1,5 +1,6 @@
 #include "GLCanvas.h"
 
+#include <GL/gl.h>
 #include <qlogging.h>
 
 #include <QFile>
@@ -105,11 +106,13 @@ void GLCanvas::resizeEvent(QResizeEvent *event) {
 
 void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
-  // 初始化渲染管理器
-  renderer_manager = new RendererManager(context()->functions());
   // 标准混合模式
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+  GLuint VAO;
+  GLCALL(glGenVertexArrays(1, &VAO));
+  // 初始化渲染管理器
+  renderer_manager = new RendererManager(this, 64, 4096);
 }
 void GLCanvas::resizeGL(int w, int h) { glViewport(0, 0, w, h); }
 
@@ -120,14 +123,4 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   renderer_manager->renderAll();
-  // 绘制矩形
-  // GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, 1));
-  // 绘制椭圆
-  // GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 4, oval_segment, 1));
 }
-
-// 初始化缓冲区
-void GLCanvas::initbuffer() {}
-
-// 初始化着色器程序
-void GLCanvas::initshader() {}

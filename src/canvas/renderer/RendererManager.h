@@ -13,8 +13,8 @@ class RendererManager {
   // 是否处理好准备渲染
   bool is_ready{false};
   // 渲染器
-  StaticRenderer* static_renderer;
-  DynamicRenderer* dynamic_renderer;
+  std::unique_ptr<StaticRenderer> static_renderer;
+  std::unique_ptr<DynamicRenderer> dynamic_renderer;
 
   // 渲染指令队列
   std::queue<RenderCommand> command_list;
@@ -30,7 +30,8 @@ class RendererManager {
 
  public:
   // 构造RendererManager
-  RendererManager(QOpenGLFunctions* glf);
+  RendererManager(GLCanvas* canvas, int oval_segment,
+                  int max_shape_count_per_renderer);
   // 析构RendererManager
   virtual ~RendererManager();
 

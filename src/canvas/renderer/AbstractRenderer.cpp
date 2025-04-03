@@ -1,12 +1,16 @@
-#include "AbstractRendere.h"
+#include "AbstractRenderer.h"
 
-AbstractRenderer::AbstractRenderer(QOpenGLFunctions* glfuntions,
-                                   int oval_segment)
-    : glf((QOpenGLFunctions_4_1_Core*)glfuntions), oval_segment(oval_segment) {
-  glf->glGenVertexArrays(1, &VAO);
-  glf->glGenBuffers(1, &VBO);
-  glf->glGenBuffers(1, &EBO);
-  glf->glGenBuffers(1, &FBO);
+#include "../GLCanvas.h"
+
+AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
+                                   int max_shape_count)
+    : cvs(canvas),
+      oval_segment(oval_segment),
+      max_shape_count(max_shape_count) {
+  cvs->glGenVertexArrays(1, &VAO);
+  cvs->glGenBuffers(1, &VBO);
+  cvs->glGenBuffers(1, &EBO);
+  cvs->glGenBuffers(1, &FBO);
 
   // 基本顶点
   std::vector<float> vertices = {
@@ -29,20 +33,20 @@ AbstractRenderer::AbstractRenderer(QOpenGLFunctions* glfuntions,
     vertices.push_back(texcoordy);
   }
 
-  glf->glBindVertexArray(VAO);
-  glf->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  cvs->glBindVertexArray(VAO);
+  cvs->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-  glf->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+  cvs->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
                     vertices.data(), GL_STATIC_DRAW);
 
   // 描述location0 顶点缓冲0~2float为float类型数据(用vec3接收)
-  glf->glEnableVertexAttribArray(0);
-  glf->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+  cvs->glEnableVertexAttribArray(0);
+  cvs->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                              nullptr);
 
   // 描述location1 顶点缓冲3~4float为float类型数据(用vec2接收为默认uv坐标)
-  glf->glEnableVertexAttribArray(1);
-  glf->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+  cvs->glEnableVertexAttribArray(1);
+  cvs->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                              (void*)(3 * sizeof(float)));
 
   // 初始化着色器程序
@@ -51,13 +55,15 @@ AbstractRenderer::AbstractRenderer(QOpenGLFunctions* glfuntions,
 
 AbstractRenderer::~AbstractRenderer() {}
 
+void AbstractRenderer::init_shader_programe() {}
+
 // 绑定渲染器
 void AbstractRenderer::bind() {
   // 绑定顶点数组
-  glf->glBindVertexArray(VAO);
+  cvs->glBindVertexArray(VAO);
 }
 // 解除绑定渲染器
 void AbstractRenderer::unbind() {
   // 取消绑定顶点数组
-  glf->glBindVertexArray(0);
+  cvs->glBindVertexArray(0);
 }

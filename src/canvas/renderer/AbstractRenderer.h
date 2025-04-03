@@ -11,20 +11,24 @@
 #define GLCALL(func)                                       \
   func;                                                    \
   {                                                        \
-    GLenum error = glf->glGetError();                      \
+    GLenum error = cvs->glGetError();                      \
     if (error != GL_NO_ERROR) {                            \
       XERROR("在[" + std::string(#func) +                  \
              "]发生OpenGL错误: " + std::to_string(error)); \
     }                                                      \
   }
 
+class GLCanvas;
+
 class AbstractRenderer {
  protected:
   // 子类公共成员
-  // gl函数
-  QOpenGLFunctions_4_1_Core* glf;
+  // gl实例指针
+  GLCanvas* cvs;
   // 割圆数
   int oval_segment;
+  // 最大图元数
+  int max_shape_count;
   // 顶点数组对象
   uint32_t VAO;
   // 顶点缓冲对象
@@ -41,11 +45,11 @@ class AbstractRenderer {
   std::vector<DrawBatch*> batches;
 
   // 初始化着色器程序
-  virtual void init_shader_programe();
+  virtual void init_shader_programe() = 0;
 
  public:
   // 构造AbstractRenderer
-  AbstractRenderer(QOpenGLFunctions* glfuntions, int oval_segment);
+  AbstractRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
   // 析构AbstractRenderer
   virtual ~AbstractRenderer();
 
@@ -55,7 +59,7 @@ class AbstractRenderer {
   virtual void unbind();
 
   // 渲染向此渲染器提交的全部图形批
-  virtual void render();
+  virtual void render() = 0;
 };
 
 #endif  // ABSTRACT_RENDERER_H

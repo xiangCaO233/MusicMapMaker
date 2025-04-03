@@ -61,7 +61,7 @@ struct RenderCommand {
   TextureInfo* texture_info;
 
   // 重写==运算符
-  bool operator==(const RenderCommand& other) {
+  bool operator==(const RenderCommand& other) const {
     return is_volatile == other.is_volatile &&
            instance_shape == other.instance_shape &&
            instace_position == other.instace_position &&
