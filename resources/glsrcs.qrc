@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>glsl/vertexshader-static.glsl.vert</file>
         <file>glsl/fragmentshader-static.glsl.frag</file>
+        <file>glsl/vertexshader-dynamic.glsl.vert</file>
+        <file>glsl/fragmentshader-dynamic.glsl.frag</file>
     </qresource>
 </RCC>
