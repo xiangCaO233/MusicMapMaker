@@ -75,10 +75,14 @@ StaticRenderer::~StaticRenderer() {}
 void StaticRenderer::init_shader_programe() {
   auto vshader = GLCALL(cvs->glCreateShader(GL_VERTEX_SHADER));
   auto fshader = GLCALL(cvs->glCreateShader(GL_FRAGMENT_SHADER));
-
   // 用`:/`前缀访问qrc文件
+#ifdef __APPLE__
+  QFile vertfile(":/glsl/macos/vertexshader-static.glsl.vert");
+  QFile fragfile(":/glsl/macos/fragmentshader-static.glsl.frag");
+#else
   QFile vertfile(":/glsl/vertexshader-static.glsl.vert");
   QFile fragfile(":/glsl/fragmentshader-static.glsl.frag");
+#endif  //__APPLE__
 
   // 检查文件是否成功打开
   if (!vertfile.open(QIODevice::ReadOnly | QIODevice::Text)) {

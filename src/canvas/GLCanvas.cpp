@@ -139,6 +139,7 @@ void GLCanvas::resizeGL(int w, int h) {
   // 计算正交投影矩阵
   proj.ortho(-(float)w / 2.0f, (float)w / 2.0f, -(float)h / 2.0f,
              (float)h / 2.0f, -1.0f, 1.0f);
+  proj.transposed();
 
   // 更新uniform
   renderer_manager->set_uniform_mat4("projection_mat", proj);

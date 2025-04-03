@@ -92,8 +92,13 @@ void DynamicRenderer::init_shader_programe() {
   auto fshader = GLCALL(cvs->glCreateShader(GL_FRAGMENT_SHADER));
 
   // 用`:/`前缀访问qrc文件
+#ifdef __APPLE__
+  QFile vertfile(":/glsl/macos/vertexshader-dynamic.glsl.vert");
+  QFile fragfile(":/glsl/macos/fragmentshader-dynamic.glsl.frag");
+#else
   QFile vertfile(":/glsl/vertexshader-dynamic.glsl.vert");
   QFile fragfile(":/glsl/fragmentshader-dynamic.glsl.frag");
+#endif  //__APPLE__
 
   // 检查文件是否成功打开
   if (!vertfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
