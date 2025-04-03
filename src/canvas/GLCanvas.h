@@ -7,12 +7,12 @@
 
 #include <cstdint>
 
-#include "renderer/static/StaticRenderer.h"
+#include "renderer/RendererManager.h"
 
 class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
  public:
   // 渲染器
-  StaticRenderer renderer;
+  RendererManager *renderer_manager;
   // 构造GLCanvas
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas

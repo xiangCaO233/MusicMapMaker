@@ -25,7 +25,10 @@ GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {
   setMouseTracking(true);
 }
 
-GLCanvas::~GLCanvas() = default;
+GLCanvas::~GLCanvas() {
+  // 释放渲染管理器
+  delete renderer_manager;
+};
 
 // qt事件
 // 鼠标按下事件
@@ -102,8 +105,8 @@ void GLCanvas::resizeEvent(QResizeEvent *event) {
 
 void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
-  initbuffer();
-  initshader();
+  // 初始化渲染管理器
+  renderer_manager = new RendererManager(context()->functions());
   // 标准混合模式
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -112,61 +115,19 @@ void GLCanvas::resizeGL(int w, int h) { glViewport(0, 0, w, h); }
 
 // 绘制画布
 void GLCanvas::paintGL() {
-  GLCALL(glUseProgram(shader_program));
   // 背景色
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+
+  renderer_manager->renderAll();
   // 绘制矩形
   // GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, 1));
   // 绘制椭圆
   // GLCALL(glDrawArraysInstanced(GL_TRIANGLE_FAN, 4, oval_segment, 1));
-  GLCALL(glUseProgram(0));
 }
 
 // 初始化缓冲区
-void GLCanvas::initbuffer() {
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &instanceBO);
-  glGenBuffers(1, &EBO);
-  glGenBuffers(1, &FBO);
-
-  // 基本顶点
-  std::vector<float> vertices = {
-      -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,  // v1
-      1.0f,  -1.0f, 1.0f, 1.0f, 0.0f,  // v2
-      1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  // v3
-      -1.0f, 1.0f,  1.0f, 0.0f, 1.0f,  // v4
-  };
-  // 初始化椭圆顶点
-  for (int i = 0; i < oval_segment; i++) {
-    auto angle = (float(2.0 * M_PI * float(i) / float(oval_segment)));
-    float x = cos(angle);
-    float y = sin(angle);
-    float texcoordx = 0.5f + 0.5f * x;
-    float texcoordy = 0.5f + 0.5f * y;
-    vertices.push_back(x);
-    vertices.push_back(y);
-    vertices.push_back(0.0f);
-    vertices.push_back(texcoordx);
-    vertices.push_back(texcoordy);
-  }
-
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
-               vertices.data(), GL_STATIC_DRAW);
-
-  // 描述location0 顶点缓冲0~2float为float类型数据(用vec3接收)
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-
-  // 描述location1 顶点缓冲3~4float为float类型数据(用vec2接收为默认uv坐标)
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        (void *)(3 * sizeof(float)));
-}
+void GLCanvas::initbuffer() {}
 
 // 初始化着色器程序
 void GLCanvas::initshader() {

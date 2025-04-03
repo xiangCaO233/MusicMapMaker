@@ -1,11 +1,72 @@
 #include "StaticRenderer.h"
 
-StaticRenderer::StaticRenderer() {}
+#include "../../../log/colorful-log.h"
+
+// 用于包装 OpenGL 调用并检查错误
+#define GLCALL(func)                                       \
+  func;                                                    \
+  {                                                        \
+    GLenum error = glf->glGetError();                      \
+    if (error != GL_NO_ERROR) {                            \
+      XERROR("在[" + std::string(#func) +                  \
+             "]发生OpenGL错误: " + std::to_string(error)); \
+    }                                                      \
+  }
+
+StaticRenderer::StaticRenderer(QOpenGLFunctions* glfuntions, int oval_segment)
+    : glf((QOpenGLFunctions_4_1_Core*)glfuntions), oval_segment(oval_segment) {
+  glf->glGenVertexArrays(1, &VAO);
+  glf->glGenBuffers(1, &VBO);
+  glf->glGenBuffers(1, &instanceBO);
+  glf->glGenBuffers(1, &EBO);
+  glf->glGenBuffers(1, &FBO);
+
+  // 基本顶点
+  std::vector<float> vertices = {
+      -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,  // v1
+      1.0f,  -1.0f, 1.0f, 1.0f, 0.0f,  // v2
+      1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  // v3
+      -1.0f, 1.0f,  1.0f, 0.0f, 1.0f,  // v4
+  };
+  // 初始化椭圆顶点
+  for (int i = 0; i < oval_segment; i++) {
+    auto angle = (float(2.0 * M_PI * float(i) / float(oval_segment)));
+    float x = cos(angle);
+    float y = sin(angle);
+    float texcoordx = 0.5f + 0.5f * x;
+    float texcoordy = 0.5f + 0.5f * y;
+    vertices.push_back(x);
+    vertices.push_back(y);
+    vertices.push_back(0.0f);
+    vertices.push_back(texcoordx);
+    vertices.push_back(texcoordy);
+  }
+
+  glf->glBindVertexArray(VAO);
+  glf->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  glf->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float),
+                    vertices.data(), GL_STATIC_DRAW);
+
+  // 描述location0 顶点缓冲0~2float为float类型数据(用vec3接收)
+  glf->glEnableVertexAttribArray(0);
+  glf->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                             nullptr);
+
+  // 描述location1 顶点缓冲3~4float为float类型数据(用vec2接收为默认uv坐标)
+  glf->glEnableVertexAttribArray(1);
+  glf->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                             (void*)(3 * sizeof(float)));
+}
 
 StaticRenderer::~StaticRenderer() {}
-// 添加矩形
-void StaticRenderer::addRect(const QRectF& rect, uint32_t textureId,
-                             const QColor& fill_color) {}
-// 添加椭圆
-void StaticRenderer::addEllipse(const QRectF& bounds, uint32_t textureId,
-                                const QColor& fill_color) {}
+// 绑定渲染器
+void StaticRenderer::bind() {}
+// 解除绑定渲染器
+void StaticRenderer::unbind() {}
+
+// 渲染向此渲染器提交的全部图形批
+void StaticRenderer::render() {
+  GLCALL(glf->glUseProgram(shader_program));
+  GLCALL(glf->glUseProgram(0));
+}

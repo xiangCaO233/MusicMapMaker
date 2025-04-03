@@ -1,17 +1,15 @@
-#ifndef STATIC_RENDERER_H
-#define STATIC_RENDERER_H
+#ifndef DYNAMIC_RENDERER_H
+#define DYNAMIC_RENDERER_H
 
-#include <QOpenGLFunctions_4_1_Core>
+#include <QOpenGLFunctions>
 #include <cstdint>
 #include <vector>
 
 #include "../RenderCommand.h"
 
-class StaticRenderer {
+class DynamicRenderer {
   // gl函数
-  QOpenGLFunctions_4_1_Core* glf;
-  // 割圆数
-  int oval_segment;
+  QOpenGLFunctions* glf;
   // 顶点数组对象
   uint32_t VAO;
   // 顶点缓冲对象
@@ -30,17 +28,17 @@ class StaticRenderer {
 
  public:
   // 构造GLRenderer
-  StaticRenderer(QOpenGLFunctions* glfuntions, int oval_segment);
+  DynamicRenderer(QOpenGLFunctions* glfuntions);
   // 析构GLRenderer
-  virtual ~StaticRenderer();
+  virtual ~DynamicRenderer();
 
   // 绑定渲染器
   void bind();
   // 解除绑定渲染器
   void unbind();
 
-  // 渲染向此渲染器提交的全部图形批
+  // 渲染向此渲染器提交的全部图形
   void render();
 };
 
-#endif  // STATIC_RENDERER_H
+#endif  // DYNAMIC_RENDERER_H

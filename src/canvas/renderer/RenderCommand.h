@@ -47,6 +47,8 @@ struct TextureInfo {
 
 // 绘制指令
 struct RenderCommand {
+  // 渲染内容是否易变
+  bool is_volatile{false};
   // 绘制的图元形状
   ShapeType instance_shape;
   // 图元边界矩形的位置
