@@ -35,10 +35,12 @@ enum class TextureFillMode {
   TILE,
 };
 
+struct TextureInstace;
+
 // 纹理信息
 struct TextureInfo {
   // 纹理(-1时仅填充颜色)
-  int32_t texture_id{-1};
+  TextureInstace* texture_id;
   // 纹理对齐模式
   TextureAlignMode texture_alignmode;
   // 纹理填充模式
@@ -48,7 +50,7 @@ struct TextureInfo {
 // 绘制指令
 struct RenderCommand {
   // 渲染内容是否易变
-  bool is_volatile{false};
+  bool is_volatile;
   // 绘制的图元形状
   ShapeType instance_shape;
   // 图元边界矩形的位置
@@ -56,7 +58,15 @@ struct RenderCommand {
   // 填充颜色(无绑定纹理时或被裁切部分的填充颜色)
   QColor fill_color;
   // 纹理信息
-  TextureInfo texture_info;
+  TextureInfo* texture_info;
+
+  // 重写==运算符
+  bool operator==(const RenderCommand& other) {
+    return is_volatile == other.is_volatile &&
+           instance_shape == other.instance_shape &&
+           instace_position == other.instace_position &&
+           fill_color == other.fill_color && texture_info == other.texture_info;
+  }
 };
 
 // 绘制批

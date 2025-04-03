@@ -1,46 +1,23 @@
 #ifndef STATIC_RENDERER_H
 #define STATIC_RENDERER_H
 
-#include <QOpenGLFunctions_4_1_Core>
-#include <cstdint>
-#include <vector>
+#include "../AbstractRendere.h"
 
-#include "../RenderCommand.h"
-
-class StaticRenderer {
-  // gl函数
-  QOpenGLFunctions_4_1_Core* glf;
-  // 割圆数
-  int oval_segment;
-  // 顶点数组对象
-  uint32_t VAO;
-  // 顶点缓冲对象
-  uint32_t VBO;
+class StaticRenderer : public AbstractRenderer {
+ protected:
+  // 顶点实例缓冲对象
   uint32_t instanceBO;
-  uint32_t EBO;
-  // 帧缓冲对象
-  uint32_t FBO;
-  // 统一缓冲对象
-  uint32_t UBO;
-  // 着色器程序
-  uint32_t shader_program;
-
-  // 渲染批列表
-  std::vector<DrawBatch*> batches;
+  // 初始化着色器程序
+  void init_shader_programe() override;
 
  public:
   // 构造GLRenderer
   StaticRenderer(QOpenGLFunctions* glfuntions, int oval_segment);
   // 析构GLRenderer
-  virtual ~StaticRenderer();
-
-  // 绑定渲染器
-  void bind();
-  // 解除绑定渲染器
-  void unbind();
+  ~StaticRenderer() override;
 
   // 渲染向此渲染器提交的全部图形批
-  void render();
+  void render() override;
 };
 
 #endif  // STATIC_RENDERER_H

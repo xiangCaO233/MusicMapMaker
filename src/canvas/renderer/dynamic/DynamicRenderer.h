@@ -1,36 +1,21 @@
 #ifndef DYNAMIC_RENDERER_H
 #define DYNAMIC_RENDERER_H
 
-#include <QOpenGLFunctions>
-#include <cstdint>
-#include <vector>
+#include "../AbstractRendere.h"
 
-#include "../RenderCommand.h"
+class DynamicRenderer : public AbstractRenderer {
+ protected:
+  // [0] 图形位置,[1] 图形尺寸,[2] 图形贴图uv,[3] 填充颜色
+  uint32_t instanceBO[3];
 
-class DynamicRenderer {
-  // gl函数
-  QOpenGLFunctions* glf;
-  // 顶点数组对象
-  uint32_t VAO;
-  // 顶点缓冲对象
-  uint32_t VBO;
-  uint32_t instanceBO;
-  uint32_t EBO;
-  // 帧缓冲对象
-  uint32_t FBO;
-  // 统一缓冲对象
-  uint32_t UBO;
-  // 着色器程序
-  uint32_t shader_program;
-
-  // 渲染批列表
-  std::vector<DrawBatch*> batches;
+  // 初始化着色器程序
+  void init_shader_programe() override;
 
  public:
   // 构造GLRenderer
-  DynamicRenderer(QOpenGLFunctions* glfuntions);
+  DynamicRenderer(QOpenGLFunctions* glfuntions, int oval_segment);
   // 析构GLRenderer
-  virtual ~DynamicRenderer();
+  ~DynamicRenderer() override;
 
   // 绑定渲染器
   void bind();
@@ -38,7 +23,7 @@ class DynamicRenderer {
   void unbind();
 
   // 渲染向此渲染器提交的全部图形
-  void render();
+  void render() override;
 };
 
 #endif  // DYNAMIC_RENDERER_H

@@ -1,7 +1,7 @@
 #ifndef RENDERER_MANAGER_H
 #define RENDERER_MANAGER_H
 
-#include <vector>
+#include <queue>
 
 #include "../texture/TexturePool.h"
 #include "dynamic/DynamicRenderer.h"
@@ -19,8 +19,13 @@ class RendererManager {
   // 渲染指令队列
   std::queue<RenderCommand> command_list;
 
+  // 缓存渲染指令队列
+  std::queue<RenderCommand> command_list_temp;
+
  private:
+  // 重置渲染指令队列
   void reset();
+  // 确定渲染内容
   void finalize();
 
  public:
@@ -30,11 +35,11 @@ class RendererManager {
   virtual ~RendererManager();
 
   // 添加矩形
-  void addRect(const QRectF& rect, TextureInstace* texture,
-               const QColor& fill_color);
+  void addRect(const QRectF& rect, TextureInfo* texture_info,
+               const QColor& fill_color, bool is_volatile);
   // 添加椭圆
-  void addEllipse(const QRectF& bounds, TextureInstace* texture,
-                  const QColor& fill_color);
+  void addEllipse(const QRectF& bounds, TextureInfo* texture_info,
+                  const QColor& fill_color, bool is_volatile);
 
   // 渲染全部图形
   void renderAll();
