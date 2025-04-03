@@ -46,6 +46,12 @@ set(PROJECT_SOURCES
     src/canvas/renderer/RenderCommand.h
     src/canvas/renderer/static/StaticRenderer.h
     src/canvas/renderer/static/StaticRenderer.cpp
+		src/canvas/renderer/dynamic/DynamicRenderer.h
+    src/canvas/renderer/dynamic/DynamicRenderer.cpp
+		src/canvas/renderer/AbstractRenderer.h
+    src/canvas/renderer/AbstractRenderer.cpp
+		src/canvas/renderer/RendererManager.h
+    src/canvas/renderer/RendererManager.cpp
     src/canvas/texture/TexturePool.h
     src/canvas/texture/TexturePool.cpp
     src/log/colorful-log.h
