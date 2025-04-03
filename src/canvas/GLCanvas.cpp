@@ -105,6 +105,7 @@ void GLCanvas::resizeEvent(QResizeEvent *event) {
 }
 
 void GLCanvas::initializeGL() {
+  XINFO("初始化OpenGL函数");
   initializeOpenGLFunctions();
   // 查询opengl版本
   auto version = GLCALL(glGetString(GL_VERSION));
@@ -133,6 +134,8 @@ void GLCanvas::initializeGL() {
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
 
+  // 投影矩阵
+  QMatrix4x4 proj;
   // 计算正交投影矩阵
   proj.ortho(-(float)w / 2.0f, (float)w / 2.0f, -(float)h / 2.0f,
              (float)h / 2.0f, -1.0f, 1.0f);
@@ -146,7 +149,12 @@ void GLCanvas::paintGL() {
   // 背景色
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
-
+  // 添加矩形渲染
+  auto rect = QRectF(100, 100, 50, 50);
+  renderer_manager->addRect(rect, nullptr, Qt::red, false);
+  XINFO("添加矩形绘制");
+  // auto rect2 = QRectF(200, 200, 80, 80);
+  // renderer_manager->addRect(rect2, nullptr, Qt::blue, false);
   renderer_manager->renderAll();
 }
 // 设置垂直同步

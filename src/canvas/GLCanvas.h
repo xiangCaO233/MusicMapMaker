@@ -1,15 +1,25 @@
 #ifndef GLCANVAS_H
 #define GLCANVAS_H
 
-#include <QtOpenGL/qopenglfunctions_4_1_core.h>
 #include <QtOpenGLWidgets/qopenglwidget.h>
+#ifdef __APPLE__
+#include <QtOpenGL/qopenglfunctions_4_1_core.h>
+#else
+#include <QtOpenGL/qopenglfunctions_4_5_core.h>
+#endif  //__APPLE__
 #include <qwidget.h>
 
 #include <QMatrix4x4>
 
 #include "renderer/RendererManager.h"
 
-class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
+class GLCanvas : public QOpenGLWidget,
+#ifdef __APPLE__
+                 public QOpenGLFunctions_4_1_Core
+#else
+                 public QOpenGLFunctions_4_5_Core
+#endif  //__APPLE__
+{
   friend class AbstractRenderer;
   friend class StaticRenderer;
   friend class DynamicRenderer;
@@ -17,8 +27,6 @@ class GLCanvas : public QOpenGLWidget, QOpenGLFunctions_4_1_Core {
  public:
   // 渲染器
   RendererManager *renderer_manager;
-  // 投影矩阵
-  QMatrix4x4 proj;
   // 构造GLCanvas
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
