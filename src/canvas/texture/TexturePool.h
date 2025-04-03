@@ -6,7 +6,7 @@
 #include <cstdint>
 
 struct TextureInstace {
-  int32_t id;
+  uint32_t id;
   QImage texture_image;
   QRect position_in_atlas;
 };
@@ -16,6 +16,7 @@ class TexturePool {
   bool use_texture_atlas;
 
  public:
+  static TextureInstace WHITE_PIXEL;
   // 构造TexturePool
   explicit TexturePool(bool is_use_texture_atlas);
   // 析构TexturePool
