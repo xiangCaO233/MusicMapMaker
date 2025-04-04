@@ -54,6 +54,15 @@ set(PROJECT_SOURCES
     src/canvas/renderer/RendererManager.cpp
     src/canvas/texture/TexturePool.h
     src/canvas/texture/TexturePool.cpp
+    src/canvas/texture/BaseTexturePool.h
+    src/canvas/texture/BaseTexturePool.cpp
+    src/canvas/texture/atlas/TextureAtlas.h
+    src/canvas/texture/atlas/TextureAtlas.cpp
+		src/canvas/texture/atlas/Rect.h
+		src/canvas/texture/atlas/MaxRectsBinPack.h
+		src/canvas/texture/atlas/MaxRectsBinPack.cpp
+		src/canvas/texture/array/TextureArray.h
+		src/canvas/texture/array/TextureArray.cpp
     src/log/colorful-log.h
     src/log/colorful_log.cpp
     ${GLSL_FILES}
