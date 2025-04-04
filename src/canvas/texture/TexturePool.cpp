@@ -1,6 +1,5 @@
 #include "TexturePool.h"
 
-TexturePool::TexturePool(bool is_use_texture_atlas)
-    : use_texture_atlas(is_use_texture_atlas) {}
+TexturePool::TexturePool() { pool_type = TexturePoolType::BASE_POOL; }
 
-TexturePool::~TexturePool() = default;
+TexturePool::~TexturePool() {}

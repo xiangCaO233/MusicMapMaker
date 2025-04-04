@@ -1,26 +1,21 @@
 #ifndef TEXTURE_POOL_H
 #define TEXTURE_POOL_H
 
-#include <qimage.h>
+#include "texture/BaseTexturePool.h"
 
-#include <cstdint>
-
-struct TextureInstace {
-  uint32_t texture_id;
-  QImage texture_image;
-  QRect position_in_atlas;
-};
-
-class TexturePool {
-  // 使用纹理图集
-  bool use_texture_atlas;
-
+class TexturePool : public BaseTexturePool {
  public:
-  static TextureInstace WHITE_PIXEL;
   // 构造TexturePool
-  explicit TexturePool(bool is_use_texture_atlas);
+  TexturePool();
   // 析构TexturePool
-  virtual ~TexturePool();
+  ~TexturePool() override;
+  // 判满
+  bool is_full() override;
+  // 载入纹理
+  // resource_path使用qrc中的路径
+  void load_texture(const char* resource_path) override;
+
+ protected:
 };
 
 #endif  // TEXTURE_POOL_H
