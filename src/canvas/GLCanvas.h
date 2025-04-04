@@ -13,6 +13,8 @@
 
 #include "renderer/RendererManager.h"
 
+enum class TexturePoolType;
+
 class GLCanvas : public QOpenGLWidget,
 #ifdef __APPLE__
                  public QOpenGLFunctions_4_1_Core
@@ -31,6 +33,9 @@ class GLCanvas : public QOpenGLWidget,
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
   ~GLCanvas() override;
+
+  // 添加纹理
+  void add_texture(const char *qrc_path, TexturePoolType type);
 
   // 设置垂直同步
   void set_Vsync(bool flag);

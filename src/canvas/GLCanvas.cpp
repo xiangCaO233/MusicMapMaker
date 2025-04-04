@@ -7,9 +7,14 @@
 #include <QFile>
 #include <QMouseEvent>
 #include <QTextStream>
+#include <memory>
 #include <string>
 
 #include "colorful-log.h"
+#include "texture/BaseTexturePool.h"
+#include "texture/TexturePool.h"
+#include "texture/array/TextureArray.h"
+#include "texture/atlas/TextureAtlas.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                       \
@@ -161,16 +166,16 @@ void GLCanvas::paintGL() {
 
   // 添加矩形渲染
   auto rect = QRectF(100, 100, 50, 50);
-  renderer_manager->addRect(rect, nullptr, Qt::red, false);
+  renderer_manager->addRect(rect, nullptr, Qt::red, 0.0f, false);
 
   auto rect2 = QRectF(0, 0, 100, 100);
-  renderer_manager->addRect(rect2, nullptr, Qt::blue, true);
+  renderer_manager->addRect(rect2, nullptr, Qt::blue, 45.0f, true);
 
   auto rect3 = QRectF(50, 200, 80, 160);
-  renderer_manager->addRect(rect3, nullptr, Qt::cyan, false);
+  renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, false);
 
   auto rect4 = QRectF(200, 60, 75, 30);
-  renderer_manager->addRect(rect4, nullptr, Qt::yellow, false);
+  renderer_manager->addRect(rect4, nullptr, Qt::yellow, 0.0f, false);
 
   // 执行渲染
   renderer_manager->renderAll();
@@ -180,4 +185,51 @@ void GLCanvas::paintGL() {
 void GLCanvas::set_Vsync(bool flag) {
   // 切换V-Sync
   context()->format().setSwapInterval(flag ? 1 : 0);
+}
+// 添加纹理
+void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type) {
+  auto poolsit = renderer_manager->texture_pools.find(type);
+  if (poolsit == renderer_manager->texture_pools.end()) {
+    // 不存在此类型纹理池列表
+    // 新建纹理池列表,更新迭代器
+    poolsit = renderer_manager->texture_pools.try_emplace(type).first;
+  }
+  auto &pools = poolsit->second;
+  std::shared_ptr<BaseTexturePool> pool;
+
+  // 检查是否需要新建纹理池
+  bool need_new_pool{true};
+  if (!pools.empty()) {
+    need_new_pool = false;
+  } else {
+    for (const auto &current_pool : pools) {
+      if (!pool->is_full()) {
+        // 包含未满的纹理池,使用此纹理池
+        need_new_pool = false;
+        pool = current_pool;
+        break;
+      }
+    }
+  }
+  if (need_new_pool) {
+    // 新建纹理池
+    switch (type) {
+      case TexturePoolType::BASE_POOL: {
+        pool = std::make_shared<TexturePool>();
+        break;
+      }
+      case TexturePoolType::ARRARY: {
+        pool = std::make_shared<TextureArray>();
+        break;
+      }
+      case TexturePoolType::ATLAS: {
+        pool = std::make_shared<TextureAtlas>();
+        break;
+      }
+    }
+    // 添加纹理池
+    pools.push_back(pool);
+  }
+  // 载入纹理
+  pool->load_texture(qrc_path);
 }
