@@ -163,11 +163,14 @@ void GLCanvas::paintGL() {
   auto rect = QRectF(100, 100, 50, 50);
   renderer_manager->addRect(rect, nullptr, Qt::red, false);
 
+  auto rect2 = QRectF(0, 0, 100, 100);
+  renderer_manager->addRect(rect2, nullptr, Qt::blue, true);
+
   auto rect3 = QRectF(50, 200, 80, 160);
   renderer_manager->addRect(rect3, nullptr, Qt::cyan, false);
 
-  auto rect2 = QRectF(0, 0, 100, 100);
-  renderer_manager->addRect(rect2, nullptr, Qt::blue, true);
+  auto rect4 = QRectF(200, 60, 75, 30);
+  renderer_manager->addRect(rect4, nullptr, Qt::yellow, false);
 
   // 执行渲染
   renderer_manager->renderAll();
