@@ -6,7 +6,7 @@
 #include <cstdint>
 
 struct TextureInstace {
-  uint32_t id;
+  uint32_t texture_id;
   QImage texture_image;
   QRect position_in_atlas;
 };

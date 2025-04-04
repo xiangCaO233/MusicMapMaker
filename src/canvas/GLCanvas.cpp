@@ -15,6 +15,7 @@
 #define GLCALL(func)                                       \
   func;                                                    \
   {                                                        \
+    XLogger::glcalls++;                                    \
     GLenum error = glGetError();                           \
     if (error != GL_NO_ERROR) {                            \
       XERROR("在[" + std::string(#func) +                  \
@@ -25,6 +26,7 @@
 GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {
   // 启用鼠标跟踪
   setMouseTracking(true);
+  // setUpdateBehavior(QOpenGLWidget::PartialUpdate);
 }
 
 GLCanvas::~GLCanvas() {
@@ -140,6 +142,10 @@ void GLCanvas::resizeGL(int w, int h) {
   // 计算正交投影矩阵
   proj.ortho(-(float)w / 2.0f, (float)w / 2.0f, -(float)h / 2.0f,
              (float)h / 2.0f, -1.0f, 1.0f);
+  // proj.ortho(0.0f, w, h, 0.0f, -1.0f, 1.0f);
+  // 反转y轴
+  proj.scale(1.0f, -1.0f, 1.0f);
+  // proj.translate(-0.5f, -0.5f, 0.0f);
   // proj.transposed();
 
   // 更新uniform
@@ -148,6 +154,7 @@ void GLCanvas::resizeGL(int w, int h) {
 
 // 绘制画布
 void GLCanvas::paintGL() {
+  XLogger::glcalls = 0;
   // 背景色
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
@@ -156,12 +163,15 @@ void GLCanvas::paintGL() {
   auto rect = QRectF(100, 100, 50, 50);
   renderer_manager->addRect(rect, nullptr, Qt::red, false);
 
+  auto rect3 = QRectF(50, 200, 80, 160);
+  renderer_manager->addRect(rect3, nullptr, Qt::cyan, false);
+
   auto rect2 = QRectF(0, 0, 100, 100);
-  renderer_manager->addRect(rect2, nullptr, Qt::blue, false);
-  // XINFO("添加矩形绘制");
-  // auto rect2 = QRectF(200, 200, 80, 80);
-  // renderer_manager->addRect(rect2, nullptr, Qt::blue, false);
+  renderer_manager->addRect(rect2, nullptr, Qt::blue, true);
+
+  // 执行渲染
   renderer_manager->renderAll();
+  XWARN("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
 }
 // 设置垂直同步
 void GLCanvas::set_Vsync(bool flag) {

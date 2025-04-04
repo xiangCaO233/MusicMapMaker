@@ -64,6 +64,7 @@ class AbstractRenderer {
   // 更新gpu数据
   virtual void update_gpu_memory() = 0;
 
+  virtual void reset_update() = 0;
   friend class GLCanvas;
   friend class RendererManager;
 
@@ -84,8 +85,8 @@ class AbstractRenderer {
   virtual void unbind();
 
   // 渲染指定图形实例
-  virtual void render(const ShapeType& shape, uint32_t start_shape_index,
-                      uint32_t count) = 0;
+  void render(const ShapeType& shape, uint32_t start_shape_index,
+              uint32_t shape_count);
 };
 
 #endif  // ABSTRACT_RENDERER_H

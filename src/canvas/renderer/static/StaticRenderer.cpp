@@ -10,6 +10,7 @@
 #define GLCALL(func)                                       \
   func;                                                    \
   {                                                        \
+    XLogger::glcalls++;                                    \
     GLenum error = cvs->glGetError();                      \
     if (error != GL_NO_ERROR) {                            \
       XERROR("在[" + std::string(#func) +                  \
@@ -175,6 +176,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case POSITION: {
       auto pos = static_cast<QVector2D*>(data);
       if (position_data.empty() || position_data.size() <= instance_index) {
+        XWARN("添加位置数据");
         position_data.push_back(*pos);
         synchronize_update_mark(instance_index);
       } else {
@@ -191,6 +193,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case SIZE: {
       auto size = static_cast<QVector2D*>(data);
       if (size_data.empty() || size_data.size() <= instance_index) {
+        XWARN("添加尺寸数据");
         size_data.push_back(*size);
         synchronize_update_mark(instance_index);
       } else {
@@ -207,6 +210,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case ROTATION: {
       auto rotation = static_cast<float*>(data);
       if (rotation_data.empty() || rotation_data.size() <= instance_index) {
+        XWARN("添加角度数据");
         rotation_data.push_back(*rotation);
         synchronize_update_mark(instance_index);
       } else {
@@ -224,6 +228,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       auto texture_policy = static_cast<int16_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
+        XWARN("添加纹理填充策略数据");
         texture_policy_data.push_back(*texture_policy);
         synchronize_update_mark(instance_index);
       } else {
@@ -240,6 +245,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case TEXTURE_ID: {
       auto texture_id = static_cast<uint32_t*>(data);
       if (texture_id_data.empty() || texture_id_data.size() <= instance_index) {
+        XWARN("添加纹理id数据");
         texture_id_data.push_back(*texture_id);
         synchronize_update_mark(instance_index);
       } else {
@@ -256,6 +262,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case FILL_COLOR: {
       auto fill_color = static_cast<QVector4D*>(data);
       if (fill_color_data.empty() || fill_color_data.size() <= instance_index) {
+        XWARN("添加填充颜色数据");
         fill_color_data.push_back(*fill_color);
         synchronize_update_mark(instance_index);
       } else {
@@ -295,7 +302,10 @@ void StaticRenderer::synchronize_update_mark(size_t instance_index) {
 
 // 更新gpu数据
 void StaticRenderer::update_gpu_memory() {
-  for (auto& [instance_start_index, instance_count] : update_mapping) {
+  // 绑定实例缓冲区
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO));
+
+  for (const auto& [instance_start_index, instance_count] : update_mapping) {
     // 构建内存块
     std::vector<float> memory_block(instance_count * 11);
     for (int i = instance_start_index;
@@ -324,8 +334,6 @@ void StaticRenderer::update_gpu_memory() {
       memory_block[i * 11 + 9] = fill_color_data[i].z();
       memory_block[i * 11 + 10] = fill_color_data[i].w();
 
-      // 绑定实例缓冲区
-      GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO));
       // 上传内存块到显存
       GLCALL(cvs->glBufferSubData(
           GL_ARRAY_BUFFER, (int)(instance_start_index * 11 * sizeof(float)),
@@ -333,24 +341,5 @@ void StaticRenderer::update_gpu_memory() {
     }
   }
 }
-
-// 渲染指定图形实例
-void StaticRenderer::render(const ShapeType& shape, uint32_t start_shape_index,
-                            uint32_t shape_count) {
-#ifdef __APPLE__
-  // TODO(xiang 2025-04-03): 实现apple平台指定实例位置绘制
-#else
-  switch (shape) {
-    case ShapeType::QUAD: {
-      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
-          GL_TRIANGLE_FAN, 0, 4, shape_count, start_shape_index));
-      break;
-    }
-    case ShapeType::OVAL: {
-      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
-          GL_TRIANGLE_FAN, 4, oval_segment, shape_count, start_shape_index));
-      break;
-    }
-  }
-#endif  //__APPLE__
-}
+// 重置更新标记
+void StaticRenderer::reset_update() { update_mapping.clear(); }

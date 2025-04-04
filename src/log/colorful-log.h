@@ -37,6 +37,7 @@ class XLogger {
   static std::shared_ptr<spdlog::logger> logger;
 
  public:
+  static uint32_t glcalls;
   static void init();
   static void shutdown();
   static void enable();

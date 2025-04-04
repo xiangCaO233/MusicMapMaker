@@ -7,6 +7,7 @@
 #define GLCALL(func)                                       \
   func;                                                    \
   {                                                        \
+    XLogger::glcalls++;                                    \
     GLenum error = cvs->glGetError();                      \
     if (error != GL_NO_ERROR) {                            \
       XERROR("在[" + std::string(#func) +                  \
@@ -107,4 +108,26 @@ void AbstractRenderer::set_uniform_mat4(const char* location_name,
   // qDebug() << mat;
   // 设置uniform
   GLCALL(cvs->glUniformMatrix4fv(locationit->second, 1, GL_FALSE, mat.data()));
+}
+
+// 渲染指定图形实例
+void AbstractRenderer::render(const ShapeType& shape,
+                              uint32_t start_shape_index,
+                              uint32_t shape_count) {
+#ifdef __APPLE__
+  // TODO(xiang 2025-04-03): 实现apple平台指定实例位置绘制
+#else
+  switch (shape) {
+    case ShapeType::QUAD: {
+      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
+          GL_TRIANGLE_FAN, 0, 4, shape_count, start_shape_index));
+      break;
+    }
+    case ShapeType::OVAL: {
+      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
+          GL_TRIANGLE_FAN, 4, oval_segment, shape_count, start_shape_index));
+      break;
+    }
+  }
+#endif  //__APPLE__
 }

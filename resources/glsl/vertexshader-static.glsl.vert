@@ -28,7 +28,7 @@ void main() {
   vec2 rotated_pos = rotation_matrix * scaled_pos;
 
   // 平移到指定位置
-  vec2 final_pos = rotated_pos + shape_pos;
+  vec2 final_pos = rotated_pos + shape_pos + shape_size / 2;
   // vec2 final_pos = shape_pos + scaled_pos;
 
 	// 输出填充颜色
@@ -36,6 +36,6 @@ void main() {
 	// color = vec4(final_pos.x/100.0, final_pos.x/100.0, 1.0, 1.0);
 
 	// 应用视图和投影矩阵
-  gl_Position = projection_mat * vec4(final_pos, 0.0, 1.0);
-  // gl_Position = vec4(vpos.xyz, 1.0);  
+  vec4 glpos = projection_mat * vec4(final_pos, 0.0, 1.0);
+  gl_Position = vec4(glpos.x - 1.0, glpos.y + 1.0, glpos.zw);
 }

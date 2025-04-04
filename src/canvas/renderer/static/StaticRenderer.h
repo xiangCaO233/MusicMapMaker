@@ -22,6 +22,9 @@ class StaticRenderer : public AbstractRenderer {
 
   // 更新gpu数据
   void update_gpu_memory() override;
+
+  // 重置更新标记
+  void reset_update() override;
   friend class RendererManager;
 
  public:
@@ -29,10 +32,6 @@ class StaticRenderer : public AbstractRenderer {
   StaticRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
   // 析构GLRenderer
   ~StaticRenderer() override;
-
-  // 渲染指定图形实例
-  void render(const ShapeType& shape, uint32_t start_shape_index,
-              uint32_t count) override;
 };
 
 #endif  // STATIC_RENDERER_H

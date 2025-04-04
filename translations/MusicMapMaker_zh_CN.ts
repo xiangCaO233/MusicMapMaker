@@ -7,7 +7,7 @@
         <location filename="../src/mainwindow.ui" line="20"/>
         <location filename="../src/mainwindow.ui" line="20"/>
         <source>MainWindow</source>
-        <translation>主窗口</translation>
+        <translation>音游谱面制作器</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="301"/>

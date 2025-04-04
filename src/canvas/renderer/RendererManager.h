@@ -24,6 +24,8 @@ struct RenderOperation {
 
 class RendererManager {
  private:
+  static uint32_t static_instance_index;
+  static uint32_t dynamic_instance_index;
   // 纹理池表
   std::map<int32_t, TexturePool> texture_pools;
 
