@@ -5,10 +5,12 @@
 #include <memory>
 #include <queue>
 
-#include "../texture/TexturePool.h"
 #include "RenderCommand.h"
 #include "dynamic/DynamicRenderer.h"
 #include "static/StaticRenderer.h"
+
+enum class TexturePoolType;
+class BaseTexturePool;
 
 // 渲染操作
 struct RenderOperation {
@@ -26,8 +28,10 @@ class RendererManager {
  private:
   static uint32_t static_instance_index;
   static uint32_t dynamic_instance_index;
-  // 纹理池表
-  std::map<int32_t, TexturePool> texture_pools;
+
+  // 纹理池表(纹理池类型-同类型纹理池列表)
+  std::map<TexturePoolType, std::vector<std::shared_ptr<BaseTexturePool>>>
+      texture_pools;
 
   // 是否处理好准备渲染
   bool is_ready{false};
@@ -59,10 +63,10 @@ class RendererManager {
 
   // 添加矩形
   void addRect(const QRectF& rect, TextureInfo* texture_info,
-               const QColor& fill_color, bool is_volatile);
+               const QColor& fill_color, float rotation, bool is_volatile);
   // 添加椭圆
   void addEllipse(const QRectF& bounds, TextureInfo* texture_info,
-                  const QColor& fill_color, bool is_volatile);
+                  const QColor& fill_color, float rotation, bool is_volatile);
 
   // 设置uniform浮点
   void set_uniform_float(const char* location_name, float value);

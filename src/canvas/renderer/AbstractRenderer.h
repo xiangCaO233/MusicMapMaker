@@ -11,6 +11,7 @@ class GLCanvas;
 class QVector2D;
 class QVector4D;
 class QMatrix4x4;
+class BaseTexturePool;
 
 enum InstanceDataType {
   POSITION,
@@ -41,6 +42,9 @@ class AbstractRenderer {
   uint32_t UBO;
   // 着色器程序
   uint32_t shader_program;
+
+  // 当前正在使用的纹理池
+  std::shared_ptr<BaseTexturePool> current_texture_pool;
 
   // uniform位置表缓存
   std::unordered_map<const char*, int32_t> uniform_locations;

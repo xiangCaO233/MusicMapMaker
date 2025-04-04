@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include "../texture/BaseTexturePool.h"
 #include "colorful-log.h"
 #include "renderer/AbstractRenderer.h"
 #include "renderer/dynamic/DynamicRenderer.h"
@@ -164,17 +165,19 @@ void RendererManager::finalize() {
 
 // 添加矩形
 void RendererManager::addRect(const QRectF& rect, TextureInfo* texture_info,
-                              const QColor& fill_color, bool is_volatile) {
+                              const QColor& fill_color, float rotation,
+                              bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(is_volatile, ShapeType::QUAD, rect, 0.0f,
+  command_list.emplace_back(is_volatile, ShapeType::QUAD, rect, rotation,
                             fill_color, texture_info);
 }
 // 添加椭圆
 void RendererManager::addEllipse(const QRectF& bounds,
                                  TextureInfo* texture_info,
-                                 const QColor& fill_color, bool is_volatile) {
+                                 const QColor& fill_color, float rotation,
+                                 bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(is_volatile, ShapeType::OVAL, bounds, 0.0f,
+  command_list.emplace_back(is_volatile, ShapeType::OVAL, bounds, rotation,
                             fill_color, texture_info);
 }
 
