@@ -5,6 +5,17 @@
 #include "../../../log/colorful-log.h"
 #include "../../GLCanvas.h"
 
+// 用于包装 OpenGL 调用并检查错误
+#define GLCALL(func)                                       \
+  func;                                                    \
+  {                                                        \
+    GLenum error = cvs->glGetError();                      \
+    if (error != GL_NO_ERROR) {                            \
+      XERROR("在[" + std::string(#func) +                  \
+             "]发生OpenGL错误: " + std::to_string(error)); \
+    }                                                      \
+  }
+
 DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
                                  int max_shape_count)
     : AbstractRenderer(canvas, oval_segment, max_shape_count) {
