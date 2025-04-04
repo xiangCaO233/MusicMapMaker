@@ -18,7 +18,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location2 顶点缓冲0~1float为float类型数据--位置信息(用vec2接收)
   GLCALL(cvs->glEnableVertexAttribArray(2));
   GLCALL(cvs->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float), nullptr));
+                                    11 * sizeof(float), nullptr));
   // 每个实例变化一次
   GLCALL(cvs->glVertexAttribDivisor(2, 1));
 
@@ -26,7 +26,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location3 顶点缓冲2~3float为float类型数据--尺寸信息(用vec2接收)
   GLCALL(cvs->glEnableVertexAttribArray(3));
   GLCALL(cvs->glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+                                    11 * sizeof(float),
                                     (void*)(2 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(3, 1));
 
@@ -34,7 +34,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location4 顶点缓冲4~4float为float类型数据--旋转角度(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(4));
   GLCALL(cvs->glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+                                    11 * sizeof(float),
                                     (void*)(4 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(4, 1));
 
@@ -42,7 +42,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location5 顶点缓冲5~5float为float类型数据--贴图uv方式(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(5));
   GLCALL(cvs->glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+                                    11 * sizeof(float),
                                     (void*)(5 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(5, 1));
 
@@ -50,7 +50,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location6 顶点缓冲6~6float为float类型数据--贴图id信息(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(6));
   GLCALL(cvs->glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+                                    11 * sizeof(float),
                                     (void*)(6 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(6, 1));
 
@@ -58,7 +58,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location7 顶点缓冲7~10float为float类型数据--填充颜色信息(用vec4接收)
   GLCALL(cvs->glEnableVertexAttribArray(7));
   GLCALL(cvs->glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+                                    11 * sizeof(float),
                                     (void*)(7 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(7, 1));
 
@@ -71,6 +71,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
 }
 
 StaticRenderer::~StaticRenderer() {}
+
 // 初始化着色器程序
 void StaticRenderer::init_shader_programe() {
   auto vshader = GLCALL(cvs->glCreateShader(GL_VERTEX_SHADER));
@@ -162,7 +163,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
   switch (data_type) {
     case POSITION: {
       auto pos = static_cast<QVector2D*>(data);
-      if (position_data.empty()) {
+      if (position_data.empty() || position_data.size() <= instance_index) {
         position_data.push_back(*pos);
         synchronize_update_mark(instance_index);
       } else {
@@ -178,7 +179,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     }
     case SIZE: {
       auto size = static_cast<QVector2D*>(data);
-      if (size_data.empty()) {
+      if (size_data.empty() || size_data.size() <= instance_index) {
         size_data.push_back(*size);
         synchronize_update_mark(instance_index);
       } else {
@@ -194,7 +195,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     }
     case ROTATION: {
       auto rotation = static_cast<float*>(data);
-      if (rotation_data.empty()) {
+      if (rotation_data.empty() || rotation_data.size() <= instance_index) {
         rotation_data.push_back(*rotation);
         synchronize_update_mark(instance_index);
       } else {
@@ -210,7 +211,8 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     }
     case TEXTURE_POLICY: {
       auto texture_policy = static_cast<int16_t*>(data);
-      if (texture_policy_data.empty()) {
+      if (texture_policy_data.empty() ||
+          texture_policy_data.size() <= instance_index) {
         texture_policy_data.push_back(*texture_policy);
         synchronize_update_mark(instance_index);
       } else {
@@ -226,7 +228,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     }
     case TEXTURE_ID: {
       auto texture_id = static_cast<uint32_t*>(data);
-      if (texture_id_data.empty()) {
+      if (texture_id_data.empty() || texture_id_data.size() <= instance_index) {
         texture_id_data.push_back(*texture_id);
         synchronize_update_mark(instance_index);
       } else {
@@ -242,7 +244,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     }
     case FILL_COLOR: {
       auto fill_color = static_cast<QVector4D*>(data);
-      if (fill_color_data.empty()) {
+      if (fill_color_data.empty() || fill_color_data.size() <= instance_index) {
         fill_color_data.push_back(*fill_color);
         synchronize_update_mark(instance_index);
       } else {
@@ -323,19 +325,19 @@ void StaticRenderer::update_gpu_memory() {
 
 // 渲染指定图形实例
 void StaticRenderer::render(const ShapeType& shape, uint32_t start_shape_index,
-                            uint32_t count) {
+                            uint32_t shape_count) {
 #ifdef __APPLE__
   // TODO(xiang 2025-04-03): 实现apple平台指定实例位置绘制
 #else
   switch (shape) {
     case ShapeType::QUAD: {
-      GLCALL(cvs->glDrawArraysInstancedBaseInstance(GL_TRIANGLE_FAN, 0, 4,
-                                                    count, start_shape_index));
+      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
+          GL_TRIANGLE_FAN, 0, 4, shape_count, start_shape_index));
       break;
     }
     case ShapeType::OVAL: {
       GLCALL(cvs->glDrawArraysInstancedBaseInstance(
-          GL_TRIANGLE_FAN, 4, oval_segment, count, start_shape_index));
+          GL_TRIANGLE_FAN, 4, oval_segment, shape_count, start_shape_index));
       break;
     }
   }

@@ -2,6 +2,7 @@
 
 #include <GL/gl.h>
 #include <qlogging.h>
+#include <qpainter.h>
 
 #include <QFile>
 #include <QMouseEvent>
@@ -139,7 +140,7 @@ void GLCanvas::resizeGL(int w, int h) {
   // 计算正交投影矩阵
   proj.ortho(-(float)w / 2.0f, (float)w / 2.0f, -(float)h / 2.0f,
              (float)h / 2.0f, -1.0f, 1.0f);
-  proj.transposed();
+  // proj.transposed();
 
   // 更新uniform
   renderer_manager->set_uniform_mat4("projection_mat", proj);
@@ -150,10 +151,14 @@ void GLCanvas::paintGL() {
   // 背景色
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+
   // 添加矩形渲染
   auto rect = QRectF(100, 100, 50, 50);
   renderer_manager->addRect(rect, nullptr, Qt::red, false);
-  XINFO("添加矩形绘制");
+
+  auto rect2 = QRectF(0, 0, 100, 100);
+  renderer_manager->addRect(rect2, nullptr, Qt::blue, false);
+  // XINFO("添加矩形绘制");
   // auto rect2 = QRectF(200, 200, 80, 80);
   // renderer_manager->addRect(rect2, nullptr, Qt::blue, false);
   renderer_manager->renderAll();

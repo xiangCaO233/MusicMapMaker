@@ -21,17 +21,19 @@ void main() {
 	// 缩放矩形到指定大小
   vec2 scaled_pos = vpos.xy * shape_size * 0.5;
 	// 旋转矩形
-  // float angle_rad = radians(shape_rotation);
-  // float cos_angle = cos(angle_rad);
-  // float sin_angle = sin(angle_rad);
-  // mat2 rotation_matrix = mat2(cos_angle, -sin_angle, sin_angle, cos_angle);
-  // vec2 rotated_pos = rotation_matrix * scaled_pos;
+  float angle_rad = radians(shape_rotation);
+  float cos_angle = cos(angle_rad);
+  float sin_angle = sin(angle_rad);
+  mat2 rotation_matrix = mat2(cos_angle, -sin_angle, sin_angle, cos_angle);
+  vec2 rotated_pos = rotation_matrix * scaled_pos;
 
-  // 平移到指定中心点
-  // vec2 final_pos = rotated_pos + shape_cp;
-  vec2 final_pos = shape_pos + scaled_pos;
+  // 平移到指定位置
+  vec2 final_pos = rotated_pos + shape_pos;
+  // vec2 final_pos = shape_pos + scaled_pos;
 
+	// 输出填充颜色
 	color = shape_fillcolor;
+	// color = vec4(final_pos.x/100.0, final_pos.x/100.0, 1.0, 1.0);
 
 	// 应用视图和投影矩阵
   gl_Position = projection_mat * vec4(final_pos, 0.0, 1.0);
