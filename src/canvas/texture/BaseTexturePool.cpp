@@ -1,6 +1,8 @@
 #include "BaseTexturePool.h"
 
-BaseTexturePool::BaseTexturePool() {}
+BaseTexturePool::BaseTexturePool() {
+  // 初始化单白像素点
+}
 
 BaseTexturePool::~BaseTexturePool() = default;
 

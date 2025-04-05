@@ -21,9 +21,10 @@ struct TextureInstace {
   uint32_t texture_id;
   // 纹理实例
   std::unique_ptr<QImage> texture_image;
+
   // 纹理在图集中的位置
-  uint32_t woffset;
-  uint32_t hoffset;
+  uint32_t woffset{0};
+  uint32_t hoffset{0};
 };
 
 class BaseTexturePool {
