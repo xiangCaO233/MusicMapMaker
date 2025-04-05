@@ -176,7 +176,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case POSITION: {
       auto pos = static_cast<QVector2D*>(data);
       if (position_data.empty() || position_data.size() <= instance_index) {
-        XWARN("添加位置数据");
+        // XWARN("添加位置数据");
         position_data.push_back(*pos);
         synchronize_update_mark(instance_index);
       } else {
@@ -193,7 +193,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case SIZE: {
       auto size = static_cast<QVector2D*>(data);
       if (size_data.empty() || size_data.size() <= instance_index) {
-        XWARN("添加尺寸数据");
+        // XWARN("添加尺寸数据");
         size_data.push_back(*size);
         synchronize_update_mark(instance_index);
       } else {
@@ -210,7 +210,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case ROTATION: {
       auto rotation = static_cast<float*>(data);
       if (rotation_data.empty() || rotation_data.size() <= instance_index) {
-        XWARN("添加角度数据");
+        // XWARN("添加角度数据");
         rotation_data.push_back(*rotation);
         synchronize_update_mark(instance_index);
       } else {
@@ -228,7 +228,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       auto texture_policy = static_cast<int16_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
-        XWARN("添加纹理填充策略数据");
+        // XWARN("添加纹理填充策略数据");
         texture_policy_data.push_back(*texture_policy);
         synchronize_update_mark(instance_index);
       } else {
@@ -245,7 +245,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case TEXTURE_ID: {
       auto texture_id = static_cast<uint32_t*>(data);
       if (texture_id_data.empty() || texture_id_data.size() <= instance_index) {
-        XWARN("添加纹理id数据");
+        // XWARN("添加纹理id数据");
         texture_id_data.push_back(*texture_id);
         synchronize_update_mark(instance_index);
       } else {
@@ -262,7 +262,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
     case FILL_COLOR: {
       auto fill_color = static_cast<QVector4D*>(data);
       if (fill_color_data.empty() || fill_color_data.size() <= instance_index) {
-        XWARN("添加填充颜色数据");
+        // XWARN("添加填充颜色数据");
         fill_color_data.push_back(*fill_color);
         synchronize_update_mark(instance_index);
       } else {
@@ -292,6 +292,9 @@ void StaticRenderer::synchronize_update_mark(size_t instance_index) {
         // 与上一更新标记连续
         // 更新连续更新数量
         preit->second++;
+      } else {
+        // 不连续,创建标记并更新迭代器
+        it = update_mapping.try_emplace(instance_index, 1).first;
       }
     } else {
       // 不连续,创建标记并更新迭代器
@@ -312,27 +315,32 @@ void StaticRenderer::update_gpu_memory() {
          i < instance_start_index + instance_count; i++) {
       //// 图形位置数据
       // std::vector<QVector2D> position_data;
-      memory_block[i * 11] = position_data[i].x();
-      memory_block[i * 11 + 1] = position_data[i].y();
+      memory_block[(i - instance_start_index) * 11] = position_data[i].x();
+      memory_block[(i - instance_start_index) * 11 + 1] = position_data[i].y();
       //// 图形尺寸
       // std::vector<QVector2D> size_data;
-      memory_block[i * 11 + 2] = size_data[i].x();
-      memory_block[i * 11 + 3] = size_data[i].y();
+      memory_block[(i - instance_start_index) * 11 + 2] = size_data[i].x();
+      memory_block[(i - instance_start_index) * 11 + 3] = size_data[i].y();
       //// 旋转角度
       // std::vector<float> rotation_data;
-      memory_block[i * 11 + 4] = rotation_data[i];
+      memory_block[(i - instance_start_index) * 11 + 4] = rotation_data[i];
       //// 贴图方式
       // std::vector<int16_t> texture_policy_data;
-      memory_block[i * 11 + 5] = texture_policy_data[i];
+      memory_block[(i - instance_start_index) * 11 + 5] =
+          texture_policy_data[i];
       //// 贴图id
       // std::vector<uint32_t> texture_id_data;
-      memory_block[i * 11 + 6] = texture_id_data[i];
+      memory_block[(i - instance_start_index) * 11 + 6] = texture_id_data[i];
       //// 填充颜色
       // std::vector<QVector4D> fill_color_data;
-      memory_block[i * 11 + 7] = fill_color_data[i].x();
-      memory_block[i * 11 + 8] = fill_color_data[i].y();
-      memory_block[i * 11 + 9] = fill_color_data[i].z();
-      memory_block[i * 11 + 10] = fill_color_data[i].w();
+      memory_block[(i - instance_start_index) * 11 + 7] =
+          fill_color_data[i].x();
+      memory_block[(i - instance_start_index) * 11 + 8] =
+          fill_color_data[i].y();
+      memory_block[(i - instance_start_index) * 11 + 9] =
+          fill_color_data[i].z();
+      memory_block[(i - instance_start_index) * 11 + 10] =
+          fill_color_data[i].w();
 
       // 上传内存块到显存
       GLCALL(cvs->glBufferSubData(

@@ -54,7 +54,7 @@ DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[2]));
   // 描述location4 顶点缓冲0~0float为float类型数据--旋转角度信息(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(4));
-  GLCALL(cvs->glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(float),
                                     nullptr));
   GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
                            (int)(max_shape_count * 1 * sizeof(float)), nullptr,
@@ -65,7 +65,7 @@ DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[3]));
   // 描述location5 顶点缓冲0~0float为float类型数据--贴图uv方式(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(5));
-  GLCALL(cvs->glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(float),
                                     nullptr));
   GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
                            (int)(max_shape_count * 1 * sizeof(float)), nullptr,
@@ -76,7 +76,7 @@ DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[4]));
   // 描述location6 顶点缓冲0~0float为float类型数据--贴图id信息(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(6));
-  GLCALL(cvs->glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 1 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(float),
                                     nullptr));
   GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
                            (int)(max_shape_count * 1 * sizeof(float)), nullptr,
@@ -188,7 +188,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
     case POSITION: {
       auto pos = static_cast<QVector2D*>(data);
       if (position_data.empty() || position_data.size() <= instance_index) {
-        XWARN("添加位置数据");
+        // XWARN("添加位置数据");
         position_data.push_back(*pos);
         synchronize_update_mark(data_type, instance_index);
       } else {
@@ -206,7 +206,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
     case SIZE: {
       auto size = static_cast<QVector2D*>(data);
       if (size_data.empty() || size_data.size() <= instance_index) {
-        XWARN("添加尺寸数据");
+        // XWARN("添加尺寸数据");
         size_data.push_back(*size);
         synchronize_update_mark(data_type, instance_index);
       } else {
@@ -221,7 +221,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
     case ROTATION: {
       auto rotation = static_cast<float*>(data);
       if (rotation_data.empty() || rotation_data.size() <= instance_index) {
-        XWARN("添加旋转数据");
+        // XWARN("添加旋转数据");
         rotation_data.push_back(*rotation);
         synchronize_update_mark(data_type, instance_index);
       } else {
@@ -237,7 +237,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       auto texture_policy = static_cast<int16_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
-        XWARN("添加纹理填充策略数据");
+        // XWARN("添加纹理填充策略数据");
         texture_policy_data.push_back(*texture_policy);
         synchronize_update_mark(data_type, instance_index);
       } else {
@@ -252,7 +252,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
     case TEXTURE_ID: {
       auto texture_id = static_cast<uint32_t*>(data);
       if (texture_id_data.empty() || texture_id_data.size() <= instance_index) {
-        XWARN("添加纹理id数据");
+        // XWARN("添加纹理id数据");
         texture_id_data.push_back(*texture_id);
         synchronize_update_mark(data_type, instance_index);
       } else {
@@ -267,7 +267,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
     case FILL_COLOR: {
       auto fill_color = static_cast<QVector4D*>(data);
       if (fill_color_data.empty() || fill_color_data.size() <= instance_index) {
-        XWARN("添加填充颜色数据");
+        // XWARN("添加填充颜色数据");
         fill_color_data.push_back(*fill_color);
         synchronize_update_mark(data_type, instance_index);
       } else {
@@ -285,8 +285,6 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
 // 同步更新标记
 void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
                                               size_t instance_index) {
-  // TODO(xiang 2025-04-04): 实现更新标志函数
-
   switch (data_type) {
     case POSITION: {
       auto mapit = update_mapping.find(POSITION);
@@ -306,6 +304,9 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
             // 与上一更新标记连续
             // 更新连续更新数量
             preit->second++;
+          } else {
+            // 不存在上一个更新标记,创建标记并更新迭代器
+            it = mark_map.try_emplace(instance_index, 1).first;
           }
         } else {
           // 不连续,创建标记并更新迭代器
@@ -332,6 +333,9 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
             // 与上一更新标记连续
             // 更新连续更新数量
             preit->second++;
+          } else {
+            // 不存在上一个更新标记,创建标记并更新迭代器
+            it = mark_map.try_emplace(instance_index, 1).first;
           }
         } else {
           // 不连续,创建标记并更新迭代器
@@ -358,6 +362,9 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
             // 与上一更新标记连续
             // 更新连续更新数量
             preit->second++;
+          } else {
+            // 不存在上一个更新标记,创建标记并更新迭代器
+            it = mark_map.try_emplace(instance_index, 1).first;
           }
         } else {
           // 不连续,创建标记并更新迭代器
@@ -384,6 +391,9 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
             // 与上一更新标记连续
             // 更新连续更新数量
             preit->second++;
+          } else {
+            // 不存在上一个更新标记,创建标记并更新迭代器
+            it = mark_map.try_emplace(instance_index, 1).first;
           }
         } else {
           // 不连续,创建标记并更新迭代器
@@ -410,6 +420,9 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
             // 与上一更新标记连续
             // 更新连续更新数量
             preit->second++;
+          } else {
+            // 不存在上一个更新标记,创建标记并更新迭代器
+            it = mark_map.try_emplace(instance_index, 1).first;
           }
         } else {
           // 不连续,创建标记并更新迭代器
@@ -436,6 +449,9 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
             // 与上一更新标记连续
             // 更新连续更新数量
             preit->second++;
+          } else {
+            // 不存在上一个更新标记,创建标记并更新迭代器
+            it = mark_map.try_emplace(instance_index, 1).first;
           }
         } else {
           // 不连续,创建标记并更新迭代器
@@ -449,7 +465,7 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
 
 // 更新gpu数据
 void DynamicRenderer::update_gpu_memory() {
-  // TODO(xiang 2025-04-03): 实现dynamic渲染器更新显存
+  // instanceBO
   // [0] 图形位置,[1] 图形尺寸,[2] 旋转角度
   // [3] 图形贴图方式,[4] 贴图id,[5]填充颜色
   for (const auto& [data_type, mark_map] : update_mapping) {
@@ -493,8 +509,9 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++) {
-            memory_block[2 * instance_start_index] = position_data[i].x();
-            memory_block[2 * instance_start_index + 1] = position_data[i].y();
+            memory_block[2 * (i - instance_start_index)] = position_data[i].x();
+            memory_block[2 * (i - instance_start_index) + 1] =
+                position_data[i].y();
           }
           break;
         }
@@ -505,8 +522,8 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++) {
-            memory_block[2 * instance_start_index] = size_data[i].x();
-            memory_block[2 * instance_start_index + 1] = size_data[i].y();
+            memory_block[2 * (i - instance_start_index)] = size_data[i].x();
+            memory_block[2 * (i - instance_start_index) + 1] = size_data[i].y();
           }
           break;
         }
@@ -517,7 +534,7 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++)
-            memory_block[instance_start_index] = rotation_data[i];
+            memory_block[(i - instance_start_index)] = rotation_data[i];
           break;
         }
         case TEXTURE_POLICY: {
@@ -527,7 +544,7 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++)
-            memory_block[instance_start_index] = texture_policy_data[i];
+            memory_block[(i - instance_start_index)] = texture_policy_data[i];
           break;
         }
         case TEXTURE_ID: {
@@ -537,7 +554,7 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++)
-            memory_block[instance_start_index] = texture_id_data[i];
+            memory_block[(i - instance_start_index)] = texture_id_data[i];
           break;
         }
         case FILL_COLOR: {
@@ -547,10 +564,14 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++) {
-            memory_block[4 * instance_start_index] = fill_color_data[i].x();
-            memory_block[4 * instance_start_index + 1] = fill_color_data[i].y();
-            memory_block[4 * instance_start_index + 2] = fill_color_data[i].z();
-            memory_block[4 * instance_start_index + 3] = fill_color_data[i].w();
+            memory_block[4 * (i - instance_start_index)] =
+                fill_color_data[i].x();
+            memory_block[4 * (i - instance_start_index) + 1] =
+                fill_color_data[i].y();
+            memory_block[4 * (i - instance_start_index) + 2] =
+                fill_color_data[i].z();
+            memory_block[4 * (i - instance_start_index) + 3] =
+                fill_color_data[i].w();
           }
           break;
         }

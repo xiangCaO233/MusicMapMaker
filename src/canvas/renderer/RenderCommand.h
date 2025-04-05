@@ -5,6 +5,8 @@
 #include <qrect.h>
 
 #include <cstdint>
+#include <sstream>
+#include <string>
 
 // 形状
 enum class ShapeType { QUAD, OVAL };
@@ -68,6 +70,40 @@ struct RenderCommand {
            instance_shape == other.instance_shape &&
            instace_bound == other.instace_bound &&
            fill_color == other.fill_color && texture_info == other.texture_info;
+  }
+  std::string toString() const {
+    std::ostringstream oss;
+
+    oss << "RenderCommand {"
+        << "\n  is_volatile: " << (is_volatile ? "true" : "false")
+        << "\n  instance_shape: ";
+
+    // 假设 是枚举类型，需要转换为字符串
+    switch (instance_shape) {
+      case ShapeType::QUAD:
+        oss << "QUAD";
+        break;
+      case ShapeType::OVAL:
+        oss << "OVAL";
+        break;
+    }
+
+    oss << "\n  instace_bound: "
+        << "QRectF(" << instace_bound.x() << ", " << instace_bound.y() << ", "
+        << instace_bound.width() << ", " << instace_bound.height() << ")"
+        << "\n  rotation: " << rotation << "°"
+        << "\n  fill_color: " << fill_color.name().toStdString()
+        << "\n  texture_info: ";
+
+    if (texture_info) {
+      oss << "TextureInfo@" << texture_info;  // 假设只打印指针地址
+    } else {
+      oss << "nullptr";
+    }
+
+    oss << "\n}";
+
+    return oss.str();
   }
 };
 

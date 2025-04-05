@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QMouseEvent>
 #include <QTextStream>
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -62,6 +63,8 @@ void GLCanvas::mouseDoubleClickEvent(QMouseEvent *event) {
 void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   QOpenGLWidget::mouseMoveEvent(event);
+  mouse_pos = event->pos();
+  repaint();
 }
 
 // 鼠标滚动事件
@@ -164,18 +167,22 @@ void GLCanvas::paintGL() {
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
-  // 添加矩形渲染
-  auto rect = QRectF(100, 100, 50, 50);
-  renderer_manager->addRect(rect, nullptr, Qt::red, 0.0f, false);
+  // 添加渲染内容
 
   auto rect2 = QRectF(0, 0, 100, 100);
   renderer_manager->addRect(rect2, nullptr, Qt::blue, 45.0f, true);
+
+  auto rect = QRectF(100, 100, 50, 50);
+  renderer_manager->addEllipse(rect, nullptr, Qt::red, 0.0f, false);
 
   auto rect3 = QRectF(50, 200, 80, 160);
   renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, false);
 
   auto rect4 = QRectF(200, 60, 75, 30);
   renderer_manager->addRect(rect4, nullptr, Qt::yellow, 0.0f, false);
+
+  auto mouse_rec = QRectF(mouse_pos.x() - 10, mouse_pos.y() - 10, 20, 20);
+  renderer_manager->addEllipse(mouse_rec, nullptr, Qt::green, 0.0f, true);
 
   // 执行渲染
   renderer_manager->renderAll();

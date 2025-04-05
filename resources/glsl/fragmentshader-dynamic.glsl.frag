@@ -1,6 +1,5 @@
 #version 450 core
 
-
 // 渲染管线前传递来的颜色
 in vec4 color;
 

@@ -52,6 +52,10 @@ class RendererManager {
   // 确定渲染内容
   void finalize();
 
+  // 同步渲染指令到渲染器
+  void sync_renderer(const std::shared_ptr<AbstractRenderer>& renderer,
+                     RenderCommand& command) const;
+
   friend class GLCanvas;
 
  public:

@@ -2,6 +2,7 @@
 #define GLCANVAS_H
 
 #include <QtOpenGLWidgets/qopenglwidget.h>
+#include <qpoint.h>
 #ifdef __APPLE__
 #include <QtOpenGL/qopenglfunctions_4_1_core.h>
 #else
@@ -25,6 +26,7 @@ class GLCanvas : public QOpenGLWidget,
   friend class AbstractRenderer;
   friend class StaticRenderer;
   friend class DynamicRenderer;
+  QPoint mouse_pos{0,0};
 
  public:
   // 渲染器
