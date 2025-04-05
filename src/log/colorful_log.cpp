@@ -70,6 +70,7 @@ const char *ColorfulFormatter::get_color(
 }
 
 uint32_t XLogger::glcalls = 0;
+uint32_t XLogger::drawcalls = 0;
 std::shared_ptr<spdlog::logger> XLogger::logger;
 
 void XLogger::init() {

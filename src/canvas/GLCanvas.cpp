@@ -7,7 +7,6 @@
 #include <QFile>
 #include <QMouseEvent>
 #include <QTextStream>
-#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -120,8 +119,26 @@ void GLCanvas::initializeGL() {
   initializeOpenGLFunctions();
   // 查询opengl版本
   auto version = GLCALL(glGetString(GL_VERSION));
-  XINFO("OpenGL Version: " +
-        std::string(reinterpret_cast<const char *>(version)));
+  XINFO("OpenGL 版本: " + std::string(reinterpret_cast<const char *>(version)));
+
+  // 查询最大支持多层纹理的最大层数
+  GLint maxLayers;
+  glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxLayers);
+  XINFO("多层纹理最大层数: " + std::to_string(maxLayers));
+  TextureArray::max_texture_layer = maxLayers;
+
+  // 查询纹理采样器最大连续数量
+  GLint max_fragment_samplers;
+  glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fragment_samplers);
+  XINFO("纹理采样器最大连续数量: " + std::to_string(max_fragment_samplers));
+  TexturePool::max_sampler_consecutive_count = max_fragment_samplers;
+
+  // 查询纹理采样器最大数量
+  GLint max_combined_samplers;
+  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_combined_samplers);
+  XINFO("纹理采样器最大数量: " + std::to_string(max_combined_samplers));
+  TexturePool::max_total_sampler_count = max_combined_samplers;
+
   // 查询最大支持抗锯齿MSAA倍率
   GLint maxSamples;
   GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
@@ -163,17 +180,15 @@ void GLCanvas::resizeGL(int w, int h) {
 // 绘制画布
 void GLCanvas::paintGL() {
   XLogger::glcalls = 0;
+  XLogger::drawcalls = 0;
   // 背景色
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 添加渲染内容
 
-  auto rect2 = QRectF(0, 0, 100, 100);
-  renderer_manager->addRect(rect2, nullptr, Qt::blue, 45.0f, true);
-
   auto rect = QRectF(100, 100, 50, 50);
-  renderer_manager->addEllipse(rect, nullptr, Qt::red, 0.0f, false);
+  renderer_manager->addRect(rect, nullptr, Qt::red, 0.0f, false);
 
   auto rect3 = QRectF(50, 200, 80, 160);
   renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, false);
@@ -181,12 +196,16 @@ void GLCanvas::paintGL() {
   auto rect4 = QRectF(200, 60, 75, 30);
   renderer_manager->addRect(rect4, nullptr, Qt::yellow, 0.0f, false);
 
+  auto rect2 = QRectF(0, 0, 100, 100);
+  renderer_manager->addEllipse(rect2, nullptr, Qt::blue, 45.0f, true);
+
   auto mouse_rec = QRectF(mouse_pos.x() - 10, mouse_pos.y() - 10, 20, 20);
   renderer_manager->addEllipse(mouse_rec, nullptr, Qt::green, 0.0f, true);
 
   // 执行渲染
   renderer_manager->renderAll();
   XWARN("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
+  XWARN("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
 }
 // 设置垂直同步
 void GLCanvas::set_Vsync(bool flag) {
@@ -226,7 +245,8 @@ void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type) {
         break;
       }
       case TexturePoolType::ARRARY: {
-        pool = std::make_shared<TextureArray>();
+        auto size = QSize(1024, 1024);
+        pool = std::make_shared<TextureArray>(size);
         break;
       }
       case TexturePoolType::ATLAS: {

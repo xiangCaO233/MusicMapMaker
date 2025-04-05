@@ -2,6 +2,7 @@
 
 // 投影矩阵
 uniform mat4 projection_mat;
+uniform float texture_pool_type;
 
 // 顶点数据
 layout (location = 0) in vec3 vpos;

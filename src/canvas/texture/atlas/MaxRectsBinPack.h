@@ -10,7 +10,7 @@ class TextureInstace;
 class MaxRectsBinPack {
  public:
   /// Instantiates a bin of the given size.
-  MaxRectsBinPack(int width = 4096, int height = 4096, float expandrate = 1.05);
+  MaxRectsBinPack(int width, int height, float expandrate);
 
   /// Specifies the different heuristic rules that can be used when deciding
   /// where to place a new rectangle.

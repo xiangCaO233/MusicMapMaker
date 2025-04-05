@@ -27,10 +27,11 @@ struct TextureInstace {
 };
 
 class BaseTexturePool {
-  // 纹理映射表(id-纹理对象)
-  std::unordered_map<std::string, TextureInstace> texture_map;
+  friend class RendererManager;
 
  protected:
+  // 纹理映射表(id-纹理对象)
+  std::unordered_map<std::string, TextureInstace*> texture_map;
   // 纹理池类型
   TexturePoolType pool_type;
 
@@ -45,7 +46,10 @@ class BaseTexturePool {
   virtual void load_texture(const char* resource_path);
 
   // 判满
-  virtual bool is_full();
+  virtual bool is_full() = 0;
+
+  // 使用此纹理池
+  virtual void bind();
 };
 
 #endif  // BASE_TEXTURE_POOL_H

@@ -14,6 +14,9 @@
              "]发生OpenGL错误: " + std::to_string(error)); \
     }                                                      \
   }
+#define DRAWCALL(func) \
+  GLCALL(func);        \
+  XLogger::drawcalls++;
 
 AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
                                    int max_shape_count)
@@ -119,12 +122,12 @@ void AbstractRenderer::render(const ShapeType& shape,
 #else
   switch (shape) {
     case ShapeType::QUAD: {
-      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
+      DRAWCALL(cvs->glDrawArraysInstancedBaseInstance(
           GL_TRIANGLE_FAN, 0, 4, shape_count, start_shape_index));
       break;
     }
     case ShapeType::OVAL: {
-      GLCALL(cvs->glDrawArraysInstancedBaseInstance(
+      DRAWCALL(cvs->glDrawArraysInstancedBaseInstance(
           GL_TRIANGLE_FAN, 4, oval_segment, shape_count, start_shape_index));
       break;
     }

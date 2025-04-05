@@ -33,9 +33,6 @@ class RendererManager {
   std::map<TexturePoolType, std::vector<std::shared_ptr<BaseTexturePool>>>
       texture_pools;
 
-  // 是否处理好准备渲染
-  bool is_ready{false};
-
   // 渲染器
   std::shared_ptr<StaticRenderer> static_renderer;
   std::shared_ptr<DynamicRenderer> dynamic_renderer;
@@ -65,6 +62,9 @@ class RendererManager {
   // 析构RendererManager
   virtual ~RendererManager();
 
+  // 使用指定纹理池
+  void use_texture_pool(const std::shared_ptr<BaseTexturePool>& texture_pool);
+
   // 添加矩形
   void addRect(const QRectF& rect, TextureInfo* texture_info,
                const QColor& fill_color, float rotation, bool is_volatile);
@@ -74,6 +74,7 @@ class RendererManager {
 
   // 设置uniform浮点
   void set_uniform_float(const char* location_name, float value);
+
   // 设置uniform矩阵(4x4)
   void set_uniform_mat4(const char* location_name, QMatrix4x4& mat);
 
