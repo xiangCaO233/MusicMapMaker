@@ -16,6 +16,7 @@ void TextureAtlas::pack() {
   if (is_packed) {
     XERROR("Atlas is already packed");
   } else {
+    // TODO(xiang 2025-04-07): 完成打包
     is_packed = true;
   }
 }

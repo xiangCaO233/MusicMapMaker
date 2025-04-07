@@ -5,8 +5,9 @@
 #include <unordered_map>
 
 #include "../Texture.h"
+
 #define POOL_FULL 0x01
-#define SUCCESS 0x01
+#define SUCCESS 0x02
 
 class GLCanvas;
 
@@ -15,6 +16,7 @@ enum class TexturePoolType {
   BASE_POOL,
   ARRARY,
 };
+
 // 纹理uniform(传递到shader)
 struct TextureUniformData {
   // 标记使用方式
@@ -27,12 +29,13 @@ struct TextureUniformData {
   // static uint32_t max_sampler_consecutive_count;
   // 使用方式为单独或纹理图集时需要
   uint32_t* sampler_contexts;
-  // 使用纹理数组时的采样器数组偏移地址
-  uint32_t texture_array_offset;
 };
 
 class BaseTexturePool {
   friend class RendererManager;
+
+  // 是否完成导入
+  bool is_finalized;
 
   // gl窗口上下文
   GLCanvas* cvs;
@@ -56,14 +59,11 @@ class BaseTexturePool {
   // 载入纹理
   virtual int load_texture(std::shared_ptr<TextureInstace> texture) = 0;
 
+  // 完成纹理池构造
+  virtual void finalize() = 0;
+
   // 判满
   virtual bool is_full() = 0;
-
-  // 使用此纹理池
-  virtual void bind() = 0;
-
-  // 取消使用此纹理池
-  virtual void unbind() = 0;
 
   // 使用指定纹理
   // 使用单独纹理池时需设置连续的uniform

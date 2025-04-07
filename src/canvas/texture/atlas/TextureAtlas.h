@@ -4,6 +4,13 @@
 #include "../Texture.h"
 #include "MaxRectsBinPack.h"
 
+class AtlasSubTexture : public TextureInstace {
+ public:
+  // 纹理在图集中的位置
+  uint32_t woffset{0};
+  uint32_t hoffset{0};
+};
+
 class TextureAtlas : public TextureInstace {
   // 打包器
   MaxRectsBinPack packer;
@@ -13,6 +20,9 @@ class TextureAtlas : public TextureInstace {
 
   // 生成纹理集
   void pack();
+
+  // 默认最大图集尺寸
+  QSize def_max_size{8192, 8192};
 
   friend class RendererManager;
 

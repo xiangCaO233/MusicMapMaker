@@ -161,6 +161,10 @@ void GLCanvas::initializeGL() {
   GLCALL(glGenVertexArrays(1, &VAO));
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
+
+  add_texture(":textures/test/1024/aijier.png", TexturePoolType::BASE_POOL,
+              false);
+  finalize_texture_loading();
 }
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
@@ -246,12 +250,12 @@ void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type,
     // 新建纹理池
     switch (type) {
       case TexturePoolType::BASE_POOL: {
-        pool = std::make_shared<TexturePool>();
+        pool = std::make_shared<TexturePool>(this);
         break;
       }
       case TexturePoolType::ARRARY: {
         QImage image(qrc_path);
-        pool = std::make_shared<TextureArray>(image.size());
+        pool = std::make_shared<TextureArray>(this, image.size());
         break;
       }
     }
@@ -266,4 +270,10 @@ void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type,
 }
 
 // 完成纹理载入
-void GLCanvas::finalize_texture_loading() {}
+void GLCanvas::finalize_texture_loading() {
+  for (const auto &[type, pools] : renderer_manager->texture_pools) {
+    for (auto &pool : pools) {
+      pool->finalize();
+    }
+  }
+}

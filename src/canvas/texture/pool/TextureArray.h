@@ -12,7 +12,7 @@ class TextureArray : public BaseTexturePool {
 
  public:
   // 构造TextureArray-opengl使用纹理数组必须相同分辨率
-  TextureArray(GLCanvas* canvas, QSize& size);
+  TextureArray(GLCanvas* canvas, QSize size);
   // 析构TextureArray
   ~TextureArray() override;
 
@@ -21,9 +21,15 @@ class TextureArray : public BaseTexturePool {
 
   // 判满
   bool is_full() override;
+
   // 载入纹理
-  // resource_path使用qrc中的路径
   int load_texture(std::shared_ptr<TextureInstace> texture) override;
+
+  // 完成纹理池构造
+  void finalize() override;
+
+  // 使用指定纹理
+  void use_texture(std::shared_ptr<TextureInstace> texture) override;
 
  protected:
 };

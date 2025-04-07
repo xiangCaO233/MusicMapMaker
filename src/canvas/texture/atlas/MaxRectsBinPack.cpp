@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "../../../log/colorful-log.h"
-#include "../BaseTexturePool.h"
+#include "../pool/BaseTexturePool.h"
 
 using namespace std;
 

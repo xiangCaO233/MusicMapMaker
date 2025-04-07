@@ -37,8 +37,14 @@ class TexturePool : public BaseTexturePool {
   bool is_full() override;
 
   // 载入纹理
-  // resource_path使用qrc中的路径
   int load_texture(std::shared_ptr<TextureInstace> texture) override;
+
+  // 完成纹理池构造
+  void finalize() override;
+
+  // 使用指定纹理
+  // 需设置连续的uniform
+  void use_texture(std::shared_ptr<TextureInstace> texture) override;
 
  protected:
 };
