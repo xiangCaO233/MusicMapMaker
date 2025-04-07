@@ -11,10 +11,9 @@
 #include <string>
 
 #include "colorful-log.h"
-#include "texture/BaseTexturePool.h"
-#include "texture/TexturePool.h"
-#include "texture/array/TextureArray.h"
-#include "texture/atlas/TextureAtlas.h"
+#include "texture/pool/BaseTexturePool.h"
+#include "texture/pool/TextureArray.h"
+#include "texture/pool/TexturePool.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                       \
@@ -151,6 +150,10 @@ void GLCanvas::initializeGL() {
   // 启用V-Sync
   context()->format().setSwapInterval(1);
 
+  int maxUBOSize;
+  GLCALL(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize));
+  XINFO("最大UBO块容量: " + std::to_string(maxUBOSize));
+
   // 标准混合模式
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -212,8 +215,10 @@ void GLCanvas::set_Vsync(bool flag) {
   // 切换V-Sync
   context()->format().setSwapInterval(flag ? 1 : 0);
 }
+
 // 添加纹理
-void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type) {
+void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type,
+                           bool use_atlas) {
   auto poolsit = renderer_manager->texture_pools.find(type);
   if (poolsit == renderer_manager->texture_pools.end()) {
     // 不存在此类型纹理池列表
@@ -245,18 +250,20 @@ void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type) {
         break;
       }
       case TexturePoolType::ARRARY: {
-        auto size = QSize(1024, 1024);
-        pool = std::make_shared<TextureArray>(size);
-        break;
-      }
-      case TexturePoolType::ATLAS: {
-        pool = std::make_shared<TextureAtlas>();
+        QImage image(qrc_path);
+        pool = std::make_shared<TextureArray>(image.size());
         break;
       }
     }
     // 添加纹理池
     pools.push_back(pool);
   }
+  // 加载纹理
+  auto texture = std::make_shared<TextureInstace>(qrc_path);
+
   // 载入纹理
-  pool->load_texture(qrc_path);
+  auto res = pool->load_texture(texture);
 }
+
+// 完成纹理载入
+void GLCanvas::finalize_texture_loading() {}

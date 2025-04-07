@@ -1,9 +1,12 @@
 #ifndef TEXTURE_POOL_H
 #define TEXTURE_POOL_H
 
+#include <cstddef>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
-#include "texture/BaseTexturePool.h"
+#include "BaseTexturePool.h"
 
 class TexturePool : public BaseTexturePool {
   friend class RendererManager;
@@ -11,9 +14,15 @@ class TexturePool : public BaseTexturePool {
   // 全部纹理批
   std::vector<std::vector<TextureInstace*>> texture_dozens;
 
+  // 纹理对应批次和批内索引的映射表(纹理-(批索引-批内索引))
+  std::unordered_map<TextureInstace*, std::pair<size_t, size_t>> batch_mapping;
+
+  // 当前正在使用的批
+  size_t current_batch;
+
  public:
   // 构造TexturePool
-  TexturePool();
+  TexturePool(GLCanvas* canvas, bool dynamic_switch = false);
 
   // 析构TexturePool
   ~TexturePool() override;
@@ -29,7 +38,7 @@ class TexturePool : public BaseTexturePool {
 
   // 载入纹理
   // resource_path使用qrc中的路径
-  void load_texture(const char* resource_path) override;
+  int load_texture(std::shared_ptr<TextureInstace> texture) override;
 
  protected:
 };

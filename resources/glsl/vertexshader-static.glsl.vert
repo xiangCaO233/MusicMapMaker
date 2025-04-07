@@ -16,11 +16,17 @@ layout (location = 5) in float shape_texture_policy;
 layout (location = 6) in float shape_texture_id;
 layout (location = 7) in vec4 shape_fillcolor;
 
-out vec4 color;
+// 填充颜色
+out vec4 fill_color;
+
+// 采样器数据
+out float texture_policy;
+out float texture_id;
 
 void main() {
 	// 缩放矩形到指定大小
   vec2 scaled_pos = vpos.xy * shape_size * 0.5;
+
 	// 旋转矩形
   float angle_rad = radians(shape_rotation);
   float cos_angle = cos(angle_rad);
@@ -33,7 +39,7 @@ void main() {
   // vec2 final_pos = shape_pos + scaled_pos;
 
 	// 输出填充颜色
-	color = shape_fillcolor;
+	fill_color = shape_fillcolor;
 	// color = vec4(final_pos.x/100.0, final_pos.x/100.0, 1.0, 1.0);
 
 	// 应用视图和投影矩阵

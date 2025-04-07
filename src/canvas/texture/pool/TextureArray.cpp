@@ -1,0 +1,27 @@
+#include "TextureArray.h"
+
+#include "texture/BaseTexturePool.h"
+
+// 最大采样器层数
+uint32_t TextureArray::max_texture_layer = 0;
+
+TextureArray::TextureArray(GLCanvas* canvas, QSize& size)
+    : BaseTexturePool(canvas), texture_size(size) {
+  pool_type = TexturePoolType::ARRARY;
+}
+
+TextureArray::~TextureArray() {}
+
+// 判满
+bool TextureArray::is_full() { return texture_map.size() < max_texture_layer; }
+
+// 载入纹理
+int TextureArray::load_texture(std::shared_ptr<TextureInstace> texture) {
+  if (is_full()) {
+    return POOL_FULL;
+  }
+  if (texture->texture_image->size() != texture_size) {
+    return EXPECTED_SIZE;
+  }
+  return SUCCESS;
+}

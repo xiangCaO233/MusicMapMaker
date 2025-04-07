@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include "../texture/BaseTexturePool.h"
+#include "../texture/pool/BaseTexturePool.h"
 #include "colorful-log.h"
 #include "renderer/AbstractRenderer.h"
 #include "renderer/dynamic/DynamicRenderer.h"

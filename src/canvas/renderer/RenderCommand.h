@@ -5,6 +5,7 @@
 #include <qrect.h>
 
 #include <cstdint>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -29,20 +30,27 @@ enum class TextureAlignMode : int16_t {
 enum class TextureFillMode : int16_t {
   // 缩放
   SCALLING = 0x01,
-  // 缩放并裁切
+  // 缩放并裁切(自动)
   SCALLING_AND_CUT = 0x02,
+  // 缩放并裁切(指定以宽为基准)
+  SCALLING_BASE_WIDTH_AND_CUT = 0x03,
+  // 缩放并裁切(指定以高为基准)
+  SCALLING_BASE_HEIGHT_AND_CUT = 0x04,
   // 缩放并保持比例
-  SCALLING_AND_KEEP_RATIO = 0x03,
+  SCALLING_AND_KEEP_RATIO = 0x05,
   // 平铺
-  TILE = 0x04,
+  TILE = 0x05,
 };
 
-struct TextureInstace;
+class TextureInstace;
+class BaseTexturePool;
 
 // 纹理信息
 struct TextureInfo {
-  // 纹理(-1时仅填充颜色)
-  TextureInstace* texture_instance;
+  // 纹理池引用
+  std::shared_ptr<BaseTexturePool> pool_ptr;
+  // 纹理(null时仅填充颜色)
+  std::shared_ptr<TextureInstace> texture_instance;
   // 纹理对齐模式
   TextureAlignMode texture_alignmode;
   // 纹理填充模式

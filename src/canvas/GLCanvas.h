@@ -3,6 +3,8 @@
 
 #include <QtOpenGLWidgets/qopenglwidget.h>
 #include <qpoint.h>
+
+#include <memory>
 #ifdef __APPLE__
 #include <QtOpenGL/qopenglfunctions_4_1_core.h>
 #else
@@ -15,6 +17,7 @@
 #include "renderer/RendererManager.h"
 
 enum class TexturePoolType;
+class TextureAtlas;
 
 class GLCanvas : public QOpenGLWidget,
 #ifdef __APPLE__
@@ -26,7 +29,7 @@ class GLCanvas : public QOpenGLWidget,
   friend class AbstractRenderer;
   friend class StaticRenderer;
   friend class DynamicRenderer;
-  QPoint mouse_pos{0,0};
+  QPoint mouse_pos{0, 0};
 
  public:
   // 渲染器
@@ -36,8 +39,13 @@ class GLCanvas : public QOpenGLWidget,
   // 析构GLCanvas
   ~GLCanvas() override;
 
+  std::shared_ptr<TextureAtlas> current_atlas;
+
   // 添加纹理
-  void add_texture(const char *qrc_path, TexturePoolType type);
+  void add_texture(const char *qrc_path, TexturePoolType type, bool use_atlas);
+
+  // 完成纹理载入
+  void finalize_texture_loading();
 
   // 设置垂直同步
   void set_Vsync(bool flag);
