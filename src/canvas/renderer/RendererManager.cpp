@@ -146,8 +146,8 @@ void RendererManager::sync_renderer(
   // 同步贴图方式数据
   int policy = 0;
   if (texture_info) {
-    policy = (static_cast<int>(texture_info->texture_fillmode)) |
-             (static_cast<int>(texture_info->texture_alignmode));
+    policy = (static_cast<int>(command.texture_fillmode)) |
+             (static_cast<int>(command.texture_alignmode));
   }
   renderer->synchronize_data(
       InstanceDataType::TEXTURE_POLICY,

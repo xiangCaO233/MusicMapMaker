@@ -1,6 +1,7 @@
 #ifndef BASE_TEXTURE_POOL_H
 #define BASE_TEXTURE_POOL_H
 
+#include <cstdint>
 #include <memory>
 #include <unordered_map>
 
@@ -34,19 +35,24 @@ struct TextureUniformData {
 class BaseTexturePool {
   friend class RendererManager;
 
-  // 是否完成导入
-  bool is_finalized;
-
   // gl窗口上下文
   GLCanvas* cvs;
 
  public:
   // 白像素
   static std::shared_ptr<TextureInstace> WHITE_PIXEL;
+
   // 纹理映射表(id-纹理对象)
-  std::unordered_map<std::string, std::shared_ptr<TextureInstace>> texture_map;
+  std::unordered_map<std::string, std::shared_ptr<TextureInfo>> texture_map;
+
   // 纹理池类型
   TexturePoolType pool_type;
+
+  // 当前纹理id句柄
+  uint32_t current_id_handle{0};
+
+  // 是否完成导入
+  bool is_finalized;
 
   // 构造TexturePool
   BaseTexturePool(GLCanvas* canvas);

@@ -22,14 +22,6 @@ out vec4 fill_color;
 out float texture_policy;
 out float texture_id;
 
-// 纹理元数据(16b)
-struct TextureMeta{ 
-  float woffset;
-  float hoffset;
-  float width;
-  float height; 
-};
-
 void main() {
 	// 缩放矩形到指定大小
   vec2 scaled_pos = vpos.xy * shape_size * 0.5;

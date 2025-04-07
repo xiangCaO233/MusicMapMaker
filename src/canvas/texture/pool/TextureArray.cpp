@@ -1,10 +1,13 @@
 #include "TextureArray.h"
 
+#include "../../../log/colorful-log.h"
+
 // 最大采样器层数
 uint32_t TextureArray::max_texture_layer = 0;
 
 TextureArray::TextureArray(GLCanvas* canvas, QSize size)
     : BaseTexturePool(canvas), texture_size(size) {
+  XINFO("构造纹理数组纹理池");
   pool_type = TexturePoolType::ARRARY;
 }
 
@@ -25,7 +28,7 @@ int TextureArray::load_texture(std::shared_ptr<TextureInstace> texture) {
 }
 
 // 完成纹理池构造
-void TextureArray::finalize() {}
+void TextureArray::finalize() { XINFO("完成处理纹理数组纹理池"); }
 
 // 使用指定纹理
 void TextureArray::use_texture(std::shared_ptr<TextureInstace> texture) {}

@@ -39,7 +39,9 @@ class GLCanvas : public QOpenGLWidget,
   // 析构GLCanvas
   ~GLCanvas() override;
 
+  // 当前纹理集信息
   std::shared_ptr<TextureAtlas> current_atlas;
+  TexturePoolType current_atlas_used_pool;
 
   // 添加纹理
   void add_texture(const char *qrc_path, TexturePoolType type, bool use_atlas);

@@ -1,3 +1,6 @@
+#ifndef TEXTURE_INSTANCE_H
+#define TEXTURE_INSTANCE_H
+
 #include <qimage.h>
 #include <qsize.h>
 
@@ -8,7 +11,7 @@ class TextureInstace {
  public:
   TextureInstace();
 
-  explicit TextureInstace(const char *qrc_path);
+  explicit TextureInstace(const char* qrc_path);
 
   virtual ~TextureInstace();
 
@@ -59,3 +62,45 @@ class TextureInstace {
   // 纹理实例
   std::unique_ptr<QImage> texture_image;
 };
+
+class BaseTexturePool;
+
+// 纹理对齐模式
+enum class TextureAlignMode : int16_t {
+  // 对齐左下角
+  ALIGN_TO_LEFT_BOTTOM = 0x10,
+  // 对齐右下角
+  ALIGN_TO_RIGHT_BOTTOM = 0x20,
+  // 对齐左上角
+  ALIGN_TO_LEFT_TOP = 0x30,
+  // 对齐右上角
+  ALIGN_TO_RIGHT_TOP = 0x40,
+  // 对齐中心
+  ALIGN_TO_RIGHT_CENTER = 0x50,
+};
+
+// 纹理填充模式
+enum class TextureFillMode : int16_t {
+  // 缩放
+  SCALLING = 0x01,
+  // 缩放并裁切(自动)
+  SCALLING_AND_CUT = 0x02,
+  // 缩放并裁切(指定以宽为基准)
+  SCALLING_BASE_WIDTH_AND_CUT = 0x03,
+  // 缩放并裁切(指定以高为基准)
+  SCALLING_BASE_HEIGHT_AND_CUT = 0x04,
+  // 缩放并保持比例
+  SCALLING_AND_KEEP_RATIO = 0x05,
+  // 平铺
+  TILE = 0x05,
+};
+
+// 纹理信息
+struct TextureInfo {
+  // 纹理池引用
+  BaseTexturePool* pool_ptr;
+  // 纹理(null时仅填充颜色)
+  std::shared_ptr<TextureInstace> texture_instance;
+};
+
+#endif  // TEXTURE_INSTANCE_H

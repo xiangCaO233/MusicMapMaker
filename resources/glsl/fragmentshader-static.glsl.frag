@@ -24,6 +24,22 @@ uniform sampler2DArray samplerarray;
 // 使用纹理数组时的采样器数组偏移地址
 uniform int texture_array_offset;
 
+// 纹理元数据
+struct TextureMeta{ 
+  float woffset;
+  float hoffset;
+  float width;
+  float height; 
+};
+
+// 定义 UBO，大小固定为最大纹理集子纹理数
+layout(std140) uniform TextureMetaBuffer {
+	float atlas_width;
+  float atlas_height;
+	int sub_image_count;
+  TextureMeta textureMetas[1024];
+};
+
 // 渲染颜色结果(向后传输着色结果)
 out vec4 FragColor;
 

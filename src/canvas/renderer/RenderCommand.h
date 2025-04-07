@@ -4,58 +4,13 @@
 #include <qcolor.h>
 #include <qrect.h>
 
-#include <cstdint>
-#include <memory>
 #include <sstream>
 #include <string>
 
+#include "../texture/Texture.h"
+
 // 形状
 enum class ShapeType { QUAD, OVAL };
-
-// 纹理对齐模式
-enum class TextureAlignMode : int16_t {
-  // 对齐左下角
-  ALIGN_TO_LEFT_BOTTOM = 0x10,
-  // 对齐右下角
-  ALIGN_TO_RIGHT_BOTTOM = 0x20,
-  // 对齐左上角
-  ALIGN_TO_LEFT_TOP = 0x30,
-  // 对齐右上角
-  ALIGN_TO_RIGHT_TOP = 0x40,
-  // 对齐中心
-  ALIGN_TO_RIGHT_CENTER = 0x50,
-};
-
-// 纹理填充模式
-enum class TextureFillMode : int16_t {
-  // 缩放
-  SCALLING = 0x01,
-  // 缩放并裁切(自动)
-  SCALLING_AND_CUT = 0x02,
-  // 缩放并裁切(指定以宽为基准)
-  SCALLING_BASE_WIDTH_AND_CUT = 0x03,
-  // 缩放并裁切(指定以高为基准)
-  SCALLING_BASE_HEIGHT_AND_CUT = 0x04,
-  // 缩放并保持比例
-  SCALLING_AND_KEEP_RATIO = 0x05,
-  // 平铺
-  TILE = 0x05,
-};
-
-class TextureInstace;
-class BaseTexturePool;
-
-// 纹理信息
-struct TextureInfo {
-  // 纹理池引用
-  std::shared_ptr<BaseTexturePool> pool_ptr;
-  // 纹理(null时仅填充颜色)
-  std::shared_ptr<TextureInstace> texture_instance;
-  // 纹理对齐模式
-  TextureAlignMode texture_alignmode;
-  // 纹理填充模式
-  TextureFillMode texture_fillmode;
-};
 
 // 绘制指令
 struct RenderCommand {
@@ -71,6 +26,11 @@ struct RenderCommand {
   QColor fill_color;
   // 纹理信息
   TextureInfo* texture_info;
+
+  // 纹理对齐模式
+  TextureAlignMode texture_alignmode;
+  // 纹理填充模式
+  TextureFillMode texture_fillmode;
 
   // 重写==运算符
   bool operator==(const RenderCommand& other) const {

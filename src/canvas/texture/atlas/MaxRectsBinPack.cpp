@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "../../../log/colorful-log.h"
-#include "../pool/BaseTexturePool.h"
+#include "TextureAtlas.h"
 
 using namespace std;
 
@@ -43,7 +43,7 @@ void MaxRectsBinPack::Expand(float rate) {
   XINFO("扩容到[" + to_string(binWidth) + "x" + to_string(binHeight) + "]");
 }
 
-void MaxRectsBinPack::Insert(shared_ptr<TextureInstace> instance,
+void MaxRectsBinPack::Insert(shared_ptr<AtlasSubTexture> instance,
                              FreeRectChoiceHeuristic method) {
   XINFO("插入纹理:[" + instance->name + "]");
   auto res = Insert(instance->texture_image->width(),
@@ -54,7 +54,7 @@ void MaxRectsBinPack::Insert(shared_ptr<TextureInstace> instance,
     XINFO("扩容完成");
     restex.push_back(instance);
     // 转移缓存
-    vector<shared_ptr<TextureInstace>> tempmetas;
+    vector<shared_ptr<AtlasSubTexture>> tempmetas;
     for (auto &tex : restex) {
       tempmetas.push_back(tex);
     }
