@@ -30,10 +30,10 @@ AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
 
   // 基本顶点
   std::vector<float> vertices = {
-      -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,  // v1
-      1.0f,  -1.0f, 1.0f, 1.0f, 0.0f,  // v2
-      1.0f,  1.0f,  1.0f, 1.0f, 1.0f,  // v3
-      -1.0f, 1.0f,  1.0f, 0.0f, 1.0f,  // v4
+      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,  // v1
+      1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,  // v2
+      1.0f,  1.0f,  0.0f, 1.0f, 1.0f,  // v3
+      -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  // v4
   };
   // 初始化椭圆顶点
   for (int i = 0; i < oval_segment; i++) {
@@ -83,23 +83,35 @@ void AbstractRenderer::unbind() {
   GLCALL(cvs->glUseProgram(0));
 }
 
+// 设置采样器
+void AbstractRenderer::set_sampler(const char* name, int value) {
+  auto location = GLCALL(cvs->glGetUniformLocation(shader_program, name));
+  GLCALL(cvs->glUniform1i(location, value));
+}
+
 // 设置uniform浮点
 void AbstractRenderer::set_uniform_float(const char* location_name,
                                          float value) {
-  auto locationit = uniform_locations.find(location_name);
-  if (locationit == uniform_locations.end()) {
-    // 直接查询
-    auto location =
-        GLCALL(cvs->glGetUniformLocation(shader_program, location_name));
-    locationit = uniform_locations.try_emplace(location_name, location).first;
-  }
   // 设置uniform
-  GLCALL(cvs->glUniform1f(locationit->second, value));
+  GLCALL(cvs->glUniform1f(uniform_loc(location_name), value));
+}
+
+// 设置uniform整数
+void AbstractRenderer::set_uniform_integer(const char* location_name,
+                                           int32_t value) {
+  // 设置uniform
+  GLCALL(cvs->glUniform1i(uniform_loc(location_name), value));
 }
 
 // 设置uniform矩阵(4x4)
 void AbstractRenderer::set_uniform_mat4(const char* location_name,
                                         const QMatrix4x4& mat) {
+  // 设置uniform
+  GLCALL(cvs->glUniformMatrix4fv(uniform_loc(location_name), 1, GL_FALSE,
+                                 mat.data()));
+}
+
+int32_t AbstractRenderer::uniform_loc(const char* location_name) {
   auto locationit = uniform_locations.find(location_name);
   if (locationit == uniform_locations.end()) {
     // 直接查询
@@ -107,10 +119,7 @@ void AbstractRenderer::set_uniform_mat4(const char* location_name,
         GLCALL(cvs->glGetUniformLocation(shader_program, location_name));
     locationit = uniform_locations.try_emplace(location_name, location).first;
   }
-  // XINFO("更新矩阵->");
-  // qDebug() << mat;
-  // 设置uniform
-  GLCALL(cvs->glUniformMatrix4fv(locationit->second, 1, GL_FALSE, mat.data()));
+  return locationit->second;
 }
 
 // 渲染指定图形实例

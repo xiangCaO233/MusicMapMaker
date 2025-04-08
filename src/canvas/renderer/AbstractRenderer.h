@@ -1,6 +1,8 @@
 #ifndef ABSTRACT_RENDERER_H
 #define ABSTRACT_RENDERER_H
 
+#include <GL/gl.h>
+
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
@@ -76,10 +78,16 @@ class AbstractRenderer {
   // 析构AbstractRenderer
   virtual ~AbstractRenderer();
 
+  // 设置采样器
+  void set_sampler(const char* name, int value);
   // 设置uniform浮点
   void set_uniform_float(const char* location_name, float value);
+  // 设置uniform整数
+  void set_uniform_integer(const char* location_name, int32_t value);
   // 设置uniform矩阵(4x4)
   void set_uniform_mat4(const char* location_name, const QMatrix4x4& mat);
+
+  int32_t uniform_loc(const char* location_name);
 
   // 绑定渲染器
   virtual void bind();

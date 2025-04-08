@@ -5,15 +5,22 @@
 #include <qsize.h>
 
 #include <cstdint>
+#include <memory>
 #include <string>
+
+class BaseTexturePool;
 
 class TextureInstace {
  public:
   TextureInstace();
 
-  explicit TextureInstace(const char* qrc_path);
+  explicit TextureInstace(const char* qrc_path,
+                          std::shared_ptr<BaseTexturePool> preference);
 
   virtual ~TextureInstace();
+
+  // 是否为纹理集
+  bool is_atlas;
 
   // 名称
   std::string name;
@@ -60,10 +67,11 @@ class TextureInstace {
   uint32_t texture_id;
 
   // 纹理实例
-  std::unique_ptr<QImage> texture_image;
-};
+  QImage texture_image;
 
-class BaseTexturePool;
+  // 纹理池引用
+  std::shared_ptr<BaseTexturePool> pool_reference;
+};
 
 // 纹理对齐模式
 enum class TextureAlignMode : int16_t {
@@ -93,14 +101,6 @@ enum class TextureFillMode : int16_t {
   SCALLING_AND_KEEP_RATIO = 0x05,
   // 平铺
   TILE = 0x05,
-};
-
-// 纹理信息
-struct TextureInfo {
-  // 纹理池引用
-  BaseTexturePool* pool_ptr;
-  // 纹理(null时仅填充颜色)
-  std::shared_ptr<TextureInstace> texture_instance;
 };
 
 #endif  // TEXTURE_INSTANCE_H

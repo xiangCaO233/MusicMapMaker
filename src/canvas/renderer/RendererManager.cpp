@@ -9,6 +9,8 @@
 #include "renderer/AbstractRenderer.h"
 #include "renderer/dynamic/DynamicRenderer.h"
 #include "renderer/static/StaticRenderer.h"
+#include "texture/pool/TextureArray.h"
+#include "texture/pool/TexturePool.h"
 
 uint32_t RendererManager::static_instance_index = 0;
 uint32_t RendererManager::dynamic_instance_index = 0;
@@ -37,15 +39,28 @@ void RendererManager::finalize() {
           (command.is_volatile
                ? std::dynamic_pointer_cast<AbstractRenderer>(dynamic_renderer)
                : std::dynamic_pointer_cast<AbstractRenderer>(static_renderer));
+      // 获取贴图
+      const auto& texture = command.texture;
+
       // 更新渲染操作队列
       if (  // 操作队列为空
           operation_queue.empty() ||
           // 操作队列尾渲染器不同
           operation_queue.back().renderer != renderer ||
           // 操作队列尾渲染图形类型不同
-          operation_queue.back().shape_type != command.instance_shape) {
+          operation_queue.back().shape_type != command.instance_shape ||
+          // 当前指令纹理池使用与操作队列尾不同时无纹理池使用
+          (texture == nullptr) !=
+              (operation_queue.back().texture_pool == nullptr) ||
+          // 操作队列尾使用纹理池不同
+          (texture ?
+                   // texture非空,操作队列尾纹理池也非空
+               operation_queue.back().texture_pool != texture->pool_reference
+                   // texture空,操作队列尾纹理池也空-可合并了
+                   : false)) {
         // 新建渲染操作
-        operation_queue.emplace(command.instance_shape, renderer,
+        operation_queue.emplace(command, command.instance_shape, renderer,
+                                texture ? texture->pool_reference : nullptr,
                                 (command.is_volatile ? dynamic_instance_index
                                                      : static_instance_index),
                                 1);
@@ -74,6 +89,8 @@ void RendererManager::finalize() {
           (command.is_volatile
                ? std::dynamic_pointer_cast<AbstractRenderer>(dynamic_renderer)
                : std::dynamic_pointer_cast<AbstractRenderer>(static_renderer));
+      // 获取贴图
+      const auto& texture = command.texture;
       if (i < command_list_temp.size()) {
         // 检查缓存
         if (command != command_list_temp[i]) {
@@ -90,9 +107,19 @@ void RendererManager::finalize() {
           // 操作队列尾渲染器不同
           operation_queue.back().renderer != renderer ||
           // 操作队列尾渲染图形类型不同
-          operation_queue.back().shape_type != command.instance_shape) {
+          operation_queue.back().shape_type != command.instance_shape ||
+          // 当前指令纹理池使用与操作队列尾不同时无纹理池使用
+          (texture == nullptr) !=
+              (operation_queue.back().texture_pool == nullptr) ||
+          // 操作队列尾使用纹理池不同
+          (texture ?
+                   // texture非空,操作队列尾纹理池也非空
+               operation_queue.back().texture_pool != texture->pool_reference
+                   // texture空,操作队列尾纹理池也空-可合并了
+                   : false)) {
         // 新建渲染操作
-        operation_queue.emplace(command.instance_shape, renderer,
+        operation_queue.emplace(command, command.instance_shape, renderer,
+                                texture ? texture->pool_reference : nullptr,
                                 (command.is_volatile ? dynamic_instance_index
                                                      : static_instance_index),
                                 1);
@@ -140,12 +167,12 @@ void RendererManager::sync_renderer(
       (command.is_volatile ? dynamic_instance_index : static_instance_index),
       &command.rotation);
 
-  // 获取贴图信息
-  auto& texture_info = command.texture_info;
+  // 获取贴图
+  const auto& texture = command.texture;
 
   // 同步贴图方式数据
   int policy = 0;
-  if (texture_info) {
+  if (texture) {
     policy = (static_cast<int>(command.texture_fillmode)) |
              (static_cast<int>(command.texture_alignmode));
   }
@@ -156,8 +183,8 @@ void RendererManager::sync_renderer(
 
   // 同步贴图id数据
   int texture_id = 0;
-  if (texture_info) {
-    texture_id = texture_info->texture_instance->texture_id;
+  if (texture) {
+    texture_id = texture->texture_id;
   }
   renderer->synchronize_data(
       InstanceDataType::TEXTURE_ID,
@@ -174,21 +201,22 @@ void RendererManager::sync_renderer(
 }
 
 // 添加矩形
-void RendererManager::addRect(const QRectF& rect, TextureInfo* texture_info,
+void RendererManager::addRect(const QRectF& rect,
+                              std::shared_ptr<TextureInstace> texture,
                               const QColor& fill_color, float rotation,
                               bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(is_volatile, ShapeType::QUAD, rect, rotation,
-                            fill_color, texture_info);
+                            fill_color, texture);
 }
 // 添加椭圆
 void RendererManager::addEllipse(const QRectF& bounds,
-                                 TextureInfo* texture_info,
+                                 std::shared_ptr<TextureInstace> texture,
                                  const QColor& fill_color, float rotation,
                                  bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(is_volatile, ShapeType::OVAL, bounds, rotation,
-                            fill_color, texture_info);
+                            fill_color, texture);
 }
 
 // 渲染全部图形
@@ -200,6 +228,31 @@ void RendererManager::renderAll() {
   while (!operation_queue.empty()) {
     auto& operetion = operation_queue.front();
     operetion.renderer->bind();
+
+    // 检查纹理池
+    auto& texpool = operetion.texture_pool;
+    if (texpool) {
+      auto base_pool = std::dynamic_pointer_cast<TexturePool>(texpool);
+      if (base_pool) {
+        // 使用basepool
+        XINFO("使用base pool");
+        // 使用头指令纹理所处批次
+        base_pool->use_batch(
+            base_pool->batch_mapping[operetion.head_command.texture].first,
+            operetion.renderer);
+      } else {
+        auto array_pool = std::dynamic_pointer_cast<TextureArray>(texpool);
+        if (array_pool) {
+          // 使用arraypool
+          XINFO("使用array pool");
+          // 使用纹理数组池
+          array_pool->use();
+        }
+      }
+    } else {
+      // 不使用纹理池
+      operetion.renderer->set_uniform_integer("texture_pool_usage", 0);
+    }
     operetion.renderer->render(operetion.shape_type,
                                operetion.start_shape_index,
                                operetion.render_shape_count);
@@ -214,9 +267,30 @@ void RendererManager::renderAll() {
   dynamic_renderer->reset_update();
 }
 
+// 设置采样器
+void RendererManager::set_sampler(const char* name, int value) const {
+  static_renderer->bind();
+  static_renderer->set_sampler(name, value);
+  static_renderer->unbind();
+
+  dynamic_renderer->bind();
+  dynamic_renderer->set_sampler(name, value);
+  dynamic_renderer->unbind();
+}
+void RendererManager::set_static_sampler(const char* name, int value) const {
+  static_renderer->bind();
+  static_renderer->set_uniform_float(name, value);
+  static_renderer->unbind();
+}
+void RendererManager::set_dynamic_sampler(const char* name, int value) const {
+  dynamic_renderer->bind();
+  dynamic_renderer->set_sampler(name, value);
+  dynamic_renderer->unbind();
+}
+
 // 设置uniform浮点
 void RendererManager::set_uniform_float(const char* location_name,
-                                        float value) {
+                                        float value) const {
   static_renderer->bind();
   static_renderer->set_uniform_float(location_name, value);
   static_renderer->unbind();
@@ -225,14 +299,38 @@ void RendererManager::set_uniform_float(const char* location_name,
   dynamic_renderer->set_uniform_float(location_name, value);
   dynamic_renderer->unbind();
 }
+void RendererManager::set_static_uniform_float(const char* location_name,
+                                               float value) const {
+  static_renderer->bind();
+  static_renderer->set_uniform_float(location_name, value);
+  static_renderer->unbind();
+}
+void RendererManager::set_dynamic_uniform_float(const char* location_name,
+                                                float value) const {
+  dynamic_renderer->bind();
+  dynamic_renderer->set_uniform_float(location_name, value);
+  dynamic_renderer->unbind();
+}
 
 // 设置uniform矩阵(4x4)
 void RendererManager::set_uniform_mat4(const char* location_name,
-                                       QMatrix4x4& mat) {
+                                       QMatrix4x4& mat) const {
   static_renderer->bind();
   static_renderer->set_uniform_mat4(location_name, mat);
   static_renderer->unbind();
 
+  dynamic_renderer->bind();
+  dynamic_renderer->set_uniform_mat4(location_name, mat);
+  dynamic_renderer->unbind();
+}
+void RendererManager::set_static_uniform_mat4(const char* location_name,
+                                              QMatrix4x4& mat) const {
+  static_renderer->bind();
+  static_renderer->set_uniform_mat4(location_name, mat);
+  static_renderer->unbind();
+}
+void RendererManager::set_dynamic_uniform_mat4(const char* location_name,
+                                               QMatrix4x4& mat) const {
   dynamic_renderer->bind();
   dynamic_renderer->set_uniform_mat4(location_name, mat);
   dynamic_renderer->unbind();

@@ -24,8 +24,8 @@ struct RenderCommand {
   float rotation;
   // 填充颜色(无绑定纹理时或被裁切部分的填充颜色)
   QColor fill_color;
-  // 纹理信息
-  TextureInfo* texture_info;
+  // 纹理
+  std::shared_ptr<TextureInstace> texture;
 
   // 纹理对齐模式
   TextureAlignMode texture_alignmode;
@@ -37,7 +37,7 @@ struct RenderCommand {
     return is_volatile == other.is_volatile &&
            instance_shape == other.instance_shape &&
            instace_bound == other.instace_bound &&
-           fill_color == other.fill_color && texture_info == other.texture_info;
+           fill_color == other.fill_color && texture == other.texture;
   }
   std::string toString() const {
     std::ostringstream oss;
@@ -61,10 +61,10 @@ struct RenderCommand {
         << instace_bound.width() << ", " << instace_bound.height() << ")"
         << "\n  rotation: " << rotation << "°"
         << "\n  fill_color: " << fill_color.name().toStdString()
-        << "\n  texture_info: ";
+        << "\n  texture: ";
 
-    if (texture_info) {
-      oss << "TextureInfo@" << texture_info;  // 假设只打印指针地址
+    if (texture) {
+      oss << texture->name;
     } else {
       oss << "nullptr";
     }

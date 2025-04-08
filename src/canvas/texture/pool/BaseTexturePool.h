@@ -13,9 +13,9 @@
 class GLCanvas;
 
 // 纹理池类型
-enum class TexturePoolType {
-  BASE_POOL,
-  ARRARY,
+enum class TexturePoolType : int32_t {
+  BASE_POOL = 1,
+  ARRARY = 2,
 };
 
 // 纹理uniform(传递到shader)
@@ -33,17 +33,17 @@ struct TextureUniformData {
 };
 
 class BaseTexturePool {
-  friend class RendererManager;
-
-  // gl窗口上下文
-  GLCanvas* cvs;
-
  public:
   // 白像素
   static std::shared_ptr<TextureInstace> WHITE_PIXEL;
 
+  // gl窗口上下文
+  GLCanvas* cvs;
+
   // 纹理映射表(id-纹理对象)
-  std::unordered_map<std::string, std::shared_ptr<TextureInfo>> texture_map;
+  std::unordered_map<std::string, std::shared_ptr<TextureInstace>> texture_map;
+  // 纹理gl句柄映射表(纹理对象-gl句柄)
+  std::unordered_map<std::shared_ptr<TextureInstace>, uint32_t> glhandler_map;
 
   // 纹理池类型
   TexturePoolType pool_type;
@@ -70,10 +70,6 @@ class BaseTexturePool {
 
   // 判满
   virtual bool is_full() = 0;
-
-  // 使用指定纹理
-  // 使用单独纹理池时需设置连续的uniform
-  virtual void use_texture(std::shared_ptr<TextureInstace> texture) = 0;
 };
 
 #endif  // BASE_TEXTURE_POOL_H

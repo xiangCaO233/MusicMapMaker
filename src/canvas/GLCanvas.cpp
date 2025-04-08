@@ -133,7 +133,10 @@ void GLCanvas::initializeGL() {
   // 查询纹理采样器最大连续数量
   GLint max_fragment_samplers;
   glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fragment_samplers);
-  XINFO("纹理采样器最大连续数量: " + std::to_string(max_fragment_samplers));
+  XINFO("纹理采样器最大连续数量: " + std::to_string(max_fragment_samplers / 2));
+  if (max_fragment_samplers > 16) {
+    max_fragment_samplers = 16;
+  }
   TexturePool::max_sampler_consecutive_count = max_fragment_samplers;
 
   // 查询纹理采样器最大数量
@@ -165,7 +168,7 @@ void GLCanvas::initializeGL() {
   GLCALL(glGenVertexArrays(1, &VAO));
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
-  QString path = ":/textures/test/1024/";
+  QString path = QDir::currentPath() + "/../resources/textures/test/1024/";
 
   QDir dir(path);
   if (!dir.exists()) {
@@ -213,18 +216,19 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 添加渲染内容
-
   auto rect = QRectF(100, 100, 50, 50);
-  renderer_manager->addRect(rect, nullptr, Qt::red, 0.0f, false);
+  renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 15.0f,
+                            false);
 
-  auto rect3 = QRectF(50, 200, 80, 160);
-  renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, false);
+  // auto rect3 = QRectF(50, 200, 80, 160);
+  // renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, false);
 
-  auto rect4 = QRectF(200, 60, 75, 30);
-  renderer_manager->addRect(rect4, nullptr, Qt::yellow, 0.0f, false);
+  // auto rect4 = QRectF(200, 60, 75, 30);
+  // renderer_manager->addRect(rect4, nullptr, Qt::yellow, 0.0f, false);
 
   auto rect2 = QRectF(0, 0, 100, 100);
-  renderer_manager->addEllipse(rect2, nullptr, Qt::blue, 45.0f, true);
+  renderer_manager->addEllipse(rect2, texture_map["aimudeng.png"], Qt::blue,
+                               45.0f, false);
 
   auto mouse_rec = QRectF(mouse_pos.x() - 10, mouse_pos.y() - 10, 20, 20);
   renderer_manager->addEllipse(mouse_rec, nullptr, Qt::green, 0.0f, true);
@@ -354,10 +358,11 @@ void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type,
     }
   } else {
     // 直接初始化纹理
-    texture = std::make_shared<TextureInstace>(qrc_path);
+    texture = std::make_shared<TextureInstace>(qrc_path, pool);
     // 载入纹理
     auto res = pool->load_texture(texture);
   }
+  texture_map.try_emplace(texture->name, texture);
 }
 
 // 完成纹理载入

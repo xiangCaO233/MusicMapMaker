@@ -14,10 +14,14 @@ class BaseTexturePool;
 
 // 渲染操作
 struct RenderOperation {
+  // 此操作包的首绘制指令
+  RenderCommand head_command;
   // 此渲染操作的图形类型
   ShapeType shape_type;
   // 此渲染操作的渲染器
   std::shared_ptr<AbstractRenderer> renderer;
+  // 此渲染操作使用的纹理池
+  std::shared_ptr<BaseTexturePool> texture_pool;
   // 此渲染操作的起始图形索引
   int32_t start_shape_index;
   // 此渲染操作的渲染图形数量
@@ -66,17 +70,28 @@ class RendererManager {
   void use_texture_pool(const std::shared_ptr<BaseTexturePool>& texture_pool);
 
   // 添加矩形
-  void addRect(const QRectF& rect, TextureInfo* texture_info,
+  void addRect(const QRectF& rect, std::shared_ptr<TextureInstace> texture,
                const QColor& fill_color, float rotation, bool is_volatile);
   // 添加椭圆
-  void addEllipse(const QRectF& bounds, TextureInfo* texture_info,
+  void addEllipse(const QRectF& bounds, std::shared_ptr<TextureInstace> texture,
                   const QColor& fill_color, float rotation, bool is_volatile);
 
+  // 设置采样器
+  void set_sampler(const char* name, int value) const;
+  void set_static_sampler(const char* name, int value) const;
+  void set_dynamic_sampler(const char* name, int value) const;
+
   // 设置uniform浮点
-  void set_uniform_float(const char* location_name, float value);
+  void set_uniform_float(const char* location_name, float value) const;
+  void set_static_uniform_float(const char* location_name, float value) const;
+  void set_dynamic_uniform_float(const char* location_name, float value) const;
 
   // 设置uniform矩阵(4x4)
-  void set_uniform_mat4(const char* location_name, QMatrix4x4& mat);
+  void set_uniform_mat4(const char* location_name, QMatrix4x4& mat) const;
+  void set_static_uniform_mat4(const char* location_name,
+                               QMatrix4x4& mat) const;
+  void set_dynamic_uniform_mat4(const char* location_name,
+                                QMatrix4x4& mat) const;
 
   // 渲染全部图形
   void renderAll();

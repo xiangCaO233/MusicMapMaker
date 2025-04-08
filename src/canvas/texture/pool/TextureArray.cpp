@@ -21,7 +21,7 @@ int TextureArray::load_texture(std::shared_ptr<TextureInstace> texture) {
   if (is_full()) {
     return POOL_FULL;
   }
-  if (texture->texture_image->size() != texture_size) {
+  if (texture->texture_image.size() != texture_size) {
     return EXPECTED_SIZE;
   }
   return SUCCESS;
@@ -30,5 +30,6 @@ int TextureArray::load_texture(std::shared_ptr<TextureInstace> texture) {
 // 完成纹理池构造
 void TextureArray::finalize() { XINFO("完成处理纹理数组纹理池"); }
 
-// 使用指定纹理
-void TextureArray::use_texture(std::shared_ptr<TextureInstace> texture) {}
+// 使用纹理数组池
+// 使用纹理集请在use后更新usage的uniform
+void TextureArray::use() {}

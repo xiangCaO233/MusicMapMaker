@@ -28,8 +28,8 @@ class TextureArray : public BaseTexturePool {
   // 完成纹理池构造
   void finalize() override;
 
-  // 使用指定纹理
-  void use_texture(std::shared_ptr<TextureInstace> texture) override;
+  // 使用纹理数组池
+  void use();
 
  protected:
 };

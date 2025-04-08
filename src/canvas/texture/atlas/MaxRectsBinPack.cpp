@@ -46,8 +46,8 @@ void MaxRectsBinPack::Expand(float rate) {
 void MaxRectsBinPack::Insert(shared_ptr<AtlasSubTexture> instance,
                              FreeRectChoiceHeuristic method) {
   XINFO("插入纹理:[" + instance->name + "]");
-  auto res = Insert(instance->texture_image->width(),
-                    instance->texture_image->height(), method);
+  auto res = Insert(instance->texture_image.width(),
+                    instance->texture_image.height(), method);
   if (res.height == 0) {
     XWARN("空间不足");
     Expand(binexpandrate);
