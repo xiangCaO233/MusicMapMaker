@@ -3,6 +3,7 @@
 #include <qvectornd.h>
 
 #include <memory>
+#include <type_traits>
 
 #include "../texture/pool/BaseTexturePool.h"
 #include "colorful-log.h"
@@ -173,7 +174,8 @@ void RendererManager::sync_renderer(
   // 同步贴图方式数据
   int policy = 0;
   if (texture) {
-    policy = (static_cast<int>(command.texture_fillmode)) |
+    policy = (static_cast<int>(command.texture_complementmode) |
+              static_cast<int>(command.texture_fillmode)) |
              (static_cast<int>(command.texture_alignmode));
   }
   renderer->synchronize_data(

@@ -26,37 +26,37 @@ const int MASK_FILL = 0x000F;
 
 // 纹理补充模式
 // 使用填充色
-const int FILL_COLOR = 0x0100;        
+const int FILL_COLOR = 0x0100;
 // 重复贴图
-const int REPEAT_TEXTURE = 0x0200;    
+const int REPEAT_TEXTURE = 0x0200;
 
 // 纹理对齐模式
 // 对齐左下角
-const int ALIGN_LEFT_BOTTOM = 0x0010;   
+const int ALIGN_LEFT_BOTTOM = 0x0010;
 // 对齐右下角
-const int ALIGN_RIGHT_BOTTOM = 0x0020;  
+const int ALIGN_RIGHT_BOTTOM = 0x0020;
 // 对齐左上角
-const int ALIGN_LEFT_TOP = 0x0030;      
+const int ALIGN_LEFT_TOP = 0x0030;
 // 对齐右上角
-const int ALIGN_RIGHT_TOP = 0x0040;     
+const int ALIGN_RIGHT_TOP = 0x0040;
 // 对齐中心
-const int ALIGN_CENTER = 0x0050;        
+const int ALIGN_CENTER = 0x0050;
 
 // 纹理填充模式
 // 缩放, 直接塞入(比例不一致会变形)
-const int FILL = 0x0001;                      
+const int FILL = 0x0001;
 // 裁切
-// 裁切--比例不一致会保证不变形的前提下裁剪一部分																								
+// 裁切--比例不一致会保证不变形的前提下裁剪一部分
 // 缩放并平铺
 // (选择会导致丢失像素最少的一边为基准裁剪)
 // 保证最大可视度
-const int SCALLING_AND_TILE = 0x0002;             
+const int SCALLING_AND_TILE = 0x0002;
 // 缩放并裁切 (强制指定以宽为基准)
-const int SCALLING_BASE_WIDTH_AND_CUT = 0x0003;   
+const int SCALLING_BASE_WIDTH_AND_CUT = 0x0003;
 // 缩放并裁切 (强制指定以高为基准)
-const int SCALLING_BASE_HEIGHT_AND_CUT = 0x0004;  
+const int SCALLING_BASE_HEIGHT_AND_CUT = 0x0004;
 // 缩放并保持比例，留出一部分空白保证不变形放下完整图形
-const int SCALLING_AND_KEEP_RATIO = 0x0005;       
+const int SCALLING_AND_KEEP_RATIO = 0x0005;
 
 // 纹理集元数据
 struct TextureMeta {
@@ -83,6 +83,8 @@ out float texture_policy;
 out float texture_id;
 // 预处理图形纹理uv
 out vec2 texture_uv;
+// 当前绘制形状的边界矩形尺寸
+out vec2 bound_size;
 
 void main() {
   // 缩放矩形到指定大小
@@ -95,10 +97,9 @@ void main() {
   mat2 rotation_matrix = mat2(cos_angle, -sin_angle, sin_angle, cos_angle);
   vec2 rotated_pos = rotation_matrix * scaled_pos;
 
-
   // 传递纹理数据
-	texture_id = shape_texture_id;
-	texture_policy = shape_texture_policy;
+  texture_id = shape_texture_id;
+  texture_policy = shape_texture_policy;
 
   // 平移到指定位置
   vec2 final_pos = rotated_pos + shape_pos + shape_size / 2;
@@ -111,27 +112,28 @@ void main() {
   // 应用视图和投影矩阵
   vec4 glpos = projection_mat * vec4(final_pos, 0.0, 1.0);
   gl_Position = vec4(glpos.x - 1.0, glpos.y + 1.0, glpos.zw);
+  bound_size = shape_size;
 
-	// 取出模式
-	int texture_comolement_mode = int(shape_texture_policy) & MASK_COMPLEMENT;
-	int texture_align_mode = int(shape_texture_policy) & MASK_ALIGN;
-	int texture_fill_mode = int(shape_texture_policy) & MASK_FILL;
+  // 取出模式
+  int texture_comolement_mode = int(shape_texture_policy) & MASK_COMPLEMENT;
+  int texture_align_mode = int(shape_texture_policy) & MASK_ALIGN;
+  int texture_fill_mode = int(shape_texture_policy) & MASK_FILL;
 
-	//TODO 实现纹理预处理
-	if(useatlas != 1){
-		// 不使用纹理集
-		switch(texture_fill_mode){
-			case FILL:{
-									break;
-								}
-			case SCALLING_AND_TILE:{
-									break
-								}
-		}
-	}else{
-		// 使用纹理集
-	}
+  // TODO 实现纹理预处理
+  if (useatlas != 1) {
+    // 不使用纹理集
+    switch (texture_fill_mode) {
+      case FILL: {
+        break;
+      }
+      case SCALLING_AND_TILE: {
+        break;
+      }
+    }
+  } else {
+    // 使用纹理集
+  }
 
   // 传递纹理uv
-	texture_uv = vuv;
+  texture_uv = vuv;
 }

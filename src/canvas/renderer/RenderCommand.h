@@ -98,6 +98,9 @@ struct RenderCommand {
       case TextureFillMode::FILL:
         oss << "SCALLING";
         break;
+      case TextureFillMode::KEEP:
+        oss << "KEEP";
+        break;
       case TextureFillMode::SCALLING_AND_TILE:
         oss << "SCALLING_AND_TILE";
         break;
@@ -106,9 +109,6 @@ struct RenderCommand {
         break;
       case TextureFillMode::SCALLING_BASE_HEIGHT_AND_CUT:
         oss << "SCALLING_BASE_HEIGHT_AND_CUT";
-        break;
-      case TextureFillMode::SCALLING_AND_KEEP_RATIO:
-        oss << "SCALLING_AND_KEEP_RATIO";
         break;
     }
 

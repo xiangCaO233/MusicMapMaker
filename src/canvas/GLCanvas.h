@@ -46,6 +46,10 @@ class GLCanvas : public QOpenGLWidget,
   // 纹理映射表(id-纹理对象)
   std::unordered_map<std::string, std::shared_ptr<TextureInstace>> texture_map;
 
+  // 从指定目录添加纹理
+  void load_texture_from_path(const char *path, TexturePoolType type,
+                              bool use_atlas);
+
   // 添加纹理
   void add_texture(const char *qrc_path, TexturePoolType type, bool use_atlas);
 

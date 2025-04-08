@@ -4,6 +4,7 @@
 #include <qdir.h>
 #include <qdiriterator.h>
 #include <qlogging.h>
+#include <qobject.h>
 #include <qpainter.h>
 
 #include <QFile>
@@ -170,24 +171,10 @@ void GLCanvas::initializeGL() {
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
-  QString path = QDir::currentPath() + "/../resources/textures/test/1024/";
-
-  QDir dir(path);
-  if (!dir.exists()) {
-    qWarning() << "Directory does not exist:" << path;
-    return;
-  }
-
-  // 递归遍历所有文件和子目录
-  QDirIterator it(path, QDirIterator::Subdirectories);
-  while (it.hasNext()) {
-    QString filePath = it.next();
-    std::string filestr = filePath.toStdString();
-    auto file = filestr.c_str();
-    if (it.fileInfo().isFile()) {
-      add_texture(file, TexturePoolType::BASE_POOL, false);
-    }
-  }
+  load_texture_from_path("../resources/textures/test/other",
+                         TexturePoolType::BASE_POOL, false);
+  load_texture_from_path("../resources/textures/test/1024",
+                         TexturePoolType::BASE_POOL, false);
   finalize_texture_loading();
 }
 void GLCanvas::resizeGL(int w, int h) {
@@ -214,21 +201,23 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 添加渲染内容
-  auto rect = QRectF(100, 100, 50, 50);
-  renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 15.0f,
-                            false);
+  auto rect = QRectF(100, 100, 200, 300);
+  renderer_manager->addRect(rect, texture_map["avatar-32x32.png"], Qt::red,
+                            15.0f, false);
 
-  auto rect3 = QRectF(50, 200, 80, 160);
-  renderer_manager->addRect(rect3, texture_map["xinzexi.png"], Qt::cyan, -30.0f,
-                            false);
+  // auto rect3 = QRectF(50, 200, 80, 160);
+  // renderer_manager->addRect(rect3, texture_map["xinzexi.png"], Qt::cyan,
+  // -30.0f,
+  //                           false);
 
-  auto rect4 = QRectF(200, 60, 75, 30);
-  renderer_manager->addRect(rect4, texture_map["aijier.png"], Qt::yellow, 0.0f,
-                            false);
+  // auto rect4 = QRectF(200, 60, 75, 30);
+  // renderer_manager->addRect(rect4, texture_map["aijier.png"], Qt::yellow,
+  // 0.0f,
+  //                           false);
 
-  auto rect2 = QRectF(0, 0, 100, 100);
-  renderer_manager->addRect(rect2, texture_map["xingdengbao.png"], Qt::blue,
-                            45.0f, false);
+  // auto rect2 = QRectF(0, 0, 100, 100);
+  // renderer_manager->addRect(rect2, texture_map["xingdengbao.png"], Qt::blue,
+  //                           45.0f, false);
 
   // 执行渲染
   renderer_manager->renderAll();
@@ -238,6 +227,29 @@ void GLCanvas::paintGL() {
   XINFO("frame_time: " + std::to_string(frame_time.count()) + "ns");
   XWARN("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
   XWARN("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
+}
+
+// 从指定目录添加纹理
+void GLCanvas::load_texture_from_path(const char *p, TexturePoolType type,
+                                      bool use_atlas) {
+  QString qps(p);
+  QString path = QDir::currentPath() + "/" + qps + "/";
+  QDir dir(path);
+  if (!dir.exists()) {
+    qWarning() << "Directory does not exist:" << path;
+    return;
+  }
+
+  // 递归遍历所有文件和子目录
+  QDirIterator it(path, QDirIterator::Subdirectories);
+  while (it.hasNext()) {
+    QString filePath = it.next();
+    std::string filestr = filePath.toStdString();
+    auto file = filestr.c_str();
+    if (it.fileInfo().isFile()) {
+      add_texture(file, type, use_atlas);
+    }
+  }
 }
 // 设置垂直同步
 void GLCanvas::set_Vsync(bool flag) {
