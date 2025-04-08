@@ -9,6 +9,7 @@
 
 #include <QFile>
 #include <QMouseEvent>
+#include <QRandomGenerator>
 #include <QTextStream>
 #include <chrono>
 #include <memory>
@@ -191,6 +192,33 @@ void GLCanvas::resizeGL(int w, int h) {
   renderer_manager->set_uniform_mat4("projection_mat", proj);
 }
 
+void generateRandomQRectF(RendererManager *&renderer_manager,
+                          std::shared_ptr<TextureInstace> &tex, qreal maxX,
+                          qreal maxY, qreal maxWidth, qreal maxHeight) {
+  // 获取全局随机数生成器
+  QRandomGenerator *rand = QRandomGenerator::global();
+
+  // 随机生成左上角坐标(x, y)
+  qreal x = rand->bounded(maxX);
+  qreal y = rand->bounded(maxY);
+
+  // 随机生成宽度和高度，确保矩形不会超出最大边界
+  qreal width = rand->bounded(maxWidth);
+  qreal height = rand->bounded(maxHeight);
+
+  // 确保矩形不会超出最大边界
+  if (x + width > maxX) {
+    width = maxX - x;
+  }
+  if (y + height > maxY) {
+    height = maxY - y;
+  }
+
+  QRectF rec(x, y, width, height);
+
+  renderer_manager->addRect(rec, tex, Qt::red, rand->bounded(360), false);
+}
+
 // 绘制画布
 void GLCanvas::paintGL() {
   XLogger::glcalls = 0;
@@ -205,19 +233,14 @@ void GLCanvas::paintGL() {
   renderer_manager->addRect(rect, texture_map["avatar-32x32.png"], Qt::red,
                             15.0f, false);
 
-  // auto rect3 = QRectF(50, 200, 80, 160);
-  // renderer_manager->addRect(rect3, texture_map["xinzexi.png"], Qt::cyan,
-  // -30.0f,
-  //                           false);
-
-  // auto rect4 = QRectF(200, 60, 75, 30);
-  // renderer_manager->addRect(rect4, texture_map["aijier.png"], Qt::yellow,
-  // 0.0f,
-  //                           false);
-
-  // auto rect2 = QRectF(0, 0, 100, 100);
-  // renderer_manager->addRect(rect2, texture_map["xingdengbao.png"], Qt::blue,
-  //                           45.0f, false);
+  auto it = texture_map.begin();
+  for (int i = 0; i < 1000; i++) {
+    it++;
+    if (it == texture_map.end()) {
+      it = texture_map.begin();
+    }
+    generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
+  }
 
   // 执行渲染
   renderer_manager->renderAll();
