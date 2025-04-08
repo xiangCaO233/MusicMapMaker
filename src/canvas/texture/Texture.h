@@ -73,34 +73,44 @@ class TextureInstace {
   std::shared_ptr<BaseTexturePool> pool_reference;
 };
 
+// 纹理补充模式
+enum class TextureComplementMode : int32_t {
+  FILL_COLOR = 0x0100,
+  REPEAT_TEXTURE = 0x0200,
+};
+
 // 纹理对齐模式
-enum class TextureAlignMode : int16_t {
+enum class TextureAlignMode : int32_t {
   // 对齐左下角
-  ALIGN_TO_LEFT_BOTTOM = 0x10,
+  ALIGN_TO_LEFT_BOTTOM = 0x0010,
   // 对齐右下角
-  ALIGN_TO_RIGHT_BOTTOM = 0x20,
+  ALIGN_TO_RIGHT_BOTTOM = 0x0020,
   // 对齐左上角
-  ALIGN_TO_LEFT_TOP = 0x30,
+  ALIGN_TO_LEFT_TOP = 0x0030,
   // 对齐右上角
-  ALIGN_TO_RIGHT_TOP = 0x40,
+  ALIGN_TO_RIGHT_TOP = 0x0040,
   // 对齐中心
-  ALIGN_TO_RIGHT_CENTER = 0x50,
+  ALIGN_TO_RIGHT_CENTER = 0x0050,
 };
 
 // 纹理填充模式
-enum class TextureFillMode : int16_t {
-  // 缩放
+enum class TextureFillMode : int32_t {
+  // 缩放,直接塞入(比例不一致会变形)
   SCALLING = 0x01,
-  // 缩放并裁切(自动)
-  SCALLING_AND_CUT = 0x02,
-  // 缩放并裁切(指定以宽为基准)
-  SCALLING_BASE_WIDTH_AND_CUT = 0x03,
-  // 缩放并裁切(指定以高为基准)
-  SCALLING_BASE_HEIGHT_AND_CUT = 0x04,
+  // 裁切--比例不一致会保证不变形的前提下裁剪一部分
+  // 缩放并平铺
+  // (选择会导致丢失像素最少的一边为基准裁剪)
+  // 保证最大可视度
+  SCALLING_AND_TILE = 0x0002,
+  // 缩放并裁切
+  // (强制指定以宽为基准)
+  SCALLING_BASE_WIDTH_AND_CUT = 0x0003,
+  // 缩放并裁切
+  // (强制指定以高为基准)
+  SCALLING_BASE_HEIGHT_AND_CUT = 0x0004,
   // 缩放并保持比例
-  SCALLING_AND_KEEP_RATIO = 0x05,
-  // 平铺
-  TILE = 0x05,
+  // 留出一部分空白保证不变形放下完整图形
+  SCALLING_AND_KEEP_RATIO = 0x0005,
 };
 
 #endif  // TEXTURE_INSTANCE_H

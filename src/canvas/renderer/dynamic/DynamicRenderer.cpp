@@ -234,7 +234,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       break;
     }
     case TEXTURE_POLICY: {
-      auto texture_policy = static_cast<int16_t*>(data);
+      auto texture_policy = static_cast<int32_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
         // XWARN("添加纹理填充策略数据");

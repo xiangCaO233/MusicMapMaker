@@ -225,7 +225,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       break;
     }
     case TEXTURE_POLICY: {
-      auto texture_policy = static_cast<int16_t*>(data);
+      auto texture_policy = static_cast<int32_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
         // XWARN("添加纹理填充策略数据");
@@ -325,7 +325,7 @@ void StaticRenderer::update_gpu_memory() {
       // std::vector<float> rotation_data;
       memory_block[(i - instance_start_index) * 11 + 4] = rotation_data[i];
       //// 贴图方式
-      // std::vector<int16_t> texture_policy_data;
+      // std::vector<int32_t> texture_policy_data;
       memory_block[(i - instance_start_index) * 11 + 5] =
           texture_policy_data[i];
       //// 贴图id

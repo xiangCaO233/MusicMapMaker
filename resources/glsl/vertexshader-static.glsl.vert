@@ -16,12 +16,14 @@ layout(location = 5) in float shape_texture_policy;
 layout(location = 6) in float shape_texture_id;
 layout(location = 7) in vec4 shape_fillcolor;
 
+// 采样器数据
 // 填充颜色
 out vec4 fill_color;
-
-// 采样器数据
+// 图形纹理填充策略
 out float texture_policy;
+// 图形纹理id
 out float texture_id;
+// 预处理图形纹理uv
 out vec2 texture_uv;
 
 void main() {
@@ -35,10 +37,7 @@ void main() {
   mat2 rotation_matrix = mat2(cos_angle, -sin_angle, sin_angle, cos_angle);
   vec2 rotated_pos = rotation_matrix * scaled_pos;
 
-  // 旋转贴图uv
-  texture_id = shape_texture_id;
-  vec2 rotated_uv = rotation_matrix * (vuv - vec2(0.5)) + vec2(0.5);
-
+  // 传递纹理uv
   texture_uv = vuv;
 
   // 平移到指定位置

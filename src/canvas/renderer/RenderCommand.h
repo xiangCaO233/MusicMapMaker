@@ -46,7 +46,7 @@ struct RenderCommand {
         << "\n  is_volatile: " << (is_volatile ? "true" : "false")
         << "\n  instance_shape: ";
 
-    // 假设 是枚举类型，需要转换为字符串
+    // Handle ShapeType enum
     switch (instance_shape) {
       case ShapeType::QUAD:
         oss << "QUAD";
@@ -67,6 +67,46 @@ struct RenderCommand {
       oss << texture->name;
     } else {
       oss << "nullptr";
+    }
+
+    // Handle TextureAlignMode enum
+    oss << "\n  texture_alignmode: ";
+    switch (texture_alignmode) {
+      case TextureAlignMode::ALIGN_TO_LEFT_BOTTOM:
+        oss << "ALIGN_TO_LEFT_BOTTOM";
+        break;
+      case TextureAlignMode::ALIGN_TO_RIGHT_BOTTOM:
+        oss << "ALIGN_TO_RIGHT_BOTTOM";
+        break;
+      case TextureAlignMode::ALIGN_TO_LEFT_TOP:
+        oss << "ALIGN_TO_LEFT_TOP";
+        break;
+      case TextureAlignMode::ALIGN_TO_RIGHT_TOP:
+        oss << "ALIGN_TO_RIGHT_TOP";
+        break;
+      case TextureAlignMode::ALIGN_TO_RIGHT_CENTER:
+        oss << "ALIGN_TO_RIGHT_CENTER";
+        break;
+    }
+
+    // Handle TextureFillMode enum
+    oss << "\n  texture_fillmode: ";
+    switch (texture_fillmode) {
+      case TextureFillMode::SCALLING:
+        oss << "SCALLING";
+        break;
+      case TextureFillMode::SCALLING_AND_TILE:
+        oss << "SCALLING_AND_TILE";
+        break;
+      case TextureFillMode::SCALLING_BASE_WIDTH_AND_CUT:
+        oss << "SCALLING_BASE_WIDTH_AND_CUT";
+        break;
+      case TextureFillMode::SCALLING_BASE_HEIGHT_AND_CUT:
+        oss << "SCALLING_BASE_HEIGHT_AND_CUT";
+        break;
+      case TextureFillMode::SCALLING_AND_KEEP_RATIO:
+        oss << "SCALLING_AND_KEEP_RATIO";
+        break;
     }
 
     oss << "\n}";

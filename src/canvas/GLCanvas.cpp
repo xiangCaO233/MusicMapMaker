@@ -157,6 +157,7 @@ void GLCanvas::initializeGL() {
   // 启用V-Sync
   context()->format().setSwapInterval(1);
 
+  // 检查最大ubo size
   int maxUBOSize;
   GLCALL(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize));
   XINFO("最大UBO块容量: " + std::to_string(maxUBOSize));
@@ -164,8 +165,6 @@ void GLCanvas::initializeGL() {
   // 标准混合模式
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-  GLuint VAO;
-  GLCALL(glGenVertexArrays(1, &VAO));
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
   QString path = QDir::currentPath() + "/../resources/textures/test/1024/";
@@ -190,17 +189,13 @@ void GLCanvas::initializeGL() {
 }
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
-
   // 投影矩阵
   QMatrix4x4 proj;
   // 计算正交投影矩阵
   proj.ortho(-(float)w / 2.0f, (float)w / 2.0f, -(float)h / 2.0f,
              (float)h / 2.0f, -1.0f, 1.0f);
-  // proj.ortho(0.0f, w, h, 0.0f, -1.0f, 1.0f);
   // 反转y轴
   proj.scale(1.0f, -1.0f, 1.0f);
-  // proj.translate(-0.5f, -0.5f, 0.0f);
-  // proj.transposed();
 
   // 更新uniform
   renderer_manager->set_uniform_mat4("projection_mat", proj);
@@ -220,11 +215,12 @@ void GLCanvas::paintGL() {
   renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 15.0f,
                             false);
 
-  // auto rect3 = QRectF(50, 200, 80, 160);
-  // renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, false);
+  auto rect3 = QRectF(50, 200, 80, 160);
+  renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, true);
 
-  // auto rect4 = QRectF(200, 60, 75, 30);
-  // renderer_manager->addRect(rect4, nullptr, Qt::yellow, 0.0f, false);
+  auto rect4 = QRectF(200, 60, 75, 30);
+  renderer_manager->addRect(rect4, texture_map["bunao.png"], Qt::yellow, 0.0f,
+                            false);
 
   auto rect2 = QRectF(0, 0, 100, 100);
   renderer_manager->addEllipse(rect2, texture_map["aimudeng.png"], Qt::blue,
