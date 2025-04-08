@@ -66,6 +66,15 @@ class RendererManager {
   // 析构RendererManager
   virtual ~RendererManager();
 
+  // 纹理填充方式
+  // 纹理对齐模式
+  TextureAlignMode texture_alignmode{TextureAlignMode::ALIGN_TO_CENTER};
+  // 纹理填充模式
+  TextureFillMode texture_fillmode{TextureFillMode::SCALLING_AND_TILE};
+  // 纹理补充模式
+  TextureComplementMode texture_complementmode{
+      TextureComplementMode::REPEAT_TEXTURE};
+
   // 使用指定纹理池
   void use_texture_pool(const std::shared_ptr<BaseTexturePool>& texture_pool);
 

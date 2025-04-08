@@ -24,6 +24,7 @@ struct RenderCommand {
   float rotation;
   // 填充颜色(无绑定纹理时或被裁切部分的填充颜色)
   QColor fill_color;
+
   // 纹理
   std::shared_ptr<TextureInstace> texture;
 
@@ -86,8 +87,8 @@ struct RenderCommand {
       case TextureAlignMode::ALIGN_TO_RIGHT_TOP:
         oss << "ALIGN_TO_RIGHT_TOP";
         break;
-      case TextureAlignMode::ALIGN_TO_RIGHT_CENTER:
-        oss << "ALIGN_TO_RIGHT_CENTER";
+      case TextureAlignMode::ALIGN_TO_CENTER:
+        oss << "ALIGN_TO_CENTER";
         break;
     }
 

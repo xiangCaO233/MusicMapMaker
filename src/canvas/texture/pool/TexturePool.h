@@ -27,14 +27,9 @@ class TexturePool : public BaseTexturePool {
   std::unordered_map<std::shared_ptr<TextureInstace>, std::pair<size_t, size_t>>
       batch_mapping;
 
-  // 当前正在使用的批
-  size_t current_batch{0};
-
-  // 上一次使用的批
-  size_t previous_batch_index{0};
-
-  // 上一次使用此纹理池的渲染器上下文
-  std::shared_ptr<AbstractRenderer> previous_renderer_context{nullptr};
+  // 缓存的渲染器-批次表
+  std::unordered_map<std::shared_ptr<AbstractRenderer>, size_t>
+      temp_renderer_pool_mark;
 
   // 是否支持动态切换纹理(不支持则只初始化一组)
   bool dynamic_switch_texture;

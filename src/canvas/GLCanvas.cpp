@@ -66,6 +66,9 @@ void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   QOpenGLWidget::mouseMoveEvent(event);
   mouse_pos = event->pos();
+  auto mouse_rec = QRectF(mouse_pos.x() - 10, mouse_pos.y() - 10, 20, 20);
+  renderer_manager->addEllipse(mouse_rec, texture_map["yuanchou.png"],
+                               Qt::green, 0.0f, true);
   repaint();
 }
 
@@ -216,18 +219,16 @@ void GLCanvas::paintGL() {
                             false);
 
   auto rect3 = QRectF(50, 200, 80, 160);
-  renderer_manager->addRect(rect3, nullptr, Qt::cyan, 30.0f, true);
+  renderer_manager->addRect(rect3, texture_map["xinzexi.png"], Qt::cyan, -30.0f,
+                            false);
 
   auto rect4 = QRectF(200, 60, 75, 30);
-  renderer_manager->addRect(rect4, texture_map["bunao.png"], Qt::yellow, 0.0f,
+  renderer_manager->addRect(rect4, texture_map["aijier.png"], Qt::yellow, 0.0f,
                             false);
 
   auto rect2 = QRectF(0, 0, 100, 100);
-  renderer_manager->addEllipse(rect2, texture_map["aimudeng.png"], Qt::blue,
-                               45.0f, false);
-
-  auto mouse_rec = QRectF(mouse_pos.x() - 10, mouse_pos.y() - 10, 20, 20);
-  renderer_manager->addEllipse(mouse_rec, nullptr, Qt::green, 0.0f, true);
+  renderer_manager->addRect(rect2, texture_map["xingdengbao.png"], Qt::blue,
+                            45.0f, false);
 
   // 执行渲染
   renderer_manager->renderAll();

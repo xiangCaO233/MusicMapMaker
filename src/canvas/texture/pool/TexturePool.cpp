@@ -125,27 +125,32 @@ void TexturePool::use_batch(
   // 更新使用纹理池方式
   renderer_context->set_uniform_integer(
       "texture_pool_usage", static_cast<int>(TexturePoolType::BASE_POOL));
-  // 与上一次使用相同渲染器和相同批
-  if (batch_index == previous_batch_index &&
-      renderer_context == previous_renderer_context)
-    return;
-  previous_batch_index = batch_index;
-  previous_renderer_context = renderer_context;
-  for (int i = 0; i < texture_dozens[batch_index].size(); i++) {
-    // 激活纹理单元
-    GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + i));
-    XWARN("激活纹理单元:" + std::to_string(i));
-    auto& texture = texture_dozens[batch_index][i];
-    // 绑定纹理句柄
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, glhandler_map[texture]));
-    XWARN("绑定纹理:" + texture->name +
-          "->gl句柄:" + std::to_string(glhandler_map[texture]) +
-          "->绑定到gl纹理单元:[" + std::to_string(i) + "]");
-    // 更新uniform
-    auto location_str = "samplers[" + std::to_string(i) + "]";
-    XWARN("更新uniform[" + location_str +
-          "]为gl句柄:" + std::to_string(glhandler_map[texture]));
-    auto cstr = location_str.c_str();
-    renderer_context->set_sampler(cstr, i);
+  auto markit = temp_renderer_pool_mark.find(renderer_context);
+  bool need_update{false};
+  if (markit == temp_renderer_pool_mark.end()) {
+    // 不存在此渲染器池标
+    // 添加标志
+    temp_renderer_pool_mark.try_emplace(renderer_context, batch_index);
+    need_update = true;
+  } else if (markit->second != batch_index)
+    need_update = true;
+  if (need_update) {
+    for (int i = 0; i < texture_dozens[batch_index].size(); i++) {
+      // 激活纹理单元
+      GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + i));
+      XWARN("激活纹理单元:" + std::to_string(i));
+      auto& texture = texture_dozens[batch_index][i];
+      // 绑定纹理句柄
+      GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, glhandler_map[texture]));
+      XWARN("绑定纹理:" + texture->name +
+            "->gl句柄:" + std::to_string(glhandler_map[texture]) +
+            "->绑定到gl纹理单元:[" + std::to_string(i) + "]");
+      // 更新uniform
+      auto location_str = "samplers[" + std::to_string(i) + "]";
+      XWARN("更新uniform[" + location_str +
+            "]为gl句柄:" + std::to_string(glhandler_map[texture]));
+      auto cstr = location_str.c_str();
+      renderer_context->set_sampler(cstr, i);
+    }
   }
 }

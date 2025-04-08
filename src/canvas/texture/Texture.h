@@ -90,7 +90,7 @@ enum class TextureAlignMode : int32_t {
   // 对齐右上角
   ALIGN_TO_RIGHT_TOP = 0x0040,
   // 对齐中心
-  ALIGN_TO_RIGHT_CENTER = 0x0050,
+  ALIGN_TO_CENTER = 0x0050,
 };
 
 // 纹理填充模式
