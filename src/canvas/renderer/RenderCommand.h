@@ -95,7 +95,7 @@ struct RenderCommand {
     // Handle TextureFillMode enum
     oss << "\n  texture_fillmode: ";
     switch (texture_fillmode) {
-      case TextureFillMode::SCALLING:
+      case TextureFillMode::FILL:
         oss << "SCALLING";
         break;
       case TextureFillMode::SCALLING_AND_TILE:

@@ -53,7 +53,7 @@ const int ALIGN_CENTER = 0x0050;
 
 // 纹理填充模式
 // 缩放, 直接塞入(比例不一致会变形)
-const int SCALLING = 0x0001;                      
+const int FILL = 0x0001;                      
 // 裁切
 // 裁切--比例不一致会保证不变形的前提下裁剪一部分																								
 // 缩放并平铺
@@ -66,22 +66,6 @@ const int SCALLING_BASE_WIDTH_AND_CUT = 0x0003;
 const int SCALLING_BASE_HEIGHT_AND_CUT = 0x0004;  
 // 缩放并保持比例，留出一部分空白保证不变形放下完整图形
 const int SCALLING_AND_KEEP_RATIO = 0x0005;       
-
-// 纹理集元数据
-struct TextureMeta {
-  float woffset;
-  float hoffset;
-  float width;
-  float height;
-};
-
-// 定义 UBO，大小固定为最大纹理集子纹理数
-layout(std140) uniform TextureMetaBuffer {
-  float atlas_width;
-  float atlas_height;
-  int sub_image_count;
-  TextureMeta textureMetas[1024];
-};
 
 // 渲染颜色结果(向后传输着色结果)
 out vec4 FragColor;

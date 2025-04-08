@@ -44,7 +44,7 @@ const int ALIGN_CENTER = 0x0050;
 
 // 纹理填充模式
 // 缩放, 直接塞入(比例不一致会变形)
-const int SCALLING = 0x0001;                      
+const int FILL = 0x0001;                      
 // 裁切
 // 裁切--比例不一致会保证不变形的前提下裁剪一部分																								
 // 缩放并平铺
@@ -95,13 +95,6 @@ void main() {
   mat2 rotation_matrix = mat2(cos_angle, -sin_angle, sin_angle, cos_angle);
   vec2 rotated_pos = rotation_matrix * scaled_pos;
 
-	// 取出模式
-	int texture_comolement_mode = int(shape_texture_policy) & MASK_COMPLEMENT;
-	int texture_align_mode = int(shape_texture_policy) & MASK_ALIGN;
-	int texture_fill_mode = int(shape_texture_policy) & MASK_FILL;
-
-  // 传递纹理uv
-  texture_uv = vuv;
 
   // 传递纹理数据
 	texture_id = shape_texture_id;
@@ -118,4 +111,27 @@ void main() {
   // 应用视图和投影矩阵
   vec4 glpos = projection_mat * vec4(final_pos, 0.0, 1.0);
   gl_Position = vec4(glpos.x - 1.0, glpos.y + 1.0, glpos.zw);
+
+	// 取出模式
+	int texture_comolement_mode = int(shape_texture_policy) & MASK_COMPLEMENT;
+	int texture_align_mode = int(shape_texture_policy) & MASK_ALIGN;
+	int texture_fill_mode = int(shape_texture_policy) & MASK_FILL;
+
+	//TODO 实现纹理预处理
+	if(useatlas != 1){
+		// 不使用纹理集
+		switch(texture_fill_mode){
+			case FILL:{
+									break;
+								}
+			case SCALLING_AND_TILE:{
+									break
+								}
+		}
+	}else{
+		// 使用纹理集
+	}
+
+  // 传递纹理uv
+	texture_uv = vuv;
 }

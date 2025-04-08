@@ -95,8 +95,8 @@ enum class TextureAlignMode : int32_t {
 
 // 纹理填充模式
 enum class TextureFillMode : int32_t {
-  // 缩放,直接塞入(比例不一致会变形)
-  SCALLING = 0x01,
+  // 填充,直接塞入(比例不一致会变形)
+  FILL = 0x01,
   // 裁切--比例不一致会保证不变形的前提下裁剪一部分
   // 缩放并平铺
   // (选择会导致丢失像素最少的一边为基准裁剪)

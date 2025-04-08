@@ -53,7 +53,7 @@ const int ALIGN_CENTER = 0x0050;
 
 // 纹理填充模式
 // 缩放, 直接塞入(比例不一致会变形)
-const int SCALLING = 0x0001;                      
+const int FILL = 0x0001;                      
 // 裁切
 // 裁切--比例不一致会保证不变形的前提下裁剪一部分																								
 // 缩放并平铺
