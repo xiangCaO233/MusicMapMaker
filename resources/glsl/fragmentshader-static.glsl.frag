@@ -28,9 +28,6 @@ uniform sampler2D samplers[16];
 // 使用方式为纹理采样器数组
 uniform sampler2DArray samplerarray;
 
-// 使用纹理数组时的采样器数组偏移地址
-uniform int texture_array_offset;
-
 // 纹理模式掩码
 const int MASK_COMPLEMENT = 0x0F00;
 const int MASK_ALIGN = 0x00F0;
@@ -96,7 +93,7 @@ void main() {
       // 使用单独采样器
       if (useatlas == 1) {
         // 使用纹理集
-        // TODO 实现纹理集采样
+        // TODO 实现独立单元纹理集采样
       } else {
         // 直接使用纹理
         if (keepratio) {
@@ -218,6 +215,11 @@ void main() {
     }
     case 2: {
       // 2-使用同尺寸纹理采样器数组
+      if (useatlas == 1) {
+        // 使用纹理集
+        // TODO 实现纹理集数组采样
+      } else {
+      }
       break;
     }
   }

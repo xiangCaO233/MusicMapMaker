@@ -18,12 +18,9 @@ bool TextureArray::is_full() { return texture_map.size() < max_texture_layer; }
 
 // 载入纹理
 int TextureArray::load_texture(std::shared_ptr<TextureInstace> texture) {
-  if (is_full()) {
-    return POOL_FULL;
-  }
-  if (texture->texture_image.size() != texture_size) {
-    return EXPECTED_SIZE;
-  }
+  if (is_full()) return POOL_FULL;
+  if (texture->texture_image.size() != texture_size) return EXPECTED_SIZE;
+  // TODO 实现纹理数组载入纹理
   return SUCCESS;
 }
 

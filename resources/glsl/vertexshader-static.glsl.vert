@@ -97,22 +97,18 @@ void main() {
   mat2 rotation_matrix = mat2(cos_angle, -sin_angle, sin_angle, cos_angle);
   vec2 rotated_pos = rotation_matrix * scaled_pos;
 
-  // 传递纹理数据
+  // 传递数据
   texture_id = shape_texture_id;
   texture_policy = shape_texture_policy;
+  fill_color = shape_fillcolor;
+  bound_size = shape_size;
 
   // 平移到指定位置
   vec2 final_pos = rotated_pos + shape_pos + shape_size / 2;
-  // vec2 final_pos = shape_pos + scaled_pos;
-
-  // 输出填充颜色
-  fill_color = shape_fillcolor;
-  // color = vec4(final_pos.x/100.0, final_pos.x/100.0, 1.0, 1.0);
 
   // 应用视图和投影矩阵
   vec4 glpos = projection_mat * vec4(final_pos, 0.0, 1.0);
   gl_Position = vec4(glpos.x - 1.0, glpos.y + 1.0, glpos.zw);
-  bound_size = shape_size;
 
   // 取出模式
   int texture_comolement_mode = int(shape_texture_policy) & MASK_COMPLEMENT;
