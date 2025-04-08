@@ -31,6 +31,8 @@ struct RenderCommand {
   TextureAlignMode texture_alignmode;
   // 纹理填充模式
   TextureFillMode texture_fillmode;
+  // 纹理补充模式
+  TextureComplementMode texture_complementmode;
 
   // 重写==运算符
   bool operator==(const RenderCommand& other) const {
@@ -106,6 +108,17 @@ struct RenderCommand {
         break;
       case TextureFillMode::SCALLING_AND_KEEP_RATIO:
         oss << "SCALLING_AND_KEEP_RATIO";
+        break;
+    }
+
+    // Handle TextureComplementMode enum
+    oss << "\n  texture_complementmode: ";
+    switch (texture_complementmode) {
+      case TextureComplementMode::FILL_COLOR:
+        oss << "FILL_COLOR";
+        break;
+      case TextureComplementMode::REPEAT_TEXTURE:
+        oss << "REPEAT_TEXTURE";
         break;
     }
 
