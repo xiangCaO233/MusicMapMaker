@@ -309,25 +309,19 @@ void StaticRenderer::update_gpu_memory() {
     for (int i = instance_start_index;
          i < instance_start_index + instance_count; i++) {
       //// 图形位置数据
-      // std::vector<QVector2D> position_data;
       memory_block[(i - instance_start_index) * 11] = position_data[i].x();
       memory_block[(i - instance_start_index) * 11 + 1] = position_data[i].y();
       //// 图形尺寸
-      // std::vector<QVector2D> size_data;
       memory_block[(i - instance_start_index) * 11 + 2] = size_data[i].x();
       memory_block[(i - instance_start_index) * 11 + 3] = size_data[i].y();
       //// 旋转角度
-      // std::vector<float> rotation_data;
       memory_block[(i - instance_start_index) * 11 + 4] = rotation_data[i];
       //// 贴图方式
-      // std::vector<int32_t> texture_policy_data;
       memory_block[(i - instance_start_index) * 11 + 5] =
           texture_policy_data[i];
       //// 贴图id
-      // std::vector<uint32_t> texture_id_data;
       memory_block[(i - instance_start_index) * 11 + 6] = texture_id_data[i];
       //// 填充颜色
-      // std::vector<QVector4D> fill_color_data;
       memory_block[(i - instance_start_index) * 11 + 7] =
           fill_color_data[i].x();
       memory_block[(i - instance_start_index) * 11 + 8] =
