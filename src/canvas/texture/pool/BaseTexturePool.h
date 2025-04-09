@@ -6,16 +6,21 @@
 #include <unordered_map>
 
 #include "../Texture.h"
+#include "renderer/AbstractRenderer.h"
 
 #define POOL_FULL 0x01
-#define SUCCESS 0x02
+#define EXPECTED_SIZE 0x02
+#define NOT_CONSECUTIVE 0x03
+#define SUCCESS 0x04
 
 class GLCanvas;
+class AbstractRenderer;
+class BaseTexturePool;
 
 // 纹理池类型
 enum class TexturePoolType : int32_t {
   BASE_POOL = 1,
-  ARRARY = 2,
+  ARRAY = 2,
 };
 
 // 纹理uniform(传递到shader)
@@ -42,8 +47,6 @@ class BaseTexturePool {
 
   // 纹理映射表(id-纹理对象)
   std::unordered_map<std::string, std::shared_ptr<TextureInstace>> texture_map;
-  // 纹理gl句柄映射表(纹理对象-gl句柄)
-  std::unordered_map<std::shared_ptr<TextureInstace>, uint32_t> glhandler_map;
 
   // 纹理池类型
   TexturePoolType pool_type;
@@ -70,6 +73,17 @@ class BaseTexturePool {
 
   // 判满
   virtual bool is_full() = 0;
+
+  // 使用此纹理池
+  // Base需使用指定批次
+  // Array不需要
+  virtual void use(std::shared_ptr<BaseTexturePool> pool_reference,
+                   std::shared_ptr<AbstractRenderer> renderer_context,
+                   size_t batch_index = -1) = 0;
+
+  // 取消使用此纹理池
+  virtual void unuse(std::shared_ptr<BaseTexturePool> pool_reference,
+                     std::shared_ptr<AbstractRenderer> renderer_context) = 0;
 };
 
 #endif  // BASE_TEXTURE_POOL_H

@@ -3,13 +3,14 @@
 
 #include <qsize.h>
 
+#include <cstdint>
+#include <memory>
+#include <vector>
+
 #include "BaseTexturePool.h"
-#define EXPECTED_SIZE 0x02
+#include "renderer/AbstractRenderer.h"
 
 class TextureArray : public BaseTexturePool {
-  QSize texture_size;
-  friend class RendererManager;
-
  public:
   // 构造TextureArray-opengl使用纹理数组必须相同分辨率
   TextureArray(GLCanvas* canvas, QSize size);
@@ -18,6 +19,21 @@ class TextureArray : public BaseTexturePool {
 
   // 最大采样器层数
   static uint32_t max_texture_layer;
+
+  // 固定相同的分辨率
+  QSize texture_size;
+
+  // 纹理数组管理
+  std::vector<std::shared_ptr<TextureInstace>> texture_array;
+
+  // 此纹理数组的openglid
+  uint32_t gl_texture_array_id;
+
+  // 首纹理id偏移
+  uint32_t first_texture_id_offset;
+
+  // 检查纹理id是否与当前纹理数组连续
+  bool is_consecutive();
 
   // 判满
   bool is_full() override;
@@ -28,10 +44,16 @@ class TextureArray : public BaseTexturePool {
   // 完成纹理池构造
   void finalize() override;
 
-  // 使用纹理数组池
-  void use();
+  // 使用此纹理池
+  // Base需使用指定批次
+  // Array不需要
+  void use(std::shared_ptr<BaseTexturePool> pool_reference,
+           std::shared_ptr<AbstractRenderer> renderer_context,
+           size_t batch_index = -1) override;
 
- protected:
+  // 取消使用此纹理池
+  void unuse(std::shared_ptr<BaseTexturePool> pool_reference,
+             std::shared_ptr<AbstractRenderer> renderer_context) override;
 };
 
 #endif  // TEXTURE_ARRAY_H

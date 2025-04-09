@@ -53,6 +53,10 @@ class GLCanvas : public QOpenGLWidget,
   // 添加纹理
   void add_texture(const char *qrc_path, TexturePoolType type, bool use_atlas);
 
+  // 创建新纹理池
+  std::shared_ptr<BaseTexturePool> creat_new_pool(
+      TexturePoolType type, QSize texture_array_used_size = {0, 0});
+
   // 完成纹理载入
   void finalize_texture_loading();
 

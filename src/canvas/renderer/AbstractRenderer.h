@@ -4,10 +4,12 @@
 #include <GL/gl.h>
 
 #include <cstdint>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
 #include "RenderCommand.h"
+#include "texture/pool/BaseTexturePool.h"
 
 class GLCanvas;
 class QVector2D;
@@ -77,6 +79,9 @@ class AbstractRenderer {
   AbstractRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
   // 析构AbstractRenderer
   virtual ~AbstractRenderer();
+
+  // 当前正在使用的纹理池
+  std::shared_ptr<BaseTexturePool> current_use_pool;
 
   // 设置采样器
   void set_sampler(const char* name, int value);

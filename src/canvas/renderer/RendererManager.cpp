@@ -240,17 +240,27 @@ void RendererManager::renderAll() {
       if (base_pool) {
         // 使用basepool
         XINFO("使用base pool");
+        if (operetion.renderer->current_use_pool) {
+          XINFO("清除当前纹理池使用状态");
+          operetion.renderer->current_use_pool->unuse(
+              operetion.renderer->current_use_pool, operetion.renderer);
+        }
         // 使用头指令纹理所处批次
-        base_pool->use_batch(
-            base_pool->batch_mapping[operetion.head_command.texture].first,
-            operetion.renderer);
+        base_pool->use(
+            base_pool, operetion.renderer,
+            base_pool->batch_mapping[operetion.head_command.texture].first);
       } else {
         auto array_pool = std::dynamic_pointer_cast<TextureArray>(texpool);
         if (array_pool) {
           // 使用arraypool
           XINFO("使用array pool");
+          if (operetion.renderer->current_use_pool) {
+            XINFO("清除当前纹理池使用状态");
+            operetion.renderer->current_use_pool->unuse(
+                operetion.renderer->current_use_pool, operetion.renderer);
+          }
           // 使用纹理数组池
-          array_pool->use();
+          array_pool->use(array_pool, operetion.renderer);
         }
       }
     } else {

@@ -215,10 +215,26 @@ void main() {
     }
     case 2: {
       // 2-使用同尺寸纹理采样器数组
-      if (useatlas == 1) {
-        // 使用纹理集
-        // TODO 实现纹理集数组采样
-      } else {
+      // 根据补充方式处理超出纹理范围的情况
+      switch (texture_comolement_mode) {
+        case REPEAT_TEXTURE: {
+          // 重复纹理模式
+          FragColor = texture(samplerarray,
+                              vec3(final_uv, texture_id - arraystartoffset));
+          break;
+        }
+        case FILL_COLOR: {
+          if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
+              final_uv.y > 1.0) {
+            // 超出部分使用填充色
+            FragColor = fill_color;
+          } else {
+            // 未超出部分使用纹理采样
+            FragColor = texture(samplerarray,
+                                vec3(final_uv, texture_id - arraystartoffset));
+          }
+          break;
+        }
       }
       break;
     }
