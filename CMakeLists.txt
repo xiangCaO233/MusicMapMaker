@@ -28,20 +28,20 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED
 find_package(spdlog REQUIRED)
 # 设置mmm相关文件
 set(MMM_SOURCES 
-	src/map/MMap.h
-	src/map/MMap.cpp
-	src/timing/Timing.h
-	src/timing/Timing.cpp
-	src/hitobject/HitObject.h
-	src/hitobject/HitObject.cpp
-	src/hitobject/Note/Note.h
-	src/hitobject/Note/Note.cpp
-	src/hitobject/Note/Hold.h
-	src/hitobject/Note/Hold.cpp
-	src/hitobject/Note/Slide.h
-	src/hitobject/Note/Slide.cpp
-	src/hitobject/Note/Slide.h
-	src/hitobject/Note/Slide.cpp
+	src/mmm/map/MMap.h
+	src/mmm/map/MMap.cpp
+	src/mmm/timing/Timing.h
+	src/mmm/timing/Timing.cpp
+	src/mmm/hitobject/HitObject.h
+	src/mmm/hitobject/HitObject.cpp
+	src/mmm/hitobject/Note/Note.h
+	src/mmm/hitobject/Note/Note.cpp
+	src/mmm/hitobject/Note/Hold.h
+	src/mmm/hitobject/Note/Hold.cpp
+	src/mmm/hitobject/Note/Slide.h
+	src/mmm/hitobject/Note/Slide.cpp
+	src/mmm/hitobject/Note/Slide.h
+	src/mmm/hitobject/Note/Slide.cpp
 )
 
 # 设置翻译文件

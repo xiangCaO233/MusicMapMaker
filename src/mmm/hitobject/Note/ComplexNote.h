@@ -4,7 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "src/hitobject/Note/Note.h"
+#include "Note.h"
+
 class ComplexNote : public Note {
  public:
   // 构造ComplexNote
