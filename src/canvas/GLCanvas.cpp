@@ -68,9 +68,6 @@ void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   QOpenGLWidget::mouseMoveEvent(event);
   mouse_pos = event->pos();
-  auto mouse_rec = QRectF(mouse_pos.x() - 10, mouse_pos.y() - 10, 20, 20);
-  renderer_manager->addEllipse(mouse_rec, texture_map["yuanchou.png"],
-                               Qt::green, 0.0f, true);
   repaint();
 }
 
@@ -172,8 +169,8 @@ void GLCanvas::initializeGL() {
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
-  load_texture_from_path("../resources/textures/test/other",
-                         TexturePoolType::BASE_POOL, false);
+  // load_texture_from_path("../resources/textures/test/other",
+  //                        TexturePoolType::BASE_POOL, false);
   load_texture_from_path("../resources/textures/test/1024",
                          TexturePoolType::ARRAY, false);
   finalize_texture_loading();
@@ -204,20 +201,23 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
   qreal y = rand->bounded(maxY);
 
   // 随机生成宽度和高度，确保矩形不会超出最大边界
-  qreal width = rand->bounded(maxWidth);
-  qreal height = rand->bounded(maxHeight);
+  // qreal width = rand->bounded(maxWidth);
+  // qreal height = rand->bounded(maxHeight);
+  qreal width = 40;
+  qreal height = 40;
 
   // 确保矩形不会超出最大边界
-  if (x + width > maxX) {
-    width = maxX - x;
-  }
-  if (y + height > maxY) {
-    height = maxY - y;
-  }
+  // if (x + width > maxX) {
+  //  width = maxX - x;
+  //}
+  // if (y + height > maxY) {
+  //  height = maxY - y;
+  //}
 
   QRectF rec(x, y, width, height);
+  auto rotation = rand->bounded(360);
 
-  renderer_manager->addRect(rec, tex, Qt::red, rand->bounded(360), false);
+  renderer_manager->addRect(rec, tex, Qt::red, 0, true);
 }
 
 // 绘制画布
@@ -230,12 +230,8 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 添加渲染内容
-  auto rect = QRectF(100, 100, 200, 300);
-  renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 0.0f,
-                            false);
-
   auto it = texture_map.begin();
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 4000; i++) {
     it++;
     if (it == texture_map.end()) {
       it = texture_map.begin();
@@ -243,14 +239,41 @@ void GLCanvas::paintGL() {
     generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
   }
 
+  auto rect = QRectF(100, 100, 300, 300);
+  renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 0.0f,
+                            false);
+
+  auto mouse_rec = QRectF(mouse_pos.x() - 20, mouse_pos.y() - 20, 41, 41);
+  renderer_manager->addEllipse(mouse_rec, texture_map["yuanchou.png"],
+                               Qt::green, 0.0f, true);
+
   // 执行渲染
   renderer_manager->renderAll();
+
   auto after = std::chrono::high_resolution_clock::now().time_since_epoch();
   auto frame_time =
-      std::chrono::duration_cast<std::chrono::nanoseconds>(after - before);
-  XINFO("frame_time: " + std::to_string(frame_time.count()) + "ns");
-  XWARN("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
-  XWARN("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
+      std::chrono::duration_cast<std::chrono::microseconds>(after - before)
+          .count();
+
+  XINFO("frame_time: " + std::to_string(frame_time) + "us");
+  XINFO("theoretical fps: " +
+        std::to_string(1 / (((float)frame_time) / 1000000.0)) + "fps");
+
+  if (XLogger::glcalls < 100) {
+    XINFO("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
+  } else if (XLogger::glcalls < 500) {
+    XWARN("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
+  } else {
+    XCRITICAL("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
+  }
+
+  if (XLogger::drawcalls < 8) {
+    XINFO("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
+  } else if (XLogger::drawcalls < 32) {
+    XWARN("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
+  } else {
+    XCRITICAL("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
+  }
 }
 
 // 从指定目录添加纹理

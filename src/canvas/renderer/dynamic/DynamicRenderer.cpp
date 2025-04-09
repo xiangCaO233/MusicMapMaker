@@ -5,6 +5,7 @@
 
 #include "../../../log/colorful-log.h"
 #include "../../GLCanvas.h"
+#include "renderer/AbstractRenderer.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                       \
@@ -193,7 +194,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         synchronize_update_mark(data_type, instance_index);
       } else {
         if (*pos != position_data.at(instance_index)) {
-          XWARN("位置数据更新");
+          // XWARN("位置数据更新");
           // 位置数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(data_type, instance_index);
@@ -211,7 +212,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         synchronize_update_mark(data_type, instance_index);
       } else {
         if (*size != size_data.at(instance_index)) {
-          XWARN("位置尺寸更新");
+          // XWARN("尺寸更新");
           synchronize_update_mark(data_type, instance_index);
           size_data[instance_index] = *size;
         }
@@ -226,7 +227,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         synchronize_update_mark(data_type, instance_index);
       } else {
         if (*rotation != rotation_data.at(instance_index)) {
-          XWARN("位置旋转更新");
+          // XWARN("旋转更新");
           synchronize_update_mark(data_type, instance_index);
           rotation_data[instance_index] = *rotation;
         }
@@ -242,7 +243,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         synchronize_update_mark(data_type, instance_index);
       } else {
         if (*texture_policy != texture_policy_data.at(instance_index)) {
-          XWARN("位置纹理填充策略更新");
+          // XWARN("纹理填充策略更新");
           synchronize_update_mark(data_type, instance_index);
           texture_policy_data[instance_index] = *texture_policy;
         }
@@ -257,7 +258,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         synchronize_update_mark(data_type, instance_index);
       } else {
         if (*texture_id != texture_id_data.at(instance_index)) {
-          XWARN("位置纹理id更新");
+          // XWARN("纹理id更新");
           synchronize_update_mark(data_type, instance_index);
           texture_id_data[instance_index] = *texture_id;
         }
@@ -272,7 +273,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         synchronize_update_mark(data_type, instance_index);
       } else {
         if (*fill_color != fill_color_data.at(instance_index)) {
-          XWARN("位置填充颜色更新");
+          // XWARN("填充颜色更新");
           synchronize_update_mark(data_type, instance_index);
           fill_color_data[instance_index] = *fill_color;
         }
@@ -285,180 +286,80 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
 // 同步更新标记
 void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
                                               size_t instance_index) {
+  std::vector<std::pair<size_t, uint32_t>>* mark_list;
   switch (data_type) {
     case POSITION: {
-      auto mapit = update_mapping.find(POSITION);
-      if (mapit == update_mapping.end()) {
+      auto listit = update_mapping.find(POSITION);
+      if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        mapit = update_mapping.try_emplace(POSITION).first;
+        listit = update_mapping.try_emplace(POSITION).first;
       }
       // 更新连续更新标记映射
-      auto& mark_map = mapit->second;
-      auto it = mark_map.find(instance_index);
-      if (it == mark_map.end()) {
-        // 不存在,检查是否包含上一更新标记
-        if (instance_index > 0) {
-          // 查询上一更新标记位置
-          auto preit = mark_map.find(instance_index - 1);
-          if (preit != mark_map.end()) {
-            // 与上一更新标记连续
-            // 更新连续更新数量
-            preit->second++;
-          } else {
-            // 不存在上一个更新标记,创建标记并更新迭代器
-            it = mark_map.try_emplace(instance_index, 1).first;
-          }
-        } else {
-          // 不连续,创建标记并更新迭代器
-          it = mark_map.try_emplace(instance_index, 1).first;
-        }
-      }
+      mark_list = &listit->second;
       break;
     }
     case SIZE: {
-      auto mapit = update_mapping.find(SIZE);
-      if (mapit == update_mapping.end()) {
+      auto listit = update_mapping.find(SIZE);
+      if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        mapit = update_mapping.try_emplace(SIZE).first;
+        listit = update_mapping.try_emplace(SIZE).first;
       }
       // 更新连续更新标记映射
-      auto& mark_map = mapit->second;
-      auto it = mark_map.find(instance_index);
-      if (it == mark_map.end()) {
-        // 不存在,检查是否包含上一更新标记
-        if (instance_index > 0) {
-          // 查询上一更新标记位置
-          auto preit = mark_map.find(instance_index - 1);
-          if (preit != mark_map.end()) {
-            // 与上一更新标记连续
-            // 更新连续更新数量
-            preit->second++;
-          } else {
-            // 不存在上一个更新标记,创建标记并更新迭代器
-            it = mark_map.try_emplace(instance_index, 1).first;
-          }
-        } else {
-          // 不连续,创建标记并更新迭代器
-          it = mark_map.try_emplace(instance_index, 1).first;
-        }
-      }
+      mark_list = &listit->second;
       break;
     }
     case ROTATION: {
-      auto mapit = update_mapping.find(ROTATION);
-      if (mapit == update_mapping.end()) {
+      auto listit = update_mapping.find(ROTATION);
+      if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        mapit = update_mapping.try_emplace(ROTATION).first;
+        listit = update_mapping.try_emplace(ROTATION).first;
       }
       // 更新连续更新标记映射
-      auto& mark_map = mapit->second;
-      auto it = mark_map.find(instance_index);
-      if (it == mark_map.end()) {
-        // 不存在,检查是否包含上一更新标记
-        if (instance_index > 0) {
-          // 查询上一更新标记位置
-          auto preit = mark_map.find(instance_index - 1);
-          if (preit != mark_map.end()) {
-            // 与上一更新标记连续
-            // 更新连续更新数量
-            preit->second++;
-          } else {
-            // 不存在上一个更新标记,创建标记并更新迭代器
-            it = mark_map.try_emplace(instance_index, 1).first;
-          }
-        } else {
-          // 不连续,创建标记并更新迭代器
-          it = mark_map.try_emplace(instance_index, 1).first;
-        }
-      }
+      mark_list = &listit->second;
       break;
     }
     case TEXTURE_POLICY: {
-      auto mapit = update_mapping.find(TEXTURE_POLICY);
-      if (mapit == update_mapping.end()) {
+      auto listit = update_mapping.find(TEXTURE_POLICY);
+      if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        mapit = update_mapping.try_emplace(TEXTURE_POLICY).first;
+        listit = update_mapping.try_emplace(TEXTURE_POLICY).first;
       }
       // 更新连续更新标记映射
-      auto& mark_map = mapit->second;
-      auto it = mark_map.find(instance_index);
-      if (it == mark_map.end()) {
-        // 不存在,检查是否包含上一更新标记
-        if (instance_index > 0) {
-          // 查询上一更新标记位置
-          auto preit = mark_map.find(instance_index - 1);
-          if (preit != mark_map.end()) {
-            // 与上一更新标记连续
-            // 更新连续更新数量
-            preit->second++;
-          } else {
-            // 不存在上一个更新标记,创建标记并更新迭代器
-            it = mark_map.try_emplace(instance_index, 1).first;
-          }
-        } else {
-          // 不连续,创建标记并更新迭代器
-          it = mark_map.try_emplace(instance_index, 1).first;
-        }
-      }
+      mark_list = &listit->second;
       break;
     }
     case TEXTURE_ID: {
-      auto mapit = update_mapping.find(TEXTURE_ID);
-      if (mapit == update_mapping.end()) {
+      auto listit = update_mapping.find(TEXTURE_ID);
+      if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        mapit = update_mapping.try_emplace(TEXTURE_ID).first;
+        listit = update_mapping.try_emplace(TEXTURE_ID).first;
       }
       // 更新连续更新标记映射
-      auto& mark_map = mapit->second;
-      auto it = mark_map.find(instance_index);
-      if (it == mark_map.end()) {
-        // 不存在,检查是否包含上一更新标记
-        if (instance_index > 0) {
-          // 查询上一更新标记位置
-          auto preit = mark_map.find(instance_index - 1);
-          if (preit != mark_map.end()) {
-            // 与上一更新标记连续
-            // 更新连续更新数量
-            preit->second++;
-          } else {
-            // 不存在上一个更新标记,创建标记并更新迭代器
-            it = mark_map.try_emplace(instance_index, 1).first;
-          }
-        } else {
-          // 不连续,创建标记并更新迭代器
-          it = mark_map.try_emplace(instance_index, 1).first;
-        }
-      }
+      mark_list = &listit->second;
       break;
     }
     case FILL_COLOR: {
-      auto mapit = update_mapping.find(FILL_COLOR);
-      if (mapit == update_mapping.end()) {
+      auto listit = update_mapping.find(FILL_COLOR);
+      if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        mapit = update_mapping.try_emplace(FILL_COLOR).first;
+        listit = update_mapping.try_emplace(FILL_COLOR).first;
       }
       // 更新连续更新标记映射
-      auto& mark_map = mapit->second;
-      auto it = mark_map.find(instance_index);
-      if (it == mark_map.end()) {
-        // 不存在,检查是否包含上一更新标记
-        if (instance_index > 0) {
-          // 查询上一更新标记位置
-          auto preit = mark_map.find(instance_index - 1);
-          if (preit != mark_map.end()) {
-            // 与上一更新标记连续
-            // 更新连续更新数量
-            preit->second++;
-          } else {
-            // 不存在上一个更新标记,创建标记并更新迭代器
-            it = mark_map.try_emplace(instance_index, 1).first;
-          }
-        } else {
-          // 不连续,创建标记并更新迭代器
-          it = mark_map.try_emplace(instance_index, 1).first;
-        }
-      }
+      mark_list = &listit->second;
       break;
+    }
+  }
+  if (mark_list->empty()) {
+    // 空,创建新的更新标记
+    mark_list->emplace_back(instance_index, 1);
+  } else {
+    // 非空,检查是否连续上一更新标记
+    if (mark_list->back().first + mark_list->back().second == instance_index) {
+      // 连续--增加更新数量
+      mark_list->back().second++;
+    } else {
+      // 不连续,创建新的更新标记
+      mark_list->emplace_back(instance_index, 1);
     }
   }
 }

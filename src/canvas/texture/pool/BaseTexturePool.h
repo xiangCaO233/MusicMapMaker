@@ -6,7 +6,6 @@
 #include <unordered_map>
 
 #include "../Texture.h"
-#include "renderer/AbstractRenderer.h"
 
 #define POOL_FULL 0x01
 #define EXPECTED_SIZE 0x02
@@ -23,25 +22,8 @@ enum class TexturePoolType : int32_t {
   ARRAY = 2,
 };
 
-// 纹理uniform(传递到shader)
-struct TextureUniformData {
-  // 标记使用方式
-  // 0-单独使用采样器
-  // 1-使用纹理图集
-  // 2-使用同尺寸纹理采样器数组
-  uint32_t texture_pool_usage;
-  // 要使用的采样器上下文数组
-  // (长度由显卡驱动实际支持长度为准)
-  // static uint32_t max_sampler_consecutive_count;
-  // 使用方式为单独或纹理图集时需要
-  uint32_t* sampler_contexts;
-};
-
 class BaseTexturePool {
  public:
-  // 白像素
-  static std::shared_ptr<TextureInstace> WHITE_PIXEL;
-
   // gl窗口上下文
   GLCanvas* cvs;
 

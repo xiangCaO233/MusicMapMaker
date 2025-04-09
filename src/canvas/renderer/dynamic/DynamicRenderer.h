@@ -1,6 +1,9 @@
 #ifndef DYNAMIC_RENDERER_H
 #define DYNAMIC_RENDERER_H
 
+#include <map>
+#include <vector>
+
 #include "../AbstractRenderer.h"
 
 class DynamicRenderer : public AbstractRenderer {
@@ -10,7 +13,7 @@ class DynamicRenderer : public AbstractRenderer {
   uint32_t instanceBO[6];
 
   // 预计更新gpu内存表(缓冲区id-(实例索引-实例数))
-  std::unordered_map<InstanceDataType, std::unordered_map<size_t, uint32_t>>
+  std::unordered_map<InstanceDataType, std::vector<std::pair<size_t, uint32_t>>>
       update_mapping;
 
   // 初始化着色器程序

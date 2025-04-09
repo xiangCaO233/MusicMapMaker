@@ -67,7 +67,7 @@ void RendererManager::finalize() {
                                 1);
       } else {
         // 与队尾渲染操作可合并
-        XWARN("合并操作");
+        // XWARN("合并操作");
         operation_queue.back().render_shape_count++;
       }
       // 同步渲染指令到渲染器
@@ -239,7 +239,7 @@ void RendererManager::renderAll() {
       auto base_pool = std::dynamic_pointer_cast<TexturePool>(texpool);
       if (base_pool) {
         // 使用basepool
-        XINFO("使用base pool");
+        // XINFO("使用base pool");
         // 使用头指令纹理所处批次
         base_pool->use(
             base_pool, operetion.renderer,
@@ -248,7 +248,7 @@ void RendererManager::renderAll() {
         auto array_pool = std::dynamic_pointer_cast<TextureArray>(texpool);
         if (array_pool) {
           // 使用arraypool
-          XINFO("使用array pool");
+          // XINFO("使用array pool");
           // 使用纹理数组池
           array_pool->use(array_pool, operetion.renderer);
         }
