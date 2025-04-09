@@ -217,7 +217,7 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
   QRectF rec(x, y, width, height);
   auto rotation = rand->bounded(360);
 
-  renderer_manager->addRect(rec, tex, Qt::red, 0, true);
+  renderer_manager->addRect(rec, tex, Qt::red, 0, false);
 }
 
 // 绘制画布

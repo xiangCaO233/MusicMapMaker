@@ -282,23 +282,18 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
 // 同步更新位置标记
 void StaticRenderer::synchronize_update_mark(size_t instance_index) {
   // 同步更新标记
-  auto it = update_mapping.find(instance_index);
-  if (it == update_mapping.end()) {
-    // 不存在,检查是否包含上一更新标记
-    if (instance_index > 0) {
-      // 查询上一更新标记位置
-      auto preit = update_mapping.find(instance_index - 1);
-      if (preit != update_mapping.end()) {
-        // 与上一更新标记连续
-        // 更新连续更新数量
-        preit->second++;
-      } else {
-        // 不连续,创建标记并更新迭代器
-        it = update_mapping.try_emplace(instance_index, 1).first;
-      }
+  if (update_list.empty()) {
+    // 空,创建新的更新标记
+    update_list.emplace_back(instance_index, 1);
+  } else {
+    // 非空,检查是否连续上一更新标记
+    if (update_list.back().first + update_list.back().second ==
+        instance_index) {
+      // 连续--增加更新数量
+      update_list.back().second++;
     } else {
-      // 不连续,创建标记并更新迭代器
-      it = update_mapping.try_emplace(instance_index, 1).first;
+      // 不连续,创建新的更新标记
+      update_list.emplace_back(instance_index, 1);
     }
   }
 }
@@ -308,7 +303,7 @@ void StaticRenderer::update_gpu_memory() {
   // 绑定实例缓冲区
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO));
 
-  for (const auto& [instance_start_index, instance_count] : update_mapping) {
+  for (const auto& [instance_start_index, instance_count] : update_list) {
     // 构建内存块
     std::vector<float> memory_block(instance_count * 11);
     for (int i = instance_start_index;
@@ -341,13 +336,12 @@ void StaticRenderer::update_gpu_memory() {
           fill_color_data[i].z();
       memory_block[(i - instance_start_index) * 11 + 10] =
           fill_color_data[i].w();
-
-      // 上传内存块到显存
-      GLCALL(cvs->glBufferSubData(
-          GL_ARRAY_BUFFER, (int)(instance_start_index * 11 * sizeof(float)),
-          memory_block.size() * sizeof(float), memory_block.data()));
     }
+    // 上传内存块到显存
+    GLCALL(cvs->glBufferSubData(
+        GL_ARRAY_BUFFER, (int)(instance_start_index * 11 * sizeof(float)),
+        memory_block.size() * sizeof(float), memory_block.data()));
   }
 }
 // 重置更新标记
-void StaticRenderer::reset_update() { update_mapping.clear(); }
+void StaticRenderer::reset_update() { update_list.clear(); }

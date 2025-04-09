@@ -1,6 +1,8 @@
 #ifndef STATIC_RENDERER_H
 #define STATIC_RENDERER_H
 
+#include <vector>
+
 #include "../AbstractRenderer.h"
 
 class StaticRenderer : public AbstractRenderer {
@@ -9,7 +11,7 @@ class StaticRenderer : public AbstractRenderer {
   uint32_t instanceBO;
 
   // 预计更新gpu内存表(实例索引-实例数)
-  std::unordered_map<size_t, uint32_t> update_mapping;
+  std::vector<std::pair<size_t, uint32_t>> update_list;
 
   // 初始化着色器程序
   void init_shader_programe();
