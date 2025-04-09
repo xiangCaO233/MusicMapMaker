@@ -201,23 +201,23 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
   qreal y = rand->bounded(maxY);
 
   // 随机生成宽度和高度，确保矩形不会超出最大边界
-  // qreal width = rand->bounded(maxWidth);
-  // qreal height = rand->bounded(maxHeight);
-  qreal width = 40;
-  qreal height = 40;
+  qreal width = rand->bounded(maxWidth);
+  qreal height = rand->bounded(maxHeight);
+  // qreal width = 40;
+  // qreal height = 40;
 
   // 确保矩形不会超出最大边界
-  // if (x + width > maxX) {
-  //  width = maxX - x;
-  //}
-  // if (y + height > maxY) {
-  //  height = maxY - y;
-  //}
+  if (x + width > maxX) {
+    width = maxX - x;
+  }
+  if (y + height > maxY) {
+    height = maxY - y;
+  }
 
   QRectF rec(x, y, width, height);
   auto rotation = rand->bounded(360);
 
-  renderer_manager->addRect(rec, tex, Qt::red, 0, false);
+  renderer_manager->addRect(rec, tex, Qt::red, rotation, true);
 }
 
 // 绘制画布
@@ -239,7 +239,7 @@ void GLCanvas::paintGL() {
     generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
   }
 
-  auto rect = QRectF(100, 100, 300, 300);
+  auto rect = QRectF(50, 50, 300, 300);
   renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 0.0f,
                             false);
 

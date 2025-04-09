@@ -286,14 +286,22 @@ void StaticRenderer::synchronize_update_mark(size_t instance_index) {
     // 空,创建新的更新标记
     update_list.emplace_back(instance_index, 1);
   } else {
-    // 非空,检查是否连续上一更新标记
-    if (update_list.back().first + update_list.back().second ==
-        instance_index) {
-      // 连续--增加更新数量
-      update_list.back().second++;
-    } else {
-      // 不连续,创建新的更新标记
-      update_list.emplace_back(instance_index, 1);
+    // 非空
+    // 确保不是同一对象的不同属性变化
+    if (update_list.back().first != instance_index) {
+      // 检查是否连续上一更新标记
+      if (update_list.back().first + update_list.back().second ==
+          instance_index) {
+        // 连续--增加更新数量
+        update_list.back().second++;
+      } else {
+        if (update_list.back().first + update_list.back().second - 1 !=
+            instance_index) {
+          // 确保未记录过
+          // 不连续,创建新的更新标记
+          update_list.emplace_back(instance_index, 1);
+        }
+      }
     }
   }
 }
