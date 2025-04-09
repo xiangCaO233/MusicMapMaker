@@ -240,11 +240,6 @@ void RendererManager::renderAll() {
       if (base_pool) {
         // 使用basepool
         XINFO("使用base pool");
-        if (operetion.renderer->current_use_pool) {
-          XINFO("清除当前纹理池使用状态");
-          operetion.renderer->current_use_pool->unuse(
-              operetion.renderer->current_use_pool, operetion.renderer);
-        }
         // 使用头指令纹理所处批次
         base_pool->use(
             base_pool, operetion.renderer,
@@ -254,11 +249,6 @@ void RendererManager::renderAll() {
         if (array_pool) {
           // 使用arraypool
           XINFO("使用array pool");
-          if (operetion.renderer->current_use_pool) {
-            XINFO("清除当前纹理池使用状态");
-            operetion.renderer->current_use_pool->unuse(
-                operetion.renderer->current_use_pool, operetion.renderer);
-          }
           // 使用纹理数组池
           array_pool->use(array_pool, operetion.renderer);
         }

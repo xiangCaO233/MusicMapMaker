@@ -36,7 +36,8 @@ TexturePool::TexturePool(GLCanvas* canvas, bool dynamic_switch)
                                         : 1);
   // 预分配采样器数组
   for (auto& texture_dozen : texture_dozens) {
-    texture_dozen.reserve(max_sampler_consecutive_count);
+    // 最后一个纹理单元留给纹理数组
+    texture_dozen.reserve(max_sampler_consecutive_count - 1);
   }
 }
 
@@ -56,7 +57,7 @@ bool TexturePool::is_full() {
     return false;
   }
   for (const auto& texture_dozen : texture_dozens) {
-    if (texture_dozen.size() < max_sampler_consecutive_count) {
+    if (texture_dozen.size() < max_sampler_consecutive_count - 1) {
       return false;
     }
   }
@@ -68,7 +69,7 @@ int TexturePool::load_texture(std::shared_ptr<TextureInstace> texture) {
   texture_map.try_emplace(texture->name, texture);
   // 添加批信息
   if (texture_dozens.empty() ||
-      texture_dozens.back().size() >= max_sampler_consecutive_count) {
+      texture_dozens.back().size() >= max_sampler_consecutive_count - 1) {
     texture_dozens.emplace_back();
   }
   batch_mapping[texture] = {texture_dozens.size() - 1,
@@ -155,27 +156,6 @@ void TexturePool::use(std::shared_ptr<BaseTexturePool> pool_reference,
       auto location_str = "samplers[" + std::to_string(i) + "]";
       auto cstr = location_str.c_str();
       renderer_context->set_sampler(cstr, i);
-    }
-  }
-}
-
-// 取消使用此纹理池
-void TexturePool::unuse(std::shared_ptr<BaseTexturePool> pool_reference,
-                        std::shared_ptr<AbstractRenderer> renderer_context) {
-  // 更新使用纹理池方式
-  renderer_context->set_uniform_integer("texture_pool_usage", 0);
-  // 确认当前使用的是此纹理池
-  bool need_update{false};
-  if (renderer_context->current_use_pool == pool_reference) need_update = true;
-  // 确认是才更新uniform
-  if (need_update) {
-    // 更新指定使用批次的纹理单元
-    for (int i = 0; i < max_sampler_consecutive_count; i++) {
-      // 更新uniform
-      auto location_str = "samplers[" + std::to_string(i) + "]";
-      auto cstr = location_str.c_str();
-      // 清除采样器活跃
-      renderer_context->set_sampler(cstr, -1);
     }
   }
 }

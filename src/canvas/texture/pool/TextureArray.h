@@ -50,10 +50,6 @@ class TextureArray : public BaseTexturePool {
   void use(std::shared_ptr<BaseTexturePool> pool_reference,
            std::shared_ptr<AbstractRenderer> renderer_context,
            size_t batch_index = -1) override;
-
-  // 取消使用此纹理池
-  void unuse(std::shared_ptr<BaseTexturePool> pool_reference,
-             std::shared_ptr<AbstractRenderer> renderer_context) override;
 };
 
 #endif  // TEXTURE_ARRAY_H

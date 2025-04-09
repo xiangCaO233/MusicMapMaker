@@ -23,7 +23,7 @@ uniform int texture_pool_usage;
 uniform int useatlas;
 
 // 使用方式为单独或纹理图集
-uniform sampler2D samplers[16];
+uniform sampler2D samplers[15];
 
 // 使用方式为纹理采样器数组
 uniform sampler2DArray samplerarray;
@@ -93,8 +93,15 @@ void main() {
   } else {
     // 直接使用纹理
     if (keepratio) {
+      ivec2 texsize;
       // 保持纹理比例
-      vec2 texsize = textureSize(samplers[int(texture_id) % 16], 0);
+      // 获取纹理尺寸
+      if (texture_pool_usage == 1) {
+        texsize = textureSize(samplers[int(texture_id) % 15], 0);
+      }
+      if (texture_pool_usage == 2) {
+        texsize = ivec2(textureSize(samplerarray, 0).xy);
+      }
       if (texture_fill_mode == KEEP) {
         // 保持原纹理尺寸-不缩放
         // 计算实际显示的UV范围（基于纹理尺寸和矩形尺寸的比例）
@@ -196,7 +203,7 @@ void main() {
       switch (texture_comolement_mode) {
         case REPEAT_TEXTURE: {
           // 重复纹理模式
-          FragColor = texture(samplers[int(texture_id) % 16], final_uv);
+          FragColor = texture(samplers[int(texture_id) % 15], final_uv);
           break;
         }
         case FILL_COLOR: {
@@ -206,7 +213,7 @@ void main() {
             FragColor = fill_color;
           } else {
             // 未超出部分使用纹理采样
-            FragColor = texture(samplers[int(texture_id) % 16], final_uv);
+            FragColor = texture(samplers[int(texture_id) % 15], final_uv);
           }
           break;
         }

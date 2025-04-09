@@ -113,27 +113,11 @@ void TextureArray::use(std::shared_ptr<BaseTexturePool> pool_reference,
     renderer_context->set_uniform_integer(
         "texture_pool_usage", static_cast<int>(TexturePoolType::ARRAY));
     // 更新samplerarray
-    GLCALL(cvs->glActiveTexture(GL_TEXTURE0));
+    GLCALL(cvs->glActiveTexture(GL_TEXTURE15));
     GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, gl_texture_array_id));
-    renderer_context->set_sampler("samplerarray", 0);
+    renderer_context->set_sampler("samplerarray", 15);
     // 更新当前使用的采样器数组起始纹理id
     renderer_context->set_uniform_integer("arraystartoffset",
                                           first_texture_id_offset);
-  }
-}
-// 取消使用此纹理池
-void TextureArray::unuse(std::shared_ptr<BaseTexturePool> pool_reference,
-                         std::shared_ptr<AbstractRenderer> renderer_context) {
-  bool need_update{false};
-  // 检查渲染器当前正在使用的纹理池
-  if (renderer_context->current_use_pool == pool_reference) {
-    // 确认是正在使用此纹理池
-    need_update = true;
-  }
-  if (need_update) {
-    // 更新用法uniform
-    renderer_context->set_uniform_integer("texture_pool_usage", 0);
-    // 清除samplerarray活跃
-    renderer_context->set_sampler("samplerarray", -1);
   }
 }
