@@ -3,10 +3,9 @@
 #include <qvectornd.h>
 
 #include <memory>
-#include <type_traits>
 
+#include "../../log/colorful-log.h"
 #include "../texture/pool/BaseTexturePool.h"
-#include "colorful-log.h"
 #include "renderer/AbstractRenderer.h"
 #include "renderer/dynamic/DynamicRenderer.h"
 #include "renderer/static/StaticRenderer.h"
@@ -215,9 +214,21 @@ void RendererManager::addRect(const QRectF& rect,
                               bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(is_volatile, ShapeType::RECT, rect, rotation,
-                            fill_color, 0.25f, texture, texture_alignmode,
+                            fill_color, 0.0f, texture, texture_alignmode,
                             texture_fillmode, texture_complementmode);
 }
+
+// 添加圆角矩形
+void RendererManager::addRoundRect(const QRectF& rect,
+                                   std::shared_ptr<TextureInstace> texture,
+                                   const QColor& fill_color, float rotation,
+                                   float radius_ratios, bool is_volatile) {
+  // 在队尾直接生成渲染指令
+  command_list.emplace_back(
+      is_volatile, ShapeType::RECT, rect, rotation, fill_color, radius_ratios,
+      texture, texture_alignmode, texture_fillmode, texture_complementmode);
+}
+
 // 添加椭圆
 void RendererManager::addEllipse(const QRectF& bounds,
                                  std::shared_ptr<TextureInstace> texture,
@@ -225,7 +236,7 @@ void RendererManager::addEllipse(const QRectF& bounds,
                                  bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(is_volatile, ShapeType::OVAL, bounds, rotation,
-                            fill_color, 0.25f, texture, texture_alignmode,
+                            fill_color, 0.0f, texture, texture_alignmode,
                             texture_fillmode, texture_complementmode);
 }
 

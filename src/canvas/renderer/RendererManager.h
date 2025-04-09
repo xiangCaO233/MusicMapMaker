@@ -81,6 +81,12 @@ class RendererManager {
   // 添加矩形
   void addRect(const QRectF& rect, std::shared_ptr<TextureInstace> texture,
                const QColor& fill_color, float rotation, bool is_volatile);
+
+  // 添加圆角矩形
+  void addRoundRect(const QRectF& rect, std::shared_ptr<TextureInstace> texture,
+                    const QColor& fill_color, float rotation,
+                    float radius_ratios, bool is_volatile);
+
   // 添加椭圆
   void addEllipse(const QRectF& bounds, std::shared_ptr<TextureInstace> texture,
                   const QColor& fill_color, float rotation, bool is_volatile);

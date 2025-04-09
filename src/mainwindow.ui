@@ -266,6 +266,22 @@
             <item>
              <widget class="GLCanvas" name="canvas"/>
             </item>
+            <item>
+             <widget class="QLineEdit" name="command_line">
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="maxLength">
+               <number>512</number>
+              </property>
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="infomation_container" native="true">
@@ -280,16 +296,16 @@
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>2</number>
+             <number>0</number>
             </property>
             <property name="topMargin">
-             <number>2</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
-             <number>2</number>
+             <number>0</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>0</number>
             </property>
             <item>
              <widget class="QTabWidget" name="tabWidget">
@@ -318,6 +334,14 @@
                 </property>
                 <item>
                  <widget class="QTextEdit" name="logTextArea">
+                  <property name="font">
+                   <font>
+                    <family>Noto Sans</family>
+                    <pointsize>10</pointsize>
+                    <bold>false</bold>
+                    <kerning>false</kerning>
+                   </font>
+                  </property>
                   <property name="undoRedoEnabled">
                    <bool>false</bool>
                   </property>
@@ -360,38 +384,6 @@
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="commandTab">
-               <attribute name="title">
-                <string>Commands</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QTextEdit" name="commandTextArea">
-                  <property name="undoRedoEnabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="readOnly">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
              </widget>
             </item>
            </layout>
@@ -417,11 +409,22 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuSwitch_Version">
+     <property name="title">
+      <string>Switch Version</string>
+     </property>
+     <addaction name="actionInsane"/>
+    </widget>
     <addaction name="actionOpen"/>
     <addaction name="actionOpen_Directory"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="separator"/>
+    <addaction name="actionPack"/>
+    <addaction name="actionPack_As"/>
+    <addaction name="actionNew_Version"/>
+    <addaction name="menuSwitch_Version"/>
    </widget>
    <widget class="QMenu" name="menuModify">
     <property name="title">
@@ -470,11 +473,6 @@
   <action name="actionOpen_Directory">
    <property name="text">
     <string>Open Directory</string>
-   </property>
-  </action>
-  <action name="action_4">
-   <property name="text">
-    <string/>
    </property>
   </action>
   <action name="actionUndo">
@@ -552,6 +550,26 @@
    </property>
    <property name="text">
     <string>Show Files</string>
+   </property>
+  </action>
+  <action name="actionPack">
+   <property name="text">
+    <string>Pack</string>
+   </property>
+  </action>
+  <action name="actionPack_As">
+   <property name="text">
+    <string>Pack As</string>
+   </property>
+  </action>
+  <action name="actionNew_Version">
+   <property name="text">
+    <string>New Version</string>
+   </property>
+  </action>
+  <action name="actionInsane">
+   <property name="text">
+    <string>Insane</string>
    </property>
   </action>
  </widget>

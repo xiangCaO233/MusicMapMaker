@@ -205,22 +205,23 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
   width = 40;
   height = 40;
 
-  // 仅矩形位置变化--使用dynamic降低glcall
-  // QRectF rec(x, y, width, height);
-  // renderer_manager->addRect(rec, tex, Qt::red, 0, true);
+  // 仅矩形位置变化--使用dynamic降低glcall和内存传输
+  QRectF rec(x, y, width, height);
+  renderer_manager->addRoundRect(rec, tex, Qt::red, 0,
+                                 (float)(rand->bounded(100)) / 100.0f, true);
 
   // 随机生成宽度和高度和角度--增加glcall
-  width = rand->bounded(maxWidth);
-  height = rand->bounded(maxHeight);
-  if (x + width > maxX) {
-    width = maxX - x;
-  }
-  if (y + height > maxY) {
-    height = maxY - y;
-  }
-  auto rotation = rand->bounded(360);
-  QRectF rec(x, y, width, height);
-  renderer_manager->addRect(rec, tex, Qt::red, rotation, true);
+  // width = rand->bounded(maxWidth);
+  // height = rand->bounded(maxHeight);
+  // if (x + width > maxX) {
+  //   width = maxX - x;
+  // }
+  // if (y + height > maxY) {
+  //   height = maxY - y;
+  // }
+  // auto rotation = rand->bounded(360);
+  // QRectF rec(x, y, width, height);
+  // renderer_manager->addRect(rec, tex, Qt::red, rotation, false);
 
   // 渲染器随机---巨幅增加glcall和drawcall
   // renderer_manager->addRect(rec, tex, Qt::red, 0,
@@ -228,7 +229,7 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
   // renderer_manager->addRect(rec, tex, Qt::red, rotation,
   //                           rand->bounded(100) > 50);
 
-  // 渲染器随机且图形随机---超巨幅增加drawcall
+  // 渲染器随机且图形随机---超巨幅增加glcall和drawcall
   // if (rand->bounded(100) > 50) {
   //   renderer_manager->addRect(rec, tex, Qt::red, 0, rand->bounded(100) > 50);
   // } else {
@@ -236,13 +237,13 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
   //   50);
   // }
 
-  if (rand->bounded(100) > 50) {
-    renderer_manager->addRect(rec, tex, Qt::red, rotation,
-                              rand->bounded(100) > 50);
-  } else {
-    renderer_manager->addEllipse(rec, tex, Qt::red, rotation,
-                                 rand->bounded(100) > 50);
-  }
+  // if (rand->bounded(100) > 50) {
+  //   renderer_manager->addRect(rec, tex, Qt::red, rotation,
+  //                             rand->bounded(100) > 50);
+  // } else {
+  //   renderer_manager->addEllipse(rec, tex, Qt::red, rotation,
+  //                                rand->bounded(100) > 50);
+  // }
 }
 
 // 绘制画布
@@ -255,18 +256,18 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 添加渲染内容
-  // auto it = texture_map.begin();
-  // for (int i = 0; i < 512; i++) {
-  //   it++;
-  //   if (it == texture_map.end()) {
-  //     it = texture_map.begin();
-  //   }
-  //   generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
-  // }
+  auto it = texture_map.begin();
+  for (int i = 0; i < 4000; i++) {
+    it++;
+    if (it == texture_map.end()) {
+      it = texture_map.begin();
+    }
+    generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
+  }
 
   auto rect = QRectF(50, 50, 300, 300);
-  renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 0.0f,
-                            true);
+  renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,
+                                 0.0f, 0.2f, true);
 
   auto mouse_rec = QRectF(mouse_pos.x() - 20, mouse_pos.y() - 20, 41, 41);
   renderer_manager->addRect(mouse_rec, texture_map["yuanchou.png"], Qt::green,

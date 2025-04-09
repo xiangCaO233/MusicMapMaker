@@ -26,6 +26,23 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED
 
 # 查找日志包
 find_package(spdlog REQUIRED)
+# 设置mmm相关文件
+set(MMM_SOURCES 
+	src/map/MMap.h
+	src/map/MMap.cpp
+	src/timing/Timing.h
+	src/timing/Timing.cpp
+	src/hitobject/HitObject.h
+	src/hitobject/HitObject.cpp
+	src/hitobject/Note/Note.h
+	src/hitobject/Note/Note.cpp
+	src/hitobject/Note/Hold.h
+	src/hitobject/Note/Hold.cpp
+	src/hitobject/Note/Slide.h
+	src/hitobject/Note/Slide.cpp
+	src/hitobject/Note/Slide.h
+	src/hitobject/Note/Slide.cpp
+)
 
 # 设置翻译文件
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
@@ -67,6 +84,7 @@ set(PROJECT_SOURCES
 		src/canvas/texture/Texture.cpp
     src/log/colorful-log.h
     src/log/colorful_log.cpp
+		${MMM_SOURCES}
     ${GLSL_FILES}
     ${TS_FILES})
 
