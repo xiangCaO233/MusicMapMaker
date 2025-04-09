@@ -168,7 +168,7 @@ void GLCanvas::initializeGL() {
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
   // 初始化渲染管理器
-  renderer_manager = new RendererManager(this, 64, 4096);
+  renderer_manager = new RendererManager(this, 32, 4096);
   // load_texture_from_path("../resources/textures/test/other",
   //                        TexturePoolType::BASE_POOL, false);
   load_texture_from_path("../resources/textures/test/1024",
@@ -255,14 +255,14 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 添加渲染内容
-  auto it = texture_map.begin();
-  for (int i = 0; i < 512; i++) {
-    it++;
-    if (it == texture_map.end()) {
-      it = texture_map.begin();
-    }
-    generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
-  }
+  // auto it = texture_map.begin();
+  // for (int i = 0; i < 512; i++) {
+  //   it++;
+  //   if (it == texture_map.end()) {
+  //     it = texture_map.begin();
+  //   }
+  //   generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
+  // }
 
   auto rect = QRectF(50, 50, 300, 300);
   renderer_manager->addRect(rect, texture_map["yuanchou.png"], Qt::red, 0.0f,

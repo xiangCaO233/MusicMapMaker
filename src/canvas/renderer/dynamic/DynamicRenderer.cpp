@@ -23,10 +23,10 @@ DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
                                  int max_shape_count)
     : AbstractRenderer(canvas, oval_segment, max_shape_count) {
   // 初始化实例缓冲区
-  GLCALL(cvs->glGenBuffers(6, instanceBO));
+  GLCALL(cvs->glGenBuffers(7, instanceBO));
 
   // [0] 图形位置,[1] 图形尺寸,[2] 旋转角度
-  // [3] 图形贴图方式,[4] 贴图id,[5]填充颜色
+  // [3] 图形贴图方式,[4] 贴图id,[5]填充颜色,[6]圆角半径
 
   // 位置信息
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[0]));
@@ -94,6 +94,18 @@ DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
                            (int)(max_shape_count * 4 * sizeof(float)), nullptr,
                            GL_DYNAMIC_DRAW));
   GLCALL(cvs->glVertexAttribDivisor(7, 1));
+
+  // 圆角半径
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[6]));
+  // 描述location8 顶点缓冲0~0float为float类型数据--圆角半径信息(用vec1接收)
+  GLCALL(cvs->glEnableVertexAttribArray(8));
+  GLCALL(cvs->glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
+                           (int)(max_shape_count * sizeof(float)), nullptr,
+                           GL_DYNAMIC_DRAW));
+  GLCALL(cvs->glVertexAttribDivisor(8, 1));
+
   // 初始化着色器程序
   init_shader_programe();
 }
@@ -280,6 +292,21 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
+    case RADIUS: {
+      auto radius = static_cast<float*>(data);
+      if (radius_data.empty() || radius_data.size() <= instance_index) {
+        // XWARN("添加圆角半径数据");
+        radius_data.push_back(*radius);
+        synchronize_update_mark(data_type, instance_index);
+      } else {
+        if (*radius != radius_data.at(instance_index)) {
+          // XWARN("圆角半径更新");
+          synchronize_update_mark(data_type, instance_index);
+          radius_data[instance_index] = *radius;
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -348,6 +375,16 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
       mark_list = &listit->second;
       break;
     }
+    case RADIUS: {
+      auto listit = update_mapping.find(RADIUS);
+      if (listit == update_mapping.end()) {
+        // 添加缓冲区映射并更新迭代器
+        listit = update_mapping.try_emplace(RADIUS).first;
+      }
+      // 更新连续更新标记映射
+      mark_list = &listit->second;
+      break;
+    }
   }
   if (mark_list->empty()) {
     // 空,创建新的更新标记
@@ -395,6 +432,10 @@ void DynamicRenderer::update_gpu_memory() {
       }
       case FILL_COLOR: {
         buffer = instanceBO[5];
+        break;
+      }
+      case RADIUS: {
+        buffer = instanceBO[6];
         break;
       }
     }
@@ -474,6 +515,16 @@ void DynamicRenderer::update_gpu_memory() {
             memory_block[4 * (i - instance_start_index) + 3] =
                 fill_color_data[i].w();
           }
+          break;
+        }
+        case RADIUS: {
+          // 每实例1float
+          memory_block_size = instance_count;
+          // 构造圆角半径数据内存块
+          memory_block.resize(memory_block_size);
+          for (int i = instance_start_index;
+               i < instance_start_index + instance_count; i++)
+            memory_block[(i - instance_start_index)] = radius_data[i];
           break;
         }
       }

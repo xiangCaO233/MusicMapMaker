@@ -30,7 +30,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location2 顶点缓冲0~1float为float类型数据--位置信息(用vec2接收)
   GLCALL(cvs->glEnableVertexAttribArray(2));
   GLCALL(cvs->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
-                                    11 * sizeof(float), nullptr));
+                                    12 * sizeof(float), nullptr));
   // 每个实例变化一次
   GLCALL(cvs->glVertexAttribDivisor(2, 1));
 
@@ -38,7 +38,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location3 顶点缓冲2~3float为float类型数据--尺寸信息(用vec2接收)
   GLCALL(cvs->glEnableVertexAttribArray(3));
   GLCALL(cvs->glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
-                                    11 * sizeof(float),
+                                    12 * sizeof(float),
                                     (void*)(2 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(3, 1));
 
@@ -46,7 +46,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location4 顶点缓冲4~4float为float类型数据--旋转角度(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(4));
   GLCALL(cvs->glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE,
-                                    11 * sizeof(float),
+                                    12 * sizeof(float),
                                     (void*)(4 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(4, 1));
 
@@ -54,7 +54,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location5 顶点缓冲5~5float为float类型数据--贴图uv方式(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(5));
   GLCALL(cvs->glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE,
-                                    11 * sizeof(float),
+                                    12 * sizeof(float),
                                     (void*)(5 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(5, 1));
 
@@ -62,7 +62,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location6 顶点缓冲6~6float为float类型数据--贴图id信息(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(6));
   GLCALL(cvs->glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE,
-                                    11 * sizeof(float),
+                                    12 * sizeof(float),
                                     (void*)(6 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(6, 1));
 
@@ -70,12 +70,20 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
   // 描述location7 顶点缓冲7~10float为float类型数据--填充颜色信息(用vec4接收)
   GLCALL(cvs->glEnableVertexAttribArray(7));
   GLCALL(cvs->glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE,
-                                    11 * sizeof(float),
+                                    12 * sizeof(float),
                                     (void*)(7 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(7, 1));
 
+  // 圆角半径信息
+  // 描述location8 顶点缓冲11~11float为float类型数据--圆角半径信息(用float接收)
+  GLCALL(cvs->glEnableVertexAttribArray(8));
+  GLCALL(cvs->glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE,
+                                    12 * sizeof(float),
+                                    (void*)(11 * sizeof(float))));
+  GLCALL(cvs->glVertexAttribDivisor(8, 1));
+
   GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
-                           (int)(max_shape_count * 11 * sizeof(float)), nullptr,
+                           (int)(max_shape_count * 12 * sizeof(float)), nullptr,
                            GL_STATIC_DRAW));
 
   // 初始化着色器程序
@@ -276,6 +284,23 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
+    case RADIUS: {
+      auto radius = static_cast<float*>(data);
+      if (radius_data.empty() || radius_data.size() <= instance_index) {
+        // XWARN("添加圆角半径数据");
+        radius_data.push_back(*radius);
+        synchronize_update_mark(instance_index);
+      } else {
+        if (*radius != radius_data.at(instance_index)) {
+          // 圆角半径数据发生变化
+          // 同步更新位置标记
+          synchronize_update_mark(instance_index);
+          // 更新此实例圆角半径数据
+          radius_data[instance_index] = *radius;
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -313,35 +338,37 @@ void StaticRenderer::update_gpu_memory() {
 
   for (const auto& [instance_start_index, instance_count] : update_list) {
     // 构建内存块
-    std::vector<float> memory_block(instance_count * 11);
+    std::vector<float> memory_block(instance_count * 12);
     for (int i = instance_start_index;
          i < instance_start_index + instance_count; i++) {
       //// 图形位置数据
-      memory_block[(i - instance_start_index) * 11] = position_data[i].x();
-      memory_block[(i - instance_start_index) * 11 + 1] = position_data[i].y();
+      memory_block[(i - instance_start_index) * 12] = position_data[i].x();
+      memory_block[(i - instance_start_index) * 12 + 1] = position_data[i].y();
       //// 图形尺寸
-      memory_block[(i - instance_start_index) * 11 + 2] = size_data[i].x();
-      memory_block[(i - instance_start_index) * 11 + 3] = size_data[i].y();
+      memory_block[(i - instance_start_index) * 12 + 2] = size_data[i].x();
+      memory_block[(i - instance_start_index) * 12 + 3] = size_data[i].y();
       //// 旋转角度
-      memory_block[(i - instance_start_index) * 11 + 4] = rotation_data[i];
+      memory_block[(i - instance_start_index) * 12 + 4] = rotation_data[i];
       //// 贴图方式
-      memory_block[(i - instance_start_index) * 11 + 5] =
+      memory_block[(i - instance_start_index) * 12 + 5] =
           texture_policy_data[i];
       //// 贴图id
-      memory_block[(i - instance_start_index) * 11 + 6] = texture_id_data[i];
+      memory_block[(i - instance_start_index) * 12 + 6] = texture_id_data[i];
       //// 填充颜色
-      memory_block[(i - instance_start_index) * 11 + 7] =
+      memory_block[(i - instance_start_index) * 12 + 7] =
           fill_color_data[i].x();
-      memory_block[(i - instance_start_index) * 11 + 8] =
+      memory_block[(i - instance_start_index) * 12 + 8] =
           fill_color_data[i].y();
-      memory_block[(i - instance_start_index) * 11 + 9] =
+      memory_block[(i - instance_start_index) * 12 + 9] =
           fill_color_data[i].z();
-      memory_block[(i - instance_start_index) * 11 + 10] =
+      memory_block[(i - instance_start_index) * 12 + 10] =
           fill_color_data[i].w();
+      // 圆角半径
+      memory_block[(i - instance_start_index) * 12 + 11] = radius_data[i];
     }
     // 上传内存块到显存
     GLCALL(cvs->glBufferSubData(
-        GL_ARRAY_BUFFER, (int)(instance_start_index * 11 * sizeof(float)),
+        GL_ARRAY_BUFFER, (int)(instance_start_index * 12 * sizeof(float)),
         memory_block.size() * sizeof(float), memory_block.data()));
   }
 }

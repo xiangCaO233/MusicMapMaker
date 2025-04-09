@@ -15,6 +15,8 @@ layout(location = 4) in float shape_rotation;
 layout(location = 5) in float shape_texture_policy;
 layout(location = 6) in float shape_texture_id;
 layout(location = 7) in vec4 shape_fillcolor;
+// 圆角半径
+layout(location = 8) in float shape_radius;
 
 // 1-使用纹理图集
 uniform int useatlas;
@@ -85,6 +87,8 @@ out float texture_id;
 out vec2 texture_uv;
 // 当前绘制形状的边界矩形尺寸
 out vec2 bound_size;
+// 当前绘制形状的边界矩形圆角半径
+out float radius;
 
 void main() {
   // 缩放矩形到指定大小
@@ -132,4 +136,6 @@ void main() {
 
   // 传递纹理uv
   texture_uv = vuv;
+  // 传递圆角半径
+  radius = shape_radius;
 }

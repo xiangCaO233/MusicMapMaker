@@ -1,7 +1,6 @@
 #ifndef DYNAMIC_RENDERER_H
 #define DYNAMIC_RENDERER_H
 
-#include <map>
 #include <vector>
 
 #include "../AbstractRenderer.h"
@@ -9,8 +8,8 @@
 class DynamicRenderer : public AbstractRenderer {
  protected:
   // [0] 图形位置,[1] 图形尺寸,[2] 旋转角度
-  // [3] 图形贴图方式,[4] 贴图id,[5]填充颜色
-  uint32_t instanceBO[6];
+  // [3] 图形贴图方式,[4] 贴图id,[5]填充颜色,[6]圆角半径
+  uint32_t instanceBO[7];
 
   // 预计更新gpu内存表(缓冲区id-(实例索引-实例数))
   std::unordered_map<InstanceDataType, std::vector<std::pair<size_t, uint32_t>>>

@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "RenderCommand.h"
-#include "texture/pool/BaseTexturePool.h"
 
 class GLCanvas;
 class QVector2D;
@@ -23,6 +22,7 @@ enum InstanceDataType {
   TEXTURE_POLICY,
   TEXTURE_ID,
   FILL_COLOR,
+  RADIUS,
 };
 
 class AbstractRenderer {
@@ -61,6 +61,8 @@ class AbstractRenderer {
   std::vector<uint32_t> texture_id_data;
   // 填充颜色
   std::vector<QVector4D> fill_color_data;
+  // 圆角半径
+  std::vector<float> radius_data;
 
   // 同步数据
   virtual void synchronize_data(InstanceDataType data_type,

@@ -5,6 +5,8 @@ in vec4 fill_color;
 
 // 当前绘制形状的边界矩形尺寸
 in vec2 bound_size;
+// 当前绘制形状的边界矩形圆角半径
+in float radius;
 
 // 渲染管线前传递来的采样器数据
 in float texture_policy;
@@ -190,12 +192,13 @@ void main() {
     }
   }
 
+  vec4 texture_color;
   // 区分纹理池类型
   switch (texture_pool_usage) {
     case 0: {
       // 不使用纹理池
       // 直接使用填充颜色
-      FragColor = fill_color;
+      texture_color = fill_color;
       break;
     };
     case 1: {
@@ -203,17 +206,17 @@ void main() {
       switch (texture_comolement_mode) {
         case REPEAT_TEXTURE: {
           // 重复纹理模式
-          FragColor = texture(samplers[int(texture_id) % 15], final_uv);
+          texture_color = texture(samplers[int(texture_id) % 15], final_uv);
           break;
         }
         case FILL_COLOR: {
           if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
               final_uv.y > 1.0) {
             // 超出部分使用填充色
-            FragColor = fill_color;
+            texture_color = fill_color;
           } else {
             // 未超出部分使用纹理采样
-            FragColor = texture(samplers[int(texture_id) % 15], final_uv);
+            texture_color = texture(samplers[int(texture_id) % 15], final_uv);
           }
           break;
         }
@@ -226,24 +229,41 @@ void main() {
       switch (texture_comolement_mode) {
         case REPEAT_TEXTURE: {
           // 重复纹理模式
-          FragColor = texture(samplerarray,
-                              vec3(final_uv, texture_id - arraystartoffset));
+          texture_color = texture(
+              samplerarray, vec3(final_uv, texture_id - arraystartoffset));
           break;
         }
         case FILL_COLOR: {
           if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
               final_uv.y > 1.0) {
             // 超出部分使用填充色
-            FragColor = fill_color;
+            texture_color = fill_color;
           } else {
             // 未超出部分使用纹理采样
-            FragColor = texture(samplerarray,
-                                vec3(final_uv, texture_id - arraystartoffset));
+            texture_color = texture(
+                samplerarray, vec3(final_uv, texture_id - arraystartoffset));
           }
           break;
         }
       }
       break;
     }
+  }
+  // ---- 圆角遮罩部分 ----
+  vec2 pos = texture_uv * 2.0 - 1.0;
+  float rx = 1.0 - radius;
+  float ry = 1.0 - radius;
+
+  float dx = max(abs(pos.x) - rx, 0.0);
+  float dy = max(abs(pos.y) - ry, 0.0);
+
+  float dist = sqrt(dx * dx + dy * dy);
+  float effectiveRadius = max(radius, 0.0001);
+  float alpha = clamp(1.0 - dist / effectiveRadius, 0.0, 1.0);
+
+  if (alpha == 0) {
+    FragColor = vec4(texture_color.rgb, texture_color.a * alpha);
+  } else {
+    FragColor = texture_color;
   }
 }

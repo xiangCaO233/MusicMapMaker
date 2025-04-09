@@ -200,6 +200,12 @@ void RendererManager::sync_renderer(
       InstanceDataType::FILL_COLOR,
       (command.is_volatile ? dynamic_instance_index : static_instance_index),
       &fill_color);
+
+  // 同步圆角半径数据
+  renderer->synchronize_data(
+      InstanceDataType::RADIUS,
+      (command.is_volatile ? dynamic_instance_index : static_instance_index),
+      &command.radius);
 }
 
 // 添加矩形
@@ -208,8 +214,8 @@ void RendererManager::addRect(const QRectF& rect,
                               const QColor& fill_color, float rotation,
                               bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(is_volatile, ShapeType::QUAD, rect, rotation,
-                            fill_color, texture, texture_alignmode,
+  command_list.emplace_back(is_volatile, ShapeType::RECT, rect, rotation,
+                            fill_color, 0.25f, texture, texture_alignmode,
                             texture_fillmode, texture_complementmode);
 }
 // 添加椭圆
@@ -219,7 +225,7 @@ void RendererManager::addEllipse(const QRectF& bounds,
                                  bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(is_volatile, ShapeType::OVAL, bounds, rotation,
-                            fill_color, texture, texture_alignmode,
+                            fill_color, 0.25f, texture, texture_alignmode,
                             texture_fillmode, texture_complementmode);
 }
 

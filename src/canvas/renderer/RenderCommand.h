@@ -10,7 +10,10 @@
 #include "../texture/Texture.h"
 
 // 形状
-enum class ShapeType { QUAD, OVAL };
+enum class ShapeType {
+  RECT,
+  OVAL,
+};
 
 // 绘制指令
 struct RenderCommand {
@@ -24,6 +27,8 @@ struct RenderCommand {
   float rotation;
   // 填充颜色(无绑定纹理时或被裁切部分的填充颜色)
   QColor fill_color;
+  // 圆角半径
+  float radius;
 
   // 纹理
   std::shared_ptr<TextureInstace> texture;
@@ -51,7 +56,7 @@ struct RenderCommand {
 
     // Handle ShapeType enum
     switch (instance_shape) {
-      case ShapeType::QUAD:
+      case ShapeType::RECT:
         oss << "QUAD";
         break;
       case ShapeType::OVAL:

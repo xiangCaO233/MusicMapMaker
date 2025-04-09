@@ -2,6 +2,7 @@
 
 #include "../../log/colorful-log.h"
 #include "../GLCanvas.h"
+#include "renderer/RenderCommand.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                       \
@@ -35,6 +36,7 @@ AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
       1.0f,  1.0f,  0.0f, 1.0f, 1.0f,  // v3
       -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  // v4
   };
+
   // 初始化椭圆顶点
   for (int i = 0; i < oval_segment; i++) {
     auto angle = (float(2.0 * M_PI * float(i) / float(oval_segment)));
@@ -48,6 +50,8 @@ AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
     vertices.push_back(texcoordx);
     vertices.push_back(texcoordy);
   }
+
+  // 初始化圆角矩形顶点
 
   GLCALL(cvs->glBindVertexArray(VAO));
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, VBO));
@@ -130,7 +134,7 @@ void AbstractRenderer::render(const ShapeType& shape,
   // TODO(xiang 2025-04-03): 实现apple平台指定实例位置绘制
 #else
   switch (shape) {
-    case ShapeType::QUAD: {
+    case ShapeType::RECT: {
       DRAWCALL(cvs->glDrawArraysInstancedBaseInstance(
           GL_TRIANGLE_FAN, 0, 4, shape_count, start_shape_index));
       break;
