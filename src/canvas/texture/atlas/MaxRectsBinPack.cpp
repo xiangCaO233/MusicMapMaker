@@ -43,7 +43,7 @@ void MaxRectsBinPack::Expand(float rate) {
   XINFO("扩容到[" + to_string(binWidth) + "x" + to_string(binHeight) + "]");
 }
 
-void MaxRectsBinPack::Insert(shared_ptr<AtlasSubTexture> instance,
+void MaxRectsBinPack::Insert(shared_ptr<AtlasSubTexture> &instance,
                              FreeRectChoiceHeuristic method) {
   XINFO("插入纹理:[" + instance->name + "]");
   auto res = Insert(instance->texture_image.width(),
@@ -62,6 +62,7 @@ void MaxRectsBinPack::Insert(shared_ptr<AtlasSubTexture> instance,
     restex.clear();
 
     for (auto &tex : tempmetas) {
+      // 递归
       Insert(tex, method);
     }
     tempmetas.clear();
@@ -69,6 +70,9 @@ void MaxRectsBinPack::Insert(shared_ptr<AtlasSubTexture> instance,
     instance->woffset = res.x;
     instance->hoffset = res.y;
     restex.push_back(instance);
+    XINFO("插入结果:" + instance->name + "位置[" +
+          std::to_string(instance->woffset) + "," +
+          std::to_string(instance->hoffset) + "]");
   }
 }
 

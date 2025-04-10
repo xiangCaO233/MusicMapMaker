@@ -21,8 +21,10 @@ class TextureAtlas;
 
 class GLCanvas : public QOpenGLWidget,
 #ifdef __APPLE__
+                 // 苹果-opengl4.1
                  public QOpenGLFunctions_4_1_Core
 #else
+                 // 其他-opengl4.5
                  public QOpenGLFunctions_4_5_Core
 #endif  //__APPLE__
 {
@@ -32,6 +34,8 @@ class GLCanvas : public QOpenGLWidget,
   QPoint mouse_pos{0, 0};
 
  public:
+  // 需要更新采样器uniform location
+  static bool need_update_sampler_location;
   // 渲染器
   RendererManager *renderer_manager;
   // 构造GLCanvas
@@ -55,7 +59,8 @@ class GLCanvas : public QOpenGLWidget,
 
   // 创建新纹理池
   std::shared_ptr<BaseTexturePool> creat_new_pool(
-      TexturePoolType type, QSize texture_array_used_size = {0, 0});
+      TexturePoolType type, QSize texture_array_used_size = {0, 0},
+      bool use_atlas = false);
 
   // 完成纹理载入
   void finalize_texture_loading();

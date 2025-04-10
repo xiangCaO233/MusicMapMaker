@@ -13,7 +13,7 @@
 class TextureArray : public BaseTexturePool {
  public:
   // 构造TextureArray-opengl使用纹理数组必须相同分辨率
-  TextureArray(GLCanvas* canvas, QSize size);
+  TextureArray(GLCanvas *canvas, QSize size, bool use_atlas);
   // 析构TextureArray
   ~TextureArray() override;
 
@@ -47,8 +47,8 @@ class TextureArray : public BaseTexturePool {
   // 使用此纹理池
   // Base需使用指定批次
   // Array不需要
-  void use(std::shared_ptr<BaseTexturePool> pool_reference,
-           std::shared_ptr<AbstractRenderer> renderer_context,
+  void use(const std::shared_ptr<BaseTexturePool> &pool_reference,
+           std::shared_ptr<AbstractRenderer> &renderer_context,
            size_t batch_index = -1) override;
 };
 

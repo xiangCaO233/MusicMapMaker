@@ -7,11 +7,13 @@
 #include <vector>
 
 #include "RenderCommand.h"
+#include "texture/pool/BaseTexturePool.h"
 
 class GLCanvas;
 class QVector2D;
 class QVector4D;
 class QMatrix4x4;
+enum class TexturePoolType;
 
 enum class InstanceDataType {
   POSITION,
@@ -54,7 +56,7 @@ class AbstractRenderer {
   // 旋转角度
   std::vector<float> rotation_data;
   // 贴图方式
-  std::vector<int16_t> texture_policy_data;
+  std::vector<int32_t> texture_policy_data;
   // 贴图id
   std::vector<uint32_t> texture_id_data;
   // 填充颜色
@@ -82,6 +84,12 @@ class AbstractRenderer {
 
   // 当前正在使用的纹理池
   std::shared_ptr<BaseTexturePool> current_use_pool;
+
+  // 当前shader使用的纹理池类型
+  TexturePoolType current_pool_type{TexturePoolType::UNKNOWN};
+
+  // 当前是否使用纹理集
+  bool is_current_atlas{false};
 
   // 设置采样器
   void set_sampler(const char* name, int value);

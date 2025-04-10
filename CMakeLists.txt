@@ -52,8 +52,11 @@ set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
 
 # 设置着色器文件
 set(GLSL_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/fragmentshader-static.glsl.frag
-  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/vertexshader-static.glsl.vert)
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/fragmentshader.glsl.frag
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/vertexshader.glsl.vert
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/macos/fragmentshader.glsl.frag
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/macos/vertexshader.glsl.vert
+)
 
 # 项目源文件
 set(PROJECT_SOURCES

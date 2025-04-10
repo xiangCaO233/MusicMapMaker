@@ -1,6 +1,9 @@
 #include "StaticRenderer.h"
 
+#include <GL/gl.h>
+
 #include <QFile>
+#include <cstdint>
 #include <vector>
 
 #include "../../../log/colorful-log.h"
@@ -23,67 +26,61 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
     : AbstractRenderer(canvas, oval_segment, max_shape_count) {
   // 初始化实例缓冲区
   GLCALL(cvs->glGenBuffers(1, &instanceBO));
-  // 图形位置2f,图形尺寸2f,旋转角度1f,图形贴图uv2f,贴图id1f,填充颜色4f
+  // 图形位置2f,图形尺寸2f,旋转角度1f,图形贴图uv2f,贴图方式1f,贴图id1f,填充颜色4f
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO));
+
+  GLsizei stride = 12 * sizeof(float);
 
   // 位置信息
   // 描述location2 顶点缓冲0~1float为float类型数据--位置信息(用vec2接收)
   GLCALL(cvs->glEnableVertexAttribArray(2));
-  GLCALL(cvs->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float), nullptr));
+  GLCALL(cvs->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, nullptr));
   // 每个实例变化一次
   GLCALL(cvs->glVertexAttribDivisor(2, 1));
 
   // 尺寸信息
   // 描述location3 顶点缓冲2~3float为float类型数据--尺寸信息(用vec2接收)
   GLCALL(cvs->glEnableVertexAttribArray(3));
-  GLCALL(cvs->glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride,
                                     (void*)(2 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(3, 1));
 
   // 旋转角度
   // 描述location4 顶点缓冲4~4float为float类型数据--旋转角度(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(4));
-  GLCALL(cvs->glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, stride,
                                     (void*)(4 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(4, 1));
 
   // 贴图uv方式
   // 描述location5 顶点缓冲5~5float为float类型数据--贴图uv方式(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(5));
-  GLCALL(cvs->glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, stride,
                                     (void*)(5 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(5, 1));
 
   // 贴图id信息
   // 描述location6 顶点缓冲6~6float为float类型数据--贴图id信息(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(6));
-  GLCALL(cvs->glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, stride,
                                     (void*)(6 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(6, 1));
 
   // 填充颜色信息
   // 描述location7 顶点缓冲7~10float为float类型数据--填充颜色信息(用vec4接收)
   GLCALL(cvs->glEnableVertexAttribArray(7));
-  GLCALL(cvs->glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, stride,
                                     (void*)(7 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(7, 1));
 
   // 圆角半径信息
   // 描述location8 顶点缓冲11~11float为float类型数据--圆角半径信息(用float接收)
   GLCALL(cvs->glEnableVertexAttribArray(8));
-  GLCALL(cvs->glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE,
-                                    12 * sizeof(float),
+  GLCALL(cvs->glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, stride,
                                     (void*)(11 * sizeof(float))));
   GLCALL(cvs->glVertexAttribDivisor(8, 1));
 
-  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
-                           (int)(max_shape_count * 12 * sizeof(float)), nullptr,
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER, (max_shape_count * stride), nullptr,
                            GL_STATIC_DRAW));
 
   // 初始化着色器程序
@@ -98,11 +95,11 @@ void StaticRenderer::init_shader_programe() {
   auto fshader = GLCALL(cvs->glCreateShader(GL_FRAGMENT_SHADER));
   // 用`:/`前缀访问qrc文件
 #ifdef __APPLE__
-  QFile vertfile(":/glsl/macos/vertexshader-static.glsl.vert");
-  QFile fragfile(":/glsl/macos/fragmentshader-static.glsl.frag");
+  QFile vertfile(":/glsl/macos/vertexshader.glsl.vert");
+  QFile fragfile(":/glsl/macos/fragmentshader.glsl.frag");
 #else
-  QFile vertfile(":/glsl/vertexshader-static.glsl.vert");
-  QFile fragfile(":/glsl/fragmentshader-static.glsl.frag");
+  QFile vertfile(":/glsl/vertexshader.glsl.vert");
+  QFile fragfile(":/glsl/fragmentshader.glsl.frag");
 #endif  //__APPLE__
 
   // 检查文件是否成功打开
@@ -368,7 +365,7 @@ void StaticRenderer::update_gpu_memory() {
     }
     // 上传内存块到显存
     GLCALL(cvs->glBufferSubData(
-        GL_ARRAY_BUFFER, (int)(instance_start_index * 12 * sizeof(float)),
+        GL_ARRAY_BUFFER, (instance_start_index * 12 * sizeof(float)),
         memory_block.size() * sizeof(float), memory_block.data()));
   }
 }

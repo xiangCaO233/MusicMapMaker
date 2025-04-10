@@ -1,6 +1,9 @@
 #include "DynamicRenderer.h"
 
+#include <GL/gl.h>
+
 #include <QFile>
+#include <cstdint>
 #include <vector>
 
 #include "../../../log/colorful-log.h"
@@ -106,6 +109,80 @@ DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
                            GL_DYNAMIC_DRAW));
   GLCALL(cvs->glVertexAttribDivisor(8, 1));
 
+  // 位置信息
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[0]));
+  // 描述location2 顶点缓冲0~1float为float类型数据--位置信息(用vec2接收)
+  GLCALL(cvs->glEnableVertexAttribArray(2));
+  GLCALL(cvs->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
+                           (max_shape_count * 2 * sizeof(float)), nullptr,
+                           GL_DYNAMIC_DRAW));
+  // 每个实例变化一次
+  GLCALL(cvs->glVertexAttribDivisor(2, 1));
+
+  // 尺寸信息
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[1]));
+  // 描述location3 顶点缓冲0~1float为float类型数据--尺寸信息(用vec2接收)
+  GLCALL(cvs->glEnableVertexAttribArray(3));
+  GLCALL(cvs->glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
+                           (max_shape_count * 2 * sizeof(float)), nullptr,
+                           GL_DYNAMIC_DRAW));
+  GLCALL(cvs->glVertexAttribDivisor(3, 1));
+
+  // 旋转角度信息
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[2]));
+  // 描述location4 顶点缓冲0~0float为float类型数据--旋转角度信息(用float接收)
+  GLCALL(cvs->glEnableVertexAttribArray(4));
+  GLCALL(cvs->glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER, (max_shape_count * sizeof(float)),
+                           nullptr, GL_DYNAMIC_DRAW));
+  GLCALL(cvs->glVertexAttribDivisor(4, 1));
+
+  // 贴图uv方式
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[3]));
+  // 描述location5 顶点缓冲0~0float为float类型数据--贴图uv方式(用float接收)
+  GLCALL(cvs->glEnableVertexAttribArray(5));
+  GLCALL(cvs->glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER, (max_shape_count * sizeof(float)),
+                           nullptr, GL_DYNAMIC_DRAW));
+  GLCALL(cvs->glVertexAttribDivisor(5, 1));
+
+  // 贴图id信息
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[4]));
+  // 描述location6 顶点缓冲0~0uint为uint类型数据--贴图id信息(用float接收)
+  GLCALL(cvs->glEnableVertexAttribArray(6));
+  GLCALL(cvs->glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER, (max_shape_count * sizeof(float)),
+                           nullptr, GL_DYNAMIC_DRAW));
+  GLCALL(cvs->glVertexAttribDivisor(6, 1));
+
+  // 填充颜色信息
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[5]));
+  // 描述location7 顶点缓冲0~3float为float类型数据--填充颜色信息(用vec4接收)
+  GLCALL(cvs->glEnableVertexAttribArray(7));
+  GLCALL(cvs->glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
+                           (max_shape_count * 4 * sizeof(float)), nullptr,
+                           GL_DYNAMIC_DRAW));
+  GLCALL(cvs->glVertexAttribDivisor(7, 1));
+
+  // 圆角半径
+  GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO[6]));
+  // 描述location8 顶点缓冲0~0float为float类型数据--圆角半径信息(用float接收)
+  GLCALL(cvs->glEnableVertexAttribArray(8));
+  GLCALL(cvs->glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(float),
+                                    nullptr));
+  GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER, (max_shape_count * sizeof(float)),
+                           nullptr, GL_DYNAMIC_DRAW));
+  GLCALL(cvs->glVertexAttribDivisor(8, 1));
+
   // 初始化着色器程序
   init_shader_programe();
 }
@@ -119,11 +196,11 @@ void DynamicRenderer::init_shader_programe() {
 
   // 用`:/`前缀访问qrc文件
 #ifdef __APPLE__
-  QFile vertfile(":/glsl/macos/vertexshader-dynamic.glsl.vert");
-  QFile fragfile(":/glsl/macos/fragmentshader-dynamic.glsl.frag");
+  QFile vertfile(":/glsl/macos/vertexshader.glsl.vert");
+  QFile fragfile(":/glsl/macos/fragmentshader.glsl.frag");
 #else
-  QFile vertfile(":/glsl/vertexshader-dynamic.glsl.vert");
-  QFile fragfile(":/glsl/fragmentshader-dynamic.glsl.frag");
+  QFile vertfile(":/glsl/vertexshader.glsl.vert");
+  QFile fragfile(":/glsl/fragmentshader.glsl.frag");
 #endif  //__APPLE__
 
   // 检查文件是否成功打开
@@ -349,7 +426,8 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
       auto listit = update_mapping.find(InstanceDataType::TEXTURE_POLICY);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(InstanceDataType::TEXTURE_POLICY).first;
+        listit =
+            update_mapping.try_emplace(InstanceDataType::TEXTURE_POLICY).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
@@ -486,7 +564,7 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++)
-            memory_block[(i - instance_start_index)] = texture_policy_data[i];
+            memory_block[i - instance_start_index] = texture_policy_data[i];
           break;
         }
         case InstanceDataType::TEXTURE_ID: {
@@ -496,7 +574,7 @@ void DynamicRenderer::update_gpu_memory() {
           memory_block.resize(memory_block_size);
           for (int i = instance_start_index;
                i < instance_start_index + instance_count; i++)
-            memory_block[(i - instance_start_index)] = texture_id_data[i];
+            memory_block[i - instance_start_index] = texture_id_data[i];
           break;
         }
         case InstanceDataType::FILL_COLOR: {
@@ -531,8 +609,8 @@ void DynamicRenderer::update_gpu_memory() {
       // 上传内存块到显存
       GLCALL(cvs->glBufferSubData(
           GL_ARRAY_BUFFER,
-          (int)(instance_start_index * (memory_block_size / instance_count) *
-                sizeof(float)),
+          (instance_start_index * (memory_block_size / instance_count) *
+           sizeof(float)),
           memory_block.size() * sizeof(float), memory_block.data()));
     }
   }

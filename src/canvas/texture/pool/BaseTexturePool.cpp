@@ -1,5 +1,6 @@
 #include "BaseTexturePool.h"
 
+#include "../atlas/TextureAtlas.h"
 #include "colorful-log.h"
 
 BaseTexturePool::BaseTexturePool(GLCanvas* canvas) : cvs(canvas) {}

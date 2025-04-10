@@ -7,6 +7,7 @@
 
 #include "../Texture.h"
 
+#define POOL_TYPE_NOTADAPT 0x00
 #define POOL_FULL 0x01
 #define EXPECTED_SIZE 0x02
 #define NOT_CONSECUTIVE 0x03
@@ -18,6 +19,7 @@ class BaseTexturePool;
 
 // 纹理池类型
 enum class TexturePoolType : int32_t {
+  UNKNOWN = -1,
   BASE_POOL = 1,
   ARRAY = 2,
 };
@@ -36,8 +38,14 @@ class BaseTexturePool {
   // 当前纹理id句柄
   uint32_t current_id_handle{0};
 
+  // 纹理数组存储的纹理集数据组
+  uint32_t atlasMetaTextureArray;
+
   // 是否完成导入
-  bool is_finalized;
+  bool is_finalized{false};
+
+  // 是否使用纹理集
+  bool use_atlas{false};
 
   // 构造TexturePool
   BaseTexturePool(GLCanvas* canvas);
@@ -59,8 +67,8 @@ class BaseTexturePool {
   // 使用此纹理池
   // Base需使用指定批次
   // Array不需要
-  virtual void use(std::shared_ptr<BaseTexturePool> pool_reference,
-                   std::shared_ptr<AbstractRenderer> renderer_context,
+  virtual void use(const std::shared_ptr<BaseTexturePool>& pool_reference,
+                   std::shared_ptr<AbstractRenderer>& renderer_context,
                    size_t batch_index = -1) = 0;
 };
 

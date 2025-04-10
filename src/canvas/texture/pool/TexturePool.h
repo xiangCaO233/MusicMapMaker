@@ -15,7 +15,7 @@ class AbstractRenderer;
 class TexturePool : public BaseTexturePool {
  public:
   // 构造TexturePool
-  TexturePool(GLCanvas* canvas, bool dynamic_switch = true);
+  TexturePool(GLCanvas *canvas, bool dynamic_switch = true);
 
   // 析构TexturePool
   ~TexturePool() override;
@@ -55,8 +55,8 @@ class TexturePool : public BaseTexturePool {
   // 使用此纹理池
   // Base需使用指定批次
   // Array不需要
-  void use(std::shared_ptr<BaseTexturePool> pool_reference,
-           std::shared_ptr<AbstractRenderer> renderer_context,
+  void use(const std::shared_ptr<BaseTexturePool> &pool_reference,
+           std::shared_ptr<AbstractRenderer> &renderer_context,
            size_t batch_index = -1) override;
 };
 

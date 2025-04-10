@@ -1,12 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>glsl/vertexshader-static.glsl.vert</file>
-        <file>glsl/fragmentshader-static.glsl.frag</file>
-        <file>glsl/vertexshader-dynamic.glsl.vert</file>
-        <file>glsl/fragmentshader-dynamic.glsl.frag</file>
-        <file>glsl/macos/vertexshader-static.glsl.vert</file>
-        <file>glsl/macos/fragmentshader-static.glsl.frag</file>
-        <file>glsl/macos/vertexshader-dynamic.glsl.vert</file>
-        <file>glsl/macos/fragmentshader-dynamic.glsl.frag</file>
+        <file>glsl/vertexshader.glsl.vert</file>
+        <file>glsl/fragmentshader.glsl.frag</file>
+        <file>glsl/macos/vertexshader.glsl.vert</file>
+        <file>glsl/macos/fragmentshader.glsl.frag</file>
     </qresource>
 </RCC>

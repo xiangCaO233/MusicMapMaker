@@ -14,7 +14,7 @@ class TextureInstace {
  public:
   TextureInstace();
 
-  explicit TextureInstace(const char* qrc_path,
+  explicit TextureInstace(const char* path,
                           std::shared_ptr<BaseTexturePool> preference);
 
   virtual ~TextureInstace();
@@ -64,6 +64,11 @@ class TextureInstace {
    *渲染合并判断:texture_id对应纹理可转换为AtlasSubTexture
    *且与此批绘制指令使用的AtlasSubTexture对应同一纹理集引用
    */
+  // 纹理集索引方式:
+  // 0x20000001;
+  // 当前纹理池第二个纹理集的第一个子纹理
+  // 0xd0000101;
+  // 当前纹理池第十五个纹理集的第一百零一个子纹理
   uint32_t texture_id;
 
   // 纹理实例
