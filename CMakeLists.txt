@@ -7,6 +7,7 @@ project(
 
 add_subdirectory(./libs/xaudiolib)
 include_directories(./ ./libs/xaudiolib/include)
+link_directories(./build)
 
 # 启用自动处理 Qt 特性
 set(CMAKE_AUTOUIC ON)
@@ -104,12 +105,32 @@ else()
   endif()
 endif()
 
+# 自动复制运行时文件和插件
+if(WIN32)
+  # 复制 DLLs
+  add_custom_command(TARGET MusicMapMaker POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:Qt6::Core>
+    $<TARGET_FILE:Qt6::Gui>
+    $<TARGET_FILE_DIR:MusicMapMaker>
+  )
+
+  # message(STATUS ${QT_DIR})
+
+  # 复制平台插件
+  get_target_property(Qt6_plugin_dir Qt6::Gui LOCATION)
+  get_filename_component(QT_DIR "${Qt6_plugin_dir}" DIRECTORY)
+  file(COPY "${QT_DIR}/../Qt6/plugins/platforms/qwindows.dll"
+    DESTINATION "${CMAKE_BINARY_DIR}/platforms")
+endif()
+
 # 链接 Qt 库
 target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-  Qt${QT_VERSION_MAJOR}::OpenGL xaudio)
+  Qt${QT_VERSION_MAJOR}::OpenGL
+  xaudio-dev)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

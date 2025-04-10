@@ -3,7 +3,6 @@
 
 #include <spdlog/common.h>
 #ifdef _WIN32
-#define SPDLOG_FUNCTION __FUNCTION__
 #endif
 
 #include <spdlog/details/log_msg.h>

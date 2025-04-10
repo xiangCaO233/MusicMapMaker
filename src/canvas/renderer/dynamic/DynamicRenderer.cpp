@@ -198,7 +198,7 @@ void DynamicRenderer::init_shader_programe() {
 void DynamicRenderer::synchronize_data(InstanceDataType data_type,
                                        size_t instance_index, void* data) {
   switch (data_type) {
-    case POSITION: {
+    case InstanceDataType::POSITION: {
       auto pos = static_cast<QVector2D*>(data);
       if (position_data.empty() || position_data.size() <= instance_index) {
         // XWARN("添加位置数据");
@@ -216,7 +216,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case SIZE: {
+    case InstanceDataType::SIZE: {
       auto size = static_cast<QVector2D*>(data);
       if (size_data.empty() || size_data.size() <= instance_index) {
         // XWARN("添加尺寸数据");
@@ -231,7 +231,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case ROTATION: {
+    case InstanceDataType::ROTATION: {
       auto rotation = static_cast<float*>(data);
       if (rotation_data.empty() || rotation_data.size() <= instance_index) {
         // XWARN("添加旋转数据");
@@ -246,7 +246,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case TEXTURE_POLICY: {
+    case InstanceDataType::TEXTURE_POLICY: {
       auto texture_policy = static_cast<int32_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
@@ -262,7 +262,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case TEXTURE_ID: {
+    case InstanceDataType::TEXTURE_ID: {
       auto texture_id = static_cast<uint32_t*>(data);
       if (texture_id_data.empty() || texture_id_data.size() <= instance_index) {
         // XWARN("添加纹理id数据");
@@ -277,7 +277,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case FILL_COLOR: {
+    case InstanceDataType::FILL_COLOR: {
       auto fill_color = static_cast<QVector4D*>(data);
       if (fill_color_data.empty() || fill_color_data.size() <= instance_index) {
         // XWARN("添加填充颜色数据");
@@ -292,7 +292,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case RADIUS: {
+    case InstanceDataType::RADIUS: {
       auto radius = static_cast<float*>(data);
       if (radius_data.empty() || radius_data.size() <= instance_index) {
         // XWARN("添加圆角半径数据");
@@ -315,71 +315,71 @@ void DynamicRenderer::synchronize_update_mark(InstanceDataType data_type,
                                               size_t instance_index) {
   std::vector<std::pair<size_t, uint32_t>>* mark_list;
   switch (data_type) {
-    case POSITION: {
-      auto listit = update_mapping.find(POSITION);
+    case InstanceDataType::POSITION: {
+      auto listit = update_mapping.find(InstanceDataType::POSITION);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(POSITION).first;
+        listit = update_mapping.try_emplace(InstanceDataType::POSITION).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
       break;
     }
-    case SIZE: {
-      auto listit = update_mapping.find(SIZE);
+    case InstanceDataType::SIZE: {
+      auto listit = update_mapping.find(InstanceDataType::SIZE);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(SIZE).first;
+        listit = update_mapping.try_emplace(InstanceDataType::SIZE).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
       break;
     }
-    case ROTATION: {
-      auto listit = update_mapping.find(ROTATION);
+    case InstanceDataType::ROTATION: {
+      auto listit = update_mapping.find(InstanceDataType::ROTATION);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(ROTATION).first;
+        listit = update_mapping.try_emplace(InstanceDataType::ROTATION).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
       break;
     }
-    case TEXTURE_POLICY: {
-      auto listit = update_mapping.find(TEXTURE_POLICY);
+    case InstanceDataType::TEXTURE_POLICY: {
+      auto listit = update_mapping.find(InstanceDataType::TEXTURE_POLICY);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(TEXTURE_POLICY).first;
+        listit = update_mapping.try_emplace(InstanceDataType::TEXTURE_POLICY).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
       break;
     }
-    case TEXTURE_ID: {
-      auto listit = update_mapping.find(TEXTURE_ID);
+    case InstanceDataType::TEXTURE_ID: {
+      auto listit = update_mapping.find(InstanceDataType::TEXTURE_ID);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(TEXTURE_ID).first;
+        listit = update_mapping.try_emplace(InstanceDataType::TEXTURE_ID).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
       break;
     }
-    case FILL_COLOR: {
-      auto listit = update_mapping.find(FILL_COLOR);
+    case InstanceDataType::FILL_COLOR: {
+      auto listit = update_mapping.find(InstanceDataType::FILL_COLOR);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(FILL_COLOR).first;
+        listit = update_mapping.try_emplace(InstanceDataType::FILL_COLOR).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
       break;
     }
-    case RADIUS: {
-      auto listit = update_mapping.find(RADIUS);
+    case InstanceDataType::RADIUS: {
+      auto listit = update_mapping.find(InstanceDataType::RADIUS);
       if (listit == update_mapping.end()) {
         // 添加缓冲区映射并更新迭代器
-        listit = update_mapping.try_emplace(RADIUS).first;
+        listit = update_mapping.try_emplace(InstanceDataType::RADIUS).first;
       }
       // 更新连续更新标记映射
       mark_list = &listit->second;
@@ -410,31 +410,31 @@ void DynamicRenderer::update_gpu_memory() {
     // 绑定对应缓冲区
     uint32_t buffer;
     switch (data_type) {
-      case POSITION: {
+      case InstanceDataType::POSITION: {
         buffer = instanceBO[0];
         break;
       }
-      case SIZE: {
+      case InstanceDataType::SIZE: {
         buffer = instanceBO[1];
         break;
       }
-      case ROTATION: {
+      case InstanceDataType::ROTATION: {
         buffer = instanceBO[2];
         break;
       }
-      case TEXTURE_POLICY: {
+      case InstanceDataType::TEXTURE_POLICY: {
         buffer = instanceBO[3];
         break;
       }
-      case TEXTURE_ID: {
+      case InstanceDataType::TEXTURE_ID: {
         buffer = instanceBO[4];
         break;
       }
-      case FILL_COLOR: {
+      case InstanceDataType::FILL_COLOR: {
         buffer = instanceBO[5];
         break;
       }
-      case RADIUS: {
+      case InstanceDataType::RADIUS: {
         buffer = instanceBO[6];
         break;
       }
@@ -444,7 +444,7 @@ void DynamicRenderer::update_gpu_memory() {
     for (const auto& [instance_start_index, instance_count] : mark_map) {
       size_t memory_block_size;
       switch (data_type) {
-        case POSITION: {
+        case InstanceDataType::POSITION: {
           // 每实例2float
           memory_block_size = 2 * instance_count;
           // 构造位置数据内存块
@@ -457,7 +457,7 @@ void DynamicRenderer::update_gpu_memory() {
           }
           break;
         }
-        case SIZE: {
+        case InstanceDataType::SIZE: {
           // 每实例2float
           memory_block_size = 2 * instance_count;
           // 构造尺寸数据内存块
@@ -469,7 +469,7 @@ void DynamicRenderer::update_gpu_memory() {
           }
           break;
         }
-        case ROTATION: {
+        case InstanceDataType::ROTATION: {
           // 每实例1float
           memory_block_size = instance_count;
           // 构造旋转角度数据内存块
@@ -479,7 +479,7 @@ void DynamicRenderer::update_gpu_memory() {
             memory_block[(i - instance_start_index)] = rotation_data[i];
           break;
         }
-        case TEXTURE_POLICY: {
+        case InstanceDataType::TEXTURE_POLICY: {
           // 每实例1float
           memory_block_size = instance_count;
           // 构造纹理填充策略数据内存块
@@ -489,7 +489,7 @@ void DynamicRenderer::update_gpu_memory() {
             memory_block[(i - instance_start_index)] = texture_policy_data[i];
           break;
         }
-        case TEXTURE_ID: {
+        case InstanceDataType::TEXTURE_ID: {
           // 每实例1float
           memory_block_size = instance_count;
           // 构造纹理id数据内存块
@@ -499,7 +499,7 @@ void DynamicRenderer::update_gpu_memory() {
             memory_block[(i - instance_start_index)] = texture_id_data[i];
           break;
         }
-        case FILL_COLOR: {
+        case InstanceDataType::FILL_COLOR: {
           // 每实例4float
           memory_block_size = 4 * instance_count;
           // 构造填充颜色数据内存块
@@ -517,7 +517,7 @@ void DynamicRenderer::update_gpu_memory() {
           }
           break;
         }
-        case RADIUS: {
+        case InstanceDataType::RADIUS: {
           // 每实例1float
           memory_block_size = instance_count;
           // 构造圆角半径数据内存块

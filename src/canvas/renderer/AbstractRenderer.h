@@ -1,8 +1,6 @@
 #ifndef ABSTRACT_RENDERER_H
 #define ABSTRACT_RENDERER_H
 
-#include <GL/gl.h>
-
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
@@ -15,7 +13,7 @@ class QVector2D;
 class QVector4D;
 class QMatrix4x4;
 
-enum InstanceDataType {
+enum class InstanceDataType {
   POSITION,
   SIZE,
   ROTATION,

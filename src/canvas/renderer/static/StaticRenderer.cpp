@@ -181,7 +181,7 @@ void StaticRenderer::init_shader_programe() {
 void StaticRenderer::synchronize_data(InstanceDataType data_type,
                                       size_t instance_index, void* data) {
   switch (data_type) {
-    case POSITION: {
+    case InstanceDataType::POSITION: {
       auto pos = static_cast<QVector2D*>(data);
       if (position_data.empty() || position_data.size() <= instance_index) {
         // XWARN("添加位置数据");
@@ -198,7 +198,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case SIZE: {
+    case InstanceDataType::SIZE: {
       auto size = static_cast<QVector2D*>(data);
       if (size_data.empty() || size_data.size() <= instance_index) {
         // XWARN("添加尺寸数据");
@@ -215,7 +215,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case ROTATION: {
+    case InstanceDataType::ROTATION: {
       auto rotation = static_cast<float*>(data);
       if (rotation_data.empty() || rotation_data.size() <= instance_index) {
         // XWARN("添加角度数据");
@@ -232,7 +232,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case TEXTURE_POLICY: {
+    case InstanceDataType::TEXTURE_POLICY: {
       auto texture_policy = static_cast<int32_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
@@ -250,7 +250,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case TEXTURE_ID: {
+    case InstanceDataType::TEXTURE_ID: {
       auto texture_id = static_cast<uint32_t*>(data);
       if (texture_id_data.empty() || texture_id_data.size() <= instance_index) {
         // XWARN("添加纹理id数据");
@@ -267,7 +267,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case FILL_COLOR: {
+    case InstanceDataType::FILL_COLOR: {
       auto fill_color = static_cast<QVector4D*>(data);
       if (fill_color_data.empty() || fill_color_data.size() <= instance_index) {
         // XWARN("添加填充颜色数据");
@@ -284,7 +284,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
-    case RADIUS: {
+    case InstanceDataType::RADIUS: {
       auto radius = static_cast<float*>(data);
       if (radius_data.empty() || radius_data.size() <= instance_index) {
         // XWARN("添加圆角半径数据");

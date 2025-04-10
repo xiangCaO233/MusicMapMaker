@@ -1,7 +1,5 @@
 #include "TextureArray.h"
 
-#include <GL/gl.h>
-
 #include <cmath>
 #include <cstdint>
 
