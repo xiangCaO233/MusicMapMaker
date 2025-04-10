@@ -175,29 +175,26 @@ void main() {
     keepratio = true;
   }
 
-  if (useatlas == -1) {
-    // 使用纹理集
-    // TODO 实现纹理集uv计算
-    // 取出纹理集索引和子纹理的集内索引
-    int(texture_id);
-    int atlasIndex;
-    int subIndex;
-  } else {
-    // 直接使用纹理
-    if (keepratio) {
+  // 区分是否保持原图比例
+  if (keepratio) {
+    if (useatlas == 1) {
+      // 使用纹理集
+      // 取出纹理集索引和子纹理的集内索引
+      int atlasIndex = (int(texture_id) >> 16) & 0xFF;
+      int subIndex = int(texture_id) & 0xFFFF;
+      // 获取纹理集头数据
+      AtlasMetaHeader header = getAtlasMetaHeader(atlasIndex);
+      // 获取绑定纹理集中子纹理的元数据
+      AtlasSubMeta sub_image_meta = getAtlasSubMeta(atlasIndex, subIndex);
+
+      // TODO 实现保持原图比例的纹理集uv计算
+
+    } else {
       ivec2 texsize;
       // 保持纹理比例
       // 获取纹理尺寸
       if (texture_pool_usage == 1) {
-        if (useatlas == -1) {
-          // 取出纹理集索引和子纹理的集内索引
-          texture_id;
-          int atlasIndex;
-          int subIndex;
-          texsize = textureSize(samplers[atlasIndex], 0);
-        } else {
-          texsize = textureSize(samplers[int(texture_id) % 14], 0);
-        }
+        texsize = textureSize(samplers[int(texture_id) % 14], 0);
       }
       if (texture_pool_usage == 2) {
         texsize = ivec2(textureSize(samplerarray, 0).xy);
@@ -283,9 +280,22 @@ void main() {
         // 应用缩放和偏移到最终uv坐标
         final_uv = anchorOffset + texture_uv * scale;
       }
+    }
+  } else {
+    // 不保持纹理比例
+    if (useatlas == 1) {
+      // 取出纹理集索引和子纹理的集内索引
+      int atlasIndex = (int(texture_id) >> 16) & 0xFF;
+      int subIndex = int(texture_id) & 0xFFFF;
+      // 获取纹理集头数据
+      AtlasMetaHeader header = getAtlasMetaHeader(atlasIndex);
+      // 获取绑定纹理集中子纹理的元数据
+      AtlasSubMeta sub_image_meta = getAtlasSubMeta(atlasIndex, subIndex);
+
+      // TODO 实现不保持原图比例的纹理集uv计算
+
     } else {
-      // 不保持纹理比例
-      // 直接使用原uv
+      // 不使用纹理集时直接使用原uv
       final_uv = texture_uv;
     }
   }
