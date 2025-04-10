@@ -20,80 +20,82 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
-                                                  OpenGL LinguistTools)
+  OpenGL LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
-             COMPONENTS Core Widgets OpenGLWidgets OpenGL LinguistTools)
+  COMPONENTS Core Widgets OpenGLWidgets OpenGL LinguistTools)
 
 # 查找日志包
 find_package(spdlog REQUIRED)
+
 # 设置mmm相关文件
-set(MMM_SOURCES 
-	src/mmm/map/MMap.h
-	src/mmm/map/MMap.cpp
-	src/mmm/timing/Timing.h
-	src/mmm/timing/Timing.cpp
-	src/mmm/hitobject/HitObject.h
-	src/mmm/hitobject/HitObject.cpp
-	src/mmm/hitobject/Note/Note.h
-	src/mmm/hitobject/Note/Note.cpp
-	src/mmm/hitobject/Note/Hold.h
-	src/mmm/hitobject/Note/Hold.cpp
-	src/mmm/hitobject/Note/Slide.h
-	src/mmm/hitobject/Note/Slide.cpp
-	src/mmm/hitobject/Note/Slide.h
-	src/mmm/hitobject/Note/Slide.cpp
+set(MMM_SOURCES
+  src/mmm/map/MMap.h
+  src/mmm/map/MMap.cpp
+  src/mmm/timing/Timing.h
+  src/mmm/timing/Timing.cpp
+  src/mmm/hitobject/HitObject.h
+  src/mmm/hitobject/HitObject.cpp
+  src/mmm/hitobject/Note/Note.h
+  src/mmm/hitobject/Note/Note.cpp
+  src/mmm/hitobject/Note/Hold.h
+  src/mmm/hitobject/Note/Hold.cpp
+  src/mmm/hitobject/Note/Slide.h
+  src/mmm/hitobject/Note/Slide.cpp
+  src/mmm/hitobject/Note/Slide.h
+  src/mmm/hitobject/Note/Slide.cpp
 )
 
 # 设置翻译文件
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
-             ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
+  ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
+
 # 设置着色器文件
 set(GLSL_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/fragmentshader-static.glsl.frag
-    ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/vertexshader-static.glsl.vert)
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/fragmentshader-static.glsl.frag
+  ${CMAKE_CURRENT_SOURCE_DIR}/resources/glsl/vertexshader-static.glsl.vert)
 
 # 项目源文件
 set(PROJECT_SOURCES
-    src/main.cpp
-    src/mainwindow.cpp
-    src/mainwindow.h
-    src/mainwindow.ui
-    src/canvas/GLCanvas.h
-    src/canvas/GLCanvas.cpp
-    src/canvas/renderer/RenderCommand.h
-    src/canvas/renderer/static/StaticRenderer.h
-    src/canvas/renderer/static/StaticRenderer.cpp
-		src/canvas/renderer/dynamic/DynamicRenderer.h
-    src/canvas/renderer/dynamic/DynamicRenderer.cpp
-		src/canvas/renderer/AbstractRenderer.h
-    src/canvas/renderer/AbstractRenderer.cpp
-		src/canvas/renderer/RendererManager.h
-    src/canvas/renderer/RendererManager.cpp
-    src/canvas/texture/atlas/TextureAtlas.h
-    src/canvas/texture/atlas/TextureAtlas.cpp
-		src/canvas/texture/atlas/Rect.h
-		src/canvas/texture/atlas/MaxRectsBinPack.h
-		src/canvas/texture/atlas/MaxRectsBinPack.cpp
-    src/canvas/texture/pool/TexturePool.h
-    src/canvas/texture/pool/TexturePool.cpp
-    src/canvas/texture/pool/BaseTexturePool.h
-    src/canvas/texture/pool/BaseTexturePool.cpp
-		src/canvas/texture/pool/TextureArray.h
-		src/canvas/texture/pool/TextureArray.cpp
-		src/canvas/texture/Texture.h
-		src/canvas/texture/Texture.cpp
-    src/log/colorful-log.h
-    src/log/colorful_log.cpp
-		${MMM_SOURCES}
-    ${GLSL_FILES}
-    ${TS_FILES})
+  src/main.cpp
+  src/mainwindow.cpp
+  src/mainwindow.h
+  src/mainwindow.ui
+  src/canvas/GLCanvas.h
+  src/canvas/GLCanvas.cpp
+  src/canvas/renderer/RenderCommand.h
+  src/canvas/renderer/static/StaticRenderer.h
+  src/canvas/renderer/static/StaticRenderer.cpp
+  src/canvas/renderer/dynamic/DynamicRenderer.h
+  src/canvas/renderer/dynamic/DynamicRenderer.cpp
+  src/canvas/renderer/AbstractRenderer.h
+  src/canvas/renderer/AbstractRenderer.cpp
+  src/canvas/renderer/RendererManager.h
+  src/canvas/renderer/RendererManager.cpp
+  src/canvas/texture/atlas/TextureAtlas.h
+  src/canvas/texture/atlas/TextureAtlas.cpp
+  src/canvas/texture/atlas/Rect.h
+  src/canvas/texture/atlas/MaxRectsBinPack.h
+  src/canvas/texture/atlas/MaxRectsBinPack.cpp
+  src/canvas/texture/pool/TexturePool.h
+  src/canvas/texture/pool/TexturePool.cpp
+  src/canvas/texture/pool/BaseTexturePool.h
+  src/canvas/texture/pool/BaseTexturePool.cpp
+  src/canvas/texture/pool/TextureArray.h
+  src/canvas/texture/pool/TextureArray.cpp
+  src/canvas/texture/Texture.h
+  src/canvas/texture/Texture.cpp
+  src/log/colorful-log.h
+  src/log/colorful_log.cpp
+  ${MMM_SOURCES}
+  ${GLSL_FILES}
+  ${TS_FILES})
 
 include_directories(./src/canvas ./src/log)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                    resources/glsrcs.qrc)
+    resources/glsrcs.qrc)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
@@ -106,8 +108,8 @@ endif()
 target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
-          Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-          Qt${QT_VERSION_MAJOR}::OpenGL xaudio)
+  Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+  Qt${QT_VERSION_MAJOR}::OpenGL xaudio)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -146,10 +148,10 @@ endif()
 set_target_properties(
   MusicMapMaker
   PROPERTIES ${BUNDLE_ID_OPTION} MACOSX_BUNDLE_BUNDLE_VERSION
-             ${PROJECT_VERSION} MACOSX_BUNDLE_SHORT_VERSION_STRING
-             ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} MACOSX_BUNDLE
-             TRUE WIN32_EXECUTABLE
-             TRUE)
+  ${PROJECT_VERSION} MACOSX_BUNDLE_SHORT_VERSION_STRING
+  ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} MACOSX_BUNDLE
+  TRUE WIN32_EXECUTABLE
+  TRUE)
 
 # 安装配置
 include(GNUInstallDirs)
