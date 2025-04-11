@@ -50,7 +50,7 @@ int TextureArray::load_texture(std::shared_ptr<TextureInstace> texture) {
       // 第一次载入纹理集
       use_atlas = true;
     } else {
-      if (use_atlas = false) {
+      if (!use_atlas) {
         // 并非纹理集纹理池
         return POOL_TYPE_NOTADAPT;
       }
@@ -110,11 +110,13 @@ void TextureArray::finalize() {
   // 激活纹理单元
   GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + 15));
   GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, gl_texture_array_id));
-
+#ifdef __APPLE__
+#else
   // 分配存储空间
   GLCALL(cvs->glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8,
                              texture_size.width(), texture_size.height(),
                              texture_array.size()));
+#endif  //__APPLE__
 
   // 为每一层上传纹理数据
   for (int i = 0; i < texture_array.size(); i++) {

@@ -78,7 +78,7 @@ int TexturePool::load_texture(std::shared_ptr<TextureInstace> texture) {
       // 第一次载入纹理集
       use_atlas = true;
     } else {
-      if (use_atlas = false) {
+      if (!use_atlas) {
         // 并非纹理集纹理池
         return POOL_TYPE_NOTADAPT;
       }
