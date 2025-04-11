@@ -6,6 +6,7 @@
 
 #include "Note.h"
 
+// 组合键
 class ComplexNote : public Note {
  public:
   // 构造ComplexNote

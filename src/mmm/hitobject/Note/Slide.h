@@ -3,6 +3,7 @@
 
 #include "Note.h"
 
+// 滑键
 class Slide : public Note {
  public:
   // 构造Slide

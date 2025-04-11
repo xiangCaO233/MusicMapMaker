@@ -3,6 +3,7 @@
 
 #include "Note.h"
 
+// 长条
 class Hold : public Note {
  public:
   // 构造Hold
