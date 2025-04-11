@@ -2,6 +2,8 @@
     <qresource prefix="/">
         <file>glsl/vertexshader.glsl.vert</file>
         <file>glsl/fragmentshader.glsl.frag</file>
+        <file>glsl/vertfontshader.glsl.vert</file>
+        <file>glsl/fragfontshader.glsl.frag</file>
         <file>glsl/macos/vertexshader.glsl.vert</file>
         <file>glsl/macos/fragmentshader.glsl.frag</file>
     </qresource>

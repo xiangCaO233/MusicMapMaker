@@ -172,6 +172,11 @@ void GLCanvas::initializeGL() {
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 32, 4096);
+  // 初始化字体池
+  font_pool = std::make_shared<FontPool>();
+  font_pool->load_font("../resources/font/ComicMono-Bold.ttf");
+
+  // 初始化纹理池
   // load_texture_from_path("../resources/textures/test/other",
   //                        TexturePoolType::BASE_POOL, false);
   load_texture_from_path("../resources/textures/test/1024",

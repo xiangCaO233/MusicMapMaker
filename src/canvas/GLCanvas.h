@@ -5,6 +5,8 @@
 #include <qpoint.h>
 
 #include <memory>
+
+#include "texture/font/FontPool.h"
 #ifdef __APPLE__
 #include <QtOpenGL/qopenglfunctions_4_1_core.h>
 #else
@@ -42,6 +44,9 @@ class GLCanvas : public QOpenGLWidget,
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
   ~GLCanvas() override;
+
+  // 字体池
+  std::shared_ptr<FontPool> font_pool;
 
   // 当前纹理集信息
   std::shared_ptr<TextureAtlas> current_atlas;
