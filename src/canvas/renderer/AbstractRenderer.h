@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "RenderCommand.h"
+#include "renderer/shader/Shader.h"
 #include "texture/pool/BaseTexturePool.h"
 
 class GLCanvas;
@@ -43,11 +44,8 @@ class AbstractRenderer {
   uint32_t FBO;
   // 统一缓冲对象
   uint32_t UBO;
-  // 着色器程序
-  uint32_t shader_program;
-
-  // uniform位置表缓存
-  std::unordered_map<const char*, int32_t> uniform_locations;
+  // 着色器
+  std::unique_ptr<Shader> shader;
 
   // 图形位置数据
   std::vector<QVector2D> position_data;
@@ -99,8 +97,6 @@ class AbstractRenderer {
   void set_uniform_integer(const char* location_name, int32_t value);
   // 设置uniform矩阵(4x4)
   void set_uniform_mat4(const char* location_name, const QMatrix4x4& mat);
-
-  int32_t uniform_loc(const char* location_name);
 
   // 绑定渲染器
   virtual void bind();

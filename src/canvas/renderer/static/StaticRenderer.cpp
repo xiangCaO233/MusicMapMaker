@@ -82,96 +82,11 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas, int oval_segment,
 
   GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER, (max_shape_count * stride), nullptr,
                            GL_STATIC_DRAW));
-
-  // 初始化着色器程序
-  init_shader_programe();
 }
 
-StaticRenderer::~StaticRenderer() {}
-
-// 初始化着色器程序
-void StaticRenderer::init_shader_programe() {
-  auto vshader = GLCALL(cvs->glCreateShader(GL_VERTEX_SHADER));
-  auto fshader = GLCALL(cvs->glCreateShader(GL_FRAGMENT_SHADER));
-  // 用`:/`前缀访问qrc文件
-#ifdef __APPLE__
-  QFile vertfile(":/glsl/macos/vertexshader.glsl.vert");
-  QFile fragfile(":/glsl/macos/fragmentshader.glsl.frag");
-#else
-  QFile vertfile(":/glsl/vertexshader.glsl.vert");
-  QFile fragfile(":/glsl/fragmentshader.glsl.frag");
-#endif  //__APPLE__
-
-  // 检查文件是否成功打开
-  if (!vertfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    auto errormsg = vertfile.errorString();
-    auto errorstr = errormsg.toStdString();
-    XERROR("Failed to open vertex source file:" + errorstr);
-  }
-  if (!fragfile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    auto errormsg = fragfile.errorString();
-    auto errorstr = errormsg.toStdString();
-    XERROR("Failed to open vertex source file:" + errorstr);
-  }
-
-  // 用QTextStream读取内容
-  QTextStream vertin(&vertfile);
-  QTextStream fragin(&fragfile);
-
-  auto vertex_shader_qstr = vertin.readAll();
-  auto fragment_shader_qstr = fragin.readAll();
-
-  auto vertex_shader_str = vertex_shader_qstr.toStdString();
-  auto fragment_shader_str = fragment_shader_qstr.toStdString();
-
-  auto vertex_shader_source = vertex_shader_str.c_str();
-  auto fragment_shader_source = fragment_shader_str.c_str();
-
-  // 关闭文件
-  vertfile.close();
-  fragfile.close();
-
-  // 注入源代码
-  GLCALL(cvs->glShaderSource(vshader, 1, &vertex_shader_source, nullptr));
-  GLCALL(cvs->glShaderSource(fshader, 1, &fragment_shader_source, nullptr));
-
-  GLCALL(cvs->glCompileShader(vshader));
-  // 检查编译错误
-  int success;
-  char infoLog[512];
-  GLCALL(cvs->glGetShaderiv(vshader, GL_COMPILE_STATUS, &success));
-  if (!success) {
-    GLCALL(cvs->glGetShaderInfoLog(vshader, 512, nullptr, infoLog));
-    XCRITICAL("顶点着色器编译出错:\n" + std::string(infoLog));
-  } else {
-    XINFO("顶点着色器编译成功");
-  }
-
-  GLCALL(cvs->glCompileShader(fshader));
-  // 检查编译错误
-  GLCALL(cvs->glGetShaderiv(fshader, GL_COMPILE_STATUS, &success));
-  if (!success) {
-    GLCALL(cvs->glGetShaderInfoLog(fshader, 512, nullptr, infoLog));
-    XCRITICAL("片段着色器编译出错:\n" + std::string(infoLog));
-  } else {
-    XINFO("片段着色器编译成功");
-  }
-  // 链接着色器
-  shader_program = GLCALL(cvs->glCreateProgram());
-  GLCALL(cvs->glAttachShader(shader_program, vshader));
-  GLCALL(cvs->glAttachShader(shader_program, fshader));
-  GLCALL(cvs->glLinkProgram(shader_program));
-  // 检查链接错误
-  GLCALL(cvs->glGetProgramiv(shader_program, GL_LINK_STATUS, &success));
-  if (!success) {
-    GLCALL(cvs->glGetProgramInfoLog(shader_program, 512, nullptr, infoLog));
-    XCRITICAL("链接着色器出错:\n" + std::string(infoLog));
-  } else {
-    XINFO("着色器程序链接成功");
-  }
-  // 释放着色器
-  GLCALL(cvs->glDeleteShader(vshader));
-  GLCALL(cvs->glDeleteShader(fshader));
+StaticRenderer::~StaticRenderer() {
+  // 释放实例缓冲区
+  GLCALL(cvs->glDeleteBuffers(1, &instanceBO));
 }
 
 // 同步数据

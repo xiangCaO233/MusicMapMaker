@@ -32,6 +32,7 @@ class StaticRenderer : public AbstractRenderer {
  public:
   // 构造GLRenderer
   StaticRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
+
   // 析构GLRenderer
   ~StaticRenderer() override;
 };

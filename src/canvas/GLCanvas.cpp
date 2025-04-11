@@ -173,7 +173,7 @@ void GLCanvas::initializeGL() {
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 32, 4096);
   // 初始化字体池
-  font_pool = std::make_shared<FontPool>();
+  font_pool = std::make_shared<FontPool>(this);
   font_pool->load_font("../resources/font/ComicMono-Bold.ttf");
 
   // 初始化纹理池
@@ -233,11 +233,10 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
   // QRectF rec(x, y, width, height);
   // renderer_manager->addRect(rec, tex, Qt::red, rotation, false);
 
-  // 渲染器随机---巨幅增加glcall和drawcall
-  // renderer_manager->addRect(rec, tex, Qt::red, 0,
-  //                           rand->bounded(100) > 50);
+  // 渲染器随机-- - 巨幅增加glcall和drawcall
+  // renderer_manager->addRect(rec, tex, Qt::red, 0, rand->bounded(100) > 50);
   // renderer_manager->addRect(rec, tex, Qt::red, rotation,
-  //                           rand->bounded(100) > 50);
+  //                          rand->bounded(100) > 50);
 
   // 渲染器随机且图形随机---超巨幅增加glcall和drawcall
   // if (rand->bounded(100) > 50) {

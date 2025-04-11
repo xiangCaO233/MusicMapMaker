@@ -51,8 +51,6 @@ AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
     vertices.push_back(texcoordy);
   }
 
-  // 初始化圆角矩形顶点
-
   GLCALL(cvs->glBindVertexArray(VAO));
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, VBO));
 
@@ -68,62 +66,63 @@ AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
   GLCALL(cvs->glEnableVertexAttribArray(1));
   GLCALL(cvs->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                                     (void*)(3 * sizeof(float))));
+
+  // 初始化着色器
+  // 用`:/`前缀访问qrc文件
+#ifdef __APPLE__
+  shader = std::make_unique<Shader>(cvs, ":/glsl/macos/vertexshader.glsl.vert",
+                                    ":/glsl/macos/fragmentshader.glsl.frag");
+#else
+  shader = std::make_unique<Shader>(cvs, ":/glsl/vertexshader.glsl.vert",
+                                    ":/glsl/fragmentshader.glsl.frag");
+#endif  //__APPLE__
 }
 
-AbstractRenderer::~AbstractRenderer() {}
+AbstractRenderer::~AbstractRenderer() {
+  // 释放顶点数组
+  GLCALL(cvs->glDeleteVertexArrays(1, &VAO));
+  // 释放缓冲区
+  GLCALL(cvs->glDeleteBuffers(1, &VBO));
+  GLCALL(cvs->glDeleteBuffers(1, &EBO));
+  GLCALL(cvs->glDeleteBuffers(1, &FBO));
+};
 
 // 绑定渲染器
 void AbstractRenderer::bind() {
   // 绑定顶点数组
   GLCALL(cvs->glBindVertexArray(VAO));
   // 绑定着色器
-  GLCALL(cvs->glUseProgram(shader_program));
+  shader->use();
 }
 // 解除绑定渲染器
 void AbstractRenderer::unbind() {
   // 取消绑定顶点数组
   GLCALL(cvs->glBindVertexArray(0));
   // 取消绑定着色器
-  GLCALL(cvs->glUseProgram(0));
+  shader->unuse();
 }
 
 // 设置采样器
 void AbstractRenderer::set_sampler(const char* name, int value) {
-  auto location = GLCALL(cvs->glGetUniformLocation(shader_program, name));
-  GLCALL(cvs->glUniform1i(location, value));
+  shader->set_sampler(name, value);
 }
 
 // 设置uniform浮点
 void AbstractRenderer::set_uniform_float(const char* location_name,
                                          float value) {
-  // 设置uniform
-  GLCALL(cvs->glUniform1f(uniform_loc(location_name), value));
+  shader->set_uniform_float(location_name, value);
 }
 
 // 设置uniform整数
 void AbstractRenderer::set_uniform_integer(const char* location_name,
                                            int32_t value) {
-  // 设置uniform
-  GLCALL(cvs->glUniform1i(uniform_loc(location_name), value));
+  shader->set_uniform_integer(location_name, value);
 }
 
 // 设置uniform矩阵(4x4)
 void AbstractRenderer::set_uniform_mat4(const char* location_name,
                                         const QMatrix4x4& mat) {
-  // 设置uniform
-  GLCALL(cvs->glUniformMatrix4fv(uniform_loc(location_name), 1, GL_FALSE,
-                                 mat.data()));
-}
-
-int32_t AbstractRenderer::uniform_loc(const char* location_name) {
-  auto locationit = uniform_locations.find(location_name);
-  if (locationit == uniform_locations.end()) {
-    // 直接查询
-    auto location =
-        GLCALL(cvs->glGetUniformLocation(shader_program, location_name));
-    locationit = uniform_locations.try_emplace(location_name, location).first;
-  }
-  return locationit->second;
+  shader->set_uniform_mat4(location_name, mat);
 }
 
 // 渲染指定图形实例

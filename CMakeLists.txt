@@ -70,6 +70,8 @@ set(PROJECT_SOURCES
   src/mainwindow.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
+  src/canvas/renderer/shader/Shader.h
+  src/canvas/renderer/shader/Shader.cpp
   src/canvas/renderer/RenderCommand.h
   src/canvas/renderer/static/StaticRenderer.h
   src/canvas/renderer/static/StaticRenderer.cpp
