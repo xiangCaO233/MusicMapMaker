@@ -405,17 +405,24 @@ void main() {
       final_uv = sub_uv_min + final_uv * (sub_uv_max - sub_uv_min);
     }
   } else {
-    // 不保持纹理比例
+    // 不保持纹理比例--拉伸(可能变形)
     if (useatlas == 1) {
       // 取出纹理集索引和子纹理的集内索引
       int atlasIndex = (int(texture_id) >> 16) & 0xFF;
       int subIndex = int(texture_id) & 0xFFFF;
-      // 获取纹理集头数据
-      AtlasMetaHeader header = getAtlasMetaHeader(atlasIndex);
-      // 获取绑定纹理集中子纹理的元数据
-      AtlasSubMeta sub_image_meta = getAtlasSubMeta(atlasIndex, subIndex);
-      // TODO 实现不保持原图比例的纹理集uv计算
 
+      // TODO 实现不保持原图比例的纹理集uv计算
+      // 获取纹理集头数据--纹理集的总尺寸
+      vec2 atlas_size = getAtlasMetaHeader(atlasIndex).size;
+      // 获取绑定纹理集中子纹理的元数据--纹理集内位置(左上角的像素偏移)
+      AtlasSubMeta sub_image_meta = getAtlasSubMeta(atlasIndex, subIndex);
+      // 转化为纹理集内uv
+      // 计算子纹理在纹理集中的UV范围
+      vec2 sub_uv_min = sub_image_meta.position / atlas_size;
+      vec2 sub_uv_max =
+          (sub_image_meta.position + sub_image_meta.size) / atlas_size;
+      // 映射到子纹理的UV空间
+      final_uv = sub_uv_min + texture_uv * (sub_uv_max - sub_uv_min);
     } else {
       // 不使用纹理集时直接使用原uv
       final_uv = texture_uv;

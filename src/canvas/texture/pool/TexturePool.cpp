@@ -90,7 +90,9 @@ int TexturePool::load_texture(std::shared_ptr<TextureInstace> texture) {
       use_atlas = false;
     }
   }
-  texture_map.try_emplace(texture->name, texture);
+  if (!texture->is_atlas) {
+    texture_map.try_emplace(texture->name, texture);
+  }
   // 添加批信息
   if (texture_dozens.empty() ||
       texture_dozens.back().size() >= max_sampler_consecutive_count - 2) {
@@ -99,9 +101,13 @@ int TexturePool::load_texture(std::shared_ptr<TextureInstace> texture) {
   batch_mapping[texture] = {texture_dozens.size() - 1,
                             texture_dozens.back().size()};
   texture_dozens.back().emplace_back(texture);
-  texture->texture_id = current_id_handle++;
+  if (!texture->is_atlas) {
+    texture->texture_id = current_id_handle++;
+    XINFO("添加纹理: " + texture->name + "成功");
+  } else {
+    XINFO("添加纹理集: " + texture->name);
+  }
 
-  XINFO("添加纹理: " + texture->name + "成功");
   return SUCCESS;
 }
 

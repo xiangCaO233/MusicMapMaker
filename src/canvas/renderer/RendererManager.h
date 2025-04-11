@@ -70,8 +70,7 @@ class RendererManager {
   // 纹理对齐模式
   TextureAlignMode texture_alignmode{TextureAlignMode::ALIGN_TO_CENTER};
   // 纹理填充模式
-  TextureFillMode texture_fillmode{
-      TextureFillMode::SCALLING_BASE_WIDTH_AND_CUT};
+  TextureFillMode texture_fillmode{TextureFillMode::KEEP};
   // 纹理补充模式
   TextureComplementMode texture_complementmode{
       TextureComplementMode::FILL_COLOR};
