@@ -180,6 +180,13 @@ void TexturePool::finalize() {
                                i * (max_sampler_consecutive_count - 2) + j, 32,
                                17, 1, GL_RGBA, GL_FLOAT,
                                texture_atlas->atlas_meta_data));
+        XINFO("metadata:");
+        XINFO("unit_index:" +
+              std::to_string(texture_atlas->atlas_meta_data[0]));
+        XINFO("sub_count:" + std::to_string(texture_atlas->atlas_meta_data[1]));
+        XINFO("atlas_size:[" +
+              std::to_string(texture_atlas->atlas_meta_data[2]) + "," +
+              std::to_string(texture_atlas->atlas_meta_data[3]) + "]");
       }
     }
   }

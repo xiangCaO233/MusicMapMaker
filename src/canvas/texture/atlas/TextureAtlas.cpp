@@ -110,10 +110,10 @@ void TextureAtlas::pack() {
       //   vec2 size;
       // };
       // 以上16b,4f
-      atlas_meta_data[4 + i] = sub_images[i]->woffset;
-      atlas_meta_data[4 + i + 1] = sub_images[i]->hoffset;
-      atlas_meta_data[4 + i + 2] = sub_images[i]->texture_image.width();
-      atlas_meta_data[4 + i + 3] = sub_images[i]->texture_image.height();
+      atlas_meta_data[4 + 4 * i] = sub_images[i]->woffset;
+      atlas_meta_data[4 + 4 * i + 1] = sub_images[i]->hoffset;
+      atlas_meta_data[4 + 4 * i + 2] = sub_images[i]->texture_image.width();
+      atlas_meta_data[4 + 4 * i + 3] = sub_images[i]->texture_image.height();
     }
 
     is_packed = true;

@@ -177,109 +177,143 @@ void main() {
 
   // 区分是否保持原图比例
   if (keepratio) {
+    vec2 texsize;
     if (useatlas == 1) {
       // 使用纹理集
       // 取出纹理集索引和子纹理的集内索引
       int atlasIndex = (int(texture_id) >> 16) & 0xFF;
       int subIndex = int(texture_id) & 0xFFFF;
-      // 获取纹理集头数据
-      AtlasMetaHeader header = getAtlasMetaHeader(atlasIndex);
-      // 获取绑定纹理集中子纹理的元数据
-      AtlasSubMeta sub_image_meta = getAtlasSubMeta(atlasIndex, subIndex);
-
-      // TODO 实现保持原图比例的纹理集uv计算
-
+      // 获取绑定纹理集中子纹理的元数据--尺寸
+      texsize = getAtlasSubMeta(atlasIndex, subIndex).size;
     } else {
-      ivec2 texsize;
       // 保持纹理比例
       // 获取纹理尺寸
       if (texture_pool_usage == 1) {
         texsize = textureSize(samplers[int(texture_id) % 14], 0);
       }
       if (texture_pool_usage == 2) {
-        texsize = ivec2(textureSize(samplerarray, 0).xy);
+        texsize = vec2(textureSize(samplerarray, 0).xy);
       }
-      if (texture_fill_mode == KEEP) {
-        // 保持原纹理尺寸-不缩放
-        // 计算实际显示的UV范围（基于纹理尺寸和矩形尺寸的比例）
-        vec2 uvScale = max(bound_size / texsize, 1.0);
-        vec2 uvOffset = vec2(0.0);
-        // 根据对齐方式计算偏移
-        switch (texture_align_mode) {
-          case ALIGN_LEFT_TOP:
-            // 左上 - 无需偏移
-            break;
-          case ALIGN_LEFT_BOTTOM:
-            // 左下
-            uvOffset.y = 1.0 - uvScale.y;
-            break;
-          case ALIGN_RIGHT_TOP:
-            // 右上
-            uvOffset.x = 1.0 - uvScale.x;
-            break;
-          case ALIGN_RIGHT_BOTTOM:
-            // 右下
-            uvOffset = 1.0 - uvScale;
-            break;
-          case ALIGN_CENTER:
-            // 中心
-            uvOffset = (1.0 - uvScale) * 0.5;
-            break;
-        }
-        // 应用最终UV坐标
-        final_uv = uvOffset + texture_uv * uvScale;
-      } else {
-        // 不保持原纹理尺寸-缩放
-        // 计算矩形和纹理的宽高比
-        float rectAspect = bound_size.x / bound_size.y;
-        float texAspect = texsize.x / texsize.y;
-        // 计算UV缩放因子
-        vec2 scale = vec2(1.0);
-        if (texture_fill_mode == SCALLING_AND_TILE) {
-          // 平铺模式-选能铺满矩形的比例缩放
-          if (texAspect > rectAspect) {
-            // 纹理比矩形宽
-            scale.x = rectAspect / texAspect;
-          } else {
-            // 纹理比矩形高
-            scale.y = texAspect / rectAspect;
-          }
+    }
+
+    // 计算归一化理论最终uv
+    if (texture_fill_mode == KEEP) {
+      // 保持原纹理尺寸-不缩放
+      // 计算实际显示的UV范围（基于纹理尺寸和矩形尺寸的比例）
+      vec2 uvScale = max(bound_size / texsize, 1.0);
+      vec2 uvOffset = vec2(0.0);
+      // 根据对齐方式计算偏移
+      switch (texture_align_mode) {
+        case ALIGN_LEFT_TOP:
+          // 左上 - 无需偏移
+          break;
+        case ALIGN_LEFT_BOTTOM:
+          // 左下
+          uvOffset.y = 1.0 - uvScale.y;
+          break;
+        case ALIGN_RIGHT_TOP:
+          // 右上
+          uvOffset.x = 1.0 - uvScale.x;
+          break;
+        case ALIGN_RIGHT_BOTTOM:
+          // 右下
+          uvOffset = 1.0 - uvScale;
+          break;
+        case ALIGN_CENTER:
+          // 中心
+          uvOffset = (1.0 - uvScale) * 0.5;
+          break;
+      }
+      // 应用最终UV坐标
+      final_uv = uvOffset + texture_uv * uvScale;
+    } else {
+      // 不保持原纹理尺寸-缩放
+      // 计算矩形和纹理的宽高比
+      float rectAspect = bound_size.x / bound_size.y;
+      float texAspect = texsize.x / texsize.y;
+      // 计算UV缩放因子
+      vec2 scale = vec2(1.0);
+      if (texture_fill_mode == SCALLING_AND_TILE) {
+        // 平铺模式-选能铺满矩形的比例缩放
+        if (texAspect > rectAspect) {
+          // 纹理比矩形宽
+          scale.x = rectAspect / texAspect;
         } else {
-          // 非平铺模式-按要求选比例缩放
-          if (texture_fill_mode == SCALLING_BASE_HEIGHT_AND_CUT) {
-            // 以矩形高为基准(高不变)
-            scale.x = rectAspect / texAspect;
-          } else if (texture_fill_mode == SCALLING_BASE_WIDTH_AND_CUT) {
-            // 以矩形宽为基准(宽不变)
-            scale.y = texAspect / rectAspect;
-          }
+          // 纹理比矩形高
+          scale.y = texAspect / rectAspect;
         }
-        // 根据基准点调整UV坐标
-        vec2 anchorOffset = vec2(0.0);
-        switch (texture_align_mode) {
-          case ALIGN_LEFT_TOP:
-            // 左上
-            anchorOffset = vec2(0.0, 0.0);
-            break;
-          case ALIGN_LEFT_BOTTOM:
-            // 左下
-            anchorOffset = vec2(0.0, 1.0 - scale.y);
-            break;
-          case ALIGN_RIGHT_TOP:
-            // 右上
-            anchorOffset = vec2(1.0 - scale.x, 0.0);
-            break;
-          case ALIGN_RIGHT_BOTTOM:
-            // 右下
-            anchorOffset = vec2(1.0 - scale.x, 1.0 - scale.y);
-            break;
-          case ALIGN_CENTER:
-            // 中心(0)
-            anchorOffset = (1.0 - scale) * 0.5;
+      } else {
+        // 非平铺模式-按要求选比例缩放
+        if (texture_fill_mode == SCALLING_BASE_HEIGHT_AND_CUT) {
+          // 以矩形高为基准(高不变)
+          scale.x = rectAspect / texAspect;
+        } else if (texture_fill_mode == SCALLING_BASE_WIDTH_AND_CUT) {
+          // 以矩形宽为基准(宽不变)
+          scale.y = texAspect / rectAspect;
         }
-        // 应用缩放和偏移到最终uv坐标
-        final_uv = anchorOffset + texture_uv * scale;
       }
+      // 根据基准点调整UV坐标
+      vec2 anchorOffset = vec2(0.0);
+      switch (texture_align_mode) {
+        case ALIGN_LEFT_TOP:
+          // 左上
+          anchorOffset = vec2(0.0, 0.0);
+          break;
+        case ALIGN_LEFT_BOTTOM:
+          // 左下
+          anchorOffset = vec2(0.0, 1.0 - scale.y);
+          break;
+        case ALIGN_RIGHT_TOP:
+          // 右上
+          anchorOffset = vec2(1.0 - scale.x, 0.0);
+          break;
+        case ALIGN_RIGHT_BOTTOM:
+          // 右下
+          anchorOffset = vec2(1.0 - scale.x, 1.0 - scale.y);
+          break;
+        case ALIGN_CENTER:
+          // 中心(0)
+          anchorOffset = (1.0 - scale) * 0.5;
+      }
+      // 应用缩放和偏移到最终uv坐标
+      final_uv = anchorOffset + texture_uv * scale;
+    }
+    // 非纹理集时已经处理完成--直接使用final_uv
+    if (useatlas == 1) {
+      // 使用纹理集时--将归一化final_uv再转化为纹理集内uv
+      // 已计算过:final_uv
+      // 子纹理尺寸:texsize
+
+      // 取出纹理集索引和子纹理的集内索引
+      int atlasIndex = (int(texture_id) >> 16) & 0xFF;
+      int subIndex = int(texture_id) & 0xFFFF;
+
+      // 获取纹理集头数据--纹理集的总尺寸
+      vec2 atlas_size = getAtlasMetaHeader(atlasIndex).size;
+      // 获取绑定纹理集中子纹理的元数据--纹理集内位置(左上角的像素偏移)
+      vec2 sub_image_pos = getAtlasSubMeta(atlasIndex, subIndex).position;
+
+      // 转化为纹理集内uv
+      // 计算子纹理在纹理集中的UV范围
+      vec2 sub_uv_min = sub_image_pos / atlas_size;
+      vec2 sub_uv_max = (sub_image_pos + texsize) / atlas_size;
+
+      // final_uv = vec2(1.0) - final_uv;
+
+      // 处理超出[0,1]范围的UV
+      if (texture_comolement_mode == REPEAT_TEXTURE) {
+        // 平铺模式 - 使用fract重复纹理
+        final_uv = fract(final_uv);
+      } else if (texture_comolement_mode == FILL_COLOR) {
+        // 填充模式 - 超出范围的部分将在后面处理
+        final_uv = clamp(final_uv, 0.0, 1.0);
+      }
+
+      // TODO 映射到子纹理的UV空间
+      final_uv = sub_uv_min + final_uv * (sub_uv_max - sub_uv_min);
+      // final_uv = vec2(1.0) - final_uv;
+      // FragColor = vec4(1.0, 1.0, 1.0, (sub_image_pos.x / 1024.0) - 0.5);
+      // return;
     }
   } else {
     // 不保持纹理比例
@@ -291,7 +325,6 @@ void main() {
       AtlasMetaHeader header = getAtlasMetaHeader(atlasIndex);
       // 获取绑定纹理集中子纹理的元数据
       AtlasSubMeta sub_image_meta = getAtlasSubMeta(atlasIndex, subIndex);
-
       // TODO 实现不保持原图比例的纹理集uv计算
 
     } else {
@@ -300,6 +333,7 @@ void main() {
     }
   }
 
+  // 从纹理中采样
   vec4 texture_color;
   // 区分纹理池类型
   switch (texture_pool_usage) {
