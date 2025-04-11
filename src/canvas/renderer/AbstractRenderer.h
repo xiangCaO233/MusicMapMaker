@@ -27,7 +27,22 @@ enum class InstanceDataType {
 };
 
 class AbstractRenderer {
- protected:
+ public:
+  // 构造AbstractRenderer
+  AbstractRenderer(GLCanvas* canvas, std::shared_ptr<Shader> general_shader,
+                   int oval_segment, int max_shape_count);
+  // 析构AbstractRenderer
+  virtual ~AbstractRenderer();
+
+  // 当前正在使用的纹理池
+  std::shared_ptr<BaseTexturePool> current_use_pool;
+
+  // 当前shader使用的纹理池类型
+  TexturePoolType current_pool_type{TexturePoolType::UNKNOWN};
+
+  // 当前是否使用纹理集
+  bool is_current_atlas{false};
+
   // 子类公共成员
   // gl实例指针
   GLCanvas* cvs;
@@ -45,7 +60,7 @@ class AbstractRenderer {
   // 统一缓冲对象
   uint32_t UBO;
   // 着色器
-  std::unique_ptr<Shader> shader;
+  std::shared_ptr<Shader> shader;
 
   // 图形位置数据
   std::vector<QVector2D> position_data;
@@ -54,7 +69,7 @@ class AbstractRenderer {
   // 旋转角度
   std::vector<float> rotation_data;
   // 贴图方式
-  std::vector<int32_t> texture_policy_data;
+  std::vector<uint32_t> texture_policy_data;
   // 贴图id
   std::vector<uint32_t> texture_id_data;
   // 填充颜色
@@ -70,33 +85,6 @@ class AbstractRenderer {
 
   // 重置更新内容
   virtual void reset_update() = 0;
-
-  friend class GLCanvas;
-  friend class RendererManager;
-
- public:
-  // 构造AbstractRenderer
-  AbstractRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
-  // 析构AbstractRenderer
-  virtual ~AbstractRenderer();
-
-  // 当前正在使用的纹理池
-  std::shared_ptr<BaseTexturePool> current_use_pool;
-
-  // 当前shader使用的纹理池类型
-  TexturePoolType current_pool_type{TexturePoolType::UNKNOWN};
-
-  // 当前是否使用纹理集
-  bool is_current_atlas{false};
-
-  // 设置采样器
-  void set_sampler(const char* name, int value);
-  // 设置uniform浮点
-  void set_uniform_float(const char* location_name, float value);
-  // 设置uniform整数
-  void set_uniform_integer(const char* location_name, int32_t value);
-  // 设置uniform矩阵(4x4)
-  void set_uniform_mat4(const char* location_name, const QMatrix4x4& mat);
 
   // 绑定渲染器
   virtual void bind();

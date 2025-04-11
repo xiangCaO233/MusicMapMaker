@@ -35,7 +35,8 @@ class DynamicRenderer : public AbstractRenderer {
 
  public:
   // 构造GLRenderer
-  DynamicRenderer(GLCanvas* canvas, int oval_segment, int max_shape_count);
+  DynamicRenderer(GLCanvas* canvas, std::shared_ptr<Shader> general_shader,
+                  int oval_segment, int max_shape_count);
   // 析构GLRenderer
   ~DynamicRenderer() override;
 };

@@ -20,9 +20,10 @@
     }                                                      \
   }
 
-DynamicRenderer::DynamicRenderer(GLCanvas* canvas, int oval_segment,
-                                 int max_shape_count)
-    : AbstractRenderer(canvas, oval_segment, max_shape_count) {
+DynamicRenderer::DynamicRenderer(GLCanvas* canvas,
+                                 std::shared_ptr<Shader> general_shader,
+                                 int oval_segment, int max_shape_count)
+    : AbstractRenderer(canvas, general_shader, oval_segment, max_shape_count) {
   // 初始化实例缓冲区
   GLCALL(cvs->glGenBuffers(7, instanceBO));
 
@@ -240,7 +241,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       break;
     }
     case InstanceDataType::TEXTURE_POLICY: {
-      auto texture_policy = static_cast<int32_t*>(data);
+      auto texture_policy = static_cast<uint32_t*>(data);
       if (texture_policy_data.empty() ||
           texture_policy_data.size() <= instance_index) {
         // XWARN("添加纹理填充策略数据");

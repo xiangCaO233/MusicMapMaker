@@ -78,7 +78,7 @@ class TextureInstace {
   std::shared_ptr<BaseTexturePool> pool_reference;
 };
 
-enum class TextureEffect : int32_t {
+enum class TextureEffect : uint32_t {
   // 无特效
   NONE = 0x0000,
   // 模糊
@@ -88,13 +88,13 @@ enum class TextureEffect : int32_t {
 };
 
 // 纹理补充模式
-enum class TextureComplementMode : int32_t {
+enum class TextureComplementMode : uint32_t {
   FILL_COLOR = 0x0100,
   REPEAT_TEXTURE = 0x0200,
 };
 
 // 纹理对齐模式
-enum class TextureAlignMode : int32_t {
+enum class TextureAlignMode : uint32_t {
   // 对齐左下角
   ALIGN_TO_LEFT_BOTTOM = 0x0010,
   // 对齐右下角
@@ -108,7 +108,7 @@ enum class TextureAlignMode : int32_t {
 };
 
 // 纹理填充模式
-enum class TextureFillMode : int32_t {
+enum class TextureFillMode : uint32_t {
   // 填充,直接塞入(比例不一致会变形)
   FILL = 0x0000,
   // 保持原尺寸

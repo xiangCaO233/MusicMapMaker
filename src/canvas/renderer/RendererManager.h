@@ -11,6 +11,7 @@
 
 enum class TexturePoolType;
 class BaseTexturePool;
+class FontPool;
 
 // 渲染操作
 struct RenderOperation {
@@ -37,9 +38,16 @@ class RendererManager {
   std::map<TexturePoolType, std::vector<std::shared_ptr<BaseTexturePool>>>
       texture_pools;
 
+  // 字体池
+  std::shared_ptr<FontPool> font_pool;
+
   // 渲染器
   std::shared_ptr<StaticRenderer> static_renderer;
   std::shared_ptr<DynamicRenderer> dynamic_renderer;
+
+  // 着色器
+  std::shared_ptr<Shader> font_shader;
+  std::shared_ptr<Shader> general_shader;
 
   // 渲染指令列表
   std::vector<RenderCommand> command_list;
@@ -67,7 +75,7 @@ class RendererManager {
   virtual ~RendererManager();
 
   // 纹理特效
-  TextureEffect texture_effect{TextureEffect::BLUR};
+  TextureEffect texture_effect{TextureEffect::NONE};
   // 纹理对齐模式
   TextureAlignMode texture_alignmode{TextureAlignMode::ALIGN_TO_CENTER};
   // 纹理填充模式
@@ -93,21 +101,18 @@ class RendererManager {
                   const QColor& fill_color, float rotation, bool is_volatile);
 
   // 设置采样器
-  void set_sampler(const char* name, int value) const;
-  void set_static_sampler(const char* name, int value) const;
-  void set_dynamic_sampler(const char* name, int value) const;
+  void set_general_sampler(const char* name, int value) const;
+  void set_fontpool_sampler(const char* name, int value) const;
 
   // 设置uniform浮点
-  void set_uniform_float(const char* location_name, float value) const;
-  void set_static_uniform_float(const char* location_name, float value) const;
-  void set_dynamic_uniform_float(const char* location_name, float value) const;
+  void set_general_uniform_float(const char* location_name, float value) const;
+  void set_fontpool_uniform_float(const char* location_name, float value) const;
 
   // 设置uniform矩阵(4x4)
-  void set_uniform_mat4(const char* location_name, QMatrix4x4& mat) const;
-  void set_static_uniform_mat4(const char* location_name,
-                               QMatrix4x4& mat) const;
-  void set_dynamic_uniform_mat4(const char* location_name,
+  void set_general_uniform_mat4(const char* location_name,
                                 QMatrix4x4& mat) const;
+  void set_fontpool_uniform_mat4(const char* location_name,
+                                 QMatrix4x4& mat) const;
 
   // 渲染全部图形
   void renderAll();

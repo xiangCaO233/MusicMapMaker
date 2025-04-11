@@ -95,8 +95,8 @@ set(PROJECT_SOURCES
   src/canvas/texture/pool/TextureArray.cpp
   src/canvas/texture/Texture.h
   src/canvas/texture/Texture.cpp
-  src/canvas/texture/font/FontPool.h
-  src/canvas/texture/font/FontPool.cpp
+  src/canvas/renderer/font/FontPool.h
+  src/canvas/renderer/font/FontPool.cpp
   src/log/colorful-log.h
   src/log/colorful_log.cpp
   ${MMM_SOURCES}

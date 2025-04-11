@@ -172,9 +172,6 @@ void GLCanvas::initializeGL() {
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 32, 4096);
-  // 初始化字体池
-  font_pool = std::make_shared<FontPool>(this);
-  font_pool->load_font("../resources/font/ComicMono-Bold.ttf");
 
   // 初始化纹理池
   // load_texture_from_path("../resources/textures/test/other",
@@ -194,7 +191,7 @@ void GLCanvas::resizeGL(int w, int h) {
   proj.scale(1.0f, -1.0f, 1.0f);
 
   // 更新uniform
-  renderer_manager->set_uniform_mat4("projection_mat", proj);
+  renderer_manager->set_general_uniform_mat4("projection_mat", proj);
 
   need_update_sampler_location = true;
 }
@@ -266,7 +263,7 @@ void GLCanvas::paintGL() {
 
   // 添加渲染内容--4000矩形
   auto it = texture_map.begin();
-  for (int i = 0; i < 4000; i++) {
+  for (int i = 0; i < 128; i++) {
     it++;
     if (it == texture_map.end()) {
       it = texture_map.begin();

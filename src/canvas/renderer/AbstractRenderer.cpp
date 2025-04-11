@@ -19,9 +19,11 @@
   GLCALL(func);        \
   XLogger::drawcalls++;
 
-AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
-                                   int max_shape_count)
+AbstractRenderer::AbstractRenderer(GLCanvas* canvas,
+                                   std::shared_ptr<Shader> general_shader,
+                                   int oval_segment, int max_shape_count)
     : cvs(canvas),
+      shader(general_shader),
       oval_segment(oval_segment),
       max_shape_count(max_shape_count) {
   GLCALL(cvs->glGenVertexArrays(1, &VAO));
@@ -66,16 +68,6 @@ AbstractRenderer::AbstractRenderer(GLCanvas* canvas, int oval_segment,
   GLCALL(cvs->glEnableVertexAttribArray(1));
   GLCALL(cvs->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                                     (void*)(3 * sizeof(float))));
-
-  // 初始化着色器
-  // 用`:/`前缀访问qrc文件
-#ifdef __APPLE__
-  shader = std::make_unique<Shader>(cvs, ":/glsl/macos/vertexshader.glsl.vert",
-                                    ":/glsl/macos/fragmentshader.glsl.frag");
-#else
-  shader = std::make_unique<Shader>(cvs, ":/glsl/vertexshader.glsl.vert",
-                                    ":/glsl/fragmentshader.glsl.frag");
-#endif  //__APPLE__
 }
 
 AbstractRenderer::~AbstractRenderer() {
@@ -100,29 +92,6 @@ void AbstractRenderer::unbind() {
   GLCALL(cvs->glBindVertexArray(0));
   // 取消绑定着色器
   shader->unuse();
-}
-
-// 设置采样器
-void AbstractRenderer::set_sampler(const char* name, int value) {
-  shader->set_sampler(name, value);
-}
-
-// 设置uniform浮点
-void AbstractRenderer::set_uniform_float(const char* location_name,
-                                         float value) {
-  shader->set_uniform_float(location_name, value);
-}
-
-// 设置uniform整数
-void AbstractRenderer::set_uniform_integer(const char* location_name,
-                                           int32_t value) {
-  shader->set_uniform_integer(location_name, value);
-}
-
-// 设置uniform矩阵(4x4)
-void AbstractRenderer::set_uniform_mat4(const char* location_name,
-                                        const QMatrix4x4& mat) {
-  shader->set_uniform_mat4(location_name, mat);
 }
 
 // 渲染指定图形实例

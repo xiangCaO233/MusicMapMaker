@@ -163,8 +163,9 @@ void TextureArray::upload_atlas_data() {
     // 生成子纹理id
     texture_atlas->generate_subid();
     // 上传到对应层
-    GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 32, 17, 1, GL_RGBA,
-                           GL_FLOAT, texture_atlas->atlas_meta_data));
+    GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 32, 17, 1,
+                                GL_RGBA, GL_FLOAT,
+                                texture_atlas->atlas_meta_data));
     XINFO("metadata:");
     XINFO("unit_index:" + std::to_string(texture_atlas->atlas_meta_data[0]));
     XINFO("sub_count:" + std::to_string(texture_atlas->atlas_meta_data[1]));
@@ -180,13 +181,14 @@ void TextureArray::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
                        size_t batch_index) {
   // 检查更新纹理池使用类型
   if (renderer_context->current_pool_type != pool_type) {
-    renderer_context->set_uniform_integer("texture_pool_usage",
-                                          static_cast<int>(pool_type));
+    renderer_context->shader->set_uniform_integer("texture_pool_usage",
+                                                  static_cast<int>(pool_type));
     renderer_context->current_pool_type = pool_type;
   }
   // 检查更新是否使用纹理集
   if (renderer_context->is_current_atlas != use_atlas) {
-    renderer_context->set_uniform_integer("useatlas", use_atlas ? 1 : 0);
+    renderer_context->shader->set_uniform_integer("useatlas",
+                                                  use_atlas ? 1 : 0);
     renderer_context->is_current_atlas = use_atlas;
   }
 
@@ -209,13 +211,13 @@ void TextureArray::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
     // 更新samplerarray
     GLCALL(cvs->glActiveTexture(GL_TEXTURE15));
     GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, gl_texture_array_id));
-    renderer_context->set_sampler("samplerarray", 15);
+    renderer_context->shader->set_sampler("samplerarray", 15);
     // 更新当前使用的采样器数组起始纹理id
-    renderer_context->set_uniform_integer("arraystartoffset",
-                                          first_texture_id_offset);
+    renderer_context->shader->set_uniform_integer("arraystartoffset",
+                                                  first_texture_id_offset);
     if (use_atlas) {
       // 绑定纹理数组存储的纹理集数据组到纹理单元14
-      renderer_context->set_sampler("atlas_meta_buffer_array", 14);
+      renderer_context->shader->set_sampler("atlas_meta_buffer_array", 14);
     }
   }
 }

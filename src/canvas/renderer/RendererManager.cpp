@@ -2,26 +2,51 @@
 
 #include <qvectornd.h>
 
+#include <cstdint>
 #include <memory>
 
 #include "../../log/colorful-log.h"
 #include "../texture/pool/BaseTexturePool.h"
-#include "renderer/AbstractRenderer.h"
-#include "renderer/dynamic/DynamicRenderer.h"
-#include "renderer/static/StaticRenderer.h"
-#include "texture/pool/TextureArray.h"
-#include "texture/pool/TexturePool.h"
+#include "../texture/pool/TextureArray.h"
+#include "../texture/pool/TexturePool.h"
+#include "AbstractRenderer.h"
+#include "dynamic/DynamicRenderer.h"
+#include "font/FontPool.h"
+#include "static/StaticRenderer.h"
 
 uint32_t RendererManager::static_instance_index = 0;
 uint32_t RendererManager::dynamic_instance_index = 0;
 
 RendererManager::RendererManager(GLCanvas* canvas, int oval_segment,
                                  int max_shape_count_per_renderer) {
+  XINFO("初始化通用着色器");
+  // 用`:/`前缀访问qrc文件
+#ifdef __APPLE__
+  general_shader =
+      std::make_shared<Shader>(canvas, ":/glsl/macos/vertexshader.glsl.vert",
+                               ":/glsl/macos/fragmentshader.glsl.frag");
+#else
+  general_shader =
+      std::make_shared<Shader>(canvas, ":/glsl/vertexshader.glsl.vert",
+                               ":/glsl/fragmentshader.glsl.frag");
+#endif  //__APPLE__
+  XINFO("初始化字体着色器");
+  /*
+   *<file>glsl/vertfontshader.glsl.vert</file>
+   *<file>glsl/fragfontshader.glsl.frag</file>
+   */
+  font_shader =
+      std::make_unique<Shader>(canvas, ":glsl/vertfontshader.glsl.vert",
+                               ":glsl/fragfontshader.glsl.frag");
   // 初始化渲染器
   static_renderer = std::make_shared<StaticRenderer>(
-      canvas, oval_segment, max_shape_count_per_renderer);
+      canvas, general_shader, oval_segment, max_shape_count_per_renderer);
   dynamic_renderer = std::make_shared<DynamicRenderer>(
-      canvas, oval_segment, max_shape_count_per_renderer);
+      canvas, general_shader, oval_segment, max_shape_count_per_renderer);
+
+  // 初始化字体池
+  font_pool = std::make_shared<FontPool>(canvas, general_shader);
+  font_pool->load_font("../resources/font/ComicMono-Bold.ttf");
 }
 
 RendererManager::~RendererManager() {}
@@ -171,12 +196,12 @@ void RendererManager::sync_renderer(
   const auto& texture = command.texture;
 
   // 同步贴图方式数据
-  int policy = 0;
+  uint32_t policy = 0;
   if (texture) {
-    policy = (static_cast<int>(command.texture_effect) |
-              static_cast<int>(command.texture_complementmode) |
-              static_cast<int>(command.texture_fillmode)) |
-             (static_cast<int>(command.texture_alignmode));
+    policy = (static_cast<uint32_t>(command.texture_effect) |
+              static_cast<uint32_t>(command.texture_complementmode) |
+              static_cast<uint32_t>(command.texture_fillmode)) |
+             (static_cast<uint32_t>(command.texture_alignmode));
   }
   renderer->synchronize_data(
       InstanceDataType::TEXTURE_POLICY,
@@ -276,7 +301,7 @@ void RendererManager::renderAll() {
       }
     } else {
       // 不使用纹理池
-      operetion.renderer->set_uniform_integer("texture_pool_usage", 0);
+      operetion.renderer->shader->set_uniform_integer("texture_pool_usage", 0);
     }
     operetion.renderer->render(operetion.shape_type,
                                operetion.start_shape_index,
@@ -293,70 +318,41 @@ void RendererManager::renderAll() {
 }
 
 // 设置采样器
-void RendererManager::set_sampler(const char* name, int value) const {
-  static_renderer->bind();
-  static_renderer->set_sampler(name, value);
-  static_renderer->unbind();
-
-  dynamic_renderer->bind();
-  dynamic_renderer->set_sampler(name, value);
-  dynamic_renderer->unbind();
+void RendererManager::set_general_sampler(const char* name, int value) const {
+  general_shader->use();
+  general_shader->set_sampler(name, value);
+  general_shader->unuse();
 }
-void RendererManager::set_static_sampler(const char* name, int value) const {
-  static_renderer->bind();
-  static_renderer->set_uniform_float(name, value);
-  static_renderer->unbind();
-}
-void RendererManager::set_dynamic_sampler(const char* name, int value) const {
-  dynamic_renderer->bind();
-  dynamic_renderer->set_sampler(name, value);
-  dynamic_renderer->unbind();
+void RendererManager::set_fontpool_sampler(const char* name, int value) const {
+  font_shader->use();
+  font_shader->set_uniform_float(name, value);
+  font_shader->unuse();
 }
 
 // 设置uniform浮点
-void RendererManager::set_uniform_float(const char* location_name,
-                                        float value) const {
-  static_renderer->bind();
-  static_renderer->set_uniform_float(location_name, value);
-  static_renderer->unbind();
-
-  dynamic_renderer->bind();
-  dynamic_renderer->set_uniform_float(location_name, value);
-  dynamic_renderer->unbind();
-}
-void RendererManager::set_static_uniform_float(const char* location_name,
-                                               float value) const {
-  static_renderer->bind();
-  static_renderer->set_uniform_float(location_name, value);
-  static_renderer->unbind();
-}
-void RendererManager::set_dynamic_uniform_float(const char* location_name,
+void RendererManager::set_general_uniform_float(const char* location_name,
                                                 float value) const {
-  dynamic_renderer->bind();
-  dynamic_renderer->set_uniform_float(location_name, value);
-  dynamic_renderer->unbind();
+  general_shader->use();
+  general_shader->set_uniform_float(location_name, value);
+  general_shader->unuse();
+}
+void RendererManager::set_fontpool_uniform_float(const char* location_name,
+                                                 float value) const {
+  font_shader->use();
+  font_shader->set_uniform_float(location_name, value);
+  font_shader->unuse();
 }
 
 // 设置uniform矩阵(4x4)
-void RendererManager::set_uniform_mat4(const char* location_name,
-                                       QMatrix4x4& mat) const {
-  static_renderer->bind();
-  static_renderer->set_uniform_mat4(location_name, mat);
-  static_renderer->unbind();
-
-  dynamic_renderer->bind();
-  dynamic_renderer->set_uniform_mat4(location_name, mat);
-  dynamic_renderer->unbind();
-}
-void RendererManager::set_static_uniform_mat4(const char* location_name,
-                                              QMatrix4x4& mat) const {
-  static_renderer->bind();
-  static_renderer->set_uniform_mat4(location_name, mat);
-  static_renderer->unbind();
-}
-void RendererManager::set_dynamic_uniform_mat4(const char* location_name,
+void RendererManager::set_general_uniform_mat4(const char* location_name,
                                                QMatrix4x4& mat) const {
-  dynamic_renderer->bind();
-  dynamic_renderer->set_uniform_mat4(location_name, mat);
-  dynamic_renderer->unbind();
+  general_shader->use();
+  general_shader->set_uniform_mat4(location_name, mat);
+  general_shader->unuse();
+}
+void RendererManager::set_fontpool_uniform_mat4(const char* location_name,
+                                                QMatrix4x4& mat) const {
+  font_shader->use();
+  font_shader->set_uniform_mat4(location_name, mat);
+  font_shader->unuse();
 }

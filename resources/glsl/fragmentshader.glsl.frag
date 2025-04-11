@@ -72,44 +72,44 @@ uniform sampler2DArray samplerarray;
 uniform int arraystartoffset;
 
 // 纹理模式掩码
-const int MASK_EFFECT = 0xF000;
-const int MASK_COMPLEMENT = 0x0F00;
-const int MASK_ALIGN = 0x00F0;
-const int MASK_FILL = 0x000F;
+const uint MASK_EFFECT = 0xF000;
+const uint MASK_COMPLEMENT = 0x0F00;
+const uint MASK_ALIGN = 0x00F0;
+const uint MASK_FILL = 0x000F;
 
 // 纹理补充模式
 // 使用填充色
-const int FILL_COLOR = 0x0100;
+const uint FILL_COLOR = 0x0100;
 // 重复贴图
-const int REPEAT_TEXTURE = 0x0200;
+const uint REPEAT_TEXTURE = 0x0200;
 
 // 纹理对齐模式
 // 对齐左下角
-const int ALIGN_LEFT_BOTTOM = 0x0010;
+const uint ALIGN_LEFT_BOTTOM = 0x0010;
 // 对齐右下角
-const int ALIGN_RIGHT_BOTTOM = 0x0020;
+const uint ALIGN_RIGHT_BOTTOM = 0x0020;
 // 对齐左上角
-const int ALIGN_LEFT_TOP = 0x0030;
+const uint ALIGN_LEFT_TOP = 0x0030;
 // 对齐右上角
-const int ALIGN_RIGHT_TOP = 0x0040;
+const uint ALIGN_RIGHT_TOP = 0x0040;
 // 对齐中心
-const int ALIGN_CENTER = 0x0050;
+const uint ALIGN_CENTER = 0x0050;
 
 // 纹理填充模式
 // 填充,直接塞入(比例不一致会变形)
-const int FILL = 0x0000;
+const uint FILL = 0x0000;
 // 缩放, 直接塞入(比例不一致会变形)
-const int KEEP = 0x0001;
+const uint KEEP = 0x0001;
 // 裁切
 // 裁切--比例不一致会保证不变形的前提下裁剪一部分
 // 缩放并平铺
 // (选择会导致丢失像素最少的一边为基准裁剪)
 // 保证最大可视度
-const int SCALLING_AND_TILE = 0x0002;
+const uint SCALLING_AND_TILE = 0x0002;
 // 缩放并裁切 (强制指定以宽为基准)
-const int SCALLING_BASE_WIDTH_AND_CUT = 0x0003;
+const uint SCALLING_BASE_WIDTH_AND_CUT = 0x0003;
 // 缩放并裁切 (强制指定以高为基准)
-const int SCALLING_BASE_HEIGHT_AND_CUT = 0x0004;
+const uint SCALLING_BASE_HEIGHT_AND_CUT = 0x0004;
 
 // 渲染颜色结果(向后传输着色结果)
 out vec4 FragColor;
@@ -164,10 +164,10 @@ AtlasSubMeta getAtlasSubMeta(int atlasIndex, int subIndex) {
 
 void main() {
   // 取出纹理模式
-  int texture_effect = int(texture_policy) & MASK_EFFECT;
-  int texture_comolement_mode = int(texture_policy) & MASK_COMPLEMENT;
-  int texture_align_mode = int(texture_policy) & MASK_ALIGN;
-  int texture_fill_mode = int(texture_policy) & MASK_FILL;
+  uint texture_effect = uint(texture_policy) & MASK_EFFECT;
+  uint texture_comolement_mode = uint(texture_policy) & MASK_COMPLEMENT;
+  uint texture_align_mode = uint(texture_policy) & MASK_ALIGN;
+  uint texture_fill_mode = uint(texture_policy) & MASK_FILL;
 
   // 计算最终uv
   vec2 final_uv;
