@@ -1,7 +1,5 @@
 #include "StaticRenderer.h"
 
-#include <GL/gl.h>
-
 #include <QFile>
 #include <cstdint>
 #include <vector>

@@ -27,6 +27,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED
 
 # 查找日志包
 find_package(spdlog REQUIRED)
+
 # 查找字体包
 find_package(Freetype REQUIRED)
 
@@ -119,20 +120,20 @@ endif()
 # 自动复制运行时文件和插件
 if(WIN32)
   # 复制 DLLs
-	#add_custom_command(TARGET MusicMapMaker POST_BUILD
-  #  COMMAND ${CMAKE_COMMAND} -E copy
-  #  $<TARGET_FILE:Qt6::Core>
-  #  $<TARGET_FILE:Qt6::Gui>
-  #  $<TARGET_FILE_DIR:MusicMapMaker>
-  #)
+  # add_custom_command(TARGET MusicMapMaker POST_BUILD
+  # COMMAND ${CMAKE_COMMAND} -E copy
+  # $<TARGET_FILE:Qt6::Core>
+  # $<TARGET_FILE:Qt6::Gui>
+  # $<TARGET_FILE_DIR:MusicMapMaker>
+  # )
 
-  ## message(STATUS ${QT_DIR})
+  # # message(STATUS ${QT_DIR})
 
-  ## 复制平台插件
-  #get_target_property(Qt6_plugin_dir Qt6::Gui LOCATION)
-  #get_filename_component(QT_DIR "${Qt6_plugin_dir}" DIRECTORY)
-  #file(COPY "${QT_DIR}/../Qt6/plugins/platforms/qwindows.dll"
-  #  DESTINATION "${CMAKE_BINARY_DIR}/platforms")
+  # # 复制平台插件
+  # get_target_property(Qt6_plugin_dir Qt6::Gui LOCATION)
+  # get_filename_component(QT_DIR "${Qt6_plugin_dir}" DIRECTORY)
+  # file(COPY "${QT_DIR}/../Qt6/plugins/platforms/qwindows.dll"
+  # DESTINATION "${CMAKE_BINARY_DIR}/platforms")
 endif()
 
 # 链接 Qt 库
@@ -140,7 +141,7 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-	Qt${QT_VERSION_MAJOR}::OpenGL Freetype::Freetype
+  Qt${QT_VERSION_MAJOR}::OpenGL Freetype::Freetype
   xaudio-dev)
 
 # 设置翻译系统

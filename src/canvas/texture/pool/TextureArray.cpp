@@ -2,7 +2,6 @@
 
 #include <qtypes.h>
 
-#include <cmath>
 #include <cstdint>
 #include <memory>
 
@@ -164,7 +163,7 @@ void TextureArray::upload_atlas_data() {
     // 生成子纹理id
     texture_atlas->generate_subid();
     // 上传到对应层
-    GLCALL(glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 32, 17, 1, GL_RGBA,
+    GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 32, 17, 1, GL_RGBA,
                            GL_FLOAT, texture_atlas->atlas_meta_data));
     XINFO("metadata:");
     XINFO("unit_index:" + std::to_string(texture_atlas->atlas_meta_data[0]));

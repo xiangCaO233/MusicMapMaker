@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <unordered_map>
 
 #include "../Texture.h"
 #include "GLCanvas.h"

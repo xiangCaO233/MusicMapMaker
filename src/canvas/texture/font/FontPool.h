@@ -1,13 +1,12 @@
 #ifndef M_FONT_H
 #define M_FONT_H
 
-#include <freetype2/ft2build.h>
-
 #include <cstdint>
 #include <memory>
 #include <vector>
 
-#include "renderer/shader/Shader.h"
+#include "../../renderer/shader/Shader.h"
+#include <freetype/freetype.h>
 #include FT_FREETYPE_H
 
 class GLCanvas;

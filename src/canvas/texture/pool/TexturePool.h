@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "BaseTexturePool.h"
-#include "texture/Texture.h"
+#include "../Texture.h"
 
 class AbstractRenderer;
 

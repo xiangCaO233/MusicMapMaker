@@ -174,7 +174,7 @@ void TexturePool::upload_atlas_data() {
       // 生成子纹理id
       texture_atlas->generate_subid();
       // 上传到对应层
-      GLCALL(glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0,
+      GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0,
                              i * (max_sampler_consecutive_count - 2) + j, 32,
                              17, 1, GL_RGBA, GL_FLOAT,
                              texture_atlas->atlas_meta_data));
