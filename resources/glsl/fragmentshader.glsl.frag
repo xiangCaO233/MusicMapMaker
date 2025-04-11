@@ -72,6 +72,7 @@ uniform sampler2DArray samplerarray;
 uniform int arraystartoffset;
 
 // 纹理模式掩码
+const int MASK_EFFECT = 0xF000;
 const int MASK_COMPLEMENT = 0x0F00;
 const int MASK_ALIGN = 0x00F0;
 const int MASK_FILL = 0x000F;
@@ -163,6 +164,7 @@ AtlasSubMeta getAtlasSubMeta(int atlasIndex, int subIndex) {
 
 void main() {
   // 取出纹理模式
+  int texture_effect = int(texture_policy) & MASK_EFFECT;
   int texture_comolement_mode = int(texture_policy) & MASK_COMPLEMENT;
   int texture_align_mode = int(texture_policy) & MASK_ALIGN;
   int texture_fill_mode = int(texture_policy) & MASK_FILL;
@@ -413,13 +415,23 @@ void main() {
 
   if (radius > 1) {
     // 启用淡入淡出
-    FragColor = vec4(texture_color.rgb, texture_color.a * alpha);
+    texture_color = vec4(texture_color.rgb, texture_color.a * alpha);
   } else {
     // 禁用淡入淡出
     if (alpha == 0) {
       discard;
     } else {
+      texture_color = texture_color;
+    }
+  }
+  switch (texture_effect) {
+    case 0: {
+      // 不使用特效
       FragColor = texture_color;
+      break;
+    }
+    case 1: {
+      break;
     }
   }
 }

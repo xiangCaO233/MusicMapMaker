@@ -33,6 +33,8 @@ struct RenderCommand {
   // 纹理
   std::shared_ptr<TextureInstace> texture;
 
+  // 纹理特效
+  TextureEffect texture_effect;
   // 纹理对齐模式
   TextureAlignMode texture_alignmode;
   // 纹理填充模式

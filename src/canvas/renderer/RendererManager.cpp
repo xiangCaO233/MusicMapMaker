@@ -173,7 +173,8 @@ void RendererManager::sync_renderer(
   // 同步贴图方式数据
   int policy = 0;
   if (texture) {
-    policy = (static_cast<int>(command.texture_complementmode) |
+    policy = (static_cast<int>(command.texture_effect) |
+              static_cast<int>(command.texture_complementmode) |
               static_cast<int>(command.texture_fillmode)) |
              (static_cast<int>(command.texture_alignmode));
   }
@@ -214,19 +215,21 @@ void RendererManager::addRect(const QRectF& rect,
                               bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(is_volatile, ShapeType::RECT, rect, rotation,
-                            fill_color, 0.0f, texture, texture_alignmode,
-                            texture_fillmode, texture_complementmode);
+                            fill_color, 0.0f, texture, texture_effect,
+                            texture_alignmode, texture_fillmode,
+                            texture_complementmode);
 }
 
-// 添加圆角矩形
+// 添加圆角矩形-radius > 1:启用边缘渐变
 void RendererManager::addRoundRect(const QRectF& rect,
                                    std::shared_ptr<TextureInstace> texture,
                                    const QColor& fill_color, float rotation,
                                    float radius_ratios, bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(
-      is_volatile, ShapeType::RECT, rect, rotation, fill_color, radius_ratios,
-      texture, texture_alignmode, texture_fillmode, texture_complementmode);
+  command_list.emplace_back(is_volatile, ShapeType::RECT, rect, rotation,
+                            fill_color, radius_ratios, texture, texture_effect,
+                            texture_alignmode, texture_fillmode,
+                            texture_complementmode);
 }
 
 // 添加椭圆
@@ -236,8 +239,9 @@ void RendererManager::addEllipse(const QRectF& bounds,
                                  bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(is_volatile, ShapeType::OVAL, bounds, rotation,
-                            fill_color, 0.0f, texture, texture_alignmode,
-                            texture_fillmode, texture_complementmode);
+                            fill_color, 0.0f, texture, texture_effect,
+                            texture_alignmode, texture_fillmode,
+                            texture_complementmode);
 }
 
 // 渲染全部图形

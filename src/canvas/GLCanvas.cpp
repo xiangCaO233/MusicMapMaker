@@ -264,15 +264,15 @@ void GLCanvas::paintGL() {
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
-  // 添加渲染内容
-  // auto it = texture_map.begin();
-  // for (int i = 0; i < 4000; i++) {
-  //   it++;
-  //   if (it == texture_map.end()) {
-  //     it = texture_map.begin();
-  //   }
-  //   generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
-  // }
+  // 添加渲染内容--4000矩形
+  auto it = texture_map.begin();
+  for (int i = 0; i < 4000; i++) {
+    it++;
+    if (it == texture_map.end()) {
+      it = texture_map.begin();
+    }
+    generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
+  }
 
   auto rect = QRectF(50, 50, 100, 200);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,

@@ -78,6 +78,15 @@ class TextureInstace {
   std::shared_ptr<BaseTexturePool> pool_reference;
 };
 
+enum class TextureEffect : int32_t {
+  // 无特效
+  NONE = 0x0000,
+  // 模糊
+  BLUR = 0x1000,
+  // 灰度
+  GRAYSCALE = 0x2000,
+};
+
 // 纹理补充模式
 enum class TextureComplementMode : int32_t {
   FILL_COLOR = 0x0100,
