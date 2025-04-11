@@ -161,93 +161,6 @@ AtlasSubMeta getAtlasSubMeta(int atlasIndex, int subIndex) {
   return meta;
 }
 
-vec4 sample_texture(int texture_comolement_mode, vec2 final_uv) {
-  // 区分纹理池类型
-  switch (texture_pool_usage) {
-    case 0: {
-      // 不使用纹理池
-      // 直接使用填充颜色
-      return fill_color;
-      break;
-    };
-    case 1: {
-      // 根据补充方式处理超出纹理范围的情况
-      switch (texture_comolement_mode) {
-        case REPEAT_TEXTURE: {
-          // 重复纹理模式
-          return texture(samplers[int(texture_id) % 14], final_uv);
-          break;
-        }
-        case FILL_COLOR: {
-          if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
-              final_uv.y > 1.0) {
-            // 超出部分使用填充色
-            return fill_color;
-          } else {
-            // 未超出部分使用纹理采样
-            return texture(samplers[int(texture_id) % 14], final_uv);
-          }
-          break;
-        }
-      }
-      break;
-    }
-    case 2: {
-      // 2-使用同尺寸纹理采样器数组
-      // 根据补充方式处理超出纹理范围的情况
-      switch (texture_comolement_mode) {
-        case REPEAT_TEXTURE: {
-          // 重复纹理模式
-          return texture(samplerarray,
-                         vec3(final_uv, texture_id - arraystartoffset));
-          break;
-        }
-        case FILL_COLOR: {
-          if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
-              final_uv.y > 1.0) {
-            // 超出部分使用填充色
-            return fill_color;
-          } else {
-            // 未超出部分使用纹理采样
-            return texture(samplerarray,
-                           vec3(final_uv, texture_id - arraystartoffset));
-          }
-          break;
-        }
-      }
-      break;
-    }
-  }
-}
-
-// 应用圆角
-vec4 apply_round_corner(vec4 texture_color) {
-  // ---- 圆角遮罩部分 ----
-  vec2 pos = texture_uv * 2.0 - 1.0;
-  float trueradius = mod(radius, 1.0);
-  float rx = 1.0 - trueradius;
-  float ry = 1.0 - trueradius;
-
-  float dx = max(abs(pos.x) - rx, 0.0);
-  float dy = max(abs(pos.y) - ry, 0.0);
-
-  float dist = sqrt(dx * dx + dy * dy);
-  float effectiveRadius = max(trueradius, 0.0001);
-  float alpha = clamp(1.0 - dist / effectiveRadius, 0.0, 1.0);
-
-  if (radius > 1) {
-    // 启用淡入淡出
-    return vec4(texture_color.rgb, texture_color.a * alpha);
-  } else {
-    // 禁用淡入淡出
-    if (alpha == 0) {
-      discard;
-    } else {
-      return texture_color;
-    }
-  }
-}
-
 void main() {
   // 取出纹理模式
   int texture_comolement_mode = int(texture_policy) & MASK_COMPLEMENT;
@@ -430,7 +343,86 @@ void main() {
   }
 
   // 从纹理中采样
-  vec4 texture_color = sample_texture(texture_comolement_mode, final_uv);
+  vec4 texture_color;
+  // 区分纹理池类型
+  switch (texture_pool_usage) {
+    case 0: {
+      // 不使用纹理池
+      // 直接使用填充颜色
+      texture_color = fill_color;
+      break;
+    };
+    case 1: {
+      // 根据补充方式处理超出纹理范围的情况
+      switch (texture_comolement_mode) {
+        case REPEAT_TEXTURE: {
+          // 重复纹理模式
+          texture_color = texture(samplers[int(texture_id) % 14], final_uv);
+          break;
+        }
+        case FILL_COLOR: {
+          if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
+              final_uv.y > 1.0) {
+            // 超出部分使用填充色
+            texture_color = fill_color;
+          } else {
+            // 未超出部分使用纹理采样
+            texture_color = texture(samplers[int(texture_id) % 14], final_uv);
+          }
+          break;
+        }
+      }
+      break;
+    }
+    case 2: {
+      // 2-使用同尺寸纹理采样器数组
+      // 根据补充方式处理超出纹理范围的情况
+      switch (texture_comolement_mode) {
+        case REPEAT_TEXTURE: {
+          // 重复纹理模式
+          texture_color = texture(
+              samplerarray, vec3(final_uv, texture_id - arraystartoffset));
+          break;
+        }
+        case FILL_COLOR: {
+          if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
+              final_uv.y > 1.0) {
+            // 超出部分使用填充色
+            texture_color = fill_color;
+          } else {
+            // 未超出部分使用纹理采样
+            texture_color = texture(
+                samplerarray, vec3(final_uv, texture_id - arraystartoffset));
+          }
+          break;
+        }
+      }
+      break;
+    }
+  }
 
-  FragColor = apply_round_corner(texture_color);
+  // ---- 圆角遮罩部分 ----
+  vec2 pos = texture_uv * 2.0 - 1.0;
+  float trueradius = mod(radius, 1.0);
+  float rx = 1.0 - trueradius;
+  float ry = 1.0 - trueradius;
+
+  float dx = max(abs(pos.x) - rx, 0.0);
+  float dy = max(abs(pos.y) - ry, 0.0);
+
+  float dist = sqrt(dx * dx + dy * dy);
+  float effectiveRadius = max(trueradius, 0.0001);
+  float alpha = clamp(1.0 - dist / effectiveRadius, 0.0, 1.0);
+
+  if (radius > 1) {
+    // 启用淡入淡出
+    FragColor = vec4(texture_color.rgb, texture_color.a * alpha);
+  } else {
+    // 禁用淡入淡出
+    if (alpha == 0) {
+      discard;
+    } else {
+      FragColor = texture_color;
+    }
+  }
 }
