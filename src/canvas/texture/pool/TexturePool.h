@@ -52,6 +52,9 @@ class TexturePool : public BaseTexturePool {
   // 完成纹理池构造
   void finalize() override;
 
+  // 上传纹理集元数据组
+  void upload_atlas_data() override;
+
   // 使用此纹理池
   // Base需使用指定批次
   // Array不需要

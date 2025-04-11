@@ -170,10 +170,7 @@ void main() {
   // 计算最终uv
   vec2 final_uv;
   // 判断是否保持比例
-  bool keepratio = false;
-  if (texture_fill_mode >= KEEP) {
-    keepratio = true;
-  }
+  bool keepratio = (texture_fill_mode >= KEEP);
 
   // 区分是否保持原图比例
   if (keepratio) {

@@ -108,6 +108,8 @@ void TextureArray::finalize() {
   XINFO("完成处理纹理数组纹理池");
   // 创建纹理数组
   GLCALL(cvs->glGenTextures(1, &gl_texture_array_id));
+  // 激活纹理单元
+  GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + 15));
   GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, gl_texture_array_id));
 
   // 分配存储空间
@@ -118,11 +120,6 @@ void TextureArray::finalize() {
   // 为每一层上传纹理数据
   for (int i = 0; i < texture_array.size(); i++) {
     auto& texture = texture_array[i];
-    // 检查是否是纹理集
-    std::shared_ptr<TextureAtlas> texture_atlas;
-    if (texture->is_atlas) {
-      texture_atlas = std::dynamic_pointer_cast<TextureAtlas>(texture);
-    }
     GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i,
                                 texture_size.width(), texture_size.height(), 1,
                                 GL_RGBA, GL_UNSIGNED_BYTE,
@@ -145,6 +142,35 @@ void TextureArray::finalize() {
   if (use_atlas) {
     XWARN("当前纹理池使用纹理集");
     // 初始化纹理数组存储的纹理集数据组
+    upload_atlas_data();
+  }
+}
+
+// 上传纹理集元数据组
+void TextureArray::upload_atlas_data() {
+  BaseTexturePool::upload_atlas_data();
+
+  // 创建32宽×17高×N层的RGBA32F纹理数组
+  GLCALL(cvs->glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA32F, 32, 17,
+                           texture_array.size(), 0, GL_RGBA, GL_FLOAT,
+                           nullptr));
+
+  for (int i = 0; i < texture_array.size(); i++) {
+    // atlas_meta_data[0] = int unit_index;
+    // 需在使用纹理池finalize函数内更新
+    auto texture_atlas =
+        std::dynamic_pointer_cast<TextureAtlas>(texture_array[i]);
+    texture_atlas->atlas_meta_data[0] = i;
+    // 生成子纹理id
+    texture_atlas->generate_subid();
+    // 上传到对应层
+    GLCALL(glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, 32, 17, 1, GL_RGBA,
+                           GL_FLOAT, texture_atlas->atlas_meta_data));
+    XINFO("metadata:");
+    XINFO("unit_index:" + std::to_string(texture_atlas->atlas_meta_data[0]));
+    XINFO("sub_count:" + std::to_string(texture_atlas->atlas_meta_data[1]));
+    XINFO("atlas_size:[" + std::to_string(texture_atlas->atlas_meta_data[2]) +
+          "," + std::to_string(texture_atlas->atlas_meta_data[3]) + "]");
   }
 }
 
@@ -164,17 +190,20 @@ void TextureArray::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
     renderer_context->set_uniform_integer("useatlas", use_atlas ? 1 : 0);
     renderer_context->is_current_atlas = use_atlas;
   }
+
   bool need_update{false};
   // 检查渲染器当前正在使用的纹理池
   if (renderer_context->current_use_pool != pool_reference) {
     // 不是使用此纹理池
     need_update = true;
   }
+
   // glViewPort后uniform的采样器location会发生变化,需要更新
   if (GLCanvas::need_update_sampler_location) {
     need_update = true;
     GLCanvas::need_update_sampler_location = false;
   }
+
   if (need_update) {
     // 更新设置渲染器当前正在使用的纹理池
     renderer_context->current_use_pool = pool_reference;
@@ -185,5 +214,9 @@ void TextureArray::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
     // 更新当前使用的采样器数组起始纹理id
     renderer_context->set_uniform_integer("arraystartoffset",
                                           first_texture_id_offset);
+    if (use_atlas) {
+      // 绑定纹理数组存储的纹理集数据组到纹理单元14
+      renderer_context->set_sampler("atlas_meta_buffer_array", 14);
+    }
   }
 }

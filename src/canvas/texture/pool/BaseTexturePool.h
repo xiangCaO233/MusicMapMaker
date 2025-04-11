@@ -64,6 +64,9 @@ class BaseTexturePool {
   // 判满
   virtual bool is_full() = 0;
 
+  // 上传纹理集元数据组
+  virtual void upload_atlas_data();
+
   // 使用此纹理池
   // Base需使用指定批次
   // Array不需要

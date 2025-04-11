@@ -175,7 +175,7 @@ void GLCanvas::initializeGL() {
   // load_texture_from_path("../resources/textures/test/other",
   //                        TexturePoolType::BASE_POOL, false);
   load_texture_from_path("../resources/textures/test/1024",
-                         TexturePoolType::BASE_POOL, true);
+                         TexturePoolType::ARRAY, true);
   finalize_texture_loading();
 }
 void GLCanvas::resizeGL(int w, int h) {
@@ -212,8 +212,8 @@ void generateRandomQRectF(RendererManager *&renderer_manager,
 
   // 仅矩形位置变化--使用dynamic降低glcall和内存传输
   QRectF rec(x, y, width, height);
-  renderer_manager->addRoundRect(rec, tex, Qt::red, 0,
-                                 (float)(rand->bounded(100)) / 100.0f, true);
+  renderer_manager->addRoundRect(
+      rec, tex, Qt::red, 0, (float)(rand->bounded(100)) / 100.0f + 1.0f, true);
 
   // 随机生成宽度和高度和角度--增加glcall
   // width = rand->bounded(maxWidth);
@@ -263,20 +263,20 @@ void GLCanvas::paintGL() {
   // 添加渲染内容
   // auto it = texture_map.begin();
   // for (int i = 0; i < 4000; i++) {
-  //  it++;
-  //  if (it == texture_map.end()) {
-  //    it = texture_map.begin();
-  //  }
-  //  generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
-  //}
+  //   it++;
+  //   if (it == texture_map.end()) {
+  //     it = texture_map.begin();
+  //   }
+  //   generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
+  // }
 
   auto rect = QRectF(50, 50, 100, 200);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,
-                                 0.0f, 0.2f, true);
+                                 0.0f, 1.2f, true);
 
   auto mouse_rec = QRectF(mouse_pos.x() - 20, mouse_pos.y() - 20, 41, 41);
   renderer_manager->addRoundRect(mouse_rec, texture_map["yuanchou.png"],
-                                 Qt::green, 0.0f, 0.15f, true);
+                                 Qt::green, 0.0f, 1.15f, true);
 
   // 执行渲染
   renderer_manager->renderAll();
