@@ -270,7 +270,7 @@ void GLCanvas::paintGL() {
   //  generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
   //}
 
-  auto rect = QRectF(50, 50, 300, 300);
+  auto rect = QRectF(50, 50, 100, 200);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,
                                  0.0f, 0.2f, true);
 
