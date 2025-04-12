@@ -26,6 +26,9 @@ enum class TexturePoolType : int32_t {
 
 class BaseTexturePool {
  public:
+  // 需要更新采样器位置
+  bool need_update_sampler_location{false};
+
   // gl窗口上下文
   GLCanvas* cvs;
 

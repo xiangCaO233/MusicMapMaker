@@ -83,6 +83,9 @@ class FontRenderer : public AbstractRenderer {
   // 全部字体渲染器数量
   static int frenderer_count;
 
+  // 需要更新采样器位置
+  bool need_update_sampler_location{false};
+
   // 字体Family名-按字体大小存储的字体字符包
   std::unordered_map<std::string, std::unordered_map<uint32_t, CharacterPack>>
       font_packs_mapping;
@@ -125,8 +128,14 @@ class FontRenderer : public AbstractRenderer {
   // 更新gpu数据
   void update_gpu_memory() override;
 
+  // 上一个字符的偏移
+  uint32_t current_character_position{0};
+
   // 重置更新内容
   void reset_update() override;
+
+  // 绑定渲染器
+  void bind() override;
 };
 
 #endif  // M_FONTRENDERER_H

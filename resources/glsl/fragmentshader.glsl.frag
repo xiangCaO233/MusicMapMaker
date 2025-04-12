@@ -61,8 +61,8 @@ uniform sampler2DArray atlas_meta_buffer_array;
 使用32×17=544纹素
 */
 
-// 使用方式为单独或纹理图集
-uniform sampler2D samplers[14];
+// 使用方式为单独
+uniform sampler2D samplers[13];
 
 // 使用方式为纹理采样器数组
 uniform sampler2DArray samplerarray;
@@ -188,7 +188,7 @@ void main() {
       // 保持纹理比例
       // 获取纹理尺寸
       if (texture_pool_usage == 1) {
-        texsize = textureSize(samplers[int(texture_id) % 14], 0);
+        texsize = textureSize(samplers[int(texture_id) % 13], 0);
       }
       if (texture_pool_usage == 2) {
         texsize = vec2(textureSize(samplerarray, 0).xy);
@@ -356,7 +356,7 @@ void main() {
       switch (texture_comolement_mode) {
         case REPEAT_TEXTURE: {
           // 重复纹理模式
-          texture_color = texture(samplers[int(texture_id) % 14], final_uv);
+          texture_color = texture(samplers[int(texture_id) % 13], final_uv);
           break;
         }
         case FILL_COLOR: {
@@ -366,7 +366,7 @@ void main() {
             texture_color = fill_color;
           } else {
             // 未超出部分使用纹理采样
-            texture_color = texture(samplers[int(texture_id) % 14], final_uv);
+            texture_color = texture(samplers[int(texture_id) % 13], final_uv);
           }
           break;
         }

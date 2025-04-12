@@ -39,9 +39,10 @@ TexturePool::TexturePool(GLCanvas* canvas, bool dynamic_switch)
                                         : 1);
   // 预分配采样器数组
   for (auto& texture_dozen : texture_dozens) {
-    // 倒数第二个个纹理单元留给纹理集元数据组
+    // 倒数第三个纹理单元留给文本纹理集数组
+    // 倒数第二个纹理单元留给纹理集元数据组
     // 最后一个纹理单元留给纹理数组
-    texture_dozen.reserve(max_sampler_consecutive_count - 2);
+    texture_dozen.reserve(max_sampler_consecutive_count - 3);
   }
 }
 
@@ -61,7 +62,7 @@ bool TexturePool::is_full() {
     return false;
   }
   for (const auto& texture_dozen : texture_dozens) {
-    if (texture_dozen.size() < max_sampler_consecutive_count - 2) {
+    if (texture_dozen.size() < max_sampler_consecutive_count - 3) {
       return false;
     }
   }
@@ -95,7 +96,7 @@ int TexturePool::load_texture(std::shared_ptr<TextureInstace> texture) {
   }
   // 添加批信息
   if (texture_dozens.empty() ||
-      texture_dozens.back().size() >= max_sampler_consecutive_count - 2) {
+      texture_dozens.back().size() >= max_sampler_consecutive_count - 3) {
     texture_dozens.emplace_back();
   }
   batch_mapping[texture] = {texture_dozens.size() - 1,
@@ -170,12 +171,12 @@ void TexturePool::upload_atlas_data() {
       auto texture_atlas =
           std::dynamic_pointer_cast<TextureAtlas>(texture_dozens[i][j]);
       texture_atlas->atlas_meta_data[0] =
-          i * (max_sampler_consecutive_count - 2) + j;
+          i * (max_sampler_consecutive_count - 3) + j;
       // 生成子纹理id
       texture_atlas->generate_subid();
       // 上传到对应层
       GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0,
-                                  i * (max_sampler_consecutive_count - 2) + j,
+                                  i * (max_sampler_consecutive_count - 3) + j,
                                   32, 17, 1, GL_RGBA, GL_FLOAT,
                                   texture_atlas->atlas_meta_data));
       XINFO("metadata:");
@@ -222,9 +223,9 @@ void TexturePool::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
     }
   }
   // glViewPort后uniform的采样器location会发生变化,需要更新
-  if (GLCanvas::need_update_sampler_location) {
+  if (need_update_sampler_location) {
     need_update = true;
-    GLCanvas::need_update_sampler_location = false;
+    need_update_sampler_location = false;
   }
 
   if (need_update) {

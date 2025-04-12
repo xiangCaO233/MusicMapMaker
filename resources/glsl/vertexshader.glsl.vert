@@ -4,11 +4,11 @@
 uniform mat4 projection_mat;
 uniform float texture_pool_type;
 
-// 顶点数据
+// 基本顶点数据
 layout(location = 0) in vec3 vpos;
 layout(location = 1) in vec2 vuv;
 
-// 矩形数据
+// 实例矩形数据
 layout(location = 2) in vec2 shape_pos;
 layout(location = 3) in vec2 shape_size;
 layout(location = 4) in float shape_rotation;

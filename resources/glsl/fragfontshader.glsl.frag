@@ -8,6 +8,10 @@ uniform sampler2DArray glyph_atlas_array;
 
 out vec4 FragColor;
 
-void main() { 
-	FragColor = glyph_color; 
+void main() {
+  float layer = float(int(glyph_id) >> 16);
+  vec3 uv3d = vec3(glyph_uv, layer);
+  vec4 sampled = vec4(1.0, 1.0, 1.0, texture(glyph_atlas_array, uv3d).r);
+  // FragColor = glyph_color * sampled;
+  FragColor = vec4(glyph_uv.x / 2);
 }

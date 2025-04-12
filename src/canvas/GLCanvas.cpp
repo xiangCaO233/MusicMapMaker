@@ -17,6 +17,7 @@
 #include <string>
 
 #include "colorful-log.h"
+#include "renderer/font/FontRenderer.h"
 #include "texture/atlas/TextureAtlas.h"
 #include "texture/pool/BaseTexturePool.h"
 #include "texture/pool/TextureArray.h"
@@ -192,12 +193,16 @@ void GLCanvas::resizeGL(int w, int h) {
 
   // 更新uniform
   renderer_manager->update_all_projection_mat("projection_mat", proj);
+  // renderer_manager->set_fontpool_uniform_float("viewport_width", w);
+  // renderer_manager->set_fontpool_uniform_float("viewport_height", h);
 
   // 标记需要更新纹理采样器位置
-  need_update_sampler_location = true;
-
-  // 需要更新
-  renderer_manager->set_fontpool_sampler("glyph_atlas_array", 0);
+  renderer_manager->font_renderer->need_update_sampler_location = true;
+  for (const auto &[name, pools] : renderer_manager->texture_pools) {
+    for (const auto &pool : pools) {
+      pool->need_update_sampler_location = true;
+    }
+  }
 }
 
 void generateRandomQRectF(RendererManager *&renderer_manager,
@@ -276,17 +281,17 @@ void GLCanvas::paintGL() {
   // }
 
   // 添加文本
-  auto text_pos = QPointF(200, 200);
-  std::u8string str = u8"aaa";
-  renderer_manager->addText(text_pos, str, 8, "Comic Mono", Qt::white, 0.0f);
+  auto text_pos = QPointF(200, 400);
+  std::u8string str = u8"@@##";
+  renderer_manager->addText(text_pos, str, 48, "Comic Mono", Qt::blue, 0.0f);
 
-  auto rect = QRectF(50, 50, 100, 200);
+  auto rect = QRectF(50, 50, 250, 300);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,
-                                 0.0f, 1.2f, true);
+                                 0.0f, 1.4f, true);
 
   auto mouse_rec = QRectF(mouse_pos.x() - 20, mouse_pos.y() - 20, 41, 41);
   renderer_manager->addRoundRect(mouse_rec, texture_map["yuanchou.png"],
-                                 Qt::green, 0.0f, 1.15f, true);
+                                 Qt::green, 0.0f, 1.35f, true);
 
   // 执行渲染
   renderer_manager->renderAll();

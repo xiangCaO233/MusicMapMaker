@@ -117,8 +117,9 @@ void RendererManager::finalize() {
       // 同步渲染指令到渲染器
       sync_renderer(renderer, command);
       // 更新渲染实例索引
-      (command.is_volatile ? dynamic_instance_index++
-                           : static_instance_index++);
+      (command.is_text ? fontr_instance_index++
+                       : (command.is_volatile ? dynamic_instance_index++
+                                              : static_instance_index++));
     }
   } else {
     // 逐一检查缓存列表指令变化情况,分析变化情况
@@ -221,13 +222,17 @@ void RendererManager::sync_renderer(
 
   renderer->synchronize_data(
       InstanceDataType::POSITION,
-      (command.is_volatile ? dynamic_instance_index : static_instance_index),
+      (command.is_text ? fontr_instance_index
+                       : (command.is_volatile ? dynamic_instance_index
+                                              : static_instance_index)),
       &position);
 
   // 同步角度数据
   renderer->synchronize_data(
       InstanceDataType::ROTATION,
-      (command.is_volatile ? dynamic_instance_index : static_instance_index),
+      (command.is_text ? fontr_instance_index
+                       : (command.is_volatile ? dynamic_instance_index
+                                              : static_instance_index)),
       &command.rotation);
 
   // 同步填充颜色数据
@@ -235,7 +240,9 @@ void RendererManager::sync_renderer(
                        command.fill_color.blue(), command.fill_color.alpha());
   renderer->synchronize_data(
       InstanceDataType::FILL_COLOR,
-      (command.is_volatile ? dynamic_instance_index : static_instance_index),
+      (command.is_text ? fontr_instance_index
+                       : (command.is_volatile ? dynamic_instance_index
+                                              : static_instance_index)),
       &fill_color);
   // 区分文本渲染指令
   if (command.is_text) {

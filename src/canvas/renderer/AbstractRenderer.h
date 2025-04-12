@@ -89,6 +89,7 @@ class AbstractRenderer {
 
   // 绑定渲染器
   virtual void bind();
+
   // 解除绑定渲染器
   virtual void unbind();
 

@@ -26,6 +26,10 @@
 uint32_t FontRenderer::current_glyph_id = 0;
 // ftlibrary库
 FT_Library FontRenderer::ft;
+// 每层最大尺寸
+const uint32_t FontRenderer::layer_size;
+// 最大层数
+const uint32_t FontRenderer::layer_count;
 
 // ftlibrary库加载标识
 bool FontRenderer::is_ft_library_loaded = false;
@@ -117,6 +121,7 @@ FontRenderer::FontRenderer(GLCanvas* canvas,
   // 创建纹理数组
   GLCALL(cvs->glGenTextures(1, &glyphs_texture_array));
   // 激活纹理单元
+  GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + 13));
   GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, glyphs_texture_array));
 #ifdef __APPLE__
 #else
@@ -127,16 +132,13 @@ FontRenderer::FontRenderer(GLCanvas* canvas,
   GLCALL(cvs->glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 
   // 设置纹理参数
-  GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
-                              GL_NEAREST));
-  GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER,
-                              GL_NEAREST));
   GLCALL(
-      cvs->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT));
+      cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
   GLCALL(
-      cvs->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT));
+      cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+  GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+  GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
   // 首次设置
-  font_shader->set_sampler("glyph_atlas_array", 0);
   font_shader->unuse();
 }
 
@@ -170,7 +172,7 @@ int FontRenderer::load_font(const char* font_path) {
     for (char8_t c = 32; c <= 176; c++) asciistr.append(1, c);
 
     // 检查载入
-    check_u8string(asciistr, 8, it->second);
+    check_u8string(asciistr, 48, it->second);
 
     XINFO("正在生成常用中文字符缓存");
 
@@ -193,7 +195,7 @@ void FontRenderer::check_u8string(const std::u8string& str, uint32_t font_size,
   if (packable_layers.empty()) {
     // 无空闲，新建层
     packable_layers.emplace_back(current_max_layer_index);
-    packer = std::make_shared<GlyphPacker>(4096, 4096);
+    packer = std::make_shared<GlyphPacker>(layer_size, layer_size);
     layer_packers.try_emplace(current_max_layer_index, packer);
     packer->layer_index = current_max_layer_index;
     current_max_layer_index++;
@@ -223,10 +225,19 @@ void FontRenderer::check_u8string(const std::u8string& str, uint32_t font_size,
       XINFO("字符[" + std::string(reinterpret_cast<const char*>(&c)) +
             "]位置->[" + std::to_string(character.pos_in_atlas.x()) + "," +
             std::to_string(character.pos_in_atlas.y()) + "]");
+      // 上传纹理
+      GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + 13));
+      glBindTexture(GL_TEXTURE_2D_ARRAY, glyphs_texture_array);
+      cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, character.pos_in_atlas.x(),
+                           character.pos_in_atlas.y(), packer->layer_index,
+                           character.size.width(), character.size.height(), 1,
+                           GL_RED, GL_UNSIGNED_BYTE, bitmap.buffer);
 
       // TODO(xiang 2025-04-12):
       // glyph_id需保存纹理集数组层数和纹理集内索引两个信息
-      character.glyph_id = (current_glyph_id++ << 16) | packer->layer_index;
+      character.glyph_id = (packer->layer_index << 16) | current_glyph_id;
+      XINFO("id->[" + std::to_string(character.glyph_id) + "]");
+      current_glyph_id++;
 
       // 放入字符集
       pack.character_set.try_emplace(c, std::move(character));
@@ -244,7 +255,8 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
       auto pos = static_cast<QVector2D*>(data);
       if (position_data.empty() || position_data.size() <= instance_index) {
         // XWARN("添加位置数据");
-        position_data.push_back(*pos);
+        position_data.push_back(*pos +
+                                QVector2D(current_character_position, 0));
         synchronize_update_mark(instance_index);
       } else {
         if (*pos != position_data.at(instance_index)) {
@@ -252,7 +264,8 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
           // 更新此实例位置数据
-          position_data[instance_index] = *pos;
+          position_data[instance_index] =
+              *pos + QVector2D(current_character_position, 0);
         }
       }
       break;
@@ -293,7 +306,6 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
     }
     case InstanceDataType::TEXT: {
       auto text = static_cast<Text*>(data);
-      CharacterUVSet uvset;
       // TODO(xiang 2025-04-12): 查询size,uv,id
       bool query_failed{false};
       auto packs_it = font_packs_mapping.find(text->font_family);
@@ -321,20 +333,30 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         glyph.glyph_id = 0;
       } else {
         glyph = character_it->second;
+        /*
+         *（单位：1/64像素）
+         *（单位：1/64像素）
+         *（单位：1/64像素）
+         *（单位：1/64像素）
+         *（单位：1/64像素）
+         *（单位：1/64像素）
+         *（单位：1/64像素）
+         */
+        current_character_position += glyph.xadvance / 64;
       }
       // id
-      auto glyph_id = static_cast<float*>(data);
+      auto glyph_id = glyph.glyph_id;
       if (glyph_id_data.empty() || glyph_id_data.size() <= instance_index) {
         // XWARN("添加字符id数据");
-        glyph_id_data.push_back(*glyph_id);
+        glyph_id_data.push_back(glyph_id);
         synchronize_update_mark(instance_index);
       } else {
-        if (*glyph_id != glyph_id_data.at(instance_index)) {
+        if (glyph_id != glyph_id_data.at(instance_index)) {
           // 字符id数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
           // 更新此实例字符id数据
-          glyph_id_data[instance_index] = *glyph_id;
+          glyph_id_data[instance_index] = glyph_id;
         }
       }
       // size
@@ -353,22 +375,24 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         }
       }
 
+      CharacterUVSet uvset;
       // uv
-      uvset.p1.setX(glyph.pos_in_atlas.x());
-      uvset.p1.setY(glyph.pos_in_atlas.y() + glyph.size.height());
-
-      uvset.p2.setX(glyph.pos_in_atlas.x() + glyph.size.width());
-      uvset.p2.setY(glyph.pos_in_atlas.y() + glyph.size.height());
-
-      uvset.p3.setX(glyph.pos_in_atlas.x() + glyph.size.width());
-      uvset.p3.setY(glyph.pos_in_atlas.y());
-
-      uvset.p4.setX(glyph.pos_in_atlas.x());
-      uvset.p4.setY(glyph.pos_in_atlas.y());
+      uvset.p1.setX(float(glyph.pos_in_atlas.x()) / float(layer_size));
+      uvset.p1.setY(float(glyph.pos_in_atlas.y()) / float(layer_size));
+      uvset.p2.setX(float(glyph.pos_in_atlas.x() + glyph.size.width()) /
+                    float(layer_size));
+      uvset.p2.setY(float(glyph.pos_in_atlas.y()) / float(layer_size));
+      uvset.p3.setX(float(glyph.pos_in_atlas.x() + glyph.size.width()) /
+                    float(layer_size));
+      uvset.p3.setY(float(glyph.pos_in_atlas.y() + glyph.size.height()) /
+                    float(layer_size));
+      uvset.p4.setX(float(glyph.pos_in_atlas.x()) / float(layer_size));
+      uvset.p4.setY(float(glyph.pos_in_atlas.y() + glyph.size.height()) /
+                    float(layer_size));
 
       if (uvset_data.empty() || uvset_data.size() <= instance_index) {
         // XWARN("同步字符uv集数据");
-        uvset_data.push_back(std::move(uvset));
+        uvset_data.push_back(uvset);
         synchronize_update_mark(instance_index);
       } else {
         if (uvset != uvset_data.at(instance_index)) {
@@ -376,7 +400,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
           // 更新此实例字符uv集数据
-          uvset_data[instance_index] = std::move(uvset);
+          uvset_data[instance_index] = uvset;
         }
       }
       break;
@@ -414,7 +438,18 @@ void FontRenderer::synchronize_update_mark(size_t instance_index) {
 }
 
 // 重置更新内容
-void FontRenderer::reset_update() { update_list.clear(); }
+void FontRenderer::reset_update() {
+  update_list.clear();
+  current_character_position = 0;
+}
+// 绑定渲染器
+void FontRenderer::bind() {
+  AbstractRenderer::bind();
+  if (need_update_sampler_location) {
+    // 需要更新
+    shader->set_sampler("glyph_atlas_array", 13);
+  }
+}
 
 // 更新gpu数据
 void FontRenderer::update_gpu_memory() {
@@ -428,37 +463,37 @@ void FontRenderer::update_gpu_memory() {
     for (int i = instance_start_index;
          i < instance_start_index + instance_count; i++) {
       //// 图形位置数据
-      memory_block[(i - instance_start_index) * 12] = position_data[i].x();
-      memory_block[(i - instance_start_index) * 12 + 1] = position_data[i].y();
+      memory_block[(i - instance_start_index) * 18] = position_data[i].x();
+      memory_block[(i - instance_start_index) * 18 + 1] = position_data[i].y();
       //// 图形尺寸
-      memory_block[(i - instance_start_index) * 12 + 2] = size_data[i].x();
-      memory_block[(i - instance_start_index) * 12 + 3] = size_data[i].y();
+      memory_block[(i - instance_start_index) * 18 + 2] = size_data[i].x();
+      memory_block[(i - instance_start_index) * 18 + 3] = size_data[i].y();
       //// 旋转角度
-      memory_block[(i - instance_start_index) * 12 + 4] = rotation_data[i];
+      memory_block[(i - instance_start_index) * 18 + 4] = rotation_data[i];
       //// 纹理集层数索引
-      memory_block[(i - instance_start_index) * 12 + 5] = glyph_id_data[i];
+      memory_block[(i - instance_start_index) * 18 + 5] = glyph_id_data[i];
       //// 填充颜色
-      memory_block[(i - instance_start_index) * 12 + 6] =
+      memory_block[(i - instance_start_index) * 18 + 6] =
           fill_color_data[i].x();
-      memory_block[(i - instance_start_index) * 12 + 7] =
+      memory_block[(i - instance_start_index) * 18 + 7] =
           fill_color_data[i].y();
-      memory_block[(i - instance_start_index) * 12 + 8] =
+      memory_block[(i - instance_start_index) * 18 + 8] =
           fill_color_data[i].z();
-      memory_block[(i - instance_start_index) * 12 + 9] =
+      memory_block[(i - instance_start_index) * 18 + 9] =
           fill_color_data[i].w();
       // 纹理uv集
       auto& uvset = uvset_data[i];
-      memory_block[(i - instance_start_index) * 12 + 10] = uvset.p1.x();
-      memory_block[(i - instance_start_index) * 12 + 11] = uvset.p1.y();
+      memory_block[(i - instance_start_index) * 18 + 10] = uvset.p1.x();
+      memory_block[(i - instance_start_index) * 18 + 11] = uvset.p1.y();
 
-      memory_block[(i - instance_start_index) * 12 + 12] = uvset.p2.x();
-      memory_block[(i - instance_start_index) * 12 + 13] = uvset.p2.y();
+      memory_block[(i - instance_start_index) * 18 + 12] = uvset.p2.x();
+      memory_block[(i - instance_start_index) * 18 + 13] = uvset.p2.y();
 
-      memory_block[(i - instance_start_index) * 12 + 14] = uvset.p3.x();
-      memory_block[(i - instance_start_index) * 12 + 15] = uvset.p3.y();
+      memory_block[(i - instance_start_index) * 18 + 14] = uvset.p3.x();
+      memory_block[(i - instance_start_index) * 18 + 15] = uvset.p3.y();
 
-      memory_block[(i - instance_start_index) * 12 + 16] = uvset.p4.x();
-      memory_block[(i - instance_start_index) * 12 + 17] = uvset.p4.y();
+      memory_block[(i - instance_start_index) * 18 + 16] = uvset.p4.x();
+      memory_block[(i - instance_start_index) * 18 + 17] = uvset.p4.y();
     }
     // 上传内存块到显存
     GLCALL(cvs->glBufferSubData(

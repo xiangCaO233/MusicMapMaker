@@ -202,9 +202,9 @@ void TextureArray::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
   }
 
   // glViewPort后uniform的采样器location会发生变化,需要更新
-  if (GLCanvas::need_update_sampler_location) {
+  if (need_update_sampler_location) {
     need_update = true;
-    GLCanvas::need_update_sampler_location = false;
+    need_update_sampler_location = false;
   }
 
   if (need_update) {
