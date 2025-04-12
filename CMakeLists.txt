@@ -18,6 +18,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_BUILD_TYPE Debug)
 
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
@@ -95,8 +96,8 @@ set(PROJECT_SOURCES
   src/canvas/texture/pool/TextureArray.cpp
   src/canvas/texture/Texture.h
   src/canvas/texture/Texture.cpp
-  src/canvas/renderer/font/FontPool.h
-  src/canvas/renderer/font/FontPool.cpp
+	src/canvas/renderer/font/FontRenderer.h
+	src/canvas/renderer/font/FontRenderer.cpp
   src/log/colorful-log.h
   src/log/colorful_log.cpp
   ${MMM_SOURCES}

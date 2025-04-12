@@ -102,7 +102,8 @@ void AbstractRenderer::render(const ShapeType& shape,
   // TODO(xiang 2025-04-03): 实现apple平台指定实例位置绘制
 #else
   switch (shape) {
-    case ShapeType::RECT: {
+    case ShapeType::RECT:
+    case ShapeType::TEXT: {
       DRAWCALL(cvs->glDrawArraysInstancedBaseInstance(
           GL_TRIANGLE_FAN, 0, 4, shape_count, start_shape_index));
       break;

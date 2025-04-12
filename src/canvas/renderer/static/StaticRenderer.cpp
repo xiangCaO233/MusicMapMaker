@@ -28,6 +28,7 @@ StaticRenderer::StaticRenderer(GLCanvas* canvas,
   // 图形位置2f,图形尺寸2f,旋转角度1f,图形贴图uv2f,贴图方式1f,贴图id1f,填充颜色4f
   GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instanceBO));
 
+  // 数据描述步长
   GLsizei stride = 12 * sizeof(float);
 
   // 位置信息
@@ -212,6 +213,8 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
+    default:
+      break;
   }
 }
 

@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <queue>
+#include <string>
 
 #include "RenderCommand.h"
 #include "dynamic/DynamicRenderer.h"
@@ -11,7 +12,7 @@
 
 enum class TexturePoolType;
 class BaseTexturePool;
-class FontPool;
+class FontRenderer;
 
 // 渲染操作
 struct RenderOperation {
@@ -33,17 +34,16 @@ class RendererManager {
  private:
   static uint32_t static_instance_index;
   static uint32_t dynamic_instance_index;
+  static uint32_t fontr_instance_index;
 
   // 纹理池表(纹理池类型-同类型纹理池列表)
   std::map<TexturePoolType, std::vector<std::shared_ptr<BaseTexturePool>>>
       texture_pools;
 
-  // 字体池
-  std::shared_ptr<FontPool> font_pool;
-
   // 渲染器
   std::shared_ptr<StaticRenderer> static_renderer;
   std::shared_ptr<DynamicRenderer> dynamic_renderer;
+  std::shared_ptr<FontRenderer> font_renderer;
 
   // 着色器
   std::shared_ptr<Shader> font_shader;
@@ -87,6 +87,11 @@ class RendererManager {
   // 使用指定纹理池
   void use_texture_pool(const std::shared_ptr<BaseTexturePool>& texture_pool);
 
+  // 添加文本
+  void addText(const QPointF& pos, std::u32string& text, float font_size,
+               const char* font_family, const QColor& fill_color,
+               float rotation);
+
   // 添加矩形
   void addRect(const QRectF& rect, std::shared_ptr<TextureInstace> texture,
                const QColor& fill_color, float rotation, bool is_volatile);
@@ -107,6 +112,9 @@ class RendererManager {
   // 设置uniform浮点
   void set_general_uniform_float(const char* location_name, float value) const;
   void set_fontpool_uniform_float(const char* location_name, float value) const;
+
+  // 更新全部投影矩阵
+  void update_all_projection_mat(const char* location_name, QMatrix4x4& mat);
 
   // 设置uniform矩阵(4x4)
   void set_general_uniform_mat4(const char* location_name,

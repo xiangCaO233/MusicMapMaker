@@ -301,6 +301,8 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
       }
       break;
     }
+    default:
+      break;
   }
 }
 

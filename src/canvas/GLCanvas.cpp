@@ -191,8 +191,9 @@ void GLCanvas::resizeGL(int w, int h) {
   proj.scale(1.0f, -1.0f, 1.0f);
 
   // 更新uniform
-  renderer_manager->set_general_uniform_mat4("projection_mat", proj);
+  renderer_manager->update_all_projection_mat("projection_mat", proj);
 
+  // 标记需要更新纹理采样器位置
   need_update_sampler_location = true;
 }
 
@@ -263,13 +264,19 @@ void GLCanvas::paintGL() {
 
   // 添加渲染内容--4000矩形
   auto it = texture_map.begin();
-  for (int i = 0; i < 128; i++) {
-    it++;
-    if (it == texture_map.end()) {
-      it = texture_map.begin();
-    }
-    generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
-  }
+  // for (int i = 0; i < 128; i++) {
+  //   it++;
+  //   if (it == texture_map.end()) {
+  //     it = texture_map.begin();
+  //   }
+  //   generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
+  // }
+
+  // 添加文本
+  auto text_pos = QPointF(200, 200);
+  std::u32string str = U"aaa";
+  renderer_manager->addText(text_pos, str, 8, "ComicMono-Bold", Qt::white,
+                            0.0f);
 
   auto rect = QRectF(50, 50, 100, 200);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,

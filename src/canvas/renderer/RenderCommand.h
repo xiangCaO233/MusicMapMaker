@@ -4,6 +4,7 @@
 #include <qcolor.h>
 #include <qrect.h>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -12,11 +13,25 @@
 // 形状
 enum class ShapeType {
   RECT,
+  TEXT,
   OVAL,
+};
+
+struct Text {
+  // 字体名
+  const char* font_family;
+  // 字体像素尺寸
+  uint32_t font_size;
+  // 字符
+  char32_t character;
 };
 
 // 绘制指令
 struct RenderCommand {
+  // 是否为文本渲染
+  bool is_text;
+  // 渲染的文本
+  Text text;
   // 渲染内容是否易变
   bool is_volatile;
   // 绘制的图元形状

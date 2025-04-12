@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <unordered_map>
 #include <vector>
 
 #include "RenderCommand.h"
@@ -24,6 +23,8 @@ enum class InstanceDataType {
   TEXTURE_ID,
   FILL_COLOR,
   RADIUS,
+  TEXT,
+  ARRAY_LAYER,
 };
 
 class AbstractRenderer {
