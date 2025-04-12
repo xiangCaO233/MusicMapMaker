@@ -195,6 +195,9 @@ void GLCanvas::resizeGL(int w, int h) {
 
   // 标记需要更新纹理采样器位置
   need_update_sampler_location = true;
+
+  // 需要更新
+  renderer_manager->set_fontpool_sampler("glyph_atlas_array", 0);
 }
 
 void generateRandomQRectF(RendererManager *&renderer_manager,
@@ -274,9 +277,8 @@ void GLCanvas::paintGL() {
 
   // 添加文本
   auto text_pos = QPointF(200, 200);
-  std::u32string str = U"aaa";
-  renderer_manager->addText(text_pos, str, 8, "ComicMono-Bold", Qt::white,
-                            0.0f);
+  std::u8string str = u8"aaa";
+  renderer_manager->addText(text_pos, str, 8, "Comic Mono", Qt::white, 0.0f);
 
   auto rect = QRectF(50, 50, 100, 200);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,

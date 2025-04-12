@@ -8,9 +8,11 @@
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include "../AbstractRenderer.h"
 #include "../shader/Shader.h"
+#include "renderer/font/GlyphPacker.h"
 #include FT_FREETYPE_H
 
 class GLCanvas;
@@ -20,7 +22,7 @@ struct CharacterGlyph {
   // 纹理ID
   uint32_t glyph_id;
   // 在纹理集中的位置
-  QRect pos_in_atlas;
+  QPoint pos_in_atlas;
   // 字形尺寸
   // width	face->glyph->bitmap.width	位图宽度（像素）
   // height	face->glyph->bitmap.rows	位图高度（像素）
@@ -63,6 +65,12 @@ class FontRenderer : public AbstractRenderer {
   // 析构FontRenderer
   ~FontRenderer() override;
 
+  // 每层最大尺寸
+  static const uint32_t layer_size{4096};
+
+  // 最大层数
+  static const uint32_t layer_count{32};
+
   // 当前字形id
   static uint32_t current_glyph_id;
 
@@ -76,10 +84,17 @@ class FontRenderer : public AbstractRenderer {
   static int frenderer_count;
 
   // 字体Family名-按字体大小存储的字体字符包
-  std::unordered_map<const char*, std::unordered_map<uint32_t, CharacterPack>>
+  std::unordered_map<std::string, std::unordered_map<uint32_t, CharacterPack>>
       font_packs_mapping;
   // 字体Family名-FreeType称之为面(Face)的东西
   std::unordered_map<const char*, FT_Face> ft_faces;
+
+  // 层数-纹理集打包器
+  std::unordered_map<uint32_t, std::shared_ptr<GlyphPacker>> layer_packers;
+  // 当前最大的层索引
+  uint32_t current_max_layer_index{0};
+  // 空闲的层数
+  std::vector<uint32_t> packable_layers;
 
   // 字体实例缓冲区
   uint32_t fInstanceVBO;
@@ -88,21 +103,17 @@ class FontRenderer : public AbstractRenderer {
   // 预计更新gpu内存表(实例索引-实例数)
   std::vector<std::pair<size_t, uint32_t>> update_list;
   // 渲染器数据
-  // 渲染器纹理集层数索引数据
-  std::vector<float> atlas_array_layer_data;
+  // 渲染器字符id集数据
+  std::vector<float> glyph_id_data;
   // 渲染器字符uv集数据
   std::vector<CharacterUVSet> uvset_data;
 
   // 加载字体
   int load_font(const char* font_path);
 
-  // 载入ascii字符
-  void load_8pixel_ascii(const char* font_name, FT_Face face);
-  bool is_8pixel_ascii_loaded{false};
-
-  // 载入中文字符
-  void load_8pixel_cjk(const char* font_name, FT_Face face);
-  bool is_8pixel_cjk_loaded{false};
+  // 检查载入字符串
+  void check_u8string(const std::u8string& str, uint32_t font_size,
+                      FT_Face& face);
 
   // 同步数据
   void synchronize_data(InstanceDataType data_type, size_t instance_index,

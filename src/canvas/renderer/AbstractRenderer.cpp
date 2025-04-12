@@ -33,10 +33,10 @@ AbstractRenderer::AbstractRenderer(GLCanvas* canvas,
 
   // 基本顶点
   std::vector<float> vertices = {
-      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,  // v1
-      1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,  // v2
-      1.0f,  1.0f,  0.0f, 1.0f, 1.0f,  // v3
-      -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  // v4
+      -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,  // v1 --左下
+      1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,  // v2 --右下
+      1.0f,  1.0f,  0.0f, 1.0f, 1.0f,  // v3 --右上
+      -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  // v4 --左上
   };
 
   // 初始化椭圆顶点

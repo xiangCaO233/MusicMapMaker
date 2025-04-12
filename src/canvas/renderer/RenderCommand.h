@@ -19,11 +19,11 @@ enum class ShapeType {
 
 struct Text {
   // 字体名
-  const char* font_family;
+  std::string font_family;
   // 字体像素尺寸
   uint32_t font_size;
-  // 字符
-  char32_t character;
+  // u8字符
+  char8_t character;
 };
 
 // 绘制指令

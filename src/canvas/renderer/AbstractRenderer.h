@@ -24,7 +24,7 @@ enum class InstanceDataType {
   FILL_COLOR,
   RADIUS,
   TEXT,
-  ARRAY_LAYER,
+  GLYPH_ID,
 };
 
 class AbstractRenderer {

@@ -88,8 +88,8 @@ class RendererManager {
   void use_texture_pool(const std::shared_ptr<BaseTexturePool>& texture_pool);
 
   // 添加文本
-  void addText(const QPointF& pos, std::u32string& text, float font_size,
-               const char* font_family, const QColor& fill_color,
+  void addText(const QPointF& pos, std::u8string& text, float font_size,
+               std::string font_family, const QColor& fill_color,
                float rotation);
 
   // 添加矩形
