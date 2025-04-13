@@ -23,7 +23,7 @@ struct Text {
   // 字体像素尺寸
   uint32_t font_size;
   // unicode字符
-  char16_t character;
+  char32_t character;
 };
 
 // 绘制指令

@@ -292,7 +292,7 @@ void RendererManager::sync_renderer(
 }
 
 // 添加文本
-void RendererManager::addText(const QPointF& pos, std::u16string& text,
+void RendererManager::addText(const QPointF& pos, std::u32string& text,
                               float font_size, std::string font_family,
                               const QColor& fill_color, float rotation) {
   // 在队尾直接生成渲染指令
@@ -312,7 +312,7 @@ void RendererManager::addRect(const QRectF& rect,
                               const QColor& fill_color, float rotation,
                               bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(false, Text("", 0, u' '), is_volatile,
+  command_list.emplace_back(false, Text("", 0, U' '), is_volatile,
                             ShapeType::RECT, rect, rotation, fill_color, 0.0f,
                             texture, texture_effect, texture_alignmode,
                             texture_fillmode, texture_complementmode);
@@ -325,7 +325,7 @@ void RendererManager::addRoundRect(const QRectF& rect,
                                    float radius_ratios, bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(
-      false, Text("", 0, u' '), is_volatile, ShapeType::RECT, rect, rotation,
+      false, Text("", 0, U' '), is_volatile, ShapeType::RECT, rect, rotation,
       fill_color, radius_ratios, texture, texture_effect, texture_alignmode,
       texture_fillmode, texture_complementmode);
 }

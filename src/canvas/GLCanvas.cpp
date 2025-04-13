@@ -282,8 +282,8 @@ void GLCanvas::paintGL() {
 
   // 添加文本
   auto text_pos = QPointF(200, 400);
-  std::u16string str = u"nmsl";
-  renderer_manager->addText(text_pos, str, 48, "Comic Mono", Qt::blue, 0.0f);
+  std::u32string str = U"nmsl";
+  renderer_manager->addText(text_pos, str, 48, "Comic Mono", Qt::white, 0.0f);
 
   auto rect = QRectF(50, 50, 250, 300);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,

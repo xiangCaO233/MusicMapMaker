@@ -12,7 +12,6 @@
 
 #include "../AbstractRenderer.h"
 #include "../shader/Shader.h"
-#include "renderer/font/GlyphPacker.h"
 #include FT_FREETYPE_H
 
 class GLCanvas;
@@ -92,12 +91,10 @@ class FontRenderer : public AbstractRenderer {
   // 字体Family名-FreeType称之为面(Face)的东西
   std::unordered_map<const char*, FT_Face> ft_faces;
 
-  // 层数-纹理集打包器
-  std::unordered_map<uint32_t, std::shared_ptr<GlyphPacker>> layer_packers;
   // 当前最大的层索引
   uint32_t current_max_layer_index{0};
   // 空闲的层数
-  std::vector<uint32_t> packable_layers;
+  std::vector<uint32_t> free_layers;
 
   // 字体实例缓冲区
   uint32_t fInstanceVBO;
@@ -115,7 +112,7 @@ class FontRenderer : public AbstractRenderer {
   int load_font(const char* font_path);
 
   // 检查载入字符串
-  void check_u16string(const std::u16string& str, uint32_t font_size,
+  void check_u32string(const std::u32string& str, uint32_t font_size,
                        FT_Face& face);
 
   // 同步数据

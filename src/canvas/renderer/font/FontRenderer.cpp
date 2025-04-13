@@ -8,7 +8,6 @@
 
 #include "../../../log/colorful-log.h"
 #include "../../GLCanvas.h"
-#include "renderer/font/GlyphPacker.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                       \
@@ -136,8 +135,11 @@ FontRenderer::FontRenderer(GLCanvas* canvas,
       cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
   GLCALL(
       cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-  GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-  GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+  GLCALL(
+      cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+  GLCALL(
+      cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+  free_layers.emplace_back(current_max_layer_index);
   // 首次设置
   font_shader->unuse();
 }
@@ -168,16 +170,16 @@ int FontRenderer::load_font(const char* font_path) {
     // 载入常用字符
     XINFO("正在生成ascii字符缓存");
     // 创建ascii字符串
-    std::u16string asciistr(u"");
-    for (char16_t c = 32; c <= 126; c++) asciistr.append(1, c);
+    std::u32string asciistr(U"a");
+    for (char32_t c = 32; c <= 127; c++) asciistr.append(1, c);
 
     // 创建cjk字符串
     // std::u16string cjkstr(u"");
-    // for (char16_t c = u'\u4e00'; c <= u'\u5e00'; c++) cjkstr.append(1, c);
+    // for (char32_t c = u'\u4e00'; c <= u'\u5e00'; c++) cjkstr.append(1, c);
 
     // 检查载入
-    check_u16string(asciistr, 48, it->second);
-    // check_u16string(cjkstr, 48, it->second);
+    check_u32string(asciistr, 48, it->second);
+    // check_u32string(cjkstr, 48, it->second);
 
     XINFO("正在生成常用中文字符缓存");
 
@@ -186,7 +188,7 @@ int FontRenderer::load_font(const char* font_path) {
 }
 
 // 检查载入字符串
-void FontRenderer::check_u16string(const std::u16string& str,
+void FontRenderer::check_u32string(const std::u32string& str,
                                    uint32_t font_size, FT_Face& face) {
   // 获取字符包
   // 尝试创建字体包映射
@@ -195,21 +197,23 @@ void FontRenderer::check_u16string(const std::u16string& str,
                    .first->second;
   pack.font_size = font_size;
 
-  // 获取空闲层的字符打包器
-  std::shared_ptr<GlyphPacker> packer;
-  if (packable_layers.empty()) {
+  int32_t free_layer_index{-1};
+  // 获取空闲层
+  if (free_layers.empty()) {
     // 无空闲，新建层
-    packable_layers.emplace_back(current_max_layer_index);
-    packer = std::make_shared<GlyphPacker>(layer_size, layer_size);
-    layer_packers.try_emplace(current_max_layer_index, packer);
-    packer->layer_index = current_max_layer_index;
     current_max_layer_index++;
+    free_layers.emplace_back(current_max_layer_index);
+    free_layer_index = current_max_layer_index;
   } else {
-    packer = layer_packers[packable_layers.front()];
+    // 有空闲，使用此层
+    free_layer_index = free_layers.back();
   }
-
   bind();
   FT_Set_Pixel_Sizes(face, 0, font_size);
+  // 当前写入位置
+  int currentX = 0;
+  int currentY = 0;
+  int maxRowHeight = 0;
   for (const auto& c : str) {
     // 加载字符的字形
     if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
@@ -217,38 +221,45 @@ void FontRenderer::check_u16string(const std::u16string& str,
       continue;
     } else {
       CharacterGlyph character;
-      FT_Bitmap bitmap = face->glyph->bitmap;
+      FT_Bitmap& bitmap = face->glyph->bitmap;
 
-      character.size = QSize(face->glyph->metrics.width / 64,
-                             face->glyph->metrics.height / 64);
-      character.bearing =
-          QPoint(face->glyph->bitmap_left, face->glyph->bitmap_top);
+      // 检查是否需要换行
+      if (currentX + bitmap.width > layer_size) {
+        currentX = 0;
+        currentY += maxRowHeight;
+        maxRowHeight = 0;
+      }
+      // 更新行高（考虑下伸部分）
+      int glyphHeight = bitmap.rows;
+      int glyphDescend =
+          (face->glyph->metrics.height - face->glyph->metrics.horiBearingY) /
+          64;
+      maxRowHeight = std::max(maxRowHeight, glyphHeight + glyphDescend);
+
+      // 上传字符位图到纹理
+
+      GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + 13));
+      GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, glyphs_texture_array));
+      GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, currentX, currentY,
+                                  free_layer_index, bitmap.width, bitmap.rows,
+                                  1, GL_RED, GL_UNSIGNED_BYTE, bitmap.buffer));
+
+      character.pos_in_atlas.setX(currentX);
+      character.pos_in_atlas.setY(currentY);
+
+      character.size.setWidth(bitmap.width);
+      character.size.setHeight(bitmap.rows);
+
+      character.glyph_id = free_layer_index;
       character.xadvance = face->glyph->advance.x;
 
-      // 先确定要绘制到哪里--确定层数,索引,具体坐标位置
-      packer->Insert(&character, GlyphPacker::RectBottomLeftRule);
-
-      auto cc = *reinterpret_cast<const char*>(&c);
-      std::string s("");
-      s.append(1, cc);
-      XINFO("字符[" + s + "]位置->[" +
-            std::to_string(character.pos_in_atlas.x()) + "," +
-            std::to_string(character.pos_in_atlas.y()) + "]");
-      // 上传纹理
-      GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + 13));
-      glBindTexture(GL_TEXTURE_2D_ARRAY, glyphs_texture_array);
-      cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, character.pos_in_atlas.x(),
-                           character.pos_in_atlas.y(), packer->layer_index,
-                           character.size.width(), character.size.height(), 1,
-                           GL_RED, GL_UNSIGNED_BYTE, bitmap.buffer);
-
-      // glyph_id需保存纹理集数组层数和纹理集内索引两个信息
-      character.glyph_id = (packer->layer_index << 16) | current_glyph_id;
-      XINFO("id->[" + std::to_string(character.glyph_id) + "]");
-      current_glyph_id++;
+      character.bearing.setX(face->glyph->metrics.horiBearingX / 64);
+      character.bearing.setY(face->glyph->metrics.horiBearingY / 64);
 
       // 放入字符集
       pack.character_set.try_emplace(c, character);
+      // 移动写入位置
+      currentX += bitmap.width;
     }
   }
 
@@ -353,6 +364,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
          */
         current_character_position += glyph.xadvance / 64;
       }
+
       // id
       auto glyph_id = glyph.glyph_id;
       if (glyph_id_data.empty() || glyph_id_data.size() <= instance_index) {
@@ -383,6 +395,9 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
           size_data[instance_index] = size;
         }
       }
+      // 更新位置
+      position_data[instance_index].setY(position_data[instance_index].y() -
+                                         glyph.bearing.y());
 
       // uv
       CharacterUVSet uvset;
