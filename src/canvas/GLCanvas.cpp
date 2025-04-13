@@ -271,7 +271,7 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 添加渲染内容--4000矩形
-  auto it = texture_map.begin();
+  // auto it = texture_map.begin();
   // for (int i = 0; i < 128; i++) {
   //   it++;
   //   if (it == texture_map.end()) {
@@ -282,7 +282,7 @@ void GLCanvas::paintGL() {
 
   // 添加文本
   auto text_pos = QPointF(200, 400);
-  std::u8string str = u8"@@##";
+  std::u16string str = u"nmsl";
   renderer_manager->addText(text_pos, str, 48, "Comic Mono", Qt::blue, 0.0f);
 
   auto rect = QRectF(50, 50, 250, 300);

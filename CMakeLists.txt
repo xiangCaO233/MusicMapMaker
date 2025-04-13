@@ -96,10 +96,10 @@ set(PROJECT_SOURCES
   src/canvas/texture/pool/TextureArray.cpp
   src/canvas/texture/Texture.h
   src/canvas/texture/Texture.cpp
-	src/canvas/renderer/font/FontRenderer.h
-	src/canvas/renderer/font/FontRenderer.cpp
-	src/canvas/renderer/font/GlyphPacker.h
-	src/canvas/renderer/font/GlyphPacker.cpp
+  src/canvas/renderer/font/FontRenderer.h
+  src/canvas/renderer/font/FontRenderer.cpp
+  src/canvas/renderer/font/GlyphPacker.h
+  src/canvas/renderer/font/GlyphPacker.cpp
   src/log/colorful-log.h
   src/log/colorful_log.cpp
   ${MMM_SOURCES}

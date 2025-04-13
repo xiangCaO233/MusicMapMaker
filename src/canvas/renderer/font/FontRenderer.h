@@ -66,7 +66,7 @@ class FontRenderer : public AbstractRenderer {
   ~FontRenderer() override;
 
   // 每层最大尺寸
-  static const uint32_t layer_size{4096};
+  static const uint32_t layer_size{1024};
 
   // 最大层数
   static const uint32_t layer_count{32};
@@ -115,8 +115,8 @@ class FontRenderer : public AbstractRenderer {
   int load_font(const char* font_path);
 
   // 检查载入字符串
-  void check_u8string(const std::u8string& str, uint32_t font_size,
-                      FT_Face& face);
+  void check_u16string(const std::u16string& str, uint32_t font_size,
+                       FT_Face& face);
 
   // 同步数据
   void synchronize_data(InstanceDataType data_type, size_t instance_index,

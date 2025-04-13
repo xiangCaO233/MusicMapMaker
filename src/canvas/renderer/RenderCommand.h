@@ -22,8 +22,8 @@ struct Text {
   std::string font_family;
   // 字体像素尺寸
   uint32_t font_size;
-  // u8字符
-  char8_t character;
+  // unicode字符
+  char16_t character;
 };
 
 // 绘制指令

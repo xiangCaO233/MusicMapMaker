@@ -108,10 +108,10 @@ FontRenderer::FontRenderer(GLCanvas* canvas,
   // 字符纹理集uv
   for (int i = 0; i < 4; i++) {
     // 描述location7+i
-    // 缓冲位置10+4*i ~ 10+4*i+3float为vec4类型数据--文本填充色(用vec4接收)
+    // 缓冲位置10+2*i ~ 10+2*i+1float为vec2类型数据-- uv(用vec2接收)
     GLCALL(cvs->glEnableVertexAttribArray(7 + i));
-    GLCALL(cvs->glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, stride,
-                                      (void*)((10 + 4 * i) * sizeof(float))));
+    GLCALL(cvs->glVertexAttribPointer(7 + i, 2, GL_FLOAT, GL_FALSE, stride,
+                                      (void*)((10 + 2 * i) * sizeof(float))));
     GLCALL(cvs->glVertexAttribDivisor(7 + i, 1));
   }
 
@@ -168,11 +168,16 @@ int FontRenderer::load_font(const char* font_path) {
     // 载入常用字符
     XINFO("正在生成ascii字符缓存");
     // 创建ascii字符串
-    std::u8string asciistr(u8"");
-    for (char8_t c = 32; c <= 176; c++) asciistr.append(1, c);
+    std::u16string asciistr(u"");
+    for (char16_t c = 32; c <= 126; c++) asciistr.append(1, c);
+
+    // 创建cjk字符串
+    // std::u16string cjkstr(u"");
+    // for (char16_t c = u'\u4e00'; c <= u'\u5e00'; c++) cjkstr.append(1, c);
 
     // 检查载入
-    check_u8string(asciistr, 48, it->second);
+    check_u16string(asciistr, 48, it->second);
+    // check_u16string(cjkstr, 48, it->second);
 
     XINFO("正在生成常用中文字符缓存");
 
@@ -181,8 +186,8 @@ int FontRenderer::load_font(const char* font_path) {
 }
 
 // 检查载入字符串
-void FontRenderer::check_u8string(const std::u8string& str, uint32_t font_size,
-                                  FT_Face& face) {
+void FontRenderer::check_u16string(const std::u16string& str,
+                                   uint32_t font_size, FT_Face& face) {
   // 获取字符包
   // 尝试创建字体包映射
   auto& pack = font_packs_mapping.try_emplace(face->family_name)
@@ -214,16 +219,20 @@ void FontRenderer::check_u8string(const std::u8string& str, uint32_t font_size,
       CharacterGlyph character;
       FT_Bitmap bitmap = face->glyph->bitmap;
 
-      character.size = QSize(bitmap.width, bitmap.rows);
+      character.size = QSize(face->glyph->metrics.width / 64,
+                             face->glyph->metrics.height / 64);
       character.bearing =
           QPoint(face->glyph->bitmap_left, face->glyph->bitmap_top);
       character.xadvance = face->glyph->advance.x;
 
-      // TODO(xiang 2025-04-12): 绘制到空闲纹理集的空闲位置中
       // 先确定要绘制到哪里--确定层数,索引,具体坐标位置
       packer->Insert(&character, GlyphPacker::RectBottomLeftRule);
-      XINFO("字符[" + std::string(reinterpret_cast<const char*>(&c)) +
-            "]位置->[" + std::to_string(character.pos_in_atlas.x()) + "," +
+
+      auto cc = *reinterpret_cast<const char*>(&c);
+      std::string s("");
+      s.append(1, cc);
+      XINFO("字符[" + s + "]位置->[" +
+            std::to_string(character.pos_in_atlas.x()) + "," +
             std::to_string(character.pos_in_atlas.y()) + "]");
       // 上传纹理
       GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + 13));
@@ -233,14 +242,13 @@ void FontRenderer::check_u8string(const std::u8string& str, uint32_t font_size,
                            character.size.width(), character.size.height(), 1,
                            GL_RED, GL_UNSIGNED_BYTE, bitmap.buffer);
 
-      // TODO(xiang 2025-04-12):
       // glyph_id需保存纹理集数组层数和纹理集内索引两个信息
       character.glyph_id = (packer->layer_index << 16) | current_glyph_id;
       XINFO("id->[" + std::to_string(character.glyph_id) + "]");
       current_glyph_id++;
 
       // 放入字符集
-      pack.character_set.try_emplace(c, std::move(character));
+      pack.character_set.try_emplace(c, character);
     }
   }
 
@@ -326,6 +334,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
                   "]字符数据");
         query_failed = true;
       }
+
       CharacterGlyph glyph;
       if (query_failed) {
         glyph.pos_in_atlas = {0, 0};
@@ -375,20 +384,16 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         }
       }
 
-      CharacterUVSet uvset;
       // uv
-      uvset.p1.setX(float(glyph.pos_in_atlas.x()) / float(layer_size));
-      uvset.p1.setY(float(glyph.pos_in_atlas.y()) / float(layer_size));
-      uvset.p2.setX(float(glyph.pos_in_atlas.x() + glyph.size.width()) /
-                    float(layer_size));
-      uvset.p2.setY(float(glyph.pos_in_atlas.y()) / float(layer_size));
-      uvset.p3.setX(float(glyph.pos_in_atlas.x() + glyph.size.width()) /
-                    float(layer_size));
-      uvset.p3.setY(float(glyph.pos_in_atlas.y() + glyph.size.height()) /
-                    float(layer_size));
-      uvset.p4.setX(float(glyph.pos_in_atlas.x()) / float(layer_size));
-      uvset.p4.setY(float(glyph.pos_in_atlas.y() + glyph.size.height()) /
-                    float(layer_size));
+      CharacterUVSet uvset;
+      uvset.p1.setX(float(glyph.pos_in_atlas.x()));
+      uvset.p1.setY(float(glyph.pos_in_atlas.y()));
+      uvset.p2.setX(float(glyph.pos_in_atlas.x() + glyph.size.width()));
+      uvset.p2.setY(float(glyph.pos_in_atlas.y()));
+      uvset.p3.setX(float(glyph.pos_in_atlas.x() + glyph.size.width()));
+      uvset.p3.setY(float(glyph.pos_in_atlas.y() + glyph.size.height()));
+      uvset.p4.setX(float(glyph.pos_in_atlas.x()));
+      uvset.p4.setY(float(glyph.pos_in_atlas.y() + glyph.size.height()));
 
       if (uvset_data.empty() || uvset_data.size() <= instance_index) {
         // XWARN("同步字符uv集数据");
