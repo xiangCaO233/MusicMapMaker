@@ -10,7 +10,8 @@ out vec4 FragColor;
 
 void main() {
   vec3 uv3d = vec3(glyph_uv / 1024.0, int(glyph_id));
-  FragColor = vec4(glyph_color.r, glyph_color.g, glyph_color.b,
-                   texture(glyph_atlas_array, uv3d).r);
+	vec4 color = glyph_color / 255.0;
+  FragColor = vec4(color.r , color.g ,
+                   color.b , texture(glyph_atlas_array, uv3d).r);
   // FragColor = vec4(glyph_uv.x / 2);
 }

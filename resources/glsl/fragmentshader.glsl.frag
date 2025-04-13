@@ -77,6 +77,14 @@ const uint MASK_COMPLEMENT = 0x0F00;
 const uint MASK_ALIGN = 0x00F0;
 const uint MASK_FILL = 0x000F;
 
+// 特效
+// 无特效
+const uint NONE = 0x0000;
+// 模糊
+const uint BLUR = 0x1000;
+// 灰度
+const uint GRAYSCALE = 0x2000;
+
 // 纹理补充模式
 // 使用填充色
 const uint FILL_COLOR = 0x0100;
@@ -306,7 +314,7 @@ void main() {
         if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
             final_uv.y > 1.0) {
           // 超出部分使用填充色
-          FragColor = fill_color;
+          FragColor = fill_color / 255.0;
           return;
         } else {
           // 未超出部分使用纹理采样
@@ -348,7 +356,7 @@ void main() {
     case 0: {
       // 不使用纹理池
       // 直接使用填充颜色
-      texture_color = fill_color;
+      texture_color = fill_color / 255.0;
       break;
     };
     case 1: {
@@ -363,7 +371,7 @@ void main() {
           if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
               final_uv.y > 1.0) {
             // 超出部分使用填充色
-            texture_color = fill_color;
+            texture_color = fill_color / 255.0;
           } else {
             // 未超出部分使用纹理采样
             texture_color = texture(samplers[int(texture_id) % 13], final_uv);
@@ -387,7 +395,7 @@ void main() {
           if (final_uv.x < 0.0 || final_uv.x > 1.0 || final_uv.y < 0.0 ||
               final_uv.y > 1.0) {
             // 超出部分使用填充色
-            texture_color = fill_color;
+            texture_color = fill_color / 255.0;
           } else {
             // 未超出部分使用纹理采样
             texture_color = texture(
@@ -420,12 +428,10 @@ void main() {
     // 禁用淡入淡出
     if (alpha == 0) {
       discard;
-    } else {
-      texture_color = texture_color;
     }
   }
   switch (texture_effect) {
-    case 0: {
+    case NONE: {
       // 不使用特效
       FragColor = texture_color;
       break;
