@@ -129,6 +129,8 @@ FontRenderer::FontRenderer(GLCanvas* canvas,
                              layer_size, layer_count));
 #endif  //__APPLE__
   GLCALL(cvs->glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+  // GLCALL(glEnable(GL_BLEND));
+  // GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
   // 设置纹理参数
   GLCALL(
@@ -259,7 +261,7 @@ void FontRenderer::check_u32string(const std::u32string& str,
       // 放入字符集
       pack.character_set.try_emplace(c, character);
       // 移动写入位置
-      currentX += bitmap.width;
+      currentX += (bitmap.width + 2);
     }
   }
 
