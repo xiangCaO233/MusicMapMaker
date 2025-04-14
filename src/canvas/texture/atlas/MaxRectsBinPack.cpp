@@ -40,7 +40,7 @@ void MaxRectsBinPack::Expand(float rate) {
   freeRectangles.clear();
 
   freeRectangles.push_back(n);
-  XINFO("扩容到[" + to_string(binWidth) + "x" + to_string(binHeight) + "]");
+  // XINFO("扩容到[" + to_string(binWidth) + "x" + to_string(binHeight) + "]");
 }
 
 void MaxRectsBinPack::Insert(const shared_ptr<AtlasSubTexture> &instance,

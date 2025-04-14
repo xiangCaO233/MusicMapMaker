@@ -264,7 +264,11 @@
              </widget>
             </item>
             <item>
-             <widget class="MapWorkspaceCanvas" name="canvas"/>
+             <widget class="MapWorkspaceCanvas" name="canvas">
+              <property name="cursor">
+               <cursorShape>BlankCursor</cursorShape>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLineEdit" name="command_line">

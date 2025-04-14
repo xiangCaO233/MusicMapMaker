@@ -85,6 +85,8 @@ enum class TextureEffect : uint32_t {
   BLUR = 0x1000,
   // 灰度
   GRAYSCALE = 0x2000,
+  // 光晕
+  GLOWING = 0x3000,
 };
 
 // 纹理补充模式

@@ -2,9 +2,12 @@
 #define GLCANVAS_H
 
 #include <QtOpenGLWidgets/qopenglwidget.h>
+#include <qpaintdevice.h>
 #include <qpoint.h>
 
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 #ifdef __APPLE__
 #include <QtOpenGL/qopenglfunctions_4_1_core.h>
@@ -19,6 +22,30 @@
 
 enum class TexturePoolType;
 class TextureAtlas;
+struct ShapeInstance {
+  // 图形的位置
+  QRectF bounds;
+  // 形状
+  ShapeType shape;
+  // 特效
+  TextureEffect effect;
+};
+
+struct Particle {
+  // 默认圆形
+  // 颜色
+  std::vector<uint8_t> color;
+  // 半径
+  QVector2D radius;
+  // 位置
+  QVector2D position;
+  // 尺寸
+  QVector2D size;
+  // 速度
+  float vx, vy;
+  // 生命周期
+  float life;
+};
 
 class GLCanvas : public QOpenGLWidget,
 #ifdef __APPLE__
@@ -32,17 +59,26 @@ class GLCanvas : public QOpenGLWidget,
   friend class AbstractRenderer;
   friend class StaticRenderer;
   friend class DynamicRenderer;
-  QPoint mouse_pos{0, 0};
 
  public:
-  // 需要更新采样器uniform location
-  static bool need_update_sampler_location;
-  // 渲染器
-  RendererManager *renderer_manager;
   // 构造GLCanvas
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
   ~GLCanvas() override;
+
+  long pre_frame_time = 100;
+  // 刷新定时器
+  QTimer *refresh_timer;
+
+  // 当前鼠标位置
+  QPoint mouse_pos{0, 0};
+
+  // 需要更新采样器uniform location
+  static bool need_update_sampler_location;
+  // 渲染管理器
+  RendererManager *renderer_manager;
+
+  std::unordered_map<std::string, ShapeInstance> live_instances;
 
   // 当前纹理集信息
   std::shared_ptr<TextureAtlas> current_atlas;

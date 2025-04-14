@@ -63,9 +63,9 @@ OsuMap::~OsuMap() = default;
 void OsuMap::load_from_file(const char* path) {
   std::filesystem::path p(path);
   auto fname = p.filename();
-  XINFO("文件名:" + fname.string());
+  // XINFO("文件名:" + fname.string());
   if (p.extension() == ".osu") {
-    XINFO("load_osu:" + p.extension().string());
+    // XINFO("load_osu:" + p.extension().string());
     std::ifstream ifs(p);
     if (!ifs.is_open()) {
       XERROR("打开文件[" + p.string() + "]失败");

@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include "GLCanvas.h"
+class MapWorkspaceCanvas;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow {
   Q_OBJECT
 
  public:
-  GLCanvas *glCanvas;
+  MapWorkspaceCanvas *canvas;
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
 

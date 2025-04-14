@@ -26,6 +26,11 @@ struct Text {
   char32_t character;
   // 终止标识
   bool is_string_ending;
+
+  bool operator==(const Text& other) const {
+    return font_size == other.font_size && character == other.character &&
+           is_string_ending == other.is_string_ending;
+  }
 };
 
 // 绘制指令
@@ -61,7 +66,8 @@ struct RenderCommand {
 
   // 重写==运算符
   bool operator==(const RenderCommand& other) const {
-    return is_volatile == other.is_volatile &&
+    return is_text == other.is_text && text == other.text &&
+           is_volatile == other.is_volatile &&
            instance_shape == other.instance_shape &&
            instace_bound == other.instace_bound &&
            fill_color == other.fill_color && texture == other.texture;

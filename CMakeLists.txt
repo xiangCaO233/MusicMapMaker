@@ -32,6 +32,9 @@ find_package(spdlog REQUIRED)
 # 查找字体包
 find_package(Freetype REQUIRED)
 
+# 字符编码集转换库
+find_package(ICU REQUIRED COMPONENTS uc i18n)
+
 # 设置mmm相关文件
 set(MMM_SOURCES
   src/mmm/map/MMap.h
@@ -80,8 +83,8 @@ set(PROJECT_SOURCES
   src/mainwindow.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
-	src/canvas/MapWorkspaceCanvas.h
-	src/canvas/MapWorkspaceCanvas.cpp
+  src/canvas/MapWorkspaceCanvas.h
+  src/canvas/MapWorkspaceCanvas.cpp
   src/canvas/renderer/shader/Shader.h
   src/canvas/renderer/shader/Shader.cpp
   src/canvas/renderer/RenderCommand.h
@@ -152,7 +155,7 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-  Qt${QT_VERSION_MAJOR}::OpenGL Freetype::Freetype
+  Qt${QT_VERSION_MAJOR}::OpenGL Freetype::Freetype ICU::uc ICU::i18n
   xaudio-dev)
 
 # 设置翻译系统
