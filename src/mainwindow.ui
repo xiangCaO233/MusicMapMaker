@@ -264,7 +264,7 @@
              </widget>
             </item>
             <item>
-             <widget class="GLCanvas" name="canvas"/>
+             <widget class="MapWorkspaceCanvas" name="canvas"/>
             </item>
             <item>
              <widget class="QLineEdit" name="command_line">
@@ -575,9 +575,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GLCanvas</class>
+   <class>MapWorkspaceCanvas</class>
    <extends>QOpenGLWidget</extends>
-   <header location="global">GLCanvas.h</header>
+   <header location="global">MapWorkspaceCanvas.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

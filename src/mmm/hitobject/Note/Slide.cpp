@@ -6,3 +6,6 @@ Slide::Slide(uint32_t time, int32_t slide_par)
 }
 
 Slide::~Slide() = default;
+
+// 打印用
+std::string Slide::toString() { return ""; }

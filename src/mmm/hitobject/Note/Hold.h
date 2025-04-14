@@ -13,6 +13,9 @@ class Hold : public Note {
 
   // 持续时间
   uint32_t hold_time;
+
+  // 打印用
+  std::string toString() override;
 };
 
 #endif  // M_HOLD_H

@@ -36,18 +36,26 @@ find_package(Freetype REQUIRED)
 set(MMM_SOURCES
   src/mmm/map/MMap.h
   src/mmm/map/MMap.cpp
+  src/mmm/map/osu/OsuMap.h
+  src/mmm/map/osu/OsuMap.cpp
   src/mmm/timing/Timing.h
   src/mmm/timing/Timing.cpp
+  src/mmm/timing/osu/OsuTiming.h
+  src/mmm/timing/osu/OsuTiming.cpp
   src/mmm/hitobject/HitObject.h
   src/mmm/hitobject/HitObject.cpp
   src/mmm/hitobject/Note/Note.h
   src/mmm/hitobject/Note/Note.cpp
+  src/mmm/hitobject/Note/osu/OsuNote.h
+  src/mmm/hitobject/Note/osu/OsuNote.cpp
   src/mmm/hitobject/Note/Hold.h
   src/mmm/hitobject/Note/Hold.cpp
-  src/mmm/hitobject/Note/Slide.h
-  src/mmm/hitobject/Note/Slide.cpp
-  src/mmm/hitobject/Note/Slide.h
-  src/mmm/hitobject/Note/Slide.cpp
+  src/mmm/hitobject/Note/osu/OsuHold.h
+  src/mmm/hitobject/Note/osu/OsuHold.cpp
+  src/mmm/hitobject/Note/rm/Slide.h
+  src/mmm/hitobject/Note/rm/Slide.cpp
+  src/mmm/hitobject/Note/rm/ComplexNote.h
+  src/mmm/hitobject/Note/rm/ComplexNote.cpp
 )
 
 # 设置翻译文件
@@ -72,6 +80,8 @@ set(PROJECT_SOURCES
   src/mainwindow.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
+	src/canvas/MapWorkspaceCanvas.h
+	src/canvas/MapWorkspaceCanvas.cpp
   src/canvas/renderer/shader/Shader.h
   src/canvas/renderer/shader/Shader.cpp
   src/canvas/renderer/RenderCommand.h

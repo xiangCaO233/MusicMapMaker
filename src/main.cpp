@@ -1,3 +1,4 @@
+#include "mmm/map/osu/OsuMap.h"
 #ifdef _WIN32
 #include <windows.h>
 #endif  //_WIN32
@@ -76,6 +77,10 @@ int main(int argc, char *argv[]) {
 
   MainWindow w;
   w.show();
+
+  OsuMap omap;
+  omap.load_from_file(
+      "../resources/map/niki - WAVE/niki - WAVE (Benson_) [Electronic].osu");
 
   return a.exec();
 }

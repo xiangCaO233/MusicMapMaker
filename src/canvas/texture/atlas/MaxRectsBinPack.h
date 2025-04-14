@@ -45,7 +45,7 @@ class MaxRectsBinPack {
   /// Inserts a single rectangle into the bin, possibly rotated.
   Rect Insert(int width, int height, FreeRectChoiceHeuristic method);
 
-  void Insert(std::shared_ptr<AtlasSubTexture> &meta,
+  void Insert(const std::shared_ptr<AtlasSubTexture> &meta,
               FreeRectChoiceHeuristic method);
 
   /// Computes the ratio of used surface area to the total bin area.

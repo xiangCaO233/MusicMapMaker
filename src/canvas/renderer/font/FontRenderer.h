@@ -89,31 +89,56 @@ class FontRenderer : public AbstractRenderer {
   std::unordered_map<std::string, std::unordered_map<uint32_t, CharacterPack>>
       font_packs_mapping;
   // 字体Family名-FreeType称之为面(Face)的东西
-  std::unordered_map<const char*, FT_Face> ft_faces;
+  std::unordered_map<std::string, FT_Face> ft_faces;
 
   // 当前最大的层索引
   uint32_t current_max_layer_index{0};
   // 空闲的层数
-  std::vector<uint32_t> free_layers;
+  std::unordered_map<uint32_t, bool> free_layers;
 
   // 字体实例缓冲区
+  /*
+   *layout(location = 2) in vec2 character_pos;
+   *layout(location = 3) in vec2 character_size;
+   *layout(location = 4) in float character_rotation;
+   *layout(location = 5) in float character_layer_index;
+   *layout(location = 6) in float character_bearingy;
+   *layout(location = 7) in vec4 character_color;
+   *** character_uv[8] 会占用连续的 locations 8~11
+   *layout(location = 8) in vec2 character_uvs[4];
+   */
   uint32_t fInstanceVBO;
   // 实际采样使用的纹理数组(作为纹理集序列存储使用的字符位图)
+  // 上一个字符的偏移
+  uint32_t current_character_position{0};
+  // 当前写入位置
+  int currentX = 0;
+  int currentY = 0;
+  int maxRowHeight = 0;
   uint32_t glyphs_texture_array;
   // 预计更新gpu内存表(实例索引-实例数)
   std::vector<std::pair<size_t, uint32_t>> update_list;
   // 渲染器数据
   // 渲染器字符id集数据
-  std::vector<float> glyph_id_data;
+  std::vector<float> layer_index_data;
+  // 渲染器字符y保留高度数据
+  std::vector<float> bearing_y_data;
   // 渲染器字符uv集数据
   std::vector<CharacterUVSet> uvset_data;
 
   // 加载字体
   int load_font(const char* font_path);
 
+  // 获取空闲层
+  uint32_t get_free_layer();
+
   // 检查载入字符串
   void check_u32string(const std::u32string& str, uint32_t font_size,
                        FT_Face& face);
+
+  // 初始化字符位图缓存
+  void generate_ascii_buffer(const std::string_view& font_family_nameconst);
+  void generate_cjk_buffer(const std::string_view& font_family_nameconst);
 
   // 同步数据
   void synchronize_data(InstanceDataType data_type, size_t instance_index,
@@ -124,9 +149,6 @@ class FontRenderer : public AbstractRenderer {
 
   // 更新gpu数据
   void update_gpu_memory() override;
-
-  // 上一个字符的偏移
-  uint32_t current_character_position{0};
 
   // 重置更新内容
   void reset_update() override;

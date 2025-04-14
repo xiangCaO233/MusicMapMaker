@@ -45,7 +45,12 @@ RendererManager::RendererManager(GLCanvas* canvas, int oval_segment,
   dynamic_renderer = std::make_shared<DynamicRenderer>(
       canvas, general_shader, oval_segment, max_shape_count_per_renderer);
   font_renderer = std::make_shared<FontRenderer>(canvas, font_shader);
-  font_renderer->load_font("../resources/font/ComicMono-Bold.ttf");
+  font_renderer->load_font(
+      "../resources/font/ComicShannsMonoNerdFont_Bold.otf");
+  font_renderer->generate_ascii_buffer("ComicShannsMono Nerd Font");
+  font_renderer->load_font(
+      "../resources/font/QingNiaoHuaGuangJianMeiHei-2.ttf");
+  font_renderer->generate_cjk_buffer("JMH");
 }
 
 RendererManager::~RendererManager() {}
@@ -296,13 +301,13 @@ void RendererManager::addText(const QPointF& pos, std::u32string& text,
                               float font_size, std::string font_family,
                               const QColor& fill_color, float rotation) {
   // 在队尾直接生成渲染指令
-  for (const auto& character : text) {
+  for (int i = 0; i < text.size(); i++) {
     // 逐字符生成渲染指令
     command_list.emplace_back(
-        true, Text(font_family, font_size, character), false, ShapeType::TEXT,
-        QRectF(pos.x(), pos.y(), 0, 0), rotation, fill_color, 0.0f, nullptr,
-        texture_effect, texture_alignmode, texture_fillmode,
-        texture_complementmode);
+        true, Text(font_family, font_size, text.at(i), i == text.size() - 1),
+        false, ShapeType::TEXT, QRectF(pos.x(), pos.y(), 0, 0), rotation,
+        fill_color, 0.0f, nullptr, texture_effect, texture_alignmode,
+        texture_fillmode, texture_complementmode);
   }
 }
 
@@ -312,7 +317,7 @@ void RendererManager::addRect(const QRectF& rect,
                               const QColor& fill_color, float rotation,
                               bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(false, Text("", 0, U' '), is_volatile,
+  command_list.emplace_back(false, Text("", 0, U' ', false), is_volatile,
                             ShapeType::RECT, rect, rotation, fill_color, 0.0f,
                             texture, texture_effect, texture_alignmode,
                             texture_fillmode, texture_complementmode);
@@ -325,9 +330,9 @@ void RendererManager::addRoundRect(const QRectF& rect,
                                    float radius_ratios, bool is_volatile) {
   // 在队尾直接生成渲染指令
   command_list.emplace_back(
-      false, Text("", 0, U' '), is_volatile, ShapeType::RECT, rect, rotation,
-      fill_color, radius_ratios, texture, texture_effect, texture_alignmode,
-      texture_fillmode, texture_complementmode);
+      false, Text("", 0, U' ', false), is_volatile, ShapeType::RECT, rect,
+      rotation, fill_color, radius_ratios, texture, texture_effect,
+      texture_alignmode, texture_fillmode, texture_complementmode);
 }
 
 // 添加椭圆
@@ -336,7 +341,7 @@ void RendererManager::addEllipse(const QRectF& bounds,
                                  const QColor& fill_color, float rotation,
                                  bool is_volatile) {
   // 在队尾直接生成渲染指令
-  command_list.emplace_back(false, Text("", 0, u' '), is_volatile,
+  command_list.emplace_back(false, Text("", 0, u' ', false), is_volatile,
                             ShapeType::OVAL, bounds, rotation, fill_color, 0.0f,
                             texture, texture_effect, texture_alignmode,
                             texture_fillmode, texture_complementmode);

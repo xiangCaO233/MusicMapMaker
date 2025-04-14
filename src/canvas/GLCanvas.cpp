@@ -281,10 +281,27 @@ void GLCanvas::paintGL() {
   // }
 
   // 添加文本
-  auto text_pos = QPointF(200, 400);
+  auto text_pos = QPointF(300, 250);
+  auto text_pos2 = QPointF(300, 270);
+  auto text_pos3 = QPointF(300, 310);
+  auto text_pos4 = QPointF(300, 360);
+  auto text_pos5 = QPointF(300, 420);
+  auto text_pos6 = QPointF(300, 480);
   std::u32string str = U"nm$l";
   auto color = QColor(255, 183, 197);
-  renderer_manager->addText(text_pos, str, 48, "Comic Mono", color, 0.0f);
+  renderer_manager->addText(text_pos, str, 12, "ComicShannsMono Nerd Font",
+                            color, 0.0f);
+  renderer_manager->addText(text_pos2, str, 16, "ComicShannsMono Nerd Font",
+                            color, 0.0f);
+  renderer_manager->addText(text_pos3, str, 24, "ComicShannsMono Nerd Font",
+                            color, 0.0f);
+  renderer_manager->addText(text_pos4, str, 36, "ComicShannsMono Nerd Font",
+                            color, 0.0f);
+  renderer_manager->addText(text_pos5, str, 48, "ComicShannsMono Nerd Font",
+                            color, 0.0f);
+
+  std::u32string strcjk = U"早上好";
+  renderer_manager->addText(text_pos6, strcjk, 36, "JMH", color, 0.0f);
 
   auto rect = QRectF(50, 50, 250, 300);
   renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,

@@ -24,6 +24,8 @@ struct Text {
   uint32_t font_size;
   // unicode字符
   char32_t character;
+  // 终止标识
+  bool is_string_ending;
 };
 
 // 绘制指令

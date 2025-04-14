@@ -11,22 +11,25 @@ layout(location = 1) in vec2 vuv;
 layout(location = 2) in vec2 character_pos;
 layout(location = 3) in vec2 character_size;
 layout(location = 4) in float character_rotation;
-layout(location = 5) in float character_glyph_id;
-layout(location = 6) in vec4 character_color;
-// layout(location = 7) in float character_yoffset;
+layout(location = 5) in float character_layer_index;
+layout(location = 6) in float character_bearingy;
+layout(location = 7) in vec4 character_color;
 
-// character_uv[7] 会占用连续的 locations 7~10
-layout(location = 7) in vec2 character_uvs[4];
+// character_uv[8] 会占用连续的 locations 8~11
+layout(location = 8) in vec2 character_uvs[4];
 
 const float pi = 3.14159265;
 
 out vec4 glyph_color;
 out vec2 glyph_uv;
-out float glyph_id;
+out float glyph_layer_index;
 
 void main() {
   // 缩放矩形到指定大小
   vec2 scaled_pos = vpos.xy * character_size * 0.5;
+
+	// 向上移动保留位置
+	scaled_pos.y = scaled_pos.y - character_bearingy;
 
   // 旋转矩形
   float angle_rad = radians(character_rotation);
@@ -43,10 +46,9 @@ void main() {
   vec4 glpos = projection_mat * vec4(final_pos.x, final_pos.y, 0.0, 1.0);
   gl_Position = vec4(glpos.x - 1.0, glpos.y + 1.0, glpos.zw);
 
+	// 传递数据到片段着色器
   // 选择uv光栅化
   glyph_uv = character_uvs[gl_VertexID];
-  // glyph_uv = vuv;
-
-  glyph_id = character_glyph_id;
+  glyph_layer_index = character_layer_index;
   glyph_color = character_color;
 }
