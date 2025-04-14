@@ -229,10 +229,15 @@ void OsuMap::load_from_file(const char* path) {
       auto timing_point_des =
           osureader.get_value("TimingPoints", std::to_string(i),
                               std::string("10000,333.33,4,0,0,100,1,1"));
+      std::istringstream timingiss(timing_point_des);
+      std::vector<std::string> timing_point_paras;
+      while (std::getline(timingiss, token, ',')) {
+        timing_point_paras.push_back(token);
+      }
       // 创建timing
       auto osu_timing = std::make_shared<OsuTiming>();
       // 使用读取出的参数初始化timing
-      osu_timing->from_osu_description(timing_point_des);
+      osu_timing->from_osu_description(timing_point_paras);
       // 加入timing列表
       timings.push_back(osu_timing);
     }

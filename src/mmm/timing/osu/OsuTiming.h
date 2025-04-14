@@ -25,6 +25,7 @@
 */
 
 #include <string>
+#include <vector>
 
 #include "../Timing.h"
 
@@ -37,42 +38,26 @@ class OsuTiming : public Timing {
 
   // osu-时间语法：时间,拍长,节拍,音效组,音效参数,音量,是否为非继承时间点（红线）,效果
 
-  // in-osu
   // 节拍（整型）：
   // 一小节中的拍子数量。继承时间点（绿线）的这个值无效果。
-  // in-imd
-  // none
   int32_t beat{4};
 
   // 该时间点的音效组
-  // in-osu
   // 音效组（整型）：
   // 物件使用的默认音效组（0 = 谱面默认设置（SampleSet），1 = normal，2 =
   // soft，3 = *drum）。
-  // in-imd
-  // none
   SampleSet sample_set{SampleSet::NORMAL};
 
-  // in-osu
   // 音效参数（整型）： 物件使用的自定义音效参数。 0 表示使用 osu!
   // 默认的音效。
-  // in-imd
-  // none
   int32_t sample_parameter{0};
 
-  // in-osu---转成浮点
   // *音量（整型）： 击打物件的音量（0 - 100）。
-  // in-imd
-  // none
-  float volume{1.0f};
+  int32_t volume{100};
 
-  // in-osu
   // *是否为非继承时间点（红线）（布尔值）： 字面意思。
-  // in-imd
-  // none
   bool is_inherit_timing{false};
 
-  // in-osu
   // 效果（整型）： 一位影响时间点特殊效果的参数。参见：效果部分。
   // 效果
   // 时间点可以通过在效果（整型）参数中，通过修改参数值为 1 或者
@@ -82,15 +67,13 @@ class OsuTiming : public Timing {
   // 模式下，忽略红线的第一条小节线显示
   // 若想同时开启两种效果，则可填 9（1 + 8
   // =9）0b00001001。其余的二进制位暂不使用。
-  // in-imd
-  // none
   int8_t effect{0b00000000};
 
   // 转换为osu的字符串
   std::string to_osu_description();
 
   // 从osu的字符串读取
-  void from_osu_description(const std::string &description);
+  void from_osu_description(std::vector<std::string>& description);
 };
 
 #endif  // M_OSU_TIMING_H

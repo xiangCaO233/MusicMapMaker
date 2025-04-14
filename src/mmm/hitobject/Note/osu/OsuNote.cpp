@@ -17,10 +17,10 @@ std::string OsuNote::toString() { return ""; }
 void OsuNote::from_osu_description(std::vector<std::string>& description,
                                    int32_t orbit_count) {
   // std::string s("");
-  for (const auto& var : description) {
-    // s.append(var);
-    XINFO(var);
-  }
+  // for (const auto& var : description) {
+  //  // s.append(var);
+  //  XINFO(var);
+  //}
   /*
    *长键（仅 osu!mania）
    *长键语法： x,y,开始时间,物件类型,长键音效,结束时间,长键音效组
