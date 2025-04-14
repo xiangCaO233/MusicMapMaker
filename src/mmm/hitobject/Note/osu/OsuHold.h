@@ -7,6 +7,7 @@ class OsuHold : public OsuNote {
  public:
   // 构造OsuHold
   OsuHold(uint32_t time, uint32_t holdtime);
+  OsuHold();
   // 析构OsuHold
   ~OsuHold() override;
 
@@ -17,7 +18,8 @@ class OsuHold : public OsuNote {
   std::string toString() override;
 
   // 从osu描述加载
-  void from_osu_description(const std::string &description) override;
+  void from_osu_description(std::vector<std::string> &description,
+                            int32_t orbit_count) override;
 };
 
 #endif  // M_OSUHOLD_H

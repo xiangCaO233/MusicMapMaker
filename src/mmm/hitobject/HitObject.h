@@ -5,7 +5,7 @@
 #include <string>
 
 // 基本打击物件---之后可以实现更多音游的物件
-enum class HitObjectType : uint8_t {
+enum class NoteType : uint8_t {
   // osu!mania的单键和长条
   NOTE = 0b00000001,
   HOLD = 0b01000000,

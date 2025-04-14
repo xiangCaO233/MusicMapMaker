@@ -11,7 +11,10 @@ class Note : public HitObject {
   ~Note() override;
 
   // 物件类型
-  HitObjectType type;
+  NoteType type;
+
+  // 物件所处轨道
+  int32_t orbit;
 
   // 打印用
   std::string toString() override;

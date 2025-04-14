@@ -6,9 +6,11 @@
 #include <string>
 #include <vector>
 
+#include "../../hitobject/Note/osu/OsuHold.h"
+#include "../../hitobject/Note/osu/OsuNote.h"
 #include "../../timing/osu/OsuTiming.h"
+#include "../MMap.h"
 #include "colorful-log.h"
-#include "src/mmm/map/MMap.h"
 
 OsuFileReader::OsuFileReader() {};
 
@@ -30,8 +32,7 @@ void OsuFileReader::parse_line(const std::string& line) {
         }
         case 2: {
           map_properties[current_chapter]
-                        ["breaks" + std::to_string(current_breaks_index++)] =
-                            line;
+                        [std::to_string(current_breaks_index++)] = line;
           break;
         }
         default:
@@ -97,13 +98,14 @@ void OsuMap::load_from_file(const char* path) {
         continue;
       osureader.parse_line(read_buffer);
     }
-    XINFO("parse result:");
-    for (const auto& [chapter, properties_map] : osureader.map_properties) {
-      XINFO("-----------chapter:" + chapter + "---------------");
-      for (const auto& [key, value] : properties_map) {
-        XINFO("key:" + key + "-->value:" + value);
-      }
-    }
+    // XINFO("parse result:");
+    // for (const auto& [chapter, properties_map] : osureader.map_properties) {
+    //   XINFO("-----------chapter:" + chapter + "---------------");
+    //   for (const auto& [key, value] : properties_map) {
+    //     XINFO("key:" + key + "-->value:" + value);
+    //   }
+    // }
+
     // 初始化map
 
     // general
@@ -209,8 +211,8 @@ void OsuMap::load_from_file(const char* path) {
 
     // breaks
     for (int i = 0; i < osureader.current_breaks_index; i++) {
-      auto breaks_des = osureader.get_value(
-          "Events", "breaks" + std::to_string(i), std::string("2,0,0"));
+      auto breaks_des = osureader.get_value("Events", std::to_string(i),
+                                            std::string("2,0,0"));
       std::istringstream breaksiss(breaks_des);
       std::vector<std::string> breaks_paras;
       while (std::getline(breaksiss, token, ',')) {
@@ -221,10 +223,43 @@ void OsuMap::load_from_file(const char* path) {
                           std::stoi(breaks_paras.at(2)));
     }
 
-    //   创建timing
-    //   auto osu_timing = std::make_shared<OsuTiming>();
-    //   osu_timing->from_osu_description(line);
-    //   auto general_timing = std::dynamic_pointer_cast<Timing>(osu_timing);
+    // 创建timing
+    for (int i = 0; i < osureader.current_timing_index; i++) {
+      // 按顺序读取timing点
+      auto timing_point_des =
+          osureader.get_value("TimingPoints", std::to_string(i),
+                              std::string("10000,333.33,4,0,0,100,1,1"));
+      // 创建timing
+      auto osu_timing = std::make_shared<OsuTiming>();
+      // 使用读取出的参数初始化timing
+      osu_timing->from_osu_description(timing_point_des);
+      // 加入timing列表
+      timings.push_back(osu_timing);
+    }
+
+    // 创建物件
+    for (int i = 0; i < osureader.current_hitobject_index; i++) {
+      // 按顺序读取物件
+      auto note_des =
+          osureader.get_value("HitObjects", std::to_string(i),
+                              std::string("469,192,1846,1,0,0:0:0:0:"));
+      std::istringstream noteiss(note_des);
+      std::vector<std::string> note_paras;
+      while (std::getline(noteiss, token, ',')) {
+        note_paras.push_back(token);
+      }
+      std::shared_ptr<OsuNote> osu_note;
+      // 创建物件
+      if (std::stoi(note_paras.at(3)) == 128) {
+        osu_note = std::make_shared<OsuHold>();
+      } else {
+        osu_note = std::make_shared<OsuNote>();
+      }
+      // 使用读取出的参数初始化物件
+      osu_note->from_osu_description(note_paras, CircleSize);
+      // 加入物件列表
+      hitobjects.push_back(osu_note);
+    }
   } else {
     XWARN("非.osu格式,读取失败");
   }

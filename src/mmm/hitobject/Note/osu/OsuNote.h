@@ -1,6 +1,9 @@
 #ifndef M_OSUNOTE_H
 #define M_OSUNOTE_H
 
+#include <cstdint>
+#include <vector>
+
 #include "../../../SampleSet.h"
 #include "../Note.h"
 
@@ -72,7 +75,8 @@ struct NoteSampleGroup {
 class OsuNote : public Note {
  public:
   // 构造OsuNote
-  OsuNote(uint32_t time);
+  explicit OsuNote(uint32_t time);
+  OsuNote();
   // 析构OsuNote
   ~OsuNote() override;
   // note采样
@@ -85,7 +89,8 @@ class OsuNote : public Note {
   std::string toString() override;
 
   // 从osu描述加载
-  virtual void from_osu_description(const std::string &description);
+  virtual void from_osu_description(std::vector<std::string> &description,
+                                    int32_t orbit_count);
 };
 
 #endif  // M_OSUNOTE_H
