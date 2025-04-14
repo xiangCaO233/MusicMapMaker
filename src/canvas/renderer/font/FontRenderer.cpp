@@ -222,6 +222,9 @@ void FontRenderer::generate_cjk_buffer(
   }
   // 创建常用中文字符串
   std::u32string cjkstr(
+      U" \\!\"#$%&'()*+,-./"
+      U"0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
+      U"abcdefghijklmnopqrstuvwxyz{|}~"
       U"一乙二十丁厂七卜人入八九几儿了力乃刀又三于干亏士工土才寸下大丈与万上小"
       U"口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉马乡丰"
       U"王井开夫天无元专云扎艺木五支厅不太犬区历尤友匹车巨牙屯比互切瓦止少日中"
@@ -427,6 +430,39 @@ void FontRenderer::check_u32string(const std::u32string& str,
 
   unbind();
 }
+// 获取字形
+void FontRenderer::get_character_glyph(const std::string& font_family,
+                                       uint32_t font_size,
+                                       const char32_t character,
+                                       CharacterGlyph& glyph) {
+  bool query_failed{false};
+  auto packs_it = font_packs_mapping.find(font_family);
+  if (packs_it == font_packs_mapping.end()) {
+    XCRITICAL("不存在字体[" + std::string(font_family) + "]");
+    query_failed = true;
+  }
+  auto pack_it = packs_it->second.find(font_size);
+  if (pack_it == packs_it->second.end()) {
+    XCRITICAL("不存在[" + std::to_string(font_size) + "]号字体包");
+    query_failed = true;
+  }
+
+  auto character_it = pack_it->second.character_set.find(character);
+  if (character_it == pack_it->second.character_set.end()) {
+    XCRITICAL("不存在[" +
+              std::string(reinterpret_cast<const char*>(&character)) +
+              "]字符数据");
+    query_failed = true;
+  }
+
+  if (query_failed) {
+    glyph.pos_in_atlas = {0, 0};
+    glyph.size = {0, 0};
+    glyph.glyph_id = 0;
+  } else {
+    glyph = character_it->second;
+  }
+}
 
 // 同步数据
 void FontRenderer::synchronize_data(InstanceDataType data_type,
@@ -436,8 +472,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
       auto pos = static_cast<QVector2D*>(data);
       if (position_data.empty() || position_data.size() <= instance_index) {
         // XWARN("添加位置数据");
-        position_data.push_back(*pos +
-                                QVector2D(current_character_position, 0));
+        position_data.push_back(*pos);
         synchronize_update_mark(instance_index);
       } else {
         if (*pos != position_data.at(instance_index)) {
@@ -445,8 +480,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
           // 更新此实例位置数据
-          position_data[instance_index] =
-              *pos + QVector2D(current_character_position, 0);
+          position_data[instance_index] = *pos;
         }
       }
       break;
@@ -487,45 +521,10 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
     }
     case InstanceDataType::TEXT: {
       auto text = static_cast<Text*>(data);
-      // TODO(xiang 2025-04-12): 查询size,uv,id
-      bool query_failed{false};
-      auto packs_it = font_packs_mapping.find(text->font_family);
-      if (packs_it == font_packs_mapping.end()) {
-        XCRITICAL("不存在字体[" + std::string(text->font_family) + "]");
-        query_failed = true;
-      }
-      auto pack_it = packs_it->second.find(text->font_size);
-      if (pack_it == packs_it->second.end()) {
-        XCRITICAL("不存在[" + std::to_string(text->font_size) + "]号字体包");
-        query_failed = true;
-      }
-
-      auto character_it = pack_it->second.character_set.find(text->character);
-      if (character_it == pack_it->second.character_set.end()) {
-        XCRITICAL("不存在[" +
-                  std::string(reinterpret_cast<const char*>(&text->character)) +
-                  "]字符数据");
-        query_failed = true;
-      }
 
       CharacterGlyph glyph;
-      if (query_failed) {
-        glyph.pos_in_atlas = {0, 0};
-        glyph.size = {0, 0};
-        glyph.glyph_id = 0;
-      } else {
-        glyph = character_it->second;
-        /*
-         *（单位：1/64像素）
-         *（单位：1/64像素）
-         *（单位：1/64像素）
-         *（单位：1/64像素）
-         *（单位：1/64像素）
-         *（单位：1/64像素）
-         *（单位：1/64像素）
-         */
-        current_character_position += glyph.xadvance / 64;
-      }
+      get_character_glyph(text->font_family, text->font_size, text->character,
+                          glyph);
 
       // layer_index
       auto layer_index = glyph.glyph_id;
@@ -599,9 +598,6 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
           // 更新此实例字符uv集数据
           uvset_data[instance_index] = uvset;
         }
-      }
-      if (text->is_string_ending) {
-        current_character_position = 0;
       }
       break;
     }
@@ -688,7 +684,7 @@ void FontRenderer::update_gpu_memory() {
       memory_block[(i - instance_start_index) * float_stride + 10] =
           fill_color_data[i].w();
       // 纹理uv集
-      auto& uvset = uvset_data[i];
+      const auto& uvset = uvset_data[i];
       memory_block[(i - instance_start_index) * float_stride + 11] =
           uvset.p1.x();
       memory_block[(i - instance_start_index) * float_stride + 12] =

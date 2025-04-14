@@ -300,14 +300,20 @@ void RendererManager::sync_renderer(
 void RendererManager::addText(const QPointF& pos, std::u32string& text,
                               float font_size, std::string font_family,
                               const QColor& fill_color, float rotation) {
+  uint32_t xoffset = 0;
   // 在队尾直接生成渲染指令
   for (int i = 0; i < text.size(); i++) {
+    Text t(font_family, font_size, text.at(i), i == text.size() - 1);
+    CharacterGlyph glyph;
+    font_renderer->get_character_glyph(t.font_family, t.font_size, t.character,
+                                       glyph);
     // 逐字符生成渲染指令
-    command_list.emplace_back(
-        true, Text(font_family, font_size, text.at(i), i == text.size() - 1),
-        false, ShapeType::TEXT, QRectF(pos.x(), pos.y(), 0, 0), rotation,
-        fill_color, 0.0f, nullptr, texture_effect, texture_alignmode,
-        texture_fillmode, texture_complementmode);
+    command_list.emplace_back(true, t, false, ShapeType::TEXT,
+                              QRectF(pos.x() + xoffset, pos.y(), 0, 0),
+                              rotation, fill_color, 0.0f, nullptr,
+                              texture_effect, texture_alignmode,
+                              texture_fillmode, texture_complementmode);
+    xoffset += glyph.xadvance / 64;
   }
 }
 

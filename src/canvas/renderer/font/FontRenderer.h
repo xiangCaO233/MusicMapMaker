@@ -16,7 +16,7 @@
 
 class GLCanvas;
 
-// 字符位图
+// 字符字形
 struct CharacterGlyph {
   // 纹理ID
   uint32_t glyph_id;
@@ -108,13 +108,11 @@ class FontRenderer : public AbstractRenderer {
    *layout(location = 8) in vec2 character_uvs[4];
    */
   uint32_t fInstanceVBO;
-  // 实际采样使用的纹理数组(作为纹理集序列存储使用的字符位图)
-  // 上一个字符的偏移
-  uint32_t current_character_position{0};
   // 当前写入位置
   int currentX = 0;
   int currentY = 0;
   int maxRowHeight = 0;
+  // 实际采样使用的纹理数组(作为纹理集序列存储使用的字符位图)
   uint32_t glyphs_texture_array;
   // 预计更新gpu内存表(实例索引-实例数)
   std::vector<std::pair<size_t, uint32_t>> update_list;
@@ -135,6 +133,10 @@ class FontRenderer : public AbstractRenderer {
   // 检查载入字符串
   void check_u32string(const std::u32string& str, uint32_t font_size,
                        FT_Face& face);
+
+  // 获取字形
+  void get_character_glyph(const std::string& font_family, uint32_t font_size,
+                           const char32_t character, CharacterGlyph& glyph);
 
   // 初始化字符位图缓存
   void generate_ascii_buffer(const std::string_view& font_family_nameconst);

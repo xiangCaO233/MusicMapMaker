@@ -66,7 +66,13 @@ class GLCanvas : public QOpenGLWidget,
   // 析构GLCanvas
   ~GLCanvas() override;
 
-  long pre_frame_time = 100;
+  // 上一次更新fps的时间
+  long pre_update_fps{0};
+  long pre_update_frame_time{100};
+
+  // 上一次的帧生成时间
+  long pre_frame_time{100};
+
   // 刷新定时器
   QTimer *refresh_timer;
 

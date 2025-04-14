@@ -341,20 +341,22 @@ void GLCanvas::paintGL() {
   //                                Qt::green, 0.0f, 1.35f, true);
 
   // 执行渲染
-  auto theoretical_fps =
-      std::to_string(1 / (((float)pre_frame_time) / 1000000.0));
+  auto theoretical_fps = std::to_string(
+      int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
   // 创建 UTF-8 到 UTF-32 的转换器
   std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
   std::u32string str = converter.from_bytes(theoretical_fps);
-  str = str + U"fps";
+  if (std::chrono::duration_cast<std::chrono::milliseconds>(before).count() -
+          pre_update_fps >
+      500) {
+    pre_update_frame_time = pre_frame_time;
+    pre_update_fps =
+        std::chrono::duration_cast<std::chrono::milliseconds>(before).count();
+  }
+  str = U"理论:" + str + U"fps";
+  renderer_manager->addText(QPointF(0, 30), str, 36, "JMH",
+                            QColor(255, 183, 197), 0.0f);
 
-  renderer_manager->addText(QPointF(0, 30), str, 16,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
-  std::u32string s = U"aaa";
-  renderer_manager->addText(QPointF(100, 30), s, 16,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
   renderer_manager->renderAll();
 
   auto after = std::chrono::high_resolution_clock::now().time_since_epoch();
