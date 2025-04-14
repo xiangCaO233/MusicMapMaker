@@ -4,14 +4,7 @@
 
 #include <QTimer>
 
-MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
-  // 添加实时鼠标位置
-  live_instances.try_emplace(
-      "mouse",
-      QRectF(mouse_pos.x() - mouse_size / 2, mouse_pos.y() - mouse_size / 2,
-             mouse_size, mouse_size),
-      ShapeType::OVAL, TextureEffect::GLOWING);
-}
+MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {}
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;
 
@@ -38,13 +31,6 @@ void MapWorkspaceCanvas::mouseDoubleClickEvent(QMouseEvent *event) {
 void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mouseMoveEvent(event);
-  // 更新实时鼠标位置
-  auto &mouse = live_instances["mouse"];
-  mouse.bounds.setX(mouse_pos.x() - mouse_size / 2);
-  mouse.bounds.setY(mouse_pos.y() - mouse_size / 2);
-  mouse.bounds.setWidth(mouse_size);
-  mouse.bounds.setHeight(mouse_size);
-  // 在鼠标附近更新粒子
 }
 
 // 鼠标滚动事件

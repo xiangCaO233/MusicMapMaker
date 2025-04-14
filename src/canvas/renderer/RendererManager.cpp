@@ -1,8 +1,14 @@
 #include "RendererManager.h"
 
+#include <qdeadlinetimer.h>
+#include <qpaintdevice.h>
 #include <qvectornd.h>
 
+#include <cmath>
 #include <cstdint>
+#include <glm/fwd.hpp>
+#include <glm/glm.hpp>
+#include <glm/matrix.hpp>
 #include <memory>
 
 #include "../../log/colorful-log.h"
@@ -268,12 +274,10 @@ void RendererManager::sync_renderer(
 
     // 同步贴图方式数据
     uint32_t policy = 0;
-    if (texture) {
-      policy = (static_cast<uint32_t>(command.texture_effect) |
-                static_cast<uint32_t>(command.texture_complementmode) |
-                static_cast<uint32_t>(command.texture_fillmode)) |
-               (static_cast<uint32_t>(command.texture_alignmode));
-    }
+    policy = static_cast<uint32_t>(command.texture_effect) |
+             static_cast<uint32_t>(command.texture_complementmode) |
+             static_cast<uint32_t>(command.texture_fillmode) |
+             static_cast<uint32_t>(command.texture_alignmode);
     renderer->synchronize_data(
         InstanceDataType::TEXTURE_POLICY,
         (command.is_volatile ? dynamic_instance_index : static_instance_index),
@@ -294,6 +298,35 @@ void RendererManager::sync_renderer(
         (command.is_volatile ? dynamic_instance_index : static_instance_index),
         &command.radius);
   }
+}
+
+// 添加直线
+void RendererManager::addLine(const QPointF& p1, const QPointF& p2,
+                              float line_width,
+                              std::shared_ptr<TextureInstace> texture,
+                              const QColor& fill_color, bool is_volatile) {
+  // 回求旋转角
+  float theta = std::atan2(p2.y() - p1.y(), p2.x() - p1.x());
+  glm::vec2 center((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2);
+
+  // 反向旋转
+  glm::mat2x2 rotation_mat = {std::cos(theta), std::sin(theta),
+                              -std::sin(theta), std::cos(theta)};
+  // rotation_mat = glm::transpose(rotation_mat);
+  auto prep1 =
+      rotation_mat * glm::vec2(p1.x() - center.x, p1.y() - center.y) + center;
+  auto prep2 =
+      rotation_mat * glm::vec2(p2.x() - center.x, p2.y() - center.y) + center;
+  // 原位置
+  QRectF desRect(prep1.x, prep1.y - line_width / 2, prep2.x - prep1.x,
+                 line_width);
+
+  // 再旋转
+  // 在队尾直接生成渲染指令
+  command_list.emplace_back(false, Text("", 0, U' ', false), is_volatile,
+                            ShapeType::RECT, desRect, theta, fill_color, 0.0f,
+                            texture, texture_effect, texture_alignmode,
+                            texture_fillmode, texture_complementmode);
 }
 
 // 添加文本

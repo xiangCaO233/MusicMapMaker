@@ -22,30 +22,6 @@
 
 enum class TexturePoolType;
 class TextureAtlas;
-struct ShapeInstance {
-  // 图形的位置
-  QRectF bounds;
-  // 形状
-  ShapeType shape;
-  // 特效
-  TextureEffect effect;
-};
-
-struct Particle {
-  // 默认圆形
-  // 颜色
-  std::vector<uint8_t> color;
-  // 半径
-  QVector2D radius;
-  // 位置
-  QVector2D position;
-  // 尺寸
-  QVector2D size;
-  // 速度
-  float vx, vy;
-  // 生命周期
-  float life;
-};
 
 class GLCanvas : public QOpenGLWidget,
 #ifdef __APPLE__
@@ -81,10 +57,9 @@ class GLCanvas : public QOpenGLWidget,
 
   // 需要更新采样器uniform location
   static bool need_update_sampler_location;
+
   // 渲染管理器
   RendererManager *renderer_manager;
-
-  std::unordered_map<std::string, ShapeInstance> live_instances;
 
   // 当前纹理集信息
   std::shared_ptr<TextureAtlas> current_atlas;

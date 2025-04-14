@@ -201,8 +201,6 @@ void GLCanvas::resizeGL(int w, int h) {
 
   // 更新uniform
   renderer_manager->update_all_projection_mat("projection_mat", proj);
-  // renderer_manager->set_fontpool_uniform_float("viewport_width", w);
-  // renderer_manager->set_fontpool_uniform_float("viewport_height", h);
 
   // 标记需要更新纹理采样器位置
   renderer_manager->font_renderer->need_update_sampler_location = true;
@@ -213,66 +211,6 @@ void GLCanvas::resizeGL(int w, int h) {
   }
 }
 
-// void generateRandomQRectF(RendererManager *&renderer_manager,
-//                           const std::shared_ptr<TextureInstace> &tex,
-//                           qreal maxX, qreal maxY, qreal maxWidth,
-//                           qreal maxHeight) {
-//   // 获取全局随机数生成器
-//   QRandomGenerator *rand = QRandomGenerator::global();
-//
-//   // 随机生成左上角坐标(x, y)
-//   qreal x = rand->bounded(maxX);
-//   qreal y = rand->bounded(maxY);
-//   qreal width;
-//   qreal height;
-//
-//   width = 40;
-//   height = 40;
-//
-//   // 仅矩形位置变化--使用dynamic降低glcall和内存传输
-//   QRectF rec(x, y, width, height);
-//   renderer_manager->addRoundRect(
-//       rec, tex, Qt::red, 0, (float)(rand->bounded(100)) / 100.0f + 1.0f,
-//       true);
-//
-//   // 随机生成宽度和高度和角度--增加glcall
-//   // width = rand->bounded(maxWidth);
-//   // height = rand->bounded(maxHeight);
-//   // if (x + width > maxX) {
-//   //   width = maxX - x;
-//   // }
-//   // if (y + height > maxY) {
-//   //   height = maxY - y;
-//   // }
-//   // auto rotation = rand->bounded(360);
-//   // QRectF rec(x, y, width, height);
-//   // renderer_manager->addRect(rec, tex, Qt::red, rotation, false);
-//
-//   // 渲染器随机-- - 巨幅增加glcall和drawcall
-//   // renderer_manager->addRect(rec, tex, Qt::red, 0, rand->bounded(100) >
-//   50);
-//   // renderer_manager->addRect(rec, tex, Qt::red, rotation,
-//   //                          rand->bounded(100) > 50);
-//
-//   // 渲染器随机且图形随机---超巨幅增加glcall和drawcall
-//   // if (rand->bounded(100) > 50) {
-//   //   renderer_manager->addRect(rec, tex, Qt::red, 0, rand->bounded(100) >
-//   50);
-//   // } else {
-//   //   renderer_manager->addEllipse(rec, tex, Qt::red, 0, rand->bounded(100)
-//   >
-//   //   50);
-//   // }
-//
-//   // if (rand->bounded(100) > 50) {
-//   //   renderer_manager->addRect(rec, tex, Qt::red, rotation,
-//   //                             rand->bounded(100) > 50);
-//   // } else {
-//   //   renderer_manager->addEllipse(rec, tex, Qt::red, rotation,
-//   //                                rand->bounded(100) > 50);
-//   // }
-// }
-
 // 绘制画布
 void GLCanvas::paintGL() {
   static long pre_frame_time = 100;
@@ -282,63 +220,6 @@ void GLCanvas::paintGL() {
   // 背景色
   GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
-
-  for (const auto &[name, shape] : live_instances) {
-    renderer_manager->texture_effect = shape.effect;
-    switch (shape.shape) {
-      case ShapeType::OVAL: {
-        renderer_manager->addEllipse(shape.bounds, nullptr,
-                                     QColor(255, 255, 255, 188), 0.0f, true);
-        break;
-      }
-      case ShapeType::RECT: {
-        renderer_manager->addRect(shape.bounds, nullptr, QColor(255, 255, 255),
-                                  0.0f, true);
-        break;
-      }
-    }
-  }
-
-  // 添加渲染内容--4000矩形
-  // auto it = texture_map.begin();
-  // for (int i = 0; i < 128; i++) {
-  //   it++;
-  //   if (it == texture_map.end()) {
-  //     it = texture_map.begin();
-  //   }
-  //   generateRandomQRectF(renderer_manager, it->second, 400, 530, 100, 100);
-  // }
-
-  // 添加文本
-  // auto text_pos = QPointF(300, 250);
-  // auto text_pos2 = QPointF(300, 270);
-  // auto text_pos3 = QPointF(300, 310);
-  // auto text_pos4 = QPointF(300, 360);
-  // auto text_pos5 = QPointF(300, 420);
-  // auto text_pos6 = QPointF(300, 480);
-  // std::u32string str = U"nm$l";
-  // auto color = QColor(255, 183, 197);
-  // renderer_manager->addText(text_pos, str, 12, "ComicShannsMono Nerd Font",
-  //                          color, 0.0f);
-  // renderer_manager->addText(text_pos2, str, 16, "ComicShannsMono Nerd Font",
-  //                          color, 0.0f);
-  // renderer_manager->addText(text_pos3, str, 24, "ComicShannsMono Nerd Font",
-  //                          color, 0.0f);
-  // renderer_manager->addText(text_pos4, str, 36, "ComicShannsMono Nerd Font",
-  //                          color, 0.0f);
-  // renderer_manager->addText(text_pos5, str, 48, "ComicShannsMono Nerd Font",
-  //                          color, 0.0f);
-
-  // std::u32string strcjk = U"早上好";
-  // renderer_manager->addText(text_pos6, strcjk, 36, "JMH", color, 0.0f);
-
-  // auto rect = QRectF(50, 50, 250, 300);
-  // renderer_manager->addRoundRect(rect, texture_map["yuanchou.png"], Qt::red,
-  //                                0.0f, 1.4f, true);
-
-  // auto mouse_rec = QRectF(mouse_pos.x() - 20, mouse_pos.y() - 20, 41, 41);
-  // renderer_manager->addRoundRect(mouse_rec, texture_map["yuanchou.png"],
-  //                                Qt::green, 0.0f, 1.35f, true);
 
   // 执行渲染
   auto theoretical_fps = std::to_string(
@@ -354,9 +235,11 @@ void GLCanvas::paintGL() {
         std::chrono::duration_cast<std::chrono::milliseconds>(before).count();
   }
   str = U"理论:" + str + U"fps";
-  renderer_manager->addText(QPointF(0, 30), str, 36, "JMH",
+  renderer_manager->addText(QPointF(0, 30), str, 24, "JMH",
                             QColor(255, 183, 197), 0.0f);
 
+  renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
+                            QColor(0, 0, 0, 255), true);
   renderer_manager->renderAll();
 
   auto after = std::chrono::high_resolution_clock::now().time_since_epoch();

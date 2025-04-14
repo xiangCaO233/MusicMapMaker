@@ -84,6 +84,8 @@ const uint NONE = 0x0000;
 const uint BLUR = 0x1000;
 // 灰度
 const uint GRAYSCALE = 0x2000;
+// 发光
+const uint GLOWING = 0x3000;
 
 // 纹理补充模式
 // 使用填充色
@@ -430,13 +432,26 @@ void main() {
       discard;
     }
   }
+
   switch (texture_effect) {
     case NONE: {
       // 不使用特效
       FragColor = texture_color;
       break;
     }
-    case 1: {
+    case BLUR: {
+      // 实现模糊特效
+      FragColor = texture_color;
+      break;
+    }
+    case GRAYSCALE: {
+      // 实现灰度处理
+      FragColor = texture_color;
+      break;
+    }
+    case GLOWING: {
+      // 实现发光特效
+      FragColor = texture_color;
       break;
     }
   }

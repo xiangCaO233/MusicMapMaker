@@ -333,10 +333,10 @@ void FontRenderer::generate_cjk_buffer(
   // check_u32string(cjkstr, 18, face_it->second);
   // check_u32string(cjkstr, 20, face_it->second);
   // check_u32string(cjkstr, 22, face_it->second);
-  // check_u32string(cjkstr, 24, face_it->second);
+  check_u32string(cjkstr, 24, face_it->second);
   // check_u32string(cjkstr, 28, face_it->second);
   check_u32string(cjkstr, 36, face_it->second);
-  // check_u32string(cjkstr, 48, face_it->second);
+  check_u32string(cjkstr, 48, face_it->second);
 }
 
 // 获取空闲层

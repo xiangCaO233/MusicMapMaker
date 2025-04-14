@@ -1,6 +1,8 @@
 #ifndef RENDERER_MANAGER_H
 #define RENDERER_MANAGER_H
 
+#include <qpoint.h>
+
 #include <map>
 #include <memory>
 #include <queue>
@@ -86,6 +88,11 @@ class RendererManager {
 
   // 使用指定纹理池
   void use_texture_pool(const std::shared_ptr<BaseTexturePool>& texture_pool);
+
+  // 添加直线
+  void addLine(const QPointF& p1, const QPointF& p2, float line_width,
+               std::shared_ptr<TextureInstace> texture,
+               const QColor& fill_color, bool is_volatile);
 
   // 添加文本
   void addText(const QPointF& pos, std::u32string& text, float font_size,
