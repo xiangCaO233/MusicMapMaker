@@ -208,25 +208,27 @@ void GLCanvas::resizeGL(int w, int h) {
 #ifdef _WIN32
 #include <Windows.h>
 // UTF-8 → UTF-16
-std::wstring utf8_to_utf16(const std::string& utf8) {
+std::wstring utf8_to_utf16(const std::string &utf8) {
   if (utf8.empty()) return L"";
-  int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8.data(), (int)utf8.size(), nullptr, 0);
+  int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8.data(),
+                                        (int)utf8.size(), nullptr, 0);
   std::wstring utf16(size_needed, 0);
-  MultiByteToWideChar(CP_UTF8, 0, utf8.data(), (int)utf8.size(), utf16.data(), size_needed);
+  MultiByteToWideChar(CP_UTF8, 0, utf8.data(), (int)utf8.size(), utf16.data(),
+                      size_needed);
   return utf16;
 }
 
 // UTF-16 → UTF-32
-std::u32string utf16_to_utf32(const std::wstring& utf16) {
+std::u32string utf16_to_utf32(const std::wstring &utf16) {
   std::u32string utf32;
   for (wchar_t c : utf16) {
-      utf32.push_back(static_cast<char32_t>(c)); // 简单转换（假设没有代理对）
+    utf32.push_back(static_cast<char32_t>(c));  // 简单转换（假设没有代理对）
   }
   return utf32;
 }
 
 // 组合函数：UTF-8 → UTF-32
-std::u32string utf8_to_utf32(const std::string& utf8) {
+std::u32string utf8_to_utf32(const std::string &utf8) {
   std::wstring utf16 = utf8_to_utf16(utf8);
   return utf16_to_utf32(utf16);
 }
@@ -249,18 +251,18 @@ void GLCanvas::paintGL() {
       int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
   auto glcall = std::to_string(pre_glcalls);
   auto drawcall = std::to_string(pre_drawcall);
-  // 创建 UTF-8 到 UTF-32 的转换器
-  #ifdef _WIN32
+// 创建 UTF-8 到 UTF-32 的转换器
+#ifdef _WIN32
   // 使用 Windows API 转换
-std::u32string fpsstr = utf8_to_utf32(theoretical_fps);
-std::u32string glcallstr = utf8_to_utf32(glcall);
-std::u32string drawcallstr = utf8_to_utf32(drawcall);
-  #else
+  std::u32string fpsstr = utf8_to_utf32(theoretical_fps);
+  std::u32string glcallstr = utf8_to_utf32(glcall);
+  std::u32string drawcallstr = utf8_to_utf32(drawcall);
+#else
   std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
   std::u32string fpsstr = converter.from_bytes(theoretical_fps);
   std::u32string glcallstr = converter.from_bytes(glcall);
   std::u32string drawcallstr = converter.from_bytes(drawcall);
-  #endif //_WIN32
+#endif  //_WIN32
   if (std::chrono::duration_cast<std::chrono::milliseconds>(before).count() -
           pre_update_fps >
       200) {
