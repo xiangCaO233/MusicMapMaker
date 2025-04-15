@@ -263,6 +263,7 @@ void OsuMap::load_from_file(const char* path) {
         hold->from_osu_description(note_paras, CircleSize);
         // 创建一个面尾物件
         auto holdend = std::make_shared<OsuHoldEnd>(hold);
+        holdend->is_hold_end = true;
         hitobjects.emplace_back(holdend);
       } else {
         osu_note = std::make_shared<OsuNote>();

@@ -78,6 +78,29 @@
        <property name="styleSheet">
         <string notr="true"/>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="spacing">
+         <number>2</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="address_line"/>
+        </item>
+        <item>
+         <widget class="QTreeView" name="file_tree"/>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="right_container" native="true">
        <property name="sizePolicy">

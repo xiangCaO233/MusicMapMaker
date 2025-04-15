@@ -43,16 +43,12 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(red);
   t4.emplace_back(blue);
 
-  // 初始化默认纹理
-  // load_texture_from_path("../resources/textures/default/hitobject",
-  //                        TexturePoolType::ARRAY, true);
-
   // 初始化定时器
   refresh_timer = new QTimer(this);
   // Lambda 捕获 this,调用成员函数
   QObject::connect(refresh_timer, &QTimer::timeout,
                    [this]() { this->update_canvas(); });
-  refresh_timer->start(timer_update_time);
+  // refresh_timer->start(timer_update_time);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;
@@ -87,6 +83,8 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
   current_time_stamp += event->pixelDelta().y() / 3;
+  update_canvas();
+  repaint();
 }
 
 // 键盘按下事件
@@ -243,7 +241,6 @@ void MapWorkspaceCanvas::update_canvas() {
     // 未暂停,更新当前时间戳
     current_time_stamp += timer_update_time;
   }
-  update();
 }
 
 // 绘制顶部栏
@@ -334,10 +331,11 @@ void MapWorkspaceCanvas::draw_beats() {
 
 // 绘制物件
 void MapWorkspaceCanvas::draw_hitobject() {
+  auto current_size = size();
   // 声明+预分配内存
-  std::vector<std::shared_ptr<HitObject>> temp_hitobjects;
+  std::vector<std::shared_ptr<Note>> temp_notes;
   std::vector<std::shared_ptr<Hold>> temp_holds;
-  temp_hitobjects.reserve(buffer_objects.size());
+  temp_notes.reserve(buffer_objects.size());
   temp_holds.reserve(buffer_objects.size());
 
   // 检查缓冲区,取出需要渲染的物件
@@ -356,7 +354,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
       }
       if (!added) {
         temp_holds.emplace_back(head);
-        temp_hitobjects.emplace_back(head);
+        temp_notes.emplace_back(head);
       }
     } else {
       // 非面尾可转为Note
@@ -366,10 +364,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
         auto hold = std::dynamic_pointer_cast<Hold>(buffer_objects[i]);
         temp_holds.emplace_back(hold);
       }
-      temp_hitobjects.emplace_back(note);
+      temp_notes.emplace_back(note);
     }
   }
-  std::sort(temp_hitobjects.begin(), temp_hitobjects.end(),
+  std::sort(temp_notes.begin(), temp_notes.end(),
             [](const std::shared_ptr<HitObject> &h1,
                const std::shared_ptr<HitObject> &h2) { return *h1 < *h2; });
   // TODO(xiang 2025-04-15): 执行渲染
@@ -379,7 +377,31 @@ void MapWorkspaceCanvas::draw_hitobject() {
       auto omap = std::dynamic_pointer_cast<OsuMap>(working_map);
       int32_t max_orbit = omap->CircleSize;
       // 物件头的尺寸
-      auto head_size = texture_map["Blue.png"]->texture_image.size();
+      auto &texture = texture_map["Blue.png"];
+      auto head_size = texture->texture_image.size();
+      for (const auto &note : temp_notes) {
+        switch (note->type) {
+          case NoteType::NOTE: {
+            // 判定线位置
+            auto judgeline_pos =
+                current_size.height() * (1 - judgeline_position);
+            // 物件距离判定线距离从下往上--反转
+            // 当前物件位置
+            auto note_pos =
+                judgeline_pos -
+                (note->timestamp - current_time_stamp) * timeline_zoom;
+            double x = current_size.width() / max_orbit * (note->orbit + 1);
+            QRectF note_bound(x, note_pos, head_size.width(),
+                              head_size.height());
+            renderer_manager->addRect(note_bound, texture, QColor(0, 0, 0, 255),
+                                      0, true);
+            break;
+          }
+          case NoteType::HOLD: {
+            break;
+          }
+        }
+      }
       break;
     }
     case MapType::RMMAP: {
@@ -399,9 +421,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
 void MapWorkspaceCanvas::push_shape() {
   draw_top_bar();
   draw_preview_content();
-  draw_judgeline();
-
   draw_beats();
+  draw_hitobject();
+
+  draw_judgeline();
 }
 
 // 切换到指定图

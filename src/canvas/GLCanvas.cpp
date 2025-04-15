@@ -1,10 +1,12 @@
 #include "GLCanvas.h"
 
 #include <GL/gl.h>
+#include <qcolor.h>
 #include <qdir.h>
 #include <qdiriterator.h>
 #include <qlogging.h>
 #include <qobject.h>
+#include <qpaintdevice.h>
 #include <qpainter.h>
 #include <qpoint.h>
 #include <qtypes.h>
@@ -176,12 +178,16 @@ void GLCanvas::initializeGL() {
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
 
+  // 初始化默认纹理
+  load_texture_from_path("../resources/textures/default/hitobject",
+                         TexturePoolType::ARRAY, true);
+
   // 初始化纹理
   // load_texture_from_path("../resources/textures/test/other",
   //                        TexturePoolType::BASE_POOL, false);
-  // load_texture_from_path("../resources/textures/test/1024",
-  //                       TexturePoolType::ARRAY, true);
-  // finalize_texture_loading();
+  load_texture_from_path("../resources/textures/test/1024",
+                         TexturePoolType::ARRAY, true);
+  finalize_texture_loading();
 }
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
@@ -282,6 +288,10 @@ void GLCanvas::paintGL() {
   renderer_manager->addText(QPointF(0, 82), drawcallstr, 24,
                             "ComicShannsMono Nerd Font", QColor(255, 183, 197),
                             0.0f);
+
+  QRectF rec(100, 100, 200, 200);
+  renderer_manager->addRect(rec, texture_map["yuanchou.png"],
+                            QColor(255, 255, 255), 0.0f, true);
 
   // renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
   //                           QColor(0, 0, 0, 255), true);
