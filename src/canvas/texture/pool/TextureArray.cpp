@@ -181,20 +181,22 @@ void TextureArray::upload_atlas_data() {
 void TextureArray::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
                        std::shared_ptr<AbstractRenderer>& renderer_context,
                        size_t batch_index) {
+  bool need_update{false};
   // 检查更新纹理池使用类型
   if (renderer_context->current_pool_type != pool_type) {
     renderer_context->shader->set_uniform_integer("texture_pool_usage",
                                                   static_cast<int>(pool_type));
     renderer_context->current_pool_type = pool_type;
+    need_update = true;
   }
   // 检查更新是否使用纹理集
   if (renderer_context->is_current_atlas != use_atlas) {
     renderer_context->shader->set_uniform_integer("useatlas",
                                                   use_atlas ? 1 : 0);
     renderer_context->is_current_atlas = use_atlas;
+    need_update = true;
   }
 
-  bool need_update{false};
   // 检查渲染器当前正在使用的纹理池
   if (renderer_context->current_use_pool != pool_reference) {
     // 不是使用此纹理池

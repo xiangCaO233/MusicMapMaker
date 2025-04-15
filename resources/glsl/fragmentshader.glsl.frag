@@ -454,5 +454,7 @@ void main() {
       FragColor = texture_color;
       break;
     }
+    default:
+      FragColor = texture_color;
   }
 }

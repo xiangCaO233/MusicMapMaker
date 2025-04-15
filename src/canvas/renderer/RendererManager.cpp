@@ -412,6 +412,9 @@ void RendererManager::renderAll() {
         }
       } else {
         // 不使用纹理池
+        operetion.renderer->current_pool_type = TexturePoolType::UNKNOWN;
+        operetion.renderer->is_current_atlas = false;
+        operetion.renderer->current_use_pool = nullptr;
         operetion.renderer->shader->set_uniform_integer("texture_pool_usage",
                                                         0);
       }

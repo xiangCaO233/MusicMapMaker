@@ -185,8 +185,8 @@ void GLCanvas::initializeGL() {
   // 初始化纹理
   // load_texture_from_path("../resources/textures/test/other",
   //                        TexturePoolType::BASE_POOL, false);
-  load_texture_from_path("../resources/textures/test/1024",
-                         TexturePoolType::ARRAY, true);
+  // load_texture_from_path("../resources/textures/test/1024",
+  //                       TexturePoolType::ARRAY, true);
   finalize_texture_loading();
 }
 void GLCanvas::resizeGL(int w, int h) {
@@ -289,10 +289,10 @@ void GLCanvas::paintGL() {
                             "ComicShannsMono Nerd Font", QColor(255, 183, 197),
                             0.0f);
 
-  QRectF rec(100, 100, 200, 200);
-  renderer_manager->addRect(rec, texture_map["yuanchou.png"],
-                            QColor(255, 255, 255), 0.0f, true);
-
+  //  QRectF rec(100, 100, 200, 200);
+  //  renderer_manager->addRect(rec, texture_map["yuanchou.png"],
+  //                            QColor(255, 255, 255), 0.0f, true);
+  //
   // renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
   //                           QColor(0, 0, 0, 255), true);
   renderer_manager->renderAll();

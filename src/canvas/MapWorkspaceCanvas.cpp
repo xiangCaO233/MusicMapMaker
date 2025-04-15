@@ -48,7 +48,7 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   // Lambda 捕获 this,调用成员函数
   QObject::connect(refresh_timer, &QTimer::timeout,
                    [this]() { this->update_canvas(); });
-  // refresh_timer->start(timer_update_time);
+  refresh_timer->start(timer_update_time);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;
@@ -83,8 +83,6 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
   current_time_stamp += event->pixelDelta().y() / 3;
-  update_canvas();
-  repaint();
 }
 
 // 键盘按下事件
@@ -241,6 +239,7 @@ void MapWorkspaceCanvas::update_canvas() {
     // 未暂停,更新当前时间戳
     current_time_stamp += timer_update_time;
   }
+  repaint();
 }
 
 // 绘制顶部栏
