@@ -43,8 +43,8 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(blue);
 
   // 初始化默认纹理
-  load_texture_from_path("../resources/textures/default/hitobject",
-                         TexturePoolType::ARRAY, true);
+  // load_texture_from_path("../resources/textures/default/hitobject",
+  //                        TexturePoolType::ARRAY, true);
 
   // 初始化定时器
   refresh_timer = new QTimer(this);

@@ -86,7 +86,7 @@ void OsuMap::load_from_file(const char* path) {
       ifs.seekg(0, std::ios::beg);
     }
     while (std::getline(ifs, read_buffer)) {
-      if (read_buffer.back() == '\r') {
+      if (!read_buffer.empty() && read_buffer.back() == '\r') {
         read_buffer.pop_back();
       }
       if (  // 未读到内容
