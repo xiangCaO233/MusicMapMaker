@@ -22,11 +22,30 @@ class HitObject {
   // 析构HitObject
   virtual ~HitObject();
 
+  // 是否是面尾物件
+  bool is_hold_end{false};
+
   // 物件时间戳
   uint32_t timestamp;
 
   // 打印用
   virtual std::string toString() = 0;
+
+  bool operator>(const HitObject& other) const {
+    return timestamp > other.timestamp;
+  };
+
+  bool operator>=(const HitObject& other) const {
+    return timestamp >= other.timestamp;
+  };
+
+  bool operator<(const HitObject& other) const {
+    return timestamp < other.timestamp;
+  };
+
+  bool operator<=(const HitObject& other) const {
+    return timestamp <= other.timestamp;
+  };
 };
 
 #endif  // M_HITOBJECT_H

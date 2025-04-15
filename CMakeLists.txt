@@ -53,6 +53,8 @@ set(MMM_SOURCES
   src/mmm/hitobject/Note/osu/OsuNote.cpp
   src/mmm/hitobject/Note/Hold.h
   src/mmm/hitobject/Note/Hold.cpp
+  src/mmm/hitobject/Note/HoldEnd.h
+  src/mmm/hitobject/Note/HoldEnd.cpp
   src/mmm/hitobject/Note/osu/OsuHold.h
   src/mmm/hitobject/Note/osu/OsuHold.cpp
   src/mmm/hitobject/Note/rm/Slide.h

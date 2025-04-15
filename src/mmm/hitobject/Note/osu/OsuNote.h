@@ -89,8 +89,8 @@ class OsuNote : public Note {
   std::string toString() override;
 
   // 从osu描述加载
-  virtual void from_osu_description(std::vector<std::string> &description,
-                                    int32_t orbit_count);
+  void from_osu_description(std::vector<std::string> &description,
+                            int32_t orbit_count);
 };
 
 #endif  // M_OSUNOTE_H

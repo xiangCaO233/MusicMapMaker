@@ -5,9 +5,14 @@
 
 #include <QTimer>
 #include <QWheelEvent>
+#include <algorithm>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
+#include "../mmm/hitobject/Note/Hold.h"
+#include "../mmm/hitobject/Note/HoldEnd.h"
+#include "../mmm/hitobject/Note/Note.h"
 #include "../mmm/timing/Timing.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
@@ -36,6 +41,10 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(blue);
   t4.emplace_back(red);
   t4.emplace_back(blue);
+
+  // 初始化默认纹理
+  load_texture_from_path("../resources/textures/default/hitobject",
+                         TexturePoolType::ARRAY, true);
 
   // 初始化定时器
   refresh_timer = new QTimer(this);
@@ -76,7 +85,7 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
 void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
-  current_time_stamp += event->pixelDelta().y() / 10;
+  current_time_stamp += event->pixelDelta().y() / 3;
 }
 
 // 键盘按下事件
@@ -156,6 +165,8 @@ void MapWorkspaceCanvas::update_canvas() {
       // 未初始化timing表,不绘制时间线
       return;
     }
+    // 清除物件缓存
+    buffer_objects.clear();
     // 使用timing计算时间
     // 每拍时间
     auto beattime = 60 / target_timing.bpm * 1000;
@@ -178,14 +189,6 @@ void MapWorkspaceCanvas::update_canvas() {
     auto start_pos = judgeline_pos + (distance * timeline_zoom);
     int32_t start_beat_index = 0;
     while (start_pos > -beattime) {
-      /*
-       *struct Beat {
-       *  double bpm;
-       *  double start_timestamp;
-       *  double end_timestamp;
-       *  int32_t divisors{4};
-       *};
-       */
       Beat beat(target_timing.bpm, process_time, process_time + beattime, 4);
       if (current_beats.size() > start_beat_index) {
         if (current_beats[start_beat_index] != beat) {
@@ -196,12 +199,44 @@ void MapWorkspaceCanvas::update_canvas() {
         // 不足,添加
         current_beats.emplace_back(beat);
       }
+      // TODO(xiang 2025-04-15): 更新当前拍可视物件列表
+      // from : process_time,to : process_time + beattime
+      std::shared_ptr<HitObject> temp_startnote =
+          std::make_shared<Note>((uint32_t)(process_time));
+      auto startit = std::upper_bound(
+          working_map->hitobjects.begin(), working_map->hitobjects.end(),
+          temp_startnote,
+          [](const std::shared_ptr<HitObject> &ho1,
+             const std::shared_ptr<HitObject> &ho2) { return *ho1 < *ho2; });
+      if (startit == working_map->hitobjects.begin()) {
+        // 所有元素 > target
+        startit = working_map->hitobjects.end();
+      } else {
+        // 使用上一个(比目标小)
+        startit--;
+      }
+      std::shared_ptr<HitObject> temp_endnote =
+          std::make_shared<Note>((uint32_t)(process_time + beattime));
+      auto endit = std::upper_bound(
+          working_map->hitobjects.begin(), working_map->hitobjects.end(),
+          temp_endnote,
+          [](const std::shared_ptr<HitObject> &ho1,
+             const std::shared_ptr<HitObject> &ho2) { return *ho1 < *ho2; });
+      if (endit == working_map->hitobjects.begin()) {
+        // 所有元素 > target
+        startit = working_map->hitobjects.end();
+      } else {
+        // 使用当前这个(比目标大)
+      }
+      if (startit < endit)
+        // 合法区间--将次区间所有物件添加到缓存列表
+        for (; startit < endit; startit++)
+          buffer_objects.emplace_back(*startit);
+
       process_time += beattime;
       start_pos -= beat_distance;
       start_beat_index++;
     }
-
-    // TODO(xiang 2025-04-15): 更新可视物件列表
   }
   if (!pasue) {
     // 未暂停,更新当前时间戳
@@ -294,6 +329,46 @@ void MapWorkspaceCanvas::draw_beats() {
       }
     }
   }
+}
+
+// 绘制物件
+void MapWorkspaceCanvas::draw_hitobject() {
+  // 声明+预分配内存
+  std::vector<std::shared_ptr<HitObject>> temp_hitobjects;
+  std::vector<std::shared_ptr<Hold>> temp_holds;
+  temp_hitobjects.reserve(buffer_objects.size());
+  temp_holds.reserve(buffer_objects.size());
+
+  // 检查缓冲区,取出需要渲染的物件
+  for (int i = 0; i < buffer_objects.size(); i++) {
+    // 区分面尾物件
+    if (buffer_objects[i]->is_hold_end) {
+      // 找出面尾的头
+      auto head =
+          std::dynamic_pointer_cast<HoldEnd>(buffer_objects[i])->reference;
+      // 判重(面头面尾同时在可视范围内)
+      bool added{false};
+      for (const auto &hold : temp_holds) {
+        if (hold == head) {
+          added = true;
+        }
+      }
+      if (!added) {
+        temp_holds.emplace_back(head);
+        temp_hitobjects.emplace_back(head);
+      }
+    } else {
+      // 非面尾可转为Note
+      auto note = std::dynamic_pointer_cast<Note>(buffer_objects[i]);
+      // 直接使用
+      if (note->type == NoteType::HOLD) {
+        auto hold = std::dynamic_pointer_cast<Hold>(buffer_objects[i]);
+        temp_holds.emplace_back(hold);
+      }
+      temp_hitobjects.emplace_back(note);
+    }
+  }
+  // TODO(xiang 2025-04-15): 执行渲染
 }
 
 // 渲染实际图形

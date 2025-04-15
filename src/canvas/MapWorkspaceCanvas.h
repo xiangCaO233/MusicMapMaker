@@ -31,6 +31,8 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 暂停播放
   bool pasue{true};
 
+  // 物件缓存
+  std::vector<std::shared_ptr<HitObject>> buffer_objects;
   // 物件区域缓存
   std::vector<QRectF> hitobject_bounds;
 
@@ -60,6 +62,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 绘制拍
   void draw_beats();
+
+  // 绘制物件
+  void draw_hitobject();
 
   // 绘制顶部栏
   void draw_top_bar();

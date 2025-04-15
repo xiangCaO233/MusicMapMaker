@@ -196,7 +196,7 @@ void OsuMap::load_from_file(const char* path) {
     std::istringstream biss(background_des);
     std::vector<std::string> background_paras;
     while (std::getline(biss, token, ',')) {
-      background_paras.push_back(token);
+      background_paras.emplace_back(token);
     }
     if (background_paras.at(0) == "0") {
       // 是图片
@@ -216,7 +216,7 @@ void OsuMap::load_from_file(const char* path) {
       std::istringstream breaksiss(breaks_des);
       std::vector<std::string> breaks_paras;
       while (std::getline(breaksiss, token, ',')) {
-        breaks_paras.push_back(token);
+        breaks_paras.emplace_back(token);
       }
       // 添加一个休息段
       breaks.emplace_back(std::stoi(breaks_paras.at(1)),
@@ -232,14 +232,14 @@ void OsuMap::load_from_file(const char* path) {
       std::istringstream timingiss(timing_point_des);
       std::vector<std::string> timing_point_paras;
       while (std::getline(timingiss, token, ',')) {
-        timing_point_paras.push_back(token);
+        timing_point_paras.emplace_back(token);
       }
       // 创建timing
       auto osu_timing = std::make_shared<OsuTiming>();
       // 使用读取出的参数初始化timing
       osu_timing->from_osu_description(timing_point_paras);
       // 加入timing列表
-      timings.push_back(osu_timing);
+      timings.emplace_back(osu_timing);
     }
 
     // 创建物件
@@ -251,20 +251,31 @@ void OsuMap::load_from_file(const char* path) {
       std::istringstream noteiss(note_des);
       std::vector<std::string> note_paras;
       while (std::getline(noteiss, token, ',')) {
-        note_paras.push_back(token);
+        note_paras.emplace_back(token);
       }
-      std::shared_ptr<OsuNote> osu_note;
+      std::shared_ptr<Note> osu_note;
       // 创建物件
       if (std::stoi(note_paras.at(3)) == 128) {
         osu_note = std::make_shared<OsuHold>();
+        auto hold = std::dynamic_pointer_cast<OsuHold>(osu_note);
+        // 使用读取出的参数初始化物件
+        hold->from_osu_description(note_paras, CircleSize);
+        // 创建一个面尾物件
+        auto holdend = std::make_shared<OsuHoldEnd>(hold);
+        hitobjects.emplace_back(holdend);
       } else {
         osu_note = std::make_shared<OsuNote>();
+        auto note = std::dynamic_pointer_cast<OsuNote>(osu_note);
+        // 使用读取出的参数初始化物件
+        note->from_osu_description(note_paras, CircleSize);
       }
-      // 使用读取出的参数初始化物件
-      osu_note->from_osu_description(note_paras, CircleSize);
       // 加入物件列表
-      hitobjects.push_back(osu_note);
+      hitobjects.emplace_back(osu_note);
     }
+
+    std::sort(hitobjects.begin(), hitobjects.end(),
+              [](std::shared_ptr<HitObject>& ho1,
+                 std::shared_ptr<HitObject>& ho2) { return *ho1 < *ho2; });
   } else {
     XWARN("非.osu格式,读取失败");
   }

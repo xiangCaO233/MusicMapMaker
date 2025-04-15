@@ -229,7 +229,7 @@ void GLCanvas::paintGL() {
   std::u32string drawcallstr = converter.from_bytes(drawcall);
   if (std::chrono::duration_cast<std::chrono::milliseconds>(before).count() -
           pre_update_fps >
-      500) {
+      200) {
     pre_update_frame_time = pre_frame_time;
     pre_update_fps =
         std::chrono::duration_cast<std::chrono::milliseconds>(before).count();

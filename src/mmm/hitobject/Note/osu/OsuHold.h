@@ -3,10 +3,11 @@
 
 #include <memory>
 
-#include "../../HitObject.h"
+#include "../Hold.h"
+#include "../HoldEnd.h"
 #include "OsuNote.h"
 
-class OsuHold : public OsuNote {
+class OsuHold : public Hold {
  public:
   // 构造OsuHold
   OsuHold(uint32_t time, uint32_t holdtime);
@@ -14,19 +15,22 @@ class OsuHold : public OsuNote {
   // 析构OsuHold
   ~OsuHold() override;
 
-  // 持续时间
-  uint32_t hold_time;
+  // note采样
+  NoteSample sample;
+
+  // 物件音效组
+  NoteSampleGroup sample_group;
 
   // 打印用
   std::string toString() override;
 
   // 从osu描述加载
   void from_osu_description(std::vector<std::string>& description,
-                            int32_t orbit_count) override;
+                            int32_t orbit_count);
 };
 
 // 面尾
-class OsuHoldEnd : public HitObject {
+class OsuHoldEnd : public HoldEnd {
  public:
   // 构造OsuHoldEnd
   explicit OsuHoldEnd(const std::shared_ptr<OsuHold>& ohold);

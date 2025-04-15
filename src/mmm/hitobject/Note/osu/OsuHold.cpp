@@ -5,9 +5,11 @@
 #include <string>
 #include <vector>
 
+#include "src/mmm/hitobject/Note/Hold.h"
+
 // 构造OsuHoldEnd
 OsuHoldEnd::OsuHoldEnd(const std::shared_ptr<OsuHold>& ohold)
-    : HitObject(ohold->timestamp + ohold->hold_time), reference(ohold) {}
+    : HoldEnd(ohold), reference(ohold) {}
 
 // 析构OsuHoldEnd
 OsuHoldEnd::~OsuHoldEnd() = default;
@@ -15,9 +17,8 @@ OsuHoldEnd::~OsuHoldEnd() = default;
 // 打印用
 std::string OsuHoldEnd::toString() { return ""; }
 
-OsuHold::OsuHold() {}
-OsuHold::OsuHold(uint32_t time, uint32_t holdtime)
-    : OsuNote(time), hold_time(holdtime) {}
+OsuHold::OsuHold() : Hold(0, 0) {}
+OsuHold::OsuHold(uint32_t time, uint32_t holdtime) : Hold(time, holdtime) {}
 
 OsuHold::~OsuHold() {}
 
