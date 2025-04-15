@@ -13,6 +13,7 @@
 #include "../mmm/hitobject/Note/Hold.h"
 #include "../mmm/hitobject/Note/HoldEnd.h"
 #include "../mmm/hitobject/Note/Note.h"
+#include "../mmm/map/osu/OsuMap.h"
 #include "../mmm/timing/Timing.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
@@ -368,7 +369,30 @@ void MapWorkspaceCanvas::draw_hitobject() {
       temp_hitobjects.emplace_back(note);
     }
   }
+  std::sort(temp_hitobjects.begin(), temp_hitobjects.end(),
+            [](const std::shared_ptr<HitObject> &h1,
+               const std::shared_ptr<HitObject> &h2) { return *h1 < *h2; });
   // TODO(xiang 2025-04-15): 执行渲染
+  switch (working_map->maptype) {
+    case MapType::OSUMAP: {
+      // osu图
+      auto omap = std::dynamic_pointer_cast<OsuMap>(working_map);
+      int32_t max_orbit = omap->CircleSize;
+      // 物件头的尺寸
+      auto head_size = texture_map["Blue.png"]->texture_image.size();
+      break;
+    }
+    case MapType::RMMAP: {
+      // rm图
+      break;
+    }
+    case MapType::MALODYMAP: {
+      // ma图
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 // 渲染实际图形

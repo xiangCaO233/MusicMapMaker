@@ -1,9 +1,14 @@
 #ifndef M_MAP_H
 #define M_MAP_H
 
-#include <filesystem>
 #include <memory>
 #include <vector>
+
+enum class MapType {
+  OSUMAP,
+  RMMAP,
+  MALODYMAP,
+};
 
 class HitObject;
 class Timing;
@@ -16,15 +21,15 @@ class MMap {
   // 析构MMap
   virtual ~MMap();
 
+  // 图类型
+  MapType maptype;
+
   // 从文件读取谱面
   virtual void load_from_file(const char* path) = 0;
   // 全部物件
   std::vector<std::shared_ptr<HitObject>> hitobjects;
   // 全部timing
   std::vector<std::shared_ptr<Timing>> timings;
-
-  // 获取此时间戳之前的最近的timing
-  // std::shared_ptr<Timing> get_pretime_closest_timing(uint32_t timestamp);
 };
 
 #endif  // M_MAP_H

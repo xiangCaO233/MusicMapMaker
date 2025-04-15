@@ -2,6 +2,7 @@
 #define M_OSUMAP_H
 
 #include <cstdint>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -34,6 +35,7 @@ class OsuMap : public MMap {
   OsuMap();
   // 析构OsuMap
   ~OsuMap() override;
+
   // 文件第一行描述了谱面文件存储格式的版本。
   // 目前，osu file format v14是最新版。
   uint32_t file_format_version{14};

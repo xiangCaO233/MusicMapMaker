@@ -174,7 +174,7 @@ void GLCanvas::initializeGL() {
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
   // 初始化渲染管理器
-  renderer_manager = new RendererManager(this, 32, 4096);
+  renderer_manager = new RendererManager(this, 64, 4096);
 
   // 初始化纹理
   // load_texture_from_path("../resources/textures/test/other",

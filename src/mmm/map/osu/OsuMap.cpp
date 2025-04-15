@@ -1,6 +1,7 @@
 #include "OsuMap.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -55,7 +56,7 @@ void OsuFileReader::parse_line(const std::string& line) {
   }
 }
 
-OsuMap::OsuMap() : MMap() {}
+OsuMap::OsuMap() : MMap() { maptype = MapType::OSUMAP; }
 
 OsuMap::~OsuMap() = default;
 
