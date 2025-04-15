@@ -4,6 +4,7 @@
 #include <qpaintdevice.h>
 
 #include <QTimer>
+#include <QWheelEvent>
 #include <cstdint>
 #include <vector>
 
@@ -75,6 +76,7 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
 void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
+  current_time_stamp += event->pixelDelta().y() / 10;
 }
 
 // 键盘按下事件
@@ -129,19 +131,33 @@ void MapWorkspaceCanvas::update_canvas() {
     Timing target_timing;
     target_timing.timestamp = current_time_stamp;
     if (current_timing_list) {
-      auto it = std::upper_bound(
-          current_timing_list->begin(), current_timing_list->end(),
-          target_timing,
-          [&](Timing target, const std::shared_ptr<Timing> &ptr) {
-            return target < *ptr;
-          });
-      if (it == current_timing_list->begin()) {
+      if (current_timing_list->empty()) {
+        // 不存在timing时,不绘制时间线
         return;
+      } else {
+        auto it = std::upper_bound(
+            current_timing_list->begin(), current_timing_list->end(),
+            target_timing,
+            [&](Timing target, const std::shared_ptr<Timing> &ptr) {
+              return target < *ptr;
+            });
+        if (it == current_timing_list->begin()) {
+          // 取第一个
+          target_timing = *(current_timing_list->at(0));
+        } else if (it == current_timing_list->end()) {
+          // 取最后一个
+          target_timing =
+              *(current_timing_list->at(current_timing_list->size() - 1));
+        } else {
+          target_timing = **(it - 1);
+        }
       }
-      target_timing = **(it - 1);
     } else {
+      // 未初始化timing表,不绘制时间线
       return;
     }
+    // 使用timing计算时间
+    // 每拍时间
     auto beattime = 60 / target_timing.bpm * 1000;
     // 每拍时间*时间线缩放=拍距
     double beat_distance = beattime * timeline_zoom;
@@ -149,9 +165,9 @@ void MapWorkspaceCanvas::update_canvas() {
     // 判定线位置
     auto judgeline_pos = current_size.height() * (1 - judgeline_position);
 
-    // 距离此timing的拍数
+    // 距离此timing的拍数-1
     auto beat_count =
-        (current_time_stamp - target_timing.timestamp) / beattime - 1;
+        int((current_time_stamp - target_timing.timestamp) / beattime - 1);
 
     // 当前处理到的时间
     int process_time = target_timing.timestamp + beat_count * beattime;
@@ -161,7 +177,7 @@ void MapWorkspaceCanvas::update_canvas() {
     double distance = std::fabs(process_time - current_time_stamp);
     auto start_pos = judgeline_pos + (distance * timeline_zoom);
     int32_t start_beat_index = 0;
-    while (start_pos > 0) {
+    while (start_pos > -beattime) {
       /*
        *struct Beat {
        *  double bpm;
@@ -170,15 +186,16 @@ void MapWorkspaceCanvas::update_canvas() {
        *  int32_t divisors{4};
        *};
        */
-      if (current_beats.size() > start_beat_index &&
-          current_beats[start_beat_index].start_timestamp == process_time) {
-        process_time += beattime;
-        start_pos -= beat_distance;
-        start_beat_index++;
-        continue;
+      Beat beat(target_timing.bpm, process_time, process_time + beattime, 4);
+      if (current_beats.size() > start_beat_index) {
+        if (current_beats[start_beat_index] != beat) {
+          // 不同,更新
+          current_beats[start_beat_index] = beat;
+        }
+      } else {
+        // 不足,添加
+        current_beats.emplace_back(beat);
       }
-      current_beats.emplace_back(target_timing.bpm, process_time,
-                                 process_time + beattime, 4);
       process_time += beattime;
       start_pos -= beat_distance;
       start_beat_index++;
@@ -222,7 +239,7 @@ void MapWorkspaceCanvas::draw_judgeline() {
       QPointF(0, current_size.height() * (1 - judgeline_position)),
       QPointF(current_size.width(),
               current_size.height() * (1 - judgeline_position)),
-      4, nullptr, QColor(0, 255, 255, 235), false);
+      8, nullptr, QColor(0, 255, 255, 235), false);
 }
 
 // 绘制拍
@@ -239,13 +256,13 @@ void MapWorkspaceCanvas::draw_beats() {
     auto judgeline_pos = current_size.height() * (1 - judgeline_position);
 
     // 拍起始时间
-    auto &start_time = beat.start_timestamp;
+    auto &beat_start_time = beat.start_timestamp;
 
     // 拍距离判定线距离从下往上--反转
-    // 拍起始位置
+    // 当前拍起始位置
     auto beat_start_pos =
-        judgeline_pos +
-        std::fabs(start_time - current_time_stamp) * timeline_zoom;
+        // pre:4659 - 5120
+        judgeline_pos - (beat_start_time - current_time_stamp) * timeline_zoom;
 
     // 获取主题
     bool has_theme{false};
@@ -255,10 +272,14 @@ void MapWorkspaceCanvas::draw_beats() {
       has_theme = true;
       color_theme = color_theme_it->second;
     }
+
+    // 绘制小节线
     for (int i = 0; i < beat.divisors; i++) {
-      double divisor_pos = beat_start_pos - i * beat_distance;
-      if (divisor_pos >= 0 && divisor_pos <= current_size.height()) {
-        // 只绘制在可视范围内的
+      // 小节线的位置
+      double divisor_pos = beat_start_pos - i * divisor_distance;
+      if (divisor_pos >= -beat_distance &&
+          divisor_pos <= current_size.height() + beat_distance) {
+        // 只绘制在可视范围内的小节线
         // 选择颜色
         QColor divisor_color;
         if (has_theme) {
@@ -268,7 +289,7 @@ void MapWorkspaceCanvas::draw_beats() {
         }
 
         renderer_manager->addLine(QPointF(0, divisor_pos),
-                                  QPointF(current_size.width(), divisor_pos), 6,
+                                  QPointF(current_size.width(), divisor_pos), 2,
                                   nullptr, divisor_color, true);
       }
     }

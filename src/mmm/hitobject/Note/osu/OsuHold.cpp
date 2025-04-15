@@ -1,10 +1,19 @@
 #include "OsuHold.h"
 
-#include <fstream>
+#include <cmath>
+#include <sstream>
 #include <string>
 #include <vector>
 
-#include "colorful-log.h"
+// 构造OsuHoldEnd
+OsuHoldEnd::OsuHoldEnd(const std::shared_ptr<OsuHold>& ohold)
+    : HitObject(ohold->timestamp + ohold->hold_time), reference(ohold) {}
+
+// 析构OsuHoldEnd
+OsuHoldEnd::~OsuHoldEnd() = default;
+
+// 打印用
+std::string OsuHoldEnd::toString() { return ""; }
 
 OsuHold::OsuHold() {}
 OsuHold::OsuHold(uint32_t time, uint32_t holdtime)

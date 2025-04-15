@@ -45,6 +45,8 @@ class GLCanvas : public QOpenGLWidget,
   // 上一次更新fps的时间
   long pre_update_fps{0};
   long pre_update_frame_time{100};
+  long pre_glcalls{0};
+  long pre_drawcall{0};
 
   // 上一次的帧生成时间
   long pre_frame_time{100};

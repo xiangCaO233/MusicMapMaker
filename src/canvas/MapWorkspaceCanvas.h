@@ -39,6 +39,11 @@ class MapWorkspaceCanvas : public GLCanvas {
     double start_timestamp;
     double end_timestamp;
     int32_t divisors{4};
+
+    bool operator==(const Beat &other) const {
+      return bpm == other.bpm && start_timestamp == other.start_timestamp &&
+             end_timestamp == other.end_timestamp && divisors == other.divisors;
+    }
   };
 
   // 当前谱面的timing列表

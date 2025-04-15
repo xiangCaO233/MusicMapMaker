@@ -220,9 +220,13 @@ void GLCanvas::paintGL() {
 
   auto theoretical_fps = std::to_string(
       int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
+  auto glcall = std::to_string(pre_glcalls);
+  auto drawcall = std::to_string(pre_drawcall);
   // 创建 UTF-8 到 UTF-32 的转换器
   std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-  std::u32string str = converter.from_bytes(theoretical_fps);
+  std::u32string fpsstr = converter.from_bytes(theoretical_fps);
+  std::u32string glcallstr = converter.from_bytes(glcall);
+  std::u32string drawcallstr = converter.from_bytes(drawcall);
   if (std::chrono::duration_cast<std::chrono::milliseconds>(before).count() -
           pre_update_fps >
       500) {
@@ -230,9 +234,18 @@ void GLCanvas::paintGL() {
     pre_update_fps =
         std::chrono::duration_cast<std::chrono::milliseconds>(before).count();
   }
-  str = U"理论:" + str + U"fps";
-  renderer_manager->addText(QPointF(0, 30), str, 24, "JMH",
-                            QColor(255, 183, 197), 0.0f);
+  fpsstr = fpsstr + U"fps";
+  glcallstr = U"glcalls:" + glcallstr;
+  drawcallstr = U"drawcalls:" + drawcallstr;
+  renderer_manager->addText(QPointF(0, 30), fpsstr, 24,
+                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
+                            0.0f);
+  renderer_manager->addText(QPointF(0, 56), glcallstr, 24,
+                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
+                            0.0f);
+  renderer_manager->addText(QPointF(0, 82), drawcallstr, 24,
+                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
+                            0.0f);
 
   // renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
   //                           QColor(0, 0, 0, 255), true);
@@ -242,6 +255,9 @@ void GLCanvas::paintGL() {
   pre_frame_time =
       std::chrono::duration_cast<std::chrono::microseconds>(after - before)
           .count();
+
+  pre_glcalls = XLogger::glcalls;
+  pre_drawcall = XLogger::drawcalls;
 
   /*
 XINFO("frame_time: " + std::to_string(frame_time) + "us");

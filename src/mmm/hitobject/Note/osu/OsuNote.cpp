@@ -1,9 +1,10 @@
 #include "OsuNote.h"
 
+#include <cmath>
+#include <sstream>
 #include <string>
 
 #include "../Note.h"
-#include "colorful-log.h"
 
 OsuNote::OsuNote() : Note(0) {}
 OsuNote::OsuNote(uint32_t time) : Note(time) {}
