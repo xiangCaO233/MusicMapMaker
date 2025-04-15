@@ -1,10 +1,48 @@
 #include "MapWorkspaceCanvas.h"
 
 #include <qnamespace.h>
+#include <qpaintdevice.h>
 
 #include <QTimer>
+#include <cstdint>
+#include <vector>
 
-MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {}
+#include "../mmm/timing/Timing.h"
+
+MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
+  QColor white(255, 255, 255, 240);
+  QColor red(255, 0, 0, 240);
+  QColor purple(160, 102, 211);
+  QColor blue(135, 206, 235);
+
+  // 一分-白色
+  auto &t1 = divisors_color_theme.try_emplace(1).first->second;
+  t1.emplace_back(white);
+  // 二分-白色/红色
+  auto &t2 = divisors_color_theme.try_emplace(2).first->second;
+  t2.emplace_back(white);
+  t2.emplace_back(red);
+
+  // 三分-白色/紫色/紫色
+  auto &t3 = divisors_color_theme.try_emplace(3).first->second;
+  t3.emplace_back(white);
+  t3.emplace_back(purple);
+  t3.emplace_back(purple);
+
+  // 四分-白色/蓝色/红色/蓝色
+  auto &t4 = divisors_color_theme.try_emplace(4).first->second;
+  t4.emplace_back(white);
+  t4.emplace_back(blue);
+  t4.emplace_back(red);
+  t4.emplace_back(blue);
+
+  // 初始化定时器
+  refresh_timer = new QTimer(this);
+  // Lambda 捕获 this,调用成员函数
+  QObject::connect(refresh_timer, &QTimer::timeout,
+                   [this]() { this->update_canvas(); });
+  refresh_timer->start(timer_update_time);
+}
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;
 
@@ -80,9 +118,175 @@ void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
   // 传递事件
   GLCanvas::resizeEvent(event);
 }
+// 更新画布
+void MapWorkspaceCanvas::update_canvas() {
+  // 重绘更新
+  auto current_size = size();
+  if (working_map) {
+    // 当前有绑定图
+    // TODO(xiang 2025-04-15): 更新可视拍列表
+    // 读取timing
+    Timing target_timing;
+    target_timing.timestamp = current_time_stamp;
+    if (current_timing_list) {
+      auto it = std::upper_bound(
+          current_timing_list->begin(), current_timing_list->end(),
+          target_timing,
+          [&](Timing target, const std::shared_ptr<Timing> &ptr) {
+            return target < *ptr;
+          });
+      if (it == current_timing_list->begin()) {
+        return;
+      }
+      target_timing = **(it - 1);
+    } else {
+      return;
+    }
+    auto beattime = 60 / target_timing.bpm * 1000;
+    // 每拍时间*时间线缩放=拍距
+    double beat_distance = beattime * timeline_zoom;
+
+    // 判定线位置
+    auto judgeline_pos = current_size.height() * (1 - judgeline_position);
+
+    // 距离此timing的拍数
+    auto beat_count =
+        (current_time_stamp - target_timing.timestamp) / beattime - 1;
+
+    // 当前处理到的时间
+    int process_time = target_timing.timestamp + beat_count * beattime;
+
+    // 拍距离判定线距离从下往上--反转
+    // 拍起始位置
+    double distance = std::fabs(process_time - current_time_stamp);
+    auto start_pos = judgeline_pos + (distance * timeline_zoom);
+    int32_t start_beat_index = 0;
+    while (start_pos > 0) {
+      /*
+       *struct Beat {
+       *  double bpm;
+       *  double start_timestamp;
+       *  double end_timestamp;
+       *  int32_t divisors{4};
+       *};
+       */
+      if (current_beats.size() > start_beat_index &&
+          current_beats[start_beat_index].start_timestamp == process_time) {
+        process_time += beattime;
+        start_pos -= beat_distance;
+        start_beat_index++;
+        continue;
+      }
+      current_beats.emplace_back(target_timing.bpm, process_time,
+                                 process_time + beattime, 4);
+      process_time += beattime;
+      start_pos -= beat_distance;
+      start_beat_index++;
+    }
+
+    // TODO(xiang 2025-04-15): 更新可视物件列表
+  }
+  if (!pasue) {
+    // 未暂停,更新当前时间戳
+    current_time_stamp += timer_update_time;
+  }
+  update();
+}
+
+// 绘制顶部栏
+void MapWorkspaceCanvas::draw_top_bar() {
+  auto current_size = size();
+  QRectF top_bar_out(0.0f, current_size.height() / 12.0f * -0.3f,
+                     current_size.width(), current_size.height() / 12.0f);
+  QRectF top_bar_in(
+      current_size.width() / 48.0f,
+      current_size.height() / 12.0f * -0.3f + current_size.height() / 48.0f,
+      current_size.width() - (current_size.width() / 48.0f),
+      current_size.height() / 12.0f - (current_size.height() / 48.0f));
+  renderer_manager->addRoundRect(top_bar_in, nullptr, QColor(30, 40, 50, 230),
+                                 0, 0.3, false);
+  renderer_manager->addRoundRect(top_bar_out, nullptr, QColor(33, 33, 33, 230),
+                                 0, 0.3, false);
+  renderer_manager->addLine(QPointF(0, 0), QPointF(current_size.width(), 0),
+                            2.0f, nullptr, QColor(255, 255, 255, 240), false);
+}
+
+// 绘制预览
+void MapWorkspaceCanvas::draw_preview_content() {
+  // TODO(xiang 2025-04-15): 绘制预览内容
+}
+// 绘制判定线
+void MapWorkspaceCanvas::draw_judgeline() {
+  auto current_size = size();
+  renderer_manager->addLine(
+      QPointF(0, current_size.height() * (1 - judgeline_position)),
+      QPointF(current_size.width(),
+              current_size.height() * (1 - judgeline_position)),
+      4, nullptr, QColor(0, 255, 255, 235), false);
+}
+
+// 绘制拍
+void MapWorkspaceCanvas::draw_beats() {
+  auto current_size = size();
+  for (const auto &beat : current_beats) {
+    // 每拍时间*时间线缩放=拍距
+    double beat_distance = 60 / beat.bpm * 1000 * timeline_zoom;
+
+    // 分拍间距
+    double divisor_distance = beat_distance / beat.divisors;
+
+    // 判定线位置
+    auto judgeline_pos = current_size.height() * (1 - judgeline_position);
+
+    // 拍起始时间
+    auto &start_time = beat.start_timestamp;
+
+    // 拍距离判定线距离从下往上--反转
+    // 拍起始位置
+    auto beat_start_pos =
+        judgeline_pos +
+        std::fabs(start_time - current_time_stamp) * timeline_zoom;
+
+    // 获取主题
+    bool has_theme{false};
+    std::vector<QColor> color_theme;
+    auto color_theme_it = divisors_color_theme.find(beat.divisors);
+    if (color_theme_it != divisors_color_theme.end()) {
+      has_theme = true;
+      color_theme = color_theme_it->second;
+    }
+    for (int i = 0; i < beat.divisors; i++) {
+      double divisor_pos = beat_start_pos - i * beat_distance;
+      if (divisor_pos >= 0 && divisor_pos <= current_size.height()) {
+        // 只绘制在可视范围内的
+        // 选择颜色
+        QColor divisor_color;
+        if (has_theme) {
+          divisor_color = color_theme[i];
+        } else {
+          divisor_color = QColor(128, 128, 128, 240);
+        }
+
+        renderer_manager->addLine(QPointF(0, divisor_pos),
+                                  QPointF(current_size.width(), divisor_pos), 6,
+                                  nullptr, divisor_color, true);
+      }
+    }
+  }
+}
+
+// 渲染实际图形
+void MapWorkspaceCanvas::push_shape() {
+  draw_top_bar();
+  draw_preview_content();
+  draw_judgeline();
+
+  draw_beats();
+}
 
 // 切换到指定图
-void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> &map) {
+void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
-  repaint();
+  current_timing_list = &map->timings;
+  current_time_stamp = 5000;
 }

@@ -49,9 +49,6 @@ class GLCanvas : public QOpenGLWidget,
   // 上一次的帧生成时间
   long pre_frame_time{100};
 
-  // 刷新定时器
-  QTimer *refresh_timer;
-
   // 当前鼠标位置
   QPoint mouse_pos{0, 0};
 
@@ -85,6 +82,9 @@ class GLCanvas : public QOpenGLWidget,
 
   // 设置垂直同步
   void set_Vsync(bool flag);
+
+  // 渲染实际图形
+  virtual void push_shape() = 0;
 
  protected:
   void initializeGL() override;

@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 #include "GLCanvas.h"
 #include "src/mmm/map/MMap.h"
@@ -23,6 +25,46 @@ class MapWorkspaceCanvas : public GLCanvas {
   void leaveEvent(QEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
 
+  // 刷新定时器
+  QTimer *refresh_timer;
+  int32_t timer_update_time{8};
+  // 暂停播放
+  bool pasue{true};
+
+  // 物件区域缓存
+  std::vector<QRectF> hitobject_bounds;
+
+  struct Beat {
+    double bpm;
+    double start_timestamp;
+    double end_timestamp;
+    int32_t divisors{4};
+  };
+
+  // 当前谱面的timing列表
+  std::vector<std::shared_ptr<Timing>> *current_timing_list;
+
+  // 当前页面的拍
+  std::vector<Beat> current_beats;
+
+  // 判定线位置:从下往上此倍率*总高度
+  double judgeline_position{0.16};
+
+  // 绘制判定线
+  void draw_judgeline();
+
+  // 绘制拍
+  void draw_beats();
+
+  // 绘制顶部栏
+  void draw_top_bar();
+
+  // 绘制预览
+  void draw_preview_content();
+
+  // 更新画布
+  void update_canvas();
+
  public:
   // 构造MapWorkspaceCanvas
   explicit MapWorkspaceCanvas(QWidget *parent = nullptr);
@@ -30,15 +72,23 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 析构MapWorkspaceCanvas
   ~MapWorkspaceCanvas() override;
 
-  // 光标大小
-  float mouse_size{24};
+  // 分拍线颜色主题
+  std::unordered_map<int32_t, std::vector<QColor>> divisors_color_theme;
 
   // 正在工作的图
   std::shared_ptr<MMap> working_map;
-  uint64_t current_time_stamp;
+
+  // 当前时间戳
+  double current_time_stamp{0};
+
+  // 时间线缩放--1px/1ms
+  double timeline_zoom{1.0};
 
   // 切换到指定图
-  void switch_map(std::shared_ptr<MMap> &map);
+  void switch_map(std::shared_ptr<MMap> map);
+
+  // 渲染实际图形
+  void push_shape() override;
 };
 
 #endif  // M_MAPWORKSPACE_H

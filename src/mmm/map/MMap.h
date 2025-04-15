@@ -22,6 +22,9 @@ class MMap {
   std::vector<std::shared_ptr<HitObject>> hitobjects;
   // 全部timing
   std::vector<std::shared_ptr<Timing>> timings;
+
+  // 获取此时间戳之前的最近的timing
+  // std::shared_ptr<Timing> get_pretime_closest_timing(uint32_t timestamp);
 };
 
 #endif  // M_MAP_H

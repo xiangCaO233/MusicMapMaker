@@ -31,6 +31,13 @@ class Timing {
   // in-imd
   //
   double bpm;
+
+  bool operator>(const Timing& other) const {
+    return timestamp > other.timestamp;
+  }
+  bool operator<(const Timing& other) const {
+    return timestamp < other.timestamp;
+  }
 };
 
 #endif  // M_TIMING_H

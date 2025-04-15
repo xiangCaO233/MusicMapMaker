@@ -44,10 +44,6 @@ GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {
   // 启用鼠标跟踪
   setMouseTracking(true);
   // setUpdateBehavior(QOpenGLWidget::PartialUpdate);
-  // 初始化定时器
-  refresh_timer = new QTimer(this);
-  connect(refresh_timer, &QTimer::timeout, this,
-          QOverload<>::of(&GLCanvas::update));
 }
 
 GLCanvas::~GLCanvas() {
@@ -180,8 +176,6 @@ void GLCanvas::initializeGL() {
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 32, 4096);
 
-  refresh_timer->start(8);
-
   // 初始化纹理
   // load_texture_from_path("../resources/textures/test/other",
   //                        TexturePoolType::BASE_POOL, false);
@@ -222,6 +216,8 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 执行渲染
+  push_shape();
+
   auto theoretical_fps = std::to_string(
       int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
   // 创建 UTF-8 到 UTF-32 的转换器
@@ -238,8 +234,8 @@ void GLCanvas::paintGL() {
   renderer_manager->addText(QPointF(0, 30), str, 24, "JMH",
                             QColor(255, 183, 197), 0.0f);
 
-  renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
-                            QColor(0, 0, 0, 255), true);
+  // renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
+  //                           QColor(0, 0, 0, 255), true);
   renderer_manager->renderAll();
 
   auto after = std::chrono::high_resolution_clock::now().time_since_epoch();

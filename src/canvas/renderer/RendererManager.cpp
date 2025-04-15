@@ -305,33 +305,24 @@ void RendererManager::addLine(const QPointF& p1, const QPointF& p2,
                               float line_width,
                               std::shared_ptr<TextureInstace> texture,
                               const QColor& fill_color, bool is_volatile) {
-  // 回求旋转角
-  float theta = std::atan2(p2.y() - p1.y(), p2.x() - p1.x());
-  glm::vec2 center((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2);
-
-  // 反向旋转
-  glm::mat2x2 rotation_mat = {std::cos(theta), std::sin(theta),
-                              -std::sin(theta), std::cos(theta)};
-  // rotation_mat = glm::transpose(rotation_mat);
-  auto prep1 =
-      rotation_mat * glm::vec2(p1.x() - center.x, p1.y() - center.y) + center;
-  auto prep2 =
-      rotation_mat * glm::vec2(p2.x() - center.x, p2.y() - center.y) + center;
-  // 原位置
-  QRectF desRect(prep1.x, prep1.y - line_width / 2, prep2.x - prep1.x,
-                 line_width);
-
-  // 再旋转
-  // 在队尾直接生成渲染指令
-  command_list.emplace_back(false, Text("", 0, U' ', false), is_volatile,
-                            ShapeType::RECT, desRect, theta, fill_color, 0.0f,
-                            texture, texture_effect, texture_alignmode,
-                            texture_fillmode, texture_complementmode);
+  // 计算直线长度（两点之间的距离）
+  QPointF diff = p2 - p1;
+  float length = std::sqrt(diff.x() * diff.x() + diff.y() * diff.y());
+  // 计算直线角度（弧度）
+  float angle = -std::atan2(diff.y(), diff.x());
+  // 创建矩形 - 宽度为line_width，长度为直线长度
+  QRectF rect(0, 0, length, line_width);
+  // 计算直线中点作为矩形中心
+  QPointF center = (p1 + p2) / 2.0;
+  // 调整矩形位置使其中心位于直线中点
+  rect.moveCenter(center);
+  // 调用addRect，传入计算好的旋转角度
+  addRect(rect, texture, fill_color, qRadiansToDegrees(angle), is_volatile);
 }
 
 // 添加文本
-void RendererManager::addText(const QPointF& pos, std::u32string& text,
-                              float font_size, std::string font_family,
+void RendererManager::addText(const QPointF& pos, const std::u32string& text,
+                              float font_size, const std::string font_family,
                               const QColor& fill_color, float rotation) {
   uint32_t xoffset = 0;
   // 在队尾直接生成渲染指令
