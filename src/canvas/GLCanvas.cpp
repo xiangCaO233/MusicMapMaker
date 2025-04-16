@@ -185,8 +185,8 @@ void GLCanvas::initializeGL() {
   // 初始化纹理
   // load_texture_from_path("../resources/textures/test/other",
   //                        TexturePoolType::BASE_POOL, false);
-  // load_texture_from_path("../resources/textures/test/1024",
-  //                       TexturePoolType::ARRAY, true);
+  load_texture_from_path("../resources/textures/test/1024",
+                         TexturePoolType::ARRAY, true);
   finalize_texture_loading();
 }
 void GLCanvas::resizeGL(int w, int h) {

@@ -90,6 +90,7 @@ void OsuMap::load_from_file(const char* path) {
       if (!read_buffer.empty() && read_buffer.back() == '\r') {
         read_buffer.pop_back();
       }
+      // XINFO(read_buffer);
       if (  // 未读到内容
           read_buffer.empty() ||
           // 直接结束

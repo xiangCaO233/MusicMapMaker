@@ -12,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
   // 设置map
   auto omap = std::make_shared<OsuMap>();
   omap->load_from_file(
-      "../resources/map/niki - WAVE/niki - WAVE (Benson_) [Electronic].osu");
+      "../resources/map/Lia - Poetry of Birds/Lia - Poetry of Birds "
+      "(xiang_233) [full version].osu");
   canvas->switch_map(omap);
 }
 

@@ -320,9 +320,15 @@ void MapWorkspaceCanvas::draw_beats() {
           divisor_color = QColor(128, 128, 128, 240);
         }
 
-        renderer_manager->addLine(QPointF(0, divisor_pos),
-                                  QPointF(current_size.width(), divisor_pos), 2,
-                                  nullptr, divisor_color, true);
+        if (i == 0) {
+          renderer_manager->addLine(QPointF(0, divisor_pos),
+                                    QPointF(current_size.width(), divisor_pos),
+                                    6, nullptr, divisor_color, true);
+        } else {
+          renderer_manager->addLine(QPointF(0, divisor_pos),
+                                    QPointF(current_size.width(), divisor_pos),
+                                    2, nullptr, divisor_color, true);
+        }
       }
     }
   }
@@ -369,37 +375,76 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::sort(temp_notes.begin(), temp_notes.end(),
             [](const std::shared_ptr<HitObject> &h1,
                const std::shared_ptr<HitObject> &h2) { return *h1 < *h2; });
+
   // TODO(xiang 2025-04-15): 执行渲染
   switch (working_map->maptype) {
     case MapType::OSUMAP: {
       // osu图
       auto omap = std::dynamic_pointer_cast<OsuMap>(working_map);
       int32_t max_orbit = omap->CircleSize;
-      // 物件头的尺寸
-      auto &texture = texture_map["Blue.png"];
-      auto head_size = texture->texture_image.size();
+      // 物件头的纹理
+      auto &head_texture = texture_map["Blue.png"];
+      // 面条主体的纹理
+      auto &long_note_body_texture = texture_map["ArrowHoldBodyb.png"];
       for (const auto &note : temp_notes) {
+        // 判定线位置
+        // auto judgeline_pos =
+        //    current_size.height() * (1 - judgeline_position);
+        auto head_note_size = QSizeF(head_texture->texture_image.width(),
+                                     head_texture->texture_image.height());
+        // 物件距离判定线距离从下往上--反转
+        // 当前物件头位置-中心
+        auto head_note_pos_y =
+            current_size.height() * (1.0 - judgeline_position) -
+            (note->timestamp - current_time_stamp) * timeline_zoom;
+        double head_note_pos_x =
+            current_size.width() / max_orbit * (note->orbit);
+        QRectF head_note_bound(head_note_pos_x,
+                               head_note_pos_y - head_note_size.height() / 2.0,
+                               head_note_size.width(), head_note_size.height());
+        renderer_manager->texture_fillmode = TextureFillMode::FILL;
         switch (note->type) {
           case NoteType::NOTE: {
-            // 判定线位置
-            auto judgeline_pos =
-                current_size.height() * (1 - judgeline_position);
-            // 物件距离判定线距离从下往上--反转
-            // 当前物件位置
-            auto note_pos =
-                judgeline_pos -
-                (note->timestamp - current_time_stamp) * timeline_zoom;
-            double x = current_size.width() / max_orbit * (note->orbit + 1);
-            QRectF note_bound(x, note_pos, head_size.width(),
-                              head_size.height());
-            renderer_manager->addRect(note_bound, texture, QColor(0, 0, 0, 255),
-                                      0, true);
+            // 直接绘制
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
             break;
           }
           case NoteType::HOLD: {
+            // 添加long_note_body
+            auto long_note = std::dynamic_pointer_cast<Hold>(note);
+            // 当前面条尾y位置
+            auto long_note_end_pos_y =
+                current_size.height() * (1.0 - judgeline_position) -
+                (long_note->hold_end_reference->timestamp -
+                 current_time_stamp) *
+                    timeline_zoom;
+            // 当前面条身位置-中心
+            auto long_note_body_pos_x =
+                head_note_pos_x -
+                long_note_body_texture->texture_image.width() / 2.0;
+            auto long_note_body_pos_y =
+                head_note_pos_y + (long_note_end_pos_y - head_note_pos_y) / 2.0;
+            // 面身尺寸
+            auto long_note_body_size =
+                QSizeF(long_note_body_texture->texture_image.width(),
+                       long_note_end_pos_y - head_note_pos_y -
+                           head_note_bound.height());
+            // 面身位置
+            QRectF long_note_body_bound(
+                long_note_body_pos_x - long_note_body_size.width() / 2.0,
+                long_note_body_pos_y - long_note_body_size.height() / 2.0,
+                long_note_body_size.width(), long_note_body_size.height());
+            // 先绘制body后绘制head
+            // renderer_manager->addRect(long_note_body_bound,
+            //                          long_note_body_texture,
+            //                          QColor(0, 0, 0, 255), 0, true);
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
             break;
           }
         }
+        renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
       }
       break;
     }
@@ -430,5 +475,5 @@ void MapWorkspaceCanvas::push_shape() {
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
   current_timing_list = &map->timings;
-  current_time_stamp = 5000;
+  current_time_stamp = 22000;
 }

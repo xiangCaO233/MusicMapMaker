@@ -37,15 +37,15 @@ void OsuTiming::from_osu_description(std::vector<std::string>& description) {
    *是否为非继承时间点（红线）（布尔值）： 字面意思。
    *效果（整型）： 一位影响时间点特殊效果的参数。参见：效果部分。
    */
-  timestamp = std::stoi(description.at(0));
+  timestamp = std::stof(description.at(0));
   // 先判断是否继承时间点
   is_inherit_timing = std::stoi(description.at(6)) == 0;
   if (is_inherit_timing) {
     // bpm只存储倍速--并非bpm
-    bpm = 100.0 / double(std::abs(std::stoi(description.at(1))));
+    bpm = 100.0 / std::abs(std::stod(description.at(1)));
   } else {
     // 真实bpm
-    bpm = 1.0 / double(std::stoi(description.at(1))) * 1000 * 60;
+    bpm = 1.0 / std::stod(description.at(1)) * 1000.0 * 60.0;
   }
   // beats
   beat = std::stoi(description.at(2));
