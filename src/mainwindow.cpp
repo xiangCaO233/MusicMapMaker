@@ -10,11 +10,20 @@ MainWindow::MainWindow(QWidget *parent)
   canvas = ui->canvas;
 
   // 设置map
-  auto omap = std::make_shared<OsuMap>();
-  omap->load_from_file(
+  auto omap6k1 = std::make_shared<OsuMap>();
+  omap6k1->load_from_file(
+      "../resources/map/Designant - Designant/Designant - Designant. (Benson_) "
+      "[Designant].osu");
+  auto omap4k1 = std::make_shared<OsuMap>();
+  omap4k1->load_from_file(
       "../resources/map/Lia - Poetry of Birds/Lia - Poetry of Birds "
       "(xiang_233) [full version].osu");
-  canvas->switch_map(omap);
+  auto omap4k2 = std::make_shared<OsuMap>();
+  omap4k2->load_from_file(
+      "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - "
+      "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - shojo rei "
+      "(xiang_233) [(LN)NM lv.29].osu");
+  canvas->switch_map(omap6k1);
 }
 
 MainWindow::~MainWindow() { delete ui; }

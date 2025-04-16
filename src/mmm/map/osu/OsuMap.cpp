@@ -12,6 +12,8 @@
 #include "../../timing/osu/OsuTiming.h"
 #include "../MMap.h"
 #include "colorful-log.h"
+#include "src/mmm/hitobject/HitObject.h"
+#include "src/mmm/hitobject/Note/Note.h"
 
 OsuFileReader::OsuFileReader() {};
 
@@ -23,22 +25,36 @@ void OsuFileReader::parse_line(const std::string& line) {
     //[Events]	谱面显示设定，故事板事件	逗号分隔的列表
     //[TimingPoints]	时间轴设定	逗号分隔的列表
     //[HitObjects]	击打物件	逗号分隔的列表
+
     if (current_chapter == "Events") {
-      int commas = std::count(line.begin(), line.end(), ',');
-      // 用逗号数区分事件类型
-      switch (commas) {
-        case 4: {
-          map_properties[current_chapter]["background"] = line;
-          break;
-        }
-        case 2: {
-          map_properties[current_chapter]
-                        [std::to_string(current_breaks_index++)] = line;
-          break;
-        }
-        default:
-          map_properties[current_chapter]["unknown"] = line;
+      auto start_5_string = line.substr(0, 5);
+      auto start_1_char = line.at(0);
+      // XINFO(start_5_string);
+      // 并非一定五个参数
+      if (start_5_string == "Video") {
+        map_properties[current_chapter]["background video"] = line;
+      } else if (start_5_string == "Break") {
+        map_properties[current_chapter]
+                      ["Break" + std::to_string(current_breaks_index++)] = line;
+      } else {
+        // general bg
+        map_properties[current_chapter]["background"] = line;
       }
+      // int commas = std::count(line.begin(), line.end(), ',');
+      // byd被wiki骗了，不能用逗号数区分事件类型
+      // switch (commas) {
+      //   case 4: {
+      //     map_properties[current_chapter]["background"] = line;
+      //     break;
+      //   }
+      //   case 2: {
+      //     map_properties[current_chapter]
+      //                   [std::to_string(current_breaks_index++)] = line;
+      //     break;
+      //   }
+      //   default:
+      //     map_properties[current_chapter]["unknown"] = line;
+      // }
     } else if (current_chapter == "TimingPoints") {
       map_properties[current_chapter][std::to_string(current_timing_index++)] =
           line;
@@ -208,8 +224,13 @@ void OsuMap::load_from_file(const char* path) {
       background_type = 1;
     }
     bg_file_name = background_paras.at(2);
-    bgxoffset = std::stoi(background_paras.at(3));
-    bgyoffset = std::stoi(background_paras.at(4));
+    if (background_paras.size() >= 5) {
+      bgxoffset = std::stoi(background_paras.at(3));
+      bgyoffset = std::stoi(background_paras.at(4));
+    } else {
+      bgxoffset = 0;
+      bgyoffset = 0;
+    }
 
     // breaks
     for (int i = 0; i < osureader.current_breaks_index; i++) {
@@ -242,6 +263,13 @@ void OsuMap::load_from_file(const char* path) {
       osu_timing->from_osu_description(timing_point_paras);
       // 加入timing列表
       timings.emplace_back(osu_timing);
+      auto temp_timing_list_it = temp_timing_map.find(osu_timing->timestamp);
+      if (temp_timing_list_it == temp_timing_map.end()) {
+        // 添加映射
+        temp_timing_list_it =
+            temp_timing_map.try_emplace(osu_timing->timestamp).first;
+      }
+      temp_timing_list_it->second.emplace_back(osu_timing);
     }
 
     // 创建物件
@@ -266,6 +294,9 @@ void OsuMap::load_from_file(const char* path) {
         auto holdend = std::make_shared<OsuHoldEnd>(hold);
         holdend->is_hold_end = true;
         hitobjects.emplace_back(holdend);
+
+        // 把长条物件加入缓存
+        temp_hold_list.emplace_back(hold);
       } else {
         osu_note = std::make_shared<OsuNote>();
         auto note = std::dynamic_pointer_cast<OsuNote>(osu_note);
@@ -281,5 +312,82 @@ void OsuMap::load_from_file(const char* path) {
                  std::shared_ptr<HitObject>& ho2) { return *ho1 < *ho2; });
   } else {
     XWARN("非.osu格式,读取失败");
+  }
+}
+
+// 查询指定位置附近的同时间点timing列表(优先在此之前,没有之前找之后)
+void OsuMap::query_around_timing(
+    std::vector<std::shared_ptr<Timing>>& result_timings, int32_t time) {
+  if (timings.empty()) return;
+  // 查找到第一个大于等于此时间的timing迭代器
+  auto it = std::upper_bound(
+      timings.begin(), timings.end(), time,
+      [](int time, const auto& timing) { return timing->timestamp >= time; });
+
+  // 确定使用的timing
+  std::shared_ptr<Timing> res;
+  if (it == result_timings.end()) {
+    // 没找到比当前时间靠后的timing
+    // 使用最后一个timing
+    res = result_timings.at(timings.size() - 1);
+
+  } else {
+    // 找到了比当前时间靠后的timing
+    if (*it == timings.front()) {
+      // 找到的是第一个
+      // 就使用这个timing
+      res = *it;
+    } else {
+      // 使用前一个
+      res = *(it - 1);
+    }
+  }
+
+  // 查找重复时间点的timing表
+  auto timing_list_it = temp_timing_map.find(res->timestamp);
+
+  // 添加到传入引用
+  for (const auto& timing : timing_list_it->second) {
+    result_timings.emplace_back(timing);
+  }
+}
+
+// 查询区间内有的物件
+void OsuMap::query_object_in_range(
+    std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
+    int32_t end) {
+  int count = 0;
+  // 查找到第一个大于等于起始时间的物件迭代器
+  auto it_start = std::upper_bound(
+      hitobjects.begin(), hitobjects.end(), start,
+      [](int32_t time, const auto& obj) { return obj->timestamp >= time; });
+
+  // 查找到第一个小于等于结束时间的物件迭代器
+  auto it_end = std::lower_bound(
+      hitobjects.begin(), hitobjects.end(), end,
+      [](const auto& obj, int time) { return obj->timestamp <= time; });
+
+  // 先将面尾时间大于起始时间的物件也加入列表
+  for (const auto& hold : temp_hold_list) {
+    if (hold->timestamp <= end &&
+        hold->hold_end_reference->timestamp >= start) {
+      result_objects.emplace_back(hold);
+      count++;
+    }
+  }
+
+  // 将区间内物件加入结果
+  for (; it_start < it_end; it_start++) {
+    // 查重
+    auto note = std::static_pointer_cast<OsuNote>((*it_start));
+    bool added{false};
+    if (note->type == NoteType::HOLD) {
+      for (const auto& obj : result_objects)
+        if (obj.get() == note.get()) added = true;
+    }
+    if (!added) {
+      result_objects.emplace_back(note);
+      count++;
+    }
   }
 }

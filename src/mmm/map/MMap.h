@@ -30,6 +30,15 @@ class MMap {
   std::vector<std::shared_ptr<HitObject>> hitobjects;
   // 全部timing
   std::vector<std::shared_ptr<Timing>> timings;
+
+  // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
+  virtual void query_around_timing(
+      std::vector<std::shared_ptr<Timing>>& timings, int32_t time) = 0;
+
+  // 查询区间内有的物件
+  virtual void query_object_in_range(
+      std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
+      int32_t end) = 0;
 };
 
 #endif  // M_MAP_H

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>888</height>
+    <width>1142</width>
+    <height>893</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -145,10 +145,13 @@
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
+          <property name="childrenCollapsible">
+           <bool>false</bool>
+          </property>
           <widget class="QWidget" name="edit_area" native="true">
            <property name="minimumSize">
             <size>
-             <width>400</width>
+             <width>600</width>
              <height>0</height>
             </size>
            </property>
@@ -428,7 +431,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1142</width>
      <height>23</height>
     </rect>
    </property>

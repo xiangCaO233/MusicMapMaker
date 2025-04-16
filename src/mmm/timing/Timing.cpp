@@ -1,5 +1,5 @@
 #include "Timing.h"
 
-Timing::Timing() {}
+Timing::Timing() : type(TimingType::UNKNOWN) {}
 
 Timing::~Timing() {}

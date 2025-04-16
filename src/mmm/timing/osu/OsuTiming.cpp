@@ -3,7 +3,9 @@
 #include <cstdlib>
 #include <string>
 
-OsuTiming::OsuTiming() {}
+#include "src/mmm/timing/Timing.h"
+
+OsuTiming::OsuTiming() : Timing() { type = TimingType::OSUTIMING; }
 
 OsuTiming::~OsuTiming() = default;
 

@@ -6,12 +6,22 @@
 // 时间点
 #include <cstdint>
 
+enum class TimingType {
+  OSUTIMING,
+  RMTIMING,
+  MALODYTIMING,
+  UNKNOWN,
+};
+
 class Timing {
  public:
   // 构造Timing
   Timing();
   // 析构Timing
   virtual ~Timing();
+
+  // timing类型
+  TimingType type;
 
   // 该时间点的时间戳
   // in-osu

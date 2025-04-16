@@ -33,8 +33,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 物件缓存
   std::vector<std::shared_ptr<HitObject>> buffer_objects;
+
   // 物件区域缓存
-  std::vector<QRectF> hitobject_bounds;
+  std::unordered_map<QRectF *, std::shared_ptr<HitObject>> hitobject_bounds_map;
 
   struct Beat {
     double bpm;
@@ -47,9 +48,6 @@ class MapWorkspaceCanvas : public GLCanvas {
              end_timestamp == other.end_timestamp && divisors == other.divisors;
     }
   };
-
-  // 当前谱面的timing列表
-  std::vector<std::shared_ptr<Timing>> *current_timing_list;
 
   // 当前页面的拍
   std::vector<Beat> current_beats;
@@ -91,8 +89,11 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 当前时间戳
   double current_time_stamp{0};
 
-  // 时间线缩放--1px/1ms
-  double timeline_zoom{1.0};
+  // 时间线缩放-- n * 1px/1ms
+  double timeline_zoom{1.5};
+
+  // 变速缩放
+  double speed_zoom{1.0};
 
   // 切换到指定图
   void switch_map(std::shared_ptr<MMap> map);

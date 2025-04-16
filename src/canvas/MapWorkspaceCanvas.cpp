@@ -15,6 +15,7 @@
 #include "../mmm/hitobject/Note/Note.h"
 #include "../mmm/map/osu/OsuMap.h"
 #include "../mmm/timing/Timing.h"
+#include "src/mmm/timing/osu/OsuTiming.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   QColor white(255, 255, 255, 240);
@@ -126,119 +127,102 @@ void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
   // 传递事件
   GLCanvas::resizeEvent(event);
 }
+
 // 更新画布
 void MapWorkspaceCanvas::update_canvas() {
-  // 重绘更新
+  if (!working_map) return;
   auto current_size = size();
-  if (working_map) {
-    // 当前有绑定图
-    // TODO(xiang 2025-04-15): 更新可视拍列表
-    // 读取timing
-    Timing target_timing;
-    target_timing.timestamp = current_time_stamp;
-    if (current_timing_list) {
-      if (current_timing_list->empty()) {
-        // 不存在timing时,不绘制时间线
-        return;
-      } else {
-        auto it = std::upper_bound(
-            current_timing_list->begin(), current_timing_list->end(),
-            target_timing,
-            [&](Timing target, const std::shared_ptr<Timing> &ptr) {
-              return target < *ptr;
-            });
-        if (it == current_timing_list->begin()) {
-          // 取第一个
-          target_timing = *(current_timing_list->at(0));
-        } else if (it == current_timing_list->end()) {
-          // 取最后一个
-          target_timing =
-              *(current_timing_list->at(current_timing_list->size() - 1));
+  // 当前有绑定图
+  // TODO(xiang 2025-04-15): 更新可视拍列表
+  // 读取获取当前时间附近的timings
+  std::vector<std::shared_ptr<Timing>> temp_timings;
+  working_map->query_around_timing(temp_timings, current_time_stamp);
+
+  if (temp_timings.empty()) {
+    // 未查询到timing-不绘制时间线
+    return;
+  }
+
+  // 当前正在使用的绝对timing--非变速timing
+  std::shared_ptr<Timing> current_abs_timing;
+
+  for (const auto &timing : temp_timings) {
+    switch (timing->type) {
+      case TimingType::OSUTIMING: {
+        auto otiming = std::static_pointer_cast<OsuTiming>(timing);
+        if (!otiming->is_inherit_timing) {
+          // 非变速timing--存储的实际bpm
+          current_abs_timing = otiming;
         } else {
-          target_timing = **(it - 1);
+          // 变速timing--存储的倍速
+          speed_zoom = otiming->bpm;
         }
+        break;
+      }
+      case TimingType::RMTIMING: {
+        break;
+      }
+      case TimingType::MALODYTIMING: {
+        break;
+      }
+      case TimingType::UNKNOWN:
+        return;
+    }
+  }
+
+  // 清除物件缓存
+  buffer_objects.clear();
+  // 使用timing计算时间
+  // 每拍时间
+  auto beattime = 60.0 / current_abs_timing->bpm * 1000.0;
+  // 每拍时间*时间线缩放=拍距
+  double beat_distance = beattime * timeline_zoom * speed_zoom;
+
+  // 判定线位置
+  auto judgeline_pos = current_size.height() * (1.0 - judgeline_position);
+
+  // 距离此timing的拍数-1
+  auto beat_count =
+      int((current_time_stamp - current_abs_timing->timestamp) / beattime - 1);
+
+  // 当前处理到的时间
+  int process_time = current_abs_timing->timestamp + beat_count * beattime;
+
+  // 拍距离判定线距离从下往上--反转
+  // 拍起始位置
+  double distance = std::fabs(process_time - current_time_stamp);
+  auto processing_pos = judgeline_pos + (distance * timeline_zoom);
+  int32_t beat_index = 0;
+  while (processing_pos > -beattime) {
+    Beat beat(current_abs_timing->bpm, process_time, process_time + beattime,
+              4);
+    if (current_beats.size() > beat_index) {
+      if (current_beats[beat_index] != beat) {
+        // 不同,更新
+        current_beats[beat_index] = beat;
       }
     } else {
-      // 未初始化timing表,不绘制时间线
-      return;
+      // 不足,添加
+      current_beats.emplace_back(beat);
     }
-    // 清除物件缓存
-    buffer_objects.clear();
-    // 使用timing计算时间
-    // 每拍时间
-    auto beattime = 60 / target_timing.bpm * 1000;
-    // 每拍时间*时间线缩放=拍距
-    double beat_distance = beattime * timeline_zoom;
 
-    // 判定线位置
-    auto judgeline_pos = current_size.height() * (1 - judgeline_position);
+    // TODO(xiang 2025-04-15): 更新当前拍可视物件列表
+    // from : process_time,to : process_time + beattime
+    working_map->query_object_in_range(buffer_objects, process_time,
+                                       process_time + beattime);
 
-    // 距离此timing的拍数-1
-    auto beat_count =
-        int((current_time_stamp - target_timing.timestamp) / beattime - 1);
-
-    // 当前处理到的时间
-    int process_time = target_timing.timestamp + beat_count * beattime;
-
-    // 拍距离判定线距离从下往上--反转
-    // 拍起始位置
-    double distance = std::fabs(process_time - current_time_stamp);
-    auto start_pos = judgeline_pos + (distance * timeline_zoom);
-    int32_t start_beat_index = 0;
-    while (start_pos > -beattime) {
-      Beat beat(target_timing.bpm, process_time, process_time + beattime, 4);
-      if (current_beats.size() > start_beat_index) {
-        if (current_beats[start_beat_index] != beat) {
-          // 不同,更新
-          current_beats[start_beat_index] = beat;
-        }
-      } else {
-        // 不足,添加
-        current_beats.emplace_back(beat);
-      }
-      // TODO(xiang 2025-04-15): 更新当前拍可视物件列表
-      // from : process_time,to : process_time + beattime
-      std::shared_ptr<HitObject> temp_startnote =
-          std::make_shared<Note>((uint32_t)(process_time));
-      auto startit = std::upper_bound(
-          working_map->hitobjects.begin(), working_map->hitobjects.end(),
-          temp_startnote,
-          [](const std::shared_ptr<HitObject> &ho1,
-             const std::shared_ptr<HitObject> &ho2) { return *ho1 < *ho2; });
-      if (startit == working_map->hitobjects.begin()) {
-        // 所有元素 > target
-        startit = working_map->hitobjects.end();
-      } else {
-        // 使用上一个(比目标小)
-        startit--;
-      }
-      std::shared_ptr<HitObject> temp_endnote =
-          std::make_shared<Note>((uint32_t)(process_time + beattime));
-      auto endit = std::upper_bound(
-          working_map->hitobjects.begin(), working_map->hitobjects.end(),
-          temp_endnote,
-          [](const std::shared_ptr<HitObject> &ho1,
-             const std::shared_ptr<HitObject> &ho2) { return *ho1 < *ho2; });
-      if (endit == working_map->hitobjects.begin()) {
-        // 所有元素 > target
-        startit = working_map->hitobjects.end();
-      } else {
-        // 使用当前这个(比目标大)
-      }
-      if (startit < endit)
-        // 合法区间--将次区间所有物件添加到缓存列表
-        for (; startit < endit; startit++)
-          buffer_objects.emplace_back(*startit);
-
-      process_time += beattime;
-      start_pos -= beat_distance;
-      start_beat_index++;
-    }
+    process_time += beattime;
+    processing_pos -= beat_distance;
+    beat_index++;
   }
   if (!pasue) {
     // 未暂停,更新当前时间戳
     current_time_stamp += timer_update_time;
   }
+
+  draw_beats();
+  draw_hitobject();
+
   repaint();
 }
 
@@ -263,29 +247,33 @@ void MapWorkspaceCanvas::draw_top_bar() {
 // 绘制预览
 void MapWorkspaceCanvas::draw_preview_content() {
   // TODO(xiang 2025-04-15): 绘制预览内容
+  if (!working_map) return;
 }
 // 绘制判定线
 void MapWorkspaceCanvas::draw_judgeline() {
   auto current_size = size();
   renderer_manager->addLine(
-      QPointF(0, current_size.height() * (1 - judgeline_position)),
+      QPointF(0, current_size.height() * (1.0 - judgeline_position)),
       QPointF(current_size.width(),
-              current_size.height() * (1 - judgeline_position)),
+              current_size.height() * (1.0 - judgeline_position)),
       8, nullptr, QColor(0, 255, 255, 235), false);
 }
 
 // 绘制拍
 void MapWorkspaceCanvas::draw_beats() {
+  if (!working_map) return;
+
   auto current_size = size();
   for (const auto &beat : current_beats) {
     // 每拍时间*时间线缩放=拍距
-    double beat_distance = 60 / beat.bpm * 1000 * timeline_zoom;
+    double beat_distance =
+        60.0 / beat.bpm * 1000.0 * timeline_zoom * speed_zoom;
 
     // 分拍间距
     double divisor_distance = beat_distance / beat.divisors;
 
     // 判定线位置
-    auto judgeline_pos = current_size.height() * (1 - judgeline_position);
+    auto judgeline_pos = current_size.height() * (1.0 - judgeline_position);
 
     // 拍起始时间
     auto &beat_start_time = beat.start_timestamp;
@@ -293,8 +281,8 @@ void MapWorkspaceCanvas::draw_beats() {
     // 拍距离判定线距离从下往上--反转
     // 当前拍起始位置
     auto beat_start_pos =
-        // pre:4659 - 5120
-        judgeline_pos - (beat_start_time - current_time_stamp) * timeline_zoom;
+        judgeline_pos -
+        (beat_start_time - current_time_stamp) * timeline_zoom * speed_zoom;
 
     // 获取主题
     bool has_theme{false};
@@ -321,6 +309,7 @@ void MapWorkspaceCanvas::draw_beats() {
         }
 
         if (i == 0) {
+          // 小节线头画粗一点
           renderer_manager->addLine(QPointF(0, divisor_pos),
                                     QPointF(current_size.width(), divisor_pos),
                                     6, nullptr, divisor_color, true);
@@ -336,6 +325,8 @@ void MapWorkspaceCanvas::draw_beats() {
 
 // 绘制物件
 void MapWorkspaceCanvas::draw_hitobject() {
+  if (!working_map) return;
+
   auto current_size = size();
   // 声明+预分配内存
   std::vector<std::shared_ptr<Note>> temp_notes;
@@ -396,7 +387,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 当前物件头位置-中心
         auto head_note_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
-            (note->timestamp - current_time_stamp) * timeline_zoom;
+            (note->timestamp - current_time_stamp) * timeline_zoom * speed_zoom;
         double head_note_pos_x =
             current_size.width() / max_orbit * (note->orbit);
         QRectF head_note_bound(head_note_pos_x,
@@ -418,11 +409,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
                 current_size.height() * (1.0 - judgeline_position) -
                 (long_note->hold_end_reference->timestamp -
                  current_time_stamp) *
-                    timeline_zoom;
+                    timeline_zoom * speed_zoom;
             // 当前面条身位置-中心
-            auto long_note_body_pos_x =
-                head_note_pos_x -
-                long_note_body_texture->texture_image.width() / 2.0;
+            auto long_note_body_pos_x = head_note_pos_x;
             auto long_note_body_pos_y =
                 head_note_pos_y + (long_note_end_pos_y - head_note_pos_y) / 2.0;
             // 面身尺寸
@@ -432,13 +421,15 @@ void MapWorkspaceCanvas::draw_hitobject() {
                            head_note_bound.height());
             // 面身位置
             QRectF long_note_body_bound(
-                long_note_body_pos_x - long_note_body_size.width() / 2.0,
-                long_note_body_pos_y - long_note_body_size.height() / 2.0,
-                long_note_body_size.width(), long_note_body_size.height());
+                long_note_body_pos_x,
+                long_note_body_pos_y - long_note_body_size.height() / 2.0 -
+                    head_note_size.height(),
+                long_note_body_size.width(),
+                long_note_body_size.height() + head_note_size.height());
             // 先绘制body后绘制head
-            // renderer_manager->addRect(long_note_body_bound,
-            //                          long_note_body_texture,
-            //                          QColor(0, 0, 0, 255), 0, true);
+            renderer_manager->addRect(long_note_body_bound,
+                                      long_note_body_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
             renderer_manager->addRect(head_note_bound, head_texture,
                                       QColor(0, 0, 0, 255), 0, true);
             break;
@@ -465,8 +456,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
 void MapWorkspaceCanvas::push_shape() {
   draw_top_bar();
   draw_preview_content();
-  draw_beats();
-  draw_hitobject();
 
   draw_judgeline();
 }
@@ -474,6 +463,5 @@ void MapWorkspaceCanvas::push_shape() {
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
-  current_timing_list = &map->timings;
-  current_time_stamp = 22000;
+  current_time_stamp = 60000;
 }

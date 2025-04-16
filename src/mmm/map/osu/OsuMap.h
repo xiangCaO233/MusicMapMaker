@@ -2,6 +2,7 @@
 #define M_OSUMAP_H
 
 #include <cstdint>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -28,6 +29,9 @@
  *[Colours]	连击、皮肤颜色	键 : 值 对
  *[HitObjects]	击打物件	逗号分隔的列表
  */
+
+class OsuHold;
+class OsuTiming;
 
 class OsuMap : public MMap {
  public:
@@ -344,8 +348,24 @@ class OsuMap : public MMap {
    */
   std::vector<int32_t> SliderBorder;
 
+  // 用于识别重叠时间域的长条物件缓存表
+  std::vector<std::shared_ptr<OsuHold>> temp_hold_list;
+
+  // 用于识别重叠时间的timing列表缓存map
+  std::unordered_map<int32_t, std::vector<std::shared_ptr<OsuTiming>>>
+      temp_timing_map;
+
   // 从文件读取谱面
   void load_from_file(const char* path) override;
+
+  // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
+  void query_around_timing(std::vector<std::shared_ptr<Timing>>& timings,
+                           int32_t time) override;
+
+  // 查询区间内有的物件
+  void query_object_in_range(
+      std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
+      int32_t end) override;
 };
 
 class OsuFileReader {
