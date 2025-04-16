@@ -30,12 +30,12 @@ RendererManager::RendererManager(GLCanvas* canvas, int oval_segment,
   // 用`:/`前缀访问qrc文件
 #ifdef __APPLE__
   general_shader =
-      std::make_shared<Shader>(canvas, ":/glsl/macos/vertexshader.glsl.vert",
-                               ":/glsl/macos/fragmentshader.glsl.frag");
+      std::make_shared<GLShader>(canvas, ":/glsl/macos/vertexshader.glsl.vert",
+                                 ":/glsl/macos/fragmentshader.glsl.frag");
 #else
   general_shader =
-      std::make_shared<Shader>(canvas, ":/glsl/vertexshader.glsl.vert",
-                               ":/glsl/fragmentshader.glsl.frag");
+      std::make_shared<GLShader>(canvas, ":/glsl/vertexshader.glsl.vert",
+                                 ":/glsl/fragmentshader.glsl.frag");
 #endif  //__APPLE__
   XINFO("初始化字体着色器");
   /*
@@ -43,8 +43,8 @@ RendererManager::RendererManager(GLCanvas* canvas, int oval_segment,
    *<file>glsl/fragfontshader.glsl.frag</file>
    */
   font_shader =
-      std::make_unique<Shader>(canvas, ":glsl/vertfontshader.glsl.vert",
-                               ":glsl/fragfontshader.glsl.frag");
+      std::make_unique<GLShader>(canvas, ":glsl/vertfontshader.glsl.vert",
+                                 ":glsl/fragfontshader.glsl.frag");
   // 初始化渲染器
   static_renderer = std::make_shared<StaticRenderer>(
       canvas, general_shader, oval_segment, max_shape_count_per_renderer);

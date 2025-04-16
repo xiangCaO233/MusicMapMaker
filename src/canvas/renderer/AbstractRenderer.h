@@ -5,9 +5,9 @@
 #include <memory>
 #include <vector>
 
+#include "../texture/pool/BaseTexturePool.h"
 #include "RenderCommand.h"
-#include "renderer/shader/Shader.h"
-#include "texture/pool/BaseTexturePool.h"
+#include "shader/GLShader.h"
 
 class GLCanvas;
 class QVector2D;
@@ -30,7 +30,7 @@ enum class InstanceDataType {
 class AbstractRenderer {
  public:
   // 构造AbstractRenderer
-  AbstractRenderer(GLCanvas* canvas, std::shared_ptr<Shader> general_shader,
+  AbstractRenderer(GLCanvas* canvas, std::shared_ptr<GLShader> general_shader,
                    int oval_segment, int max_shape_count);
   // 析构AbstractRenderer
   virtual ~AbstractRenderer();
@@ -61,7 +61,7 @@ class AbstractRenderer {
   // 统一缓冲对象
   uint32_t UBO;
   // 着色器
-  std::shared_ptr<Shader> shader;
+  std::shared_ptr<GLShader> shader;
 
   // 图形位置数据
   std::vector<QVector2D> position_data;

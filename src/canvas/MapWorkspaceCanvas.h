@@ -6,8 +6,21 @@
 #include <unordered_map>
 #include <vector>
 
+#include "AudioManager.h"
 #include "GLCanvas.h"
 #include "src/mmm/map/MMap.h"
+
+struct Beat {
+  double bpm;
+  double start_timestamp;
+  double end_timestamp;
+  int32_t divisors{4};
+
+  bool operator==(const Beat &other) const {
+    return bpm == other.bpm && start_timestamp == other.start_timestamp &&
+           end_timestamp == other.end_timestamp && divisors == other.divisors;
+  }
+};
 
 class MapWorkspaceCanvas : public GLCanvas {
  protected:
@@ -28,6 +41,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 刷新定时器
   QTimer *refresh_timer;
   int32_t timer_update_time{8};
+
   // 暂停播放
   bool pasue{true};
 
@@ -36,18 +50,6 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 物件区域缓存
   std::unordered_map<QRectF *, std::shared_ptr<HitObject>> hitobject_bounds_map;
-
-  struct Beat {
-    double bpm;
-    double start_timestamp;
-    double end_timestamp;
-    int32_t divisors{4};
-
-    bool operator==(const Beat &other) const {
-      return bpm == other.bpm && start_timestamp == other.start_timestamp &&
-             end_timestamp == other.end_timestamp && divisors == other.divisors;
-    }
-  };
 
   // 当前页面的拍
   std::vector<Beat> current_beats;
@@ -79,6 +81,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 析构MapWorkspaceCanvas
   ~MapWorkspaceCanvas() override;
+
+  // 音频管理器
+  std::shared_ptr<XAudioManager> audio_manager;
 
   // 分拍线颜色主题
   std::unordered_map<int32_t, std::vector<QColor>> divisors_color_theme;

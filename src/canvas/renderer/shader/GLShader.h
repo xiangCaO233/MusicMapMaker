@@ -7,7 +7,7 @@
 
 class GLCanvas;
 
-class Shader {
+class GLShader {
   // gl上下文
   GLCanvas* cvs;
 
@@ -21,10 +21,10 @@ class Shader {
 
  public:
   // 构造Shader
-  explicit Shader(GLCanvas* canvas, const char* vertex_source_code_path,
-                  const char* fragment_source_code_path);
+  explicit GLShader(GLCanvas* canvas, const char* vertex_source_code_path,
+                    const char* fragment_source_code_path);
   // 析构Shader
-  virtual ~Shader();
+  virtual ~GLShader();
 
   // 设置采样器
   void set_sampler(const char* name, int value);

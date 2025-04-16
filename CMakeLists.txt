@@ -22,9 +22,9 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
-  OpenGL LinguistTools)
+	OpenGL LinguistTools Svg SvgWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
-  COMPONENTS Core Widgets OpenGLWidgets OpenGL LinguistTools)
+  COMPONENTS Core Widgets OpenGLWidgets OpenGL LinguistTools Svg SvgWidgets)
 
 # 查找日志包
 find_package(spdlog REQUIRED)
@@ -32,11 +32,11 @@ find_package(spdlog REQUIRED)
 # 查找字体包
 find_package(Freetype REQUIRED)
 
-# 字符编码集转换库
-find_package(ICU REQUIRED COMPONENTS uc i18n)
-
 # 设置mmm相关文件
 set(MMM_SOURCES
+	src/mmm/SampleSet.h
+	src/mmm/MapWorkProject.h
+	src/mmm/MapWorkProject.cpp
   src/mmm/map/MMap.h
   src/mmm/map/MMap.cpp
   src/mmm/map/osu/OsuMap.h
@@ -83,12 +83,17 @@ set(PROJECT_SOURCES
   src/mainwindow.cpp
   src/mainwindow.h
   src/mainwindow.ui
+  src/filebrowsercontroller.h
+  src/filebrowsercontroller.cpp
+  src/projectcontroller.cpp
+  src/projectcontroller.h
+  src/mprojectcontroller.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/MapWorkspaceCanvas.h
   src/canvas/MapWorkspaceCanvas.cpp
-  src/canvas/renderer/shader/Shader.h
-  src/canvas/renderer/shader/Shader.cpp
+	src/canvas/renderer/shader/GLShader.h
+	src/canvas/renderer/shader/GLShader.cpp
   src/canvas/renderer/RenderCommand.h
   src/canvas/renderer/static/StaticRenderer.h
   src/canvas/renderer/static/StaticRenderer.cpp
@@ -119,7 +124,7 @@ set(PROJECT_SOURCES
   ${GLSL_FILES}
   ${TS_FILES})
 
-include_directories(./src/canvas ./src/log)
+include_directories(./src ./src/canvas ./src/log)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -157,8 +162,8 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-  Qt${QT_VERSION_MAJOR}::OpenGL Freetype::Freetype ICU::uc ICU::i18n
-  xaudio-dev)
+  Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::Svg 
+	Qt${QT_VERSION_MAJOR}::SvgWidgets Freetype::Freetype xaudio-dev)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

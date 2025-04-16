@@ -48,8 +48,8 @@ class RendererManager {
   std::shared_ptr<FontRenderer> font_renderer;
 
   // 着色器
-  std::shared_ptr<Shader> font_shader;
-  std::shared_ptr<Shader> general_shader;
+  std::shared_ptr<GLShader> font_shader;
+  std::shared_ptr<GLShader> general_shader;
 
   // 渲染指令列表
   std::vector<RenderCommand> command_list;

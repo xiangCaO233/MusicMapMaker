@@ -78,14 +78,14 @@ OsuMap::~OsuMap() = default;
 
 // 从文件读取谱面
 void OsuMap::load_from_file(const char* path) {
-  std::filesystem::path p(path);
-  auto fname = p.filename();
+  map_file_path = std::filesystem::path(path);
+  auto fname = map_file_path.filename();
   // XINFO("文件名:" + fname.string());
-  if (p.extension() == ".osu") {
+  if (map_file_path.extension() == ".osu") {
     // XINFO("load_osu:" + p.extension().string());
-    std::ifstream ifs(p);
+    std::ifstream ifs(map_file_path);
     if (!ifs.is_open()) {
-      XERROR("打开文件[" + p.string() + "]失败");
+      XERROR("打开文件[" + map_file_path.string() + "]失败");
       return;
     }
     OsuFileReader osureader;
@@ -129,6 +129,13 @@ void OsuMap::load_from_file(const char* path) {
     // general
     AudioFilename =
         osureader.get_value("General", "AudioFilename", std::string(""));
+    // 初始化音频绝对路径
+    // XINFO("map file parent:" + map_file_path.parent_path().string());
+    // XINFO(AudioFilename);
+    audio_file_abs_path = map_file_path.parent_path() / AudioFilename;
+
+    XINFO("audio path:" + audio_file_abs_path.string());
+
     AudioLeadIn = osureader.get_value("General", "AudioLeadIn", 0);
     AudioHash = osureader.get_value("General", "AudioHash", std::string(""));
     PreviewTime = osureader.get_value("General", "PreviewTime", -1);

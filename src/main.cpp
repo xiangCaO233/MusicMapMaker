@@ -15,7 +15,7 @@
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
-  XLogger::init();
+  XLogger::init("MMM");
 
   // 获取系统语言环境
   QLocale systemLocale = QLocale::system();

@@ -73,7 +73,7 @@ uint32_t XLogger::glcalls = 0;
 uint32_t XLogger::drawcalls = 0;
 std::shared_ptr<spdlog::logger> XLogger::logger;
 
-void XLogger::init() {
+void XLogger::init(const char *name) {
   // 创建三个sink（终端、全量文件、错误文件）
   auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
   auto file_all_sink =
@@ -94,7 +94,7 @@ void XLogger::init() {
 
   // 创建组合logger
   logger = std::make_shared<spdlog::logger>(
-      "MMM",
+      name,
       spdlog::sinks_init_list{console_sink, file_all_sink, file_error_sink});
 
   // 设置全局日志级别

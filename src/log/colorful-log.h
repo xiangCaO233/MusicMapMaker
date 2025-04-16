@@ -38,7 +38,7 @@ class XLogger {
  public:
   static uint32_t glcalls;
   static uint32_t drawcalls;
-  static void init();
+  static void init(const char* name);
   static void shutdown();
   static void enable();
   static void disable();

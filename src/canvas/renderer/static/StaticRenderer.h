@@ -31,7 +31,7 @@ class StaticRenderer : public AbstractRenderer {
 
  public:
   // 构造GLRenderer
-  StaticRenderer(GLCanvas* canvas, std::shared_ptr<Shader> general_shader,
+  StaticRenderer(GLCanvas* canvas, std::shared_ptr<GLShader> general_shader,
                  int oval_segment, int max_shape_count);
 
   // 析构GLRenderer

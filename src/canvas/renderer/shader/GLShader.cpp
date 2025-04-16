@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "GLShader.h"
 
 #include <QFile>
 
@@ -17,8 +17,8 @@
     }                                                      \
   }
 
-Shader::Shader(GLCanvas* canvas, const char* vertex_source_code_path,
-               const char* fragment_source_code_path)
+GLShader::GLShader(GLCanvas* canvas, const char* vertex_source_code_path,
+                   const char* fragment_source_code_path)
     : cvs(canvas) {
   auto vshader = GLCALL(cvs->glCreateShader(GL_VERTEX_SHADER));
   auto fshader = GLCALL(cvs->glCreateShader(GL_FRAGMENT_SHADER));
@@ -102,44 +102,44 @@ Shader::Shader(GLCanvas* canvas, const char* vertex_source_code_path,
   GLCALL(cvs->glDeleteShader(fshader));
 }
 
-Shader::~Shader() { GLCALL(cvs->glDeleteProgram(shader_program)); }
+GLShader::~GLShader() { GLCALL(cvs->glDeleteProgram(shader_program)); }
 
-void Shader::use() {
+void GLShader::use() {
   // 绑定着色器
   GLCALL(cvs->glUseProgram(shader_program));
 }
-void Shader::unuse() {
+void GLShader::unuse() {
   // 取消绑定着色器
   GLCALL(cvs->glUseProgram(0));
 }
 
 // 设置采样器
-void Shader::set_sampler(const char* name, int value) {
+void GLShader::set_sampler(const char* name, int value) {
   auto location = GLCALL(cvs->glGetUniformLocation(shader_program, name));
   GLCALL(cvs->glUniform1i(location, value));
 }
 
 // 设置uniform浮点
-void Shader::set_uniform_float(const char* location_name, float value) {
+void GLShader::set_uniform_float(const char* location_name, float value) {
   // 设置uniform
   GLCALL(cvs->glUniform1f(uniform_loc(location_name), value));
 }
 
 // 设置uniform整数
-void Shader::set_uniform_integer(const char* location_name, int32_t value) {
+void GLShader::set_uniform_integer(const char* location_name, int32_t value) {
   // 设置uniform
   GLCALL(cvs->glUniform1i(uniform_loc(location_name), value));
 }
 
 // 设置uniform矩阵(4x4)
-void Shader::set_uniform_mat4(const char* location_name,
-                              const QMatrix4x4& mat) {
+void GLShader::set_uniform_mat4(const char* location_name,
+                                const QMatrix4x4& mat) {
   // 设置uniform
   GLCALL(cvs->glUniformMatrix4fv(uniform_loc(location_name), 1, GL_FALSE,
                                  mat.data()));
 }
 
-int32_t Shader::uniform_loc(const char* location_name) {
+int32_t GLShader::uniform_loc(const char* location_name) {
   auto locationit = uniform_locations.find(location_name);
   if (locationit == uniform_locations.end()) {
     // 直接查询

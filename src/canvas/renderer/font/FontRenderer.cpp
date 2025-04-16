@@ -38,7 +38,7 @@ bool FontRenderer::is_ft_library_loaded = false;
 int FontRenderer::frenderer_count = 0;
 
 FontRenderer::FontRenderer(GLCanvas* canvas,
-                           std::shared_ptr<Shader> font_shader)
+                           std::shared_ptr<GLShader> font_shader)
     : AbstractRenderer(canvas, font_shader, -1, 4096) {
   font_shader->use();
   frenderer_count++;

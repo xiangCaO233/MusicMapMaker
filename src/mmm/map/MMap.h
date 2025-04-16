@@ -1,6 +1,7 @@
 #ifndef M_MAP_H
 #define M_MAP_H
 
+#include <filesystem>
 #include <memory>
 #include <vector>
 
@@ -20,6 +21,12 @@ class MMap {
   MMap();
   // 析构MMap
   virtual ~MMap();
+
+  // map文件路径
+  std::filesystem::path map_file_path;
+
+  // 音频绝对路径
+  std::filesystem::path audio_file_abs_path;
 
   // 图类型
   MapType maptype;

@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "../AbstractRenderer.h"
-#include "../shader/Shader.h"
+#include "../shader/GLShader.h"
 #include FT_FREETYPE_H
 
 class GLCanvas;
@@ -60,7 +60,7 @@ struct CharacterUVSet {
 class FontRenderer : public AbstractRenderer {
  public:
   // 构造FontRenderer
-  FontRenderer(GLCanvas* canvas, std::shared_ptr<Shader> font_shader);
+  FontRenderer(GLCanvas* canvas, std::shared_ptr<GLShader> font_shader);
   // 析构FontRenderer
   ~FontRenderer() override;
 

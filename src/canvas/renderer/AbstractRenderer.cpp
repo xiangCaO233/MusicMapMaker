@@ -20,7 +20,7 @@
   XLogger::drawcalls++;
 
 AbstractRenderer::AbstractRenderer(GLCanvas* canvas,
-                                   std::shared_ptr<Shader> general_shader,
+                                   std::shared_ptr<GLShader> general_shader,
                                    int oval_segment, int max_shape_count)
     : cvs(canvas),
       shader(general_shader),

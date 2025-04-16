@@ -1,9 +1,16 @@
 #ifndef M_UTIL_H
 #define M_UTIL_H
 
+#include <qcolor.h>
+#include <qcontainerfwd.h>
+#include <qpushbutton.h>
 #include <unicode/ucnv.h>
 #include <unicode/ustring.h>
 
+#include <QFile>
+#include <QPainter>
+#include <QSvgRenderer>
+#include <QtSvgWidgets/QSvgWidget>
 #include <string>
 
 namespace mutil {
@@ -21,6 +28,37 @@ inline void string2u32sring(const std::string& src, std::u32string& des) {
   u_strFromUTF8(reinterpret_cast<UChar*>(&des[0]), destLength, nullptr,
                 src.c_str(), src.length(), &status);
   ucnv_close(conv);
+}
+inline void set_button_svgcolor(QPushButton* button, const char* svgpath,
+                                QColor& color) {
+  // 加载SVG文件
+  QSvgWidget svgWidget(svgpath);
+  QByteArray svgData;
+  QFile file(svgpath);
+  if (file.open(QIODevice::ReadOnly)) {
+    svgData = file.readAll();
+    file.close();
+  }
+
+  // 添加或替换fill属性
+  QString svgString = QString::fromUtf8(svgData);
+  if (svgString.contains("fill=\"\"")) {
+    // 替换为指定颜色
+    svgString.replace("fill=\"\"", "fill=\"" + color.name() + "\"");
+  } else {
+    // 如果没有fill属性，直接插入
+    svgString.replace("<path ", "<path fill=\"" + color.name() + "\" ");
+  }
+
+  // 创建QPixmap
+  QSvgRenderer renderer(svgString.toUtf8());
+  QPixmap pixmap(28, 28);
+  pixmap.fill(Qt::transparent);
+  QPainter painter(&pixmap);
+  renderer.render(&painter);
+
+  // 设置图标
+  button->setIcon(QIcon(pixmap));
 }
 };  // namespace mutil
 

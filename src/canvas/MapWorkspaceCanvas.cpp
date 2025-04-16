@@ -15,6 +15,7 @@
 #include "../mmm/hitobject/Note/Note.h"
 #include "../mmm/map/osu/OsuMap.h"
 #include "../mmm/timing/Timing.h"
+#include "colorful-log.h"
 #include "src/mmm/timing/osu/OsuTiming.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
@@ -463,5 +464,10 @@ void MapWorkspaceCanvas::push_shape() {
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
+  // 载入音频
+  std::string audio_name;
+  audio_manager->loadaudio(map->audio_file_abs_path.string(), audio_name);
+  XINFO("Workspace载入音频[" + audio_name + "]成功");
+
   current_time_stamp = 60000;
 }

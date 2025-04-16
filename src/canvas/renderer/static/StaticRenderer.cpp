@@ -20,7 +20,7 @@
   }
 
 StaticRenderer::StaticRenderer(GLCanvas* canvas,
-                               std::shared_ptr<Shader> general_shader,
+                               std::shared_ptr<GLShader> general_shader,
                                int oval_segment, int max_shape_count)
     : AbstractRenderer(canvas, general_shader, oval_segment, max_shape_count) {
   // 初始化实例缓冲区
