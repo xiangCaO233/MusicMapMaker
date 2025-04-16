@@ -333,10 +333,10 @@ void OsuMap::query_around_timing(
 
   // 确定使用的timing
   std::shared_ptr<Timing> res;
-  if (it == result_timings.end()) {
+  if (it == timings.end()) {
     // 没找到比当前时间靠后的timing
     // 使用最后一个timing
-    res = result_timings.at(timings.size() - 1);
+    res = timings.at(timings.size() - 1);
 
   } else {
     // 找到了比当前时间靠后的timing

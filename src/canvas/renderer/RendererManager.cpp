@@ -136,7 +136,7 @@ void RendererManager::finalize() {
     // 逐一检查缓存列表指令变化情况,分析变化情况
     // 遍历指令列表
     bool should_update_temp{false};
-    if (command_list.size() < command_list_temp.size())
+    if (command_list.size() > command_list_temp.size())
       should_update_temp = true;
     for (int i = 0; i < command_list.size(); i++) {
       // 同步数据
