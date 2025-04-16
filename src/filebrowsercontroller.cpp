@@ -4,6 +4,7 @@
 
 #include <filesystem>
 
+#include "log/colorful-log.h"
 #include "mmm/MapWorkProject.h"
 
 // 构造MFileBrowserController
@@ -23,6 +24,7 @@ void MFileBrowserController::on_open_folder(QFileSystemModel* model,
 void MFileBrowserController::on_open_folder_as_project(QString& file_path) {
   // TODO(xiang 2025-04-16): 实现打开工程
   std::filesystem::path ppath(file_path.toStdString());
+  XINFO("打开项目目录:[" + ppath.string() + "]");
   auto project = std::make_shared<MapWorkProject>(ppath);
   // 发送信号
   emit open_project(project);

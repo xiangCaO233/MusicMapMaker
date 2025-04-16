@@ -32,6 +32,9 @@ find_package(spdlog REQUIRED)
 # 查找字体包
 find_package(Freetype REQUIRED)
 
+# 查找pugixml包
+find_package(pugixml REQUIRED)
+
 # 设置mmm相关文件
 set(MMM_SOURCES
 	src/mmm/SampleSet.h
@@ -163,7 +166,8 @@ target_link_libraries(
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
   Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::Svg 
-	Qt${QT_VERSION_MAJOR}::SvgWidgets Freetype::Freetype xaudio-dev)
+	Qt${QT_VERSION_MAJOR}::SvgWidgets 
+	Freetype::Freetype pugixml::pugixml xaudio-dev)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

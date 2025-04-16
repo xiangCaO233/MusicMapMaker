@@ -23,6 +23,7 @@
     </message>
     <message>
         <location filename="../src/mprojectcontroller.ui" line="149"/>
+        <location filename="../src/mprojectcontroller.ui" line="149"/>
         <source>Audios</source>
         <translation>音频</translation>
     </message>
@@ -157,7 +158,7 @@
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="752"/>
-        <location filename="../src/mainwindow.cpp" line="147"/>
+        <location filename="../src/mainwindow.cpp" line="150"/>
         <location filename="../src/mainwindow.ui" line="752"/>
         <source>Delete</source>
         <translation>删除</translation>
@@ -241,24 +242,29 @@
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="135"/>
+        <source>Open As Project</source>
+        <translation>打开为项目</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="138"/>
         <location filename="../src/mainwindow.cpp" line="135"/>
         <source>New File</source>
         <translation>创建文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="141"/>
+        <location filename="../src/mainwindow.cpp" line="144"/>
         <location filename="../src/mainwindow.cpp" line="141"/>
         <source>Open File</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="144"/>
+        <location filename="../src/mainwindow.cpp" line="147"/>
         <location filename="../src/mainwindow.cpp" line="144"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="154"/>
+        <location filename="../src/mainwindow.cpp" line="157"/>
         <location filename="../src/mainwindow.cpp" line="154"/>
         <source>Properties</source>
         <translation>属性</translation>

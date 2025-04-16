@@ -42,14 +42,13 @@ MainWindow::MainWindow(QWidget* parent)
 
   // 隐藏修改日期
   ui->file_browser_treeview->hideColumn(3);
-
-  // 名称栏自动扩张
-  ui->file_browser_treeview->header()->setSectionResizeMode(
-      0, QHeaderView::Stretch);
+  // 隐藏类型
+  ui->file_browser_treeview->hideColumn(2);
 
   // 跳转到当前运行目录
   ui->file_browser_treeview->setRootIndex(file_model->index(home));
-
+  ui->file_browser_treeview->setColumnWidth(0, 400);
+  ui->file_browser_treeview->setColumnWidth(1, 80);
   // 初始化文件浏览器管理器
   filebrowercontroller = std::make_shared<MFileBrowserController>();
 
@@ -131,6 +130,9 @@ void MainWindow::on_file_browser_treeview_customContextMenuRequested(
       filebrowercontroller->on_open_folder(
           qobject_cast<QFileSystemModel*>(ui->file_browser_treeview->model()),
           index);
+    });
+    menu.addAction(tr("Open As Project"), [&]() {
+      filebrowercontroller->on_open_folder_as_project(click_abs_path);
     });
     menu.addAction(tr("New File"), [&]() {
       filebrowercontroller->on_new_file_infolder(click_abs_path);
