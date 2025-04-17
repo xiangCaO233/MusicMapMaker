@@ -3,7 +3,10 @@
 
 #include <qcolor.h>
 #include <qcontainerfwd.h>
+#include <qmenu.h>
 #include <qpushbutton.h>
+#include <qsize.h>
+#include <qtoolbutton.h>
 #include <unicode/ucnv.h>
 #include <unicode/ustring.h>
 
@@ -30,7 +33,7 @@ inline void string2u32sring(const std::string& src, std::u32string& des) {
   ucnv_close(conv);
 }
 inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgpath,
-                                    QColor& color) {
+                                    QColor& color, QSize& size) {
   // 加载SVG文件
   QSvgWidget svgWidget(svgpath);
   QByteArray svgData;
@@ -52,17 +55,28 @@ inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgpath,
 
   // 创建QPixmap
   QSvgRenderer renderer(svgString.toUtf8());
-  pixmap = QPixmap(28, 28);
+  pixmap = QPixmap(size);
   pixmap.fill(Qt::transparent);
   QPainter painter(&pixmap);
   renderer.render(&painter);
 }
 
 inline void set_button_svgcolor(QPushButton* button, const char* svgpath,
-                                QColor& color) {
+                                QColor& color, int32_t w, int32_t h) {
   // 创建QPixmap
   QPixmap pixmap;
-  get_colored_icon_pixmap(pixmap, svgpath, color);
+  QSize size(w, h);
+  get_colored_icon_pixmap(pixmap, svgpath, color, size);
+
+  // 设置图标
+  button->setIcon(QIcon(pixmap));
+}
+inline void set_toolbutton_svgcolor(QToolButton* button, const char* svgpath,
+                                    QColor& color, int32_t w, int32_t h) {
+  // 创建QPixmap
+  QPixmap pixmap;
+  QSize size(w, h);
+  get_colored_icon_pixmap(pixmap, svgpath, color, size);
 
   // 设置图标
   button->setIcon(QIcon(pixmap));
@@ -71,10 +85,21 @@ inline void set_action_svgcolor(QAction* action, const char* svgpath,
                                 QColor& color) {
   // 创建QPixmap
   QPixmap pixmap;
-  get_colored_icon_pixmap(pixmap, svgpath, color);
+  QSize size(28, 28);
+  get_colored_icon_pixmap(pixmap, svgpath, color, size);
 
   // 设置图标
   action->setIcon(QIcon(pixmap));
+}
+
+inline void set_menu_svgcolor(QMenu* menu, const char* svgpath, QColor& color) {
+  // 创建QPixmap
+  QPixmap pixmap;
+  QSize size(28, 28);
+  get_colored_icon_pixmap(pixmap, svgpath, color, size);
+
+  // 设置图标
+  menu->setIcon(QIcon(pixmap));
 }
 };  // namespace mutil
 

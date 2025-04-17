@@ -365,14 +365,14 @@
           <property name="childrenCollapsible">
            <bool>false</bool>
           </property>
-          <widget class="QWidget" name="edit_area" native="true">
+          <widget class="QWidget" name="central_area" native="true">
            <property name="minimumSize">
             <size>
              <width>600</width>
              <height>0</height>
             </size>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
+           <layout class="QVBoxLayout" name="verticalLayout_7">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -389,17 +389,8 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QWidget" name="ToolsBar" native="true">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LayoutDirection::LeftToRight</enum>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <widget class="QWidget" name="central_controller" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
                <property name="spacing">
                 <number>0</number>
                </property>
@@ -416,78 +407,57 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QPushButton" name="pushButton">
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::FocusPolicy::ClickFocus</enum>
-                 </property>
-                 <property name="text">
-                  <string notr="true"/>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_2">
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::FocusPolicy::ClickFocus</enum>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_3">
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::FocusPolicy::ClickFocus</enum>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="checkable">
-                  <bool>true</bool>
-                 </property>
+                <widget class="QWidget" name="page_manager" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QComboBox" name="page_combobox">
+                    <property name="minimumSize">
+                     <size>
+                      <width>200</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="close_page_button">
+                    <property name="maximumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/glsrcs.qrc">
+                      <normaloff>:/icons/close.svg</normaloff>:/icons/close.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
                <item>
@@ -497,7 +467,7 @@
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
+                   <width>369</width>
                    <height>20</height>
                   </size>
                  </property>
@@ -507,10 +477,294 @@
              </widget>
             </item>
             <item>
-             <widget class="MapWorkspaceCanvas" name="canvas">
-              <property name="cursor">
-               <cursorShape>ArrowCursor</cursorShape>
-              </property>
+             <widget class="QWidget" name="current_page_widget" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QWidget" name="tool_container" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QToolButton" name="default_divisor_policy_toolbutton">
+                    <property name="minimumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>change the default divisors policy</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/glsrcs.qrc">
+                      <normaloff>:/icons/stream.svg</normaloff>:/icons/stream.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QToolButton" name="bookmark_toolbutton">
+                    <property name="minimumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>map bookmarks</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/glsrcs.qrc">
+                      <normaloff>:/icons/bookmark.svg</normaloff>:/icons/bookmark.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>613</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="audio_controller_button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string notr="true"/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/glsrcs.qrc">
+                      <normaloff>:/icons/sliders-h.svg</normaloff>:/icons/sliders-h.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="fit_size_to_orbitcount_button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>resize canvas to fit current orbit count</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/glsrcs.qrc">
+                      <normaloff>:/icons/expand.svg</normaloff>:/icons/expand.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="magnet_todivisor_button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>magnet to divisors</string>
+                    </property>
+                    <property name="text">
+                     <string notr="true"/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/glsrcs.qrc">
+                      <normaloff>:/icons/magnet.svg</normaloff>:/icons/magnet.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="wheel_direction_button">
+                    <property name="minimumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>28</width>
+                      <height>28</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>change the mouse wheel direction</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="../resources/glsrcs.qrc">
+                      <normaloff>:/icons/long-arrow-alt-up.svg</normaloff>
+                      <activeon>:/icons/long-arrow-alt-down.svg</activeon>
+                      <selectedon>:/icons/long-arrow-alt-down.svg</selectedon>:/icons/long-arrow-alt-up.svg</iconset>
+                    </property>
+                    <property name="iconSize">
+                     <size>
+                      <width>16</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QTabWidget" name="canvas_tabswidget">
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <widget class="QWidget" name="test_canvas_tab">
+                  <attribute name="title">
+                   <string>map_name</string>
+                  </attribute>
+                  <layout class="QHBoxLayout" name="horizontalLayout_4">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="MapWorkspaceCanvas" name="canvas">
+                     <property name="cursor">
+                      <cursorShape>ArrowCursor</cursorShape>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
             <item>
@@ -660,6 +914,10 @@
      <property name="title">
       <string>Switch Version</string>
      </property>
+     <property name="icon">
+      <iconset resource="../resources/glsrcs.qrc">
+       <normaloff>:/icons/exchange-alt.svg</normaloff>:/icons/exchange-alt.svg</iconset>
+     </property>
      <addaction name="actionInsane"/>
     </widget>
     <addaction name="actionOpen"/>
@@ -731,31 +989,55 @@
    </property>
   </action>
   <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/undo-alt.svg</normaloff>:/icons/undo-alt.svg</iconset>
+   </property>
    <property name="text">
     <string>Undo</string>
    </property>
   </action>
   <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/redo-alt.svg</normaloff>:/icons/redo-alt.svg</iconset>
+   </property>
    <property name="text">
     <string>Redo</string>
    </property>
   </action>
   <action name="actionYank">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/copy.svg</normaloff>:/icons/copy.svg</iconset>
+   </property>
    <property name="text">
     <string>Yank</string>
    </property>
   </action>
   <action name="actionCut">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/cut.svg</normaloff>:/icons/cut.svg</iconset>
+   </property>
    <property name="text">
     <string>Cut</string>
    </property>
   </action>
   <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/paste.svg</normaloff>:/icons/paste.svg</iconset>
+   </property>
    <property name="text">
     <string>Paste</string>
    </property>
   </action>
   <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/trash.svg</normaloff>:/icons/trash.svg</iconset>
+   </property>
    <property name="text">
     <string>Delete</string>
    </property>
@@ -834,6 +1116,10 @@
    </property>
   </action>
   <action name="actionNew_Version">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/plus.svg</normaloff>:/icons/plus.svg</iconset>
+   </property>
    <property name="text">
     <string>New Version</string>
    </property>

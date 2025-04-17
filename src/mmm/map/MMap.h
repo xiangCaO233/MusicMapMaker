@@ -1,9 +1,11 @@
 #ifndef M_MAP_H
 #define M_MAP_H
 
+#include <QRectF>
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 enum class MapType {
@@ -49,7 +51,9 @@ class MMap {
   // 查询区间内有的物件
   virtual void query_object_in_range(
       std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-      int32_t end) = 0;
+      int32_t end,
+      std::unordered_map<std::shared_ptr<HitObject>, QRectF*>* object_area_ptr =
+          nullptr) = 0;
 };
 
 #endif  // M_MAP_H

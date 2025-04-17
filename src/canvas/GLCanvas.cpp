@@ -179,7 +179,7 @@ void GLCanvas::initializeGL() {
   renderer_manager = new RendererManager(this, 64, 4096);
 
   // 初始化默认纹理
-  load_texture_from_path("../resources/textures/default/hitobject",
+  load_texture_from_path("../resources/textures/default",
                          TexturePoolType::ARRAY, true);
 
   // 初始化纹理
@@ -339,14 +339,22 @@ void GLCanvas::load_texture_from_path(const char *p, TexturePoolType type,
     return;
   }
 
+  // 筛选图片文件
+  static const std::unordered_set<std::string> image_extention = {"png", "jpg",
+                                                                  "jpeg"};
   // 递归遍历所有文件和子目录
   QDirIterator it(path, QDirIterator::Subdirectories);
+
   while (it.hasNext()) {
     QString filePath = it.next();
-    std::string filestr = filePath.toStdString();
-    auto file = filestr.c_str();
-    if (it.fileInfo().isFile()) {
-      add_texture(file, type, use_atlas);
+    auto finfo = it.fileInfo();
+    auto extention = finfo.suffix().toStdString();
+    if (finfo.isFile()) {
+      if (image_extention.find(extention) != image_extention.end()) {
+        std::string filestr = filePath.toStdString();
+        auto file = filestr.c_str();
+        add_texture(file, type, use_atlas);
+      }
     }
   }
 }

@@ -365,7 +365,9 @@ class OsuMap : public MMap {
   // 查询区间内有的物件
   void query_object_in_range(
       std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-      int32_t end) override;
+      int32_t end,
+      std::unordered_map<std::shared_ptr<HitObject>, QRectF*>* object_area_ptr =
+          nullptr) override;
 };
 
 class OsuFileReader {

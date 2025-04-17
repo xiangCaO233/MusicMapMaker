@@ -1,6 +1,8 @@
 #ifndef M_MAPWORKSPACE_H
 #define M_MAPWORKSPACE_H
 
+#include <qpaintdevice.h>
+
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
@@ -10,6 +12,17 @@
 #include "GLCanvas.h"
 #include "src/mmm/map/MMap.h"
 
+// 鼠标正在操作的区域
+enum class MouseOperationArea {
+  // 编辑区
+  EDIT,
+  // 预览区
+  PREVIEW,
+  // 物件
+  NOTE,
+};
+
+// "拍"结构体
 struct Beat {
   double bpm;
   double start_timestamp;
@@ -45,17 +58,30 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 暂停播放
   bool pasue{true};
 
+  // 鼠标操作区
+  MouseOperationArea operation_area;
+
   // 物件缓存
   std::vector<std::shared_ptr<HitObject>> buffer_objects;
 
-  // 物件区域缓存
-  std::unordered_map<QRectF *, std::shared_ptr<HitObject>> hitobject_bounds_map;
+  // 区域
+  QRectF edit_area;
+  QRectF preview_area;
+
+  // 物件区域缓存--实时更新包含的物件,不包含得删
+  std::unordered_map<std::shared_ptr<HitObject>, QRectF *> hitobject_bounds_map;
 
   // 当前页面的拍
   std::vector<Beat> current_beats;
 
   // 判定线位置:从下往上此倍率*总高度
   double judgeline_position{0.16};
+
+  // 预览区宽度倍率:实际宽度为总宽度*preview_width_scale
+  double preview_width_scale{0.22};
+
+  // 预览区区域倍率:实际时间线缩放为timeline_zoom*preview_area_scale
+  double preview_area_scale{5.0};
 
   // 绘制判定线
   void draw_judgeline();

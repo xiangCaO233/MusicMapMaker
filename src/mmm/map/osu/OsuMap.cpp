@@ -365,7 +365,8 @@ void OsuMap::query_around_timing(
 // 查询区间内有的物件
 void OsuMap::query_object_in_range(
     std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-    int32_t end) {
+    int32_t end,
+    std::unordered_map<std::shared_ptr<HitObject>, QRectF*>* object_area_ptr) {
   int count = 0;
   // 查找到第一个大于等于起始时间的物件迭代器
   auto it_start = std::upper_bound(
@@ -381,6 +382,13 @@ void OsuMap::query_object_in_range(
   for (const auto& hold : temp_hold_list) {
     if (hold->timestamp <= end &&
         hold->hold_end_reference->timestamp >= start) {
+      // 删除区域内不需要的物件映射
+      if (object_area_ptr) {
+        if (object_area_ptr->find(hold) == object_area_ptr->end()) {
+          // 不存在当前物件-- 构建映射
+          object_area_ptr->try_emplace(hold);
+        }
+      }
       result_objects.emplace_back(hold);
       count++;
     }
@@ -396,6 +404,9 @@ void OsuMap::query_object_in_range(
         if (obj.get() == note.get()) added = true;
     }
     if (!added) {
+      // 删除区域内不需要的物件映射
+      if (object_area_ptr) {
+      }
       result_objects.emplace_back(note);
       count++;
     }

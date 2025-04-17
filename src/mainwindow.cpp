@@ -133,16 +133,54 @@ void MainWindow::use_theme(GlobalTheme theme) {
                              file_button_color);
   mutil::set_action_svgcolor(ui->actionPack_As, ":/icons/file-archive.svg",
                              file_button_color);
+  mutil::set_action_svgcolor(ui->actionNew_Version, ":/icons/plus.svg",
+                             file_button_color);
+  mutil::set_menu_svgcolor(ui->menuSwitch_Version, ":/icons/exchange-alt.svg",
+                           file_button_color);
+
+  // 设置编辑操作图标颜色
+  mutil::set_action_svgcolor(ui->actionUndo, ":/icons/undo-alt.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionRedo, ":/icons/redo-alt.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionYank, ":/icons/copy.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionCut, ":/icons/cut.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionPaste, ":/icons/paste.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionDelete, ":/icons/trash.svg",
+                             file_button_color);
 
   // 设置文件管理器按钮图标颜色
   mutil::set_button_svgcolor(ui->cdup, ":/icons/angle-left.svg",
-                             file_button_color);
+                             file_button_color, 28, 28);
   mutil::set_button_svgcolor(ui->cdnext, ":/icons/angle-right.svg",
-                             file_button_color);
+                             file_button_color, 28, 28);
   mutil::set_button_svgcolor(ui->address_confirm, ":/icons/arrow-right.svg",
-                             file_button_color);
+                             file_button_color, 28, 28);
   mutil::set_button_svgcolor(ui->search, ":/icons/search.svg",
-                             file_button_color);
+                             file_button_color, 28, 28);
+
+  // 设置工具栏按钮图标颜色
+  mutil::set_toolbutton_svgcolor(ui->default_divisor_policy_toolbutton,
+                                 ":/icons/stream.svg", file_button_color, 16,
+                                 16);
+  mutil::set_toolbutton_svgcolor(ui->bookmark_toolbutton,
+                                 ":/icons/bookmark.svg", file_button_color, 16,
+                                 16);
+  mutil::set_button_svgcolor(ui->audio_controller_button,
+                             ":/icons/sliders-h.svg", file_button_color, 16,
+                             16);
+  mutil::set_button_svgcolor(ui->fit_size_to_orbitcount_button,
+                             ":/icons/expand.svg", file_button_color, 16, 16);
+  mutil::set_button_svgcolor(ui->magnet_todivisor_button, ":/icons/magnet.svg",
+                             file_button_color, 16, 16);
+
+  // 两个状态
+  mutil::set_button_svgcolor(ui->wheel_direction_button,
+                             ":/icons/long-arrow-alt-up.svg", file_button_color,
+                             16, 16);
 }
 
 // 选择音频输出设备事件
