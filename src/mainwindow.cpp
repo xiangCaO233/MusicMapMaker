@@ -8,7 +8,6 @@
 
 #include "./ui_mainwindow.h"
 #include "AudioManager.h"
-#include "mmm/map/osu/OsuMap.h"
 #include "src/util/mutil.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -81,24 +80,6 @@ MainWindow::MainWindow(QWidget* parent)
   // 连接项目选择map信号
   connect(ui->project_controller, &MProjectController::select_map, this,
           &MainWindow::project_controller_select_map);
-
-  // 设置map
-  // auto omap6k1 = std::make_shared<OsuMap>();
-  // omap6k1->load_from_file(
-  //    "../resources/map/Designant - Designant/Designant - Designant. (Benson_)
-  //    "
-  //    "[Designant].osu");
-  // auto omap4k1 = std::make_shared<OsuMap>();
-  // omap4k1->load_from_file(
-  //    "../resources/map/Lia - Poetry of Birds/Lia - Poetry of Birds "
-  //    "(xiang_233) [full version].osu");
-  // auto omap4k2 = std::make_shared<OsuMap>();
-  // omap4k2->load_from_file(
-  //    "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - "
-  //    "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - shojo rei
-  //    "
-  //    "(xiang_233) [(LN)NM lv.29].osu");
-  // canvas->switch_map(omap6k1);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -194,6 +175,7 @@ void MainWindow::on_audio_device_selector_currentIndexChanged(int index) {
 void MainWindow::on_file_browser_treeview_customContextMenuRequested(
     const QPoint& pos) {
   QModelIndex index = ui->file_browser_treeview->indexAt(pos);
+
   if (!index.isValid()) return;
   auto click_abs_path = index.data(Qt::UserRole + 1).toString();
   auto click_item = QFileInfo(click_abs_path);
@@ -238,6 +220,29 @@ void MainWindow::on_file_browser_treeview_customContextMenuRequested(
 
   // 显示菜单
   menu.exec(ui->file_browser_treeview->viewport()->mapToGlobal(pos));
+}
+
+// 滚动方向切换按钮触发
+void MainWindow::on_wheel_direction_button_toggled(bool checked) {
+  use_natural_wheel = checked;
+  // 根据主题切换图标颜色
+  QColor file_button_color;
+  switch (current_theme) {
+    case GlobalTheme::DARK: {
+      file_button_color = QColor(255, 255, 255);
+      break;
+    }
+    case GlobalTheme::LIGHT: {
+      file_button_color = QColor(0, 0, 0);
+      break;
+    }
+  }
+
+  // 两个状态
+  mutil::set_button_svgcolor(ui->wheel_direction_button,
+                             (checked ? ":/icons/long-arrow-alt-down.svg"
+                                      : ":/icons/long-arrow-alt-up.svg"),
+                             file_button_color, 16, 16);
 }
 
 // 项目控制器选择了map事件

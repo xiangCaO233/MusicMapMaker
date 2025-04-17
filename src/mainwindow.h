@@ -32,6 +32,9 @@ class MainWindow : public QMainWindow {
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
 
+  // 使用自然滚动
+  bool use_natural_wheel{false};
+
   // 音频管理器
   std::shared_ptr<XAudioManager> audio_manager;
 
@@ -55,6 +58,9 @@ class MainWindow : public QMainWindow {
 
   // 项目控制器选择了map事件
   void project_controller_select_map(std::shared_ptr<MMap> &map);
+
+  // 滚动方向切换按钮触发
+  void on_wheel_direction_button_toggled(bool checked);
 
  private:
   Ui::MainWindow *ui;

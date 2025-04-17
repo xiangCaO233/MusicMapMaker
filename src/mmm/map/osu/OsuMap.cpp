@@ -80,7 +80,7 @@ OsuMap::~OsuMap() = default;
 void OsuMap::load_from_file(const char* path) {
   map_file_path = std::filesystem::path(path);
   auto fname = map_file_path.filename();
-  // XINFO("文件名:" + fname.string());
+  XINFO("路径:" + map_file_path.string());
   if (map_file_path.extension() == ".osu") {
     // XINFO("load_osu:" + p.extension().string());
     std::ifstream ifs(map_file_path);

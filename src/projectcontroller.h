@@ -31,6 +31,13 @@ class MProjectController : public QWidget {
   // 制谱工程映射表
   std::unordered_map<std::string, std::shared_ptr<MapWorkProject>>
       project_mapping;
+
+  // 最后一次打开的文件目录
+  QString last_select_directory;
+
+  // 选择项目
+  void select_project(std::shared_ptr<MapWorkProject> &project);
+
  signals:
   void select_map(std::shared_ptr<MMap> &map);
 
@@ -61,6 +68,9 @@ class MProjectController : public QWidget {
 
   // 视频列表上下文菜单事件
   void on_video_list_view_customContextMenuRequested(const QPoint &pos);
+
+  // 关闭项目事件
+  void on_close_project_button_clicked();
 
  private:
   Ui::MProjectController *ui;

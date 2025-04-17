@@ -22,20 +22,20 @@
         <translation>谱面</translation>
     </message>
     <message>
-        <location filename="../src/mprojectcontroller.ui" line="149"/>
-        <location filename="../src/mprojectcontroller.ui" line="149"/>
+        <location filename="../src/mprojectcontroller.ui" line="153"/>
+        <location filename="../src/mprojectcontroller.ui" line="153"/>
         <source>Audios</source>
         <translation>音频</translation>
     </message>
     <message>
-        <location filename="../src/mprojectcontroller.ui" line="174"/>
-        <location filename="../src/mprojectcontroller.ui" line="174"/>
+        <location filename="../src/mprojectcontroller.ui" line="182"/>
+        <location filename="../src/mprojectcontroller.ui" line="182"/>
         <source>Images</source>
         <translation>图片</translation>
     </message>
     <message>
-        <location filename="../src/mprojectcontroller.ui" line="199"/>
-        <location filename="../src/mprojectcontroller.ui" line="199"/>
+        <location filename="../src/mprojectcontroller.ui" line="211"/>
+        <location filename="../src/mprojectcontroller.ui" line="211"/>
         <source>Videos</source>
         <translation>视频</translation>
     </message>
@@ -61,14 +61,55 @@
         <translation>音频设备</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="564"/>
-        <location filename="../src/mainwindow.ui" line="564"/>
+        <location filename="../src/mainwindow.ui" line="530"/>
+        <location filename="../src/mainwindow.ui" line="530"/>
+        <source>change the default divisors policy</source>
+        <translation>更改默认分拍策略</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="562"/>
+        <location filename="../src/mainwindow.ui" line="562"/>
+        <source>map bookmarks</source>
+        <translation>谱面标签</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="607"/>
+        <source>audio controller</source>
+        <translation>打开音频控制器</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="639"/>
+        <location filename="../src/mainwindow.ui" line="636"/>
+        <source>resize canvas to fit current orbit count</source>
+        <translation>调整画布尺寸以适应轨道数</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="671"/>
+        <location filename="../src/mainwindow.ui" line="668"/>
+        <source>magnet to divisors</source>
+        <translation>滚动时吸附到分拍线上</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="706"/>
+        <location filename="../src/mainwindow.ui" line="703"/>
+        <source>change the mouse wheel direction</source>
+        <translation>更改鼠标滚动方向</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="741"/>
+        <location filename="../src/mainwindow.ui" line="738"/>
+        <source>map_name</source>
+        <translation>谱面名称</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.ui" line="821"/>
+        <location filename="../src/mainwindow.ui" line="818"/>
         <source>Log</source>
         <translation>日志</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="604"/>
-        <location filename="../src/mainwindow.ui" line="604"/>
+        <location filename="../src/mainwindow.ui" line="861"/>
+        <location filename="../src/mainwindow.ui" line="858"/>
         <source>Errors</source>
         <translation>错误</translation>
     </message>
@@ -79,153 +120,153 @@
         <translation>命令</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="657"/>
-        <location filename="../src/mainwindow.ui" line="657"/>
+        <location filename="../src/mainwindow.ui" line="914"/>
+        <location filename="../src/mainwindow.ui" line="911"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="661"/>
-        <location filename="../src/mainwindow.ui" line="661"/>
+        <location filename="../src/mainwindow.ui" line="918"/>
+        <location filename="../src/mainwindow.ui" line="915"/>
         <source>Switch Version</source>
         <translation>切换版本</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="678"/>
-        <location filename="../src/mainwindow.ui" line="678"/>
+        <location filename="../src/mainwindow.ui" line="939"/>
+        <location filename="../src/mainwindow.ui" line="936"/>
         <source>Modify</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="691"/>
-        <location filename="../src/mainwindow.ui" line="691"/>
+        <location filename="../src/mainwindow.ui" line="952"/>
+        <location filename="../src/mainwindow.ui" line="949"/>
         <source>View</source>
         <translation>视图</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="698"/>
-        <location filename="../src/mainwindow.ui" line="698"/>
+        <location filename="../src/mainwindow.ui" line="959"/>
+        <location filename="../src/mainwindow.ui" line="956"/>
         <source>Tool</source>
         <translation>工具</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="704"/>
-        <location filename="../src/mainwindow.ui" line="704"/>
+        <location filename="../src/mainwindow.ui" line="965"/>
+        <location filename="../src/mainwindow.ui" line="962"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="717"/>
-        <location filename="../src/mainwindow.ui" line="717"/>
+        <location filename="../src/mainwindow.ui" line="982"/>
+        <location filename="../src/mainwindow.ui" line="979"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="722"/>
-        <location filename="../src/mainwindow.ui" line="722"/>
+        <location filename="../src/mainwindow.ui" line="991"/>
+        <location filename="../src/mainwindow.ui" line="988"/>
         <source>Open Directory</source>
         <translation>打开目录</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="727"/>
-        <location filename="../src/mainwindow.ui" line="727"/>
+        <location filename="../src/mainwindow.ui" line="1000"/>
+        <location filename="../src/mainwindow.ui" line="997"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="732"/>
-        <location filename="../src/mainwindow.ui" line="732"/>
+        <location filename="../src/mainwindow.ui" line="1009"/>
+        <location filename="../src/mainwindow.ui" line="1006"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="737"/>
-        <location filename="../src/mainwindow.ui" line="737"/>
+        <location filename="../src/mainwindow.ui" line="1018"/>
+        <location filename="../src/mainwindow.ui" line="1015"/>
         <source>Yank</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="742"/>
-        <location filename="../src/mainwindow.ui" line="742"/>
+        <location filename="../src/mainwindow.ui" line="1027"/>
+        <location filename="../src/mainwindow.ui" line="1024"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="747"/>
-        <location filename="../src/mainwindow.ui" line="747"/>
+        <location filename="../src/mainwindow.ui" line="1036"/>
+        <location filename="../src/mainwindow.ui" line="1033"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="752"/>
-        <location filename="../src/mainwindow.cpp" line="150"/>
-        <location filename="../src/mainwindow.ui" line="752"/>
+        <location filename="../src/mainwindow.ui" line="1045"/>
+        <location filename="../src/mainwindow.cpp" line="228"/>
+        <location filename="../src/mainwindow.ui" line="1042"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="757"/>
-        <location filename="../src/mainwindow.ui" line="757"/>
+        <location filename="../src/mainwindow.ui" line="1050"/>
+        <location filename="../src/mainwindow.ui" line="1047"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="768"/>
-        <location filename="../src/mainwindow.ui" line="768"/>
+        <location filename="../src/mainwindow.ui" line="1061"/>
+        <location filename="../src/mainwindow.ui" line="1058"/>
         <source>Show Logs</source>
         <translation>显示日志</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="773"/>
-        <location filename="../src/mainwindow.ui" line="773"/>
+        <location filename="../src/mainwindow.ui" line="1070"/>
+        <location filename="../src/mainwindow.ui" line="1067"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="778"/>
-        <location filename="../src/mainwindow.ui" line="778"/>
+        <location filename="../src/mainwindow.ui" line="1079"/>
+        <location filename="../src/mainwindow.ui" line="1076"/>
         <source>Save As</source>
         <translation>另存为...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="783"/>
-        <location filename="../src/mainwindow.ui" line="783"/>
+        <location filename="../src/mainwindow.ui" line="1084"/>
+        <location filename="../src/mainwindow.ui" line="1081"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="788"/>
-        <location filename="../src/mainwindow.ui" line="788"/>
+        <location filename="../src/mainwindow.ui" line="1089"/>
+        <location filename="../src/mainwindow.ui" line="1086"/>
         <source>Check Stack Object</source>
         <translation>检查重叠物件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="799"/>
-        <location filename="../src/mainwindow.ui" line="799"/>
+        <location filename="../src/mainwindow.ui" line="1100"/>
+        <location filename="../src/mainwindow.ui" line="1097"/>
         <source>Show Files</source>
         <translation>显示文件管理器</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="804"/>
-        <location filename="../src/mainwindow.ui" line="804"/>
+        <location filename="../src/mainwindow.ui" line="1109"/>
+        <location filename="../src/mainwindow.ui" line="1106"/>
         <source>Pack</source>
         <translation>打包</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="809"/>
-        <location filename="../src/mainwindow.ui" line="809"/>
+        <location filename="../src/mainwindow.ui" line="1118"/>
+        <location filename="../src/mainwindow.ui" line="1115"/>
         <source>Pack As</source>
         <translation>打包为...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="814"/>
-        <location filename="../src/mainwindow.ui" line="814"/>
+        <location filename="../src/mainwindow.ui" line="1127"/>
+        <location filename="../src/mainwindow.ui" line="1124"/>
         <source>New Version</source>
         <translation>创建版本</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="819"/>
-        <location filename="../src/mainwindow.ui" line="819"/>
+        <location filename="../src/mainwindow.ui" line="1132"/>
+        <location filename="../src/mainwindow.ui" line="1129"/>
         <source>Insane</source>
         <translation>疯狂</translation>
     </message>
@@ -235,37 +276,38 @@
         <translation>按钮</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="130"/>
-        <location filename="../src/mainwindow.cpp" line="130"/>
+        <location filename="../src/mainwindow.cpp" line="208"/>
+        <location filename="../src/mainwindow.cpp" line="208"/>
         <source>Open Folder</source>
         <translation>打开目录</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="135"/>
+        <location filename="../src/mainwindow.cpp" line="213"/>
+        <location filename="../src/mainwindow.cpp" line="213"/>
         <source>Open As Project</source>
         <translation>打开为项目</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="138"/>
-        <location filename="../src/mainwindow.cpp" line="135"/>
+        <location filename="../src/mainwindow.cpp" line="216"/>
+        <location filename="../src/mainwindow.cpp" line="216"/>
         <source>New File</source>
         <translation>创建文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="144"/>
-        <location filename="../src/mainwindow.cpp" line="141"/>
+        <location filename="../src/mainwindow.cpp" line="222"/>
+        <location filename="../src/mainwindow.cpp" line="222"/>
         <source>Open File</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="147"/>
-        <location filename="../src/mainwindow.cpp" line="144"/>
+        <location filename="../src/mainwindow.cpp" line="225"/>
+        <location filename="../src/mainwindow.cpp" line="225"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="157"/>
-        <location filename="../src/mainwindow.cpp" line="154"/>
+        <location filename="../src/mainwindow.cpp" line="235"/>
+        <location filename="../src/mainwindow.cpp" line="235"/>
         <source>Properties</source>
         <translation>属性</translation>
     </message>
