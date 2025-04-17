@@ -159,6 +159,10 @@ void RendererManager::finalize() {
           //  同步渲染指令到渲染器
           sync_renderer(renderer, command);
         }
+      } else {
+        // 超出缓存范围,先同步指令
+        // 同步渲染指令到渲染器
+        sync_renderer(renderer, command);
       }
       if (command.is_text) {
         // TODO(xiang 2025-04-12): 检查可合并的渲染文本指令
