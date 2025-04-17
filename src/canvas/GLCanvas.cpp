@@ -50,7 +50,7 @@ GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {
 
 GLCanvas::~GLCanvas() {
   // 释放渲染管理器
-  delete renderer_manager;
+  if (renderer_manager) delete renderer_manager;
 };
 
 // qt事件

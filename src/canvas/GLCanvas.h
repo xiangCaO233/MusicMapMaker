@@ -58,7 +58,7 @@ class GLCanvas : public QOpenGLWidget,
   static bool need_update_sampler_location;
 
   // 渲染管理器
-  RendererManager *renderer_manager;
+  RendererManager *renderer_manager = nullptr;
 
   // 当前纹理集信息
   std::shared_ptr<TextureAtlas> current_atlas;

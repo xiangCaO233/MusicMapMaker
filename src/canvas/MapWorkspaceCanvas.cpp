@@ -2,12 +2,14 @@
 
 #include <qnamespace.h>
 #include <qpaintdevice.h>
+#include <unistd.h>
 
 #include <QTimer>
 #include <QWheelEvent>
 #include <algorithm>
 #include <cstdint>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include "../mmm/hitobject/Note/Hold.h"
@@ -50,7 +52,19 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   // Lambda 捕获 this,调用成员函数
   QObject::connect(refresh_timer, &QTimer::timeout,
                    [this]() { this->update_canvas(); });
-  refresh_timer->start(timer_update_time);
+
+  // 新建线程等待gl初始化完成后启动刷新器
+  auto tw = [this]() {
+    while (!renderer_manager) {
+      XINFO("等待gl上下文初始化");
+      usleep(1000 * 50);
+    }
+    QMetaObject::invokeMethod(
+        this, [this]() { refresh_timer->start(timer_update_time); },
+        Qt::QueuedConnection);
+  };
+  std::thread t(tw);
+  t.detach();
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;

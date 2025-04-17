@@ -16,7 +16,6 @@
 #include <filesystem>
 #include <memory>
 
-#include "colorful-log.h"
 #include "mmm/MapWorkProject.h"
 #include "ui_mprojectcontroller.h"
 
@@ -50,6 +49,7 @@ MProjectController::MProjectController(QWidget* parent)
   ui->video_list_view->setModel(video_list_model);
   ui->video_list_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+  // 默认无选择
   ui->project_selector->addItem(QString(tr("No Project")));
 }
 

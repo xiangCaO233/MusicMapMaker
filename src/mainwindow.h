@@ -3,7 +3,10 @@
 
 #include <QComboBox>
 #include <QMainWindow>
+#include <cstdint>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 #include "src/filebrowsercontroller.h"
 
@@ -13,10 +16,17 @@ enum class GlobalTheme {
   LIGHT,
 };
 
+// 设置
+struct Settings {
+  // 显示欢迎页
+  bool show_hello_page{true};
+};
+
 class XAudioManager;
 class MapWorkspaceCanvas;
 class XOutputDevice;
 class MMap;
+class HelloUserPage;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,6 +41,27 @@ class MainWindow : public QMainWindow {
   MapWorkspaceCanvas *canvas;
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
+
+  // 使用真实gl上下文的画布
+  MapWorkspaceCanvas *canvas_context = nullptr;
+
+  // 欢迎页
+  HelloUserPage *hello_page;
+
+  // 全部设置
+  Settings settings;
+
+  // 上一次的标签页索引
+  int32_t last_main_tab_index{0};
+
+  // 打开的谱面映射表
+  std::unordered_map<std::string, std::shared_ptr<MMap>> opened_maps_map;
+
+  // 标签页索引的谱面映射表
+  std::unordered_map<int32_t, std::shared_ptr<MMap>> tabindex_maps_map;
+
+  // 谱面的标签页索引映射表
+  std::unordered_map<std::shared_ptr<MMap>, int32_t> maps_tabindex_map;
 
   // 使用自然滚动
   bool use_natural_wheel{false};
@@ -61,6 +92,9 @@ class MainWindow : public QMainWindow {
 
   // 滚动方向切换按钮触发
   void on_wheel_direction_button_toggled(bool checked);
+
+  // 切换当前标签页事件
+  void on_main_tabs_widget_currentChanged(int index);
 
  private:
   Ui::MainWindow *ui;

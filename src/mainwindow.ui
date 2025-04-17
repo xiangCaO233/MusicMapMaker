@@ -358,7 +358,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QSplitter" name="splitter">
+         <widget class="QSplitter" name="right_splitter">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
@@ -388,94 +388,6 @@
             <property name="bottomMargin">
              <number>0</number>
             </property>
-            <item>
-             <widget class="QWidget" name="central_controller" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_8">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QWidget" name="page_manager" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_7">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QComboBox" name="page_combobox">
-                    <property name="minimumSize">
-                     <size>
-                      <width>200</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="close_page_button">
-                    <property name="maximumSize">
-                     <size>
-                      <width>28</width>
-                      <height>28</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="../resources/glsrcs.qrc">
-                      <normaloff>:/icons/close.svg</normaloff>:/icons/close.svg</iconset>
-                    </property>
-                    <property name="iconSize">
-                     <size>
-                      <width>16</width>
-                      <height>16</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>369</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </widget>
-            </item>
             <item>
              <widget class="QWidget" name="current_page_widget" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -732,39 +644,10 @@
                 </widget>
                </item>
                <item>
-                <widget class="QTabWidget" name="canvas_tabswidget">
+                <widget class="QTabWidget" name="main_tabs_widget">
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>-1</number>
                  </property>
-                 <widget class="QWidget" name="test_canvas_tab">
-                  <attribute name="title">
-                   <string>map_name</string>
-                  </attribute>
-                  <layout class="QHBoxLayout" name="horizontalLayout_4">
-                   <property name="spacing">
-                    <number>0</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="MapWorkspaceCanvas" name="canvas">
-                     <property name="cursor">
-                      <cursorShape>ArrowCursor</cursorShape>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
                 </widget>
                </item>
               </layout>
@@ -812,7 +695,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QTabWidget" name="tabWidget">
+             <widget class="QTabWidget" name="information_tab_widget">
               <property name="currentIndex">
                <number>0</number>
               </property>
@@ -1134,11 +1017,6 @@
   </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>MapWorkspaceCanvas</class>
-   <extends>QOpenGLWidget</extends>
-   <header location="global">MapWorkspaceCanvas.h</header>
-  </customwidget>
   <customwidget>
    <class>MProjectController</class>
    <extends>QWidget</extends>
