@@ -84,7 +84,7 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
 void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
-  current_time_stamp += event->pixelDelta().y() / 3;
+  current_time_stamp += event->angleDelta().y() / 3;
 }
 
 // 键盘按下事件
