@@ -53,13 +53,13 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
       }
     } else if (audio_extention.find(extention) != audio_extention.end()) {
       // 音频文件
-      audio_paths.emplace_back(entry.path());
+      audio_paths.emplace_back(entry.path().string());
     } else if (image_extention.find(extention) != image_extention.end()) {
       // 图片文件
-      image_paths.emplace_back(entry.path());
+      image_paths.emplace_back(entry.path().string());
     } else if (video_extention.find(extention) != video_extention.end()) {
       // 视频文件
-      video_paths.emplace_back(entry.path());
+      video_paths.emplace_back(entry.path().string());
     }
   }
 
