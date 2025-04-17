@@ -29,8 +29,8 @@ inline void string2u32sring(const std::string& src, std::u32string& des) {
                 src.c_str(), src.length(), &status);
   ucnv_close(conv);
 }
-inline void set_button_svgcolor(QPushButton* button, const char* svgpath,
-                                QColor& color) {
+inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgpath,
+                                    QColor& color) {
   // 加载SVG文件
   QSvgWidget svgWidget(svgpath);
   QByteArray svgData;
@@ -52,13 +52,29 @@ inline void set_button_svgcolor(QPushButton* button, const char* svgpath,
 
   // 创建QPixmap
   QSvgRenderer renderer(svgString.toUtf8());
-  QPixmap pixmap(28, 28);
+  pixmap = QPixmap(28, 28);
   pixmap.fill(Qt::transparent);
   QPainter painter(&pixmap);
   renderer.render(&painter);
+}
+
+inline void set_button_svgcolor(QPushButton* button, const char* svgpath,
+                                QColor& color) {
+  // 创建QPixmap
+  QPixmap pixmap;
+  get_colored_icon_pixmap(pixmap, svgpath, color);
 
   // 设置图标
   button->setIcon(QIcon(pixmap));
+}
+inline void set_action_svgcolor(QAction* action, const char* svgpath,
+                                QColor& color) {
+  // 创建QPixmap
+  QPixmap pixmap;
+  get_colored_icon_pixmap(pixmap, svgpath, color);
+
+  // 设置图标
+  action->setIcon(QIcon(pixmap));
 }
 };  // namespace mutil
 

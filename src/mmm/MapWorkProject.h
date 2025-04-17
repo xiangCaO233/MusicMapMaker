@@ -1,8 +1,11 @@
 #ifndef M_MAPWORKPROJECT_H
 #define M_MAPWORKPROJECT_H
 
+#include <qimage.h>
+
 #include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <pugixml.hpp>
 #include <string>
 #include <vector>
@@ -36,7 +39,16 @@ class MapWorkProject {
   ProjectConfig config;
 
   // 项目中谱的列表
-  std::vector<MMap> maps;
+  std::vector<std::shared_ptr<MMap>> maps;
+
+  // 项目中音频的路径列表
+  std::vector<std::string> audio_paths;
+
+  // 项目中图片的路径列表
+  std::vector<std::string> image_paths;
+
+  // 项目中视频的路径列表
+  std::vector<std::string> video_paths;
 
   // xml配置文档
   pugi::xml_document config_xml;

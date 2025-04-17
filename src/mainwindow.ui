@@ -713,11 +713,19 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/file.svg</normaloff>:/icons/file.svg</iconset>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
   </action>
   <action name="actionOpen_Directory">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/folder-open.svg</normaloff>:/icons/folder-open.svg</iconset>
+   </property>
    <property name="text">
     <string>Open Directory</string>
    </property>
@@ -769,11 +777,19 @@
    </property>
   </action>
   <action name="actionSave">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/file-alt.svg</normaloff>:/icons/file-alt.svg</iconset>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
   </action>
   <action name="actionSave_As">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/file-export.svg</normaloff>:/icons/file-export.svg</iconset>
+   </property>
    <property name="text">
     <string>Save As</string>
    </property>
@@ -800,11 +816,19 @@
    </property>
   </action>
   <action name="actionPack">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/file-archive.svg</normaloff>:/icons/file-archive.svg</iconset>
+   </property>
    <property name="text">
     <string>Pack</string>
    </property>
   </action>
   <action name="actionPack_As">
+   <property name="icon">
+    <iconset resource="../resources/glsrcs.qrc">
+     <normaloff>:/icons/file-archive.svg</normaloff>:/icons/file-archive.svg</iconset>
+   </property>
    <property name="text">
     <string>Pack As</string>
    </property>

@@ -134,7 +134,7 @@ void OsuMap::load_from_file(const char* path) {
     // XINFO(AudioFilename);
     audio_file_abs_path = map_file_path.parent_path() / AudioFilename;
 
-    XINFO("audio path:" + audio_file_abs_path.string());
+    // XINFO("audio path:" + audio_file_abs_path.string());
 
     AudioLeadIn = osureader.get_value("General", "AudioLeadIn", 0);
     AudioHash = osureader.get_value("General", "AudioHash", std::string(""));
@@ -211,6 +211,9 @@ void OsuMap::load_from_file(const char* path) {
     SliderMultiplier =
         osureader.get_value("Difficulty", "SliderMultiplier", 0.0);
     SliderTickRate = osureader.get_value("Difficulty", "SliderTickRate", 0.0);
+
+    // 生成图名
+    map_name = "[o!m] [" + std::to_string(int(CircleSize)) + "k]" + Version;
 
     // colour--- 不写
 

@@ -15,6 +15,8 @@ enum class GlobalTheme {
 
 class XAudioManager;
 class MapWorkspaceCanvas;
+class XOutputDevice;
+class MMap;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,11 +32,14 @@ class MainWindow : public QMainWindow {
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
 
-  // 当前主题
-  GlobalTheme current_theme;
-
   // 音频管理器
   std::shared_ptr<XAudioManager> audio_manager;
+
+  // 当前选择的音频输出设备
+  std::shared_ptr<XOutputDevice> current_use_device;
+
+  // 当前主题
+  GlobalTheme current_theme;
 
   // 文件浏览器控制器
   std::shared_ptr<MFileBrowserController> filebrowercontroller;
@@ -45,6 +50,11 @@ class MainWindow : public QMainWindow {
  private slots:
   // 文件浏览器上下文菜单事件
   void on_file_browser_treeview_customContextMenuRequested(const QPoint &pos);
+  // 选择音频输出设备事件
+  void on_audio_device_selector_currentIndexChanged(int index);
+
+  // 项目控制器选择了map事件
+  void project_controller_select_map(std::shared_ptr<MMap> &map);
 
  private:
   Ui::MainWindow *ui;

@@ -14,6 +14,18 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
+  // 注册QVariant数据类型
+  // 注册 string 类型
+  qRegisterMetaType<std::string>("std::string");
+  // 注册 shared_ptr<XOutputDevice> 类型
+  qRegisterMetaType<std::shared_ptr<XOutputDevice>>(
+      "std::shared_ptr<XOutputDevice>");
+  // 注册 shared_ptr<MMap> 类型
+  qRegisterMetaType<std::shared_ptr<MMap>>("std::shared_ptr<MMap>");
+  // 注册 shared_ptr<MapWorkProject> 类型
+  qRegisterMetaType<std::shared_ptr<MapWorkProject>>(
+      "std::shared_ptr<MapWorkProject>");
+
   // 初始化音频管理器
   audio_manager = XAudioManager::newmanager();
 
@@ -21,7 +33,8 @@ MainWindow::MainWindow(QWidget* parent)
   auto devices = audio_manager->get_outdevices();
   for (const auto& [device_id, device] : *devices) {
     ui->audio_device_selector->addItem(
-        QString::fromStdString(device->device_name), QVariant(device_id));
+        QString::fromStdString(device->device_name),
+        QVariant::fromValue(device));
   }
 
   // 获取家目录
@@ -65,21 +78,27 @@ MainWindow::MainWindow(QWidget* parent)
   connect(filebrowercontroller.get(), &MFileBrowserController::open_project,
           ui->project_controller, &MProjectController::new_project);
 
+  // 连接项目选择map信号
+  connect(ui->project_controller, &MProjectController::select_map, this,
+          &MainWindow::project_controller_select_map);
+
   // 设置map
-  auto omap6k1 = std::make_shared<OsuMap>();
-  omap6k1->load_from_file(
-      "../resources/map/Designant - Designant/Designant - Designant. (Benson_) "
-      "[Designant].osu");
-  auto omap4k1 = std::make_shared<OsuMap>();
-  omap4k1->load_from_file(
-      "../resources/map/Lia - Poetry of Birds/Lia - Poetry of Birds "
-      "(xiang_233) [full version].osu");
-  auto omap4k2 = std::make_shared<OsuMap>();
-  omap4k2->load_from_file(
-      "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - "
-      "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - shojo rei "
-      "(xiang_233) [(LN)NM lv.29].osu");
-  canvas->switch_map(omap6k1);
+  // auto omap6k1 = std::make_shared<OsuMap>();
+  // omap6k1->load_from_file(
+  //    "../resources/map/Designant - Designant/Designant - Designant. (Benson_)
+  //    "
+  //    "[Designant].osu");
+  // auto omap4k1 = std::make_shared<OsuMap>();
+  // omap4k1->load_from_file(
+  //    "../resources/map/Lia - Poetry of Birds/Lia - Poetry of Birds "
+  //    "(xiang_233) [full version].osu");
+  // auto omap4k2 = std::make_shared<OsuMap>();
+  // omap4k2->load_from_file(
+  //    "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - "
+  //    "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - shojo rei
+  //    "
+  //    "(xiang_233) [(LN)NM lv.29].osu");
+  // canvas->switch_map(omap6k1);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -100,7 +119,22 @@ void MainWindow::use_theme(GlobalTheme theme) {
     }
   }
 
-  // 设置文件管理器按钮颜色
+  // 设置文件操作图标颜色
+  mutil::set_action_svgcolor(ui->actionOpen, ":/icons/file.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionOpen_Directory,
+                             ":/icons/folder-open.svg", file_button_color);
+
+  mutil::set_action_svgcolor(ui->actionSave, ":/icons/file-alt.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionSave_As, ":/icons/file-export.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionPack, ":/icons/file-archive.svg",
+                             file_button_color);
+  mutil::set_action_svgcolor(ui->actionPack_As, ":/icons/file-archive.svg",
+                             file_button_color);
+
+  // 设置文件管理器按钮图标颜色
   mutil::set_button_svgcolor(ui->cdup, ":/icons/angle-left.svg",
                              file_button_color);
   mutil::set_button_svgcolor(ui->cdnext, ":/icons/angle-right.svg",
@@ -109,6 +143,13 @@ void MainWindow::use_theme(GlobalTheme theme) {
                              file_button_color);
   mutil::set_button_svgcolor(ui->search, ":/icons/search.svg",
                              file_button_color);
+}
+
+// 选择音频输出设备事件
+void MainWindow::on_audio_device_selector_currentIndexChanged(int index) {
+  // 获取并设置当前选中的音频设备
+  auto data = ui->audio_device_selector->currentData();
+  current_use_device = data.value<std::shared_ptr<XOutputDevice>>();
 }
 
 // 文件浏览器上下文菜单
@@ -159,4 +200,10 @@ void MainWindow::on_file_browser_treeview_customContextMenuRequested(
 
   // 显示菜单
   menu.exec(ui->file_browser_treeview->viewport()->mapToGlobal(pos));
+}
+
+// 项目控制器选择了map事件
+void MainWindow::project_controller_select_map(std::shared_ptr<MMap>& map) {
+  // 切换画布到选择的map
+  ui->canvas->switch_map(map);
 }

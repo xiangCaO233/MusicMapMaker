@@ -117,7 +117,7 @@
          <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="map_tab">
          <attribute name="title">
@@ -140,7 +140,11 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QListView" name="map_list_view"/>
+           <widget class="QListView" name="map_list_view">
+            <property name="contextMenuPolicy">
+             <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -165,7 +169,11 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QListView" name="audio_list_view"/>
+           <widget class="QListView" name="audio_list_view">
+            <property name="contextMenuPolicy">
+             <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -190,7 +198,11 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QListView" name="image_list_view"/>
+           <widget class="QListView" name="image_list_view">
+            <property name="contextMenuPolicy">
+             <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -215,7 +227,11 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QListView" name="video_list_view"/>
+           <widget class="QListView" name="video_list_view">
+            <property name="contextMenuPolicy">
+             <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

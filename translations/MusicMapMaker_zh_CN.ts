@@ -185,7 +185,7 @@
         <location filename="../src/mainwindow.ui" line="778"/>
         <location filename="../src/mainwindow.ui" line="778"/>
         <source>Save As</source>
-        <translation>另存为</translation>
+        <translation>另存为...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="783"/>
@@ -215,7 +215,7 @@
         <location filename="../src/mainwindow.ui" line="809"/>
         <location filename="../src/mainwindow.ui" line="809"/>
         <source>Pack As</source>
-        <translation>打包为</translation>
+        <translation>打包为...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="814"/>

@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <memory>
+#include <string>
 #include <vector>
 
 enum class MapType {
@@ -21,6 +22,9 @@ class MMap {
   MMap();
   // 析构MMap
   virtual ~MMap();
+
+  // 图名称
+  std::string map_name;
 
   // map文件路径
   std::filesystem::path map_file_path;

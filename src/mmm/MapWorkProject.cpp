@@ -2,9 +2,13 @@
 
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <ostream>
+#include <string>
+#include <unordered_set>
 
 #include "colorful-log.h"
+#include "mmm/map/osu/OsuMap.h"
 
 using namespace pugi;
 
@@ -26,10 +30,37 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
   auto config_file_name = config.project_name + ".xml";
   auto config_path = project_path / config_file_name;
 
+  static const std::unordered_set<std::string> map_extention = {".osu", ".imd",
+                                                                ".mc"};
+  static const std::unordered_set<std::string> audio_extention = {
+      ".mp3", ".ogg", ".wav"};
+  static const std::unordered_set<std::string> image_extention = {
+      ".png", ".jpg", ".jpeg"};
+  static const std::unordered_set<std::string> video_extention = {".mp4",
+                                                                  ".mkv"};
   // 打开目录中可载入文件(.osu,.imd,.mp3,.ogg,.wav,.png,.jpg,.jpeg,.mp4,.mkv)--到项目管理器
   // 遍历目录内容
   for (const auto& entry : std::filesystem::directory_iterator(project_path)) {
-    XINFO("检查文件:[" + entry.path().string() + "]");
+    const auto extention = entry.path().extension().string();
+    if (map_extention.find(extention) != map_extention.end()) {
+      // 谱面文件--预加载
+      if (extention == ".osu") {
+        maps.emplace_back();
+        const auto map_file_string = entry.path().string();
+        auto& map = maps.back();
+        map = std::make_shared<OsuMap>();
+        maps.back()->load_from_file(map_file_string.c_str());
+      }
+    } else if (audio_extention.find(extention) != audio_extention.end()) {
+      // 音频文件
+      audio_paths.emplace_back(entry.path());
+    } else if (image_extention.find(extention) != image_extention.end()) {
+      // 图片文件
+      image_paths.emplace_back(entry.path());
+    } else if (video_extention.find(extention) != video_extention.end()) {
+      // 视频文件
+      video_paths.emplace_back(entry.path());
+    }
   }
 
   // 检查配置文件
