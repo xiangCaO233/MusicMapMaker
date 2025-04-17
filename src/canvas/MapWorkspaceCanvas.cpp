@@ -2,7 +2,6 @@
 
 #include <qnamespace.h>
 #include <qpaintdevice.h>
-#include <unistd.h>
 
 #include <QTimer>
 #include <QWheelEvent>
@@ -57,7 +56,7 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   auto tw = [this]() {
     while (!renderer_manager) {
       XINFO("等待gl上下文初始化");
-      usleep(1000 * 50);
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
     QMetaObject::invokeMethod(
         this, [this]() { refresh_timer->start(timer_update_time); },
