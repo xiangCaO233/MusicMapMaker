@@ -280,6 +280,29 @@ void MainWindow::on_page_selector_currentTextChanged(const QString& text) {
   ui->canvas->switch_map(mapit->second);
 }
 
+// 关闭页面事件
+void MainWindow::on_close_page_button_clicked() {
+  auto current_text = ui->page_selector->currentText();
+  auto mapit = pagetext_maps_map.find(current_text);
+  if (mapit == pagetext_maps_map.end()) {
+    XWARN("未发现[" + current_text.toStdString() + "]页");
+    return;
+  }
+  // 移除当前选中的item
+  ui->page_selector->removeItem(ui->page_selector->currentIndex());
+  // 移除索引
+  pagetext_maps_map.erase(mapit);
+
+  // 更新画布
+  if (pagetext_maps_map.empty()) {
+    // 设置null
+    ui->canvas->switch_map(nullptr);
+  } else {
+    // 随便选一个
+    ui->canvas->switch_map(pagetext_maps_map.begin()->second);
+  }
+}
+
 // 项目控制器选择了map事件
 void MainWindow::project_controller_select_map(std::shared_ptr<MMap>& map) {
   // 检查是否存在page映射

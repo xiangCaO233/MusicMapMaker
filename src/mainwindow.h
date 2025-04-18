@@ -50,9 +50,6 @@ class MainWindow : public QMainWindow {
   // 当前主题
   GlobalTheme current_theme;
 
-  // 当前page
-  QString current_page_text;
-
   // page名的谱面映射表
   std::unordered_map<QString, std::shared_ptr<MMap>> pagetext_maps_map;
 
@@ -92,6 +89,9 @@ class MainWindow : public QMainWindow {
 
   // 选择页事件
   void on_page_selector_currentTextChanged(const QString &text);
+
+  // 关闭页面事件
+  void on_close_page_button_clicked();
 
  private:
   Ui::MainWindow *ui;

@@ -195,8 +195,6 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
                      // 使用文件管理器打开
                      QDesktopServices::openUrl(url);
                    });
-    // 在新画布打开
-    menu.addAction(tr("Open In New Canvas"), [&]() {});
   }
   // 添加通用菜单项
   menu.addSeparator();
