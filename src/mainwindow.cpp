@@ -3,13 +3,17 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <qlogging.h>
+#include <qobject.h>
 
 #include <QFileSystemModel>
+#include <QVBoxLayout>
+#include <memory>
+#include <unordered_map>
 
 #include "./ui_mainwindow.h"
 #include "AudioManager.h"
 #include "MapWorkspaceCanvas.h"
-#include "hellouserpage.h"
+#include "colorful-log.h"
 #include "src/util/mutil.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -48,6 +52,7 @@ MainWindow::MainWindow(QWidget* parent)
   // 文件管理器模型
   QFileSystemModel* file_model = new QFileSystemModel;
   file_model->setRootPath(home);
+
   // 文件管理器过滤器(不显示.显示..)
   file_model->setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
 
@@ -68,37 +73,6 @@ MainWindow::MainWindow(QWidget* parent)
 
   // 默认使用Dark主题
   use_theme(GlobalTheme::DARK);
-
-  // 添加欢迎页
-  hello_page = new HelloUserPage(ui->main_tabs_widget);
-
-  // 根据设置判断是否添加欢迎页
-  if (settings.show_hello_page) {
-    ui->main_tabs_widget->addTab(hello_page, tr("Welcom Use MMM"));
-    // 获取当前所有子组件的大小
-    QList<int> sizes = ui->right_splitter->sizes();
-    // 修改tab页组件的宽度
-    sizes[0] = 480;
-    // 应用新的大小
-    ui->right_splitter->setSizes(sizes);
-  } else {
-    hello_page->hide();
-  }
-  // 设置Tabs可关闭
-  ui->main_tabs_widget->setTabsClosable(true);
-
-  // 连接关闭信号
-  connect(ui->main_tabs_widget, &QTabWidget::tabCloseRequested,
-          [this](int index) {
-            auto tabindexit = tabindex_maps_map.end();
-            if ((tabindexit = tabindex_maps_map.find(index)) ==
-                tabindex_maps_map.end()) {
-              // 非画布标签页直接关闭
-              ui->main_tabs_widget->removeTab(index);
-            } else {
-              // 处理画布标签页的关闭
-            }
-          });
 
   // 连接文件浏览器和项目管理器信号
   connect(filebrowercontroller.get(), &MFileBrowserController::open_project,
@@ -189,6 +163,8 @@ void MainWindow::use_theme(GlobalTheme theme) {
   mutil::set_button_svgcolor(ui->wheel_direction_button,
                              ":/icons/long-arrow-alt-up.svg", file_button_color,
                              16, 16);
+  mutil::set_button_svgcolor(ui->lock_edit_mode_button, ":/icons/lock-open.svg",
+                             file_button_color, 16, 16);
 }
 
 // 选择音频输出设备事件
@@ -227,7 +203,6 @@ void MainWindow::on_file_browser_treeview_customContextMenuRequested(
     });
   } else {
     // 文件
-    // qDebug() << "click file: " << click_abs_path;
     menu.addAction(tr("Open File"), [&]() {
       filebrowercontroller->on_open_file(click_abs_path);
     });
@@ -272,89 +247,52 @@ void MainWindow::on_wheel_direction_button_toggled(bool checked) {
                              file_button_color, 16, 16);
 }
 
-// 交换标签页内容
-void safeSwapTabs(QTabWidget* tabWidget, int i, int j) {
-  if (i == j) return;
-
-  // 阻塞信号避免不必要的刷新
-  const bool wasBlocked = tabWidget->blockSignals(true);
-
-  // 获取widget前先保存状态
-  int current = tabWidget->currentIndex();
-  QWidget* w1 = tabWidget->widget(i);
-  QWidget* w2 = tabWidget->widget(j);
-
-  // 临时解除父子关系
-  w1->setParent(nullptr);
-  w2->setParent(nullptr);
-
-  // 移除并重新插入
-  tabWidget->removeTab(qMax(i, j));
-  tabWidget->removeTab(qMin(i, j));
-
-  tabWidget->insertTab(i, w2, tabWidget->tabText(j));
-  tabWidget->insertTab(j, w1, tabWidget->tabText(i));
-
-  // 恢复当前索引
-  if (current == i) {
-    tabWidget->setCurrentIndex(j);
-  } else if (current == j) {
-    tabWidget->setCurrentIndex(i);
+// 模式锁定按钮状态切换事件
+void MainWindow::on_lock_edit_mode_button_toggled(bool checked) {
+  lock_mode_auto_switch = checked;
+  // 根据主题切换图标颜色
+  QColor file_button_color;
+  switch (current_theme) {
+    case GlobalTheme::DARK: {
+      file_button_color = QColor(255, 255, 255);
+      break;
+    }
+    case GlobalTheme::LIGHT: {
+      file_button_color = QColor(0, 0, 0);
+      break;
+    }
   }
 
-  // 恢复信号
-  tabWidget->blockSignals(wasBlocked);
+  // 两个状态
+  mutil::set_button_svgcolor(
+      ui->lock_edit_mode_button,
+      (checked ? ":/icons/lock.svg" : ":/icons/lock-open.svg"),
+      file_button_color, 16, 16);
+}
+
+// 选择页事件
+void MainWindow::on_page_selector_currentTextChanged(const QString& text) {
+  auto mapit = pagetext_maps_map.find(text);
+  if (mapit == pagetext_maps_map.end()) {
+    XWARN("无[" + text.toStdString() + "]页");
+    return;
+  }
+  ui->canvas->switch_map(mapit->second);
 }
 
 // 项目控制器选择了map事件
 void MainWindow::project_controller_select_map(std::shared_ptr<MMap>& map) {
-  // 查找是否存在已打开的此map的标签页
-  auto tabindex_it = maps_tabindex_map.find(map);
+  // 检查是否存在page映射
+  auto page_text = QString::fromStdString(map->map_name);
+  auto mapit = pagetext_maps_map.find(page_text);
 
-  MapWorkspaceCanvas* current_canvas;
-  if (tabindex_it == maps_tabindex_map.end()) {
-    // 无已打开的谱面标签页
-    tabindex_it = maps_tabindex_map.try_emplace(map).first;
+  if (mapit == pagetext_maps_map.end()) {
+    // 不存在,添加page映射
+    pagetext_maps_map.try_emplace(page_text).first->second = map;
 
-    bool share{false};
-    if (!canvas_context) {
-      // 初始化上下文
-      canvas_context = new MapWorkspaceCanvas(ui->main_tabs_widget);
-      current_canvas = canvas_context;
-    } else {
-      // 新建并共享gl上下文
-      current_canvas = new MapWorkspaceCanvas(ui->main_tabs_widget);
-      share = true;
-    }
-
-    // 传递音频管理器
-    current_canvas->audio_manager = audio_manager;
-    // 新建画布上下文构造一个tab
-    tabindex_it->second = ui->main_tabs_widget->addTab(
-        current_canvas, QString::fromStdString(map->map_name));
-
-    // 切换到这个标签
-    // 先显示
-    ui->main_tabs_widget->setCurrentIndex(tabindex_it->second);
-
-    if (share) {
-      current_canvas->context()->setShareContext(canvas_context->context());
-    }
-
-    // 切换画布map到选择的map
-    current_canvas->switch_map(map);
-
-    // 创建另一个映射
-    tabindex_maps_map.try_emplace(tabindex_it->second, map);
-  } else {
-    // 直接切换到这个标签
-    // 切换标签页
-    ui->main_tabs_widget->setCurrentIndex(tabindex_it->second);
+    // 添加selector item
+    ui->page_selector->addItem(page_text);
   }
-}
 
-// 切换当前标签页事件
-void MainWindow::on_main_tabs_widget_currentChanged(int index) {
-  // 更新最后选择的标签索引
-  last_main_tab_index = index;
+  ui->page_selector->setCurrentText(page_text);
 }

@@ -91,9 +91,6 @@ set(PROJECT_SOURCES
   src/projectcontroller.cpp
   src/projectcontroller.h
   src/mprojectcontroller.ui
-	src/hellouserpage.h 
-	src/hellouserpage.cpp 
-	src/hellouserpage.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/MapWorkspaceCanvas.h

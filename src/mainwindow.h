@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <qobject.h>
+
 #include <QComboBox>
 #include <QMainWindow>
 #include <cstdint>
@@ -18,8 +20,8 @@ enum class GlobalTheme {
 
 // 设置
 struct Settings {
-  // 显示欢迎页
-  bool show_hello_page{true};
+  // 主题
+  GlobalTheme current_theme;
 };
 
 class XAudioManager;
@@ -42,38 +44,29 @@ class MainWindow : public QMainWindow {
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
 
-  // 使用真实gl上下文的画布
-  MapWorkspaceCanvas *canvas_context = nullptr;
-
-  // 欢迎页
-  HelloUserPage *hello_page;
-
   // 全部设置
   Settings settings;
 
-  // 上一次的标签页索引
-  int32_t last_main_tab_index{0};
+  // 当前主题
+  GlobalTheme current_theme;
 
-  // 打开的谱面映射表
-  std::unordered_map<std::string, std::shared_ptr<MMap>> opened_maps_map;
+  // 当前page
+  QString current_page_text;
 
-  // 标签页索引的谱面映射表
-  std::unordered_map<int32_t, std::shared_ptr<MMap>> tabindex_maps_map;
-
-  // 谱面的标签页索引映射表
-  std::unordered_map<std::shared_ptr<MMap>, int32_t> maps_tabindex_map;
+  // page名的谱面映射表
+  std::unordered_map<QString, std::shared_ptr<MMap>> pagetext_maps_map;
 
   // 使用自然滚动
   bool use_natural_wheel{false};
+
+  // 锁定模式-不自动切换
+  bool lock_mode_auto_switch{false};
 
   // 音频管理器
   std::shared_ptr<XAudioManager> audio_manager;
 
   // 当前选择的音频输出设备
   std::shared_ptr<XOutputDevice> current_use_device;
-
-  // 当前主题
-  GlobalTheme current_theme;
 
   // 文件浏览器控制器
   std::shared_ptr<MFileBrowserController> filebrowercontroller;
@@ -84,6 +77,7 @@ class MainWindow : public QMainWindow {
  private slots:
   // 文件浏览器上下文菜单事件
   void on_file_browser_treeview_customContextMenuRequested(const QPoint &pos);
+
   // 选择音频输出设备事件
   void on_audio_device_selector_currentIndexChanged(int index);
 
@@ -93,8 +87,11 @@ class MainWindow : public QMainWindow {
   // 滚动方向切换按钮触发
   void on_wheel_direction_button_toggled(bool checked);
 
-  // 切换当前标签页事件
-  void on_main_tabs_widget_currentChanged(int index);
+  // 模式锁定按钮状态切换事件
+  void on_lock_edit_mode_button_toggled(bool checked);
+
+  // 选择页事件
+  void on_page_selector_currentTextChanged(const QString &text);
 
  private:
   Ui::MainWindow *ui;

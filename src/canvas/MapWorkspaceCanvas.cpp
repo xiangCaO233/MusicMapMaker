@@ -46,24 +46,11 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(red);
   t4.emplace_back(blue);
 
-  // 初始化定时器
+  // 初始化定时器--绑定updatecanvas函数
   refresh_timer = new QTimer(this);
-  // Lambda 捕获 this,调用成员函数
   QObject::connect(refresh_timer, &QTimer::timeout,
                    [this]() { this->update_canvas(); });
-
-  // 新建线程等待gl初始化完成后启动刷新器
-  auto tw = [this]() {
-    while (!renderer_manager) {
-      XINFO("等待gl上下文初始化");
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-    QMetaObject::invokeMethod(
-        this, [this]() { refresh_timer->start(timer_update_time); },
-        Qt::QueuedConnection);
-  };
-  std::thread t(tw);
-  t.detach();
+  refresh_timer->start(timer_update_time);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;
@@ -442,7 +429,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         std::shared_ptr<TextureInstace> long_note_end_texture;
         if (max_orbit == 4) {
           // 4k--粉白白粉
-          if (note->orbit % 2 == 0) {
+          if (note->orbit == 0 || note->orbit == 3) {
             head_texture = head_texture_pink;
             long_note_body_texture = long_note_body_texture_pink;
             long_note_end_texture = long_note_end_texture_pink;
