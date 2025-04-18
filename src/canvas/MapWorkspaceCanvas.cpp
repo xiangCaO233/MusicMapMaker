@@ -2,13 +2,13 @@
 
 #include <qnamespace.h>
 #include <qpaintdevice.h>
+#include <qtmetamacros.h>
 
 #include <QTimer>
 #include <QWheelEvent>
 #include <algorithm>
 #include <cstdint>
 #include <memory>
-#include <thread>
 #include <vector>
 
 #include "../mmm/hitobject/Note/Hold.h"
@@ -86,7 +86,9 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
 void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
-  current_time_stamp += event->angleDelta().y() / 3;
+  auto unit = event->angleDelta().y() / 120 * timeline_zoom * height() / 20.0;
+  current_time_stamp += unit * scroll_ratio;
+  emit current_time_stamp_changed(current_time_stamp);
 }
 
 // 键盘按下事件
@@ -147,7 +149,6 @@ void MapWorkspaceCanvas::update_canvas() {
   if (!working_map) return;
   auto current_size = size();
   // 当前有绑定图
-  // TODO(xiang 2025-04-15): 更新可视拍列表
   // 读取获取当前时间附近的timings
   std::vector<std::shared_ptr<Timing>> temp_timings;
   working_map->query_around_timing(temp_timings, current_time_stamp);
@@ -156,9 +157,6 @@ void MapWorkspaceCanvas::update_canvas() {
     // 未查询到timing-不绘制时间线
     return;
   }
-
-  // 当前正在使用的绝对timing--非变速timing
-  std::shared_ptr<Timing> current_abs_timing;
 
   for (const auto &timing : temp_timings) {
     switch (timing->type) {
@@ -220,7 +218,6 @@ void MapWorkspaceCanvas::update_canvas() {
       current_beats.emplace_back(beat);
     }
 
-    // TODO(xiang 2025-04-15): 更新当前拍可视物件列表
     // from : process_time,to : process_time + beattime
     working_map->query_object_in_range(buffer_objects, process_time,
                                        process_time + beattime);
@@ -340,19 +337,23 @@ void MapWorkspaceCanvas::draw_beats() {
           divisor_color = QColor(128, 128, 128, 240);
         }
 
-        if (i == 0) {
-          // 小节线头画粗一点
-          renderer_manager->addLine(
-              QPointF(0, divisor_pos),
-              QPointF(current_size.width() * (1 - preview_width_scale),
-                      divisor_pos),
-              6, nullptr, divisor_color, true);
-        } else {
-          renderer_manager->addLine(
-              QPointF(0, divisor_pos),
-              QPointF(current_size.width() * (1 - preview_width_scale),
-                      divisor_pos),
-              2, nullptr, divisor_color, true);
+        if (beat_start_time +
+                i * (beat.end_timestamp - beat_start_time) / beat.divisors >=
+            current_abs_timing->timestamp) {
+          if (i == 0) {
+            // 小节线头画粗一点
+            renderer_manager->addLine(
+                QPointF(0, divisor_pos),
+                QPointF(current_size.width() * (1 - preview_width_scale),
+                        divisor_pos),
+                6, nullptr, divisor_color, true);
+          } else {
+            renderer_manager->addLine(
+                QPointF(0, divisor_pos),
+                QPointF(current_size.width() * (1 - preview_width_scale),
+                        divisor_pos),
+                2, nullptr, divisor_color, true);
+          }
         }
       }
     }
@@ -574,4 +575,5 @@ void MapWorkspaceCanvas::push_shape() {
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
   current_time_stamp = 0;
+  emit current_time_stamp_changed(0);
 }

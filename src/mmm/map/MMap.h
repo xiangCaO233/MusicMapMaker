@@ -2,6 +2,7 @@
 #define M_MAP_H
 
 #include <QRectF>
+#include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -36,6 +37,9 @@ class MMap {
 
   // 图类型
   MapType maptype;
+
+  // 谱面时长--计算
+  int32_t map_length;
 
   // 从文件读取谱面
   virtual void load_from_file(const char* path) = 0;

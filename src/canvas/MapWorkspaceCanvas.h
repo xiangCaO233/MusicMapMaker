@@ -2,6 +2,7 @@
 #define M_MAPWORKSPACE_H
 
 #include <qpaintdevice.h>
+#include <qtmetamacros.h>
 
 #include <cstdint>
 #include <memory>
@@ -36,6 +37,7 @@ struct Beat {
 };
 
 class MapWorkspaceCanvas : public GLCanvas {
+  Q_OBJECT
  protected:
   // qt事件
   void mousePressEvent(QMouseEvent *event) override;
@@ -71,8 +73,14 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 物件区域缓存--实时更新包含的物件,不包含得删
   std::unordered_map<std::shared_ptr<HitObject>, QRectF *> hitobject_bounds_map;
 
+  // 当前正在使用的绝对timing--非变速timing
+  std::shared_ptr<Timing> current_abs_timing;
+
   // 当前页面的拍
   std::vector<Beat> current_beats;
+
+  // 滚动倍率
+  double scroll_ratio{1.0};
 
   // 判定线位置:从下往上此倍率*总高度
   double judgeline_position{0.16};
@@ -129,8 +137,13 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 切换到指定图
   void switch_map(std::shared_ptr<MMap> map);
 
+  // 获取暂停状态
+  inline bool &is_paused() { return pasue; }
+
   // 渲染实际图形
   void push_shape() override;
+ signals:
+  void current_time_stamp_changed(double current_time_stamp);
 };
 
 #endif  // M_MAPWORKSPACE_H

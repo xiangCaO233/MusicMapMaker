@@ -81,6 +81,10 @@ MainWindow::MainWindow(QWidget* parent)
   // 连接项目选择map信号
   connect(ui->project_controller, &MProjectController::select_map, this,
           &MainWindow::project_controller_select_map);
+
+  // 连接画布时间更新信号
+  connect(ui->canvas, &MapWorkspaceCanvas::current_time_stamp_changed, this,
+          &MainWindow::on_canvas_timestamp_changed);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -300,6 +304,27 @@ void MainWindow::on_close_page_button_clicked() {
   } else {
     // 随便选一个
     ui->canvas->switch_map(pagetext_maps_map.begin()->second);
+  }
+}
+
+// 画布时间变化事件
+void MainWindow::on_canvas_timestamp_changed(double time) {
+  // 更新进度条
+  double ratio = time / (double)(ui->canvas->working_map->map_length);
+  ui->progress_slider->setValue(ratio * 10000.0);
+}
+
+// 进度条移动事件
+void MainWindow::on_progress_slider_valueChanged(int value) {
+  // 同步画布时间
+  if (ui->canvas->is_paused()) {
+    // 不暂停不允许调节时间
+    if (ui->canvas->working_map) {
+      double ratio = (double)value / 10000.0;
+      // qDebug() << "value:" << value;
+      ui->canvas->current_time_stamp =
+          (double)(ui->canvas->working_map->map_length) * ratio;
+    }
   }
 }
 

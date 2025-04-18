@@ -305,6 +305,9 @@ void OsuMap::load_from_file(const char* path) {
         holdend->is_hold_end = true;
         hitobjects.emplace_back(holdend);
 
+        // 更新谱面时长
+        if (holdend->timestamp > map_length) map_length = holdend->timestamp;
+
         // 把长条物件加入缓存
         temp_hold_list.emplace_back(hold);
       } else {
@@ -313,6 +316,10 @@ void OsuMap::load_from_file(const char* path) {
         // 使用读取出的参数初始化物件
         note->from_osu_description(note_paras, CircleSize);
       }
+
+      // 更新谱面时长
+      if (osu_note->timestamp > map_length) map_length = osu_note->timestamp;
+
       // 加入物件列表
       hitobjects.emplace_back(osu_note);
     }

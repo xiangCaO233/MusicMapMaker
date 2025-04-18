@@ -40,7 +40,6 @@ class MainWindow : public QMainWindow {
   Q_OBJECT
 
  public:
-  MapWorkspaceCanvas *canvas;
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow() override;
 
@@ -92,6 +91,12 @@ class MainWindow : public QMainWindow {
 
   // 关闭页面事件
   void on_close_page_button_clicked();
+
+  // 进度条移动事件
+  void on_progress_slider_valueChanged(int value);
+
+  // 画布时间变化事件
+  void on_canvas_timestamp_changed(double time);
 
  private:
   Ui::MainWindow *ui;
