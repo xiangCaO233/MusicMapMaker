@@ -38,13 +38,18 @@ class MMap {
   // 图类型
   MapType maptype;
 
+  // 背景图-如果有
+  std::filesystem::path bg_path;
+
   // 谱面时长--计算
-  int32_t map_length;
+  int32_t map_length = 0;
 
   // 从文件读取谱面
   virtual void load_from_file(const char* path) = 0;
+
   // 全部物件
   std::vector<std::shared_ptr<HitObject>> hitobjects;
+
   // 全部timing
   std::vector<std::shared_ptr<Timing>> timings;
 

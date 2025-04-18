@@ -103,6 +103,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 绘制顶部栏
   void draw_top_bar();
 
+  // 绘制背景
+  void draw_background();
+
   // 绘制预览
   void draw_preview_content();
 

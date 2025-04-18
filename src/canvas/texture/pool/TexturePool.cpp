@@ -237,13 +237,14 @@ void TexturePool::use(const std::shared_ptr<BaseTexturePool>& pool_reference,
     for (int i = 0; i < texture_dozens[batch_index].size(); i++) {
       // 激活纹理单元
       GLCALL(cvs->glActiveTexture(GL_TEXTURE0 + i));
-      XWARN("激活纹理单元:" + std::to_string(i));
+      // XWARN("激活纹理单元:" + std::to_string(i));
       const auto& texture = texture_dozens[batch_index][i];
       // 绑定纹理句柄
       GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, glhandler_map[texture]));
-      XWARN("绑定纹理:" + texture->name +
-            "->gl句柄:" + std::to_string(glhandler_map[texture]) +
-            "->绑定到gl纹理单元:[" + std::to_string(i) + "]");
+      // XWARN("绑定纹理:" + texture->name +
+      //       "->gl句柄:" + std::to_string(glhandler_map[texture]) +
+      //       "->绑定到gl纹理单元:[" + std::to_string(i) + "]");
+
       // 更新uniform
       auto location_str = "samplers[" + std::to_string(i) + "]";
       auto cstr = location_str.c_str();

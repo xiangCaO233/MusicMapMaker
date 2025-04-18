@@ -237,6 +237,16 @@ void MapWorkspaceCanvas::update_canvas() {
   repaint();
 }
 
+// 绘制背景
+void MapWorkspaceCanvas::draw_background() {
+  if (!working_map) return;
+  auto des = QRectF(0, 0, width(), height());
+  auto texname = working_map->bg_path.filename().string();
+  renderer_manager->addRect(des, texture_map[texname],
+                            QColor(255, 255, 255, 255), 0, false);
+  // XINFO("bg_path:" + working_map->bg_path.string());
+}
+
 // 绘制顶部栏
 void MapWorkspaceCanvas::draw_top_bar() {
   auto current_size = size();
@@ -564,6 +574,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
 // 渲染实际图形
 void MapWorkspaceCanvas::push_shape() {
+  draw_background();
   draw_preview_content();
 
   draw_top_bar();
@@ -574,6 +585,8 @@ void MapWorkspaceCanvas::push_shape() {
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
+  add_texture(map->bg_path.c_str(), TexturePoolType::ARRAY, false);
+  finalize_texture_loading();
   current_time_stamp = 0;
   emit current_time_stamp_changed(0);
 }

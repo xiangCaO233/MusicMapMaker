@@ -8,6 +8,7 @@
 #include <QFileSystemModel>
 #include <QVBoxLayout>
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 #include "./ui_mainwindow.h"
@@ -310,7 +311,12 @@ void MainWindow::on_close_page_button_clicked() {
 // 画布时间变化事件
 void MainWindow::on_canvas_timestamp_changed(double time) {
   // 更新进度条
-  double ratio = time / (double)(ui->canvas->working_map->map_length);
+  auto maptime = (double)(ui->canvas->working_map->map_length);
+  // XINFO("src maptime: " +
+  // std::to_string(ui->canvas->working_map->map_length)); XINFO("maptime: " +
+  // std::to_string(maptime));
+  double ratio = time / maptime;
+  // XINFO("ratio: " + std::to_string(ratio));
   ui->progress_slider->setValue(ratio * 10000.0);
 }
 
@@ -321,9 +327,11 @@ void MainWindow::on_progress_slider_valueChanged(int value) {
     // 不暂停不允许调节时间
     if (ui->canvas->working_map) {
       double ratio = (double)value / 10000.0;
-      // qDebug() << "value:" << value;
-      ui->canvas->current_time_stamp =
-          (double)(ui->canvas->working_map->map_length) * ratio;
+      auto maptime = (double)(ui->canvas->working_map->map_length);
+      // XINFO("maptime: " + std::to_string(maptime));
+      // XINFO("ratio: " + std::to_string(ratio));
+      //  qDebug() << "value:" << value;
+      ui->canvas->current_time_stamp = maptime * ratio;
     }
   }
 }
