@@ -22,7 +22,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
-	OpenGL LinguistTools Svg SvgWidgets)
+  OpenGL LinguistTools Svg SvgWidgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core Widgets OpenGLWidgets OpenGL LinguistTools Svg SvgWidgets)
 
@@ -37,9 +37,9 @@ find_package(pugixml REQUIRED)
 
 # 设置mmm相关文件
 set(MMM_SOURCES
-	src/mmm/SampleSet.h
-	src/mmm/MapWorkProject.h
-	src/mmm/MapWorkProject.cpp
+  src/mmm/SampleSet.h
+  src/mmm/MapWorkProject.h
+  src/mmm/MapWorkProject.cpp
   src/mmm/map/MMap.h
   src/mmm/map/MMap.cpp
   src/mmm/map/osu/OsuMap.h
@@ -91,12 +91,15 @@ set(PROJECT_SOURCES
   src/projectcontroller.cpp
   src/projectcontroller.h
   src/mprojectcontroller.ui
+  src/timecontroller.h
+  src/timecontroller.cpp
+  src/timecontroller.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/MapWorkspaceCanvas.h
   src/canvas/MapWorkspaceCanvas.cpp
-	src/canvas/renderer/shader/GLShader.h
-	src/canvas/renderer/shader/GLShader.cpp
+  src/canvas/renderer/shader/GLShader.h
+  src/canvas/renderer/shader/GLShader.cpp
   src/canvas/renderer/RenderCommand.h
   src/canvas/renderer/static/StaticRenderer.h
   src/canvas/renderer/static/StaticRenderer.cpp
@@ -110,13 +113,13 @@ set(PROJECT_SOURCES
   src/canvas/renderer/font/FontRenderer.cpp
   src/canvas/texture/Texture.h
   src/canvas/texture/Texture.cpp
-	src/canvas/texture/pool/Atlas.h
-	src/canvas/texture/pool/Atlas.cpp
-	src/canvas/texture/pool/MTexturePool.h
-	src/canvas/texture/pool/MTexturePool.cpp
-	src/canvas/texture/pool/MaxRectsBinPack.h
-	src/canvas/texture/pool/MaxRectsBinPack.cpp
-	src/canvas/texture/pool/Rect.h
+  src/canvas/texture/pool/Atlas.h
+  src/canvas/texture/pool/Atlas.cpp
+  src/canvas/texture/pool/MTexturePool.h
+  src/canvas/texture/pool/MTexturePool.cpp
+  src/canvas/texture/pool/MaxRectsBinPack.h
+  src/canvas/texture/pool/MaxRectsBinPack.cpp
+  src/canvas/texture/pool/Rect.h
   src/log/colorful-log.h
   src/log/colorful_log.cpp
   ${MMM_SOURCES}
@@ -128,7 +131,8 @@ include_directories(./src ./src/canvas ./src/log)
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-    resources/glsrcs.qrc)
+    resources/glsrcs.qrc
+  )
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
@@ -161,9 +165,9 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-  Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::Svg 
-	Qt${QT_VERSION_MAJOR}::SvgWidgets 
-	Freetype::Freetype pugixml::pugixml xaudio-dev)
+  Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::Svg
+  Qt${QT_VERSION_MAJOR}::SvgWidgets
+  Freetype::Freetype pugixml::pugixml xaudio-dev)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -79,11 +79,26 @@
         <string notr="true"/>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QWidget" name="project_container" native="true">
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <property name="spacing">
-            <number>2</number>
+            <number>0</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -297,7 +312,7 @@
             <number>0</number>
            </property>
            <property name="leftMargin">
-            <number>2</number>
+            <number>4</number>
            </property>
            <property name="topMargin">
             <number>0</number>
@@ -414,7 +429,7 @@
             </property>
             <item>
              <widget class="QWidget" name="page_widget" native="true">
-              <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,1">
+              <layout class="QVBoxLayout" name="verticalLayout_9">
                <property name="spacing">
                 <number>0</number>
                </property>
@@ -577,9 +592,15 @@
                        </property>
                        <property name="iconSize">
                         <size>
-                         <width>16</width>
-                         <height>16</height>
+                         <width>12</width>
+                         <height>12</height>
                         </size>
+                       </property>
+                       <property name="popupMode">
+                        <enum>QToolButton::ToolButtonPopupMode::MenuButtonPopup</enum>
+                       </property>
+                       <property name="autoRaise">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -609,9 +630,15 @@
                        </property>
                        <property name="iconSize">
                         <size>
-                         <width>16</width>
-                         <height>16</height>
+                         <width>12</width>
+                         <height>12</height>
                         </size>
+                       </property>
+                       <property name="popupMode">
+                        <enum>QToolButton::ToolButtonPopupMode::MenuButtonPopup</enum>
+                       </property>
+                       <property name="autoRaise">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -658,6 +685,9 @@
                          <height>16</height>
                         </size>
                        </property>
+                       <property name="flat">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -689,6 +719,9 @@
                          <width>16</width>
                          <height>16</height>
                         </size>
+                       </property>
+                       <property name="flat">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -727,6 +760,9 @@
                        <property name="checkable">
                         <bool>true</bool>
                        </property>
+                       <property name="flat">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -760,6 +796,9 @@
                         </size>
                        </property>
                        <property name="checkable">
+                        <bool>true</bool>
+                       </property>
+                       <property name="flat">
                         <bool>true</bool>
                        </property>
                       </widget>
@@ -802,14 +841,17 @@
                        <property name="checked">
                         <bool>false</bool>
                        </property>
+                       <property name="flat">
+                        <bool>true</bool>
+                       </property>
                       </widget>
                      </item>
                     </layout>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QWidget" name="canvas_container" native="true">
-                    <layout class="QHBoxLayout" name="horizontalLayout_4">
+                   <widget class="QWidget" name="canvasandaudiocontroller" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1,0">
                      <property name="spacing">
                       <number>0</number>
                      </property>
@@ -826,23 +868,47 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="MapWorkspaceCanvas" name="canvas"/>
+                      <widget class="QWidget" name="canvas_container" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_4">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="MapWorkspaceCanvas" name="canvas"/>
+                        </item>
+                        <item>
+                         <widget class="QScrollBar" name="progress_slider">
+                          <property name="maximum">
+                           <number>10000</number>
+                          </property>
+                          <property name="pageStep">
+                           <number>50</number>
+                          </property>
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Vertical</enum>
+                          </property>
+                          <property name="invertedAppearance">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                      <item>
-                      <widget class="QScrollBar" name="progress_slider">
-                       <property name="maximum">
-                        <number>10000</number>
-                       </property>
-                       <property name="pageStep">
-                        <number>50</number>
-                       </property>
-                       <property name="orientation">
-                        <enum>Qt::Orientation::Vertical</enum>
-                       </property>
-                       <property name="invertedAppearance">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
+                      <widget class="TimeController" name="widget" native="true"/>
                      </item>
                     </layout>
                    </widget>
@@ -1227,6 +1293,12 @@
    <class>MapWorkspaceCanvas</class>
    <extends>QOpenGLWidget</extends>
    <header location="global">MapWorkspaceCanvas.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TimeController</class>
+   <extends>QWidget</extends>
+   <header location="global">timecontroller.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

@@ -65,27 +65,22 @@ MainWindow::MainWindow(QWidget* parent)
   // 隐藏类型
   ui->file_browser_treeview->hideColumn(2);
 
-  // 跳转到当前运行目录
+  // 跳转到目录
   ui->file_browser_treeview->setRootIndex(file_model->index(home));
   ui->file_browser_treeview->setColumnWidth(0, 400);
   ui->file_browser_treeview->setColumnWidth(1, 80);
+
+  // 禁用展开
+  ui->file_browser_treeview->setItemsExpandable(false);
+  ui->file_browser_treeview->setRootIsDecorated(false);
+
   // 初始化文件浏览器管理器
   filebrowercontroller = std::make_shared<MFileBrowserController>();
 
   // 默认使用Dark主题
   use_theme(GlobalTheme::DARK);
 
-  // 连接文件浏览器和项目管理器信号
-  connect(filebrowercontroller.get(), &MFileBrowserController::open_project,
-          ui->project_controller, &MProjectController::new_project);
-
-  // 连接项目选择map信号
-  connect(ui->project_controller, &MProjectController::select_map, this,
-          &MainWindow::project_controller_select_map);
-
-  // 连接画布时间更新信号
-  connect(ui->canvas, &MapWorkspaceCanvas::current_time_stamp_changed, this,
-          &MainWindow::on_canvas_timestamp_changed);
+  setupsignals();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -151,11 +146,11 @@ void MainWindow::use_theme(GlobalTheme theme) {
 
   // 设置工具栏按钮图标颜色
   mutil::set_toolbutton_svgcolor(ui->default_divisor_policy_toolbutton,
-                                 ":/icons/stream.svg", file_button_color, 16,
-                                 16);
+                                 ":/icons/stream.svg", file_button_color, 12,
+                                 12);
   mutil::set_toolbutton_svgcolor(ui->bookmark_toolbutton,
-                                 ":/icons/bookmark.svg", file_button_color, 16,
-                                 16);
+                                 ":/icons/bookmark.svg", file_button_color, 12,
+                                 12);
   mutil::set_button_svgcolor(ui->audio_controller_button,
                              ":/icons/sliders-h.svg", file_button_color, 16,
                              16);
@@ -170,6 +165,43 @@ void MainWindow::use_theme(GlobalTheme theme) {
                              16, 16);
   mutil::set_button_svgcolor(ui->lock_edit_mode_button, ":/icons/lock-open.svg",
                              file_button_color, 16, 16);
+}
+
+// 设置信号
+void MainWindow::setupsignals() {
+  // 连接文件浏览器和项目管理器信号
+  connect(filebrowercontroller.get(), &MFileBrowserController::open_project,
+          ui->project_controller, &MProjectController::new_project);
+
+  // 连接项目选择map信号
+  connect(ui->project_controller, &MProjectController::select_map, this,
+          &MainWindow::project_controller_select_map);
+
+  // 连接画布时间更新信号
+  connect(ui->canvas, &MapWorkspaceCanvas::current_time_stamp_changed, this,
+          &MainWindow::on_canvas_timestamp_changed);
+
+  // 地址栏确认事件
+  connect(ui->address_confirm, &QPushButton::clicked,
+          filebrowercontroller.get(),
+          &MFileBrowserController::on_address_confirm_clicked);
+
+  // 文件管理器双击事件
+  connect(ui->file_browser_treeview, &QTreeView::doubleClicked,
+          filebrowercontroller.get(),
+          &MFileBrowserController::on_file_browser_treeview_doubleClicked);
+
+  // 文件管理器返回事件
+  connect(ui->cdup, &QPushButton::clicked, filebrowercontroller.get(),
+          &MFileBrowserController::on_cdup_clicked);
+
+  // 文件管理器向后返回事件
+  connect(ui->cdnext, &QPushButton::clicked, filebrowercontroller.get(),
+          &MFileBrowserController::on_cdnext_clicked);
+
+  // 文件管理器搜索事件
+  connect(ui->search, &QPushButton::clicked, filebrowercontroller.get(),
+          &MFileBrowserController::on_search_clicked);
 }
 
 // 选择音频输出设备事件
@@ -196,7 +228,7 @@ void MainWindow::on_file_browser_treeview_customContextMenuRequested(
     // 文件夹
     // qDebug() << "click folder: " << click_abs_path;
     menu.addAction(tr("Open Folder"), [&]() {
-      filebrowercontroller->on_open_folder(
+      filebrowercontroller->on_menu_open_folder(
           qobject_cast<QFileSystemModel*>(ui->file_browser_treeview->model()),
           index);
     });
@@ -204,25 +236,25 @@ void MainWindow::on_file_browser_treeview_customContextMenuRequested(
       filebrowercontroller->on_open_folder_as_project(click_abs_path);
     });
     menu.addAction(tr("New File"), [&]() {
-      filebrowercontroller->on_new_file_infolder(click_abs_path);
+      filebrowercontroller->on_menu_new_file_infolder(click_abs_path);
     });
   } else {
     // 文件
     menu.addAction(tr("Open File"), [&]() {
-      filebrowercontroller->on_open_file(click_abs_path);
+      filebrowercontroller->on_menu_open_file(click_abs_path);
     });
     menu.addAction(tr("Rename"), [&]() {
-      filebrowercontroller->on_rename_file(click_abs_path);
+      filebrowercontroller->on_menu_rename_file(click_abs_path);
     });
     menu.addAction(tr("Delete"), [&]() {
-      filebrowercontroller->on_delete_file(click_abs_path);
+      filebrowercontroller->on_menu_delete_file(click_abs_path);
     });
   }
 
   // 添加通用菜单项
   menu.addSeparator();
   menu.addAction(tr("Properties"), [&]() {
-    filebrowercontroller->on_show_properties(click_abs_path);
+    filebrowercontroller->on_menu_show_properties(click_abs_path);
   });
 
   // 显示菜单
@@ -336,6 +368,7 @@ void MainWindow::on_progress_slider_valueChanged(int value) {
   }
 }
 
+// 项目控制器
 // 项目控制器选择了map事件
 void MainWindow::project_controller_select_map(std::shared_ptr<MMap>& map) {
   // 检查是否存在page映射

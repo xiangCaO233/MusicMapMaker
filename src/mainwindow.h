@@ -70,6 +70,9 @@ class MainWindow : public QMainWindow {
   // 使用主题
   void use_theme(GlobalTheme theme);
 
+  // 设置信号
+  void setupsignals();
+
  private slots:
   // 文件浏览器上下文菜单事件
   void on_file_browser_treeview_customContextMenuRequested(const QPoint &pos);

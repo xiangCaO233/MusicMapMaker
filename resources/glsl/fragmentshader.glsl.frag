@@ -371,6 +371,7 @@ void main() {
     }
   }
 
+  // TODO(xiang 2025-04-16): 实现特效
   switch (texture_effect) {
     case NONE: {
       // 不使用特效
