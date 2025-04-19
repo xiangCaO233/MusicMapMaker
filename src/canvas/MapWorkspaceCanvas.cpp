@@ -16,7 +16,6 @@
 #include "../mmm/hitobject/Note/Note.h"
 #include "../mmm/map/osu/OsuMap.h"
 #include "../mmm/timing/Timing.h"
-#include "colorful-log.h"
 #include "src/mmm/timing/osu/OsuTiming.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
@@ -242,6 +241,7 @@ void MapWorkspaceCanvas::draw_background() {
   if (!working_map) return;
   auto des = QRectF(0, 0, width(), height());
   auto texname = working_map->bg_path.filename().string();
+  renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
   renderer_manager->addRect(des, texture_full_map[texname],
                             QColor(255, 255, 255, 255), 0, false);
   // XINFO("bg_path:" + working_map->bg_path.string());
@@ -575,14 +575,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
 }
 
 // 渲染实际图形
-// void MapWorkspaceCanvas::push_shape() {
-//  draw_background();
-//  draw_preview_content();
-//
-//  draw_top_bar();
-//
-//  draw_judgeline();
-//}
+void MapWorkspaceCanvas::push_shape() {
+  draw_background();
+  draw_preview_content();
+
+  draw_top_bar();
+
+  draw_judgeline();
+}
 
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {

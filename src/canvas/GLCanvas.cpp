@@ -219,11 +219,14 @@ void GLCanvas::paintGL() {
 
   // 执行渲染
   // push_shape();
-  renderer_manager->addRect(QRectF(30, 30, 160, 90), texture_full_map["bg.jpg"],
-                            QColor(0, 0, 0, 255), 0, false);
-  renderer_manager->addRect(QRectF(100, 100, 128, 30),
-                            texture_full_map["White.png"], QColor(0, 0, 0, 255),
-                            0, true);
+
+  // DEBUG
+  // renderer_manager->addRect(QRectF(30, 30, 160, 90),
+  // texture_full_map["bg.jpg"],
+  //                           QColor(0, 0, 0, 255), 0, false);
+  // renderer_manager->addRect(QRectF(100, 100, 128, 30),
+  //                           texture_full_map["White.png"], QColor(0, 0, 0,
+  //                           255), 0, true);
 
   auto theoretical_fps = std::to_string(
       int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
@@ -261,12 +264,14 @@ void GLCanvas::paintGL() {
   //                           "ComicShannsMono Nerd Font", QColor(255, 183,
   //                           197), 0.0f);
 
-  //  QRectF rec(100, 100, 200, 200);
-  //  renderer_manager->addRect(rec, texture_map["yuanchou.png"],
-  //                            QColor(255, 255, 255), 0.0f, true);
-  //
-  // renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
-  //                           QColor(0, 0, 0, 255), true);
+  QRectF rec(100, 100, 200, 200);
+
+  renderer_manager->addRect(rec, texture_full_map["yuanchou.png"],
+                            QColor(255, 255, 255), 0.0f, true);
+
+  renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
+                            QColor(0, 0, 0, 255), true);
+
   renderer_manager->renderAll();
 
   auto after = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -277,6 +282,9 @@ void GLCanvas::paintGL() {
   pre_glcalls = XLogger::glcalls;
   pre_drawcall = XLogger::drawcalls;
 }
+
+// 渲染实际图形
+void GLCanvas::push_shape() {}
 
 // 从指定目录添加纹理
 void GLCanvas::load_texture_from_path(const char *p) {

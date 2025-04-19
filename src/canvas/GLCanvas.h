@@ -75,7 +75,7 @@ class GLCanvas : public QOpenGLWidget,
   void set_Vsync(bool flag);
 
   // 渲染实际图形
-  // virtual void push_shape() = 0;
+  virtual void push_shape();
 
  protected:
   void initializeGL() override;

@@ -40,6 +40,9 @@ struct AtlasMeta {
   AtlasSubMeta sub_metas[512];
 };
 
+// 是否使用纹理
+uniform int use_texture;
+
 // 当前纹理池存储的全部纹理图集对应的纹理图集元数据组
 uniform sampler2DArray atlas_meta_buffer_array;
 /*
@@ -157,7 +160,7 @@ AtlasSubMeta getAtlasSubMeta(int atlasIndex, int subIndex) {
 }
 
 void main() {
-  if (texture_id == -1) {
+  if (use_texture == 0) {
     // 未使用纹理--直接填充指定颜色
     FragColor = fill_color;
     return;

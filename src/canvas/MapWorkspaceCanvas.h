@@ -144,7 +144,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   inline bool &is_paused() { return pasue; }
 
   // 渲染实际图形
-  // void push_shape() override;
+  void push_shape() override;
  signals:
   void current_time_stamp_changed(double current_time_stamp);
 };

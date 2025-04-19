@@ -404,10 +404,11 @@ void RendererManager::renderAll() {
         //          std::shared_ptr<AbstractRenderer> &renderer_context,
         //          size_t layer_index);
         texpool->use(texpool, operetion.renderer, operetion.layer_index);
+        operetion.renderer->shader->set_uniform_integer("use_texture", 1);
       } else {
         // 不使用纹理池
         operetion.renderer->current_use_pool = nullptr;
-        // operetion.renderer->shader->set_uniform_integer("use_texture", 0);
+        operetion.renderer->shader->set_uniform_integer("use_texture", 0);
       }
     }
 
