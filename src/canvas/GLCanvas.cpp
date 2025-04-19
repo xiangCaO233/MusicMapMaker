@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 
+#include "../util/mutil.h"
 #include "colorful-log.h"
 #include "renderer/font/FontRenderer.h"
 #include "texture/pool/MTexturePool.h"
@@ -184,7 +185,7 @@ void GLCanvas::initializeGL() {
   // load_texture_from_path("../resources/textures/test/other");
   load_texture_from_path("../resources/textures/test/1024");
 
-  add_texture("/home/xiang/Downloads/Designant - Designant/bg.jpg");
+  add_texture("../resources/map/Designant - Designant/bg.jpg");
 }
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
