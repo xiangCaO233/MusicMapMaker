@@ -3,17 +3,18 @@
 
 #include <qpoint.h>
 
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <queue>
 #include <string>
+#include <vector>
 
 #include "RenderCommand.h"
 #include "dynamic/DynamicRenderer.h"
 #include "static/StaticRenderer.h"
 
-enum class TexturePoolType;
-class BaseTexturePool;
+class MTexturePool;
 class FontRenderer;
 
 // 渲染操作
@@ -25,7 +26,9 @@ struct RenderOperation {
   // 此渲染操作的渲染器
   std::shared_ptr<AbstractRenderer> renderer;
   // 此渲染操作使用的纹理池
-  std::shared_ptr<BaseTexturePool> texture_pool;
+  std::shared_ptr<MTexturePool> texture_pool;
+  // 此渲染操作的纹理层数
+  size_t layer_index;
   // 此渲染操作的起始图形索引
   int32_t start_shape_index;
   // 此渲染操作的渲染图形数量
@@ -39,8 +42,7 @@ class RendererManager {
   static uint32_t fontr_instance_index;
 
   // 纹理池表(纹理池类型-同类型纹理池列表)
-  std::map<TexturePoolType, std::vector<std::shared_ptr<BaseTexturePool>>>
-      texture_pools;
+  std::vector<std::shared_ptr<MTexturePool>> texturepools;
 
   // 渲染器
   std::shared_ptr<StaticRenderer> static_renderer;
@@ -85,9 +87,6 @@ class RendererManager {
   // 纹理补充模式
   TextureComplementMode texture_complementmode{
       TextureComplementMode::REPEAT_TEXTURE};
-
-  // 使用指定纹理池
-  void use_texture_pool(const std::shared_ptr<BaseTexturePool>& texture_pool);
 
   // 添加直线
   void addLine(const QPointF& p1, const QPointF& p2, float line_width,

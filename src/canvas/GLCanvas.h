@@ -5,6 +5,7 @@
 #include <qpaintdevice.h>
 #include <qpoint.h>
 
+#include <cstddef>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -60,33 +61,21 @@ class GLCanvas : public QOpenGLWidget,
   // 渲染管理器
   RendererManager *renderer_manager = nullptr;
 
-  // 当前纹理集信息
-  std::shared_ptr<TextureAtlas> current_atlas;
-  TexturePoolType current_atlas_used_pool;
-
-  // 纹理映射表(id-纹理对象)
-  std::unordered_map<std::string, std::shared_ptr<TextureInstace>> texture_map;
+  // 全部纹理映射表(id-纹理对象)
+  std::unordered_map<std::string, std::shared_ptr<TextureInstace>>
+      texture_full_map;
 
   // 从指定目录添加纹理
-  void load_texture_from_path(const char *path, TexturePoolType type,
-                              bool use_atlas);
+  void load_texture_from_path(const char *path);
 
   // 添加纹理
-  void add_texture(const char *qrc_path, TexturePoolType type, bool use_atlas);
-
-  // 创建新纹理池
-  std::shared_ptr<BaseTexturePool> creat_new_pool(
-      TexturePoolType type, QSize texture_array_used_size = {0, 0},
-      bool use_atlas = false);
-
-  // 完成纹理载入
-  void finalize_texture_loading();
+  void add_texture(const char *path);
 
   // 设置垂直同步
   void set_Vsync(bool flag);
 
   // 渲染实际图形
-  virtual void push_shape() = 0;
+  // virtual void push_shape() = 0;
 
  protected:
   void initializeGL() override;

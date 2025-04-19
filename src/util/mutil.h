@@ -16,7 +16,38 @@
 #include <QtSvgWidgets/QSvgWidget>
 #include <string>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 namespace mutil {
+#ifdef _WIN32
+// UTF-8 → UTF-16
+inline std::wstring utf8_to_utf16(const std::string& utf8) {
+  if (utf8.empty()) return L"";
+  int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8.data(),
+                                        (int)utf8.size(), nullptr, 0);
+  std::wstring utf16(size_needed, 0);
+  MultiByteToWideChar(CP_UTF8, 0, utf8.data(), (int)utf8.size(), utf16.data(),
+                      size_needed);
+  return utf16;
+}
+
+// UTF-16 → UTF-32
+inline std::u32string utf16_to_utf32(const std::wstring& utf16) {
+  std::u32string utf32;
+  for (wchar_t c : utf16) {
+    utf32.push_back(static_cast<char32_t>(c));  // 简单转换（假设没有代理对）
+  }
+  return utf32;
+}
+
+// 组合函数：UTF-8 → UTF-32
+inline std::u32string utf8_to_utf32(const std::string& utf8) {
+  std::wstring utf16 = utf8_to_utf16(utf8);
+  return utf16_to_utf32(utf16);
+}
+#endif
 inline void string2u32sring(const std::string& src, std::u32string& des) {
   UErrorCode status = U_ZERO_ERROR;
   UConverter* conv = ucnv_open("UTF-8", &status);

@@ -9,13 +9,13 @@
 #include <string>
 
 class BaseTexturePool;
+class MTexturePool;
 
 class TextureInstace {
  public:
   TextureInstace();
 
-  explicit TextureInstace(const char* path,
-                          std::shared_ptr<BaseTexturePool> preference);
+  TextureInstace(const char* path, std::shared_ptr<MTexturePool> preference);
 
   virtual ~TextureInstace();
 
@@ -50,7 +50,7 @@ class TextureInstace {
    *将多个小纹理绘制到一个gl纹理对象中
    *在TextureAtlas中存储每个子纹理在此大纹理中的位置偏移和尺寸
    *包括此纹理集的总尺寸,第一个子纹理在纹理池中的偏移id
-   *通过ubo向gpu传输此TextureAtlas的对象数据
+   *通过其他方式向gpu传输此TextureAtlas的对象数据
    *此纹理集继承于普通TextureInstace,
    *可再存储于独立存储的纹理池或纹理数组的纹理池中
    *预操作:判断纹理是否可转换为AtlasSubTexture,
@@ -71,11 +71,18 @@ class TextureInstace {
   // 当前纹理池第十五个纹理集的第一百零一个子纹理
   uint32_t texture_id;
 
+  // 纹理在纹理池的层数
+  uint32_t texture_layer;
+
   // 纹理实例
   QImage texture_image;
 
+  // 纹理在图集中的位置
+  uint32_t woffset{0};
+  uint32_t hoffset{0};
+
   // 纹理池引用
-  std::shared_ptr<BaseTexturePool> pool_reference;
+  std::shared_ptr<MTexturePool> poolreference;
 };
 
 enum class TextureEffect : uint32_t {

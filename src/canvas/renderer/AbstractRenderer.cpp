@@ -2,7 +2,7 @@
 
 #include "../../log/colorful-log.h"
 #include "../GLCanvas.h"
-#include "renderer/RenderCommand.h"
+#include "RenderCommand.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                       \

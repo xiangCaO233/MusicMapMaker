@@ -20,13 +20,9 @@
 #include <memory>
 #include <string>
 
-#include "../util/mutil.h"
 #include "colorful-log.h"
 #include "renderer/font/FontRenderer.h"
-#include "texture/atlas/TextureAtlas.h"
-#include "texture/pool/BaseTexturePool.h"
-#include "texture/pool/TextureArray.h"
-#include "texture/pool/TexturePool.h"
+#include "texture/pool/MTexturePool.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                       \
@@ -77,6 +73,7 @@ void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   QOpenGLWidget::mouseMoveEvent(event);
   mouse_pos = event->pos();
+  repaint();
 }
 
 // 鼠标滚动事件
@@ -138,7 +135,6 @@ void GLCanvas::initializeGL() {
   GLint maxLayers;
   glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxLayers);
   XINFO("多层纹理最大层数: " + std::to_string(maxLayers));
-  TextureArray::max_texture_layer = maxLayers;
 
   // 查询纹理采样器最大连续数量
   GLint max_fragment_samplers;
@@ -147,17 +143,19 @@ void GLCanvas::initializeGL() {
   if (max_fragment_samplers > 16) {
     max_fragment_samplers = 16;
   }
-  TexturePool::max_sampler_consecutive_count = max_fragment_samplers;
 
   // 查询纹理采样器最大数量
   GLint max_combined_samplers;
   glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_combined_samplers);
   XINFO("纹理采样器最大数量: " + std::to_string(max_combined_samplers));
-  TexturePool::max_total_sampler_count = max_combined_samplers;
 
   // 查询最大支持抗锯齿MSAA倍率
   GLint maxSamples;
   GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
+
+  // 初始化纹理池驱动信息
+  MTexturePool::init_driver_info(maxLayers, max_combined_samplers,
+                                 max_fragment_samplers);
 
   XINFO("启用最大抗锯齿倍率: " + std::to_string(maxSamples));
   // 启用 最大 MSAA
@@ -175,19 +173,18 @@ void GLCanvas::initializeGL() {
   // 标准混合模式
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 4096);
 
   // 初始化默认纹理
-  load_texture_from_path("../resources/textures/default",
-                         TexturePoolType::ARRAY, true);
+  load_texture_from_path("../resources/textures/default");
 
   // 初始化纹理
-  // load_texture_from_path("../resources/textures/test/other",
-  //                        TexturePoolType::BASE_POOL, false);
-  load_texture_from_path("../resources/textures/test/1024",
-                         TexturePoolType::ARRAY, true);
-  finalize_texture_loading();
+  // load_texture_from_path("../resources/textures/test/other");
+  load_texture_from_path("../resources/textures/test/1024");
+
+  add_texture("/home/xiang/Downloads/Designant - Designant/bg.jpg");
 }
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
@@ -204,41 +201,10 @@ void GLCanvas::resizeGL(int w, int h) {
 
   // 标记需要更新纹理采样器位置
   renderer_manager->font_renderer->need_update_sampler_location = true;
-  for (const auto &[name, pools] : renderer_manager->texture_pools) {
-    for (const auto &pool : pools) {
-      pool->need_update_sampler_location = true;
-    }
+  for (const auto &pool : renderer_manager->texturepools) {
+    pool->need_update_sampler_location = true;
   }
 }
-
-#ifdef _WIN32
-#include <Windows.h>
-// UTF-8 → UTF-16
-std::wstring utf8_to_utf16(const std::string &utf8) {
-  if (utf8.empty()) return L"";
-  int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8.data(),
-                                        (int)utf8.size(), nullptr, 0);
-  std::wstring utf16(size_needed, 0);
-  MultiByteToWideChar(CP_UTF8, 0, utf8.data(), (int)utf8.size(), utf16.data(),
-                      size_needed);
-  return utf16;
-}
-
-// UTF-16 → UTF-32
-std::u32string utf16_to_utf32(const std::wstring &utf16) {
-  std::u32string utf32;
-  for (wchar_t c : utf16) {
-    utf32.push_back(static_cast<char32_t>(c));  // 简单转换（假设没有代理对）
-  }
-  return utf32;
-}
-
-// 组合函数：UTF-8 → UTF-32
-std::u32string utf8_to_utf32(const std::string &utf8) {
-  std::wstring utf16 = utf8_to_utf16(utf8);
-  return utf16_to_utf32(utf16);
-}
-#endif
 
 // 绘制画布
 void GLCanvas::paintGL() {
@@ -251,7 +217,12 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 执行渲染
-  push_shape();
+  // push_shape();
+  renderer_manager->addRect(QRectF(30, 30, 160, 90), texture_full_map["bg.jpg"],
+                            QColor(0, 0, 0, 255), 0, false);
+  renderer_manager->addRect(QRectF(100, 100, 128, 30),
+                            texture_full_map["White.png"], QColor(0, 0, 0, 255),
+                            0, true);
 
   auto theoretical_fps = std::to_string(
       int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
@@ -260,9 +231,9 @@ void GLCanvas::paintGL() {
 // 创建 UTF-8 到 UTF-32 的转换器
 #ifdef _WIN32
   // 使用 Windows API 转换
-  std::u32string fpsstr = utf8_to_utf32(theoretical_fps);
-  std::u32string glcallstr = utf8_to_utf32(glcall);
-  std::u32string drawcallstr = utf8_to_utf32(drawcall);
+  std::u32string fpsstr = mutil::utf8_to_utf32(theoretical_fps);
+  std::u32string glcallstr = mutil::utf8_to_utf32(glcall);
+  std::u32string drawcallstr = mutil::utf8_to_utf32(drawcall);
 #else
   std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
   std::u32string fpsstr = converter.from_bytes(theoretical_fps);
@@ -279,15 +250,15 @@ void GLCanvas::paintGL() {
   fpsstr = fpsstr + U"fps";
   glcallstr = U"glcalls:" + glcallstr;
   drawcallstr = U"drawcalls:" + drawcallstr;
-  renderer_manager->addText(QPointF(0, 30), fpsstr, 24,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
-  renderer_manager->addText(QPointF(0, 56), glcallstr, 24,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
-  renderer_manager->addText(QPointF(0, 82), drawcallstr, 24,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
+  // renderer_manager->addText(QPointF(0, 30), fpsstr, 24,
+  //                           "ComicShannsMono Nerd Font", QColor(255, 183,
+  //                           197), 0.0f);
+  // renderer_manager->addText(QPointF(0, 56), glcallstr, 24,
+  //                           "ComicShannsMono Nerd Font", QColor(255, 183,
+  //                           197), 0.0f);
+  // renderer_manager->addText(QPointF(0, 82), drawcallstr, 24,
+  //                           "ComicShannsMono Nerd Font", QColor(255, 183,
+  //                           197), 0.0f);
 
   //  QRectF rec(100, 100, 200, 200);
   //  renderer_manager->addRect(rec, texture_map["yuanchou.png"],
@@ -304,33 +275,10 @@ void GLCanvas::paintGL() {
 
   pre_glcalls = XLogger::glcalls;
   pre_drawcall = XLogger::drawcalls;
-
-  /*
-XINFO("frame_time: " + std::to_string(frame_time) + "us");
-XINFO("theoretical fps: " +
-  std::to_string(1 / (((float)frame_time) / 1000000.0)) + "fps");
-
-if (XLogger::glcalls < 100) {
-XINFO("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
-} else if (XLogger::glcalls < 500) {
-XWARN("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
-} else {
-XCRITICAL("当前帧GLCALL数量: " + std::to_string(XLogger::glcalls));
-}
-
-if (XLogger::drawcalls < 8) {
-XINFO("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
-} else if (XLogger::drawcalls < 32) {
-XWARN("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
-} else {
-XCRITICAL("当前帧DRAWCALL数量: " + std::to_string(XLogger::drawcalls));
-}
-  */
 }
 
 // 从指定目录添加纹理
-void GLCanvas::load_texture_from_path(const char *p, TexturePoolType type,
-                                      bool use_atlas) {
+void GLCanvas::load_texture_from_path(const char *p) {
   QString qps(p);
   QString path = QDir::currentPath() + "/" + qps + "/";
   QDir dir(path);
@@ -353,7 +301,7 @@ void GLCanvas::load_texture_from_path(const char *p, TexturePoolType type,
       if (image_extention.find(extention) != image_extention.end()) {
         std::string filestr = filePath.toStdString();
         auto file = filestr.c_str();
-        add_texture(file, type, use_atlas);
+        add_texture(file);
       }
     }
   }
@@ -361,194 +309,37 @@ void GLCanvas::load_texture_from_path(const char *p, TexturePoolType type,
 // 设置垂直同步
 void GLCanvas::set_Vsync(bool flag) {
   // 切换V-Sync
-  context()->format().setSwapInterval(flag ? 1 : 0);
+  context()->format().setSwapInterval(flag);
 }
 
 // 添加纹理
-void GLCanvas::add_texture(const char *qrc_path, TexturePoolType type,
-                           bool use_atlas) {
-  auto poolsit = renderer_manager->texture_pools.find(type);
-  if (poolsit == renderer_manager->texture_pools.end()) {
-    // 不存在此类型纹理池列表
-    // 新建纹理池列表,更新迭代器
-    poolsit = renderer_manager->texture_pools.try_emplace(type).first;
-  }
-  auto &pools = poolsit->second;
-  std::shared_ptr<BaseTexturePool> pool;
-
-  // 检查是否需要新建纹理池
+void GLCanvas::add_texture(const char *qrc_path) {
+  // 是否需要新建纹理池
   bool need_new_pool{true};
-  if (!pools.empty()) {
-    for (const auto &current_pool : pools) {
-      if (!current_pool->is_full()) {
-        // 包含未满的纹理池,使用此纹理池
-        need_new_pool = false;
-        pool = current_pool;
-        break;
-      }
+  std::shared_ptr<MTexturePool> pool;
+  for (const auto &p : renderer_manager->texturepools) {
+    if (!p->isfull()) {
+      // 有未满的纹理池,就用这个
+      need_new_pool = false;
+      pool = p;
     }
   }
 
+  // 需要新建时
   if (need_new_pool) {
-    // 新建纹理池
-    QImage image(qrc_path);
-    pool = creat_new_pool(type, image.size(), use_atlas);
+    pool = std::make_shared<MTexturePool>(this);
+    // 加入纹理池表
+    renderer_manager->texturepools.emplace_back(pool);
   }
 
-  // 加载纹理
-  std::shared_ptr<TextureInstace> texture;
-  if (use_atlas) {
-    // 使用纹理集
-    if (!current_atlas) {
-      // 初始化纹理集
-      current_atlas = std::make_shared<TextureAtlas>(this, pool);
-      current_atlas_used_pool = type;
-    }
-    if (type == current_atlas_used_pool) {
-      // 使用相同类型纹理池
-      if (current_atlas->is_full()) {
-        // 当前纹理集已满
-        // 载入纹理池
-        current_atlas->pack();
-        int res = pool->load_texture(current_atlas);
-        if (res == NOT_CONSECUTIVE || res == POOL_TYPE_NOTADAPT) {
-          // 使用了纹理数组且id不连续
-          // 重新创建纹理池
-          pool = creat_new_pool(type, current_atlas->size(), use_atlas);
-          pool->load_texture(current_atlas);
-        }
-        // 重新初始化纹理集
-        current_atlas = std::make_shared<TextureAtlas>(this, pool);
-      } else {
-        // 当前纹理集未满
-        // 加入当前纹理集-接收子纹理对象
-        texture = current_atlas->add_texture(pool, current_atlas, qrc_path);
-      }
-    } else {
-      // 使用不同类型
-      // 打包当前纹理集
-      current_atlas->pack();
+  // 初始化纹理
+  auto texture = std::make_shared<TextureInstace>(qrc_path, pool);
 
-      // 检查前一类型纹理池
-      auto prepoolsit =
-          renderer_manager->texture_pools.find(current_atlas_used_pool);
-      const auto &prepools = prepoolsit->second;
-      std::shared_ptr<BaseTexturePool> prepool;
-      // 检查是否需要新建纹理池
-      bool prefull{true};
-      if (!prepools.empty()) {
-        for (const auto &pre_pool : prepools) {
-          if (!pre_pool->is_full()) {
-            // 包含未满的纹理池,使用此纹理池
-            prefull = false;
-            prepool = pre_pool;
-            break;
-          }
-        }
-      }
-      if (prefull) {
-        // 新建纹理池
-        prepool = creat_new_pool(current_atlas_used_pool, current_atlas->size(),
-                                 use_atlas);
-      }
-      // 载入上一类型的纹理池
-      int res = prepool->load_texture(current_atlas);
-      // 载入上一类型的纹理池失败
-      if (res == NOT_CONSECUTIVE || res == POOL_TYPE_NOTADAPT) {
-        // 使用了纹理数组且id不连续
-        // 重新创建纹理池
-        prepool = creat_new_pool(current_atlas_used_pool, current_atlas->size(),
-                                 use_atlas);
-        prepool->load_texture(current_atlas);
-      }
-      // 重新初始化纹理集
-      current_atlas = std::make_shared<TextureAtlas>(this, prepool);
-    }
-  } else {
-    // 直接初始化纹理
-    texture = std::make_shared<TextureInstace>(qrc_path, pool);
-    // 载入纹理
-    int res = pool->load_texture(texture);
-    if (res == NOT_CONSECUTIVE) {
-      // 使用了纹理数组且id不连续
-      // 重新创建纹理池
-      pool = creat_new_pool(type, current_atlas->size());
-      pool->load_texture(current_atlas);
-    }
-  }
-  texture_map.try_emplace(texture->name, texture);
-}
+  // 添加到纹理池
+  auto res = pool->load_texture(texture);
 
-// 创建新纹理池
-std::shared_ptr<BaseTexturePool> GLCanvas::creat_new_pool(
-    TexturePoolType type, QSize texture_array_used_size, bool use_atlas) {
-  auto poolsit = renderer_manager->texture_pools.find(type);
-  if (poolsit == renderer_manager->texture_pools.end()) {
-    // 不存在此类型纹理池列表
-    // 新建纹理池列表,更新迭代器
-    poolsit = renderer_manager->texture_pools.try_emplace(type).first;
-  }
-  auto &pools = poolsit->second;
-  // 预声明纹理池
-  std::shared_ptr<BaseTexturePool> pool;
-  switch (type) {
-    case TexturePoolType::BASE_POOL: {
-      pool = std::make_shared<TexturePool>(this);
-      break;
-    }
-    case TexturePoolType::ARRAY: {
-      pool = std::make_shared<TextureArray>(this, texture_array_used_size,
-                                            use_atlas);
-      break;
-    }
-  }
-  pools.emplace_back(pool);
-  return pool;
-}
-
-// 完成纹理载入
-void GLCanvas::finalize_texture_loading() {
-  // 处理完未处理的纹理集
-  if (current_atlas) {
-    // 打包当前纹理集
-    current_atlas->pack();
-    // 检查前一类型纹理池
-    auto prepoolsit =
-        renderer_manager->texture_pools.find(current_atlas_used_pool);
-    auto &prepools = prepoolsit->second;
-    std::shared_ptr<BaseTexturePool> prepool;
-
-    // 检查是否需要新建纹理池
-    bool prefull{true};
-    if (!prepools.empty()) {
-      for (const auto &pre_pool : prepools) {
-        if (!pre_pool->is_full()) {
-          // 包含未满的纹理池,使用此纹理池
-          prefull = false;
-          prepool = pre_pool;
-          break;
-        }
-      }
-    }
-    if (prefull) {
-      // 新建纹理池
-      prepool =
-          creat_new_pool(current_atlas_used_pool, current_atlas->size(), true);
-    }
-    // 载入上一类型的纹理池
-    int res = prepool->load_texture(current_atlas);
-    if (res == NOT_CONSECUTIVE || res == POOL_TYPE_NOTADAPT) {
-      // 使用了纹理数组且id不连续
-      // 重新创建纹理池
-      prepool =
-          creat_new_pool(current_atlas_used_pool, current_atlas->size(), true);
-      prepool->load_texture(current_atlas);
-    }
-  }
-
-  for (const auto &[type, pools] : renderer_manager->texture_pools) {
-    for (auto &pool : pools) {
-      pool->finalize();
-    }
+  if (res) {
+    // 成功添加映射
+    texture_full_map.try_emplace(texture->name, texture);
   }
 }

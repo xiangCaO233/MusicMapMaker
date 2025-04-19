@@ -5,7 +5,7 @@
 
 #include "Rect.h"
 
-class AtlasSubTexture;
+class TextureInstace;
 
 class MaxRectsBinPack {
  public:
@@ -45,7 +45,7 @@ class MaxRectsBinPack {
   /// Inserts a single rectangle into the bin, possibly rotated.
   Rect Insert(int width, int height, FreeRectChoiceHeuristic method);
 
-  void Insert(const std::shared_ptr<AtlasSubTexture> &meta,
+  bool Insert(const std::shared_ptr<TextureInstace> &meta,
               FreeRectChoiceHeuristic method);
 
   /// Computes the ratio of used surface area to the total bin area.
@@ -53,7 +53,8 @@ class MaxRectsBinPack {
 
   int binWidth;
   int binHeight;
-  std::vector<std::shared_ptr<AtlasSubTexture>> restex;
+  std::vector<std::shared_ptr<TextureInstace>> restex;
+  bool full{false};
 
  private:
   friend class Texturepool;

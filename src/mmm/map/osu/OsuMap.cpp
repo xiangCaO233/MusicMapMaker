@@ -234,6 +234,10 @@ void OsuMap::load_from_file(const char* path) {
       background_type = 1;
     }
     bg_file_name = background_paras.at(2);
+    if (bg_file_name.starts_with('\"')) {
+      bg_file_name.replace(bg_file_name.begin(), bg_file_name.begin() + 1, "");
+      bg_file_name.replace(bg_file_name.end() - 1, bg_file_name.end(), "");
+    }
     bg_path = map_file_path.parent_path() / bg_file_name;
     if (background_paras.size() >= 5) {
       bgxoffset = std::stoi(background_paras.at(3));

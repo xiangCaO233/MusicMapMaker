@@ -12,9 +12,7 @@
 #include <memory>
 
 #include "../../log/colorful-log.h"
-#include "../texture/pool/BaseTexturePool.h"
-#include "../texture/pool/TextureArray.h"
-#include "../texture/pool/TexturePool.h"
+#include "../texture/pool/MTexturePool.h"
 #include "AbstractRenderer.h"
 #include "dynamic/DynamicRenderer.h"
 #include "font/FontRenderer.h"
@@ -79,7 +77,6 @@ void RendererManager::finalize() {
                       : std::dynamic_pointer_cast<AbstractRenderer>(
                             static_renderer)));
       if (command.is_text) {
-        // TODO(xiang 2025-04-12): 检查可合并的渲染文本指令
         if (  // 操作队列为空
             operation_queue.empty() ||
             // 操作队列尾渲染器不同
@@ -88,7 +85,7 @@ void RendererManager::finalize() {
             operation_queue.back().shape_type != command.instance_shape) {
           // 新建渲染操作
           operation_queue.emplace(command, command.instance_shape, renderer,
-                                  nullptr, fontr_instance_index, 1);
+                                  nullptr, 0, fontr_instance_index, 1);
         } else {
           // 与队尾渲染操作可合并
           operation_queue.back().render_shape_count++;
@@ -110,12 +107,13 @@ void RendererManager::finalize() {
             // 操作队列尾使用纹理池不同
             (texture ?
                      // texture非空,操作队列尾纹理池也非空
-                 operation_queue.back().texture_pool != texture->pool_reference
+                 operation_queue.back().texture_pool != texture->poolreference
                      // texture空,操作队列尾纹理池也空-可合并了
                      : false)) {
           // 新建渲染操作
           operation_queue.emplace(command, command.instance_shape, renderer,
-                                  texture ? texture->pool_reference : nullptr,
+                                  texture ? texture->poolreference : nullptr,
+                                  texture ? texture->texture_layer : 0,
                                   (command.is_volatile ? dynamic_instance_index
                                                        : static_instance_index),
                                   1);
@@ -174,7 +172,7 @@ void RendererManager::finalize() {
             operation_queue.back().shape_type != command.instance_shape) {
           // 新建渲染操作
           operation_queue.emplace(command, command.instance_shape, renderer,
-                                  nullptr, fontr_instance_index, 1);
+                                  nullptr, 0, fontr_instance_index, 1);
         } else {
           // 与队尾渲染操作可合并
           operation_queue.back().render_shape_count++;
@@ -195,12 +193,16 @@ void RendererManager::finalize() {
             // 操作队列尾使用纹理池不同
             (texture ?
                      // texture非空,操作队列尾纹理池也非空
-                 operation_queue.back().texture_pool != texture->pool_reference
+                 (operation_queue.back().texture_pool !=
+                      texture->poolreference ||
+                  // 纹理集层级不同
+                  operation_queue.back().layer_index != texture->texture_layer)
                      // texture空,操作队列尾纹理池也空-可合并了
                      : false)) {
           // 新建渲染操作
           operation_queue.emplace(command, command.instance_shape, renderer,
-                                  texture ? texture->pool_reference : nullptr,
+                                  texture ? texture->poolreference : nullptr,
+                                  texture ? texture->texture_layer : 0,
                                   (command.is_volatile ? dynamic_instance_index
                                                        : static_instance_index),
                                   1);
@@ -288,7 +290,7 @@ void RendererManager::sync_renderer(
         &policy);
 
     // 同步贴图id数据
-    int texture_id = 0;
+    int texture_id = -1;
     if (texture) {
       texture_id = texture->texture_id;
     }
@@ -296,6 +298,7 @@ void RendererManager::sync_renderer(
         InstanceDataType::TEXTURE_ID,
         (command.is_volatile ? dynamic_instance_index : static_instance_index),
         &texture_id);
+
     // 同步圆角半径数据
     renderer->synchronize_data(
         InstanceDataType::RADIUS,
@@ -397,30 +400,14 @@ void RendererManager::renderAll() {
       // 检查纹理池
       auto& texpool = operetion.texture_pool;
       if (texpool) {
-        auto base_pool = std::dynamic_pointer_cast<TexturePool>(texpool);
-        if (base_pool) {
-          // 使用basepool
-          // XINFO("使用base pool");
-          // 使用头指令纹理所处批次
-          base_pool->use(
-              base_pool, operetion.renderer,
-              base_pool->batch_mapping[operetion.head_command.texture].first);
-        } else {
-          auto array_pool = std::dynamic_pointer_cast<TextureArray>(texpool);
-          if (array_pool) {
-            // 使用arraypool
-            // XINFO("使用array pool");
-            // 使用纹理数组池
-            array_pool->use(array_pool, operetion.renderer);
-          }
-        }
+        // void use(const std::shared_ptr<MTexturePool> &pool_reference,
+        //          std::shared_ptr<AbstractRenderer> &renderer_context,
+        //          size_t layer_index);
+        texpool->use(texpool, operetion.renderer, operetion.layer_index);
       } else {
         // 不使用纹理池
-        operetion.renderer->current_pool_type = TexturePoolType::UNKNOWN;
-        operetion.renderer->is_current_atlas = false;
         operetion.renderer->current_use_pool = nullptr;
-        operetion.renderer->shader->set_uniform_integer("texture_pool_usage",
-                                                        0);
+        // operetion.renderer->shader->set_uniform_integer("use_texture", 0);
       }
     }
 

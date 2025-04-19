@@ -106,21 +106,17 @@ set(PROJECT_SOURCES
   src/canvas/renderer/AbstractRenderer.cpp
   src/canvas/renderer/RendererManager.h
   src/canvas/renderer/RendererManager.cpp
-  src/canvas/texture/atlas/TextureAtlas.h
-  src/canvas/texture/atlas/TextureAtlas.cpp
-  src/canvas/texture/atlas/Rect.h
-  src/canvas/texture/atlas/MaxRectsBinPack.h
-  src/canvas/texture/atlas/MaxRectsBinPack.cpp
-  src/canvas/texture/pool/TexturePool.h
-  src/canvas/texture/pool/TexturePool.cpp
-  src/canvas/texture/pool/BaseTexturePool.h
-  src/canvas/texture/pool/BaseTexturePool.cpp
-  src/canvas/texture/pool/TextureArray.h
-  src/canvas/texture/pool/TextureArray.cpp
-  src/canvas/texture/Texture.h
-  src/canvas/texture/Texture.cpp
   src/canvas/renderer/font/FontRenderer.h
   src/canvas/renderer/font/FontRenderer.cpp
+  src/canvas/texture/Texture.h
+  src/canvas/texture/Texture.cpp
+	src/canvas/texture/pool/Atlas.h
+	src/canvas/texture/pool/Atlas.cpp
+	src/canvas/texture/pool/MTexturePool.h
+	src/canvas/texture/pool/MTexturePool.cpp
+	src/canvas/texture/pool/MaxRectsBinPack.h
+	src/canvas/texture/pool/MaxRectsBinPack.cpp
+	src/canvas/texture/pool/Rect.h
   src/log/colorful-log.h
   src/log/colorful_log.cpp
   ${MMM_SOURCES}

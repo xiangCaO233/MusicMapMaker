@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "../../../log/colorful-log.h"
-#include "TextureAtlas.h"
+#include "../Texture.h"
 
 using namespace std;
 
@@ -43,29 +43,17 @@ void MaxRectsBinPack::Expand(float rate) {
   // XINFO("扩容到[" + to_string(binWidth) + "x" + to_string(binHeight) + "]");
 }
 
-void MaxRectsBinPack::Insert(const shared_ptr<AtlasSubTexture> &instance,
+bool MaxRectsBinPack::Insert(const shared_ptr<TextureInstace> &instance,
                              FreeRectChoiceHeuristic method) {
   // XINFO("插入纹理:[" + instance->name + "]");
   auto res = Insert(instance->texture_image.width(),
                     instance->texture_image.height(), method);
   if (res.height == 0) {
     // XWARN("空间不足");
-    Expand(binexpandrate);
-    // XINFO("扩容完成");
-    restex.push_back(instance);
-    // 转移缓存
-    vector<shared_ptr<AtlasSubTexture>> tempmetas;
-    for (const auto &tex : restex) {
-      tempmetas.push_back(tex);
-    }
-    // 清空结果重新插入
-    restex.clear();
-
-    for (auto &tex : tempmetas) {
-      // 递归
-      Insert(tex, method);
-    }
-    tempmetas.clear();
+    instance->woffset = -1;
+    instance->hoffset = -1;
+    full = true;
+    return false;
   } else {
     instance->woffset = res.x;
     instance->hoffset = res.y;
@@ -73,6 +61,7 @@ void MaxRectsBinPack::Insert(const shared_ptr<AtlasSubTexture> &instance,
     // XINFO("插入结果:" + instance->name + "位置[" +
     //       std::to_string(instance->woffset) + "," +
     //       std::to_string(instance->hoffset) + "]");
+    return true;
   }
 }
 

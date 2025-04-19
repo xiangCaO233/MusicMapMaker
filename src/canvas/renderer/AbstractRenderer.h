@@ -5,7 +5,6 @@
 #include <memory>
 #include <vector>
 
-#include "../texture/pool/BaseTexturePool.h"
 #include "RenderCommand.h"
 #include "shader/GLShader.h"
 
@@ -36,13 +35,7 @@ class AbstractRenderer {
   virtual ~AbstractRenderer();
 
   // 当前正在使用的纹理池
-  std::shared_ptr<BaseTexturePool> current_use_pool;
-
-  // 当前shader使用的纹理池类型
-  TexturePoolType current_pool_type{TexturePoolType::UNKNOWN};
-
-  // 当前是否使用纹理集
-  bool is_current_atlas{false};
+  std::shared_ptr<MTexturePool> current_use_pool;
 
   // 子类公共成员
   // gl实例指针

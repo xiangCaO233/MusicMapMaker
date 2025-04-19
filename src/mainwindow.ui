@@ -826,7 +826,7 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="MapWorkspaceCanvas" name="canvas"/>
+                      <widget class="GLCanvas" name="canvas"/>
                      </item>
                      <item>
                       <widget class="QScrollBar" name="progress_slider">
@@ -1224,9 +1224,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>MapWorkspaceCanvas</class>
+   <class>GLCanvas</class>
    <extends>QOpenGLWidget</extends>
-   <header location="global">MapWorkspaceCanvas.h</header>
+   <header>GLCanvas.h</header>
   </customwidget>
  </customwidgets>
  <resources>
