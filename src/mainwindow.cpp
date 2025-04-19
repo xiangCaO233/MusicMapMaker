@@ -1,11 +1,8 @@
 #include "mainwindow.h"
 
-#include <qdir.h>
-#include <qfileinfo.h>
 #include <qlogging.h>
 #include <qobject.h>
 
-#include <QFileSystemModel>
 #include <QVBoxLayout>
 #include <memory>
 #include <string>
@@ -42,40 +39,6 @@ MainWindow::MainWindow(QWidget* parent)
         QString::fromStdString(device->device_name),
         QVariant::fromValue(device));
   }
-
-  // 获取家目录
-  QString home = QDir::homePath();
-
-  // 设置地址栏为家目录
-  ui->address_line->setText(home);
-
-  // 初始化文件浏览器
-  // 文件管理器模型
-  QFileSystemModel* file_model = new QFileSystemModel;
-  file_model->setRootPath(home);
-
-  // 文件管理器过滤器(不显示.显示..)
-  file_model->setFilter(QDir::AllEntries | QDir::NoDotAndDotDot);
-
-  // 使用文件管理器模型
-  ui->file_browser_treeview->setModel(file_model);
-
-  // 隐藏修改日期
-  ui->file_browser_treeview->hideColumn(3);
-  // 隐藏类型
-  ui->file_browser_treeview->hideColumn(2);
-
-  // 跳转到目录
-  ui->file_browser_treeview->setRootIndex(file_model->index(home));
-  ui->file_browser_treeview->setColumnWidth(0, 400);
-  ui->file_browser_treeview->setColumnWidth(1, 80);
-
-  // 禁用展开
-  ui->file_browser_treeview->setItemsExpandable(false);
-  ui->file_browser_treeview->setRootIsDecorated(false);
-
-  // 初始化文件浏览器管理器
-  filebrowercontroller = std::make_shared<MFileBrowserController>();
 
   // 默认使用Dark主题
   use_theme(GlobalTheme::DARK);
@@ -134,15 +97,8 @@ void MainWindow::use_theme(GlobalTheme theme) {
   mutil::set_action_svgcolor(ui->actionDelete, ":/icons/trash.svg",
                              file_button_color);
 
-  // 设置文件管理器按钮图标颜色
-  mutil::set_button_svgcolor(ui->cdup, ":/icons/angle-left.svg",
-                             file_button_color, 28, 28);
-  mutil::set_button_svgcolor(ui->cdnext, ":/icons/angle-right.svg",
-                             file_button_color, 28, 28);
-  mutil::set_button_svgcolor(ui->address_confirm, ":/icons/arrow-right.svg",
-                             file_button_color, 28, 28);
-  mutil::set_button_svgcolor(ui->search, ":/icons/search.svg",
-                             file_button_color, 28, 28);
+  // 设置文件浏览器图标颜色
+  ui->file_controller->use_theme(theme);
 
   // 设置工具栏按钮图标颜色
   mutil::set_toolbutton_svgcolor(ui->default_divisor_policy_toolbutton,
@@ -170,7 +126,7 @@ void MainWindow::use_theme(GlobalTheme theme) {
 // 设置信号
 void MainWindow::setupsignals() {
   // 连接文件浏览器和项目管理器信号
-  connect(filebrowercontroller.get(), &MFileBrowserController::open_project,
+  connect(ui->file_controller, &FileBrowserController::open_project,
           ui->project_controller, &MProjectController::new_project);
 
   // 连接项目选择map信号
@@ -180,28 +136,6 @@ void MainWindow::setupsignals() {
   // 连接画布时间更新信号
   connect(ui->canvas, &MapWorkspaceCanvas::current_time_stamp_changed, this,
           &MainWindow::on_canvas_timestamp_changed);
-
-  // 地址栏确认事件
-  connect(ui->address_confirm, &QPushButton::clicked,
-          filebrowercontroller.get(),
-          &MFileBrowserController::on_address_confirm_clicked);
-
-  // 文件管理器双击事件
-  connect(ui->file_browser_treeview, &QTreeView::doubleClicked,
-          filebrowercontroller.get(),
-          &MFileBrowserController::on_file_browser_treeview_doubleClicked);
-
-  // 文件管理器返回事件
-  connect(ui->cdup, &QPushButton::clicked, filebrowercontroller.get(),
-          &MFileBrowserController::on_cdup_clicked);
-
-  // 文件管理器向后返回事件
-  connect(ui->cdnext, &QPushButton::clicked, filebrowercontroller.get(),
-          &MFileBrowserController::on_cdnext_clicked);
-
-  // 文件管理器搜索事件
-  connect(ui->search, &QPushButton::clicked, filebrowercontroller.get(),
-          &MFileBrowserController::on_search_clicked);
 }
 
 // 选择音频输出设备事件
@@ -209,56 +143,6 @@ void MainWindow::on_audio_device_selector_currentIndexChanged(int index) {
   // 获取并设置当前选中的音频设备
   auto data = ui->audio_device_selector->currentData();
   current_use_device = data.value<std::shared_ptr<XOutputDevice>>();
-}
-
-// 文件浏览器上下文菜单
-void MainWindow::on_file_browser_treeview_customContextMenuRequested(
-    const QPoint& pos) {
-  QModelIndex index = ui->file_browser_treeview->indexAt(pos);
-
-  if (!index.isValid()) return;
-  auto click_abs_path = index.data(Qt::UserRole + 1).toString();
-  auto click_item = QFileInfo(click_abs_path);
-
-  // 生成菜单
-  QMenu menu;
-
-  // 根据项目类型添加不同的菜单项
-  if (click_item.isDir()) {
-    // 文件夹
-    // qDebug() << "click folder: " << click_abs_path;
-    menu.addAction(tr("Open Folder"), [&]() {
-      filebrowercontroller->on_menu_open_folder(
-          qobject_cast<QFileSystemModel*>(ui->file_browser_treeview->model()),
-          index);
-    });
-    menu.addAction(tr("Open As Project"), [&]() {
-      filebrowercontroller->on_open_folder_as_project(click_abs_path);
-    });
-    menu.addAction(tr("New File"), [&]() {
-      filebrowercontroller->on_menu_new_file_infolder(click_abs_path);
-    });
-  } else {
-    // 文件
-    menu.addAction(tr("Open File"), [&]() {
-      filebrowercontroller->on_menu_open_file(click_abs_path);
-    });
-    menu.addAction(tr("Rename"), [&]() {
-      filebrowercontroller->on_menu_rename_file(click_abs_path);
-    });
-    menu.addAction(tr("Delete"), [&]() {
-      filebrowercontroller->on_menu_delete_file(click_abs_path);
-    });
-  }
-
-  // 添加通用菜单项
-  menu.addSeparator();
-  menu.addAction(tr("Properties"), [&]() {
-    filebrowercontroller->on_menu_show_properties(click_abs_path);
-  });
-
-  // 显示菜单
-  menu.exec(ui->file_browser_treeview->viewport()->mapToGlobal(pos));
 }
 
 // 滚动方向切换按钮触发

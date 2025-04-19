@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
-    <height>195</height>
+    <width>366</width>
+    <height>144</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_6">
    <property name="spacing">
@@ -114,7 +114,7 @@
             <item>
              <widget class="QLabel" name="unit">
               <property name="text">
-               <string>ms</string>
+               <string notr="true">ms</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -139,7 +139,10 @@
          </item>
          <item>
           <widget class="QWidget" name="infomationwidget" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout">
+           <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <property name="leftMargin">
              <number>0</number>
             </property>
@@ -153,13 +156,39 @@
              <number>0</number>
             </property>
             <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>11</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QWidget" name="timelinespeedwidget" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
                <item>
                 <widget class="QLabel" name="timelinespeedprefix">
                  <property name="font">
                   <font>
-                   <pointsize>18</pointsize>
+                   <pointsize>16</pointsize>
                   </font>
                  </property>
                  <property name="text">
@@ -174,47 +203,11 @@
                 <widget class="QLabel" name="timelinespeedvalue">
                  <property name="font">
                   <font>
-                   <pointsize>18</pointsize>
+                   <pointsize>16</pointsize>
                   </font>
                  </property>
                  <property name="text">
                   <string notr="true">1.00</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QWidget" name="bpmwidget" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout">
-               <property name="spacing">
-                <number>8</number>
-               </property>
-               <item>
-                <widget class="QLabel" name="bpmvalue">
-                 <property name="font">
-                  <font>
-                   <pointsize>22</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string notr="true">200</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="bpmsuffix">
-                 <property name="font">
-                  <font>
-                   <pointsize>22</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string notr="true">BPM</string>
                  </property>
                 </widget>
                </item>
@@ -248,6 +241,18 @@
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <property name="spacing">
           <number>16</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
          </property>
          <item>
           <spacer name="horizontalSpacer_2">
@@ -289,6 +294,9 @@
              <height>16</height>
             </size>
            </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
@@ -317,6 +325,9 @@
              <width>16</width>
              <height>16</height>
             </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -347,6 +358,9 @@
              <height>16</height>
             </size>
            </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
@@ -368,6 +382,57 @@
       <item>
        <widget class="QWidget" name="speedaltcontroller" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QWidget" name="bpmwidget" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="bpmvalue">
+              <property name="font">
+               <font>
+                <pointsize>16</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string notr="true">200</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bpmsuffix">
+              <property name="font">
+               <font>
+                <pointsize>16</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string notr="true">BPM</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
@@ -408,6 +473,12 @@
              <height>16</height>
             </size>
            </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
           </widget>
          </item>
          <item>
@@ -416,6 +487,9 @@
             <font>
              <pointsize>16</pointsize>
             </font>
+           </property>
+           <property name="frame">
+            <bool>false</bool>
            </property>
            <property name="prefix">
             <string>audio speed </string>
@@ -465,6 +539,9 @@
              <width>16</width>
              <height>16</height>
             </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

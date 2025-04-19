@@ -10,8 +10,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "src/filebrowsercontroller.h"
-
 // 默认主题
 enum class GlobalTheme {
   DARK,
@@ -63,9 +61,6 @@ class MainWindow : public QMainWindow {
 
   // 当前选择的音频输出设备
   std::shared_ptr<XOutputDevice> current_use_device;
-
-  // 文件浏览器控制器
-  std::shared_ptr<MFileBrowserController> filebrowercontroller;
 
   // 使用主题
   void use_theme(GlobalTheme theme);

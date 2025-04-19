@@ -86,8 +86,9 @@ set(PROJECT_SOURCES
   src/mainwindow.cpp
   src/mainwindow.h
   src/mainwindow.ui
-  src/filebrowsercontroller.h
-  src/filebrowsercontroller.cpp
+  src/mfilebrowsercontroller.cpp
+  src/mfilebrowsercontroller.h
+  src/mfilebrowsercontroller.ui
   src/projectcontroller.cpp
   src/projectcontroller.h
   src/mprojectcontroller.ui
@@ -131,8 +132,7 @@ include_directories(./src ./src/canvas ./src/log)
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-    resources/glsrcs.qrc
-  )
+    resources/glsrcs.qrc)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
