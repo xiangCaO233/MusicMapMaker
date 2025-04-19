@@ -1,12 +1,12 @@
 #version 450 core
 
-// 渲染管线前传递来的颜色
-in vec4 fill_color;
-
 // 当前绘制形状的边界矩形尺寸
 in vec2 bound_size;
 // 当前绘制形状的边界矩形圆角半径
 in float radius;
+
+// 渲染管线前传递来的颜色
+in vec4 fill_color;
 
 // 渲染管线前传递来的采样器数据
 in float texture_policy;
@@ -160,11 +160,12 @@ AtlasSubMeta getAtlasSubMeta(int atlasIndex, int subIndex) {
 }
 
 void main() {
+  // 未使用纹理--直接填充指定颜色
   if (use_texture == 0) {
-    // 未使用纹理--直接填充指定颜色
-    FragColor = fill_color;
+    FragColor = fill_color / 255.0;
     return;
   }
+
   // 取出纹理模式
   uint texture_effect = uint(texture_policy) & MASK_EFFECT;
   uint texture_comolement_mode = uint(texture_policy) & MASK_COMPLEMENT;

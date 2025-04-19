@@ -290,7 +290,7 @@ void RendererManager::sync_renderer(
         &policy);
 
     // 同步贴图id数据
-    int texture_id = -1;
+    int texture_id = 0;
     if (texture) {
       texture_id = texture->texture_id;
     }
@@ -400,21 +400,19 @@ void RendererManager::renderAll() {
       // 检查纹理池
       auto& texpool = operetion.texture_pool;
       if (texpool) {
-        // void use(const std::shared_ptr<MTexturePool> &pool_reference,
-        //          std::shared_ptr<AbstractRenderer> &renderer_context,
-        //          size_t layer_index);
-        texpool->use(texpool, operetion.renderer, operetion.layer_index);
         operetion.renderer->shader->set_uniform_integer("use_texture", 1);
+        texpool->use(texpool, operetion.renderer);
       } else {
         // 不使用纹理池
-        operetion.renderer->current_use_pool = nullptr;
         operetion.renderer->shader->set_uniform_integer("use_texture", 0);
+        operetion.renderer->current_use_pool = nullptr;
       }
     }
 
     operetion.renderer->render(operetion.shape_type,
                                operetion.start_shape_index,
                                operetion.render_shape_count);
+
     operetion.renderer->unbind();
     operation_queue.pop();
   }

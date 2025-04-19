@@ -230,6 +230,7 @@ void MapWorkspaceCanvas::update_canvas() {
     current_time_stamp += timer_update_time;
   }
 
+  draw_background();
   draw_beats();
   draw_hitobject();
 
@@ -258,9 +259,9 @@ void MapWorkspaceCanvas::draw_top_bar() {
       current_size.width() - (current_size.width() / 48.0f),
       current_size.height() / 12.0f - (current_size.height() / 48.0f));
   renderer_manager->addRoundRect(top_bar_in, nullptr, QColor(30, 40, 50, 230),
-                                 0, 0.3, false);
+                                 0, 1.3, false);
   renderer_manager->addRoundRect(top_bar_out, nullptr, QColor(33, 33, 33, 230),
-                                 0, 0.3, false);
+                                 0, 1.3, false);
   renderer_manager->addLine(QPointF(0, 0), QPointF(current_size.width(), 0),
                             2.0f, nullptr, QColor(255, 255, 255, 240), false);
 }
@@ -576,7 +577,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
 // 渲染实际图形
 void MapWorkspaceCanvas::push_shape() {
-  draw_background();
   draw_preview_content();
 
   draw_top_bar();

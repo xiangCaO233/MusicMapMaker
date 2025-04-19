@@ -83,8 +83,7 @@ class MTexturePool {
 
   // 使用纹理池
   void use(const std::shared_ptr<MTexturePool> &pool_reference,
-           std::shared_ptr<AbstractRenderer> &renderer_context,
-           size_t layer_index);
+           std::shared_ptr<AbstractRenderer> &renderer_context);
 };
 
 #endif  // M_MTEXTUREPOOL_H

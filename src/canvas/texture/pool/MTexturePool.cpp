@@ -289,13 +289,13 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
 
   // 成功添加映射
   texture_map.try_emplace(texture->name, texture);
+  need_update_sampler_location = true;
   return true;
 }
 
 // 使用纹理池
 void MTexturePool::use(const std::shared_ptr<MTexturePool> &pool_reference,
-                       std::shared_ptr<AbstractRenderer> &renderer_context,
-                       size_t layer_index) {
+                       std::shared_ptr<AbstractRenderer> &renderer_context) {
   bool need_update{false};
   // 绑定纹理池
   if (renderer_context->current_use_pool != pool_reference) {

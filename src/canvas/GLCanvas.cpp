@@ -74,7 +74,7 @@ void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   QOpenGLWidget::mouseMoveEvent(event);
   mouse_pos = event->pos();
-  repaint();
+  // repaint();
 }
 
 // 鼠标滚动事件
@@ -185,7 +185,7 @@ void GLCanvas::initializeGL() {
   // load_texture_from_path("../resources/textures/test/other");
   load_texture_from_path("../resources/textures/test/1024");
 
-  add_texture("../resources/map/Designant - Designant/bg.jpg");
+  // add_texture("../resources/map/Designant - Designant/bg.jpg");
 }
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
@@ -218,15 +218,24 @@ void GLCanvas::paintGL() {
   GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
   // 执行渲染
-  // push_shape();
+  push_shape();
+  // auto current_size = size();
+
+  // // 绘制一层滤镜
+  // QRectF preview_area_bg_bound(current_size.width() * (1 - 0.15), 0.0,
+  //                              current_size.width() * 0.15,
+  //                              current_size.height());
+
+  // renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6,
+  // 75),
+  //                           0, true);
 
   // DEBUG
   // renderer_manager->addRect(QRectF(30, 30, 160, 90),
   // texture_full_map["bg.jpg"],
   //                           QColor(0, 0, 0, 255), 0, false);
-  // renderer_manager->addRect(QRectF(100, 100, 128, 30),
-  //                           texture_full_map["White.png"], QColor(0, 0, 0,
-  //                           255), 0, true);
+  // renderer_manager->addRect(QRectF(100, 100, 128, 30), nullptr,
+  //                           QColor(255, 255, 255, 255), 0, true);
 
   auto theoretical_fps = std::to_string(
       int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
@@ -264,13 +273,13 @@ void GLCanvas::paintGL() {
   //                           "ComicShannsMono Nerd Font", QColor(255, 183,
   //                           197), 0.0f);
 
-  QRectF rec(100, 100, 200, 200);
+  // QRectF rec(100, 100, 200, 200);
 
-  renderer_manager->addRect(rec, texture_full_map["yuanchou.png"],
-                            QColor(255, 255, 255), 0.0f, true);
+  // renderer_manager->addRect(rec, texture_full_map["yuanchou.png"],
+  //                           QColor(255, 255, 255), 0.0f, true);
 
-  renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
-                            QColor(0, 0, 0, 255), true);
+  // renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
+  //                           QColor(0, 0, 0, 255), true);
 
   renderer_manager->renderAll();
 
