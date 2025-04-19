@@ -83,18 +83,18 @@ set(GLSL_FILES
 # 项目源文件
 set(PROJECT_SOURCES
   src/main.cpp
-  src/mainwindow.cpp
-  src/mainwindow.h
-  src/mainwindow.ui
-  src/mfilebrowsercontroller.cpp
-  src/mfilebrowsercontroller.h
-  src/mfilebrowsercontroller.ui
-  src/projectcontroller.cpp
-  src/projectcontroller.h
-  src/mprojectcontroller.ui
-  src/timecontroller.h
-  src/timecontroller.cpp
-  src/timecontroller.ui
+  src/ui/mainwindow.cpp
+  src/ui/mainwindow.h
+  src/ui/mainwindow.ui
+  src/ui/mfilebrowsercontroller.cpp
+  src/ui/mfilebrowsercontroller.h
+  src/ui/mfilebrowsercontroller.ui
+  src/ui/projectcontroller.cpp
+  src/ui/projectcontroller.h
+  src/ui/mprojectcontroller.ui
+  src/ui/timecontroller.h
+  src/ui/timecontroller.cpp
+  src/ui/timecontroller.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/MapWorkspaceCanvas.h
@@ -127,7 +127,7 @@ set(PROJECT_SOURCES
   ${GLSL_FILES}
   ${TS_FILES})
 
-include_directories(./src ./src/canvas ./src/log)
+include_directories(./src ./src/ui ./src/canvas ./src/log)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
