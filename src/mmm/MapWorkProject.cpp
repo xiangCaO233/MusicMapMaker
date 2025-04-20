@@ -1,10 +1,12 @@
 #include "MapWorkProject.h"
 
+#include <deque>
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <ostream>
 #include <string>
+#include <thread>
 #include <unordered_set>
 
 #include "colorful-log.h"

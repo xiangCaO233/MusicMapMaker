@@ -5,13 +5,15 @@
 #include <string>
 
 // 基本打击物件---之后可以实现更多音游的物件
-enum class NoteType : uint8_t {
-  // osu!mania的单键和长条
-  NOTE = 0b00000001,
-  HOLD = 0b01000000,
-  // 另外的滑键和折线
-  SLIDE = 0b00000010,
-  COMPLEX = 0b00000100,
+enum class HitObjectType {
+  NOTE,
+  HOLD,
+  HOLDEND,
+  OSUNOTE,
+  OSUHOLD,
+  OSUHOLDEND,
+  RMSLIDE,
+  RMCOMPLEX,
 };
 
 // 打击物件
@@ -21,6 +23,9 @@ class HitObject {
   explicit HitObject(uint32_t time);
   // 析构HitObject
   virtual ~HitObject();
+
+  // 物件具体类型-可直接static转化
+  HitObjectType object_type;
 
   // 是否是面尾物件
   bool is_hold_end{false};

@@ -1,7 +1,8 @@
 #include "ComplexNote.h"
 
 ComplexNote::ComplexNote(uint32_t time) : Note(time) {
-  type = NoteType::COMPLEX;
+  object_type = HitObjectType::RMCOMPLEX;
+  note_type = NoteType::COMPLEX;
 }
 
 ComplexNote::~ComplexNote() = default;

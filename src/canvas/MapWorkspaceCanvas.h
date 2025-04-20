@@ -4,14 +4,14 @@
 #include <qpaintdevice.h>
 #include <qtmetamacros.h>
 
-#include <cstdint>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
+#include "../mmm/Beat.h"
+#include "../mmm/map/MMap.h"
 #include "AudioManager.h"
 #include "GLCanvas.h"
-#include "src/mmm/map/MMap.h"
 
 // 鼠标正在操作的区域
 enum class MouseOperationArea {
@@ -21,19 +21,6 @@ enum class MouseOperationArea {
   PREVIEW,
   // 物件
   NOTE,
-};
-
-// "拍"结构体
-struct Beat {
-  double bpm;
-  double start_timestamp;
-  double end_timestamp;
-  int32_t divisors{4};
-
-  bool operator==(const Beat &other) const {
-    return bpm == other.bpm && start_timestamp == other.start_timestamp &&
-           end_timestamp == other.end_timestamp && divisors == other.divisors;
-  }
 };
 
 class MapWorkspaceCanvas : public GLCanvas {
@@ -127,6 +114,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 正在工作的图
   std::shared_ptr<MMap> working_map;
+
+  // 正在工作的图类型
+  MapType map_type;
 
   // 当前时间戳
   double current_time_stamp{0};

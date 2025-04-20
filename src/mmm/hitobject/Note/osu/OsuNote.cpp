@@ -6,8 +6,14 @@
 
 #include "../Note.h"
 
-OsuNote::OsuNote() : Note(0) {}
-OsuNote::OsuNote(uint32_t time) : Note(time) {}
+OsuNote::OsuNote() : Note(0) {
+  object_type = HitObjectType::OSUNOTE;
+  note_type = NoteType::NOTE;
+}
+OsuNote::OsuNote(uint32_t time) : Note(time) {
+  object_type = HitObjectType::OSUNOTE;
+  note_type = NoteType::NOTE;
+}
 
 OsuNote::~OsuNote() = default;
 
@@ -39,7 +45,7 @@ void OsuNote::from_osu_description(std::vector<std::string>& description,
   // 时间戳
   timestamp = std::stoi(description.at(2));
 
-  type = NoteType::NOTE;
+  note_type = NoteType::NOTE;
 
   // 音效
   sample = static_cast<NoteSample>(std::stoi(description.at(4)));

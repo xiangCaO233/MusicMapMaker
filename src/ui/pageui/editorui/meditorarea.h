@@ -25,6 +25,9 @@ class MEditorArea : public QWidget {
   // 使用自然滚动
   bool use_natural_wheel{false};
 
+  // 吸附到小节线
+  bool magnet_to_divisor{false};
+
   // 锁定模式-不自动切换
   bool lock_mode_auto_switch{false};
 
@@ -34,6 +37,7 @@ class MEditorArea : public QWidget {
  public slots:
   // page选择了新map事件
   void on_selectnewmap(std::shared_ptr<MMap> &map);
+
  private slots:
 
   // 画布时间变化事件
@@ -51,6 +55,7 @@ class MEditorArea : public QWidget {
   // 进度条移动事件
   void on_progress_slider_valueChanged(int value);
 
+  // 切换显示音频控制器
   void on_audio_time_controller_button_clicked();
 
  private:

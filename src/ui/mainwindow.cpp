@@ -14,6 +14,7 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
+
   // 注册QVariant数据类型
   // 注册 string 类型
   qRegisterMetaType<std::string>("std::string");

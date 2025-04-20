@@ -12,6 +12,7 @@
 #include "../../timing/osu/OsuTiming.h"
 #include "../MMap.h"
 #include "colorful-log.h"
+#include "mmm/timing/Timing.h"
 #include "src/mmm/hitobject/HitObject.h"
 #include "src/mmm/hitobject/Note/Note.h"
 
@@ -277,7 +278,7 @@ void OsuMap::load_from_file(const char* path) {
       // 使用读取出的参数初始化timing
       osu_timing->from_osu_description(timing_point_paras);
       // 加入timing列表
-      timings.emplace_back(osu_timing);
+      timings.emplace(osu_timing);
       auto temp_timing_list_it = temp_timing_map.find(osu_timing->timestamp);
       if (temp_timing_list_it == temp_timing_map.end()) {
         // 添加映射
@@ -308,13 +309,13 @@ void OsuMap::load_from_file(const char* path) {
         // 创建一个面尾物件
         auto holdend = std::make_shared<OsuHoldEnd>(hold);
         holdend->is_hold_end = true;
-        hitobjects.emplace_back(holdend);
+        hitobjects.insert(holdend);
 
         // 更新谱面时长
         if (holdend->timestamp > map_length) map_length = holdend->timestamp;
 
         // 把长条物件加入缓存
-        temp_hold_list.emplace_back(hold);
+        temp_hold_list.insert(hold);
       } else {
         osu_note = std::make_shared<OsuNote>();
         auto note = std::dynamic_pointer_cast<OsuNote>(osu_note);
@@ -326,101 +327,50 @@ void OsuMap::load_from_file(const char* path) {
       if (osu_note->timestamp > map_length) map_length = osu_note->timestamp;
 
       // 加入物件列表
-      hitobjects.emplace_back(osu_note);
+      hitobjects.insert(osu_note);
     }
 
-    std::sort(hitobjects.begin(), hitobjects.end(),
-              [](std::shared_ptr<HitObject>& ho1,
-                 std::shared_ptr<HitObject>& ho2) { return *ho1 < *ho2; });
+    // 更新拍
+    // 基准timing
+    // auto base_timing = timings.front();
+    // uint32_t process_time = base_timing->timestamp;
+    // 查找当前以当前基准timing为准的拍时间到下一拍时间直接有没有其他timing,
+    // auto current_beat_time = 60.0 / base_timing->bpm * 1000.0;
+
   } else {
     XWARN("非.osu格式,读取失败");
   }
 }
 
+// 有序的添加物件
+void OsuMap::insert_object(std::shared_ptr<HitObject>& hitobject) {
+  switch (hitobject->object_type) {
+    case HitObjectType::OSUNOTE:
+    case HitObjectType::OSUHOLD:
+    case HitObjectType::OSUHOLDEND:
+      break;
+    default:
+      XWARN("osumap必须添加osu物件");
+  }
+  // 有序插入
+  hitobjects.insert(hitobject);
+}
+
+// 有序的添加timing-会分析并更新拍
+void OsuMap::insert_timing(std::shared_ptr<Timing>& timing) {}
+
 // 查询指定位置附近的同时间点timing列表(优先在此之前,没有之前找之后)
 void OsuMap::query_around_timing(
     std::vector<std::shared_ptr<Timing>>& result_timings, int32_t time) {
   if (timings.empty()) return;
-  // 查找到第一个大于等于此时间的timing迭代器
-  auto it = std::upper_bound(
-      timings.begin(), timings.end(), time,
-      [](int time, const auto& timing) { return timing->timestamp >= time; });
-
-  // 确定使用的timing
-  std::shared_ptr<Timing> res;
-  if (it == timings.end()) {
-    // 没找到比当前时间靠后的timing
-    // 使用最后一个timing
-    res = timings.at(timings.size() - 1);
-
-  } else {
-    // 找到了比当前时间靠后的timing
-    if (*it == timings.front()) {
-      // 找到的是第一个
-      // 就使用这个timing
-      res = *it;
-    } else {
-      // 使用前一个
-      res = *(it - 1);
-    }
-  }
-
-  // 查找重复时间点的timing表
-  auto timing_list_it = temp_timing_map.find(res->timestamp);
-
-  // 添加到传入引用
-  for (const auto& timing : timing_list_it->second) {
-    result_timings.emplace_back(timing);
-  }
 }
 
-// 查询区间内有的物件
+// 查询区间窗口内的拍
+void OsuMap::query_beat_in_range(
+    std::vector<std::shared_ptr<Beat>>& result_beats, int32_t start,
+    int32_t end) {}
+
+// 查询区间窗口内有的物件
 void OsuMap::query_object_in_range(
     std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-    int32_t end,
-    std::unordered_map<std::shared_ptr<HitObject>, QRectF*>* object_area_ptr) {
-  int count = 0;
-  // 查找到第一个大于等于起始时间的物件迭代器
-  auto it_start = std::upper_bound(
-      hitobjects.begin(), hitobjects.end(), start,
-      [](int32_t time, const auto& obj) { return obj->timestamp >= time; });
-
-  // 查找到第一个小于等于结束时间的物件迭代器
-  auto it_end = std::lower_bound(
-      hitobjects.begin(), hitobjects.end(), end,
-      [](const auto& obj, int time) { return obj->timestamp <= time; });
-
-  // 先将面尾时间大于起始时间的物件也加入列表
-  for (const auto& hold : temp_hold_list) {
-    if (hold->timestamp <= end &&
-        hold->hold_end_reference->timestamp >= start) {
-      // 删除区域内不需要的物件映射
-      if (object_area_ptr) {
-        if (object_area_ptr->find(hold) == object_area_ptr->end()) {
-          // 不存在当前物件-- 构建映射
-          object_area_ptr->try_emplace(hold);
-        }
-      }
-      result_objects.emplace_back(hold);
-      count++;
-    }
-  }
-
-  // 将区间内物件加入结果
-  for (; it_start < it_end; it_start++) {
-    // 查重
-    auto note = std::static_pointer_cast<OsuNote>((*it_start));
-    bool added{false};
-    if (note->type == NoteType::HOLD) {
-      for (const auto& obj : result_objects)
-        if (obj.get() == note.get()) added = true;
-    }
-    if (!added) {
-      // 删除区域内不需要的物件映射
-      if (object_area_ptr) {
-      }
-      result_objects.emplace_back(note);
-      count++;
-    }
-  }
-}
+    int32_t end) {}

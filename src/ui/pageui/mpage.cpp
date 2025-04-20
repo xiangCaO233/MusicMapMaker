@@ -52,6 +52,7 @@ void MPage::project_controller_select_map(std::shared_ptr<MMap>& map) {
     ui->page_selector->addItem(page_text);
   }
 
+  // 选择此页
   ui->page_selector->setCurrentText(page_text);
 }
 

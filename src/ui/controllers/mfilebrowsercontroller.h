@@ -2,6 +2,7 @@
 #define MFILEBROWSERCONTROLLER_H
 
 #include <QWidget>
+#include <stack>
 
 #include "mmm/MapWorkProject.h"
 
@@ -17,6 +18,10 @@ class FileBrowserController : public QWidget {
  public:
   explicit FileBrowserController(QWidget *parent = nullptr);
   ~FileBrowserController();
+
+  // 缓存目录
+  std::stack<QString> last_path_stack;
+  std::stack<QString> next_path_stack;
 
   // 使用主题
   void use_theme(GlobalTheme theme);
@@ -35,11 +40,14 @@ class FileBrowserController : public QWidget {
   // 文件列表双击事件
   void on_file_browser_treeview_doubleClicked(const QModelIndex &index);
 
-  // 返回上一级
+  // 返回上一目录
   void on_cdup_clicked();
 
-  // 返回下一级
+  // 返回下一目录
   void on_cdnext_clicked();
+
+  // 返回父级目录
+  void on_cdparent_clicked();
 
   // 地址栏编辑回车按下
   void on_address_line_returnPressed();

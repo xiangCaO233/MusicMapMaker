@@ -9,7 +9,9 @@
 
 // 构造OsuHoldEnd
 OsuHoldEnd::OsuHoldEnd(const std::shared_ptr<OsuHold>& ohold)
-    : HoldEnd(ohold), reference(ohold) {}
+    : HoldEnd(ohold), reference(ohold) {
+  object_type = HitObjectType::OSUHOLDEND;
+}
 
 // 析构OsuHoldEnd
 OsuHoldEnd::~OsuHoldEnd() = default;
@@ -17,8 +19,15 @@ OsuHoldEnd::~OsuHoldEnd() = default;
 // 打印用
 std::string OsuHoldEnd::toString() { return ""; }
 
-OsuHold::OsuHold() : Hold(0, 0) {}
-OsuHold::OsuHold(uint32_t time, uint32_t holdtime) : Hold(time, holdtime) {}
+OsuHold::OsuHold() : Hold(0, 0) {
+  note_type = NoteType::HOLD;
+  object_type = HitObjectType::OSUHOLD;
+}
+
+OsuHold::OsuHold(uint32_t time, uint32_t holdtime) : Hold(time, holdtime) {
+  note_type = NoteType::HOLD;
+  object_type = HitObjectType::OSUHOLD;
+}
 
 OsuHold::~OsuHold() {}
 
@@ -42,7 +51,7 @@ void OsuHold::from_osu_description(std::vector<std::string>& description,
   // int y = std::stoi(description.at(1));
   // 时间戳
   timestamp = std::stoi(description.at(2));
-  type = NoteType::HOLD;
+  note_type = NoteType::HOLD;
   // 音效
   sample = static_cast<NoteSample>(std::stoi(description.at(4)));
 

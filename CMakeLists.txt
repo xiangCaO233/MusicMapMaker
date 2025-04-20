@@ -95,15 +95,15 @@ set(PROJECT_SOURCES
   src/ui/controllers/timecontroller.h
   src/ui/controllers/timecontroller.cpp
   src/ui/controllers/timecontroller.ui
-	src/ui/pageui/mpage.h 
-	src/ui/pageui/mpage.cpp 
-	src/ui/pageui/mpage.ui
-  src/ui/pageui/editorui/meditorarea.h 
-	src/ui/pageui/editorui/meditorarea.cpp 
-	src/ui/pageui/editorui/meditorarea.ui
-	src/ui/infoui/minfo.h
-	src/ui/infoui/minfo.cpp
-	src/ui/infoui/minfo.ui
+  src/ui/pageui/mpage.h
+  src/ui/pageui/mpage.cpp
+  src/ui/pageui/mpage.ui
+  src/ui/pageui/editorui/meditorarea.h
+  src/ui/pageui/editorui/meditorarea.cpp
+  src/ui/pageui/editorui/meditorarea.ui
+  src/ui/infoui/minfo.h
+  src/ui/infoui/minfo.cpp
+  src/ui/infoui/minfo.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/MapWorkspaceCanvas.h
@@ -137,20 +137,20 @@ set(PROJECT_SOURCES
   ${TS_FILES})
 
 include_directories(
-	./src 
-	./src/ui
-	./src/ui/infoui
-	./src/ui/pageui
-	./src/ui/pageui/editorui
-	./src/ui/controllers  
-	./src/canvas 
-	./src/log)
+  ./src
+  ./src/ui
+  ./src/ui/infoui
+  ./src/ui/pageui
+  ./src/ui/pageui/editorui
+  ./src/ui/controllers
+  ./src/canvas
+  ./src/log)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
     resources/glsrcs.qrc
-    )
+  )
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
@@ -162,7 +162,7 @@ endif()
 # 自动复制运行时文件和插件
 if(WIN32)
   # 复制 DLLs
-  # add_custom_command(TARGET MusicMapMaker POST_BUILD
+	# add_custom_command(TARGET MusicMapMaker POST_BUILD
   # COMMAND ${CMAKE_COMMAND} -E copy
   # $<TARGET_FILE:Qt6::Core>
   # $<TARGET_FILE:Qt6::Gui>

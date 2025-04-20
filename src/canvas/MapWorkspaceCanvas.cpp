@@ -406,7 +406,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
       // 非面尾可转为Note
       auto note = std::dynamic_pointer_cast<Note>(buffer_objects[i]);
       // 直接使用
-      if (note->type == NoteType::HOLD) {
+      if (note->note_type == NoteType::HOLD) {
         auto hold = std::dynamic_pointer_cast<Hold>(buffer_objects[i]);
         temp_holds.emplace_back(hold);
       }
@@ -507,7 +507,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 切换纹理绘制补齐方式为重采样
         renderer_manager->texture_complementmode =
             TextureComplementMode::REPEAT_TEXTURE;
-        switch (note->type) {
+        switch (note->note_type) {
           case NoteType::NOTE: {
             // 直接绘制
             renderer_manager->addRect(head_note_bound, head_texture,
@@ -591,6 +591,7 @@ void MapWorkspaceCanvas::push_shape() {
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
+  map_type = map->maptype;
 
   if (map) {
     // TODO(xiang 2025-04-20): 预防重复载入纹理

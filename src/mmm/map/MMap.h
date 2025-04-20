@@ -5,9 +5,12 @@
 #include <cstdint>
 #include <filesystem>
 #include <memory>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "mmm/Beat.h"
 
 enum class MapType {
   OSUMAP,
@@ -44,25 +47,37 @@ class MMap {
   // 谱面时长--计算
   int32_t map_length = 0;
 
+  // 全部物件
+  std::set<std::shared_ptr<HitObject>> hitobjects;
+
+  // 全部timing
+  std::multiset<std::shared_ptr<Timing>> timings;
+
+  // 全部拍-自动分析分拍和bpm,变速
+  std::multiset<Beat> beats;
+
   // 从文件读取谱面
   virtual void load_from_file(const char* path) = 0;
 
-  // 全部物件
-  std::vector<std::shared_ptr<HitObject>> hitobjects;
+  // 有序的添加物件
+  virtual void insert_object(std::shared_ptr<HitObject>& hitobject) = 0;
 
-  // 全部timing
-  std::vector<std::shared_ptr<Timing>> timings;
+  // 有序的添加timing-会分析并更新拍
+  virtual void insert_timing(std::shared_ptr<Timing>& timing) = 0;
 
   // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
   virtual void query_around_timing(
       std::vector<std::shared_ptr<Timing>>& timings, int32_t time) = 0;
 
+  // 查询区间窗口内的拍
+  virtual void query_beat_in_range(
+      std::vector<std::shared_ptr<Beat>>& result_beats, int32_t start,
+      int32_t end) = 0;
+
   // 查询区间内有的物件
   virtual void query_object_in_range(
       std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-      int32_t end,
-      std::unordered_map<std::shared_ptr<HitObject>, QRectF*>* object_area_ptr =
-          nullptr) = 0;
+      int32_t end) = 0;
 };
 
 #endif  // M_MAP_H

@@ -26,6 +26,7 @@ class MPage : public QWidget {
   // 使用主题
   void use_theme(GlobalTheme theme);
  signals:
+  // 选择map信号
   void select_map(std::shared_ptr<MMap> &map);
 
  public slots:

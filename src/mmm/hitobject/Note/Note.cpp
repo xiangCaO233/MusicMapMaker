@@ -1,6 +1,9 @@
 #include "Note.h"
 
-Note::Note(uint32_t time) : HitObject(time) { type = NoteType::NOTE; }
+Note::Note(uint32_t time) : HitObject(time) {
+  object_type = HitObjectType::NOTE;
+  note_type = NoteType::NOTE;
+}
 
 Note::~Note() {}
 

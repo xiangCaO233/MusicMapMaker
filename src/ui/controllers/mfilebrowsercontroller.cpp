@@ -4,6 +4,7 @@
 #include <qfileinfo.h>
 
 #include <QFileSystemModel>
+#include <filesystem>
 
 #include "../../log/colorful-log.h"
 #include "../../util/mutil.h"
@@ -40,8 +41,8 @@ FileBrowserController::FileBrowserController(QWidget* parent)
   ui->file_browser_treeview->setColumnWidth(1, 80);
 
   // 禁用展开
-  // ui->file_browser_treeview->setItemsExpandable(false);
-  // ui->file_browser_treeview->setRootIsDecorated(false);
+  ui->file_browser_treeview->setItemsExpandable(false);
+  ui->file_browser_treeview->setRootIsDecorated(false);
 }
 
 FileBrowserController::~FileBrowserController() { delete ui; }
@@ -64,6 +65,8 @@ void FileBrowserController::use_theme(GlobalTheme theme) {
                              file_button_color, 28, 28);
   mutil::set_button_svgcolor(ui->cdnext, ":/icons/angle-right.svg",
                              file_button_color, 28, 28);
+  mutil::set_button_svgcolor(ui->cdparent, ":/icons/long-arrow-alt-up.svg",
+                             file_button_color, 28, 28);
   mutil::set_button_svgcolor(ui->address_confirm, ":/icons/arrow-right.svg",
                              file_button_color, 28, 28);
   mutil::set_button_svgcolor(ui->search, ":/icons/search.svg",
@@ -72,7 +75,20 @@ void FileBrowserController::use_theme(GlobalTheme theme) {
 
 // TODO(xiang 2025-04-16): 实现文件管理器功能
 // 切换目录
-void FileBrowserController::cd(const QString& path) {}
+void FileBrowserController::cd(const QString& p) {
+  std::filesystem::path path(p.toStdString());
+  if (std::filesystem::exists(path)) {
+    // 目录存在
+    // 设置地址栏文本
+    auto despath = QString::fromStdString(path.string());
+    ui->address_line->setText(despath);
+    // 切换文件视图
+    auto filesystemmodel =
+        qobject_cast<QFileSystemModel*>(ui->file_browser_treeview->model());
+    filesystemmodel->setRootPath(despath);
+    ui->file_browser_treeview->setRootIndex(filesystemmodel->index(despath));
+  }
+}
 
 // 文件浏览器上下文菜单
 void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
@@ -132,16 +148,45 @@ void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
 // 文件列表双击事件
 void FileBrowserController::on_file_browser_treeview_doubleClicked(
     const QModelIndex& index) {
+  auto current_path = ui->address_line->text();
+  last_path_stack.push(current_path);
+  auto filesystemmodel =
+      qobject_cast<QFileSystemModel*>(ui->file_browser_treeview->model());
   // 双击文件夹cd过去
+  if (filesystemmodel->isDir(index)) {
+    cd(filesystemmodel->filePath(index));
+  }
 
   // 双击文件唤起添加到项目对话框
 }
 
-// 返回上一级
-void FileBrowserController::on_cdup_clicked() {}
+// 返回上一目录
+void FileBrowserController::on_cdup_clicked() {
+  if (!last_path_stack.empty()) {
+    cd(last_path_stack.top());
+    next_path_stack.push(last_path_stack.top());
+    last_path_stack.pop();
+  }
+}
 
-// 返回下一级
-void FileBrowserController::on_cdnext_clicked() {}
+// 返回下一目录
+void FileBrowserController::on_cdnext_clicked() {
+  if (!next_path_stack.empty()) {
+    cd(next_path_stack.top());
+    last_path_stack.push(next_path_stack.top());
+    next_path_stack.pop();
+  }
+}
+
+// 返回父级目录
+void FileBrowserController::on_cdparent_clicked() {
+  auto current_path = ui->address_line->text();
+  next_path_stack.push(current_path);
+  std::filesystem::path path(current_path.toStdString());
+
+  auto parent_path = path.parent_path();
+  cd(QString::fromStdString(parent_path.string()));
+}
 
 // 地址栏编辑回车按下
 void FileBrowserController::on_address_line_returnPressed() {}

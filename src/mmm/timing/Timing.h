@@ -26,7 +26,8 @@ class Timing {
   // 该时间点的时间戳
   // in-osu
   // *时间（整型）：
-  // *时间轴区间的开始时间，以谱面音频开始为原点，单位是毫秒。这个时间轴区间的结束时间即为下一个时间点的开始时间（如果这是最后一个时间点，则无结束时间）。
+  // *时间轴区间的开始时间，以谱面音频开始为原点，单位是毫秒。
+  // 这个时间轴区间的结束时间即为下一个时间点的开始时间（如果这是最后一个时间点，则无结束时间）。
   // in-imd
   //
   uint32_t timestamp;
@@ -45,6 +46,7 @@ class Timing {
   bool operator>(const Timing& other) const {
     return timestamp > other.timestamp;
   }
+
   bool operator<(const Timing& other) const {
     return timestamp < other.timestamp;
   }
