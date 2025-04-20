@@ -35,22 +35,6 @@ class HitObject {
 
   // 打印用
   virtual std::string toString() = 0;
-
-  bool operator>(const HitObject& other) const {
-    return timestamp > other.timestamp;
-  };
-
-  bool operator>=(const HitObject& other) const {
-    return timestamp >= other.timestamp;
-  };
-
-  bool operator<(const HitObject& other) const {
-    return timestamp < other.timestamp;
-  };
-
-  bool operator<=(const HitObject& other) const {
-    return timestamp <= other.timestamp;
-  };
 };
 
 #endif  // M_HITOBJECT_H

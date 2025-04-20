@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 
+#include "../../SampleSet.h"
 #include "../Timing.h"
 
 class OsuTiming : public Timing {

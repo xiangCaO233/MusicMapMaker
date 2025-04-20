@@ -40,14 +40,22 @@ void OsuTiming::from_osu_description(std::vector<std::string>& description) {
    *效果（整型）： 一位影响时间点特殊效果的参数。参见：效果部分。
    */
   timestamp = std::stof(description.at(0));
+
+  // 上一个基准bpm
+  static double last_base_bpm;
+
   // 先判断是否继承时间点
   is_inherit_timing = std::stoi(description.at(6)) == 0;
   if (is_inherit_timing) {
     // bpm只存储倍速--并非bpm
     bpm = 100.0 / std::abs(std::stod(description.at(1)));
+    is_base_timing = false;
+    basebpm = last_base_bpm;
   } else {
     // 真实bpm
     bpm = 1.0 / std::stod(description.at(1)) * 1000.0 * 60.0;
+    last_base_bpm = bpm;
+    basebpm = last_base_bpm;
   }
   // beats
   beat = std::stoi(description.at(2));

@@ -417,7 +417,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 重新排序
   std::sort(temp_notes.begin(), temp_notes.end(),
             [](const std::shared_ptr<HitObject> &h1,
-               const std::shared_ptr<HitObject> &h2) { return *h1 < *h2; });
+               const std::shared_ptr<HitObject> &h2) {
+              return (*h1).timestamp < (*h2).timestamp;
+            });
 
   // TODO(xiang 2025-04-15): 执行渲染
   switch (working_map->maptype) {

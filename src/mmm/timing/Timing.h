@@ -20,6 +20,9 @@ class Timing {
   // 析构Timing
   virtual ~Timing();
 
+  // 是否为基准timing
+  bool is_base_timing{true};
+
   // timing类型
   TimingType type;
 
@@ -42,6 +45,9 @@ class Timing {
   // in-imd
   //
   double bpm;
+
+  // 非继承的最近的基准bpm
+  double basebpm;
 
   bool operator==(const Timing& other) const = default;
 

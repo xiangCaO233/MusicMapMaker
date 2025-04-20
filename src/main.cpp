@@ -1,3 +1,10 @@
+#include <memory>
+
+#include "mmm/hitobject/HitObject.h"
+#include "mmm/hitobject/Note/Note.h"
+#include "mmm/map/osu/OsuMap.h"
+#include "mmm/timing/Timing.h"
+#include "mmm/timing/osu/OsuTiming.h"
 #ifdef _WIN32
 #include <windows.h>
 #endif  //_WIN32
@@ -9,11 +16,12 @@
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QTranslator>
+#include <iostream>
 
 #include "log/colorful-log.h"
 #include "ui/mainwindow.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   QApplication a(argc, argv);
   XLogger::init("MMM");
 
@@ -74,8 +82,21 @@ int main(int argc, char *argv[]) {
   QSurfaceFormat::setDefaultFormat(format);
 #endif  //__APPLE__
 
-  MainWindow w;
-  w.show();
+  // MainWindow w;
+  // w.show();
+
+  auto map = std::make_shared<OsuMap>();
+  map->load_from_file(
+      "../resources/map/Designant - Designant/Designant - Designant. "
+      "(Benson_) [Designant].osu");
+
+  std::shared_ptr<Timing> speedtiming = std::make_shared<OsuTiming>();
+  speedtiming->timestamp = 60000;
+  speedtiming->is_base_timing = false;
+  speedtiming->basebpm = 200;
+  speedtiming->bpm = 1.5;
+
+  map->insert_timing(speedtiming);
 
   return a.exec();
 }

@@ -63,6 +63,59 @@ inline void string2u32sring(const std::string& src, std::u32string& des) {
                 src.c_str(), src.length(), &status);
   ucnv_close(conv);
 }
+
+inline bool isApproxEqual(double a, double b, double tolerance) {
+  return std::abs(a - b) <= tolerance;
+}
+
+// 计算分音策略(2~64)
+inline int calculateDivisionStrategy(const std::set<double>& timestamps,
+                                     double beat_start, double beat_length,
+                                     double tolerance) {
+  if (timestamps.empty() || beat_length <= 0) return 1;
+
+  double beat_end = beat_start + beat_length;
+  std::vector<double> current_beat_timestamps;
+
+  // 收集当前拍内的时间戳 [beat_start, beat_end)
+  for (double ts : timestamps) {
+    if (ts >= beat_start && ts < beat_end) {
+      current_beat_timestamps.push_back(ts);
+    }
+  }
+  if (current_beat_timestamps.empty()) return 1;
+
+  // 从最小分音数开始检查（2到64）
+  for (int n = 2; n <= 64; ++n) {
+    bool valid = true;
+    double sub_beat = beat_length / n;
+
+    // 生成当前拍的分音点
+    std::vector<double> subdivisions;
+    for (int k = 0; k < n; ++k) {
+      subdivisions.push_back(beat_start + k * sub_beat);
+    }
+
+    // 检查所有时间戳是否对齐分音点
+    for (double ts : current_beat_timestamps) {
+      bool aligned = false;
+      for (double sub : subdivisions) {
+        if (isApproxEqual(ts, sub, tolerance)) {
+          aligned = true;
+          break;
+        }
+      }
+      if (!aligned) {
+        valid = false;
+        break;
+      }
+    }
+    if (valid) return n;
+  }
+
+  return 1;  // 无有效分音策略
+}
+
 inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgpath,
                                     QColor& color, QSize& size) {
   // 加载SVG文件

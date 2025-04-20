@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,7 @@
 #include "mmm/timing/Timing.h"
 #include "src/mmm/hitobject/HitObject.h"
 #include "src/mmm/hitobject/Note/Note.h"
+#include "util/mutil.h"
 
 OsuFileReader::OsuFileReader() {};
 
@@ -326,36 +328,3 @@ void OsuMap::load_from_file(const char* path) {
     XWARN("非.osu格式,读取失败");
   }
 }
-
-// 有序的添加timing-会分析并更新拍
-void OsuMap::insert_timing(std::shared_ptr<Timing> osu_timing) {
-  // 加入timing列表
-  auto insertit = timings.insert(osu_timing);
-
-  auto temp_timing_list_it = temp_timing_map.find(osu_timing->timestamp);
-  if (temp_timing_list_it == temp_timing_map.end()) {
-    // 添加映射
-    temp_timing_list_it =
-        temp_timing_map.try_emplace(osu_timing->timestamp).first;
-  }
-  temp_timing_list_it->second.emplace_back(
-      std::dynamic_pointer_cast<OsuTiming>(osu_timing));
-
-  // 更新此timing时间开始到下一基准timing之前的拍/之后没有就一直到maplegnth
-}
-
-// 查询指定位置附近的同时间点timing列表(优先在此之前,没有之前找之后)
-void OsuMap::query_around_timing(
-    std::vector<std::shared_ptr<Timing>>& result_timings, int32_t time) {
-  if (timings.empty()) return;
-}
-
-// 查询区间窗口内的拍
-void OsuMap::query_beat_in_range(
-    std::vector<std::shared_ptr<Beat>>& result_beats, int32_t start,
-    int32_t end) {}
-
-// 查询区间窗口内有的物件
-void OsuMap::query_object_in_range(
-    std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-    int32_t end) {}

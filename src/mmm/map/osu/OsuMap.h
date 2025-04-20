@@ -352,28 +352,8 @@ class OsuMap : public MMap {
   // 用于识别重叠时间域的长条物件缓存表
   std::multiset<std::shared_ptr<OsuHold>> temp_hold_list;
 
-  // 用于识别重叠时间的timing列表缓存map
-  std::unordered_map<int32_t, std::vector<std::shared_ptr<OsuTiming>>>
-      temp_timing_map;
-
   // 从文件读取谱面
   void load_from_file(const char* path) override;
-
-  // 有序的添加timing-会分析并更新拍
-  void insert_timing(std::shared_ptr<Timing> timing) override;
-
-  // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
-  void query_around_timing(std::vector<std::shared_ptr<Timing>>& timings,
-                           int32_t time) override;
-
-  // 查询区间窗口内的拍
-  void query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
-                           int32_t start, int32_t end) override;
-
-  // 查询区间内有的物件
-  void query_object_in_range(
-      std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-      int32_t end) override;
 };
 
 class OsuFileReader {

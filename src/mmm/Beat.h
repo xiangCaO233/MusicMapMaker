@@ -1,7 +1,6 @@
 #ifndef M_BEAT_H
 #define M_BEAT_H
 
-#include <compare>
 #include <cstdint>
 
 // "拍"结构体
@@ -21,19 +20,6 @@ struct Beat {
 
   // 操作符重载
   bool operator==(const Beat &other) const = default;
-  bool operator<(const Beat &other) const {
-    if (start_timestamp < other.start_timestamp) return true;
-    if (start_timestamp == other.start_timestamp) {
-      if (timeline_zoom == 1.0 && other.timeline_zoom != 1.0) {
-        return true;
-      }
-      if (timeline_zoom != 1.0 && other.timeline_zoom == 1.0) {
-        return false;
-      }
-    }
-
-    return false;
-  };
 };
 
 #endif  // M_BEAT_H

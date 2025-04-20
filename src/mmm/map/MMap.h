@@ -10,6 +10,8 @@
 #include <vector>
 
 #include "../Beat.h"
+#include "../hitobject/HitObject.h"
+#include "../timing/Timing.h"
 
 enum class MapType {
   OSUMAP,
@@ -46,34 +48,82 @@ class MMap {
   // 谱面时长--计算
   int32_t map_length = 0;
 
+  // 物件比较器
+  struct HitObjectComparator {
+    bool operator()(const std::shared_ptr<HitObject>& a,
+                    const std::shared_ptr<HitObject>& b) const {
+      return a->timestamp < b->timestamp;
+    }
+  };
+
   // 全部物件
-  std::set<std::shared_ptr<HitObject>> hitobjects;
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> hitobjects;
+
+  // timing比较器
+  struct TimingComparator {
+    bool operator()(const std::shared_ptr<Timing>& a,
+                    const std::shared_ptr<Timing>& b) const {
+      return a->timestamp < b->timestamp;
+    }
+  };
 
   // 全部timing
-  std::set<std::shared_ptr<Timing>> timings;
+  std::multiset<std::shared_ptr<Timing>, TimingComparator> timings;
+
+  // 用于识别重叠时间的timing列表缓存map
+  std::unordered_map<int32_t, std::vector<std::shared_ptr<Timing>>>
+      temp_timing_map;
+
+  // timing比较器
+  struct BeatComparator {
+    bool operator()(const std::shared_ptr<Beat>& a,
+                    const std::shared_ptr<Beat>& b) const {
+      if (a->start_timestamp < b->start_timestamp) return true;
+      if (a->start_timestamp == b->start_timestamp) {
+        if (a->timeline_zoom == 1.0 && b->timeline_zoom != 1.0) {
+          return true;
+        }
+        if (a->timeline_zoom != 1.0 && b->timeline_zoom == 1.0) {
+          return false;
+        }
+      }
+      return false;
+    }
+  };
 
   // 全部拍-自动分析分拍和bpm,变速
-  std::multiset<Beat> beats;
+  std::multiset<std::shared_ptr<Beat>, BeatComparator> beats;
 
   // 从文件读取谱面
   virtual void load_from_file(const char* path) = 0;
 
+  // 生成此拍的分拍策略
+  void generate_divisor_policy(std::shared_ptr<Beat>& beat);
+
+  // 擦除指定范围内的拍
+  void erase_beats(double start, double end);
+
   // 有序的添加timing-会分析并更新拍
-  virtual void insert_timing(std::shared_ptr<Timing> timing) = 0;
+  virtual void insert_timing(std::shared_ptr<Timing> timing);
 
   // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
   virtual void query_around_timing(
-      std::vector<std::shared_ptr<Timing>>& timings, int32_t time) = 0;
+      std::vector<std::shared_ptr<Timing>>& timings, int32_t time);
+
+  // 查询区间窗口内的timing
+  virtual void query_timing_in_range(
+      std::vector<std::shared_ptr<Timing>>& result_timings, int32_t start,
+      int32_t end);
 
   // 查询区间窗口内的拍
   virtual void query_beat_in_range(
       std::vector<std::shared_ptr<Beat>>& result_beats, int32_t start,
-      int32_t end) = 0;
+      int32_t end);
 
   // 查询区间内有的物件
   virtual void query_object_in_range(
       std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-      int32_t end) = 0;
+      int32_t end);
 };
 
 #endif  // M_MAP_H
