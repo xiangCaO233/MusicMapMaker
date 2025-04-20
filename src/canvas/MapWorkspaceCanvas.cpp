@@ -241,7 +241,9 @@ void MapWorkspaceCanvas::update_canvas() {
 void MapWorkspaceCanvas::draw_background() {
   if (!working_map) return;
   auto des = QRectF(0, 0, width(), height());
-  auto texname = working_map->bg_path.filename().string();
+
+  auto texname = working_map->bg_path.parent_path().filename().string() + "/" +
+                 working_map->bg_path.filename().string();
   renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
   renderer_manager->addRect(des, texture_full_map[texname],
                             QColor(255, 255, 255, 255), 0, false);
@@ -425,16 +427,18 @@ void MapWorkspaceCanvas::draw_hitobject() {
       int32_t max_orbit = omap->CircleSize;
 
       // 物件头的纹理
-      auto &head_texture_pink = texture_full_map["Pink.png"];
-      auto &head_texture_white = texture_full_map["White.png"];
+      auto &head_texture_pink = texture_full_map["hitobject/Pink.png"];
+      auto &head_texture_white = texture_full_map["hitobject/White.png"];
       // 面条主体的纹理
       auto &long_note_body_texture_pink =
-          texture_full_map["ArrowHoldBodyp.png"];
+          texture_full_map["hitobject/ArrowHoldBodyp.png"];
       auto &long_note_body_texture_white =
-          texture_full_map["ArrowHoldBodyw.png"];
+          texture_full_map["hitobject/ArrowHoldBodyw.png"];
       // 面条尾的纹理
-      auto &long_note_end_texture_pink = texture_full_map["ArrowHoldEndp.png"];
-      auto &long_note_end_texture_white = texture_full_map["ArrowHoldEndw.png"];
+      auto &long_note_end_texture_pink =
+          texture_full_map["hitobject/ArrowHoldEndp.png"];
+      auto &long_note_end_texture_white =
+          texture_full_map["hitobject/ArrowHoldEndw.png"];
 
       for (const auto &note : temp_notes) {
         // 粉白
@@ -588,8 +592,11 @@ void MapWorkspaceCanvas::push_shape() {
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
 
-  // 加载背景图纹理
-  add_texture(map->bg_path.string().c_str());
+  if (map) {
+    // TODO(xiang 2025-04-20): 预防重复载入纹理
+    // 加载背景图纹理
+    add_texture(map->bg_path.string().c_str());
+  }
 
   // 重置谱面时间
   current_time_stamp = 0;

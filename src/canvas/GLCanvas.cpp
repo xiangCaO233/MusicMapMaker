@@ -219,16 +219,6 @@ void GLCanvas::paintGL() {
 
   // 执行渲染
   push_shape();
-  // auto current_size = size();
-
-  // // 绘制一层滤镜
-  // QRectF preview_area_bg_bound(current_size.width() * (1 - 0.15), 0.0,
-  //                              current_size.width() * 0.15,
-  //                              current_size.height());
-
-  // renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6,
-  // 75),
-  //                           0, true);
 
   // DEBUG
   // renderer_manager->addRect(QRectF(30, 30, 160, 90),
@@ -263,15 +253,15 @@ void GLCanvas::paintGL() {
   fpsstr = fpsstr + U"fps";
   glcallstr = U"glcalls:" + glcallstr;
   drawcallstr = U"drawcalls:" + drawcallstr;
-  // renderer_manager->addText(QPointF(0, 30), fpsstr, 24,
-  //                           "ComicShannsMono Nerd Font", QColor(255, 183,
-  //                           197), 0.0f);
-  // renderer_manager->addText(QPointF(0, 56), glcallstr, 24,
-  //                           "ComicShannsMono Nerd Font", QColor(255, 183,
-  //                           197), 0.0f);
-  // renderer_manager->addText(QPointF(0, 82), drawcallstr, 24,
-  //                           "ComicShannsMono Nerd Font", QColor(255, 183,
-  //                           197), 0.0f);
+  renderer_manager->addText(QPointF(0, 30), fpsstr, 24,
+                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
+                            0.0f);
+  renderer_manager->addText(QPointF(0, 56), glcallstr, 24,
+                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
+                            0.0f);
+  renderer_manager->addText(QPointF(0, 82), drawcallstr, 24,
+                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
+                            0.0f);
 
   // QRectF rec(100, 100, 200, 200);
 

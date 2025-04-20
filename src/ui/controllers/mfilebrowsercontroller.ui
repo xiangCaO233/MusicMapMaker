@@ -68,7 +68,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/glsrcs.qrc">
+         <iconset resource="../../resources/glsrcs.qrc">
           <normaloff>:/icons/angle-left.svg</normaloff>:/icons/angle-left.svg</iconset>
         </property>
         <property name="iconSize">
@@ -97,7 +97,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/glsrcs.qrc">
+         <iconset resource="../../resources/glsrcs.qrc">
           <normaloff>:/icons/angle-right.svg</normaloff>:/icons/angle-right.svg</iconset>
         </property>
         <property name="iconSize">
@@ -138,7 +138,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/glsrcs.qrc">
+         <iconset resource="../../resources/glsrcs.qrc">
           <normaloff>:/icons/arrow-right.svg</normaloff>:/icons/arrow-right.svg</iconset>
         </property>
         <property name="iconSize">
@@ -167,7 +167,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/glsrcs.qrc">
+         <iconset resource="../../resources/glsrcs.qrc">
           <normaloff>:/icons/search.svg</normaloff>:/icons/search.svg</iconset>
         </property>
         <property name="iconSize">
@@ -191,7 +191,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resources/glsrcs.qrc"/>
+  <include location="../../resources/glsrcs.qrc"/>
  </resources>
  <connections/>
 </ui>

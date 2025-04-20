@@ -16,7 +16,7 @@
 #include <filesystem>
 #include <memory>
 
-#include "mmm/MapWorkProject.h"
+#include "../../mmm/MapWorkProject.h"
 #include "ui_mprojectcontroller.h"
 
 MProjectController::MProjectController(QWidget* parent)

@@ -11,7 +11,7 @@
 #include <QTranslator>
 
 #include "log/colorful-log.h"
-#include "mainwindow.h"
+#include "ui/mainwindow.h"
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);

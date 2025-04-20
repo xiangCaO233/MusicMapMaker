@@ -5,10 +5,10 @@
 
 #include <QFileSystemModel>
 
-#include "log/colorful-log.h"
-#include "mainwindow.h"
+#include "../../log/colorful-log.h"
+#include "../../util/mutil.h"
+#include "../mainwindow.h"
 #include "ui_mfilebrowsercontroller.h"
-#include "util/mutil.h"
 
 FileBrowserController::FileBrowserController(QWidget* parent)
     : QWidget(parent), ui(new Ui::FileBrowserController) {
@@ -71,10 +71,10 @@ void FileBrowserController::use_theme(GlobalTheme theme) {
 }
 
 // TODO(xiang 2025-04-16): 实现文件管理器功能
-// 文件浏览器上下文菜单
-void MainWindow::on_file_browser_treeview_customContextMenuRequested(
-    const QPoint& pos) {}
+// 切换目录
+void FileBrowserController::cd(const QString& path) {}
 
+// 文件浏览器上下文菜单
 void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
     const QPoint& pos) {
   QModelIndex index = ui->file_browser_treeview->indexAt(pos);
@@ -128,3 +128,26 @@ void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
   // 显示菜单
   menu.exec(ui->file_browser_treeview->viewport()->mapToGlobal(pos));
 }
+
+// 文件列表双击事件
+void FileBrowserController::on_file_browser_treeview_doubleClicked(
+    const QModelIndex& index) {
+  // 双击文件夹cd过去
+
+  // 双击文件唤起添加到项目对话框
+}
+
+// 返回上一级
+void FileBrowserController::on_cdup_clicked() {}
+
+// 返回下一级
+void FileBrowserController::on_cdnext_clicked() {}
+
+// 地址栏编辑回车按下
+void FileBrowserController::on_address_line_returnPressed() {}
+
+// 地址确认按键事件
+void FileBrowserController::on_address_confirm_clicked() {}
+
+// 搜索按键事件
+void FileBrowserController::on_search_clicked() {}

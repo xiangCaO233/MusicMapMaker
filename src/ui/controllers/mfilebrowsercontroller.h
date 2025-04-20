@@ -21,13 +21,34 @@ class FileBrowserController : public QWidget {
   // 使用主题
   void use_theme(GlobalTheme theme);
 
+  // 切换目录
+  void cd(const QString &path);
+
  signals:
   // 打开工程信号
   void open_project(std::shared_ptr<MapWorkProject> &project);
 
  private slots:
-  // 上下文菜单槽
+  // 文件列表上下文菜单槽
   void on_file_browser_treeview_customContextMenuRequested(const QPoint &pos);
+
+  // 文件列表双击事件
+  void on_file_browser_treeview_doubleClicked(const QModelIndex &index);
+
+  // 返回上一级
+  void on_cdup_clicked();
+
+  // 返回下一级
+  void on_cdnext_clicked();
+
+  // 地址栏编辑回车按下
+  void on_address_line_returnPressed();
+
+  // 地址确认按键事件
+  void on_address_confirm_clicked();
+
+  // 搜索按键事件
+  void on_search_clicked();
 
  private:
   Ui::FileBrowserController *ui;

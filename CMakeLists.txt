@@ -86,15 +86,21 @@ set(PROJECT_SOURCES
   src/ui/mainwindow.cpp
   src/ui/mainwindow.h
   src/ui/mainwindow.ui
-  src/ui/mfilebrowsercontroller.cpp
-  src/ui/mfilebrowsercontroller.h
-  src/ui/mfilebrowsercontroller.ui
-  src/ui/projectcontroller.cpp
-  src/ui/projectcontroller.h
-  src/ui/mprojectcontroller.ui
-  src/ui/timecontroller.h
-  src/ui/timecontroller.cpp
-  src/ui/timecontroller.ui
+  src/ui/controllers/mfilebrowsercontroller.cpp
+  src/ui/controllers/mfilebrowsercontroller.h
+  src/ui/controllers/mfilebrowsercontroller.ui
+  src/ui/controllers/projectcontroller.cpp
+  src/ui/controllers/projectcontroller.h
+  src/ui/controllers/mprojectcontroller.ui
+  src/ui/controllers/timecontroller.h
+  src/ui/controllers/timecontroller.cpp
+  src/ui/controllers/timecontroller.ui
+	src/ui/pageui/mpage.h 
+	src/ui/pageui/mpage.cpp 
+	src/ui/pageui/mpage.ui
+  src/ui/pageui/editorui/meditorarea.h 
+	src/ui/pageui/editorui/meditorarea.cpp 
+	src/ui/pageui/editorui/meditorarea.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/MapWorkspaceCanvas.h
@@ -127,12 +133,20 @@ set(PROJECT_SOURCES
   ${GLSL_FILES}
   ${TS_FILES})
 
-include_directories(./src ./src/ui ./src/canvas ./src/log)
+include_directories(
+	./src 
+	./src/ui
+	./src/ui/pageui
+	./src/ui/pageui/editorui
+	./src/ui/controllers  
+	./src/canvas 
+	./src/log)
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-    resources/glsrcs.qrc)
+    resources/glsrcs.qrc
+    )
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
