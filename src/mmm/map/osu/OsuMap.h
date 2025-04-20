@@ -359,11 +359,8 @@ class OsuMap : public MMap {
   // 从文件读取谱面
   void load_from_file(const char* path) override;
 
-  // 有序的添加物件
-  void insert_object(std::shared_ptr<HitObject>& hitobject) override;
-
   // 有序的添加timing-会分析并更新拍
-  void insert_timing(std::shared_ptr<Timing>& timing) override;
+  void insert_timing(std::shared_ptr<Timing> timing) override;
 
   // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
   void query_around_timing(std::vector<std::shared_ptr<Timing>>& timings,

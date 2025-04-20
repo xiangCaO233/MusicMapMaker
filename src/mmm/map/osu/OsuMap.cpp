@@ -262,32 +262,6 @@ void OsuMap::load_from_file(const char* path) {
                           std::stoi(breaks_paras.at(2)));
     }
 
-    // 创建timing
-    for (int i = 0; i < osureader.current_timing_index; i++) {
-      // 按顺序读取timing点
-      auto timing_point_des =
-          osureader.get_value("TimingPoints", std::to_string(i),
-                              std::string("10000,333.33,4,0,0,100,1,1"));
-      std::istringstream timingiss(timing_point_des);
-      std::vector<std::string> timing_point_paras;
-      while (std::getline(timingiss, token, ',')) {
-        timing_point_paras.emplace_back(token);
-      }
-      // 创建timing
-      auto osu_timing = std::make_shared<OsuTiming>();
-      // 使用读取出的参数初始化timing
-      osu_timing->from_osu_description(timing_point_paras);
-      // 加入timing列表
-      timings.emplace(osu_timing);
-      auto temp_timing_list_it = temp_timing_map.find(osu_timing->timestamp);
-      if (temp_timing_list_it == temp_timing_map.end()) {
-        // 添加映射
-        temp_timing_list_it =
-            temp_timing_map.try_emplace(osu_timing->timestamp).first;
-      }
-      temp_timing_list_it->second.emplace_back(osu_timing);
-    }
-
     // 创建物件
     for (int i = 0; i < osureader.current_hitobject_index; i++) {
       // 按顺序读取物件
@@ -330,34 +304,45 @@ void OsuMap::load_from_file(const char* path) {
       hitobjects.insert(osu_note);
     }
 
-    // 更新拍
-    // 基准timing
-    // auto base_timing = timings.front();
-    // uint32_t process_time = base_timing->timestamp;
-    // 查找当前以当前基准timing为准的拍时间到下一拍时间直接有没有其他timing,
-    // auto current_beat_time = 60.0 / base_timing->bpm * 1000.0;
+    // 创建timing
+    for (int i = 0; i < osureader.current_timing_index; i++) {
+      // 按顺序读取timing点
+      auto timing_point_des =
+          osureader.get_value("TimingPoints", std::to_string(i),
+                              std::string("10000,333.33,4,0,0,100,1,1"));
+      std::istringstream timingiss(timing_point_des);
+      std::vector<std::string> timing_point_paras;
+      while (std::getline(timingiss, token, ',')) {
+        timing_point_paras.emplace_back(token);
+      }
+      // 创建timing
+      auto osu_timing = std::make_shared<OsuTiming>();
+      // 使用读取出的参数初始化timing
+      osu_timing->from_osu_description(timing_point_paras);
+      insert_timing(osu_timing);
+    }
 
   } else {
     XWARN("非.osu格式,读取失败");
   }
 }
 
-// 有序的添加物件
-void OsuMap::insert_object(std::shared_ptr<HitObject>& hitobject) {
-  switch (hitobject->object_type) {
-    case HitObjectType::OSUNOTE:
-    case HitObjectType::OSUHOLD:
-    case HitObjectType::OSUHOLDEND:
-      break;
-    default:
-      XWARN("osumap必须添加osu物件");
-  }
-  // 有序插入
-  hitobjects.insert(hitobject);
-}
-
 // 有序的添加timing-会分析并更新拍
-void OsuMap::insert_timing(std::shared_ptr<Timing>& timing) {}
+void OsuMap::insert_timing(std::shared_ptr<Timing> osu_timing) {
+  // 加入timing列表
+  auto insertit = timings.insert(osu_timing);
+
+  auto temp_timing_list_it = temp_timing_map.find(osu_timing->timestamp);
+  if (temp_timing_list_it == temp_timing_map.end()) {
+    // 添加映射
+    temp_timing_list_it =
+        temp_timing_map.try_emplace(osu_timing->timestamp).first;
+  }
+  temp_timing_list_it->second.emplace_back(
+      std::dynamic_pointer_cast<OsuTiming>(osu_timing));
+
+  // 更新此timing时间开始到下一基准timing之前的拍/之后没有就一直到maplegnth
+}
 
 // 查询指定位置附近的同时间点timing列表(优先在此之前,没有之前找之后)
 void OsuMap::query_around_timing(

@@ -1,7 +1,7 @@
 #ifndef M_TIMING_H
 #define M_TIMING_H
 
-#include "../SampleSet.h"
+#include <compare>
 
 // 时间点
 #include <cstdint>
@@ -43,12 +43,10 @@ class Timing {
   //
   double bpm;
 
-  bool operator>(const Timing& other) const {
-    return timestamp > other.timestamp;
-  }
+  bool operator==(const Timing& other) const = default;
 
-  bool operator<(const Timing& other) const {
-    return timestamp < other.timestamp;
+  auto operator<=>(const Timing& other) const {
+    return timestamp <=> other.timestamp;
   }
 };
 

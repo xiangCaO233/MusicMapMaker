@@ -7,10 +7,9 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-#include "mmm/Beat.h"
+#include "../Beat.h"
 
 enum class MapType {
   OSUMAP,
@@ -51,7 +50,7 @@ class MMap {
   std::set<std::shared_ptr<HitObject>> hitobjects;
 
   // 全部timing
-  std::multiset<std::shared_ptr<Timing>> timings;
+  std::set<std::shared_ptr<Timing>> timings;
 
   // 全部拍-自动分析分拍和bpm,变速
   std::multiset<Beat> beats;
@@ -59,11 +58,8 @@ class MMap {
   // 从文件读取谱面
   virtual void load_from_file(const char* path) = 0;
 
-  // 有序的添加物件
-  virtual void insert_object(std::shared_ptr<HitObject>& hitobject) = 0;
-
   // 有序的添加timing-会分析并更新拍
-  virtual void insert_timing(std::shared_ptr<Timing>& timing) = 0;
+  virtual void insert_timing(std::shared_ptr<Timing> timing) = 0;
 
   // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
   virtual void query_around_timing(
