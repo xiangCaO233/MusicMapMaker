@@ -35,7 +35,7 @@ void MEditorArea::use_theme(GlobalTheme theme) {
   mutil::set_toolbutton_svgcolor(ui->bookmark_toolbutton,
                                  ":/icons/bookmark.svg", file_button_color, 12,
                                  12);
-  mutil::set_button_svgcolor(ui->audio_controller_button,
+  mutil::set_button_svgcolor(ui->audio_time_controller_button,
                              ":/icons/sliders-h.svg", file_button_color, 16,
                              16);
   mutil::set_button_svgcolor(ui->fit_size_to_orbitcount_button,
@@ -138,4 +138,9 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
       ui->canvas->current_time_stamp = maptime * ratio;
     }
   }
+}
+
+// 切换音频控制器
+void MEditorArea::on_audio_time_controller_button_clicked() {
+  ui->audio_time_controller->setHidden(!ui->audio_time_controller->isHidden());
 }

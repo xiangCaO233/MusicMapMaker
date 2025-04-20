@@ -10,7 +10,7 @@ enum class GlobalTheme {
 // 设置
 struct Settings {
   // 主题
-  GlobalTheme current_theme;
+  GlobalTheme global_theme;
 };
 
 #endif  // M_GLOBAL_SETTINGS_H

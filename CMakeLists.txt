@@ -101,6 +101,9 @@ set(PROJECT_SOURCES
   src/ui/pageui/editorui/meditorarea.h 
 	src/ui/pageui/editorui/meditorarea.cpp 
 	src/ui/pageui/editorui/meditorarea.ui
+	src/ui/infoui/minfo.h
+	src/ui/infoui/minfo.cpp
+	src/ui/infoui/minfo.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/MapWorkspaceCanvas.h
@@ -136,6 +139,7 @@ set(PROJECT_SOURCES
 include_directories(
 	./src 
 	./src/ui
+	./src/ui/infoui
 	./src/ui/pageui
 	./src/ui/pageui/editorui
 	./src/ui/controllers  

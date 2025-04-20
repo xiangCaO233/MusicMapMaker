@@ -33,8 +33,10 @@ class MPage : public QWidget {
   void project_controller_select_map(std::shared_ptr<MMap> &map);
 
  private slots:
+  // 选择页事件
   void on_page_selector_currentTextChanged(const QString &arg1);
 
+  // 关闭页面事件
   void on_close_page_button_clicked();
 
  private:

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1791</width>
-    <height>812</height>
+    <width>1600</width>
+    <height>960</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -283,100 +283,9 @@
              <height>0</height>
             </size>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-             <widget class="QTabWidget" name="information_tab_widget">
-              <property name="currentIndex">
-               <number>0</number>
-              </property>
-              <widget class="QWidget" name="logTab">
-               <attribute name="title">
-                <string>Log</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_2">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QTextEdit" name="logTextArea">
-                  <property name="font">
-                   <font>
-                    <family>Noto Sans</family>
-                    <pointsize>10</pointsize>
-                    <bold>false</bold>
-                    <kerning>false</kerning>
-                   </font>
-                  </property>
-                  <property name="undoRedoEnabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="readOnly">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="errorTab">
-               <attribute name="title">
-                <string>Errors</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QTextEdit" name="errorTextArea">
-                  <property name="undoRedoEnabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="readOnly">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </widget>
+             <widget class="MInfo" name="infomation_widget" native="true"/>
             </item>
            </layout>
           </widget>
@@ -393,7 +302,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1791</width>
+     <width>1600</width>
      <height>23</height>
     </rect>
    </property>
@@ -638,6 +547,12 @@
    <class>MPage</class>
    <extends>QWidget</extends>
    <header location="global">mpage.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MInfo</class>
+   <extends>QWidget</extends>
+   <header location="global">minfo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
