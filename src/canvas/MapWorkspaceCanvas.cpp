@@ -197,7 +197,7 @@ void MapWorkspaceCanvas::update_canvas() {
   auto beat_count =
       int((current_time_stamp - current_abs_timing->timestamp) / beattime - 1);
 
-  // 当前处理到的时间
+  // 处理的时间范围
   double from_time = current_abs_timing->timestamp + beat_count * beattime;
   double to_time = current_abs_timing->timestamp + beat_count * beattime;
 

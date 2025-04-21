@@ -13,7 +13,7 @@ MMap::MMap() {}
 MMap::~MMap() = default;
 
 // 生成此拍的分拍策略
-void MMap::generate_divisor_policy(std::shared_ptr<Beat>& beat) {
+void MMap::generate_divisor_policy(const std::shared_ptr<Beat>& beat) {
   // 计算这拍之内的可能分拍策略
   // 获取此拍范围内的物件
   std::vector<std::shared_ptr<HitObject>> notes;
@@ -28,10 +28,10 @@ void MMap::generate_divisor_policy(std::shared_ptr<Beat>& beat) {
       // set自动排序+去重
       timestamps.insert(note->timestamp);
     }
-    // 允许3ms误差
+    // 允许5ms误差
     beat->divisors = mutil::calculateDivisionStrategy(
         timestamps, beat->start_timestamp,
-        beat->end_timestamp - beat->start_timestamp, 3);
+        beat->end_timestamp - beat->start_timestamp, 5);
   }
 }
 
@@ -69,10 +69,10 @@ void MMap::erase_beats(double start, double end) {
 }
 
 // 有序的添加timing-会分析并更新拍
-void MMap::insert_timing(std::shared_ptr<Timing> timing) {
+void MMap::insert_timing(const std::shared_ptr<Timing>& timing) {
   // 加入timing列表
   auto insertit = timings.insert(timing);
-  insertit++;
+  ++insertit;
 
   auto temp_timing_list_it = temp_timing_map.find(timing->timestamp);
   if (temp_timing_list_it == temp_timing_map.end()) {
@@ -88,7 +88,7 @@ void MMap::insert_timing(std::shared_ptr<Timing> timing) {
       next_base_timing = *insertit;
       break;
     }
-    insertit++;
+    ++insertit;
   }
 
   // 区分变速timing和基准timing
@@ -109,7 +109,7 @@ void MMap::insert_timing(std::shared_ptr<Timing> timing) {
     erase_beats(start, end);
 
     // 当前处理到的时间
-    double current_process_time = double(start);
+    auto current_process_time = double(start);
     // 每一拍的时间
     double beattime = 60.0 / timing->basebpm * 1000.0;
 
@@ -156,11 +156,6 @@ void MMap::insert_timing(std::shared_ptr<Timing> timing) {
         current_process_time += beattime;
       }
     } else {
-      // 范围内无其他timing--直接生成start-end之间的全部非变速拍
-      // 当前处理到的时间
-      double current_process_time = double(start);
-      // 每一拍的时间
-      double beattime = 60.0 / timing->basebpm * 1000.0;
       while (current_process_time < end) {
         // 每一拍
         auto beat =
@@ -187,7 +182,7 @@ void MMap::insert_timing(std::shared_ptr<Timing> timing) {
     } else {
       // 没有,不管
     }
-    double start = timing->timestamp;
+    const double start = timing->timestamp;
     double end;
 
     // 检查是否有
@@ -204,7 +199,7 @@ void MMap::insert_timing(std::shared_ptr<Timing> timing) {
 
     // 生成新拍
     // 当前处理到的时间
-    double current_process_time = double(start);
+    auto current_process_time = double(start);
     // 每一拍的实际时间
     double beattime = 60.0 / timing->basebpm * 1000.0;
 
@@ -242,12 +237,11 @@ void MMap::query_around_timing(
       [](int time, const auto& timing) { return timing->timestamp >= time; });
 
   // 确定使用的timing
-  std::shared_ptr<Timing> res;
   if (it == timings.end()) {
     // 没找到比当前时间靠后的timing
     // 使用最后一个timing
     it = timings.end();
-    it--;
+    --it;
   } else {
     // 找到了比当前时间靠后的timing
     if (it == timings.begin()) {
@@ -255,10 +249,10 @@ void MMap::query_around_timing(
       // 就使用这个timing
     } else {
       // 使用前一个
-      it--;
+      --it;
     }
   }
-  res = *it;
+  std::shared_ptr<Timing> res = *it;
 
   // 查找重复时间点的timing表
   auto timing_list_it = temp_timing_map.find(res->timestamp);
@@ -276,7 +270,7 @@ void MMap::query_timing_in_range(
 
 // 查询时间区间窗口内的拍
 void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
-                               int32_t start, int32_t end) {
+                               int32_t start, const int32_t end) {
   result_beats.clear();
   auto lower_bound = std::make_shared<Beat>(200, start, start);
 
@@ -293,16 +287,16 @@ void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
 // 查询区间窗口内有的物件
 void MMap::query_object_in_range(
     std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-    int32_t end, bool with_longhold) {
+    const int32_t end, bool with_longhold) {
   /*
    *lower_bound(key)	返回第一个 ≥ key 的元素的迭代器。
    *upper_bound(key)	返回第一个 > key 的元素的迭代器。
    */
   if (with_longhold) {
     // 带超级长条
-    // 只要面尾时间>窗口起始时间就加入列表
+    // 面尾时间>窗口起始时间且面头<结束时间就加入列表
     for (const auto& hold : temp_hold_list) {
-      if (hold->timestamp + hold->hold_time > start) {
+      if (hold->timestamp < end && hold->timestamp + hold->hold_time > start) {
         result_objects.emplace_back(hold);
       }
     }
@@ -312,13 +306,13 @@ void MMap::query_object_in_range(
   auto startit = hitobjects.lower_bound(std::make_shared<Note>(start));
 
   for (; startit != hitobjects.end() && (*startit)->timestamp < end;
-       startit++) {
+       ++startit) {
     // 查重
     if ((*startit)->object_type == HitObjectType::HOLD ||
         (*startit)->object_type == HitObjectType::OSUHOLD) {
       bool added{false};
       for (const auto& obj : result_objects)
-        if (obj.get() == (*startit).get()) added = true;
+        if (obj.get() == startit->get()) added = true;
       if (!added) {
         // 窗口内的没加入过的长条
         result_objects.emplace_back(*startit);
@@ -330,9 +324,8 @@ void MMap::query_object_in_range(
   }
 
   // 防止乱序再排一个
-  std::sort(
-      result_objects.begin(), result_objects.end(),
-      [](std::shared_ptr<HitObject>& ho1, std::shared_ptr<HitObject>& ho2) {
-        return ho1->timestamp < ho2->timestamp;
-      });
+  std::ranges::sort(result_objects, [](const std::shared_ptr<HitObject>& ho1,
+                                       const std::shared_ptr<HitObject>& ho2) {
+    return ho1->timestamp < ho2->timestamp;
+  });
 }

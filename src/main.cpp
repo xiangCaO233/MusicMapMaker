@@ -11,7 +11,6 @@
 #include <qsurfaceformat.h>
 
 #include <QApplication>
-#include <QDebug>
 #include <QDir>
 #include <QLibraryInfo>
 #include <QLocale>
@@ -88,8 +87,10 @@ int main(int argc, char* argv[]) {
   // auto map = std::make_shared<OsuMap>();
 
   // map->load_from_file(
-  //     "../resources/map/Designant - Designant/Designant - Designant. "
-  //     "(Benson_) [Designant].osu");
+  //     "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - "
+  //     "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - shojo rei
+  //     "
+  //     "(xiang_233) [(LN)NM lv.29].osu");
 
   // std::shared_ptr<Timing> speedtiming = std::make_shared<OsuTiming>();
   //  speedtiming->timestamp = 90473;

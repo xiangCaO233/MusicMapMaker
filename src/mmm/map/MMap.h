@@ -1,12 +1,11 @@
 #ifndef M_MAP_H
 #define M_MAP_H
 
-#include <QRectF>
-#include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "../Beat.h"
@@ -93,13 +92,13 @@ class MMap {
   virtual void load_from_file(const char* path) = 0;
 
   // 生成此拍的分拍策略
-  void generate_divisor_policy(std::shared_ptr<Beat>& beat);
+  void generate_divisor_policy(const std::shared_ptr<Beat>& beat);
 
   // 擦除指定范围内的拍
   void erase_beats(double start, double end);
 
   // 有序的添加timing-会分析并更新拍
-  virtual void insert_timing(std::shared_ptr<Timing> timing);
+  virtual void insert_timing(const std::shared_ptr<Timing> &timing);
 
   // 移除timing-会分析并更新拍
   virtual void remove_timing(std::shared_ptr<Timing> timing);
