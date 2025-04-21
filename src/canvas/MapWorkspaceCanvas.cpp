@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QWheelEvent>
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -16,6 +17,7 @@
 #include "../mmm/hitobject/Note/Note.h"
 #include "../mmm/map/osu/OsuMap.h"
 #include "../mmm/timing/Timing.h"
+#include "mmm/hitobject/HitObject.h"
 #include "src/mmm/timing/osu/OsuTiming.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
@@ -199,7 +201,7 @@ void MapWorkspaceCanvas::update_canvas() {
 
   // TODO(xiang 2025-04-21):
   // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
-  // 处理的时间范围--大致
+  // 当前处理的时间范围--大致
   double from_time = current_abs_timing->timestamp + beat_count * beattime;
   double to_time = current_abs_timing->timestamp + beat_count * beattime;
 
@@ -276,17 +278,99 @@ void MapWorkspaceCanvas::draw_top_bar() {
 // 绘制预览
 void MapWorkspaceCanvas::draw_preview_content() {
   auto current_size = size();
-
-  // TODO(xiang 2025-04-15): 绘制预览内容
-  if (!working_map) {
-  }
+  auto preview_x_startpos = current_size.width() * (1 - preview_width_scale);
 
   // 绘制一层滤镜
-  QRectF preview_area_bg_bound(current_size.width() * (1 - preview_width_scale),
-                               0.0, current_size.width() * preview_width_scale,
+  QRectF preview_area_bg_bound(preview_x_startpos, 0.0,
+                               current_size.width() * preview_width_scale,
                                current_size.height());
   renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75),
                             0, false);
+
+  // TODO(xiang 2025-04-15): 绘制预览内容
+  if (working_map) {
+    // 绘制整个map
+    switch (working_map->maptype) {
+      case MapType::OSUMAP: {
+        auto omap = std::static_pointer_cast<OsuMap>(working_map);
+        auto orbits = omap->CircleSize;
+        size_t objindex = 0;
+        for (const auto &obj : working_map->hitobjects) {
+          auto note = std::static_pointer_cast<Note>(obj);
+
+          // 轨道宽度
+          auto orbit_width =
+              current_size.width() * preview_width_scale / orbits;
+
+          // 最终纹理缩放倍率
+          double texture_ratio{1.0};
+
+          auto note_head_size = QSizeF(orbit_width * 0.8, 1.0);
+
+          // 物件头中心位置
+          auto note_center_pos_x = preview_x_startpos +
+                                   orbit_width * note->orbit +
+                                   orbit_width / 2.0;
+
+          // 物件头左上角位置
+          double head_note_pos_x =
+              note_center_pos_x - note_head_size.width() / 2.0;
+
+          double head_note_pos_y =
+              current_size.height() *
+                  (1.0 -
+                   double(note->timestamp) / double(working_map->map_length)) -
+              note_head_size.height() / 2.0;
+          // qDebug() << head_note_pos_y;
+
+          // 物件头的实际区域
+          QRectF head_note_bound(
+              head_note_pos_x, head_note_pos_y - note_head_size.height() / 2.0,
+              note_head_size.width(), note_head_size.height());
+
+          // 切换纹理绘制方式为填充
+          renderer_manager->texture_fillmode = TextureFillMode::FILL;
+          // 切换纹理绘制补齐方式为重采样
+          renderer_manager->texture_complementmode =
+              TextureComplementMode::REPEAT_TEXTURE;
+
+          switch (obj->object_type) {
+            case HitObjectType::OSUNOTE: {
+              // 单物件
+              // 直接绘制
+              renderer_manager->addRoundRect(head_note_bound, nullptr,
+                                             QColor(255, 182, 193, 255), 0, 1.3,
+                                             false);
+              break;
+            }
+            case HitObjectType::OSUHOLD: {
+              break;
+            }
+            default:
+              break;
+          }
+          ++objindex;
+        }
+        break;
+      }
+      case MapType::MALODYMAP: {
+        break;
+      }
+      case MapType::RMMAP: {
+        break;
+      }
+    }
+    // 绘制当前位置--小框
+    QSizeF preview_area_size(current_size.width() * preview_width_scale, 100);
+    QRectF current_area(
+        preview_x_startpos,
+        current_size.height() *
+                (1.0 - (current_time_stamp / double(working_map->map_length))) -
+            preview_area_size.height() / 2.0,
+        preview_area_size.width(), preview_area_size.height());
+    renderer_manager->addRect(current_area, nullptr, QColor(240, 240, 240, 75),
+                              0, false);
+  }
 }
 // 绘制判定线
 void MapWorkspaceCanvas::draw_judgeline() {
@@ -299,11 +383,11 @@ void MapWorkspaceCanvas::draw_judgeline() {
               current_size.height() * (1.0 - judgeline_position)),
       8, nullptr, QColor(0, 255, 255, 235), false);
   // 预览区域判定线
-  renderer_manager->addLine(
-      QPointF(current_size.width() * (1 - preview_width_scale),
-              current_size.height() / 2.0),
-      QPointF(current_size.width(), current_size.height() / 2.0), 6, nullptr,
-      QColor(0, 255, 255, 235), false);
+  // renderer_manager->addLine(
+  //    QPointF(current_size.width() * (1 - preview_width_scale),
+  //            current_size.height() / 2.0),
+  //    QPointF(current_size.width(), current_size.height() / 2.0), 6, nullptr,
+  //    QColor(0, 255, 255, 235), false);
 }
 
 // 绘制拍

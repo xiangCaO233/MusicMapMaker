@@ -80,6 +80,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 预览区宽度倍率:实际宽度为总宽度*preview_width_scale
   double preview_width_scale{0.22};
 
+  // 预览区时间倍率:实际时间范围为当前时间范围*preview_time_scale
+  double preview_time_scale{10.0};
+
   // 绘制判定线
   void draw_judgeline();
 
