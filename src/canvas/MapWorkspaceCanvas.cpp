@@ -241,11 +241,17 @@ void MapWorkspaceCanvas::draw_background() {
   if (!working_map) return;
   auto des = QRectF(0, 0, width(), height());
 
+  // 绘制背景图
   auto texname = working_map->bg_path.parent_path().filename().string() + "/" +
                  working_map->bg_path.filename().string();
   renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
   renderer_manager->addRect(des, texture_full_map[texname],
                             QColor(255, 255, 255, 255), 0, false);
+  // 绘制背景遮罩
+  if (background_darken_ratio != 0.0) {
+    renderer_manager->addRect(
+        des, nullptr, QColor(0, 0, 0, 255 * background_darken_ratio), 0, false);
+  }
   // XINFO("bg_path:" + working_map->bg_path.string());
 }
 
@@ -390,48 +396,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
   if (!working_map) return;
 
   auto current_size = size();
-  // 声明+预分配内存
-  // std::vector<std::shared_ptr<Note>> temp_notes;
-  // std::vector<std::shared_ptr<Hold>> temp_holds;
-  // temp_notes.reserve(buffer_objects.size());
-  // temp_holds.reserve(buffer_objects.size());
-
-  // // 检查缓冲区,取出需要渲染的物件
-  // for (int i = 0; i < buffer_objects.size(); i++) {
-  //   // 区分面尾物件
-  //   if (buffer_objects[i]->is_hold_end) {
-  //     // 找出面尾的头
-  //     auto head =
-  //         std::dynamic_pointer_cast<HoldEnd>(buffer_objects[i])->reference;
-  //     // 判重(面头面尾同时在可视范围内)
-  //     bool added{false};
-  //     for (const auto &hold : temp_holds) {
-  //       if (hold == head) {
-  //         added = true;
-  //       }
-  //     }
-  //     if (!added) {
-  //       temp_holds.emplace_back(head);
-  //       temp_notes.emplace_back(head);
-  //     }
-  //   } else {
-  //     // 非面尾可转为Note
-  //     auto note = std::dynamic_pointer_cast<Note>(buffer_objects[i]);
-  //     // 直接使用
-  //     if (note->note_type == NoteType::HOLD) {
-  //       auto hold = std::dynamic_pointer_cast<Hold>(buffer_objects[i]);
-  //       temp_holds.emplace_back(hold);
-  //     }
-  //     temp_notes.emplace_back(note);
-  //   }
-  // }
-
-  // // 重新排序
-  // std::sort(temp_notes.begin(), temp_notes.end(),
-  //           [](const std::shared_ptr<HitObject> &h1,
-  //              const std::shared_ptr<HitObject> &h2) {
-  //             return (*h1).timestamp < (*h2).timestamp;
-  //           });
 
   // TODO(xiang 2025-04-15): 执行渲染
   switch (working_map->maptype) {
@@ -496,13 +460,16 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 判定线位置
         // auto judgeline_pos =
         //    current_size.height() * (1 - judgeline_position);
-        auto head_note_size = QSizeF(head_texture->texture_image.width(),
-                                     head_texture->texture_image.height());
+        auto head_note_size =
+            QSizeF(head_texture->texture_image.width() * object_size_scale,
+                   head_texture->texture_image.height() * object_size_scale);
+
         // 物件距离判定线距离从下往上--反转
         // 当前物件头位置-中心
         auto head_note_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
             (note->timestamp - current_time_stamp) * timeline_zoom * speed_zoom;
+
         // 轨道宽度
         auto orbit_width =
             current_size.width() * (1 - preview_width_scale) / max_orbit;
@@ -542,9 +509,11 @@ void MapWorkspaceCanvas::draw_hitobject() {
             auto long_note_body_pos_x = note_center_pos;
             auto long_note_body_pos_y =
                 head_note_pos_y + (long_note_end_pos_y - head_note_pos_y) / 2.0;
+
             // 面身实际尺寸高度-1.5note
             auto long_note_body_size =
-                QSizeF(long_note_body_texture->texture_image.width(),
+                QSizeF(long_note_body_texture->texture_image.width() *
+                           object_size_scale,
                        long_note_end_pos_y - head_note_pos_y -
                            0.5 * head_note_bound.height());
 
@@ -559,8 +528,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
             auto long_note_end_pos_x = note_center_pos;
             // 面尾实际尺寸
             auto long_note_end_size =
-                QSizeF(long_note_end_texture->texture_image.width(),
-                       long_note_end_texture->texture_image.height());
+                QSizeF(long_note_end_texture->texture_image.width() *
+                           object_size_scale,
+                       long_note_end_texture->texture_image.height() *
+                           object_size_scale);
             // 面尾的实际区域--在面身缺的那一note位置
             QRectF long_note_end_bound(
                 long_note_end_pos_x - long_note_end_size.width() / 2.0,
@@ -609,12 +580,11 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   map_type = map->maptype;
 
   if (map) {
-    // TODO(xiang 2025-04-20): 预防重复载入纹理
     // 加载背景图纹理
     add_texture(map->bg_path.string().c_str());
   }
 
   // 重置谱面时间
-  current_time_stamp = 1057.19;
+  current_time_stamp = 0;
   emit current_time_stamp_changed(0);
 }

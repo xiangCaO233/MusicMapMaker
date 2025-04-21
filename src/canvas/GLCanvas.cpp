@@ -324,6 +324,16 @@ void GLCanvas::set_Vsync(bool flag) {
 
 // 添加纹理
 void GLCanvas::add_texture(const char *qrc_path) {
+  // 初始化纹理
+  auto texture = std::make_shared<TextureInstace>(qrc_path);
+
+  // 检查纹理是否已载入过
+  auto texit = texture_full_map.find(texture->name);
+  if (texit != texture_full_map.end()) {
+    // 载入过了
+    return;
+  }
+
   // 是否需要新建纹理池
   bool need_new_pool{true};
   std::shared_ptr<MTexturePool> pool;
@@ -342,8 +352,8 @@ void GLCanvas::add_texture(const char *qrc_path) {
     renderer_manager->texturepools.emplace_back(pool);
   }
 
-  // 初始化纹理
-  auto texture = std::make_shared<TextureInstace>(qrc_path, pool);
+  // 设置引用
+  texture->poolreference = pool;
 
   // 添加到纹理池
   auto res = pool->load_texture(texture);

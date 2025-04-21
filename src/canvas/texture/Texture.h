@@ -15,7 +15,8 @@ class TextureInstace {
  public:
   TextureInstace();
 
-  TextureInstace(const char* path, std::shared_ptr<MTexturePool> preference);
+  TextureInstace(const char* path,
+                 std::shared_ptr<MTexturePool> preference = nullptr);
 
   virtual ~TextureInstace();
 

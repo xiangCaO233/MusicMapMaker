@@ -385,10 +385,15 @@ class OsuFileReader {
     auto key_it = chapter_it->second.find(key);
     if (key_it == chapter_it->second.end()) return default_value;
 
-    std::istringstream iss(key_it->second);
-    T value;
-    iss >> value;
-    return value;
+    if constexpr (std::is_same_v<T, std::string>) {
+      // 类型为字符串时整个返回
+      return key_it->second;
+    } else {
+      std::istringstream iss(key_it->second);
+      T value;
+      iss >> value;
+      return value;
+    }
   }
 };
 

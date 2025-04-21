@@ -39,7 +39,7 @@ void OsuFileReader::parse_line(const std::string& line) {
       } else if (start_5_string == "Break") {
         map_properties[current_chapter]
                       ["Break" + std::to_string(current_breaks_index++)] = line;
-      } else {
+      } else if (start_1_char == '0') {
         // general bg
         map_properties[current_chapter]["background"] = line;
       }
@@ -69,6 +69,8 @@ void OsuFileReader::parse_line(const std::string& line) {
       if (eq_pos != std::string::npos) {
         std::string key = line.substr(0, eq_pos);
         std::string value = line.substr(eq_pos + 1);
+        // XWARN("key:" + key);
+        // XWARN("value:" + value);
         map_properties[current_chapter][key] = value;
       }
     }
@@ -121,6 +123,9 @@ void OsuMap::load_from_file(const char* path) {
     }
     // XINFO("parse result:");
     // for (const auto& [chapter, properties_map] : osureader.map_properties) {
+    //   if (chapter == "HitObjects" || chapter == "TimingPoints") {
+    //     continue;
+    //   }
     //   XINFO("-----------chapter:" + chapter + "---------------");
     //   for (const auto& [key, value] : properties_map) {
     //     XINFO("key:" + key + "-->value:" + value);
@@ -195,6 +200,7 @@ void OsuMap::load_from_file(const char* path) {
         osureader.get_value("Metadata", "ArtistUnicode", std::string(""));
     Creator = osureader.get_value("Metadata", "Creator", std::string("mmm"));
     Version = osureader.get_value("Metadata", "Version", std::string("[mmm]"));
+    // XWARN("载入osu谱面Version:" + Version);
     Source = osureader.get_value("Metadata", "Source", std::string(""));
     // ***Tags	空格分隔的 String（字符串）数组	易于搜索的标签
     auto tags = osureader.get_value("Editor", "Tags", std::string(""));
