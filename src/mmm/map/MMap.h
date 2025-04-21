@@ -74,20 +74,11 @@ class MMap {
   std::unordered_map<int32_t, std::vector<std::shared_ptr<Timing>>>
       temp_timing_map;
 
-  // timing比较器
+  // beat比较器
   struct BeatComparator {
     bool operator()(const std::shared_ptr<Beat>& a,
                     const std::shared_ptr<Beat>& b) const {
-      if (a->start_timestamp < b->start_timestamp) return true;
-      if (a->start_timestamp == b->start_timestamp) {
-        if (a->timeline_zoom == 1.0 && b->timeline_zoom != 1.0) {
-          return true;
-        }
-        if (a->timeline_zoom != 1.0 && b->timeline_zoom == 1.0) {
-          return false;
-        }
-      }
-      return false;
+      return a->start_timestamp < b->start_timestamp;
     }
   };
 

@@ -86,17 +86,25 @@ int main(int argc, char* argv[]) {
   // w.show();
 
   auto map = std::make_shared<OsuMap>();
+
   map->load_from_file(
       "../resources/map/Designant - Designant/Designant - Designant. "
       "(Benson_) [Designant].osu");
 
   std::shared_ptr<Timing> speedtiming = std::make_shared<OsuTiming>();
-  speedtiming->timestamp = 60000;
-  speedtiming->is_base_timing = false;
-  speedtiming->basebpm = 200;
-  speedtiming->bpm = 1.5;
+  // speedtiming->timestamp = 90473;
+  // speedtiming->is_base_timing = false;
+  // speedtiming->basebpm = 100;
+  // speedtiming->bpm = 3.0;
 
-  map->insert_timing(speedtiming);
+  // std::shared_ptr<Timing> speedtiming2 = std::make_shared<OsuTiming>();
+  // speedtiming2->timestamp = 90623;
+  // speedtiming2->is_base_timing = false;
+  // speedtiming2->basebpm = 100;
+  // speedtiming2->bpm = 2.0;
+
+  // map->insert_timing(speedtiming);
+  // map->insert_timing(speedtiming2);
 
   return a.exec();
 }

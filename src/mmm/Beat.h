@@ -20,6 +20,9 @@ struct Beat {
 
   // 操作符重载
   bool operator==(const Beat &other) const = default;
+  bool operator<=(const Beat &other) const {
+    return start_timestamp <= other.start_timestamp;
+  };
 };
 
 #endif  // M_BEAT_H

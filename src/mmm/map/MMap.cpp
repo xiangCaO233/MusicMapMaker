@@ -55,11 +55,15 @@ void MMap::erase_beats(double start, double end) {
     // 所有 Beat 都 > end，区间内无 Beat 可删
     return;
   }
-
-  // 确保 beat_startit ≤ beat_endit（否则区间无效）
-  if (beat_startit != beats.end() && *beat_startit <= *beat_endit) {
-    // 删除 [beat_startit, beat_endit] 区间内的所有 Beat
-    beats.erase(beat_startit, ++beat_endit);  // erase 是 [first, last)
+  auto start_legal = beat_startit != beats.end();
+  if (start_legal) {
+    auto start_less_than_end =
+        *beat_startit != *beat_endit && **beat_startit <= **beat_endit;
+    // 确保 beat_startit ≤ beat_endit（否则区间无效）
+    if (start_less_than_end) {
+      // 删除 [beat_startit, beat_endit] 区间内的所有 Beat
+      beats.erase(beat_startit, ++beat_endit);  // erase 是 [first, last)
+    }
   }
 }
 
@@ -81,6 +85,7 @@ void MMap::insert_timing(std::shared_ptr<Timing> timing) {
   while (insertit != timings.end()) {
     if ((*insertit)->is_base_timing) {
       next_base_timing = *insertit;
+      break;
     }
     insertit++;
   }
