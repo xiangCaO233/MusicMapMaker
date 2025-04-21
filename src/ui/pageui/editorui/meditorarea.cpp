@@ -58,11 +58,7 @@ void MEditorArea::on_canvas_timestamp_changed(double time) {
   if (ui->canvas->working_map) {
     // 更新进度条
     auto maptime = (double)(ui->canvas->working_map->map_length);
-    // XINFO("src maptime: " +
-    // std::to_string(ui->canvas->working_map->map_length)); XINFO("maptime: " +
-    // std::to_string(maptime));
     double ratio = time / maptime;
-    // XINFO("ratio: " + std::to_string(ratio));
     t = ratio * 10000.0;
   }
   ui->progress_slider->setValue(int(t));
@@ -133,9 +129,6 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
     if (ui->canvas->working_map) {
       double ratio = (double)value / 10000.0;
       auto maptime = (double)(ui->canvas->working_map->map_length);
-      // XINFO("maptime: " + std::to_string(maptime));
-      // XINFO("ratio: " + std::to_string(ratio));
-      //  qDebug() << "value:" << value;
       ui->canvas->current_time_stamp = maptime * ratio;
     }
   }
