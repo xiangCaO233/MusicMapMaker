@@ -9,6 +9,9 @@ MEditorArea::MEditorArea(QWidget* parent)
   // 连接画布时间更新信号
   connect(ui->canvas, &MapWorkspaceCanvas::current_time_stamp_changed, this,
           &MEditorArea::on_canvas_timestamp_changed);
+
+  // 默认隐藏音频控制器
+  ui->audio_time_controller->hide();
 }
 
 MEditorArea::~MEditorArea() { delete ui; }

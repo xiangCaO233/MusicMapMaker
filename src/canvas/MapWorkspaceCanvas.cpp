@@ -197,7 +197,9 @@ void MapWorkspaceCanvas::update_canvas() {
   auto beat_count =
       int((current_time_stamp - current_abs_timing->timestamp) / beattime - 1);
 
-  // 处理的时间范围
+  // TODO(xiang 2025-04-21):
+  // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
+  // 处理的时间范围--大致
   double from_time = current_abs_timing->timestamp + beat_count * beattime;
   double to_time = current_abs_timing->timestamp + beat_count * beattime;
 
@@ -303,7 +305,8 @@ void MapWorkspaceCanvas::draw_beats() {
   if (!working_map) return;
 
   auto current_size = size();
-  for (const auto &beat : current_beats) {
+  for (int i = 0; i < current_beats.size(); ++i) {
+    auto &beat = current_beats[i];
     // 每拍时间*时间线缩放=拍距
     double beat_distance =
         60.0 / beat->bpm * 1000.0 * timeline_zoom * speed_zoom;
@@ -333,24 +336,36 @@ void MapWorkspaceCanvas::draw_beats() {
     }
 
     // 绘制小节线
-    for (int i = 0; i < beat->divisors; i++) {
+    for (int j = 0; j < beat->divisors; ++j) {
+      // 筛选越界分拍线
+      if (i < current_beats.size() - 1) {
+        // 并非这波最后一拍
+        // 取出下一拍引用
+        auto &nextbeat = current_beats[i + 1];
+        if ((beat->start_timestamp +
+             (beat->end_timestamp - beat_start_time) / beat->divisors * j) >
+            nextbeat->start_timestamp) {
+          // 这个分拍线超过了下一拍的起始时间--跳过此分拍线的绘制
+          continue;
+        }
+      }
       // 小节线的位置
-      double divisor_pos = beat_start_pos - i * divisor_distance;
+      double divisor_pos = beat_start_pos - j * divisor_distance;
       if (divisor_pos >= -beat_distance &&
           divisor_pos <= current_size.height() + beat_distance) {
         // 只绘制在可视范围内的小节线
         // 选择颜色
         QColor divisor_color;
         if (has_theme) {
-          divisor_color = color_theme[i];
+          divisor_color = color_theme[j];
         } else {
           divisor_color = QColor(128, 128, 128, 240);
         }
 
         if (beat_start_time +
-                i * (beat->end_timestamp - beat_start_time) / beat->divisors >=
+                j * (beat->end_timestamp - beat_start_time) / beat->divisors >=
             current_abs_timing->timestamp) {
-          if (i == 0) {
+          if (j == 0) {
             // 小节线头画粗一点
             renderer_manager->addLine(
                 QPointF(0, divisor_pos),
