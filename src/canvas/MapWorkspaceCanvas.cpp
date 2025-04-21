@@ -202,29 +202,32 @@ void MapWorkspaceCanvas::update_canvas() {
   // TODO(xiang 2025-04-21):
   // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
   // 当前处理的时间范围--大致
-  double from_time = current_abs_timing->timestamp + beat_count * beattime;
-  double to_time = current_abs_timing->timestamp + beat_count * beattime;
+  current_time_area_start =
+      current_abs_timing->timestamp + beat_count * beattime;
+  current_time_area_end = current_abs_timing->timestamp + beat_count * beattime;
 
   // 拍距离判定线距离从下往上--反转
   // 拍起始位置
-  double distance = std::fabs(to_time - current_time_stamp);
+  double distance = std::fabs(current_time_area_end - current_time_stamp);
   auto processing_pos = judgeline_pos + (distance * timeline_zoom);
 
   while (processing_pos > -beattime) {
-    to_time += beattime;
+    current_time_area_end += beattime;
     processing_pos -= beat_distance;
   }
 
   // 更新拍列表
   // 清除拍缓存
   current_beats.clear();
-  working_map->query_beat_in_range(current_beats, int32_t(from_time),
-                                   int32_t(to_time));
+  working_map->query_beat_in_range(current_beats,
+                                   int32_t(current_time_area_start),
+                                   int32_t(current_time_area_end));
   // 更新物件列表
   // 清除物件缓存
   buffer_objects.clear();
-  working_map->query_object_in_range(buffer_objects, int32_t(from_time),
-                                     int32_t(to_time), true);
+  working_map->query_object_in_range(buffer_objects,
+                                     int32_t(current_time_area_start),
+                                     int32_t(current_time_area_end), true);
 
   if (!pasue) {
     // 未暂停,更新当前时间戳
@@ -295,7 +298,10 @@ void MapWorkspaceCanvas::draw_preview_content() {
         auto omap = std::static_pointer_cast<OsuMap>(working_map);
         auto orbits = omap->CircleSize;
         size_t objindex = 0;
-        for (const auto &obj : working_map->hitobjects) {
+
+        // 获取预览区物件
+
+        for (const auto &obj : buffer_preview_objects) {
           auto note = std::static_pointer_cast<Note>(obj);
 
           // 轨道宽度
@@ -541,9 +547,18 @@ void MapWorkspaceCanvas::draw_hitobject() {
             long_note_end_texture = long_note_end_texture_white;
           }
         }
-        // 判定线位置
-        // auto judgeline_pos =
-        //    current_size.height() * (1 - judgeline_position);
+        // 轨道宽度
+        auto orbit_width =
+            current_size.width() * (1 - preview_width_scale) / max_orbit;
+
+        // 依据轨道宽度自动适应物件纹理尺寸
+        // 物件尺寸缩放--相对于纹理尺寸
+        auto width_scale =
+            (orbit_width - 4.0) / double(head_texture->texture_image.width());
+
+        // 不大于1--不放大纹理
+        double object_size_scale = std::min(width_scale, 1.0);
+
         auto head_note_size =
             QSizeF(head_texture->texture_image.width() * object_size_scale,
                    head_texture->texture_image.height() * object_size_scale);
@@ -553,10 +568,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
         auto head_note_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
             (note->timestamp - current_time_stamp) * timeline_zoom * speed_zoom;
-
-        // 轨道宽度
-        auto orbit_width =
-            current_size.width() * (1 - preview_width_scale) / max_orbit;
 
         // 物件头中心位置
         auto note_center_pos = orbit_width * note->orbit + orbit_width / 2.0;

@@ -53,6 +53,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 物件缓存
   std::vector<std::shared_ptr<HitObject>> buffer_objects;
 
+  // 预览物件缓存
+  std::vector<std::shared_ptr<HitObject>> buffer_preview_objects;
+
   // 区域
   // 编辑区
   QRectF edit_area;
@@ -75,13 +78,17 @@ class MapWorkspaceCanvas : public GLCanvas {
   double judgeline_position{0.16};
 
   // 信息区宽度倍率:实际宽度为总宽度*preview_width_scale
-  double infoarea_width_scale{0.22};
+  double infoarea_width_scale{0.16};
 
   // 预览区宽度倍率:实际宽度为总宽度*preview_width_scale
   double preview_width_scale{0.22};
 
   // 预览区时间倍率:实际时间范围为当前时间范围*preview_time_scale
   double preview_time_scale{10.0};
+
+  // 上一次编辑区绘制的时间区域
+  double current_time_area_start{0.0};
+  double current_time_area_end{0.0};
 
   // 绘制判定线
   void draw_judgeline();
@@ -128,9 +135,6 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 背景暗化
   double background_darken_ratio{0.55};
-
-  // 物件尺寸缩放--相对于纹理尺寸
-  double object_size_scale{0.7};
 
   // 时间线缩放-- n * 1px/1ms
   double timeline_zoom{1.2};
