@@ -11,6 +11,7 @@
 
 #include "../Beat.h"
 #include "../hitobject/HitObject.h"
+#include "../hitobject/Note/Hold.h"
 #include "../timing/Timing.h"
 
 enum class MapType {
@@ -59,6 +60,9 @@ class MMap {
   // 全部物件
   std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> hitobjects;
 
+  // 用于识别重叠时间域的长条物件缓存表
+  std::multiset<std::shared_ptr<Hold>> temp_hold_list;
+
   // timing比较器
   struct TimingComparator {
     bool operator()(const std::shared_ptr<Timing>& a,
@@ -97,6 +101,9 @@ class MMap {
   // 有序的添加timing-会分析并更新拍
   virtual void insert_timing(std::shared_ptr<Timing> timing);
 
+  // 移除timing-会分析并更新拍
+  virtual void remove_timing(std::shared_ptr<Timing> timing);
+
   // 查询指定位置附近的timing(优先在此之前,没有之前找之后)
   virtual void query_around_timing(
       std::vector<std::shared_ptr<Timing>>& timings, int32_t time);
@@ -114,7 +121,7 @@ class MMap {
   // 查询区间内有的物件
   virtual void query_object_in_range(
       std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-      int32_t end);
+      int32_t end, bool with_longhold = false);
 };
 
 #endif  // M_MAP_H

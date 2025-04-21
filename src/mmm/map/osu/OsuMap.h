@@ -349,9 +349,6 @@ class OsuMap : public MMap {
    */
   std::vector<int32_t> SliderBorder;
 
-  // 用于识别重叠时间域的长条物件缓存表
-  std::multiset<std::shared_ptr<OsuHold>> temp_hold_list;
-
   // 从文件读取谱面
   void load_from_file(const char* path) override;
 };

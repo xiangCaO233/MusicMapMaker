@@ -64,7 +64,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   std::shared_ptr<Timing> current_abs_timing;
 
   // 当前页面的拍
-  std::vector<Beat> current_beats;
+  std::vector<std::shared_ptr<Beat>> current_beats;
 
   // 滚动倍率
   double scroll_ratio{1.0};

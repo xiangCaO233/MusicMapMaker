@@ -82,20 +82,20 @@ int main(int argc, char* argv[]) {
   QSurfaceFormat::setDefaultFormat(format);
 #endif  //__APPLE__
 
-  // MainWindow w;
-  // w.show();
+  MainWindow w;
+  w.show();
 
-  auto map = std::make_shared<OsuMap>();
+  // auto map = std::make_shared<OsuMap>();
 
-  map->load_from_file(
-      "../resources/map/Designant - Designant/Designant - Designant. "
-      "(Benson_) [Designant].osu");
+  // map->load_from_file(
+  //     "../resources/map/Designant - Designant/Designant - Designant. "
+  //     "(Benson_) [Designant].osu");
 
-  std::shared_ptr<Timing> speedtiming = std::make_shared<OsuTiming>();
-  // speedtiming->timestamp = 90473;
-  // speedtiming->is_base_timing = false;
-  // speedtiming->basebpm = 100;
-  // speedtiming->bpm = 3.0;
+  // std::shared_ptr<Timing> speedtiming = std::make_shared<OsuTiming>();
+  //  speedtiming->timestamp = 90473;
+  //  speedtiming->is_base_timing = false;
+  //  speedtiming->basebpm = 100;
+  //  speedtiming->bpm = 3.0;
 
   // std::shared_ptr<Timing> speedtiming2 = std::make_shared<OsuTiming>();
   // speedtiming2->timestamp = 90623;

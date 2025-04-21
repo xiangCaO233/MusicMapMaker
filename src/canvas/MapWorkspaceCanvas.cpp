@@ -87,6 +87,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   GLCanvas::wheelEvent(event);
   auto unit = event->angleDelta().y() / 120 * timeline_zoom * height() / 20.0;
   current_time_stamp += unit * scroll_ratio;
+  // qDebug() << "current time:" << current_time_stamp;
   emit current_time_stamp_changed(current_time_stamp);
 }
 
@@ -146,8 +147,9 @@ void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
 // 更新画布
 void MapWorkspaceCanvas::update_canvas() {
   if (!working_map) return;
-  auto current_size = size();
   // 当前有绑定图
+  auto current_size = size();
+
   // 读取获取当前时间附近的timings
   std::vector<std::shared_ptr<Timing>> temp_timings;
   working_map->query_around_timing(temp_timings, current_time_stamp);
@@ -157,6 +159,7 @@ void MapWorkspaceCanvas::update_canvas() {
     return;
   }
 
+  // 更新参考绝对timing
   for (const auto &timing : temp_timings) {
     switch (timing->type) {
       case TimingType::OSUTIMING: {
@@ -181,8 +184,6 @@ void MapWorkspaceCanvas::update_canvas() {
     }
   }
 
-  // 清除物件缓存
-  buffer_objects.clear();
   // 使用timing计算时间
   // 每拍时间
   auto beattime = 60.0 / current_abs_timing->bpm * 1000.0;
@@ -197,34 +198,30 @@ void MapWorkspaceCanvas::update_canvas() {
       int((current_time_stamp - current_abs_timing->timestamp) / beattime - 1);
 
   // 当前处理到的时间
-  int process_time = current_abs_timing->timestamp + beat_count * beattime;
+  double from_time = current_abs_timing->timestamp + beat_count * beattime;
+  double to_time = current_abs_timing->timestamp + beat_count * beattime;
 
   // 拍距离判定线距离从下往上--反转
   // 拍起始位置
-  double distance = std::fabs(process_time - current_time_stamp);
+  double distance = std::fabs(to_time - current_time_stamp);
   auto processing_pos = judgeline_pos + (distance * timeline_zoom);
-  int32_t beat_index = 0;
+
   while (processing_pos > -beattime) {
-    Beat beat(current_abs_timing->bpm, process_time, process_time + beattime,
-              4);
-    if (current_beats.size() > beat_index) {
-      if (current_beats[beat_index] != beat) {
-        // 不同,更新
-        current_beats[beat_index] = beat;
-      }
-    } else {
-      // 不足,添加
-      current_beats.emplace_back(beat);
-    }
-
-    // from : process_time,to : process_time + beattime
-    working_map->query_object_in_range(buffer_objects, process_time,
-                                       process_time + beattime);
-
-    process_time += beattime;
+    to_time += beattime;
     processing_pos -= beat_distance;
-    beat_index++;
   }
+
+  // 更新拍列表
+  // 清除拍缓存
+  current_beats.clear();
+  working_map->query_beat_in_range(current_beats, int32_t(from_time),
+                                   int32_t(to_time));
+  // 更新物件列表
+  // 清除物件缓存
+  buffer_objects.clear();
+  working_map->query_object_in_range(buffer_objects, int32_t(from_time),
+                                     int32_t(to_time), true);
+
   if (!pasue) {
     // 未暂停,更新当前时间戳
     current_time_stamp += timer_update_time;
@@ -309,16 +306,16 @@ void MapWorkspaceCanvas::draw_beats() {
   for (const auto &beat : current_beats) {
     // 每拍时间*时间线缩放=拍距
     double beat_distance =
-        60.0 / beat.bpm * 1000.0 * timeline_zoom * speed_zoom;
+        60.0 / beat->bpm * 1000.0 * timeline_zoom * speed_zoom;
 
     // 分拍间距
-    double divisor_distance = beat_distance / beat.divisors;
+    double divisor_distance = beat_distance / beat->divisors;
 
     // 判定线位置
     auto judgeline_pos = current_size.height() * (1.0 - judgeline_position);
 
     // 拍起始时间
-    auto &beat_start_time = beat.start_timestamp;
+    auto &beat_start_time = beat->start_timestamp;
 
     // 拍距离判定线距离从下往上--反转
     // 当前拍起始位置
@@ -329,14 +326,14 @@ void MapWorkspaceCanvas::draw_beats() {
     // 获取主题
     bool has_theme{false};
     std::vector<QColor> color_theme;
-    auto color_theme_it = divisors_color_theme.find(beat.divisors);
+    auto color_theme_it = divisors_color_theme.find(beat->divisors);
     if (color_theme_it != divisors_color_theme.end()) {
       has_theme = true;
       color_theme = color_theme_it->second;
     }
 
     // 绘制小节线
-    for (int i = 0; i < beat.divisors; i++) {
+    for (int i = 0; i < beat->divisors; i++) {
       // 小节线的位置
       double divisor_pos = beat_start_pos - i * divisor_distance;
       if (divisor_pos >= -beat_distance &&
@@ -351,7 +348,7 @@ void MapWorkspaceCanvas::draw_beats() {
         }
 
         if (beat_start_time +
-                i * (beat.end_timestamp - beat_start_time) / beat.divisors >=
+                i * (beat->end_timestamp - beat_start_time) / beat->divisors >=
             current_abs_timing->timestamp) {
           if (i == 0) {
             // 小节线头画粗一点
@@ -379,47 +376,47 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
   auto current_size = size();
   // 声明+预分配内存
-  std::vector<std::shared_ptr<Note>> temp_notes;
-  std::vector<std::shared_ptr<Hold>> temp_holds;
-  temp_notes.reserve(buffer_objects.size());
-  temp_holds.reserve(buffer_objects.size());
+  // std::vector<std::shared_ptr<Note>> temp_notes;
+  // std::vector<std::shared_ptr<Hold>> temp_holds;
+  // temp_notes.reserve(buffer_objects.size());
+  // temp_holds.reserve(buffer_objects.size());
 
-  // 检查缓冲区,取出需要渲染的物件
-  for (int i = 0; i < buffer_objects.size(); i++) {
-    // 区分面尾物件
-    if (buffer_objects[i]->is_hold_end) {
-      // 找出面尾的头
-      auto head =
-          std::dynamic_pointer_cast<HoldEnd>(buffer_objects[i])->reference;
-      // 判重(面头面尾同时在可视范围内)
-      bool added{false};
-      for (const auto &hold : temp_holds) {
-        if (hold == head) {
-          added = true;
-        }
-      }
-      if (!added) {
-        temp_holds.emplace_back(head);
-        temp_notes.emplace_back(head);
-      }
-    } else {
-      // 非面尾可转为Note
-      auto note = std::dynamic_pointer_cast<Note>(buffer_objects[i]);
-      // 直接使用
-      if (note->note_type == NoteType::HOLD) {
-        auto hold = std::dynamic_pointer_cast<Hold>(buffer_objects[i]);
-        temp_holds.emplace_back(hold);
-      }
-      temp_notes.emplace_back(note);
-    }
-  }
+  // // 检查缓冲区,取出需要渲染的物件
+  // for (int i = 0; i < buffer_objects.size(); i++) {
+  //   // 区分面尾物件
+  //   if (buffer_objects[i]->is_hold_end) {
+  //     // 找出面尾的头
+  //     auto head =
+  //         std::dynamic_pointer_cast<HoldEnd>(buffer_objects[i])->reference;
+  //     // 判重(面头面尾同时在可视范围内)
+  //     bool added{false};
+  //     for (const auto &hold : temp_holds) {
+  //       if (hold == head) {
+  //         added = true;
+  //       }
+  //     }
+  //     if (!added) {
+  //       temp_holds.emplace_back(head);
+  //       temp_notes.emplace_back(head);
+  //     }
+  //   } else {
+  //     // 非面尾可转为Note
+  //     auto note = std::dynamic_pointer_cast<Note>(buffer_objects[i]);
+  //     // 直接使用
+  //     if (note->note_type == NoteType::HOLD) {
+  //       auto hold = std::dynamic_pointer_cast<Hold>(buffer_objects[i]);
+  //       temp_holds.emplace_back(hold);
+  //     }
+  //     temp_notes.emplace_back(note);
+  //   }
+  // }
 
-  // 重新排序
-  std::sort(temp_notes.begin(), temp_notes.end(),
-            [](const std::shared_ptr<HitObject> &h1,
-               const std::shared_ptr<HitObject> &h2) {
-              return (*h1).timestamp < (*h2).timestamp;
-            });
+  // // 重新排序
+  // std::sort(temp_notes.begin(), temp_notes.end(),
+  //           [](const std::shared_ptr<HitObject> &h1,
+  //              const std::shared_ptr<HitObject> &h2) {
+  //             return (*h1).timestamp < (*h2).timestamp;
+  //           });
 
   // TODO(xiang 2025-04-15): 执行渲染
   switch (working_map->maptype) {
@@ -442,7 +439,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
       auto &long_note_end_texture_white =
           texture_full_map["hitobject/ArrowHoldEndw.png"];
 
-      for (const auto &note : temp_notes) {
+      for (const auto &obj : buffer_objects) {
+        auto note = std::static_pointer_cast<Note>(obj);
         // 粉白
         std::shared_ptr<TextureInstace> head_texture;
         std::shared_ptr<TextureInstace> long_note_body_texture;
@@ -602,6 +600,6 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   }
 
   // 重置谱面时间
-  current_time_stamp = 0;
+  current_time_stamp = 1057.19;
   emit current_time_stamp_changed(0);
 }

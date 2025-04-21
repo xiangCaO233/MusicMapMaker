@@ -1,5 +1,6 @@
 #include "MMap.h"
 
+#include <algorithm>
 #include <memory>
 
 #include "../../util/mutil.h"
@@ -228,10 +229,44 @@ void MMap::insert_timing(std::shared_ptr<Timing> timing) {
   }
 }
 
+// 移除timing-会分析并更新拍
+void MMap::remove_timing(std::shared_ptr<Timing> timing) {}
+
 // 查询指定位置附近的同时间点timing列表(优先在此之前,没有之前找之后)
 void MMap::query_around_timing(
     std::vector<std::shared_ptr<Timing>>& result_timings, int32_t time) {
   if (timings.empty()) return;
+  // 查找到第一个大于等于此时间的timing迭代器
+  auto it = std::upper_bound(
+      timings.begin(), timings.end(), time,
+      [](int time, const auto& timing) { return timing->timestamp >= time; });
+
+  // 确定使用的timing
+  std::shared_ptr<Timing> res;
+  if (it == timings.end()) {
+    // 没找到比当前时间靠后的timing
+    // 使用最后一个timing
+    it = timings.end();
+    it--;
+  } else {
+    // 找到了比当前时间靠后的timing
+    if (it == timings.begin()) {
+      // 找到的是第一个
+      // 就使用这个timing
+    } else {
+      // 使用前一个
+      it--;
+    }
+  }
+  res = *it;
+
+  // 查找重复时间点的timing表
+  auto timing_list_it = temp_timing_map.find(res->timestamp);
+
+  // 添加到传入引用
+  for (const auto& timing : timing_list_it->second) {
+    result_timings.emplace_back(timing);
+  }
 }
 
 // 查询区间窗口内的timing
@@ -239,7 +274,7 @@ void MMap::query_timing_in_range(
     std::vector<std::shared_ptr<Timing>>& result_timings, int32_t start,
     int32_t end) {}
 
-// 查询区间窗口内的拍
+// 查询时间区间窗口内的拍
 void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
                                int32_t start, int32_t end) {
   result_beats.clear();
@@ -258,15 +293,46 @@ void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
 // 查询区间窗口内有的物件
 void MMap::query_object_in_range(
     std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-    int32_t end) {
+    int32_t end, bool with_longhold) {
   /*
    *lower_bound(key)	返回第一个 ≥ key 的元素的迭代器。
    *upper_bound(key)	返回第一个 > key 的元素的迭代器。
    */
+  if (with_longhold) {
+    // 带超级长条
+    // 只要面尾时间>窗口起始时间就加入列表
+    for (const auto& hold : temp_hold_list) {
+      if (hold->timestamp + hold->hold_time > start) {
+        result_objects.emplace_back(hold);
+      }
+    }
+  }
+
+  // 窗口内的物件
   auto startit = hitobjects.lower_bound(std::make_shared<Note>(start));
 
   for (; startit != hitobjects.end() && (*startit)->timestamp < end;
        startit++) {
-    result_objects.emplace_back(*startit);
+    // 查重
+    if ((*startit)->object_type == HitObjectType::HOLD ||
+        (*startit)->object_type == HitObjectType::OSUHOLD) {
+      bool added{false};
+      for (const auto& obj : result_objects)
+        if (obj.get() == (*startit).get()) added = true;
+      if (!added) {
+        // 窗口内的没加入过的长条
+        result_objects.emplace_back(*startit);
+      }
+    } else {
+      // 窗口内的非长条物件
+      result_objects.emplace_back(*startit);
+    }
   }
+
+  // 防止乱序再排一个
+  std::sort(
+      result_objects.begin(), result_objects.end(),
+      [](std::shared_ptr<HitObject>& ho1, std::shared_ptr<HitObject>& ho2) {
+        return ho1->timestamp < ho2->timestamp;
+      });
 }
