@@ -6,6 +6,7 @@
 #include <qpoint.h>
 
 #include <cstddef>
+#include <filesystem>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -70,6 +71,9 @@ class GLCanvas : public QOpenGLWidget,
 
   // 添加纹理
   void add_texture(const char *path);
+
+  // 添加纹理
+  void add_texture(std::filesystem::path &path);
 
   // 设置垂直同步
   void set_Vsync(bool flag);

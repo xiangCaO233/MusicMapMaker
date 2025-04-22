@@ -17,6 +17,7 @@
 #include <QTextStream>
 #include <QTimer>
 #include <chrono>
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -322,10 +323,14 @@ void GLCanvas::set_Vsync(bool flag) {
   context()->format().setSwapInterval(flag);
 }
 
-// 添加纹理
 void GLCanvas::add_texture(const char *qrc_path) {
+  std::filesystem::path p(qrc_path);
+  add_texture(p);
+}
+// 添加纹理
+void GLCanvas::add_texture(std::filesystem::path &path) {
   // 初始化纹理
-  auto texture = std::make_shared<TextureInstace>(qrc_path);
+  auto texture = std::make_shared<TextureInstace>(path);
 
   // 检查纹理是否已载入过
   auto texit = texture_full_map.find(texture->name);

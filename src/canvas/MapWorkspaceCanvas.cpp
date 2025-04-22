@@ -835,7 +835,7 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
 
   if (map) {
     // 加载背景图纹理
-    add_texture(map->bg_path.string().c_str());
+    add_texture(map->bg_path);
   }
 
   // 重置谱面时间
