@@ -12,6 +12,7 @@ class MProjectController;
 
 class MapWorkProject;
 class MMap;
+class XAudioManager;
 
 class MProjectController : public QWidget {
   Q_OBJECT
@@ -24,6 +25,15 @@ class MProjectController : public QWidget {
   explicit MProjectController(QWidget *parent = nullptr);
 
   ~MProjectController();
+
+  // 设备同步锁
+  bool device_sync_lock{false};
+
+  // 音频管理器引用
+  std::shared_ptr<XAudioManager> audio_manager_reference;
+
+  // 当前选中的制谱工程
+  std::shared_ptr<MapWorkProject> selected_project{nullptr};
 
   // 制谱工程列表
   std::vector<std::shared_ptr<MapWorkProject>> project_list;
@@ -71,6 +81,9 @@ class MProjectController : public QWidget {
 
   // 关闭项目事件
   void on_close_project_button_clicked();
+
+  // 为项目选择音频输出设备事件
+  void on_audio_device_selector_currentTextChanged(const QString &arg1);
 
  private:
   Ui::MProjectController *ui;

@@ -1,9 +1,13 @@
 #include "MapWorkspaceCanvas.h"
 
+#include <qlogging.h>
 #include <qnamespace.h>
 #include <qpaintdevice.h>
+#include <qtimer.h>
 #include <qtmetamacros.h>
+#include <unistd.h>
 
+#include <QKeyEvent>
 #include <QTimer>
 #include <QWheelEvent>
 #include <algorithm>
@@ -11,16 +15,20 @@
 #include <cstdint>
 #include <memory>
 #include <set>
+#include <string>
+#include <thread>
 #include <vector>
 
+#include "../mmm/MapWorkProject.h"
+#include "../mmm/hitobject/HitObject.h"
 #include "../mmm/hitobject/Note/Hold.h"
 #include "../mmm/hitobject/Note/HoldEnd.h"
 #include "../mmm/hitobject/Note/Note.h"
 #include "../mmm/map/osu/OsuMap.h"
 #include "../mmm/timing/Timing.h"
-#include "mmm/hitobject/HitObject.h"
-#include "src/mmm/timing/osu/OsuTiming.h"
-#include "util/mutil.h"
+#include "../mmm/timing/osu/OsuTiming.h"
+#include "../util/mutil.h"
+#include "colorful-log.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   QColor white(255, 255, 255, 240);
@@ -49,16 +57,42 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(red);
   t4.emplace_back(blue);
 
-  // 初始化定时器--绑定updatecanvas函数
+  // refresh_timer = new QTimer(this);
+  // auto timer = new QTimer(this);
+  // QObject::connect(timer, &QTimer::timeout, [this]() { update(); });
+  // timer->start(8);
+
+  // 初始化定时器
   refresh_timer = new QTimer(this);
-  QObject::connect(refresh_timer, &QTimer::timeout,
-                   [this]() { this->update_canvas(); });
-  refresh_timer->start(timer_update_time);
+  // 设置为高精度定时器
+  refresh_timer->setTimerType(Qt::PreciseTimer);
+  QObject::connect(refresh_timer, &QTimer::timeout, [this]() { update(); });
+  // 获取主屏幕的刷新率
+  QScreen *primaryScreen = QGuiApplication::primaryScreen();
+  float refreshRate = primaryScreen->refreshRate();
+  XINFO("显示器刷新率:" + std::to_string(refreshRate) + "Hz");
+
+  // 垂直同步帧间隔
+  timer_update_time = 8;
+  refresh_timer->setInterval(timer_update_time);
+
+  // 启动高精度定时器
+  refresh_timer->start();
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;
 
 // qt事件
+void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
+  GLCanvas::paintEvent(event);
+
+  static long long lasttime = 0;
+  auto time = std::chrono::duration_cast<std::chrono::microseconds>(
+                  std::chrono::high_resolution_clock::now().time_since_epoch())
+                  .count();
+  XINFO("update time:" + std::to_string(time - lasttime));
+  lasttime = time;
+}
 // 鼠标按下事件
 void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   // 传递事件
@@ -226,6 +260,22 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
 void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
   // 传递事件
   GLCanvas::keyPressEvent(event);
+
+  // 捕获按键
+  auto k = event->text();
+  auto keycode = event->key();
+  if (keycode == 32) {
+    if (!working_map) return;
+
+    if (working_map->project_reference->device->device_name ==
+        "unknown output device") {
+      XWARN("未选择设备,无法切换暂停状态");
+      return;
+    }
+    // 空格
+    pasue = !pasue;
+    emit pause_signal(pasue);
+  }
 }
 
 // 键盘释放事件
@@ -246,18 +296,6 @@ void MapWorkspaceCanvas::focusOutEvent(QFocusEvent *event) {
   GLCanvas::focusOutEvent(event);
 }
 
-// 进入事件
-void MapWorkspaceCanvas::enterEvent(QEnterEvent *event) {
-  // 传递事件
-  GLCanvas::enterEvent(event);
-}
-
-// 退出事件
-void MapWorkspaceCanvas::leaveEvent(QEvent *event) {
-  // 传递事件
-  GLCanvas::leaveEvent(event);
-}
-
 // 调整尺寸事件
 void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
   // 传递事件
@@ -273,105 +311,6 @@ void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
   preview_area.setY(0);
   preview_area.setWidth(width() * preview_width_scale);
   edit_area.setHeight(height());
-}
-
-// 更新画布
-void MapWorkspaceCanvas::update_canvas() {
-  if (!working_map) return;
-  // 当前有绑定图
-  auto current_size = size();
-
-  // 读取获取当前时间附近的timings
-  std::vector<std::shared_ptr<Timing>> temp_timings;
-  working_map->query_around_timing(temp_timings, current_time_stamp);
-
-  if (temp_timings.empty()) {
-    // 未查询到timing-不绘制时间线
-    return;
-  }
-
-  // 更新参考绝对timing
-  for (const auto &timing : temp_timings) {
-    switch (timing->type) {
-      case TimingType::OSUTIMING: {
-        auto otiming = std::static_pointer_cast<OsuTiming>(timing);
-        if (!otiming->is_inherit_timing) {
-          // 非变速timing--存储的实际bpm
-          current_abs_timing = otiming;
-          speed_zoom = 1.0;
-          emit current_absbpm_changed(current_abs_timing->basebpm);
-          emit current_timeline_speed_changed(speed_zoom);
-        } else {
-          // 变速timing--存储的倍速
-          speed_zoom = otiming->bpm;
-          emit current_timeline_speed_changed(speed_zoom);
-        }
-        break;
-      }
-      case TimingType::RMTIMING: {
-        break;
-      }
-      case TimingType::MALODYTIMING: {
-        break;
-      }
-      case TimingType::UNKNOWN:
-        return;
-    }
-  }
-
-  // 使用timing计算时间
-  // 每拍时间
-  auto beattime = 60.0 / current_abs_timing->bpm * 1000.0;
-  // 每拍时间*时间线缩放=拍距
-  double beat_distance = beattime * timeline_zoom * speed_zoom;
-
-  // 判定线位置
-  auto judgeline_pos = current_size.height() * (1.0 - judgeline_position);
-
-  // 距离此timing的拍数-1
-  auto beat_count =
-      int((current_time_stamp - current_abs_timing->timestamp) / beattime - 1);
-
-  // TODO(xiang 2025-04-21):
-  // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
-  // 当前处理的时间范围--大致
-  current_time_area_start =
-      current_abs_timing->timestamp + beat_count * beattime;
-  current_time_area_end = current_abs_timing->timestamp + beat_count * beattime;
-
-  // 拍距离判定线距离从下往上--反转
-  // 拍起始位置
-  double distance = std::fabs(current_time_area_end - current_time_stamp);
-  auto processing_pos = judgeline_pos + (distance * timeline_zoom);
-
-  while (processing_pos > -beattime) {
-    current_time_area_end += beattime;
-    processing_pos -= beat_distance;
-  }
-
-  // 更新拍列表
-  // 清除拍缓存
-  current_beats.clear();
-  working_map->query_beat_in_range(current_beats,
-                                   int32_t(current_time_area_start),
-                                   int32_t(current_time_area_end));
-  // 更新物件列表
-  // 清除物件缓存
-  buffer_objects.clear();
-  working_map->query_object_in_range(buffer_objects,
-                                     int32_t(current_time_area_start),
-                                     int32_t(current_time_area_end), true);
-
-  if (!pasue) {
-    // 未暂停,更新当前时间戳
-    current_time_stamp += timer_update_time;
-  }
-
-  draw_background();
-  draw_beats();
-  draw_hitobject();
-
-  repaint();
 }
 
 // 绘制背景
@@ -628,7 +567,7 @@ void MapWorkspaceCanvas::draw_beats() {
           mutil::format_music_time2u32(timestr, divisor_time);
           renderer_manager->addText(QPointF(4, divisor_pos - 4), timestr, 16,
                                     "ComicShannsMono Nerd Font",
-                                    QColor(255, 182, 193, 240), 0);
+                                    QColor(255, 182, 193, 240), 0, true);
         }
       }
     }
@@ -820,6 +759,103 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
 // 渲染实际图形
 void MapWorkspaceCanvas::push_shape() {
+  if (working_map) {
+    // 当前有绑定图
+    auto current_size = size();
+
+    // 读取获取当前时间附近的timings
+    std::vector<std::shared_ptr<Timing>> temp_timings;
+    working_map->query_around_timing(temp_timings, current_time_stamp);
+
+    if (temp_timings.empty()) {
+      // 未查询到timing-不绘制时间线
+      return;
+    }
+
+    // 更新参考绝对timing
+    for (const auto &timing : temp_timings) {
+      switch (timing->type) {
+        case TimingType::OSUTIMING: {
+          auto otiming = std::static_pointer_cast<OsuTiming>(timing);
+          if (!otiming->is_inherit_timing) {
+            // 非变速timing--存储的实际bpm
+            current_abs_timing = otiming;
+            speed_zoom = 1.0;
+            emit current_absbpm_changed(current_abs_timing->basebpm);
+            emit current_timeline_speed_changed(speed_zoom);
+          } else {
+            // 变速timing--存储的倍速
+            speed_zoom = otiming->bpm;
+            emit current_timeline_speed_changed(speed_zoom);
+          }
+          break;
+        }
+        case TimingType::RMTIMING: {
+          break;
+        }
+        case TimingType::MALODYTIMING: {
+          break;
+        }
+        case TimingType::UNKNOWN:
+          return;
+      }
+    }
+
+    // 使用timing计算时间
+    // 每拍时间
+    auto beattime = 60.0 / current_abs_timing->bpm * 1000.0;
+    // 每拍时间*时间线缩放=拍距
+    double beat_distance = beattime * timeline_zoom * speed_zoom;
+
+    // 判定线位置
+    auto judgeline_pos = current_size.height() * (1.0 - judgeline_position);
+
+    // 距离此timing的拍数-1
+    auto beat_count = int(
+        (current_time_stamp - current_abs_timing->timestamp) / beattime - 1);
+
+    // TODO(xiang 2025-04-21):
+    // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
+    // 当前处理的时间范围--大致
+    current_time_area_start =
+        current_abs_timing->timestamp + beat_count * beattime;
+    current_time_area_end =
+        current_abs_timing->timestamp + beat_count * beattime;
+
+    // 拍距离判定线距离从下往上--反转
+    // 拍起始位置
+    double distance = std::fabs(current_time_area_end - current_time_stamp);
+    auto processing_pos = judgeline_pos + (distance * timeline_zoom);
+
+    while (processing_pos > -beattime) {
+      current_time_area_end += beattime;
+      processing_pos -= beat_distance;
+    }
+
+    // 更新拍列表
+    // 清除拍缓存
+    current_beats.clear();
+    working_map->query_beat_in_range(current_beats,
+                                     int32_t(current_time_area_start),
+                                     int32_t(current_time_area_end));
+    // 更新物件列表
+    // 清除物件缓存
+    buffer_objects.clear();
+    working_map->query_object_in_range(buffer_objects,
+                                       int32_t(current_time_area_start),
+                                       int32_t(current_time_area_end), true);
+
+    if (!pasue) {
+      // 未暂停,更新当前时间戳
+      current_time_stamp += timer_update_time;
+      emit current_time_stamp_changed(current_time_stamp);
+    }
+
+    draw_background();
+    draw_beats();
+    draw_hitobject();
+  }
+
   draw_preview_content();
 
   draw_judgeline();

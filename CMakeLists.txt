@@ -105,6 +105,8 @@ set(PROJECT_SOURCES
   src/ui/infoui/minfo.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
+	src/canvas/FrameRateCounter.h
+	src/canvas/FrameRateCounter.cpp
   src/canvas/MapWorkspaceCanvas.h
   src/canvas/MapWorkspaceCanvas.cpp
   src/canvas/renderer/shader/GLShader.h

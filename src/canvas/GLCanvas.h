@@ -2,8 +2,10 @@
 #define GLCANVAS_H
 
 #include <QtOpenGLWidgets/qopenglwidget.h>
+#include <qopenglwindow.h>
 #include <qpaintdevice.h>
 #include <qpoint.h>
+#include <qtmetamacros.h>
 
 #include <cstddef>
 #include <filesystem>
@@ -19,13 +21,15 @@
 #include <qwidget.h>
 
 #include <QMatrix4x4>
+#include <QTimer>
 
+#include "FrameRateCounter.h"
 #include "renderer/RendererManager.h"
 
 enum class TexturePoolType;
 class TextureAtlas;
 
-class GLCanvas : public QOpenGLWidget,
+class GLCanvas : public QOpenGLWindow,
 #ifdef __APPLE__
                  // 苹果-opengl4.1
                  public QOpenGLFunctions_4_1_Core
@@ -34,6 +38,7 @@ class GLCanvas : public QOpenGLWidget,
                  public QOpenGLFunctions_4_5_Core
 #endif  //__APPLE__
 {
+  Q_OBJECT
   friend class AbstractRenderer;
   friend class StaticRenderer;
   friend class DynamicRenderer;
@@ -44,9 +49,9 @@ class GLCanvas : public QOpenGLWidget,
   // 析构GLCanvas
   ~GLCanvas() override;
 
-  // 上一次更新fps的时间
-  long pre_update_fps{0};
-  long pre_update_frame_time{100};
+  FrameRateCounter *fpsCounter;
+
+  // 上一帧glcall
   long pre_glcalls{0};
   long pre_drawcall{0};
 
@@ -81,6 +86,13 @@ class GLCanvas : public QOpenGLWidget,
   // 渲染实际图形
   virtual void push_shape();
 
+ public slots:
+  // 更新fps显示
+  void updateFpsDisplay(int fps);
+
+ signals:
+  void update_window_title_suffix(QString &title_suffix);
+
  protected:
   void initializeGL() override;
   void resizeGL(int w, int h) override;
@@ -96,8 +108,6 @@ class GLCanvas : public QOpenGLWidget,
   void keyReleaseEvent(QKeyEvent *event) override;
   void focusInEvent(QFocusEvent *event) override;
   void focusOutEvent(QFocusEvent *event) override;
-  void enterEvent(QEnterEvent *event) override;
-  void leaveEvent(QEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
 };
 

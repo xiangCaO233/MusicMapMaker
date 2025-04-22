@@ -115,7 +115,10 @@ void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
       // TODO(xiang 2025-04-16): 实现打开工程
       std::filesystem::path ppath(click_abs_path.toStdString());
       XINFO("打开项目目录:[" + ppath.string() + "]");
-      auto project = std::make_shared<MapWorkProject>(ppath);
+      auto project =
+          std::make_shared<MapWorkProject>(ppath, audio_manager_reference);
+      // 初始化map的项目引用
+      for (const auto& map : project->maps) map->project_reference = project;
       // 发送信号
       emit open_project(project);
     });

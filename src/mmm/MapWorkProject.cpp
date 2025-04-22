@@ -1,12 +1,11 @@
 #include "MapWorkProject.h"
 
-#include <deque>
+#include <AudioManager.h>
+
 #include <filesystem>
 #include <fstream>
 #include <memory>
-#include <ostream>
 #include <string>
-#include <thread>
 #include <unordered_set>
 
 #include "colorful-log.h"
@@ -16,7 +15,9 @@ using namespace pugi;
 
 // 构造MapWorkProject
 MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
-                               const char* name) {
+                               std::shared_ptr<XAudioManager> audio_manager,
+                               const char* name)
+    : audio_manager_reference(audio_manager) {
   // 初始化项目名
   if (name) {
     config.project_name = std::string(name);
@@ -25,7 +26,6 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
     config.project_name = project_path.filename().string();
   }
 
-  // TODO(xiang 2025-04-16): 实现从目录构造项目
   XINFO("构建项目");
 
   // 读取项目配置文件/没有则创建
@@ -56,6 +56,13 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
     } else if (audio_extention.find(extention) != audio_extention.end()) {
       // 音频文件
       audio_paths.emplace_back(entry.path().string());
+      // 加载音频
+      std::string audio_name;
+      auto audiohandle =
+          audio_manager->loadaudio(entry.path().string(), audio_name);
+
+      audios.try_emplace(audio_name,
+                         (*audio_manager->get_audios()).at(audiohandle));
     } else if (image_extention.find(extention) != image_extention.end()) {
       // 图片文件
       image_paths.emplace_back(entry.path().string());
@@ -63,6 +70,25 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
       // 视频文件
       video_paths.emplace_back(entry.path().string());
     }
+  }
+
+  // 设置谱面的音频引用
+  for (const auto& map : maps) {
+    auto filename = map->audio_file_abs_path.filename().string();
+    // 去除头部空格
+    filename.erase(
+        filename.begin(),
+        std::find_if(filename.begin(), filename.end(),
+                     [](unsigned char ch) { return !std::isspace(ch); }));
+    // 去除尾部空格
+    filename.erase(
+        std::find_if(filename.rbegin(), filename.rend(),
+                     [](unsigned char ch) { return !std::isspace(ch); })
+            .base(),
+        filename.end());
+    auto audio_handle = (*audio_manager->get_handles()).at(filename);
+    auto audio = (*audio_manager->get_audios()).at(audio_handle);
+    map->audio_reference = audio;
   }
 
   // 检查配置文件
@@ -90,7 +116,16 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
   } else {
     // 读取
   }
+
+  // 默认使用unknown设备
+  device = audio_manager->get_outdevices()->at(-1);
 }
 
 // 析构MapWorkProject
 MapWorkProject::~MapWorkProject() = default;
+
+// 设置项目音频输出设备
+void MapWorkProject::set_audio_device(
+    std::shared_ptr<XOutputDevice>& outdevice) {
+  device = outdevice;
+}

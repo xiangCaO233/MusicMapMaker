@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <stack>
 
-#include "mmm/MapWorkProject.h"
+#include "../../mmm/MapWorkProject.h"
 
 enum class GlobalTheme;
 
@@ -22,6 +22,9 @@ class FileBrowserController : public QWidget {
   // 缓存目录
   std::stack<QString> last_path_stack;
   std::stack<QString> next_path_stack;
+
+  // 音频管理器引用
+  std::shared_ptr<XAudioManager> audio_manager_reference;
 
   // 使用主题
   void use_theme(GlobalTheme theme);

@@ -9,6 +9,7 @@
 #include "../../GlobalSettings.h"
 
 class MMap;
+class XAudioManager;
 
 namespace Ui {
 class MEditorArea;
@@ -23,6 +24,9 @@ class MEditorArea : public QWidget {
 
   // 当前主题
   GlobalTheme current_theme;
+
+  // 音频管理器
+  std::shared_ptr<XAudioManager> audio_manager;
 
   // 锁定模式-不自动切换
   bool lock_mode_auto_switch{false};
@@ -40,8 +44,10 @@ class MEditorArea : public QWidget {
   // 切换map信号
   void switched_map(std::shared_ptr<MMap> &map);
 
- private slots:
+  // 进度条移动信号
+  void progress_pos_changed(double ratio);
 
+ private slots:
   // 画布时间变化事件
   void on_canvas_timestamp_changed(double time);
 

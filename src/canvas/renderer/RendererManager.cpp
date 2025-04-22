@@ -330,7 +330,8 @@ void RendererManager::addLine(const QPointF& p1, const QPointF& p2,
 // 添加文本
 void RendererManager::addText(const QPointF& pos, const std::u32string& text,
                               float font_size, const std::string font_family,
-                              const QColor& fill_color, float rotation) {
+                              const QColor& fill_color, float rotation,
+                              bool is_volatile) {
   uint32_t xoffset = 0;
   // 在队尾直接生成渲染指令
   for (int i = 0; i < text.size(); i++) {
@@ -339,7 +340,7 @@ void RendererManager::addText(const QPointF& pos, const std::u32string& text,
     font_renderer->get_character_glyph(t.font_family, t.font_size, t.character,
                                        glyph);
     // 逐字符生成渲染指令
-    command_list.emplace_back(true, t, false, ShapeType::TEXT,
+    command_list.emplace_back(true, t, is_volatile, ShapeType::TEXT,
                               QRectF(pos.x() + xoffset, pos.y(), 0, 0),
                               rotation, fill_color, 0.0f, nullptr,
                               texture_effect, texture_alignmode,

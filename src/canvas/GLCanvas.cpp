@@ -9,6 +9,7 @@
 #include <qpaintdevice.h>
 #include <qpainter.h>
 #include <qpoint.h>
+#include <qtmetamacros.h>
 #include <qtypes.h>
 
 #include <QFile>
@@ -40,10 +41,16 @@
 
 bool GLCanvas::need_update_sampler_location = false;
 
-GLCanvas::GLCanvas(QWidget *parent) : QOpenGLWidget(parent) {
+GLCanvas::GLCanvas(QWidget *parent) {
   // 启用鼠标跟踪
-  setMouseTracking(true);
+  // setMouseTracking(true);
   // setUpdateBehavior(QOpenGLWidget::PartialUpdate);
+  // 初始化帧率计数器
+  fpsCounter = new FrameRateCounter();
+
+  // 更新fps显示内容
+  connect(fpsCounter, &FrameRateCounter::fpsUpdated, this,
+          &GLCanvas::updateFpsDisplay);
 }
 
 GLCanvas::~GLCanvas() {
@@ -51,29 +58,38 @@ GLCanvas::~GLCanvas() {
   if (renderer_manager) delete renderer_manager;
 };
 
+// 更新fps显示
+void GLCanvas::updateFpsDisplay(int fps) {
+  QString title_suffix = QString("%1 FPS(glcall:%2/drawcall:%3)")
+                             .arg(fps)
+                             .arg(XLogger::glcalls)
+                             .arg(XLogger::drawcalls);
+  emit update_window_title_suffix(title_suffix);
+}
+
 // qt事件
 // 鼠标按下事件
 void GLCanvas::mousePressEvent(QMouseEvent *event) {
   // 传递事件
-  QOpenGLWidget::mousePressEvent(event);
+  QOpenGLWindow::mousePressEvent(event);
 }
 
 // 鼠标释放事件
 void GLCanvas::mouseReleaseEvent(QMouseEvent *event) {
   // 传递事件
-  QOpenGLWidget::mouseReleaseEvent(event);
+  QOpenGLWindow::mouseReleaseEvent(event);
 }
 
 // 鼠标双击事件
 void GLCanvas::mouseDoubleClickEvent(QMouseEvent *event) {
   // 传递事件
-  QOpenGLWidget::mouseDoubleClickEvent(event);
+  QOpenGLWindow::mouseDoubleClickEvent(event);
 }
 
 // 鼠标移动事件
 void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
-  QOpenGLWidget::mouseMoveEvent(event);
+  QOpenGLWindow::mouseMoveEvent(event);
   mouse_pos = event->pos();
   // repaint();
 }
@@ -81,49 +97,37 @@ void GLCanvas::mouseMoveEvent(QMouseEvent *event) {
 // 鼠标滚动事件
 void GLCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
-  QOpenGLWidget::wheelEvent(event);
+  QOpenGLWindow::wheelEvent(event);
 }
 
 // 键盘按下事件
 void GLCanvas::keyPressEvent(QKeyEvent *event) {
   // 传递事件
-  QOpenGLWidget::keyPressEvent(event);
+  QOpenGLWindow::keyPressEvent(event);
 }
 
 // 键盘释放事件
 void GLCanvas::keyReleaseEvent(QKeyEvent *event) {
   // 传递事件
-  QOpenGLWidget::keyReleaseEvent(event);
+  QOpenGLWindow::keyReleaseEvent(event);
 }
 
 // 取得焦点事件
 void GLCanvas::focusInEvent(QFocusEvent *event) {
   // 传递事件
-  QOpenGLWidget::focusInEvent(event);
+  QOpenGLWindow::focusInEvent(event);
 }
 
 // 失去焦点事件
 void GLCanvas::focusOutEvent(QFocusEvent *event) {
   // 传递事件
-  QOpenGLWidget::focusOutEvent(event);
-}
-
-// 进入事件
-void GLCanvas::enterEvent(QEnterEvent *event) {
-  // 传递事件
-  QOpenGLWidget::enterEvent(event);
-}
-
-// 退出事件
-void GLCanvas::leaveEvent(QEvent *event) {
-  // 传递事件
-  QOpenGLWidget::leaveEvent(event);
+  QOpenGLWindow::focusOutEvent(event);
 }
 
 // 调整尺寸事件
 void GLCanvas::resizeEvent(QResizeEvent *event) {
   // 传递事件
-  QOpenGLWidget::resizeEvent(event);
+  QOpenGLWindow::resizeEvent(event);
 }
 
 void GLCanvas::initializeGL() {
@@ -164,8 +168,9 @@ void GLCanvas::initializeGL() {
   context()->format().setSamples(maxSamples);
 
   XINFO("启用垂直同步");
+
   // 启用V-Sync
-  context()->format().setSwapInterval(0);
+  context()->format().setSwapInterval(1);
 
   // 检查最大ubo size
   int maxUBOSize;
@@ -212,7 +217,6 @@ void GLCanvas::resizeGL(int w, int h) {
 
 // 绘制画布
 void GLCanvas::paintGL() {
-  static long pre_frame_time = 100;
   XLogger::glcalls = 0;
   XLogger::drawcalls = 0;
   auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -222,58 +226,6 @@ void GLCanvas::paintGL() {
 
   // 执行渲染
   push_shape();
-
-  // DEBUG
-  // renderer_manager->addRect(QRectF(30, 30, 160, 90),
-  // texture_full_map["bg.jpg"],
-  //                           QColor(0, 0, 0, 255), 0, false);
-  // renderer_manager->addRect(QRectF(100, 100, 128, 30), nullptr,
-  //                           QColor(255, 255, 255, 255), 0, true);
-
-  auto theoretical_fps = std::to_string(
-      int(std::round(1.0 / (((float)pre_update_frame_time) / 1000000.0))));
-  auto glcall = std::to_string(pre_glcalls);
-  auto drawcall = std::to_string(pre_drawcall);
-// 创建 UTF-8 到 UTF-32 的转换器
-#ifdef _WIN32
-  // 使用 Windows API 转换
-  std::u32string fpsstr = mutil::utf8_to_utf32(theoretical_fps);
-  std::u32string glcallstr = mutil::utf8_to_utf32(glcall);
-  std::u32string drawcallstr = mutil::utf8_to_utf32(drawcall);
-#else
-  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-  std::u32string fpsstr = converter.from_bytes(theoretical_fps);
-  std::u32string glcallstr = converter.from_bytes(glcall);
-  std::u32string drawcallstr = converter.from_bytes(drawcall);
-#endif  //_WIN32
-  if (std::chrono::duration_cast<std::chrono::milliseconds>(before).count() -
-          pre_update_fps >
-      200) {
-    pre_update_frame_time = pre_frame_time;
-    pre_update_fps =
-        std::chrono::duration_cast<std::chrono::milliseconds>(before).count();
-  }
-  fpsstr = fpsstr + U"fps";
-  glcallstr = U"glcalls:" + glcallstr;
-  drawcallstr = U"drawcalls:" + drawcallstr;
-  renderer_manager->addText(QPointF(0, 30), fpsstr, 24,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
-  renderer_manager->addText(QPointF(0, 56), glcallstr, 24,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
-  renderer_manager->addText(QPointF(0, 82), drawcallstr, 24,
-                            "ComicShannsMono Nerd Font", QColor(255, 183, 197),
-                            0.0f);
-
-  // QRectF rec(100, 100, 200, 200);
-
-  // renderer_manager->addRect(rec, texture_full_map["yuanchou.png"],
-  //                           QColor(255, 255, 255), 0.0f, true);
-
-  // renderer_manager->addLine(QPointF(0, 0), QPointF(200, 200), 20.0f, nullptr,
-  //                           QColor(0, 0, 0, 255), true);
-
   renderer_manager->renderAll();
 
   auto after = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -281,8 +233,11 @@ void GLCanvas::paintGL() {
       std::chrono::duration_cast<std::chrono::microseconds>(after - before)
           .count();
 
+  // XINFO("frame_time:" + std::to_string(pre_frame_time));
+
   pre_glcalls = XLogger::glcalls;
   pre_drawcall = XLogger::drawcalls;
+  fpsCounter->frameRendered();
 }
 
 // 渲染实际图形

@@ -2,6 +2,7 @@
 
 #include <qlogging.h>
 #include <qobject.h>
+#include <qtmetamacros.h>
 
 #include <QVBoxLayout>
 #include <memory>
@@ -27,16 +28,11 @@ MainWindow::MainWindow(QWidget* parent)
   qRegisterMetaType<std::shared_ptr<MapWorkProject>>(
       "std::shared_ptr<MapWorkProject>");
 
-  // 初始化音频管理器
-  audio_manager = XAudioManager::newmanager();
-
-  // 更新设备列表
-  auto devices = audio_manager->get_outdevices();
-  for (const auto& [device_id, device] : *devices) {
-    ui->audio_device_selector->addItem(
-        QString::fromStdString(device->device_name),
-        QVariant::fromValue(device));
-  }
+  // 传递音频管理器引用
+  ui->file_controller->audio_manager_reference =
+      ui->page_widget->audio_manager_reference;
+  ui->project_controller->audio_manager_reference =
+      ui->page_widget->audio_manager_reference;
 
   // 默认使用Dark主题
   use_theme(GlobalTheme::DARK);
@@ -106,11 +102,4 @@ void MainWindow::use_theme(GlobalTheme theme) {
 
   // 设置page主题
   ui->page_widget->use_theme(theme);
-}
-
-// 选择音频输出设备事件
-void MainWindow::on_audio_device_selector_currentIndexChanged(int index) {
-  // 获取并设置当前选中的音频设备
-  auto data = ui->audio_device_selector->currentData();
-  current_use_device = data.value<std::shared_ptr<XOutputDevice>>();
 }

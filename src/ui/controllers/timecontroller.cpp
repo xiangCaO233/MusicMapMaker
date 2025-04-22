@@ -3,6 +3,7 @@
 #include "../../mmm/map/MMap.h"
 #include "../../util/mutil.h"
 #include "../GlobalSettings.h"
+#include "AudioManager.h"
 #include "ui_timecontroller.h"
 
 TimeController::TimeController(QWidget *parent)
@@ -27,7 +28,7 @@ void TimeController::use_theme(GlobalTheme theme) {
     }
   }
 
-  // 设置工具栏按钮图标颜色
+  // 设置按钮图标颜色
   mutil::set_button_svgcolor(ui->pausebutton, ":/icons/play.svg",
                              file_button_color, 16, 16);
   mutil::set_button_svgcolor(ui->fastbackward, ":/icons/backward.svg",
@@ -38,7 +39,61 @@ void TimeController::use_theme(GlobalTheme theme) {
                              file_button_color, 16, 16);
   mutil::set_button_svgcolor(ui->resetspeedbutton, ":/icons/bolt.svg",
                              file_button_color, 16, 16);
+
+  mutil::set_button_svgcolor(ui->reset_global_volume_button,
+                             ":/icons/volume-high.svg", file_button_color, 16,
+                             16);
+  mutil::set_button_svgcolor(ui->reset_music_volume_button, ":/icons/music.svg",
+                             file_button_color, 16, 16);
+
+  mutil::set_button_svgcolor(ui->reset_effect_volume_button,
+                             ":/icons/effect.svg", file_button_color, 16, 16);
 }
+
+// 更新全局音量按钮(主题)
+void TimeController::update_global_volume_button() {
+  QColor button_color;
+  switch (current_theme) {
+    case GlobalTheme::DARK: {
+      button_color = QColor(255, 255, 255);
+      break;
+    }
+    case GlobalTheme::LIGHT: {
+      button_color = QColor(0, 0, 0);
+      break;
+    }
+  }
+  auto current_global_volume = ui->global_volume_slider->value();
+  mutil::set_button_svgcolor(
+      ui->reset_global_volume_button,
+      (current_global_volume > 50
+           ? ":/icons/volume-high.svg"
+           : (current_global_volume > 0 ? ":/icons/volume-low.svg"
+                                        : ":/icons/volume-off.svg")),
+      button_color, 16, 16);
+}
+
+// 画布暂停槽
+void TimeController::on_canvas_pause(bool paused) {
+  // 更新暂停状态和按钮图标
+  pause = paused;
+  QColor button_color;
+  switch (current_theme) {
+    case GlobalTheme::DARK: {
+      button_color = QColor(255, 255, 255);
+      break;
+    }
+    case GlobalTheme::LIGHT: {
+      button_color = QColor(0, 0, 0);
+      break;
+    }
+  }
+  mutil::set_button_svgcolor(ui->pausebutton,
+                             (pause ? ":/icons/play.svg" : ":/icons/pause.svg"),
+                             button_color, 16, 16);
+  // 切换音频播放状态
+}
+
 // 实时信息变化槽
 // bpm
 void TimeController::on_current_bpm_changed(double bpm) {

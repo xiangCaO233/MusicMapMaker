@@ -96,7 +96,7 @@ class RendererManager {
   // 添加文本
   void addText(const QPointF& pos, const std::u32string& text, float font_size,
                const std::string font_family, const QColor& fill_color,
-               float rotation);
+               float rotation, bool is_volatile = false);
 
   // 添加矩形
   void addRect(const QRectF& rect, std::shared_ptr<TextureInstace> texture,

@@ -13,6 +13,9 @@
 #include "../hitobject/Note/Hold.h"
 #include "../timing/Timing.h"
 
+class XSound;
+class MapWorkProject;
+
 enum class MapType {
   OSUMAP,
   RMMAP,
@@ -38,6 +41,12 @@ class MMap {
 
   // 音频绝对路径
   std::filesystem::path audio_file_abs_path;
+
+  // 音频引用
+  std::shared_ptr<XSound> audio_reference;
+
+  // 项目引用
+  std::shared_ptr<MapWorkProject> project_reference;
 
   // 图类型
   MapType maptype;
@@ -98,7 +107,7 @@ class MMap {
   void erase_beats(double start, double end);
 
   // 有序的添加timing-会分析并更新拍
-  virtual void insert_timing(const std::shared_ptr<Timing> &timing);
+  virtual void insert_timing(const std::shared_ptr<Timing>& timing);
 
   // 移除timing-会分析并更新拍
   virtual void remove_timing(std::shared_ptr<Timing> timing);

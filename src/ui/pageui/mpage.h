@@ -9,6 +9,7 @@
 #include "../../GlobalSettings.h"
 
 class MMap;
+class XAudioManager;
 
 namespace Ui {
 class MPage;
@@ -20,6 +21,9 @@ class MPage : public QWidget {
  public:
   explicit MPage(QWidget *parent = nullptr);
   ~MPage();
+  // 音频管理器
+  std::shared_ptr<XAudioManager> audio_manager_reference;
+
   // page名的谱面映射表
   std::unordered_map<QString, std::shared_ptr<MMap>> pagetext_maps_map;
 

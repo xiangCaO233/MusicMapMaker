@@ -36,9 +36,8 @@ class MapWorkspaceCanvas : public GLCanvas {
   void keyReleaseEvent(QKeyEvent *event) override;
   void focusInEvent(QFocusEvent *event) override;
   void focusOutEvent(QFocusEvent *event) override;
-  void enterEvent(QEnterEvent *event) override;
-  void leaveEvent(QEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
+  void paintEvent(QPaintEvent *event) override;
 
   // 刷新定时器
   QTimer *refresh_timer;
@@ -108,9 +107,6 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 绘制预览
   void draw_preview_content();
 
-  // 更新画布
-  void update_canvas();
-
  public:
   // 构造MapWorkspaceCanvas
   explicit MapWorkspaceCanvas(QWidget *parent = nullptr);
@@ -167,6 +163,8 @@ class MapWorkspaceCanvas : public GLCanvas {
   void current_absbpm_changed(double bpm);
   // 时间线速度变化信号
   void current_timeline_speed_changed(double timeline_speed);
+  // 是否暂停播放信号
+  void pause_signal(bool paused);
 };
 
 #endif  // M_MAPWORKSPACE_H

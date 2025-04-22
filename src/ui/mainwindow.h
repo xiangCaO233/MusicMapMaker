@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <qobject.h>
+#include <qtmetamacros.h>
 
 #include <QComboBox>
 #include <QMainWindow>
@@ -34,18 +35,8 @@ class MainWindow : public QMainWindow {
   // 当前主题
   GlobalTheme current_theme;
 
-  // 音频管理器
-  std::shared_ptr<XAudioManager> audio_manager;
-
-  // 当前选择的音频输出设备
-  std::shared_ptr<XOutputDevice> current_use_device;
-
   // 使用主题
   void use_theme(GlobalTheme theme);
-
- private slots:
-  // 选择音频输出设备事件
-  void on_audio_device_selector_currentIndexChanged(int index);
 
  private:
   Ui::MainWindow *ui;

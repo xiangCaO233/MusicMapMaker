@@ -1,5 +1,6 @@
 #include "projectcontroller.h"
 
+#include <AudioManager.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <qsharedpointer.h>
@@ -79,12 +80,15 @@ void MProjectController::on_project_selector_currentIndexChanged(int index) {
   // 获取当前选中项的数据
   QVariant var = ui->project_selector->currentData();
   auto project = var.value<std::shared_ptr<MapWorkProject>>();
-  select_project(project);
+  if (project) {
+    select_project(project);
+  }
 }
 
 // 选择项目
 void MProjectController::select_project(
     std::shared_ptr<MapWorkProject>& project) {
+  selected_project = project;
   auto map_model =
       qobject_cast<QStandardItemModel*>(ui->map_list_view->model());
   map_model->clear();
@@ -137,6 +141,20 @@ void MProjectController::select_project(
       video_model->appendRow(video_path_item);
     }
   }
+
+  // 初始化设备列表并选中此项目选中的设备
+  ui->audio_device_selector->clear();
+  device_sync_lock = true;
+  // 更新设备列表
+  auto devices = audio_manager_reference->get_outdevices();
+  for (const auto& [device_id, device] : *devices) {
+    ui->audio_device_selector->addItem(
+        QString::fromStdString(device->device_name),
+        QVariant::fromValue(device));
+  }
+  // 选中此设备
+  ui->audio_device_selector->setCurrentText(
+      QString::fromStdString(project->device->device_name));
 }
 
 // 谱面列表双击事件
@@ -257,4 +275,16 @@ void MProjectController::on_close_project_button_clicked() {
       }
     }
   }
+}
+
+// 选择音频输出设备事件
+void MProjectController::on_audio_device_selector_currentTextChanged(
+    const QString& arg1) {
+  if (device_sync_lock) {
+    device_sync_lock = false;
+    return;
+  }
+  // 获取并设置项目设备为当前选中的音频设备
+  auto data = ui->audio_device_selector->currentData();
+  selected_project->device = data.value<std::shared_ptr<XOutputDevice>>();
 }
