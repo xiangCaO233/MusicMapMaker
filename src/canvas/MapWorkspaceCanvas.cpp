@@ -5,7 +5,6 @@
 #include <qpaintdevice.h>
 #include <qtimer.h>
 #include <qtmetamacros.h>
-#include <unistd.h>
 
 #include <QKeyEvent>
 #include <QTimer>
