@@ -1,10 +1,16 @@
 #ifndef TIMECONTROLLER_H
 #define TIMECONTROLLER_H
 
+#include <qtmetamacros.h>
+
 #include <QWidget>
+#include <memory>
+
+class MMap;
+enum class GlobalTheme;
 
 namespace Ui {
-class TimeController;
+class audio_time_controller;
 }
 
 class TimeController : public QWidget {
@@ -14,8 +20,31 @@ class TimeController : public QWidget {
   explicit TimeController(QWidget *parent = nullptr);
   ~TimeController();
 
+  // 当前主题
+  GlobalTheme current_theme;
+
+  // 时间控制器绑定的map
+  std::shared_ptr<MMap> binding_map;
+
+  // 使用主题
+  void use_theme(GlobalTheme theme);
+
+ public slots:
+  // page选择了新map事件
+  void on_selectnewmap(std::shared_ptr<MMap> &map);
+  // 画布时间变化事件
+  void on_canvas_timestamp_changed(double time);
+
+  // 实时信息变化槽
+  void on_current_bpm_changed(double bpm);
+  void on_current_timeline_speed_changed(double timeline_speed);
+
+ signals:
+  // 时间控制器编辑时间信号
+  void time_edited(double time);
+
  private:
-  Ui::TimeController *ui;
+  Ui::audio_time_controller *ui;
 };
 
 #endif  // TIMECONTROLLER_H

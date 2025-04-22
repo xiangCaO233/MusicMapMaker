@@ -1,6 +1,8 @@
 #ifndef MEDITORAREA_H
 #define MEDITORAREA_H
 
+#include <qtmetamacros.h>
+
 #include <QWidget>
 #include <memory>
 
@@ -22,21 +24,21 @@ class MEditorArea : public QWidget {
   // 当前主题
   GlobalTheme current_theme;
 
-  // 使用自然滚动
-  bool use_natural_wheel{false};
-
-  // 吸附到小节线
-  bool magnet_to_divisor{false};
-
   // 锁定模式-不自动切换
   bool lock_mode_auto_switch{false};
 
   // 使用主题
   void use_theme(GlobalTheme theme);
 
+  // 同步时间锁
+  bool sync_time_lock{false};
+
  public slots:
   // page选择了新map事件
   void on_selectnewmap(std::shared_ptr<MMap> &map);
+ signals:
+  // 切换map信号
+  void switched_map(std::shared_ptr<MMap> &map);
 
  private slots:
 

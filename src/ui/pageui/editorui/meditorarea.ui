@@ -306,7 +306,10 @@
    </item>
    <item>
     <widget class="QWidget" name="canvasandaudiocontroller" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1,0">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -363,7 +366,41 @@
        </widget>
       </item>
       <item>
-       <widget class="TimeController" name="audio_time_controller" native="true"/>
+       <widget class="QFrame" name="atcontroller_frame">
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Raised</enum>
+        </property>
+        <property name="lineWidth">
+         <number>2</number>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
+          <number>4</number>
+         </property>
+         <item>
+          <widget class="TimeController" name="audio_time_controller" native="true">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -116,6 +116,56 @@ inline int calculateDivisionStrategy(const std::set<double>& timestamps,
   return 1;  // 无有效分音策略
 }
 
+inline void format_music_time2u32(std::u32string& res, double srcmilliseconds) {
+  // 确保毫秒数为非负数
+  if (srcmilliseconds < 0) {
+    srcmilliseconds = 0;
+  }
+
+  // 计算分钟、秒和毫秒
+  uint32_t total_ms = static_cast<uint32_t>(std::round(srcmilliseconds));
+  uint32_t minutes = total_ms / 60000;
+  uint32_t remaining_ms = total_ms % 60000;
+  uint32_t seconds = remaining_ms / 1000;
+  uint32_t milliseconds = remaining_ms % 1000;
+  // 格式化为 "mm:ss:mmm"
+  std::string temp;
+
+  // 分钟部分（两位数）
+  if (minutes < 10) {
+    temp += '0';
+  }
+  temp += std::to_string(minutes);
+  temp += ':';
+
+  // 秒部分（两位数）
+  if (seconds < 10) {
+    temp += '0';
+  }
+  temp += std::to_string(seconds);
+  temp += ':';
+
+  // 毫秒部分（三位数）
+  if (milliseconds < 100) {
+    temp += '0';
+    if (milliseconds < 10) {
+      temp += '0';
+    }
+  }
+  temp += std::to_string(milliseconds);
+
+  res.clear();
+#ifdef _WIN32
+  res = utf8_to_utf32(temp);
+#else
+  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+  res = converter.from_bytes(temp);
+#endif  //_WIN32
+}
+
+inline void format_music_time2milliseconds(const std::string& src,
+                                           double& desmilliseconds) {}
+
 inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgpath,
                                     QColor& color, QSize& size) {
   // 加载SVG文件

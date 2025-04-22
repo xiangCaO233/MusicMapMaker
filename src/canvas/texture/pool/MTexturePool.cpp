@@ -281,11 +281,11 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
   GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, (subindex + 1) % 32,
                               (subindex + 1) / 32, layer_index, 1, 1, 1,
                               GL_RGBA, GL_FLOAT, metadata.data()));
-  XINFO("纹理元数据:[woff:" + std::to_string(texture->woffset) +
-        ",hoff:" + std::to_string(texture->hoffset) +
-        ",w:" + std::to_string(texture->texture_image.width()) +
-        ",h:" + std::to_string(texture->texture_image.height()) + "]" +
-        texture->name + "已上传到gpu");
+  // XINFO("纹理元数据:[woff:" + std::to_string(texture->woffset) +
+  //       ",hoff:" + std::to_string(texture->hoffset) +
+  //       ",w:" + std::to_string(texture->texture_image.width()) +
+  //       ",h:" + std::to_string(texture->texture_image.height()) + "]" +
+  //       texture->name + "已上传到gpu");
 
   // 成功添加映射
   texture_map.try_emplace(texture->name, texture);

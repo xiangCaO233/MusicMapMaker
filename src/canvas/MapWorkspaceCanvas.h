@@ -71,9 +71,6 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 当前页面的拍
   std::vector<std::shared_ptr<Beat>> current_beats;
 
-  // 滚动倍率
-  double scroll_ratio{1.0};
-
   // 判定线位置:从下往上此倍率*总高度
   double judgeline_position{0.16};
 
@@ -92,6 +89,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 绘制判定线
   void draw_judgeline();
+
+  // 绘制信息区
+  void draw_infoarea();
 
   // 绘制拍
   void draw_beats();
@@ -142,6 +142,15 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 变速缩放
   double speed_zoom{1.0};
 
+  // 滚动倍率
+  double scroll_ratio{1.0};
+
+  // 滚动方向--1.0或-1.0
+  double scroll_direction{1.0};
+
+  // 滚动时吸附到小节线
+  bool magnet_to_divisor{false};
+
   // 切换到指定图
   void switch_map(std::shared_ptr<MMap> map);
 
@@ -150,8 +159,14 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 渲染实际图形
   void push_shape() override;
+
  signals:
+  // 时间戳更新信号
   void current_time_stamp_changed(double current_time_stamp);
+  // 绝对bpm变化信号
+  void current_absbpm_changed(double bpm);
+  // 时间线速度变化信号
+  void current_timeline_speed_changed(double timeline_speed);
 };
 
 #endif  // M_MAPWORKSPACE_H

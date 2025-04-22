@@ -1,10 +1,66 @@
 #include "timecontroller.h"
 
+#include "../../mmm/map/MMap.h"
+#include "../../util/mutil.h"
+#include "../GlobalSettings.h"
 #include "ui_timecontroller.h"
 
 TimeController::TimeController(QWidget *parent)
-    : QWidget(parent), ui(new Ui::TimeController) {
+    : QWidget(parent), ui(new Ui::audio_time_controller) {
   ui->setupUi(this);
 }
 
 TimeController::~TimeController() { delete ui; }
+
+// 使用主题
+void TimeController::use_theme(GlobalTheme theme) {
+  current_theme = theme;
+  QColor file_button_color;
+  switch (theme) {
+    case GlobalTheme::DARK: {
+      file_button_color = QColor(255, 255, 255);
+      break;
+    }
+    case GlobalTheme::LIGHT: {
+      file_button_color = QColor(0, 0, 0);
+      break;
+    }
+  }
+
+  // 设置工具栏按钮图标颜色
+  mutil::set_button_svgcolor(ui->pausebutton, ":/icons/play.svg",
+                             file_button_color, 16, 16);
+  mutil::set_button_svgcolor(ui->fastbackward, ":/icons/backward.svg",
+                             file_button_color, 16, 16);
+  mutil::set_button_svgcolor(ui->fastforward, ":/icons/forward.svg",
+                             file_button_color, 16, 16);
+  mutil::set_button_svgcolor(ui->enablepitchaltbutton, ":/icons/pitch-alt.svg",
+                             file_button_color, 16, 16);
+  mutil::set_button_svgcolor(ui->resetspeedbutton, ":/icons/bolt.svg",
+                             file_button_color, 16, 16);
+}
+// 实时信息变化槽
+// bpm
+void TimeController::on_current_bpm_changed(double bpm) {
+  ui->bpmvalue->setText(QString::number(bpm, 'f', 2));
+}
+
+// timeline_speed
+void TimeController::on_current_timeline_speed_changed(double timeline_speed) {
+  ui->timelinespeedvalue->setText(QString::number(timeline_speed, 'f', 2));
+}
+
+// page选择了新map事件
+void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
+  binding_map = map;
+}
+
+// 画布时间变化事件
+void TimeController::on_canvas_timestamp_changed(double time) {
+  if (!binding_map) return;
+  // 计算进度
+  auto progress = time / binding_map->map_length;
+  // 更新lineedit和progress
+  ui->lineEdit->setText(QString::number(int32_t(time)));
+  ui->playprogress->setValue(ui->playprogress->maximum() * progress);
+}
