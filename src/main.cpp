@@ -22,6 +22,11 @@
 #include "ui/mainwindow.h"
 
 int main(int argc, char* argv[]) {
+  #ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(65001);
+    std::setlocale(LC_ALL, ".UTF-8");
+  #endif  //_WIN32
   QApplication a(argc, argv);
   XLogger::init("MMM");
 
