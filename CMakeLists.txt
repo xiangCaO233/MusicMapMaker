@@ -18,7 +18,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-set(CMAKE_BUILD_TYPE Debug)
 
 # 查找 Qt 包
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets OpenGLWidgets
@@ -162,20 +161,22 @@ endif()
 # 自动复制运行时文件和插件
 if(WIN32)
   # 复制 DLLs
-	# add_custom_command(TARGET MusicMapMaker POST_BUILD
-  # COMMAND ${CMAKE_COMMAND} -E copy
-  # $<TARGET_FILE:Qt6::Core>
-  # $<TARGET_FILE:Qt6::Gui>
-  # $<TARGET_FILE_DIR:MusicMapMaker>
-  # )
+  add_custom_command(TARGET MusicMapMaker POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:Qt6::Core>
+    $<TARGET_FILE:Qt6::Gui>
+    $<TARGET_FILE_DIR:MusicMapMaker>
+  )
 
-  # # message(STATUS ${QT_DIR})
+  # message(STATUS ${QT_DIR})
 
-  # # 复制平台插件
-  # get_target_property(Qt6_plugin_dir Qt6::Gui LOCATION)
-  # get_filename_component(QT_DIR "${Qt6_plugin_dir}" DIRECTORY)
-  # file(COPY "${QT_DIR}/../Qt6/plugins/platforms/qwindows.dll"
-  # DESTINATION "${CMAKE_BINARY_DIR}/platforms")
+  # 复制平台插件
+  get_target_property(Qt6_plugin_dir Qt6::Gui LOCATION)
+  get_filename_component(QT_DIR "${Qt6_plugin_dir}" DIRECTORY)
+  file(COPY "${QT_DIR}/../plugins/platforms/qwindows.dll"
+    DESTINATION "${CMAKE_BINARY_DIR}/platforms")
+  file(COPY "${QT_DIR}/../plugins/platforms/qwindowsd.dll"
+    DESTINATION "${CMAKE_BINARY_DIR}/platforms")
 endif()
 
 # 链接 Qt 库
