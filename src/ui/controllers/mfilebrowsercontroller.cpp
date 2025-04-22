@@ -189,10 +189,18 @@ void FileBrowserController::on_cdparent_clicked() {
 }
 
 // 地址栏编辑回车按下
-void FileBrowserController::on_address_line_returnPressed() {}
+void FileBrowserController::on_address_line_returnPressed() {
+  on_address_confirm_clicked();
+}
 
 // 地址确认按键事件
-void FileBrowserController::on_address_confirm_clicked() {}
+void FileBrowserController::on_address_confirm_clicked() {
+  auto des_path = ui->address_line->text();
+  auto filesystemmodel =
+      qobject_cast<QFileSystemModel*>(ui->file_browser_treeview->model());
+  last_path_stack.push(filesystemmodel->rootPath());
+  cd(des_path);
+}
 
 // 搜索按键事件
 void FileBrowserController::on_search_clicked() {}
