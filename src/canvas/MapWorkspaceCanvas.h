@@ -5,6 +5,7 @@
 #include <qtmetamacros.h>
 
 #include <memory>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -41,7 +42,14 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 刷新定时器
   QTimer *refresh_timer;
-  int32_t timer_update_time{8};
+  // 刷新线程
+  std::thread refresh_thread;
+  // 停止刷新线程标识
+  bool stop_refresh{false};
+
+  // 目标刷新时间间隔
+  int32_t des_update_time{8};
+  // 实际刷新时间间隔
   double actual_update_time{0};
 
   // 暂停播放

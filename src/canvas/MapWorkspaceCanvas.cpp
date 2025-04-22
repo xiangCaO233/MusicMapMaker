@@ -2,6 +2,7 @@
 
 #include <qlogging.h>
 #include <qnamespace.h>
+#include <qnumeric.h>
 #include <qpaintdevice.h>
 #include <qtimer.h>
 #include <qtmetamacros.h>
@@ -56,24 +57,21 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(red);
   t4.emplace_back(blue);
 
-  // refresh_timer = new QTimer(this);
-  // auto timer = new QTimer(this);
-  // QObject::connect(timer, &QTimer::timeout, [this]() { update(); });
-  // timer->start(8);
-
-  // 初始化定时器
-  refresh_timer = new QTimer(this);
-  // 设置为高精度定时器
-  refresh_timer->setTimerType(Qt::PreciseTimer);
-  QObject::connect(refresh_timer, &QTimer::timeout, [this]() { update(); });
   // 获取主屏幕的刷新率
   QScreen *primaryScreen = QGuiApplication::primaryScreen();
   float refreshRate = primaryScreen->refreshRate();
   XINFO("显示器刷新率:" + std::to_string(refreshRate) + "Hz");
 
   // 垂直同步帧间隔
-  timer_update_time = 8;
-  refresh_timer->setInterval(timer_update_time);
+  des_update_time = qRound(1000.0 / refreshRate);
+
+  // 初始化定时器
+  refresh_timer = new QTimer(this);
+
+  // 设置为高精度定时器
+  refresh_timer->setTimerType(Qt::PreciseTimer);
+  QObject::connect(refresh_timer, &QTimer::timeout, [this]() { update(); });
+  refresh_timer->setInterval(des_update_time);
 
   // 启动高精度定时器
   refresh_timer->start();
