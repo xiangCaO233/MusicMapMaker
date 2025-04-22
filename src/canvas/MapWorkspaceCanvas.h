@@ -137,7 +137,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   double background_darken_ratio{0.55};
 
   // 时间线缩放-- n * 1px/1ms
-  double timeline_zoom{1.2};
+  double timeline_zoom{1.0};
 
   // 变速缩放
   double speed_zoom{1.0};

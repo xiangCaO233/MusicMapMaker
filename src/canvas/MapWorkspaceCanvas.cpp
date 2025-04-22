@@ -91,6 +91,34 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   GLCanvas::wheelEvent(event);
   if (!working_map) return;
 
+  // 修饰符
+  auto modifiers = event->modifiers();
+
+  // 编辑区
+  double temp_scroll_ration{1.0};
+  if (modifiers & Qt::ControlModifier) {
+    // 在编辑区-按下controll滚动
+    // 修改时间线缩放
+    double res_timeline_zoom = timeline_zoom;
+    if (event->angleDelta().y() > 0) {
+      res_timeline_zoom += 0.05;
+    } else {
+      res_timeline_zoom -= 0.05;
+    }
+    if (res_timeline_zoom >= 0.5 && res_timeline_zoom <= 2.0) {
+      timeline_zoom = res_timeline_zoom;
+    }
+    return;
+  }
+  if (modifiers & Qt::AltModifier) {
+    // 在编辑区-按下alt滚动
+    // 获取鼠标位置的拍--修改此拍分拍策略/改为自定义
+  }
+  if (modifiers & Qt::ShiftModifier) {
+    // 在编辑区-按下shift滚动
+    // 短暂增加滚动倍率
+    temp_scroll_ration = 3.0;
+  }
   if (magnet_to_divisor) {
     // 获取当前时间附近的拍
     // 找到第一个拍起始时间大于或等于当前时间的拍迭代器
@@ -187,7 +215,8 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
     }
   } else {
     auto unit = event->angleDelta().y() / 120 * timeline_zoom * height() / 10.0;
-    current_time_stamp += unit * scroll_ratio * scroll_direction;
+    current_time_stamp +=
+        unit * temp_scroll_ration * scroll_ratio * scroll_direction;
   }
 
   emit current_time_stamp_changed(current_time_stamp);
