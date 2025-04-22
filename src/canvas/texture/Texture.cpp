@@ -1,8 +1,14 @@
 #include "Texture.h"
 
+#include <filesystem>
+#include <qcontainerfwd.h>
+#include <qdebug.h>
 #include <qdir.h>
 #include <qnamespace.h>
 #include <qobject.h>
+#include <string>
+
+#include "../../log/colorful-log.h"
 
 // 构造
 TextureInstace::TextureInstace() : is_atlas(true) {}
@@ -29,7 +35,8 @@ void TextureInstace::load_from_file(std::filesystem::path& file_path) {
   fpath.cdUp();
   auto parent_path_name = fpath.dirName().toStdString();
   name = parent_path_name + "/" + file_name;
-
+  // XINFO("loading res:["+std::to_string(std::filesystem::exists(file_path))+"]");
+  auto src_image = QImage(QString::fromStdString(file_path.string()));
   texture_image =
-      QImage(file_path.c_str()).convertToFormat(QImage::Format_RGBA8888);
+      src_image.convertToFormat(QImage::Format_RGBA8888);
 }
