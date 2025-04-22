@@ -6,6 +6,7 @@
 #include "mmm/timing/Timing.h"
 #include "mmm/timing/osu/OsuTiming.h"
 #ifdef _WIN32
+#define NOMINMAX 
 #include <windows.h>
 #endif  //_WIN32
 #include <qsurfaceformat.h>
