@@ -42,6 +42,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 刷新定时器
   QTimer *refresh_timer;
   int32_t timer_update_time{8};
+  double actual_update_time{0};
 
   // 暂停播放
   bool pasue{true};

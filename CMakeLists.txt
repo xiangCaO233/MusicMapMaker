@@ -100,6 +100,8 @@ set(PROJECT_SOURCES
   src/ui/pageui/editorui/meditorarea.h
   src/ui/pageui/editorui/meditorarea.cpp
   src/ui/pageui/editorui/meditorarea.ui
+	src/ui/pageui/editorui/CanvasContainer.h
+	src/ui/pageui/editorui/CanvasContainer.cpp
   src/ui/infoui/minfo.h
   src/ui/infoui/minfo.cpp
   src/ui/infoui/minfo.ui

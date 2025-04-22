@@ -326,7 +326,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="canvas_container" native="true">
+       <widget class="QWidget" name="canvas_widget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <property name="spacing">
           <number>0</number>
@@ -344,11 +344,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="MapWorkspaceCanvas" name="canvas">
-           <property name="focusPolicy">
-            <enum>Qt::FocusPolicy::StrongFocus</enum>
-           </property>
-          </widget>
+          <widget class="CanvasContainer" name="canvas_container" native="true"/>
          </item>
          <item>
           <widget class="QScrollBar" name="progress_slider">
@@ -413,14 +409,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MapWorkspaceCanvas</class>
-   <extends>QOpenGLWidget</extends>
-   <header location="global">MapWorkspaceCanvas.h</header>
-  </customwidget>
-  <customwidget>
    <class>TimeController</class>
    <extends>QWidget</extends>
    <header location="global">timecontroller.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CanvasContainer</class>
+   <extends>QWidget</extends>
+   <header location="global">CanvasContainer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

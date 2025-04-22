@@ -48,6 +48,10 @@ GLCanvas::GLCanvas(QWidget *parent) {
   // 初始化帧率计数器
   fpsCounter = new FrameRateCounter();
 
+  // horizontalLayout->setSpacing(0);
+  // horizontalLayout->setObjectName("horizontalLayout");
+  // horizontalLayout->setContentsMargins(0, 0, 0, 0);
+
   // 更新fps显示内容
   connect(fpsCounter, &FrameRateCounter::fpsUpdated, this,
           &GLCanvas::updateFpsDisplay);

@@ -18,20 +18,25 @@ MEditorArea::MEditorArea(QWidget* parent)
           &TimeController::on_selectnewmap);
 
   // 连接画布暂停信号和时间控制器暂停槽
-  connect(ui->canvas, &MapWorkspaceCanvas::pause_signal,
-          ui->audio_time_controller, &TimeController::on_canvas_pause);
+  connect(ui->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::pause_signal, ui->audio_time_controller,
+          &TimeController::on_canvas_pause);
 
   // 连接画布时间更新信号
-  connect(ui->canvas, &MapWorkspaceCanvas::current_time_stamp_changed, this,
+  connect(ui->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::current_time_stamp_changed, this,
           &MEditorArea::on_canvas_timestamp_changed);
-  connect(ui->canvas, &MapWorkspaceCanvas::current_time_stamp_changed,
+  connect(ui->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::current_time_stamp_changed,
           ui->audio_time_controller,
           &TimeController::on_canvas_timestamp_changed);
 
   // 连接bpm,时间线速度变化槽
-  connect(ui->canvas, &MapWorkspaceCanvas::current_absbpm_changed,
+  connect(ui->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::current_absbpm_changed,
           ui->audio_time_controller, &TimeController::on_current_bpm_changed);
-  connect(ui->canvas, &MapWorkspaceCanvas::current_timeline_speed_changed,
+  connect(ui->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::current_timeline_speed_changed,
           ui->audio_time_controller,
           &TimeController::on_current_timeline_speed_changed);
 
@@ -84,9 +89,10 @@ void MEditorArea::use_theme(GlobalTheme theme) {
 // 画布时间变化事件
 void MEditorArea::on_canvas_timestamp_changed(double time) {
   double t = 0.0;
-  if (ui->canvas->working_map) {
+  if (ui->canvas_container->canvas.data()->working_map) {
     // 更新进度条
-    auto maptime = (double)(ui->canvas->working_map->map_length);
+    auto maptime =
+        (double)(ui->canvas_container->canvas.data()->working_map->map_length);
     double ratio = time / maptime;
     t = ratio * 10000.0;
   }
@@ -97,18 +103,19 @@ void MEditorArea::on_canvas_timestamp_changed(double time) {
 // page选择了新map事件
 void MEditorArea::on_selectnewmap(std::shared_ptr<MMap>& map) {
   // 为画布切换map
-  ui->canvas->switch_map(map);
+  ui->canvas_container->canvas.data()->switch_map(map);
 
   // 发送个信号
   emit switched_map(map);
 
   // 更新一下
-  ui->canvas->repaint();
+  ui->canvas_container->canvas.data()->update();
 }
 
 // 滚动方向切换按钮触发
 void MEditorArea::on_wheel_direction_button_toggled(bool checked) {
-  ui->canvas->scroll_direction = (checked ? -1.0 : 1.0);
+  ui->canvas_container->canvas.data()->scroll_direction =
+      (checked ? -1.0 : 1.0);
 
   // 根据主题切换图标颜色
   QColor file_button_color;
@@ -132,7 +139,7 @@ void MEditorArea::on_wheel_direction_button_toggled(bool checked) {
 
 // 吸附到分拍线按钮状态切换事件
 void MEditorArea::on_magnet_todivisor_button_toggled(bool checked) {
-  ui->canvas->magnet_to_divisor = checked;
+  ui->canvas_container->canvas.data()->magnet_to_divisor = checked;
 }
 
 // 模式锁定按钮状态切换事件
@@ -165,12 +172,13 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
     return;
   }
   // 同步画布时间
-  if (ui->canvas->is_paused()) {
+  if (ui->canvas_container->canvas.data()->is_paused()) {
     // 不暂停不允许调节时间
-    if (ui->canvas->working_map) {
+    if (ui->canvas_container->canvas.data()->working_map) {
       double ratio = (double)value / 10000.0;
-      auto maptime = (double)(ui->canvas->working_map->map_length);
-      ui->canvas->current_time_stamp = maptime * ratio;
+      auto maptime = (double)(ui->canvas_container->canvas.data()
+                                  ->working_map->map_length);
+      ui->canvas_container->canvas.data()->current_time_stamp = maptime * ratio;
       emit progress_pos_changed(maptime * ratio);
     }
   }

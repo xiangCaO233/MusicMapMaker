@@ -90,7 +90,9 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
   auto time = std::chrono::duration_cast<std::chrono::microseconds>(
                   std::chrono::high_resolution_clock::now().time_since_epoch())
                   .count();
-  XINFO("update time:" + std::to_string(time - lasttime));
+  auto atime = time - lasttime;
+  actual_update_time = double(atime) / 1000.0;
+  // XINFO("update time:" + std::to_string(atime));
   lasttime = time;
 }
 // 鼠标按下事件
@@ -847,7 +849,7 @@ void MapWorkspaceCanvas::push_shape() {
 
     if (!pasue) {
       // 未暂停,更新当前时间戳
-      current_time_stamp += timer_update_time;
+      current_time_stamp += actual_update_time;
       emit current_time_stamp_changed(current_time_stamp);
     }
 
