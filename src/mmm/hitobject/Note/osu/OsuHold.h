@@ -10,7 +10,7 @@
 class OsuHold : public Hold {
  public:
   // 构造OsuHold
-  OsuHold(uint32_t time, uint32_t holdtime);
+  OsuHold(uint32_t time, int32_t orbit_pos, uint32_t holdtime);
   OsuHold();
   // 析构OsuHold
   ~OsuHold() override;

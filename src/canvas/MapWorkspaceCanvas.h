@@ -73,6 +73,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 物件区域缓存--实时更新包含的物件,不包含得删
   std::unordered_map<std::shared_ptr<HitObject>, QRectF *> hitobject_bounds_map;
 
+  // 参考bpm
+  std::unique_ptr<double> preference_bpm = nullptr;
+
   // 当前正在使用的绝对timing--非变速timing
   std::shared_ptr<Timing> current_abs_timing;
 

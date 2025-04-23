@@ -10,7 +10,7 @@
 class ComplexNote : public Note {
  public:
   // 构造ComplexNote
-  explicit ComplexNote(uint32_t time);
+  explicit ComplexNote(uint32_t time, int32_t orbit_pos);
   // 析构ComplexNote
   ~ComplexNote() override;
 

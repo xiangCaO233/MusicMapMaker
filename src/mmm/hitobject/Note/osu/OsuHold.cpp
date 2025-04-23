@@ -19,12 +19,13 @@ OsuHoldEnd::~OsuHoldEnd() = default;
 // 打印用
 std::string OsuHoldEnd::toString() { return ""; }
 
-OsuHold::OsuHold() : Hold(0, 0) {
+OsuHold::OsuHold() : Hold(0, 0, 0) {
   note_type = NoteType::HOLD;
   object_type = HitObjectType::OSUHOLD;
 }
 
-OsuHold::OsuHold(uint32_t time, uint32_t holdtime) : Hold(time, holdtime) {
+OsuHold::OsuHold(uint32_t time, int32_t orbit_pos, uint32_t holdtime)
+    : Hold(time, orbit_pos, holdtime) {
   note_type = NoteType::HOLD;
   object_type = HitObjectType::OSUHOLD;
 }

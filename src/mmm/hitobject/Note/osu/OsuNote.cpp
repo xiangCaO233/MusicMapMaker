@@ -6,11 +6,11 @@
 
 #include "../Note.h"
 
-OsuNote::OsuNote() : Note(0) {
+OsuNote::OsuNote() : Note(0, 0) {
   object_type = HitObjectType::OSUNOTE;
   note_type = NoteType::NOTE;
 }
-OsuNote::OsuNote(uint32_t time) : Note(time) {
+OsuNote::OsuNote(uint32_t time, int32_t orbit_pos) : Note(time, orbit_pos) {
   object_type = HitObjectType::OSUNOTE;
   note_type = NoteType::NOTE;
 }

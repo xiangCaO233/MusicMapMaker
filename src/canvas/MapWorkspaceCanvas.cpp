@@ -247,9 +247,10 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
       }
     }
   } else {
-    auto unit = event->angleDelta().y() / 120 * timeline_zoom * height() / 10.0;
+    auto scroll_unit = (event->angleDelta().y() > 0 ? 1.0 : -1.0) *
+                       timeline_zoom * height() / 10.0;
     current_time_stamp +=
-        unit * temp_scroll_ration * scroll_ratio * scroll_direction;
+        scroll_unit * temp_scroll_ration * scroll_ratio * scroll_direction;
   }
 
   emit current_time_stamp_changed(current_time_stamp);
@@ -487,9 +488,10 @@ void MapWorkspaceCanvas::draw_beats() {
   auto current_size = size();
   for (int i = 0; i < current_beats.size(); ++i) {
     auto &beat = current_beats[i];
+
     // 每拍时间*时间线缩放=拍距
     double beat_distance =
-        60.0 / beat->bpm * 1000.0 * timeline_zoom * speed_zoom;
+        60.0 / beat->bpm * 1000.0 * timeline_zoom * (pasue ? 1.0 : speed_zoom);
 
     // 分拍间距
     double divisor_distance = beat_distance / beat->divisors;
@@ -503,8 +505,8 @@ void MapWorkspaceCanvas::draw_beats() {
     // 拍距离判定线距离从下往上--反转
     // 当前拍起始位置
     auto beat_start_pos =
-        judgeline_pos -
-        (beat_start_time - current_time_stamp) * timeline_zoom * speed_zoom;
+        judgeline_pos - (beat_start_time - current_time_stamp) * timeline_zoom *
+                            (pasue ? 1.0 : speed_zoom);
 
     // 获取主题
     bool has_theme{false};
@@ -661,7 +663,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 当前物件头位置-中心
         auto head_note_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
-            (note->timestamp - current_time_stamp) * timeline_zoom * speed_zoom;
+            (note->timestamp - current_time_stamp) * timeline_zoom *
+                (pasue ? 1.0 : speed_zoom);
 
         // 物件头中心位置
         auto note_center_pos = edit_area_start_pos_x +
@@ -695,7 +698,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
                 current_size.height() * (1.0 - judgeline_position) -
                 (long_note->hold_end_reference->timestamp -
                  current_time_stamp) *
-                    timeline_zoom * speed_zoom;
+                    timeline_zoom * (pause ? 1.0 : speed_zoom);
             // 当前面条身中心位置,y位置偏下一个note
             auto long_note_body_pos_x = note_center_pos;
             auto long_note_body_pos_y =
@@ -779,6 +782,11 @@ void MapWorkspaceCanvas::push_shape() {
           if (!otiming->is_inherit_timing) {
             // 非变速timing--存储的实际bpm
             current_abs_timing = otiming;
+            if (!preference_bpm) {
+              // 只更新一次参考bpm
+              preference_bpm = std::make_unique<double>();
+              *preference_bpm = current_abs_timing->basebpm;
+            }
             speed_zoom = 1.0;
             emit current_absbpm_changed(current_abs_timing->basebpm);
             emit current_timeline_speed_changed(speed_zoom);

@@ -1,6 +1,7 @@
 #include "ComplexNote.h"
 
-ComplexNote::ComplexNote(uint32_t time) : Note(time) {
+ComplexNote::ComplexNote(uint32_t time, int32_t orbit_pos)
+    : Note(time, orbit_pos) {
   object_type = HitObjectType::RMCOMPLEX;
   note_type = NoteType::COMPLEX;
 }

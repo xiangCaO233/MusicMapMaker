@@ -3,10 +3,11 @@
 #include "mmm/hitobject/HitObject.h"
 #include "mmm/hitobject/Note/Note.h"
 #include "mmm/map/osu/OsuMap.h"
+#include "mmm/map/rm/RMMap.h"
 #include "mmm/timing/Timing.h"
 #include "mmm/timing/osu/OsuTiming.h"
 #ifdef _WIN32
-#define NOMINMAX 
+#define NOMINMAX
 #include <windows.h>
 #endif  //_WIN32
 #include <qsurfaceformat.h>
@@ -22,11 +23,11 @@
 #include "ui/mainwindow.h"
 
 int main(int argc, char* argv[]) {
-  #ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);
-    SetConsoleCP(65001);
-    std::setlocale(LC_ALL, ".UTF-8");
-  #endif  //_WIN32
+#ifdef _WIN32
+  SetConsoleOutputCP(CP_UTF8);
+  SetConsoleCP(65001);
+  std::setlocale(LC_ALL, ".UTF-8");
+#endif  //_WIN32
   QApplication a(argc, argv);
   XLogger::init("MMM");
 
@@ -93,8 +94,9 @@ int main(int argc, char* argv[]) {
   // auto map = std::make_shared<OsuMap>();
 
   // map->load_from_file(
-  //     "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - "
-  //     "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku - shojo rei
+  //     "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku
+  //     - " "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku -
+  //     shojo rei
   //     "
   //     "(xiang_233) [(LN)NM lv.29].osu");
 

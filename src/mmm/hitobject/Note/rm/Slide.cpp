@@ -13,8 +13,9 @@ SlideEnd::~SlideEnd() = default;
 // 打印用
 std::string SlideEnd::toString() { return ""; }
 
-Slide::Slide(uint32_t time, int32_t slide_par)
-    : Note(time), slide_parameter(slide_par) {
+Slide::Slide(uint32_t time, int32_t orbit_pos, int32_t slide_par)
+    : Note(time, orbit_pos), slide_parameter(slide_par) {
+  object_type = HitObjectType::RMSLIDE;
   note_type = NoteType::SLIDE;
 }
 

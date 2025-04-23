@@ -33,7 +33,7 @@ class Timing {
   // 这个时间轴区间的结束时间即为下一个时间点的开始时间（如果这是最后一个时间点，则无结束时间）。
   // in-imd
   //
-  uint32_t timestamp;
+  int32_t timestamp{-1};
 
   // 该时间点的bpm
   // in-osu
@@ -44,10 +44,10 @@ class Timing {
   // 代表这一时间段的滑条速度均为基础滑条速度的 2 倍。
   // in-imd
   //
-  double bpm;
+  double bpm{-1.0};
 
   // 非继承的最近的基准bpm
-  double basebpm;
+  double basebpm{-1.0};
 
   bool operator==(const Timing& other) const = default;
 

@@ -11,7 +11,7 @@ class HoldEnd;
 class Hold : public Note {
  public:
   // 构造Hold
-  Hold(uint32_t time, uint32_t holdtime);
+  Hold(uint32_t time, uint32_t holdtime, int32_t orbit_pos);
   // 析构Hold
   ~Hold() override;
 

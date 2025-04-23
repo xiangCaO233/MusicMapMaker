@@ -303,7 +303,7 @@ void MMap::query_object_in_range(
   }
 
   // 窗口内的物件
-  auto startit = hitobjects.lower_bound(std::make_shared<Note>(start));
+  auto startit = hitobjects.lower_bound(std::make_shared<Note>(start, 0));
 
   for (; startit != hitobjects.end() && (*startit)->timestamp < end;
        ++startit) {

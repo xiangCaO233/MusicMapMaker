@@ -75,7 +75,7 @@ struct NoteSampleGroup {
 class OsuNote : public Note {
  public:
   // 构造OsuNote
-  explicit OsuNote(uint32_t time);
+  explicit OsuNote(uint32_t time, int32_t orbit_pos);
   OsuNote();
   // 析构OsuNote
   ~OsuNote() override;

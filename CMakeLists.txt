@@ -43,6 +43,8 @@ set(MMM_SOURCES
   src/mmm/map/MMap.cpp
   src/mmm/map/osu/OsuMap.h
   src/mmm/map/osu/OsuMap.cpp
+  src/mmm/map/rm/RMMap.h
+  src/mmm/map/rm/RMMap.cpp
   src/mmm/timing/Timing.h
   src/mmm/timing/Timing.cpp
   src/mmm/timing/osu/OsuTiming.h

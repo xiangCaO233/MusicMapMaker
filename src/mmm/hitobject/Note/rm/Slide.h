@@ -10,7 +10,8 @@
 class Slide : public Note {
  public:
   // 构造Slide
-  Slide(uint32_t time, int32_t slide_par);
+  Slide(uint32_t time, int32_t orbit_pos, int32_t slide_par);
+
   // 析构Slide
   ~Slide() override;
 
