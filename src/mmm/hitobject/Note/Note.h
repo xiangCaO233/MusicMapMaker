@@ -3,13 +3,22 @@
 
 #include "../HitObject.h"
 
-enum class NoteType : uint8_t {
+class ComplexNote;
+
+enum class NoteType {
   // osu!mania的单键和长条
-  NOTE = 0b00000001,
-  HOLD = 0b01000000,
+  NOTE,
+  HOLD,
   // 另外的滑键和折线
-  SLIDE = 0b00000010,
-  COMPLEX = 0b00000100,
+  SLIDE,
+  COMPLEX,
+};
+
+enum class ComplexInfo {
+  NONE,
+  HEAD,
+  BODY,
+  END,
 };
 
 class Note : public HitObject {
@@ -25,8 +34,17 @@ class Note : public HitObject {
   // 物件所处轨道
   int32_t orbit;
 
+  // 父组合键引用
+  ComplexNote* parent_reference{nullptr};
+
+  // 组合键分区
+  ComplexInfo compinfo{ComplexInfo::NONE};
+
   // 打印用
   std::string toString() override;
+
+  // 比较器使用
+  bool lessThan(const HitObject* other) const override;
 };
 
 #endif  // M_NOTE_H

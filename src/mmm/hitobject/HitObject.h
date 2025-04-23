@@ -27,6 +27,9 @@ class HitObject {
   // 物件具体类型-可直接static转化
   HitObjectType object_type;
 
+  // 是否为note
+  bool is_note{false};
+
   // 是否是面尾物件
   bool is_hold_end{false};
 
@@ -35,6 +38,9 @@ class HitObject {
 
   // 打印用
   virtual std::string toString() = 0;
+
+  // 比较器使用
+  virtual bool lessThan(const HitObject* other) const = 0;
 };
 
 #endif  // M_HITOBJECT_H

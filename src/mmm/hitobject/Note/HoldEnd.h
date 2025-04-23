@@ -14,10 +14,13 @@ class HoldEnd : public HitObject {
   ~HoldEnd() override;
 
   // 对应面条物件引用
-  std::shared_ptr<Hold> reference;
+  Hold* reference;
 
   // 打印用
   std::string toString() override;
+
+  // 比较器使用
+  bool lessThan(const HitObject* other) const override;
 };
 
 #endif  // M_HOLDEND_H

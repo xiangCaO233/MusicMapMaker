@@ -44,9 +44,9 @@ void TextureInstace::load_from_file(std::filesystem::path& file_path) {
   unsigned char* data =
       stbi_load(file_path.string().c_str(), &width, &height, &nrChannels, 0);
 
-  // XINFO("stb load res:[w:" + std::to_string(width) +
-  //       ",h:" + std::to_string(height) +
-  //       ",channels:" + std::to_string(nrChannels) + "]");
+  XINFO("stb load res:" + file_name + "[w:" + std::to_string(width) +
+        ",h:" + std::to_string(height) +
+        ",channels:" + std::to_string(nrChannels) + "]");
 
   if (data) {
     QImage::Format format = QImage::Format_Invalid;

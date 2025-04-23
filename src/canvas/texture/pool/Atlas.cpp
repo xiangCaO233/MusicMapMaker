@@ -18,7 +18,7 @@ bool Atlas::isfull() {
 bool Atlas::add_texture(std::shared_ptr<TextureInstace> &texture) {
   if (isfull()) return false;
 
-  auto res = packer.Insert(texture, MaxRectsBinPack::RectBottomLeftRule);
+  auto res = packer.Insert(texture, MaxRectsBinPack::RectBestAreaFit);
   if (res) {
     // 成功添加映射
     texture->texture_id = sub_textures.size();

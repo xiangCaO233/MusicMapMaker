@@ -140,11 +140,16 @@ void MProjectController::select_project(
                                Qt::UserRole + 1);
       video_model->appendRow(video_path_item);
     }
+    if (project->device) {
+      device_sync_lock = true;
+      // 选中此设备
+      ui->audio_device_selector->setCurrentText(
+          QString::fromStdString(project->device->device_name));
+    }
   }
 
   // 初始化设备列表并选中此项目选中的设备
   ui->audio_device_selector->clear();
-  device_sync_lock = true;
   // 更新设备列表
   auto devices = audio_manager_reference->get_outdevices();
   for (const auto& [device_id, device] : *devices) {
@@ -152,9 +157,6 @@ void MProjectController::select_project(
         QString::fromStdString(device->device_name),
         QVariant::fromValue(device));
   }
-  // 选中此设备
-  ui->audio_device_selector->setCurrentText(
-      QString::fromStdString(project->device->device_name));
 }
 
 // 谱面列表双击事件
@@ -284,7 +286,9 @@ void MProjectController::on_audio_device_selector_currentTextChanged(
     device_sync_lock = false;
     return;
   }
-  // 获取并设置项目设备为当前选中的音频设备
-  auto data = ui->audio_device_selector->currentData();
-  selected_project->device = data.value<std::shared_ptr<XOutputDevice>>();
+  if (selected_project) {
+    // 获取并设置项目设备为当前选中的音频设备
+    auto data = ui->audio_device_selector->currentData();
+    selected_project->device = data.value<std::shared_ptr<XOutputDevice>>();
+  }
 }

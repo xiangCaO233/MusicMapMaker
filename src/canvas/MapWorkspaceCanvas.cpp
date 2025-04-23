@@ -24,11 +24,14 @@
 #include "../mmm/hitobject/Note/Hold.h"
 #include "../mmm/hitobject/Note/HoldEnd.h"
 #include "../mmm/hitobject/Note/Note.h"
+#include "../mmm/hitobject/Note/rm//ComplexNote.h"
 #include "../mmm/map/osu/OsuMap.h"
+#include "../mmm/map/rm/RMMap.h"
 #include "../mmm/timing/Timing.h"
 #include "../mmm/timing/osu/OsuTiming.h"
 #include "../util/mutil.h"
 #include "colorful-log.h"
+#include "mmm/hitobject/Note/rm/Slide.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   QColor white(255, 255, 255, 240);
@@ -580,174 +583,27 @@ void MapWorkspaceCanvas::draw_hitobject() {
   if (!working_map) return;
 
   auto current_size = size();
+  // 编辑区x起始位置
   auto edit_area_start_pos_x = current_size.width() * infoarea_width_scale;
+  // 编辑区宽度
   auto edit_area_width =
       current_size.width() * (1.0 - infoarea_width_scale - preview_width_scale);
+
+  // 轨道数
+  int32_t max_orbit;
 
   // TODO(xiang 2025-04-15): 执行渲染
   switch (working_map->maptype) {
     case MapType::OSUMAP: {
       // osu图
       auto omap = std::dynamic_pointer_cast<OsuMap>(working_map);
-      int32_t max_orbit = omap->CircleSize;
-
-      // 物件头的纹理
-      auto &head_texture_pink = texture_full_map["hitobject/Pink.png"];
-      auto &head_texture_white = texture_full_map["hitobject/White.png"];
-      // 面条主体的纹理
-      auto &long_note_body_texture_pink =
-          texture_full_map["hitobject/ArrowHoldBodyp.png"];
-      auto &long_note_body_texture_white =
-          texture_full_map["hitobject/ArrowHoldBodyw.png"];
-      // 面条尾的纹理
-      auto &long_note_end_texture_pink =
-          texture_full_map["hitobject/ArrowHoldEndp.png"];
-      auto &long_note_end_texture_white =
-          texture_full_map["hitobject/ArrowHoldEndw.png"];
-
-      for (const auto &obj : buffer_objects) {
-        auto note = std::static_pointer_cast<Note>(obj);
-        // 粉白
-        std::shared_ptr<TextureInstace> head_texture;
-        std::shared_ptr<TextureInstace> long_note_body_texture;
-        std::shared_ptr<TextureInstace> long_note_end_texture;
-        if (max_orbit == 4) {
-          // 4k--粉白白粉
-          if (note->orbit == 0 || note->orbit == 3) {
-            head_texture = head_texture_pink;
-            long_note_body_texture = long_note_body_texture_pink;
-            long_note_end_texture = long_note_end_texture_pink;
-          } else {
-            head_texture = head_texture_white;
-            long_note_body_texture = long_note_body_texture_white;
-            long_note_end_texture = long_note_end_texture_white;
-          }
-        } else if (max_orbit == 6) {
-          // 6k--白粉白白粉白
-          if (note->orbit == 1 || note->orbit == 4) {
-            head_texture = head_texture_pink;
-            long_note_body_texture = long_note_body_texture_pink;
-            long_note_end_texture = long_note_end_texture_pink;
-          } else {
-            head_texture = head_texture_white;
-            long_note_body_texture = long_note_body_texture_white;
-            long_note_end_texture = long_note_end_texture_white;
-          }
-        } else {
-          if (note->orbit % 2 == 0) {
-            head_texture = head_texture_pink;
-            long_note_body_texture = long_note_body_texture_pink;
-            long_note_end_texture = long_note_end_texture_pink;
-          } else {
-            head_texture = head_texture_white;
-            long_note_body_texture = long_note_body_texture_white;
-            long_note_end_texture = long_note_end_texture_white;
-          }
-        }
-        // 轨道宽度
-        auto orbit_width = edit_area_width / max_orbit;
-
-        // 依据轨道宽度自动适应物件纹理尺寸
-        // 物件尺寸缩放--相对于纹理尺寸
-        auto width_scale =
-            (orbit_width - 4.0) / double(head_texture->texture_image.width());
-
-        // 不大于1--不放大纹理
-        double object_size_scale = std::min(width_scale, 1.0);
-
-        auto head_note_size =
-            QSizeF(head_texture->texture_image.width() * object_size_scale,
-                   head_texture->texture_image.height() * object_size_scale);
-
-        // 物件距离判定线距离从下往上--反转
-        // 当前物件头位置-中心
-        auto head_note_pos_y =
-            current_size.height() * (1.0 - judgeline_position) -
-            (note->timestamp - current_time_stamp) * timeline_zoom *
-                (pasue ? 1.0 : speed_zoom);
-
-        // 物件头中心位置
-        auto note_center_pos = edit_area_start_pos_x +
-                               orbit_width * note->orbit + orbit_width / 2.0;
-        // 物件头左上角位置
-        double head_note_pos_x = note_center_pos - head_note_size.width() / 2.0;
-
-        // 物件头的实际区域
-        QRectF head_note_bound(head_note_pos_x,
-                               head_note_pos_y - head_note_size.height() / 2.0,
-                               head_note_size.width(), head_note_size.height());
-
-        // 切换纹理绘制方式为填充
-        renderer_manager->texture_fillmode = TextureFillMode::FILL;
-        // 切换纹理绘制补齐方式为重采样
-        renderer_manager->texture_complementmode =
-            TextureComplementMode::REPEAT_TEXTURE;
-        switch (note->note_type) {
-          case NoteType::NOTE: {
-            // 直接绘制
-            renderer_manager->addRect(head_note_bound, head_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
-            break;
-          }
-          case NoteType::HOLD: {
-            // 添加long_note_body
-            auto long_note = std::dynamic_pointer_cast<Hold>(note);
-            if (!long_note) continue;
-            // 当前面条尾y轴位置
-            auto long_note_end_pos_y =
-                current_size.height() * (1.0 - judgeline_position) -
-                (long_note->hold_end_reference->timestamp -
-                 current_time_stamp) *
-                    timeline_zoom * (pause ? 1.0 : speed_zoom);
-            // 当前面条身中心位置,y位置偏下一个note
-            auto long_note_body_pos_x = note_center_pos;
-            auto long_note_body_pos_y =
-                head_note_pos_y + (long_note_end_pos_y - head_note_pos_y) / 2.0;
-
-            // 面身实际尺寸高度-1.5note
-            auto long_note_body_size =
-                QSizeF(long_note_body_texture->texture_image.width() *
-                           object_size_scale,
-                       long_note_end_pos_y - head_note_pos_y -
-                           0.5 * head_note_bound.height());
-
-            // 面身的实际区域--
-            QRectF long_note_body_bound(
-                long_note_body_pos_x - long_note_body_size.width() / 2.0,
-                long_note_body_pos_y - long_note_body_size.height() / 2.0,
-                long_note_body_size.width(), long_note_body_size.height());
-
-            // 添加long_note_end
-            // 当前面条尾中心位置
-            auto long_note_end_pos_x = note_center_pos;
-            // 面尾实际尺寸
-            auto long_note_end_size =
-                QSizeF(long_note_end_texture->texture_image.width() *
-                           object_size_scale,
-                       long_note_end_texture->texture_image.height() *
-                           object_size_scale);
-            // 面尾的实际区域--在面身缺的那一note位置
-            QRectF long_note_end_bound(
-                long_note_end_pos_x - long_note_end_size.width() / 2.0,
-                long_note_end_pos_y - long_note_end_size.height() / 2.0,
-                long_note_end_size.width(), long_note_end_size.height());
-            // 先绘制body再绘制end,最后head
-            renderer_manager->addRect(long_note_body_bound,
-                                      long_note_body_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
-            renderer_manager->addRect(long_note_end_bound,
-                                      long_note_end_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
-            renderer_manager->addRect(head_note_bound, head_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
-            break;
-          }
-        }
-      }
+      max_orbit = omap->CircleSize;
       break;
     }
     case MapType::RMMAP: {
       // rm图
+      auto rmmap = std::dynamic_pointer_cast<RMMap>(working_map);
+      max_orbit = rmmap->max_orbits;
       break;
     }
     case MapType::MALODYMAP: {
@@ -756,6 +612,244 @@ void MapWorkspaceCanvas::draw_hitobject() {
     }
     default:
       break;
+  }
+  // 物件头的纹理
+  std::shared_ptr<TextureInstace> head_texture =
+      texture_full_map["hitobject/head.png"];
+  // 面条主体的纹理
+  std::shared_ptr<TextureInstace> long_note_body_vertical_texture =
+      texture_full_map["hitobject/holdbodyvertical.png"];
+
+  // 横向面条主体的纹理
+  std::shared_ptr<TextureInstace> long_note_body_horizontal_texture =
+      texture_full_map["hitobject/holdbodyhorizontal.png"];
+
+  // 组合键节点纹理
+  std::shared_ptr<TextureInstace> complex_note_node_texture =
+      texture_full_map["hitobject/node.png"];
+
+  // 面条尾的纹理
+  std::shared_ptr<TextureInstace> long_note_end_texture =
+      texture_full_map["hitobject/holdend.png"];
+
+  // 滑键尾的纹理
+  std::shared_ptr<TextureInstace> slide_left_note_end_texture =
+      texture_full_map["hitobject/arrowleft.png"];
+  std::shared_ptr<TextureInstace> slide_right_note_end_texture =
+      texture_full_map["hitobject/arrowright.png"];
+
+  // 节点区域缓存
+  std::vector<QRectF> nodes;
+
+  // 渲染物件
+  for (const auto &obj : buffer_objects) {
+    if (!obj->is_note) continue;
+    auto note = std::static_pointer_cast<Note>(obj);
+    if (!note) continue;
+    // 轨道宽度
+    auto orbit_width = edit_area_width / max_orbit;
+
+    // 依据轨道宽度自动适应物件纹理尺寸
+    // 物件尺寸缩放--相对于纹理尺寸
+    auto width_scale =
+        (orbit_width - 4.0) / double(head_texture->texture_image.width());
+
+    // 不大于1--不放大纹理
+    double object_size_scale = std::min(width_scale, 1.0);
+
+    auto head_note_size =
+        QSizeF(head_texture->texture_image.width() * object_size_scale,
+               head_texture->texture_image.height() * object_size_scale);
+
+    // 物件距离判定线距离从下往上--反转
+    // 当前物件头位置-中心
+    auto note_center_pos_y =
+        current_size.height() * (1.0 - judgeline_position) -
+        (note->timestamp - current_time_stamp) * timeline_zoom *
+            (pasue ? 1.0 : speed_zoom);
+
+    // 物件头中心位置
+    auto note_center_pos_x =
+        edit_area_start_pos_x + orbit_width * note->orbit + orbit_width / 2.0;
+
+    // 物件头左上角位置
+    double head_note_pos_x = note_center_pos_x - head_note_size.width() / 2.0;
+
+    // 物件头的实际区域
+    QRectF head_note_bound(head_note_pos_x,
+                           note_center_pos_y - head_note_size.height() / 2.0,
+                           head_note_size.width(), head_note_size.height());
+
+    // 横向身的高度
+    auto horizon_body_height =
+        long_note_body_horizontal_texture->texture_image.height() *
+        object_size_scale;
+
+    // 切换纹理绘制方式为填充
+    renderer_manager->texture_fillmode = TextureFillMode::FILL;
+    // 切换纹理绘制补齐方式为重采样
+    renderer_manager->texture_complementmode =
+        TextureComplementMode::REPEAT_TEXTURE;
+
+    switch (note->note_type) {
+      case NoteType::NOTE: {
+        // 直接绘制
+        renderer_manager->addRect(head_note_bound, head_texture,
+                                  QColor(0, 0, 0, 255), 0, true);
+        break;
+      }
+      case NoteType::HOLD: {
+        // 添加long_note_body
+        auto long_note = std::dynamic_pointer_cast<Hold>(note);
+        // 处于组合键内,不绘制
+        if (!long_note) continue;
+
+        // 当前面条尾y轴位置
+        auto long_note_end_pos_y =
+            current_size.height() * (1.0 - judgeline_position) -
+            (long_note->hold_end_reference->timestamp - current_time_stamp) *
+                timeline_zoom * (pause ? 1.0 : speed_zoom);
+
+        // 当前面条身中心位置,y位置偏下一个note
+        auto long_note_body_pos_x = note_center_pos_x;
+        auto long_note_body_pos_y =
+            note_center_pos_y + (long_note_end_pos_y - note_center_pos_y) / 2.0;
+
+        // 面身实际尺寸高度-1.5note
+        auto long_note_body_size =
+            QSizeF(long_note_body_vertical_texture->texture_image.width() *
+                       object_size_scale,
+                   long_note_end_pos_y - note_center_pos_y -
+                       0.5 * head_note_bound.height());
+
+        // 面身的实际区域--
+        QRectF long_note_body_bound(
+            long_note_body_pos_x - long_note_body_size.width() / 2.0,
+            long_note_body_pos_y - long_note_body_size.height() / 2.0,
+            long_note_body_size.width(), long_note_body_size.height());
+
+        // 添加long_note_end
+        // 当前面条尾中心位置
+        auto long_note_end_pos_x = note_center_pos_x;
+        // 面尾实际尺寸
+        auto long_note_end_size = QSizeF(
+            long_note_end_texture->texture_image.width() * object_size_scale,
+            long_note_end_texture->texture_image.height() * object_size_scale);
+        // 面尾的实际区域--在面身缺的那一note位置
+        QRectF long_note_end_bound(
+            long_note_end_pos_x - long_note_end_size.width() / 2.0,
+            long_note_end_pos_y - long_note_end_size.height() / 2.0,
+            long_note_end_size.width(), long_note_end_size.height());
+        // 先绘制body再绘制end,最后head
+        renderer_manager->addRect(long_note_body_bound,
+                                  long_note_body_vertical_texture,
+                                  QColor(0, 0, 0, 255), 0, true);
+
+        // 节点尺寸
+        auto node_size =
+            QSizeF(complex_note_node_texture->texture_image.width() *
+                       object_size_scale,
+                   complex_note_node_texture->texture_image.height() *
+                       object_size_scale);
+        // 节点的实际区域--也在面身缺的那note位置
+        QRectF node_bound(long_note_end_pos_x - node_size.width() / 2.0,
+                          long_note_end_pos_y - node_size.height() / 2.0,
+                          node_size.width(), node_size.height());
+
+        switch (long_note->compinfo) {
+          case ComplexInfo::NONE: {
+            // 头尾都画
+            renderer_manager->addRect(long_note_end_bound,
+                                      long_note_end_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            break;
+          }
+          case ComplexInfo::HEAD: {
+            // 多画个头-在尾处追加一个节点
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            nodes.emplace_back(node_bound);
+            break;
+          }
+          case ComplexInfo::BODY: {
+            // 仅在尾处追加一个节点
+            nodes.emplace_back(node_bound);
+
+            break;
+          }
+          case ComplexInfo::END: {
+            // 补齐节点,画个尾
+            for (const auto &noderect : nodes) {
+              renderer_manager->addRect(noderect, complex_note_node_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
+            renderer_manager->addRect(long_note_end_bound,
+                                      long_note_end_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            // 并清空节点缓存
+            nodes.clear();
+            break;
+          }
+        }
+        break;
+      }
+      case NoteType::SLIDE: {
+        // 滑键
+        auto slide = std::static_pointer_cast<Slide>(note);
+        if (!slide) continue;
+        auto endorbit = slide->orbit + slide->slide_parameter;
+
+        // 横向身的终点位置
+        auto horizon_body_end_pos_x =
+            edit_area_start_pos_x + orbit_width * endorbit + orbit_width / 2.0;
+
+        // 横向身的尺寸
+        // 横向身的宽度
+        auto horizon_body_width =
+            std::abs(horizon_body_end_pos_x - note_center_pos_x) +
+            horizon_body_height;
+
+        std::shared_ptr<TextureInstace> slide_end_texture;
+        // 横向身的具体位置
+        double horizon_body_pos_x = -horizon_body_height / 2.0;
+        if (slide->slide_parameter > 0) {
+          // 右滑,矩形就在头物件中心位置
+          horizon_body_pos_x += note_center_pos_x;
+          slide_end_texture = slide_right_note_end_texture;
+        } else {
+          // 左滑,矩形整体左移矩形宽度的位置
+          horizon_body_pos_x = horizon_body_pos_x + note_center_pos_x -
+                               horizon_body_width + horizon_body_height;
+          slide_end_texture = slide_left_note_end_texture;
+        }
+        auto horizon_body_bound = QRectF(
+            horizon_body_pos_x, note_center_pos_y - horizon_body_height / 2.0,
+            horizon_body_width, horizon_body_height);
+
+        // 箭头位置--滑键结束轨道的位置
+        auto slide_end_bound = QRectF(
+            horizon_body_end_pos_x - slide_end_texture->texture_image.width() *
+                                         object_size_scale / 2.0,
+            note_center_pos_y - slide_end_texture->texture_image.height() *
+                                    object_size_scale / 2.0,
+            slide_end_texture->texture_image.width() * object_size_scale,
+            slide_end_texture->texture_image.height() * object_size_scale);
+
+        // 先绘制横向身,然后头和箭头
+        renderer_manager->addRect(horizon_body_bound,
+                                  long_note_body_horizontal_texture,
+                                  QColor(0, 0, 0, 255), 0, true);
+        if (!slide->parent_reference) {
+          renderer_manager->addRect(head_note_bound, head_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
+          renderer_manager->addRect(slide_end_bound, slide_end_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
+        }
+        break;
+      }
+    }
   }
 }
 
@@ -798,6 +892,12 @@ void MapWorkspaceCanvas::push_shape() {
           break;
         }
         case TimingType::RMTIMING: {
+          // rmtiming只能存bpm
+          auto rmtiming = std::static_pointer_cast<Timing>(timing);
+          current_abs_timing = rmtiming;
+          speed_zoom = 1.0;
+          emit current_absbpm_changed(current_abs_timing->basebpm);
+          emit current_timeline_speed_changed(speed_zoom);
           break;
         }
         case TimingType::MALODYTIMING: {

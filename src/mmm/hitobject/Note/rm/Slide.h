@@ -20,13 +20,16 @@ class Slide : public Note {
 
   // 打印用
   std::string toString() override;
+
+  // 比较器使用
+  bool lessThan(const HitObject* other) const override;
 };
 
 // 滑键尾
 class SlideEnd : public HitObject {
  public:
   // 构造SlideEnd
-  SlideEnd(const std::shared_ptr<Slide> &head);
+  SlideEnd(const std::shared_ptr<Slide>& head);
   // 析构SlideEnd
   ~SlideEnd() override;
 
@@ -34,9 +37,12 @@ class SlideEnd : public HitObject {
   int32_t endorbit;
 
   // 对应的滑键引用
-  std::shared_ptr<Slide> reference;
+  Slide* reference;
 
   // 打印用
   std::string toString() override;
+
+  // 比较器使用
+  bool lessThan(const HitObject* other) const override;
 };
 #endif  // M_SLIDE_H

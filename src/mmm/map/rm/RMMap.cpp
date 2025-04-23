@@ -232,12 +232,14 @@ void RMMap::load_from_file(const char* path) {
         // 长条
         temp_note =
             std::make_shared<Hold>(note_timestamp, note_orbit, note_parameter);
+        auto hold = std::static_pointer_cast<Hold>(temp_note);
         // 构造一个面条尾物件
-        auto hold_end = std::make_shared<HoldEnd>(
-            std::static_pointer_cast<Hold>(temp_note));
+        auto hold_end = std::make_shared<HoldEnd>(hold);
         hitobjects.insert(hold_end);
         // 面尾也需要更新谱面长度
         if (hold_end->timestamp > map_length) map_length = hold_end->timestamp;
+        // 把长条物件加入缓存
+        temp_hold_list.insert(hold);
         break;
       }
     }
@@ -251,21 +253,31 @@ void RMMap::load_from_file(const char* path) {
         // 组合键头(开始键)
         temp_complex_note =
             std::make_shared<ComplexNote>(note_timestamp, note_orbit);
+        // 设置父物件
+        temp_note->parent_reference = temp_complex_note.get();
+        temp_note->compinfo = ComplexInfo::HEAD;
         // 添加本头
         temp_complex_note->child_notes.emplace_back(temp_note);
         break;
       }
       case 0x20: {
         // 组合键中间
+        // 设置父物件
+        temp_note->parent_reference = temp_complex_note.get();
+        temp_note->compinfo = ComplexInfo::BODY;
         // 只是一味添加
         temp_complex_note->child_notes.emplace_back(temp_note);
         break;
       }
       case 0xa0: {
         // 组合键尾(结束键)
+        // 设置父物件
+        temp_note->parent_reference = temp_complex_note.get();
+        temp_note->compinfo = ComplexInfo::END;
         // 先添加,再把组合键添加进去
         temp_complex_note->child_notes.emplace_back(temp_note);
         hitobjects.insert(temp_complex_note);
+        temp_complex_note.reset();
         break;
       }
     }

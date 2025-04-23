@@ -10,6 +10,7 @@
 
 #include "colorful-log.h"
 #include "mmm/map/osu/OsuMap.h"
+#include "mmm/map/rm/RMMap.h"
 
 using namespace pugi;
 
@@ -46,13 +47,16 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
     const auto extention = entry.path().extension().string();
     if (map_extention.find(extention) != map_extention.end()) {
       // 谱面文件--预加载
+      maps.emplace_back();
+      const auto map_file_string = entry.path().string();
+      auto& map = maps.back();
       if (extention == ".osu") {
-        maps.emplace_back();
-        const auto map_file_string = entry.path().string();
-        auto& map = maps.back();
         map = std::make_shared<OsuMap>();
-        maps.back()->load_from_file(map_file_string.c_str());
       }
+      if (extention == ".imd") {
+        map = std::make_shared<RMMap>();
+      }
+      maps.back()->load_from_file(map_file_string.c_str());
     } else if (audio_extention.find(extention) != audio_extention.end()) {
       // 音频文件
       audio_paths.emplace_back(entry.path().string());

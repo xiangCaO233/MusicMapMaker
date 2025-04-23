@@ -195,7 +195,7 @@ void GLCanvas::initializeGL() {
 
   // 初始化纹理
   // load_texture_from_path("../resources/textures/test/other");
-  load_texture_from_path("../resources/textures/test/1024");
+  // load_texture_from_path("../resources/textures/test/1024");
 
   // add_texture("../resources/map/Designant - Designant/bg.jpg");
 }

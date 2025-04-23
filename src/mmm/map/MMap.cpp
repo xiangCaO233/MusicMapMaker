@@ -2,11 +2,13 @@
 
 #include <algorithm>
 #include <memory>
+#include <vector>
 
 #include "../../util/mutil.h"
 #include "../hitobject/HitObject.h"
+#include "../hitobject/Note/Note.h"
+#include "../hitobject/Note/rm/ComplexNote.h"
 #include "../timing/Timing.h"
-#include "mmm/hitobject/Note/Note.h"
 
 MMap::MMap() {}
 
@@ -284,10 +286,20 @@ void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
   }
 }
 
+struct SharedPtrCompare {
+  bool operator()(const std::shared_ptr<HitObject>& a,
+                  const std::shared_ptr<HitObject>& b) const {
+    // 基类有虚函数 lessThan
+    return a->lessThan(b.get());
+  }
+};
+
 // 查询区间窗口内有的物件
 void MMap::query_object_in_range(
     std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
     const int32_t end, bool with_longhold) {
+  // 自动去重+排序
+  std::set<std::shared_ptr<HitObject>, SharedPtrCompare> adding_objects;
   /*
    *lower_bound(key)	返回第一个 ≥ key 的元素的迭代器。
    *upper_bound(key)	返回第一个 > key 的元素的迭代器。
@@ -297,7 +309,7 @@ void MMap::query_object_in_range(
     // 面尾时间>窗口起始时间且面头<结束时间就加入列表
     for (const auto& hold : temp_hold_list) {
       if (hold->timestamp < end && hold->timestamp + hold->hold_time > start) {
-        result_objects.emplace_back(hold);
+        adding_objects.insert(hold);
       }
     }
   }
@@ -305,27 +317,23 @@ void MMap::query_object_in_range(
   // 窗口内的物件
   auto startit = hitobjects.lower_bound(std::make_shared<Note>(start, 0));
 
+  ComplexNote* temp_comp = nullptr;
+
   for (; startit != hitobjects.end() && (*startit)->timestamp < end;
        ++startit) {
-    // 查重
-    if ((*startit)->object_type == HitObjectType::HOLD ||
-        (*startit)->object_type == HitObjectType::OSUHOLD) {
-      bool added{false};
-      for (const auto& obj : result_objects)
-        if (obj.get() == startit->get()) added = true;
-      if (!added) {
-        // 窗口内的没加入过的长条
-        result_objects.emplace_back(*startit);
+    // 添加组合键
+    auto note = std::dynamic_pointer_cast<Note>(*startit);
+    if (note && note->parent_reference && temp_comp != note->parent_reference) {
+      temp_comp = note->parent_reference;
+      // 将所有子物件加入渲染队列
+      for (const auto& subnote : temp_comp->child_notes) {
+        adding_objects.insert(subnote);
       }
-    } else {
-      // 窗口内的非长条物件
-      result_objects.emplace_back(*startit);
     }
+    // 添加窗口内物件
+    adding_objects.insert(*startit);
   }
 
-  // 防止乱序再排一个
-  std::ranges::sort(result_objects, [](const std::shared_ptr<HitObject>& ho1,
-                                       const std::shared_ptr<HitObject>& ho2) {
-    return ho1->timestamp < ho2->timestamp;
-  });
+  // 按set遍历加入结果
+  for (const auto& obj : adding_objects) result_objects.emplace_back(obj);
 }
