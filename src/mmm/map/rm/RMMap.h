@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <string>
 #include <vector>
 
 #include "../MMap.h"
@@ -18,6 +19,12 @@ class RMMap : public MMap {
 
   // 表格行数
   int32_t table_rows{0};
+
+  // 轨道数
+  int32_t max_orbits{0};
+
+  // 版本--一般为ez,nm,hd,mx之类的
+  std::string version;
 
   // 从文件读取谱面
   void load_from_file(const char* path) override;

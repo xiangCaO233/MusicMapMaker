@@ -84,6 +84,9 @@ OsuMap::~OsuMap() = default;
 // 从文件读取谱面
 void OsuMap::load_from_file(const char* path) {
   map_file_path = std::filesystem::path(path);
+  if (map_file_path.is_relative()) {
+    map_file_path = std::filesystem::absolute(map_file_path);
+  }
   auto fname = map_file_path.filename();
   XINFO("路径:" + map_file_path.string());
   if (map_file_path.extension() == ".osu") {
@@ -247,7 +250,8 @@ void OsuMap::load_from_file(const char* path) {
       bg_file_name.replace(bg_file_name.begin(), bg_file_name.begin() + 1, "");
       bg_file_name.replace(bg_file_name.end() - 1, bg_file_name.end(), "");
     }
-    bg_path = std::filesystem::path(map_file_path.parent_path().string() + "/" + bg_file_name);
+    bg_path = std::filesystem::path(map_file_path.parent_path().string() + "/" +
+                                    bg_file_name);
     if (background_paras.size() >= 5) {
       bgxoffset = std::stoi(background_paras.at(3));
       bgyoffset = std::stoi(background_paras.at(4));

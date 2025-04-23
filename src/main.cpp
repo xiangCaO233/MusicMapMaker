@@ -88,11 +88,15 @@ int main(int argc, char* argv[]) {
   QSurfaceFormat::setDefaultFormat(format);
 #endif  //__APPLE__
 
-  MainWindow w;
-  w.show();
+  // MainWindow w;
+  // w.show();
+
+  auto map = std::make_shared<RMMap>();
+  map->load_from_file(
+      "../resources/map/rm/4K-Lv.13-Quattro Elements Dimiourgia/Quattro "
+      "Elements Dimiourgia_4k_hd.imd");
 
   // auto map = std::make_shared<OsuMap>();
-
   // map->load_from_file(
   //     "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku
   //     - " "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku -

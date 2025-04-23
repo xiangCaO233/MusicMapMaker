@@ -1,6 +1,7 @@
 #include "RMMap.h"
 
 #include <cstdint>
+#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -58,7 +59,50 @@ void RMMap::load_from_file(const char* path) {
    * 滑动参数为3代表向右滑动3轨道
    */
   // 打开文件，以二进制模式读取
-  std::ifstream file(path, std::ios::binary);
+  map_file_path = std::filesystem::path(path);
+  if (map_file_path.is_relative()) {
+    map_file_path = std::filesystem::absolute(map_file_path);
+  }
+  auto fname = map_file_path.filename();
+  auto fnamestr = fname.string();
+
+  auto first_pos = fnamestr.find('_');
+  auto second_pos = fnamestr.find('_', first_pos + 1);
+  auto last_pos = fnamestr.rfind(".");
+
+  // 截取第二个_到最后一个.之间的字符串作为版本
+  version = second_pos < last_pos
+                ? fnamestr.substr(second_pos + 1, last_pos - second_pos - 1)
+                : "unknown";
+
+  // 截取0~第一个_之间的字符串作为文件前缀
+  auto file_presuffix = fnamestr.substr(0, first_pos);
+
+  // 前缀+.mp3作为音频文件名
+  audio_file_abs_path = map_file_path.parent_path() / (file_presuffix + ".mp3");
+
+  // 检查前缀+.png 或.jpg .jpeg有哪个用哪个作为bg
+  bool has_bg{true};
+  bg_path = map_file_path.parent_path() / (file_presuffix + ".png");
+  if (!std::filesystem::exists(bg_path)) {
+    bg_path = map_file_path.parent_path() / (file_presuffix + ".jpg");
+    if (!std::filesystem::exists(bg_path)) {
+      bg_path = map_file_path.parent_path() / (file_presuffix + ".jpeg");
+      if (!std::filesystem::exists(bg_path)) {
+        has_bg = false;
+      }
+    }
+  }
+  if (!has_bg) {
+    bg_path.clear();
+  }
+
+  XINFO("路径:" + map_file_path.string());
+  if (map_file_path.extension() != ".imd") {
+    XERROR("不是imd文件,读个锤子");
+    return;
+  }
+  std::ifstream file(map_file_path, std::ios::binary);
 
   if (!file) {
     XERROR("无法打开文件");
@@ -159,6 +203,12 @@ void RMMap::load_from_file(const char* path) {
     auto note_parameter = reader.read_value<int32_t>(data_pos);
     data_pos += 4;
 
+    // 更新轨道数
+    if (note_orbit + 1 > max_orbits) max_orbits = note_orbit + 1;
+
+    // 更新谱面长度
+    if (note_timestamp > map_length) map_length = note_timestamp;
+
     // 初始化物件
     switch (note_type) {
       case 0: {
@@ -186,6 +236,8 @@ void RMMap::load_from_file(const char* path) {
         auto hold_end = std::make_shared<HoldEnd>(
             std::static_pointer_cast<Hold>(temp_note));
         hitobjects.insert(hold_end);
+        // 面尾也需要更新谱面长度
+        if (hold_end->timestamp > map_length) map_length = hold_end->timestamp;
         break;
       }
     }
@@ -225,6 +277,10 @@ void RMMap::load_from_file(const char* path) {
     //       std::to_string(note_orbit) + "],参数:[" +
     //       std::to_string(note_parameter) + "]");
   }
+
+  // 生成图名
+  map_name = "[rm] " + file_presuffix + " [" + std::to_string(max_orbits) +
+             "k] " + version;
 
   // 添加timing--自动生成拍
   for (const auto& temp_timing : temp_timings) {
