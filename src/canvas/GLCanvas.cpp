@@ -63,13 +63,7 @@ GLCanvas::~GLCanvas() {
 };
 
 // 更新fps显示
-void GLCanvas::updateFpsDisplay(int fps) {
-  QString title_suffix = QString("%1 FPS(glcall:%2/drawcall:%3)")
-                             .arg(fps)
-                             .arg(XLogger::glcalls)
-                             .arg(XLogger::drawcalls);
-  emit update_window_title_suffix(title_suffix);
-}
+void GLCanvas::updateFpsDisplay(int fps) {}
 
 // qt事件
 // 鼠标按下事件

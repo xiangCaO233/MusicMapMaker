@@ -16,7 +16,6 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <thread>
 #include <vector>
 
 #include "../mmm/MapWorkProject.h"
@@ -24,7 +23,6 @@
 #include "../mmm/hitobject/Note/Hold.h"
 #include "../mmm/hitobject/Note/HoldEnd.h"
 #include "../mmm/hitobject/Note/Note.h"
-#include "../mmm/hitobject/Note/rm//ComplexNote.h"
 #include "../mmm/map/osu/OsuMap.h"
 #include "../mmm/map/rm/RMMap.h"
 #include "../mmm/timing/Timing.h"
@@ -95,6 +93,20 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
   // XINFO("update time:" + std::to_string(atime));
   lasttime = time;
 }
+
+// 更新fps显示
+void MapWorkspaceCanvas::updateFpsDisplay(int fps) {
+  QString title_suffix = QString(
+                             "%1 FPS(glcalls: %2 | drawcalls: %3 | frametime: "
+                             "%4 us | updatetime(qt): %5 ms)")
+                             .arg(fps)
+                             .arg(XLogger::glcalls)
+                             .arg(XLogger::drawcalls)
+                             .arg(pre_frame_time)
+                             .arg(actual_update_time);
+  emit update_window_title_suffix(title_suffix);
+}
+
 // 鼠标按下事件
 void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   // 传递事件
@@ -489,6 +501,8 @@ void MapWorkspaceCanvas::draw_beats() {
   if (!working_map) return;
 
   auto current_size = size();
+
+  std::unordered_map<std::u32string, QPointF> timestr_rects;
   for (int i = 0; i < current_beats.size(); ++i) {
     auto &beat = current_beats[i];
 
@@ -565,16 +579,20 @@ void MapWorkspaceCanvas::draw_beats() {
                 2, nullptr, divisor_color, true);
           }
 
-          // 绘制精确时间
+          // 添加绘制精确时间
           // 计算精确时间--格式化
           std::u32string timestr;
           mutil::format_music_time2u32(timestr, divisor_time);
-          renderer_manager->addText(QPointF(4, divisor_pos - 4), timestr, 16,
-                                    "ComicShannsMono Nerd Font",
-                                    QColor(255, 182, 193, 240), 0, true);
+          timestr_rects.try_emplace(timestr).first->second =
+              QPointF(4, divisor_pos - 4);
         }
       }
     }
+  }
+  // 一次全部绘制所有文本
+  for (const auto &[str, pointf] : timestr_rects) {
+    renderer_manager->addText(pointf, str, 16, "ComicShannsMono Nerd Font",
+                              QColor(255, 182, 193, 240), 0, true);
   }
 }
 
@@ -651,15 +669,13 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
     // 依据轨道宽度自动适应物件纹理尺寸
     // 物件尺寸缩放--相对于纹理尺寸
-    auto width_scale =
-        (orbit_width - 4.0) / double(head_texture->texture_image.width());
+    auto width_scale = (orbit_width - 4.0) / double(head_texture->width);
 
     // 不大于1--不放大纹理
     double object_size_scale = std::min(width_scale, 1.0);
 
-    auto head_note_size =
-        QSizeF(head_texture->texture_image.width() * object_size_scale,
-               head_texture->texture_image.height() * object_size_scale);
+    auto head_note_size = QSizeF(head_texture->width * object_size_scale,
+                                 head_texture->height * object_size_scale);
 
     // 物件距离判定线距离从下往上--反转
     // 当前物件头位置-中心
@@ -682,8 +698,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
     // 横向身的高度
     auto horizon_body_height =
-        long_note_body_horizontal_texture->texture_image.height() *
-        object_size_scale;
+        long_note_body_horizontal_texture->height * object_size_scale;
 
     // 切换纹理绘制方式为填充
     renderer_manager->texture_fillmode = TextureFillMode::FILL;
@@ -702,7 +717,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 添加long_note_body
         auto long_note = std::dynamic_pointer_cast<Hold>(note);
         // 处于组合键内,不绘制
-        if (!long_note) continue;
+        if (!long_note || long_note->parent_reference) continue;
 
         // 当前面条尾y轴位置
         auto long_note_end_pos_y =
@@ -717,8 +732,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
         // 面身实际尺寸高度-1.5note
         auto long_note_body_size =
-            QSizeF(long_note_body_vertical_texture->texture_image.width() *
-                       object_size_scale,
+            QSizeF(long_note_body_vertical_texture->width * object_size_scale,
                    long_note_end_pos_y - note_center_pos_y -
                        0.5 * head_note_bound.height());
 
@@ -732,9 +746,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 当前面条尾中心位置
         auto long_note_end_pos_x = note_center_pos_x;
         // 面尾实际尺寸
-        auto long_note_end_size = QSizeF(
-            long_note_end_texture->texture_image.width() * object_size_scale,
-            long_note_end_texture->texture_image.height() * object_size_scale);
+        auto long_note_end_size =
+            QSizeF(long_note_end_texture->width * object_size_scale,
+                   long_note_end_texture->height * object_size_scale);
         // 面尾的实际区域--在面身缺的那一note位置
         QRectF long_note_end_bound(
             long_note_end_pos_x - long_note_end_size.width() / 2.0,
@@ -747,10 +761,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
         // 节点尺寸
         auto node_size =
-            QSizeF(complex_note_node_texture->texture_image.width() *
-                       object_size_scale,
-                   complex_note_node_texture->texture_image.height() *
-                       object_size_scale);
+            QSizeF(complex_note_node_texture->width * object_size_scale,
+                   complex_note_node_texture->height * object_size_scale);
         // 节点的实际区域--也在面身缺的那note位置
         QRectF node_bound(long_note_end_pos_x - node_size.width() / 2.0,
                           long_note_end_pos_y - node_size.height() / 2.0,
@@ -798,7 +810,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
       case NoteType::SLIDE: {
         // 滑键
         auto slide = std::static_pointer_cast<Slide>(note);
-        if (!slide) continue;
+        if (!slide || slide->parent_reference) continue;
         auto endorbit = slide->orbit + slide->slide_parameter;
 
         // 横向身的终点位置
@@ -829,23 +841,61 @@ void MapWorkspaceCanvas::draw_hitobject() {
             horizon_body_width, horizon_body_height);
 
         // 箭头位置--滑键结束轨道的位置
-        auto slide_end_bound = QRectF(
-            horizon_body_end_pos_x - slide_end_texture->texture_image.width() *
-                                         object_size_scale / 2.0,
-            note_center_pos_y - slide_end_texture->texture_image.height() *
-                                    object_size_scale / 2.0,
-            slide_end_texture->texture_image.width() * object_size_scale,
-            slide_end_texture->texture_image.height() * object_size_scale);
+        auto slide_end_bound =
+            QRectF(horizon_body_end_pos_x -
+                       slide_end_texture->width * object_size_scale / 2.0,
+                   note_center_pos_y -
+                       slide_end_texture->height * object_size_scale / 2.0,
+                   slide_end_texture->width * object_size_scale,
+                   slide_end_texture->height * object_size_scale);
+
+        // 节点尺寸
+        auto node_size =
+            QSizeF(complex_note_node_texture->width * object_size_scale,
+                   complex_note_node_texture->height * object_size_scale);
+        // 节点的实际区域--也在面身缺的那note位置
+        QRectF node_bound(horizon_body_end_pos_x - node_size.width() / 2.0,
+                          note_center_pos_y - node_size.height() / 2.0,
+                          node_size.width(), node_size.height());
 
         // 先绘制横向身,然后头和箭头
         renderer_manager->addRect(horizon_body_bound,
                                   long_note_body_horizontal_texture,
                                   QColor(0, 0, 0, 255), 0, true);
-        if (!slide->parent_reference) {
-          renderer_manager->addRect(head_note_bound, head_texture,
-                                    QColor(0, 0, 0, 255), 0, true);
-          renderer_manager->addRect(slide_end_bound, slide_end_texture,
-                                    QColor(0, 0, 0, 255), 0, true);
+        switch (slide->compinfo) {
+          case ComplexInfo::NONE: {
+            // 头尾都画
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            renderer_manager->addRect(slide_end_bound, slide_end_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            break;
+          }
+          case ComplexInfo::HEAD: {
+            // 多画个头-在尾处追加一个节点
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            nodes.emplace_back(node_bound);
+            break;
+          }
+          case ComplexInfo::BODY: {
+            // 仅在尾处追加一个节点
+            nodes.emplace_back(node_bound);
+
+            break;
+          }
+          case ComplexInfo::END: {
+            // 补齐节点,画个尾
+            for (const auto &noderect : nodes) {
+              renderer_manager->addRect(noderect, complex_note_node_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
+            renderer_manager->addRect(slide_end_bound, slide_end_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
+            // 并清空节点缓存
+            nodes.clear();
+            break;
+          }
         }
         break;
       }
@@ -974,9 +1024,9 @@ void MapWorkspaceCanvas::push_shape() {
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   working_map = map;
-  map_type = map->maptype;
 
   if (map) {
+    map_type = map->maptype;
     // 加载背景图纹理
     add_texture(map->bg_path);
   }

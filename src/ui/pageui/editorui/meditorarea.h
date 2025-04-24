@@ -10,6 +10,7 @@
 
 class MMap;
 class XAudioManager;
+class CanvasContainer;
 
 namespace Ui {
 class MEditorArea;
@@ -21,6 +22,9 @@ class MEditorArea : public QWidget {
  public:
   explicit MEditorArea(QWidget *parent = nullptr);
   ~MEditorArea();
+
+  // 画布容器引用
+  CanvasContainer *canvas_container;
 
   // 当前主题
   GlobalTheme current_theme;

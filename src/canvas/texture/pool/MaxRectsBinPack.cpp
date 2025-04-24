@@ -46,8 +46,7 @@ void MaxRectsBinPack::Expand(float rate) {
 bool MaxRectsBinPack::Insert(const shared_ptr<TextureInstace> &instance,
                              FreeRectChoiceHeuristic method) {
   // XINFO("插入纹理:[" + instance->name + "]");
-  auto res = Insert(instance->texture_image.width(),
-                    instance->texture_image.height(), method);
+  auto res = Insert(instance->width, instance->height, method);
   if (res.height == 0) {
     // XWARN("空间不足");
     instance->woffset = -1;

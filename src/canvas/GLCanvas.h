@@ -88,7 +88,7 @@ class GLCanvas : public QOpenGLWindow,
 
  public slots:
   // 更新fps显示
-  void updateFpsDisplay(int fps);
+  virtual void updateFpsDisplay(int fps);
 
  signals:
   void update_window_title_suffix(QString &title_suffix);

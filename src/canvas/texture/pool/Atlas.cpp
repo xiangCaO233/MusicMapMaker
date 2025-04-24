@@ -1,5 +1,8 @@
 #include "Atlas.h"
 
+#include <string>
+
+#include "../../../log/colorful-log.h"
 #include "../Texture.h"
 #include "MaxRectsBinPack.h"
 
@@ -18,7 +21,7 @@ bool Atlas::isfull() {
 bool Atlas::add_texture(std::shared_ptr<TextureInstace> &texture) {
   if (isfull()) return false;
 
-  auto res = packer.Insert(texture, MaxRectsBinPack::RectBestAreaFit);
+  auto res = packer.Insert(texture, MaxRectsBinPack::RectBottomLeftRule);
   if (res) {
     // 成功添加映射
     texture->texture_id = sub_textures.size();

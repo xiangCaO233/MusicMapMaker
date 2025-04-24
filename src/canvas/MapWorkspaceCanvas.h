@@ -168,6 +168,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 渲染实际图形
   void push_shape() override;
 
+  // 更新fps显示
+  virtual void updateFpsDisplay(int fps) override;
+
  signals:
   // 时间戳更新信号
   void current_time_stamp_changed(double current_time_stamp);

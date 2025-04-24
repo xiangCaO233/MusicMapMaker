@@ -10,6 +10,9 @@
 
 #include "./ui_mainwindow.h"
 #include "AudioManager.h"
+#include "pageui/editorui/CanvasContainer.h"
+#include "pageui/editorui/meditorarea.h"
+#include "pageui/mpage.h"
 #include "src/util/mutil.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -44,9 +47,19 @@ MainWindow::MainWindow(QWidget* parent)
   // 连接项目选择map信号
   connect(ui->project_controller, &MProjectController::select_map,
           ui->page_widget, &MPage::project_controller_select_map);
+
+  // 连接窗口标题更新信号
+  connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+          &GLCanvas::update_window_title_suffix, this,
+          &MainWindow::update_window_title);
 }
 
 MainWindow::~MainWindow() { delete ui; }
+
+// 更新窗口标题
+void MainWindow::update_window_title(QString& suffix) {
+  setWindowTitle(tr("Music Map Maker -") + suffix);
+}
 
 // 使用主题
 void MainWindow::use_theme(GlobalTheme theme) {

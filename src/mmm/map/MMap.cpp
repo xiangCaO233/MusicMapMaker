@@ -298,8 +298,11 @@ struct SharedPtrCompare {
 void MMap::query_object_in_range(
     std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
     const int32_t end, bool with_longhold) {
+  // 全部物件
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> adding_objects;
+
   // 自动去重+排序
-  std::set<std::shared_ptr<HitObject>, SharedPtrCompare> adding_objects;
+  // std::set<std::shared_ptr<HitObject>, SharedPtrCompare> adding_objects;
   /*
    *lower_bound(key)	返回第一个 ≥ key 的元素的迭代器。
    *upper_bound(key)	返回第一个 > key 的元素的迭代器。

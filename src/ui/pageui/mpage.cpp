@@ -11,6 +11,7 @@
 
 MPage::MPage(QWidget* parent) : QWidget(parent), ui(new Ui::MPage) {
   ui->setupUi(this);
+  edit_area_widget = ui->edit_area_widget;
 
   // 连接选择map信号
   connect(this, &MPage::select_map, ui->edit_area_widget,

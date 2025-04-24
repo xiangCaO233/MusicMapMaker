@@ -49,7 +49,7 @@ std::string Slide::toString() { return ""; }
 
 // 比较器使用
 bool Slide::lessThan(const HitObject* other) const {
-  if (typeid(*this) != typeid(other)) {
+  if (typeid(*this) != typeid(*other)) {
     // 类型不同
     return timestamp < other->timestamp
                ? true

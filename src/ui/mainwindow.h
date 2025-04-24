@@ -38,6 +38,10 @@ class MainWindow : public QMainWindow {
   // 使用主题
   void use_theme(GlobalTheme theme);
 
+ public slots:
+  // 更新窗口标题
+  void update_window_title(QString &suffix);
+
  private:
   Ui::MainWindow *ui;
 };

@@ -10,6 +10,7 @@
 
 class MMap;
 class XAudioManager;
+class MEditorArea;
 
 namespace Ui {
 class MPage;
@@ -21,6 +22,10 @@ class MPage : public QWidget {
  public:
   explicit MPage(QWidget *parent = nullptr);
   ~MPage();
+
+  // 编辑区引用
+  MEditorArea *edit_area_widget;
+
   // 音频管理器
   std::shared_ptr<XAudioManager> audio_manager_reference;
 

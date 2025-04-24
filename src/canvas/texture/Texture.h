@@ -24,9 +24,6 @@ class TextureInstace {
 
   virtual ~TextureInstace();
 
-  // 是否为纹理集
-  bool is_atlas;
-
   // 名称
   std::string name;
 
@@ -79,12 +76,19 @@ class TextureInstace {
   // 纹理在纹理池的层数
   uint32_t texture_layer;
 
-  // 纹理实例
-  QImage texture_image;
+  // 纹理尺寸
+  int32_t width;
+  int32_t height;
+
+  // 纹理通道数
+  int32_t channels;
+
+  // 纹理数据
+  unsigned char* data;
 
   // 纹理在图集中的位置
-  uint32_t woffset{0};
-  uint32_t hoffset{0};
+  int32_t woffset{0};
+  int32_t hoffset{0};
 
   // 纹理池引用
   std::shared_ptr<MTexturePool> poolreference;

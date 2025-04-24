@@ -164,6 +164,31 @@ MTexturePool::~MTexturePool() = default;
 // 判满
 bool MTexturePool::isfull() { return layers.size() > current_max_layer; }
 
+void draw_texture_debug_border(uint8_t *data, int width, int height,
+                               int stride = 4) {
+  auto set_pixel = [&](int x, int y, uint8_t r, uint8_t g, uint8_t b,
+                       uint8_t a = 255) {
+    if (x < 0 || x >= width || y < 0 || y >= height) return;
+    int index = (y * width + x) * stride;
+    data[index + 0] = r;
+    data[index + 1] = g;
+    data[index + 2] = b;
+    data[index + 3] = a;
+  };
+
+  // 上下边框
+  for (int x = 0; x < width; ++x) {
+    set_pixel(x, 0, 255, 0, 0);           // 顶部红线
+    set_pixel(x, height - 1, 0, 255, 0);  // 底部绿线
+  }
+
+  // 左右边框
+  for (int y = 0; y < height; ++y) {
+    set_pixel(0, y, 0, 0, 255);            // 左侧蓝线
+    set_pixel(width - 1, y, 255, 255, 0);  // 右侧黄线
+  }
+}
+
 // 添加纹理
 bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
   bool need_new_layer{true};
@@ -212,14 +237,16 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
   // 绑定纹理到选中的纹理单元
   GLCALL(
       cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, current_gl_texture_array_handle));
-  GLCALL(cvs->glTexSubImage3D(
-      GL_TEXTURE_2D_ARRAY, 0, texture->woffset, texture->hoffset, layer_index,
-      texture->texture_image.size().width(), texture->texture_image.height(), 1,
-      GL_RGBA, GL_UNSIGNED_BYTE, texture->texture_image.bits()));
+  // draw_texture_debug_border(texture->data, texture->width, texture->height);
+  GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, texture->woffset,
+                              texture->hoffset, layer_index, texture->width,
+                              texture->height, 1, GL_RGBA, GL_UNSIGNED_BYTE,
+                              texture->data));
   // 更新纹理id--符合层索引和子纹理id
   texture->texture_id = ((uint32_t)layer_index << 16) | texture->texture_id;
-  XINFO("纹理:[" + std::to_string(texture->texture_id) + "]" + texture->name +
-        "已上传到gpu");
+  // XINFO("纹理:[" + std::to_string(texture->texture_id) + "]" + texture->name
+  // +
+  //       "已上传到gpu");
 
   // 上传纹理元数据到元数据集采样器对应位置
 
@@ -268,9 +295,8 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
   // (subindex + 1) / 32;
   // 创建元数据
   std::vector<float> metadata = {float(texture->woffset),
-                                 float(texture->hoffset),
-                                 float(texture->texture_image.width()),
-                                 float(texture->texture_image.height())};
+                                 float(texture->hoffset), float(texture->width),
+                                 float(texture->height)};
 
   // 上传子纹理元数据---等效纹素1x1
   auto subindex = atlas->sub_textures.size() - 1;
@@ -281,11 +307,11 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
   GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, (subindex + 1) % 32,
                               (subindex + 1) / 32, layer_index, 1, 1, 1,
                               GL_RGBA, GL_FLOAT, metadata.data()));
-  // XINFO("纹理元数据:[woff:" + std::to_string(texture->woffset) +
-  //       ",hoff:" + std::to_string(texture->hoffset) +
-  //       ",w:" + std::to_string(texture->texture_image.width()) +
-  //       ",h:" + std::to_string(texture->texture_image.height()) + "]" +
-  //       texture->name + "已上传到gpu");
+  XINFO("纹理元数据:[atlaslayer:" + std::to_string(layer_index) +
+        ",woff:" + std::to_string(texture->woffset) +
+        ",hoff:" + std::to_string(texture->hoffset) +
+        ",w:" + std::to_string(texture->width) + ",h:" +
+        std::to_string(texture->height) + "]" + texture->name + "添加到纹理集");
 
   // 成功添加映射
   texture_map.try_emplace(texture->name, texture);
