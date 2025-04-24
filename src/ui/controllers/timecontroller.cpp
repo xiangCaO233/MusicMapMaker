@@ -1,5 +1,11 @@
 #include "timecontroller.h"
 
+#include <functional>
+#include <memory>
+#include <string>
+
+#include "../../log/colorful-log.h"
+#include "../../mmm/MapWorkProject.h"
 #include "../../mmm/map/MMap.h"
 #include "../../util/mutil.h"
 #include "../GlobalSettings.h"
@@ -92,6 +98,31 @@ void TimeController::on_canvas_pause(bool paused) {
                              (pause ? ":/icons/play.svg" : ":/icons/pause.svg"),
                              button_color, 16, 16);
   // 切换音频播放状态
+  if (binding_map) {
+    // 检查项目使用的音频设备
+    auto &device = binding_map->project_reference->device;
+    if (device) {
+      // 在播放器查找对应音频轨道
+      std::shared_ptr<XAudioOrbit> orbit;
+      auto orbitit = device->player->mixer->audio_orbits.find(
+          binding_map->audio_reference->handle);
+      if (orbitit == device->player->mixer->audio_orbits.end()) {
+        // 新建轨道
+        orbit = std::make_shared<XAudioOrbit>(binding_map->audio_reference);
+        device->player->mixer->add_orbit(orbit);
+      } else {
+        orbit = orbitit->second;
+      }
+      // 应用暂停状态
+      orbit->paused = pause;
+      // 更新播放器状态
+      if (pause) {
+        device->player->pause();
+      } else {
+        device->player->resume();
+      }
+    }
+  }
 }
 
 // 实时信息变化槽
@@ -118,4 +149,16 @@ void TimeController::on_canvas_timestamp_changed(double time) {
   // 更新lineedit和progress
   ui->lineEdit->setText(QString::number(int32_t(time)));
   ui->playprogress->setValue(ui->playprogress->maximum() * progress);
+  if (!pause) return;
+  // 更新音频播放位置
+  if (binding_map) {
+    // 检查项目使用的音频设备
+    auto &device = binding_map->project_reference->device;
+    if (device) {
+      audio_manager_reference->set_audio_current_pos(
+          audio_manager_reference->get_outdevice_indicies()->at(
+              device->device_name),
+          binding_map->audio_reference->handle, time);
+    }
+  }
 }

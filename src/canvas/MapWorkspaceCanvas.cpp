@@ -717,7 +717,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 添加long_note_body
         auto long_note = std::dynamic_pointer_cast<Hold>(note);
         // 处于组合键内,不绘制
-        if (!long_note || long_note->parent_reference) continue;
+        if (!long_note) continue;
 
         // 当前面条尾y轴位置
         auto long_note_end_pos_y =
@@ -810,7 +810,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
       case NoteType::SLIDE: {
         // 滑键
         auto slide = std::static_pointer_cast<Slide>(note);
-        if (!slide || slide->parent_reference) continue;
+        if (!slide) continue;
         auto endorbit = slide->orbit + slide->slide_parameter;
 
         // 横向身的终点位置

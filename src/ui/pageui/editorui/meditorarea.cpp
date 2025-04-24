@@ -11,6 +11,7 @@ MEditorArea::MEditorArea(QWidget* parent)
   canvas_container = ui->canvas_container;
   // 初始化音频管理器
   audio_manager = XAudioManager::newmanager();
+  ui->audio_time_controller->audio_manager_reference = audio_manager;
   // 默认隐藏音频控制器
   ui->audio_time_controller->hide();
 

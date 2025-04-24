@@ -290,5 +290,13 @@ void MProjectController::on_audio_device_selector_currentTextChanged(
     // 获取并设置项目设备为当前选中的音频设备
     auto data = ui->audio_device_selector->currentData();
     selected_project->device = data.value<std::shared_ptr<XOutputDevice>>();
+    // 检查项目使用的音频设备上的播放器
+    if (selected_project->device &&
+        selected_project->device->device_name != "unknown output device" &&
+        !selected_project->device->player) {
+      // 没有就创建一个
+      selected_project->device->creat_player();
+      selected_project->device->player->start();
+    }
   }
 }
