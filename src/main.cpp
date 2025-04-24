@@ -68,25 +68,21 @@ int main(int argc, char* argv[]) {
           languageCode.toStdString() + ")");
   }
 
-#ifdef __APPLE__
   // 初始化gl版本
   QSurfaceFormat format;
+#ifdef __APPLE__
   // gl4.1版本
   format.setVersion(4, 1);
-  // gl核心模式
-  format.setProfile(QSurfaceFormat::CoreProfile);
-  // 应用gl设置
-  QSurfaceFormat::setDefaultFormat(format);
 #else
-  // 初始化gl版本
-  QSurfaceFormat format;
   // gl4.1版本
   format.setVersion(4, 5);
+#endif  //__APPLE__
   // gl核心模式
   format.setProfile(QSurfaceFormat::CoreProfile);
+  // 禁用用V-Sync
+  format.setSwapInterval(0);
   // 应用gl设置
   QSurfaceFormat::setDefaultFormat(format);
-#endif  //__APPLE__
 
   MainWindow w;
   w.show();

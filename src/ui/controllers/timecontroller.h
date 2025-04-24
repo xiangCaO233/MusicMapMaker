@@ -6,8 +6,6 @@
 #include <QWidget>
 #include <memory>
 
-class XAudioManager;
-
 class MMap;
 enum class GlobalTheme;
 
@@ -24,9 +22,6 @@ class TimeController : public QWidget {
 
   // 当前主题
   GlobalTheme current_theme;
-
-  // 音频管理器
-  std::shared_ptr<XAudioManager> audio_manager_reference;
 
   // 暂停状态
   bool pause{true};
@@ -57,6 +52,11 @@ class TimeController : public QWidget {
  signals:
   // 时间控制器编辑时间信号
   void time_edited(double time);
+  void pause_button_changed(bool paused);
+
+ private slots:
+  // 暂停按钮
+  void on_pausebutton_clicked();
 
  private:
   Ui::audio_time_controller *ui;

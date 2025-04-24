@@ -9,7 +9,6 @@
 #include "../../GlobalSettings.h"
 
 class MMap;
-class XAudioManager;
 class MEditorArea;
 
 namespace Ui {
@@ -25,9 +24,6 @@ class MPage : public QWidget {
 
   // 编辑区引用
   MEditorArea *edit_area_widget;
-
-  // 音频管理器
-  std::shared_ptr<XAudioManager> audio_manager_reference;
 
   // page名的谱面映射表
   std::unordered_map<QString, std::shared_ptr<MMap>> pagetext_maps_map;

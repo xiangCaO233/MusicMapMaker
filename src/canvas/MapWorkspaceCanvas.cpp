@@ -8,6 +8,7 @@
 #include <qtmetamacros.h>
 
 #include <QKeyEvent>
+#include <QThread>
 #include <QTimer>
 #include <QWheelEvent>
 #include <algorithm>
@@ -58,27 +59,19 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(red);
   t4.emplace_back(blue);
 
-  // 获取主屏幕的刷新率
-  QScreen *primaryScreen = QGuiApplication::primaryScreen();
-  float refreshRate = primaryScreen->refreshRate();
-  XINFO("显示器刷新率:" + std::to_string(refreshRate) + "Hz");
-
-  // 垂直同步帧间隔
-  des_update_time = qRound(1000.0 / refreshRate);
-
-  // 初始化定时器
-  refresh_timer = new QTimer(this);
-
-  // 设置为高精度定时器
-  refresh_timer->setTimerType(Qt::PreciseTimer);
-  QObject::connect(refresh_timer, &QTimer::timeout, [this]() { update(); });
-  refresh_timer->setInterval(des_update_time);
-
-  // 启动高精度定时器
-  refresh_timer->start();
+  // 初始化特效纹理序列
+  for (int i = 1; i <= 17; ++i) {
+    hiteffects.emplace_back(
+        texture_full_map["onhit/" + std::to_string(i) + ".png"]);
+  }
 }
 
-MapWorkspaceCanvas::~MapWorkspaceCanvas() = default;
+MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
+
+// 时间控制器暂停按钮触发
+void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
+  pasue = paused;
+}
 
 // qt事件
 void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
@@ -173,6 +166,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
     auto current_beat_it = working_map->beats.lower_bound(
         std::make_shared<Beat>(200, current_time_stamp, current_time_stamp));
 
+    // TODO(xiang 2025-04-24): 修复吸附的bug
     // 待吸附列表
     std::vector<std::shared_ptr<Beat>> magnet_beats;
 
@@ -267,6 +261,12 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
     current_time_stamp +=
         scroll_unit * temp_scroll_ration * scroll_ratio * scroll_direction;
   }
+  if (current_time_stamp < 0) {
+    current_time_stamp = 0;
+  }
+  if (current_time_stamp > working_map->map_length) {
+    current_time_stamp = working_map->map_length;
+  }
 
   emit current_time_stamp_changed(current_time_stamp);
 }
@@ -282,9 +282,8 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
   if (keycode == 32) {
     if (!working_map) return;
 
-    if (working_map->project_reference->device->device_name ==
-        "unknown output device") {
-      XWARN("未选择设备,无法切换暂停状态");
+    if (working_map->project_reference->devicename == "unknown output device") {
+      XWARN("未选择音频输出设备,无法切换暂停状态");
       return;
     }
     // 空格
@@ -631,6 +630,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
     default:
       break;
   }
+
   // 物件头的纹理
   std::shared_ptr<TextureInstace> head_texture =
       texture_full_map["hitobject/head.png"];
@@ -900,6 +900,18 @@ void MapWorkspaceCanvas::draw_hitobject() {
         break;
       }
     }
+    // 最后添加特效动画
+    // if (std::abs(note->timestamp - current_time_stamp) <= 3) {
+    //   // 与判定线相差3ms内
+    //   auto effect_work = [&]() {
+    //     for (int i = 0; i < hiteffects.size(); ++i) {
+    //       renderer_manager->addRect(head_note_bound, hiteffects[i],
+    //                                 QColor(0, 0, 0, 255), 0, true);
+    //     }
+    //   };
+    //   std::thread t(effect_work);
+    //   t.detach();
+    // }
   }
 }
 
@@ -1005,6 +1017,12 @@ void MapWorkspaceCanvas::push_shape() {
     if (!pasue) {
       // 未暂停,更新当前时间戳
       current_time_stamp += actual_update_time;
+      if (current_time_stamp < 0) {
+        current_time_stamp = 0;
+      }
+      if (current_time_stamp > working_map->map_length) {
+        current_time_stamp = working_map->map_length;
+      }
       emit current_time_stamp_changed(current_time_stamp);
     }
 

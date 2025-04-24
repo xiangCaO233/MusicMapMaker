@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "../../mmm/MapWorkProject.h"
+#include "audio/BackgroundAudio.h"
 #include "ui_mprojectcontroller.h"
 
 MProjectController::MProjectController(QWidget* parent)
@@ -140,22 +141,21 @@ void MProjectController::select_project(
                                Qt::UserRole + 1);
       video_model->appendRow(video_path_item);
     }
-    if (project->device) {
+
+    if (project->devicename != "unknown output device") {
       device_sync_lock = true;
       // 选中此设备
       ui->audio_device_selector->setCurrentText(
-          QString::fromStdString(project->device->device_name));
+          QString::fromStdString(project->devicename));
     }
   }
 
   // 初始化设备列表并选中此项目选中的设备
   ui->audio_device_selector->clear();
   // 更新设备列表
-  auto devices = audio_manager_reference->get_outdevices();
-  for (const auto& [device_id, device] : *devices) {
+  for (const auto& [device_id, device] : (*BackgroundAudio::devices())) {
     ui->audio_device_selector->addItem(
-        QString::fromStdString(device->device_name),
-        QVariant::fromValue(device));
+        QString::fromStdString(device->device_name));
   }
 }
 
@@ -286,17 +286,11 @@ void MProjectController::on_audio_device_selector_currentTextChanged(
     device_sync_lock = false;
     return;
   }
+
   if (selected_project) {
     // 获取并设置项目设备为当前选中的音频设备
-    auto data = ui->audio_device_selector->currentData();
-    selected_project->device = data.value<std::shared_ptr<XOutputDevice>>();
-    // 检查项目使用的音频设备上的播放器
-    if (selected_project->device &&
-        selected_project->device->device_name != "unknown output device" &&
-        !selected_project->device->player) {
-      // 没有就创建一个
-      selected_project->device->creat_player();
-      selected_project->device->player->start();
-    }
+    selected_project->devicename =
+        ui->audio_device_selector->currentText().toStdString();
+    BackgroundAudio::init_device(selected_project->devicename);
   }
 }

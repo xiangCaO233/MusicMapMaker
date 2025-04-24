@@ -143,7 +143,11 @@ void OsuMap::load_from_file(const char* path) {
     // 初始化音频绝对路径
     // XINFO("map file parent:" + map_file_path.parent_path().string());
     // XINFO(AudioFilename);
-    audio_file_abs_path = map_file_path.parent_path() / AudioFilename;
+    while (AudioFilename.starts_with(' ')) {
+      AudioFilename.erase(0, 1);
+    }
+    audio_file_abs_path = std::filesystem::weakly_canonical(
+        std::filesystem::absolute(map_file_path.parent_path() / AudioFilename));
 
     // XINFO("audio path:" + audio_file_abs_path.string());
 

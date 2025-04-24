@@ -16,9 +16,6 @@ MPage::MPage(QWidget* parent) : QWidget(parent), ui(new Ui::MPage) {
   // 连接选择map信号
   connect(this, &MPage::select_map, ui->edit_area_widget,
           &MEditorArea::on_selectnewmap);
-
-  // 传递音频管理器引用
-  audio_manager_reference = ui->edit_area_widget->audio_manager;
 }
 
 MPage::~MPage() { delete ui; }

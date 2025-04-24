@@ -10,9 +10,7 @@
 
 #include "GlobalSettings.h"
 
-class XAudioManager;
 class MapWorkspaceCanvas;
-class XOutputDevice;
 class MMap;
 class HelloUserPage;
 

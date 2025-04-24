@@ -9,7 +9,6 @@
 #include "../../GlobalSettings.h"
 
 class MMap;
-class XAudioManager;
 class CanvasContainer;
 
 namespace Ui {
@@ -28,9 +27,6 @@ class MEditorArea : public QWidget {
 
   // 当前主题
   GlobalTheme current_theme;
-
-  // 音频管理器
-  std::shared_ptr<XAudioManager> audio_manager;
 
   // 锁定模式-不自动切换
   bool lock_mode_auto_switch{false};

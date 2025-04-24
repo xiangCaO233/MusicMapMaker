@@ -61,7 +61,8 @@ void RMMap::load_from_file(const char* path) {
   // 打开文件，以二进制模式读取
   map_file_path = std::filesystem::path(path);
   if (map_file_path.is_relative()) {
-    map_file_path = std::filesystem::absolute(map_file_path);
+    map_file_path = std::filesystem::weakly_canonical(
+        std::filesystem::absolute(map_file_path));
   }
   auto fname = map_file_path.filename();
   auto fnamestr = fname.string();

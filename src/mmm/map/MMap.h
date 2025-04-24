@@ -13,7 +13,6 @@
 #include "../hitobject/Note/Hold.h"
 #include "../timing/Timing.h"
 
-class XSound;
 class MapWorkProject;
 
 enum class MapType {
@@ -39,11 +38,8 @@ class MMap {
   // map文件路径
   std::filesystem::path map_file_path;
 
-  // 音频绝对路径
+  // 谱面音频绝对路径
   std::filesystem::path audio_file_abs_path;
-
-  // 音频引用
-  std::shared_ptr<XSound> audio_reference;
 
   // 项目引用
   std::shared_ptr<MapWorkProject> project_reference;

@@ -6,6 +6,7 @@
 #include <qdiriterator.h>
 #include <qlogging.h>
 #include <qobject.h>
+#include <qopenglversionfunctions.h>
 #include <qpaintdevice.h>
 #include <qpainter.h>
 #include <qpoint.h>
@@ -16,6 +17,7 @@
 #include <QMouseEvent>
 #include <QRandomGenerator>
 #include <QTextStream>
+#include <QThread>
 #include <QTimer>
 #include <chrono>
 #include <filesystem>
@@ -42,24 +44,29 @@
 bool GLCanvas::need_update_sampler_location = false;
 
 GLCanvas::GLCanvas(QWidget *parent) {
-  // 启用鼠标跟踪
-  // setMouseTracking(true);
-  // setUpdateBehavior(QOpenGLWidget::PartialUpdate);
   // 初始化帧率计数器
   fpsCounter = new FrameRateCounter();
-
-  // horizontalLayout->setSpacing(0);
-  // horizontalLayout->setObjectName("horizontalLayout");
-  // horizontalLayout->setContentsMargins(0, 0, 0, 0);
 
   // 更新fps显示内容
   connect(fpsCounter, &FrameRateCounter::fpsUpdated, this,
           &GLCanvas::updateFpsDisplay);
+
+  // 获取主屏幕的刷新率
+  QScreen *primaryScreen = QGuiApplication::primaryScreen();
+  float refreshRate = primaryScreen->refreshRate();
+
+  XINFO("显示器刷新率:" + std::to_string(refreshRate) + "Hz");
+
+  // 垂直同步帧间隔
+  des_update_time = qRound(1000.0 / refreshRate);
 }
 
 GLCanvas::~GLCanvas() {
   // 释放渲染管理器
   if (renderer_manager) delete renderer_manager;
+  // 确保刷新线程退出
+  stop_refresh = true;
+  // update_thread.join();
 };
 
 // 更新fps显示
@@ -165,10 +172,7 @@ void GLCanvas::initializeGL() {
   // 启用 最大 MSAA
   context()->format().setSamples(maxSamples);
 
-  XINFO("启用垂直同步");
-
-  // 启用V-Sync
-  context()->format().setSwapInterval(1);
+  // XINFO("启用垂直同步");
 
   // 检查最大ubo size
   int maxUBOSize;
@@ -192,7 +196,30 @@ void GLCanvas::initializeGL() {
   // load_texture_from_path("../resources/textures/test/1024");
 
   // add_texture("../resources/map/Designant - Designant/bg.jpg");
+  start_render();
 }
+
+void GLCanvas::start_render() {
+  // 初始化定时器
+  auto render_work = [&]() {
+    QElapsedTimer timer;
+    timer.start();
+
+    while (!stop_refresh) {
+      qint64 start = timer.elapsed();
+      // 触发主线程更新
+      QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
+
+      qint64 elapsed = timer.elapsed() - start;
+      if (elapsed < des_update_time) {
+        QThread::usleep((des_update_time - elapsed) * 1000);
+      }
+    }
+  };
+  update_thread = std::thread(render_work);
+  update_thread.detach();
+}
+
 void GLCanvas::resizeGL(int w, int h) {
   GLCALL(glViewport(0, 0, w, h));
   // 投影矩阵
@@ -213,8 +240,7 @@ void GLCanvas::resizeGL(int w, int h) {
   }
 }
 
-// 绘制画布
-void GLCanvas::paintGL() {
+void GLCanvas::rendergl() {
   XLogger::glcalls = 0;
   XLogger::drawcalls = 0;
   auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -237,6 +263,9 @@ void GLCanvas::paintGL() {
   pre_drawcall = XLogger::drawcalls;
   fpsCounter->frameRendered();
 }
+
+// 绘制画布
+void GLCanvas::paintGL() { rendergl(); }
 
 // 渲染实际图形
 void GLCanvas::push_shape() {}

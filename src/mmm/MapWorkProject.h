@@ -8,14 +8,9 @@
 #include <memory>
 #include <pugixml.hpp>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "map/MMap.h"
-
-class XAudioManager;
-class XOutputDevice;
-class XSound;
 
 struct ProjectConfig {
   // 项目名称
@@ -30,7 +25,7 @@ struct ProjectConfig {
   uint32_t canvas_resolution_height;
 
   // 使用的音频设备名
-  std::shared_ptr<XOutputDevice> device;
+  std::string device;
 };
 
 // 项目
@@ -38,7 +33,6 @@ class MapWorkProject {
  public:
   // 构造MapWorkProject
   explicit MapWorkProject(const std::filesystem::path& project_path,
-                          std::shared_ptr<XAudioManager> audio_manager,
                           const char* name = nullptr);
 
   // 析构MapWorkProject
@@ -47,20 +41,14 @@ class MapWorkProject {
   // 配置
   ProjectConfig config;
 
-  // 音频管理器引用
-  std::shared_ptr<XAudioManager> audio_manager_reference;
-
   // 项目中谱的列表
   std::vector<std::shared_ptr<MMap>> maps;
 
   // 当前项目所使用的音频输出设备
-  std::shared_ptr<XOutputDevice> device;
+  std::string devicename;
 
   // 项目中音频的路径列表
   std::vector<std::string> audio_paths;
-
-  // 项目中的全部音频
-  std::unordered_map<std::string, std::shared_ptr<XSound>> audios;
 
   // 项目中图片的路径列表
   std::vector<std::string> image_paths;
@@ -72,7 +60,7 @@ class MapWorkProject {
   pugi::xml_document config_xml;
 
   // 设置项目音频输出设备
-  void set_audio_device(std::shared_ptr<XOutputDevice>& outdevice);
+  void set_audio_device(std::string& outdevicename);
 };
 
 #endif  // M_MAPWORKPROJECT_H

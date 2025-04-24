@@ -30,10 +30,10 @@ void MMap::generate_divisor_policy(const std::shared_ptr<Beat>& beat) {
       // set自动排序+去重
       timestamps.insert(note->timestamp);
     }
-    // 允许8ms误差
+    // 允许5ms误差
     beat->divisors = mutil::calculateDivisionStrategy(
         timestamps, beat->start_timestamp,
-        beat->end_timestamp - beat->start_timestamp, 8);
+        beat->end_timestamp - beat->start_timestamp, 5);
   }
 }
 

@@ -5,13 +5,11 @@
 #include <qtmetamacros.h>
 
 #include <memory>
-#include <thread>
 #include <unordered_map>
 #include <vector>
 
 #include "../mmm/Beat.h"
 #include "../mmm/map/MMap.h"
-#include "AudioManager.h"
 #include "GLCanvas.h"
 
 // 鼠标正在操作的区域
@@ -42,13 +40,12 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 刷新定时器
   QTimer *refresh_timer;
-  // 刷新线程
-  std::thread refresh_thread;
-  // 停止刷新线程标识
-  bool stop_refresh{false};
+  // 自补偿定时器
+  // QElapsedTimer frameTimer;
 
-  // 目标刷新时间间隔
-  int32_t des_update_time{8};
+  // 打击特效纹理序列
+  std::vector<std::shared_ptr<TextureInstace>> hiteffects;
+
   // 实际刷新时间间隔
   double actual_update_time{0};
 
@@ -126,9 +123,6 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 析构MapWorkspaceCanvas
   ~MapWorkspaceCanvas() override;
 
-  // 音频管理器
-  std::shared_ptr<XAudioManager> audio_manager;
-
   // 分拍线颜色主题
   std::unordered_map<int32_t, std::vector<QColor>> divisors_color_theme;
 
@@ -170,6 +164,10 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 更新fps显示
   virtual void updateFpsDisplay(int fps) override;
+
+ public slots:
+  // 时间控制器暂停按钮触发
+  void on_timecontroller_pause_button_changed(bool paused);
 
  signals:
   // 时间戳更新信号

@@ -9,7 +9,8 @@
 #include <string>
 
 #include "./ui_mainwindow.h"
-#include "AudioManager.h"
+#include "audio/BackgroundAudio.h"
+#include "controllers/timecontroller.h"
 #include "pageui/editorui/CanvasContainer.h"
 #include "pageui/editorui/meditorarea.h"
 #include "pageui/mpage.h"
@@ -18,24 +19,16 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
+  BackgroundAudio::init();
 
   // 注册QVariant数据类型
   // 注册 string 类型
   qRegisterMetaType<std::string>("std::string");
-  // 注册 shared_ptr<XOutputDevice> 类型
-  qRegisterMetaType<std::shared_ptr<XOutputDevice>>(
-      "std::shared_ptr<XOutputDevice>");
   // 注册 shared_ptr<MMap> 类型
   qRegisterMetaType<std::shared_ptr<MMap>>("std::shared_ptr<MMap>");
   // 注册 shared_ptr<MapWorkProject> 类型
   qRegisterMetaType<std::shared_ptr<MapWorkProject>>(
       "std::shared_ptr<MapWorkProject>");
-
-  // 传递音频管理器引用
-  ui->file_controller->audio_manager_reference =
-      ui->page_widget->audio_manager_reference;
-  ui->project_controller->audio_manager_reference =
-      ui->page_widget->audio_manager_reference;
 
   // 默认使用Dark主题
   use_theme(GlobalTheme::DARK);

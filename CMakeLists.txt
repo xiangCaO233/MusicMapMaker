@@ -84,6 +84,8 @@ set(GLSL_FILES
 # 项目源文件
 set(PROJECT_SOURCES
   src/main.cpp
+	src/audio/BackgroundAudio.h
+	src/audio/BackgroundAudio.cpp
   src/ui/mainwindow.cpp
   src/ui/mainwindow.h
   src/ui/mainwindow.ui

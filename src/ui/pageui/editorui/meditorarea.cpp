@@ -9,9 +9,6 @@ MEditorArea::MEditorArea(QWidget* parent)
     : QWidget(parent), ui(new Ui::MEditorArea) {
   ui->setupUi(this);
   canvas_container = ui->canvas_container;
-  // 初始化音频管理器
-  audio_manager = XAudioManager::newmanager();
-  ui->audio_time_controller->audio_manager_reference = audio_manager;
   // 默认隐藏音频控制器
   ui->audio_time_controller->hide();
 
@@ -19,10 +16,13 @@ MEditorArea::MEditorArea(QWidget* parent)
   connect(this, &MEditorArea::switched_map, ui->audio_time_controller,
           &TimeController::on_selectnewmap);
 
-  // 连接画布暂停信号和时间控制器暂停槽
+  // 连接画布暂停信号和时间控制器暂停槽(来回)
   connect(ui->canvas_container->canvas.data(),
           &MapWorkspaceCanvas::pause_signal, ui->audio_time_controller,
           &TimeController::on_canvas_pause);
+  connect(ui->audio_time_controller, &TimeController::pause_button_changed,
+          ui->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
 
   // 连接画布时间更新信号
   connect(ui->canvas_container->canvas.data(),
@@ -89,6 +89,7 @@ void MEditorArea::use_theme(GlobalTheme theme) {
 }
 
 // 画布时间变化事件
+// 更新进度条
 void MEditorArea::on_canvas_timestamp_changed(double time) {
   double t = 0.0;
   if (ui->canvas_container->canvas.data()->working_map) {

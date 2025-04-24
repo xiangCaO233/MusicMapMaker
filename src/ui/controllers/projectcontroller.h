@@ -12,7 +12,6 @@ class MProjectController;
 
 class MapWorkProject;
 class MMap;
-class XAudioManager;
 
 class MProjectController : public QWidget {
   Q_OBJECT
@@ -28,9 +27,6 @@ class MProjectController : public QWidget {
 
   // 设备同步锁
   bool device_sync_lock{false};
-
-  // 音频管理器引用
-  std::shared_ptr<XAudioManager> audio_manager_reference;
 
   // 当前选中的制谱工程
   std::shared_ptr<MapWorkProject> selected_project{nullptr};

@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <filesystem>
 #include <memory>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -49,7 +50,17 @@ class GLCanvas : public QOpenGLWindow,
   // 析构GLCanvas
   ~GLCanvas() override;
 
+  // fps计数器
   FrameRateCounter *fpsCounter;
+
+  // 刷新线程
+  std::thread update_thread;
+
+  // 目标刷新时间间隔
+  int32_t des_update_time{8};
+
+  // 停止刷新线程标识
+  bool stop_refresh{false};
 
   // 上一帧glcall
   long pre_glcalls{0};
@@ -85,6 +96,10 @@ class GLCanvas : public QOpenGLWindow,
 
   // 渲染实际图形
   virtual void push_shape();
+
+  void start_render();
+
+  void rendergl();
 
  public slots:
   // 更新fps显示
