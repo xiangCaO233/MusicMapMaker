@@ -320,6 +320,8 @@ void OsuMap::load_from_file(const char* path) {
       hitobjects.insert(osu_note);
     }
 
+    std::set<std::shared_ptr<Timing>, TimingComparator> basetimings;
+    std::set<std::shared_ptr<Timing>, TimingComparator> notbasetimings;
     // 创建timing
     for (int i = 0; i < osureader.current_timing_index; i++) {
       // 按顺序读取timing点
@@ -335,7 +337,21 @@ void OsuMap::load_from_file(const char* path) {
       auto osu_timing = std::make_shared<OsuTiming>();
       // 使用读取出的参数初始化timing
       osu_timing->from_osu_description(timing_point_paras);
-      insert_timing(osu_timing);
+      if (osu_timing->is_inherit_timing) {
+        notbasetimings.insert(osu_timing);
+      } else {
+        basetimings.insert(osu_timing);
+      }
+    }
+    // 先倒序添加全部基准timing--生成分拍
+    for (auto rbegin = basetimings.rbegin(); rbegin != basetimings.rend();
+         ++rbegin) {
+      insert_timing(*rbegin);
+    }
+    // 再倒序添加全部变速timing
+    for (auto rbegin = notbasetimings.rbegin(); rbegin != notbasetimings.rend();
+         ++rbegin) {
+      insert_timing(*rbegin);
     }
 
   } else {

@@ -35,6 +35,12 @@ class TimeController : public QWidget {
   // 更新全局音量按钮(主题)
   void update_global_volume_button();
 
+  // 更新音频状态
+  void update_audio_status();
+
+  // 更新暂停按钮
+  void update_pause_button();
+
  public slots:
   // page选择了新map事件
   void on_selectnewmap(std::shared_ptr<MMap> &map);

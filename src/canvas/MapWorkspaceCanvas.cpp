@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <set>
 #include <string>
@@ -29,6 +30,7 @@
 #include "../mmm/timing/Timing.h"
 #include "../mmm/timing/osu/OsuTiming.h"
 #include "../util/mutil.h"
+#include "audio/BackgroundAudio.h"
 #include "colorful-log.h"
 #include "mmm/hitobject/Note/rm/Slide.h"
 
@@ -77,14 +79,32 @@ void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
 void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
   GLCanvas::paintEvent(event);
 
-  static long long lasttime = 0;
+  static long lasttime = 0;
   auto time = std::chrono::duration_cast<std::chrono::microseconds>(
                   std::chrono::high_resolution_clock::now().time_since_epoch())
                   .count();
   auto atime = time - lasttime;
   actual_update_time = double(atime) / 1000.0;
-  // XINFO("update time:" + std::to_string(atime));
+  if (actual_update_time - des_update_time > 1.5) {
+    XWARN("qt update delayed:" + std::to_string(actual_update_time));
+  }
   lasttime = time;
+
+  if (!pasue) {
+    // 未暂停,更新当前时间戳
+    current_time_stamp += actual_update_time;
+    if (current_time_stamp < 0) {
+      current_time_stamp = 0;
+      pasue = true;
+      emit pause_signal(pasue);
+    }
+    if (current_time_stamp > working_map->map_length) {
+      current_time_stamp = working_map->map_length;
+      pasue = true;
+      emit pause_signal(pasue);
+    }
+    update_mapcanvas_timepos();
+  }
 }
 
 // 更新fps显示
@@ -263,12 +283,15 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   }
   if (current_time_stamp < 0) {
     current_time_stamp = 0;
+    pasue = true;
+    emit pause_signal(pasue);
   }
   if (current_time_stamp > working_map->map_length) {
     current_time_stamp = working_map->map_length;
+    pasue = true;
+    emit pause_signal(pasue);
   }
-
-  emit current_time_stamp_changed(current_time_stamp);
+  update_mapcanvas_timepos();
 }
 
 // 键盘按下事件
@@ -308,6 +331,68 @@ void MapWorkspaceCanvas::focusInEvent(QFocusEvent *event) {
 void MapWorkspaceCanvas::focusOutEvent(QFocusEvent *event) {
   // 传递事件
   GLCanvas::focusOutEvent(event);
+}
+
+// 更新谱面时间位置
+void MapWorkspaceCanvas::update_mapcanvas_timepos() {
+  // 更新项目中自己的位置
+  working_map->project_reference->map_canvasposes.at(working_map) =
+      current_time_stamp;
+  // 最后一次变速的速度
+  // static double last_speed_zoom{1.0};
+
+  // // 更新实际变速的时间线拉伸值
+  // // 拉伸原点速度--根据相对bpm
+  // double pre_speed = current_abs_timing->basebpm / *preference_bpm;
+  // if (pre_speed_timing) {
+  //   // 存在上一个变速timing--应用此变速
+  //   pre_speed *= pre_speed_timing->bpm;
+  // }
+
+  // // 拉伸结束点速度--根据下一个变速timing
+  // double end_speed = -1.0;
+  // if (next_speed_timing) {
+  //   // 存在下一个变速timing--使用此变速
+  //   end_speed = next_speed_timing->bpm;
+  // }
+
+  // // 拉伸长度--50ms
+  // double distance_with_pretiming;
+  // if (pre_speed_timing) {
+  //   // 从前一timing时间戳拉伸50ms
+  //   distance_with_pretiming = current_time_stamp -
+  //   pre_speed_timing->timestamp;
+  // } else {
+  //   // 从上一个绝对timing拉伸
+  //   distance_with_pretiming =
+  //       current_time_stamp - current_abs_timing->timestamp;
+  // }
+  // // 应用拉伸
+  // if (distance_with_pretiming > 0 && distance_with_pretiming <= 50) {
+  //   // 范围内
+  //   speed_zoom = last_speed_zoom +
+  //                (pre_speed - last_speed_zoom) / 50.0 *
+  //                distance_with_pretiming;
+  // } else {
+  //   // 超出拉伸范围-直接使用最终结果
+  //   speed_zoom = pre_speed;
+  // }
+
+  // double distance_with_nexttiming;
+  // if (end_speed != -1.0) {
+  //   distance_with_nexttiming =
+  //       next_speed_timing->timestamp - current_time_stamp;
+  //   // 应用拉伸
+  //   if (distance_with_nexttiming > 0 && distance_with_pretiming <= 50) {
+  //     // 范围内
+  //     speed_zoom = last_speed_zoom + (end_speed - last_speed_zoom) / 50.0 *
+  //                                        distance_with_nexttiming;
+  //   }
+  // }
+
+  // // 更新最后一次的变速值
+  // last_speed_zoom = speed_zoom;
+  emit current_time_stamp_changed(current_time_stamp);
 }
 
 // 调整尺寸事件
@@ -723,18 +808,18 @@ void MapWorkspaceCanvas::draw_hitobject() {
         auto long_note_end_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
             (long_note->hold_end_reference->timestamp - current_time_stamp) *
-                timeline_zoom * (pause ? 1.0 : speed_zoom);
+                timeline_zoom * (pasue ? 1.0 : speed_zoom);
+        auto long_note_body_height = (long_note_end_pos_y - note_center_pos_y);
 
         // 当前面条身中心位置,y位置偏下一个note
         auto long_note_body_pos_x = note_center_pos_x;
         auto long_note_body_pos_y =
             note_center_pos_y + (long_note_end_pos_y - note_center_pos_y) / 2.0;
 
-        // 面身实际尺寸高度-1.5note
+        // 面身实际尺寸高度-0.5note
         auto long_note_body_size =
             QSizeF(long_note_body_vertical_texture->width * object_size_scale,
-                   long_note_end_pos_y - note_center_pos_y -
-                       0.5 * head_note_bound.height());
+                   long_note_body_height - 0.5 * head_note_bound.height());
 
         // 面身的实际区域--
         QRectF long_note_body_bound(
@@ -920,7 +1005,6 @@ void MapWorkspaceCanvas::push_shape() {
   if (working_map) {
     // 当前有绑定图
     auto current_size = size();
-
     // 读取获取当前时间附近的timings
     std::vector<std::shared_ptr<Timing>> temp_timings;
     working_map->query_around_timing(temp_timings, current_time_stamp);
@@ -1014,23 +1098,10 @@ void MapWorkspaceCanvas::push_shape() {
                                        int32_t(current_time_area_start),
                                        int32_t(current_time_area_end), true);
 
-    if (!pasue) {
-      // 未暂停,更新当前时间戳
-      current_time_stamp += actual_update_time;
-      if (current_time_stamp < 0) {
-        current_time_stamp = 0;
-      }
-      if (current_time_stamp > working_map->map_length) {
-        current_time_stamp = working_map->map_length;
-      }
-      emit current_time_stamp_changed(current_time_stamp);
-    }
-
     draw_background();
     draw_beats();
     draw_hitobject();
   }
-
   draw_preview_content();
 
   draw_judgeline();
@@ -1041,10 +1112,18 @@ void MapWorkspaceCanvas::push_shape() {
 
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
+  // 此处确保了未打开项目是无法switchmap的(没有选项)
   working_map = map;
 
   if (map) {
     map_type = map->maptype;
+    // 更新谱面长度(如果音乐比谱面长)
+    auto map_audio_length =
+        BackgroundAudio::get_audio_length(map->audio_file_abs_path);
+    XINFO("maplength:" + std::to_string(map->map_length));
+    XINFO("audiolength:" + std::to_string(map_audio_length));
+    if (map->map_length < map_audio_length) map->map_length = map_audio_length;
+
     // 加载背景图纹理
     add_texture(map->bg_path);
   }

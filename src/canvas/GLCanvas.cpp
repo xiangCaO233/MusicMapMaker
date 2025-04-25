@@ -58,7 +58,7 @@ GLCanvas::GLCanvas(QWidget *parent) {
   XINFO("显示器刷新率:" + std::to_string(refreshRate) + "Hz");
 
   // 垂直同步帧间隔
-  des_update_time = qRound(1000.0 / refreshRate);
+  des_update_time = 1000.0 / refreshRate;
 }
 
 GLCanvas::~GLCanvas() {
@@ -183,19 +183,12 @@ void GLCanvas::initializeGL() {
   GLCALL(glEnable(GL_BLEND));
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-  // GLCALL(glEnable(GL_SCISSOR_TEST));
-
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 65536);
 
   // 初始化默认纹理
   load_texture_from_path("../resources/textures/default");
 
-  // 初始化纹理
-  // load_texture_from_path("../resources/textures/test/other");
-  // load_texture_from_path("../resources/textures/test/1024");
-
-  // add_texture("../resources/map/Designant - Designant/bg.jpg");
   start_render();
 }
 
@@ -211,8 +204,8 @@ void GLCanvas::start_render() {
       QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
 
       qint64 elapsed = timer.elapsed() - start;
-      if (elapsed < des_update_time) {
-        QThread::usleep((des_update_time - elapsed) * 1000);
+      if (elapsed < des_update_time / 2.0) {
+        usleep((des_update_time / 2.0 - elapsed) * 1000);
       }
     }
   };

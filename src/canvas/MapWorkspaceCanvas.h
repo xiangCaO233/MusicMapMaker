@@ -52,6 +52,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 暂停播放
   bool pasue{true};
 
+  // 播放速度
+  double playspeed{1.0f};
+
   // 鼠标操作区
   MouseOperationArea operation_area;
 
@@ -76,6 +79,10 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 当前正在使用的绝对timing--非变速timing
   std::shared_ptr<Timing> current_abs_timing;
 
+  // 附近的两个变速timing
+  std::shared_ptr<Timing> pre_speed_timing;
+  std::shared_ptr<Timing> next_speed_timing;
+
   // 当前页面的拍
   std::vector<std::shared_ptr<Beat>> current_beats;
 
@@ -94,6 +101,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 上一次编辑区绘制的时间区域
   double current_time_area_start{0.0};
   double current_time_area_end{0.0};
+
+  // 更新谱面时间位置
+  void update_mapcanvas_timepos();
 
   // 绘制判定线
   void draw_judgeline();
@@ -138,11 +148,16 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 背景暗化
   double background_darken_ratio{0.55};
 
-  // 时间线缩放-- n * 1px/1ms
+  // 用户调节的时间线缩放-- n * 1px/1ms
   double timeline_zoom{1.0};
 
+  // TODO(xiang 2025-04-25):
+  // 在两个变速timing间插值-下一个是基准timing时保持最后一个变速timing的速度作为时间线缩放
   // 变速缩放
   double speed_zoom{1.0};
+
+  // 显示用的当前倍速
+  double current_display_speed{1.0f};
 
   // 滚动倍率
   double scroll_ratio{1.0};

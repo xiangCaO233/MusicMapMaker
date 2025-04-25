@@ -81,9 +81,39 @@ void TimeController::update_global_volume_button() {
       button_color, 16, 16);
 }
 
-// 暂停按钮
-void TimeController::on_pausebutton_clicked() {
-  pause = !pause;
+// 更新音频状态
+void TimeController::update_audio_status() {
+  if (binding_map) {
+    if (pause) {
+      BackgroundAudio::pause_audio(binding_map->project_reference->devicename,
+                                   binding_map->audio_file_abs_path);
+    } else {
+      BackgroundAudio::play_audio(binding_map->project_reference->devicename,
+                                  binding_map->audio_file_abs_path);
+    }
+    // 尝试添加回调
+    BackgroundAudio::add_playpos_callback(
+        binding_map->project_reference->devicename,
+        binding_map->audio_file_abs_path, binding_map->audio_pos_callback);
+    // 暂停的话同步一下
+    if (pause) {
+      // 防止播放器已播放完暂停了死等待
+      if (BackgroundAudio::get_device_playerstatus(
+              binding_map->project_reference->devicename) == 1) {
+        binding_map->audio_pos_callback->waitfor_clear_buffer([&]() {
+          XINFO("同步画布时间");
+          BackgroundAudio::set_audio_pos(
+              binding_map->project_reference->devicename,
+              binding_map->audio_file_abs_path,
+              binding_map->project_reference->map_canvasposes.at(binding_map));
+        });
+      }
+    }
+  }
+}
+
+// 更新暂停按钮
+void TimeController::update_pause_button() {
   QColor button_color;
   switch (current_theme) {
     case GlobalTheme::DARK: {
@@ -98,23 +128,14 @@ void TimeController::on_pausebutton_clicked() {
   mutil::set_button_svgcolor(ui->pausebutton,
                              (pause ? ":/icons/play.svg" : ":/icons/pause.svg"),
                              button_color, 16, 16);
+}
 
+// 暂停按钮
+void TimeController::on_pausebutton_clicked() {
+  pause = !pause;
+  update_pause_button();
   // 切换音频播放状态
-  if (binding_map) {
-    if (pause) {
-      BackgroundAudio::pause_audio(binding_map->project_reference->devicename,
-                                   binding_map->audio_file_abs_path);
-    } else {
-      BackgroundAudio::play_audio(binding_map->project_reference->devicename,
-                                  binding_map->audio_file_abs_path);
-    }
-  }
-  class AudioEnginPlayCallback : public PlayposCallBack {
-    void playpos_call(double playpos) override {
-      XINFO("callback:" + std::to_string(playpos));
-    }
-  };
-
+  update_audio_status();
   emit pause_button_changed(pause);
 }
 
@@ -122,31 +143,10 @@ void TimeController::on_pausebutton_clicked() {
 void TimeController::on_canvas_pause(bool paused) {
   // 更新暂停状态和按钮图标
   pause = paused;
-  QColor button_color;
-  switch (current_theme) {
-    case GlobalTheme::DARK: {
-      button_color = QColor(255, 255, 255);
-      break;
-    }
-    case GlobalTheme::LIGHT: {
-      button_color = QColor(0, 0, 0);
-      break;
-    }
-  }
-  mutil::set_button_svgcolor(ui->pausebutton,
-                             (pause ? ":/icons/play.svg" : ":/icons/pause.svg"),
-                             button_color, 16, 16);
+  update_pause_button();
 
   // 切换音频播放状态
-  if (binding_map) {
-    if (pause) {
-      BackgroundAudio::pause_audio(binding_map->project_reference->devicename,
-                                   binding_map->audio_file_abs_path);
-    } else {
-      BackgroundAudio::play_audio(binding_map->project_reference->devicename,
-                                  binding_map->audio_file_abs_path);
-    }
-  }
+  update_audio_status();
 }
 
 // 实时信息变化槽
@@ -173,6 +173,8 @@ void TimeController::on_canvas_timestamp_changed(double time) {
   // 更新lineedit和progress
   ui->lineEdit->setText(QString::number(int32_t(time)));
   ui->playprogress->setValue(ui->playprogress->maximum() * progress);
+
+  // 暂停可调
   if (!pause) return;
   // 更新音频播放位置
   if (binding_map) {

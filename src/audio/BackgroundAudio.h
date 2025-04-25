@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "../log/colorful-log.h"
 #include "AudioManager.h"
 
 class BackgroundAudio {
@@ -14,13 +15,20 @@ class BackgroundAudio {
   // 轨道音量
   static float orbit_volume;
 
+  // 轨道速度
+  static float orbit_speed;
+
   // 全局音量
   static float global_volume;
+
+  // 全局速度
+  static float global_speed;
 
  public:
   inline static void init() {
     BackgroundAudio::audiomanager = XAudioManager::newmanager();
-    audiomanager->disableLoggin();
+    // XLogger::setlevel(spdlog::level::warn);
+    // audiomanager->disableLoggin();
   }
 
   inline static std::unordered_map<int, std::shared_ptr<XOutputDevice>>*
@@ -107,6 +115,30 @@ class BackgroundAudio {
 
     audiomanager->set_audio_current_pos(device_idit->second, audio_idit->second,
                                         time_milliseconds);
+  }
+
+  // 获取音频时长
+  inline static double get_audio_length(const std::string& audio_full_path) {
+    auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
+    if (audio_idit == audiomanager->get_handles()->end()) return -1;
+    auto& audio = audiomanager->get_audios()->at(audio_idit->second);
+    return double(
+        xutil::plannerpcmpos2milliseconds(
+            audio->get_pcm_data_size(), static_cast<int>(Config::samplerate)) /
+        static_cast<int>(Config::channel));
+  }
+
+  // 获取设备播放器播放状态
+  inline static int32_t get_device_playerstatus(
+      const std::string& device_full_name) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return -1;
+    return audiomanager->get_outdevices()
+                   ->at(device_idit->second)
+                   ->player->paused
+               ? 0
+               : 1;
   }
 };  // namespace BackgroundAudio
 

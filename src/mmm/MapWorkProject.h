@@ -8,6 +8,7 @@
 #include <memory>
 #include <pugixml.hpp>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "map/MMap.h"
@@ -43,6 +44,9 @@ class MapWorkProject {
 
   // 项目中谱的列表
   std::vector<std::shared_ptr<MMap>> maps;
+
+  // 项目中谱的显示时间位置
+  std::unordered_map<std::shared_ptr<MMap>, double> map_canvasposes;
 
   // 当前项目所使用的音频输出设备
   std::string devicename;

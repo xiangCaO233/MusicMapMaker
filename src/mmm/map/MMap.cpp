@@ -10,7 +10,10 @@
 #include "../hitobject/Note/rm/ComplexNote.h"
 #include "../timing/Timing.h"
 
-MMap::MMap() {}
+MMap::MMap() {
+  // 初始化播放回调对象
+  audio_pos_callback = std::make_shared<AudioEnginPlayCallback>();
+}
 
 MMap::~MMap() = default;
 
@@ -229,7 +232,9 @@ void MMap::insert_timing(const std::shared_ptr<Timing>& timing) {
 // 移除timing-会分析并更新拍
 void MMap::remove_timing(std::shared_ptr<Timing> timing) {}
 
-// 查询指定位置附近的同时间点timing列表(优先在此之前,没有之前找之后)
+// 查询指定位置附近的timing列表
+// 返回3个timing-基准timing,前一个基准timing,前一个变速timing和后一个变速timing
+// 包含传入时间点时返回4个或5个(放在[3]和[4]),即此时间点同时存在基准和变速timing
 void MMap::query_around_timing(
     std::vector<std::shared_ptr<Timing>>& result_timings, int32_t time) {
   if (timings.empty()) return;

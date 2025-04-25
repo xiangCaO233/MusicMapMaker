@@ -8,12 +8,39 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../log/colorful-log.h"
 #include "../Beat.h"
 #include "../hitobject/HitObject.h"
 #include "../hitobject/Note/Hold.h"
 #include "../timing/Timing.h"
+#include "AudioManager.h"
 
 class MapWorkProject;
+
+class AudioEnginPlayCallback : public PlayposCallBack {
+  std::atomic<bool> synclock{true};
+
+  void playpos_call(double playpos) override {
+    XINFO("mixer callback pos:" + std::to_string(playpos));
+    XINFO("本轨道缓冲区已清空");
+    synclock.store(false, std::memory_order_release);
+  }
+
+ public:
+  template <typename func>
+  void waitfor_clear_buffer(func&& f) {
+    synclock.store(true, std::memory_order_relaxed);
+    XINFO("等待缓冲区清空");
+    // 等到回调执行
+    while (synclock.load(std::memory_order_acquire)) {
+      // 让出CPU时间片--等待播放线程清空缓冲区并修改同步锁为true
+      std::this_thread::yield();
+    }
+
+    // 执行任意传入lambda
+    f();
+  }
+};
 
 enum class MapType {
   OSUMAP,
@@ -40,6 +67,9 @@ class MMap {
 
   // 谱面音频绝对路径
   std::filesystem::path audio_file_abs_path;
+
+  // 混音器音频播放位置回调
+  std::shared_ptr<AudioEnginPlayCallback> audio_pos_callback;
 
   // 项目引用
   std::shared_ptr<MapWorkProject> project_reference;
@@ -71,13 +101,18 @@ class MMap {
   struct TimingComparator {
     bool operator()(const std::shared_ptr<Timing>& a,
                     const std::shared_ptr<Timing>& b) const {
-      return a->timestamp < b->timestamp;
+      if (a->timestamp < b->timestamp) {
+        return true;
+      } else if (a->timestamp == b->timestamp) {
+        return a->is_base_timing > b->is_base_timing;
+      } else {
+        return false;
+      }
     }
   };
 
   // 全部timing
   std::multiset<std::shared_ptr<Timing>, TimingComparator> timings;
-
   // 用于识别重叠时间的timing列表缓存map
   std::unordered_map<int32_t, std::vector<std::shared_ptr<Timing>>>
       temp_timing_map;

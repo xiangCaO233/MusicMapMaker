@@ -5,6 +5,7 @@
 #include <qopenglwindow.h>
 #include <qpaintdevice.h>
 #include <qpoint.h>
+#include <qthread.h>
 #include <qtmetamacros.h>
 
 #include <cstddef>
@@ -49,7 +50,6 @@ class GLCanvas : public QOpenGLWindow,
   explicit GLCanvas(QWidget *parent = nullptr);
   // 析构GLCanvas
   ~GLCanvas() override;
-
   // fps计数器
   FrameRateCounter *fpsCounter;
 

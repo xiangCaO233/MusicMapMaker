@@ -58,6 +58,8 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
         map = std::make_shared<RMMap>();
       }
       maps.back()->load_from_file(map_file_string.c_str());
+      // 初始化画布时间位置
+      map_canvasposes.try_emplace(map, 0.0);
     } else if (audio_extention.find(extention) != audio_extention.end()) {
       // 音频文件
       audio_paths.emplace_back(abspath.string());
