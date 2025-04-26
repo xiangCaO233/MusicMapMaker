@@ -738,7 +738,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
     // 当前物件头位置-中心
     auto note_center_pos_y =
         current_size.height() * (1.0 - judgeline_position) -
-        ((pause ? note->timestamp : note_visual_time) - current_time_stamp) *
+        ((canvas_pasued ? note->timestamp : note_visual_time) -
+         current_time_stamp) *
             timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
 
     // 物件头中心位置
@@ -746,24 +747,24 @@ void MapWorkspaceCanvas::draw_hitobject() {
         edit_area_start_pos_x + orbit_width * note->orbit + orbit_width / 2.0;
 
     // 打击特效帧
-    if (std::abs((pause ? note->timestamp : note_visual_time) -
-                 current_time_stamp) < (des_update_time * 1.5) &&
-        !canvas_pasued) {
-      // 添加一序列的打击特效帧
-      auto &framequeue = effects[note->orbit];
-      auto w = hiteffects[0]->width * object_size_scale * 0.75;
-      auto h = hiteffects[0]->height * object_size_scale * 0.75;
-      for (const auto &hiteffect : hiteffects) {
-        auto frame = HitEffectFrame();
-        frame.effect_texture = hiteffect;
-        frame.effect_bound.setX(note_center_pos_x - w / 2.0);
-        frame.effect_bound.setY(
-            current_size.height() * (1 - judgeline_position) - h / 2.0);
-        frame.effect_bound.setWidth(w);
-        frame.effect_bound.setHeight(h);
-        framequeue.push(std::move(frame));
-      }
-    }
+    // if (std::abs((canvas_pasued ? note->timestamp : note_visual_time) -
+    //              current_time_stamp) < (des_update_time * 1.5) &&
+    //     !canvas_pasued) {
+    //   // 添加一序列的打击特效帧
+    //   auto &framequeue = effects[note->orbit];
+    //   auto w = hiteffects[0]->width * object_size_scale * 0.75;
+    //   auto h = hiteffects[0]->height * object_size_scale * 0.75;
+    //   for (const auto &hiteffect : hiteffects) {
+    //     auto frame = HitEffectFrame();
+    //     frame.effect_texture = hiteffect;
+    //     frame.effect_bound.setX(note_center_pos_x - w / 2.0);
+    //     frame.effect_bound.setY(
+    //         current_size.height() * (1 - judgeline_position) - h / 2.0);
+    //     frame.effect_bound.setWidth(w);
+    //     frame.effect_bound.setHeight(h);
+    //     framequeue.push(std::move(frame));
+    //   }
+    // }
 
     // 物件头左上角位置
     double head_note_pos_x = note_center_pos_x - head_note_size.width() / 2.0;
@@ -809,8 +810,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 当前面条尾y轴位置
         auto long_note_end_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
-            ((pause ? long_note->hold_end_reference->timestamp
-                    : long_note_end_visual_time) -
+            ((canvas_pasued ? long_note->hold_end_reference->timestamp
+                            : long_note_end_visual_time) -
              current_time_stamp) *
                 timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
         auto long_note_body_height = (long_note_end_pos_y - note_center_pos_y);
@@ -1013,14 +1014,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
     }
   }
   // 最后给每个轨道添加特效动画
-  for (auto &[orbit, framequeue] : effects) {
-    if (!framequeue.empty()) {
-      renderer_manager->addRect(framequeue.front().effect_bound,
-                                framequeue.front().effect_texture,
-                                QColor(0, 0, 0, 255), 0, true);
-      framequeue.pop();
-    }
-  }
+  // for (auto &[orbit, framequeue] : effects) {
+  //   if (!framequeue.empty()) {
+  //     renderer_manager->addRect(framequeue.front().effect_bound,
+  //                               framequeue.front().effect_texture,
+  //                               QColor(0, 0, 0, 255), 0, true);
+  //     framequeue.pop();
+  //   }
+  // }
 }
 
 // 渲染实际图形
