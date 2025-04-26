@@ -556,8 +556,8 @@ void MapWorkspaceCanvas::draw_beats() {
     auto &beat = current_beats[i];
 
     // 每拍时间*时间线缩放=拍距
-    double beat_distance =
-        60.0 / beat->bpm * 1000.0 * timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
+    double beat_distance = 60.0 / beat->bpm * 1000.0 * timeline_zoom *
+                           (canvas_pasued ? 1.0 : speed_zoom);
 
     // 分拍间距
     double divisor_distance = beat_distance / beat->divisors;
@@ -738,7 +738,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
     // 当前物件头位置-中心
     auto note_center_pos_y =
         current_size.height() * (1.0 - judgeline_position) -
-        (canvas_pasued ? note->timestamp : note_visual_time - current_time_stamp) *
+        (canvas_pasued ? note->timestamp
+                       : note_visual_time - current_time_stamp) *
             timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
 
     // 物件头中心位置
@@ -746,7 +747,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         edit_area_start_pos_x + orbit_width * note->orbit + orbit_width / 2.0;
 
     // 打击特效帧
-    if (std::abs((canvas_pasued? note->timestamp : note_visual_time) -
+    if (std::abs((canvas_pasued ? note->timestamp : note_visual_time) -
                  current_time_stamp) < (des_update_time * 1.5) &&
         !canvas_pasued) {
       // 添加一序列的打击特效帧
@@ -809,10 +810,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 当前面条尾y轴位置
         auto long_note_end_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
-            ((canvas_pasued? long_note->hold_end_reference->timestamp
-                    : long_note_end_visual_time) -
+            ((canvas_pasued ? long_note->hold_end_reference->timestamp
+                            : long_note_end_visual_time) -
              current_time_stamp) *
-                timeline_zoom * (canvas_pasued? 1.0 : speed_zoom);
+                timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
         auto long_note_body_height = (long_note_end_pos_y - note_center_pos_y);
 
         // 当前面条身中心位置,y位置偏下一个note
