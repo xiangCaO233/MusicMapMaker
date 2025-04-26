@@ -24,7 +24,6 @@
 #include <memory>
 #include <string>
 
-#include "../util/mutil.h"
 #include "colorful-log.h"
 #include "renderer/font/FontRenderer.h"
 #include "texture/pool/MTexturePool.h"
@@ -188,6 +187,8 @@ void GLCanvas::initializeGL() {
 
   // 初始化默认纹理
   load_texture_from_path("../resources/textures/default");
+  // 初始化默认特效
+  // load_texture_from_path("../resources/textures/effects");
 
   start_render();
 }
@@ -205,18 +206,16 @@ void GLCanvas::start_render() {
 
       qint64 elapsed = timer.elapsed() - start;
       if (elapsed < des_update_time / 2.0) {
-        #ifdef _WIN32
-        
+#ifdef _WIN32
         auto start = std::chrono::high_resolution_clock::now();
-
-    auto end = start + std::chrono::microseconds(int((des_update_time / 2.0 - elapsed) * 1000));
-    
-    while (std::chrono::high_resolution_clock::now() < end) {
-        std::this_thread::yield(); // 让出CPU时间片
-    }
-    #else
+        auto end = start + std::chrono::microseconds(
+                               int((des_update_time / 2.0 - elapsed) * 1000));
+        while (std::chrono::high_resolution_clock::now() < end) {
+          std::this_thread::yield();  // 让出CPU时间片
+        }
+#else
         usleep((des_update_time / 2.0 - elapsed) * 1000);
-        #endif //_WIN32
+#endif  //_WIN32
       }
     }
   };

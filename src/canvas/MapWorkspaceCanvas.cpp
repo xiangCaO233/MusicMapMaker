@@ -19,6 +19,8 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "../mmm/MapWorkProject.h"
@@ -68,11 +70,11 @@ MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
 void MapWorkspaceCanvas::initializeGL() {
   GLCanvas::initializeGL();
   // 初始化特效纹理序列
-  for (int i = 1; i <= 51; ++i) {
-    auto name = "onhit/" + std::to_string(i) + ".png";
-    auto &t = texture_full_map.at(name);
-    hiteffects.emplace_back(t);
-  }
+  // for (int i = 1; i <= 51; ++i) {
+  //   auto name = "onhit/" + std::to_string(i) + ".png";
+  //   auto &t = texture_full_map.at(name);
+  //   hiteffects.emplace_back(t);
+  // }
 }
 // 时间控制器暂停按钮触发
 void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
@@ -690,45 +692,65 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 面条主体的纹理
   std::shared_ptr<TextureInstace> long_note_body_vertical_texture =
       texture_full_map["hitobject/holdbodyvertical.png"];
+  std::shared_ptr<TextureInstace> long_note_body_vertical_hovered_texture =
+      texture_full_map["hitobject/holdbodyvertical_hover.png"];
 
   // 横向面条主体的纹理
   std::shared_ptr<TextureInstace> long_note_body_horizontal_texture =
       texture_full_map["hitobject/holdbodyhorizontal.png"];
+  std::shared_ptr<TextureInstace> long_note_body_horizontal_hovered_texture =
+      texture_full_map["hitobject/holdbodyhorizontal_hover.png"];
 
   // 组合键节点纹理
   std::shared_ptr<TextureInstace> complex_note_node_texture =
       texture_full_map["hitobject/node.png"];
+  std::shared_ptr<TextureInstace> complex_note_node_hovered_texture =
+      texture_full_map["hitobject/node_hover.png"];
 
   // 面条尾的纹理
   std::shared_ptr<TextureInstace> long_note_end_texture =
       texture_full_map["hitobject/holdend.png"];
+  std::shared_ptr<TextureInstace> long_note_end_hovered_texture =
+      texture_full_map["hitobject/holdend_hover.png"];
 
   // 滑键尾的纹理
   std::shared_ptr<TextureInstace> slide_left_note_end_texture =
       texture_full_map["hitobject/arrowleft.png"];
+  std::shared_ptr<TextureInstace> slide_left_note_end_hovered_texture =
+      texture_full_map["hitobject/arrowleft_hover.png"];
   std::shared_ptr<TextureInstace> slide_right_note_end_texture =
       texture_full_map["hitobject/arrowright.png"];
+  std::shared_ptr<TextureInstace> slide_right_note_end_hovered_texture =
+      texture_full_map["hitobject/arrowright_hover.png"];
+
+  // 轨道宽度
+  auto orbit_width = edit_area_width / max_orbit;
+
+  // 依据轨道宽度自动适应物件纹理尺寸
+  // 物件尺寸缩放--相对于纹理尺寸
+  auto width_scale = (orbit_width - 4.0) / double(head_texture->width);
+
+  // 不大于1--不放大纹理
+  double object_size_scale = std::min(width_scale, 1.0);
+
+  auto head_note_size = QSizeF(head_texture->width * object_size_scale,
+                               head_texture->height * object_size_scale);
 
   // 节点区域缓存
   std::vector<QRectF> nodes;
 
+  // 防止重复绘制
+  std::unordered_map<std::shared_ptr<HitObject>, bool> drawed_objects;
+
   // 渲染物件
   for (const auto &obj : buffer_objects) {
-    if (!obj->is_note) continue;
+    if (!obj->is_note || obj->object_type == HitObjectType::RMCOMPLEX) continue;
     auto note = std::static_pointer_cast<Note>(obj);
     if (!note) continue;
-    // 轨道宽度
-    auto orbit_width = edit_area_width / max_orbit;
-
-    // 依据轨道宽度自动适应物件纹理尺寸
-    // 物件尺寸缩放--相对于纹理尺寸
-    auto width_scale = (orbit_width - 4.0) / double(head_texture->width);
-
-    // 不大于1--不放大纹理
-    double object_size_scale = std::min(width_scale, 1.0);
-
-    auto head_note_size = QSizeF(head_texture->width * object_size_scale,
-                                 head_texture->height * object_size_scale);
+    if (drawed_objects.find(note) == drawed_objects.end())
+      drawed_objects.insert({note, true});
+    else
+      continue;
 
     double note_visual_time =
         current_time_stamp +
@@ -799,7 +821,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
       case NoteType::HOLD: {
         // 添加long_note_body
         auto long_note = std::dynamic_pointer_cast<Hold>(note);
-        // 处于组合键内,不绘制
+
         if (!long_note) continue;
 
         double long_note_end_visual_time =
@@ -844,10 +866,16 @@ void MapWorkspaceCanvas::draw_hitobject() {
             long_note_end_pos_x - long_note_end_size.width() / 2.0,
             long_note_end_pos_y - long_note_end_size.height() / 2.0,
             long_note_end_size.width(), long_note_end_size.height());
-        // 先绘制body再绘制end,最后head
-        renderer_manager->addRect(long_note_body_bound,
-                                  long_note_body_vertical_texture,
-                                  QColor(0, 0, 0, 255), 0, true);
+        // 先绘制body
+        if (long_note_body_bound.contains(mouse_pos)) {
+          renderer_manager->addRect(long_note_body_bound,
+                                    long_note_body_vertical_hovered_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
+        } else {
+          renderer_manager->addRect(long_note_body_bound,
+                                    long_note_body_vertical_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
+        }
 
         // 节点尺寸
         auto node_size =
@@ -861,9 +889,16 @@ void MapWorkspaceCanvas::draw_hitobject() {
         switch (long_note->compinfo) {
           case ComplexInfo::NONE: {
             // 头尾都画
-            renderer_manager->addRect(long_note_end_bound,
-                                      long_note_end_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
+            if (long_note_end_bound.contains(mouse_pos)) {
+              renderer_manager->addRect(long_note_end_bound,
+                                        long_note_end_hovered_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            } else {
+              renderer_manager->addRect(long_note_end_bound,
+                                        long_note_end_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
+
             if (head_note_bound.contains(mouse_pos)) {
               renderer_manager->addRect(head_note_bound, head_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -894,18 +929,26 @@ void MapWorkspaceCanvas::draw_hitobject() {
           case ComplexInfo::END: {
             // 补齐节点,画个尾
             for (const auto &noderect : nodes) {
-              renderer_manager->addRect(noderect, complex_note_node_texture,
-                                        QColor(0, 0, 0, 255), 0, true);
-              // if (noderect.contains(mouse_pos)) {
-              //   // 画个节点hover滤镜
-              //   renderer_manager->addRect(noderect, nullptr,
-              //                             QColor(255, 255, 255, 128), 0,
-              //                             true);
-              // }
+              if (noderect.contains(mouse_pos)) {
+                renderer_manager->addRect(noderect,
+                                          complex_note_node_hovered_texture,
+                                          QColor(0, 0, 0, 255), 0, true);
+              } else {
+                renderer_manager->addRect(noderect, complex_note_node_texture,
+                                          QColor(0, 0, 0, 255), 0, true);
+              }
             }
-            renderer_manager->addRect(long_note_end_bound,
-                                      long_note_end_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
+
+            if (long_note_end_bound.contains(mouse_pos)) {
+              renderer_manager->addRect(long_note_end_bound,
+                                        long_note_end_hovered_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+
+            } else {
+              renderer_manager->addRect(long_note_end_bound,
+                                        long_note_end_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
             // 并清空节点缓存
             nodes.clear();
             break;
@@ -930,17 +973,20 @@ void MapWorkspaceCanvas::draw_hitobject() {
             horizon_body_height;
 
         std::shared_ptr<TextureInstace> slide_end_texture;
+        std::shared_ptr<TextureInstace> slide_end_hovered_texture;
         // 横向身的具体位置
         double horizon_body_pos_x = -horizon_body_height / 2.0;
         if (slide->slide_parameter > 0) {
           // 右滑,矩形就在头物件中心位置
           horizon_body_pos_x += note_center_pos_x;
           slide_end_texture = slide_right_note_end_texture;
+          slide_end_hovered_texture = slide_right_note_end_hovered_texture;
         } else {
           // 左滑,矩形整体左移矩形宽度的位置
           horizon_body_pos_x = horizon_body_pos_x + note_center_pos_x -
                                horizon_body_width + horizon_body_height;
           slide_end_texture = slide_left_note_end_texture;
+          slide_end_hovered_texture = slide_left_note_end_hovered_texture;
         }
         auto horizon_body_bound = QRectF(
             horizon_body_pos_x, note_center_pos_y - horizon_body_height / 2.0,
@@ -955,6 +1001,17 @@ void MapWorkspaceCanvas::draw_hitobject() {
                    slide_end_texture->width * object_size_scale,
                    slide_end_texture->height * object_size_scale);
 
+        // 先绘制横向身,然后头和箭头
+        if (horizon_body_bound.contains(mouse_pos)) {
+          renderer_manager->addRect(horizon_body_bound,
+                                    long_note_body_horizontal_hovered_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
+        } else {
+          renderer_manager->addRect(horizon_body_bound,
+                                    long_note_body_horizontal_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
+        }
+
         // 节点尺寸
         auto node_size =
             QSizeF(complex_note_node_texture->width * object_size_scale,
@@ -964,23 +1021,35 @@ void MapWorkspaceCanvas::draw_hitobject() {
                           note_center_pos_y - node_size.height() / 2.0,
                           node_size.width(), node_size.height());
 
-        // 先绘制横向身,然后头和箭头
-        renderer_manager->addRect(horizon_body_bound,
-                                  long_note_body_horizontal_texture,
-                                  QColor(0, 0, 0, 255), 0, true);
         switch (slide->compinfo) {
           case ComplexInfo::NONE: {
             // 头尾都画
-            renderer_manager->addRect(head_note_bound, head_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
-            renderer_manager->addRect(slide_end_bound, slide_end_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
+            if (head_note_bound.contains(mouse_pos)) {
+              renderer_manager->addRect(head_note_bound, head_hovered_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            } else {
+              renderer_manager->addRect(head_note_bound, head_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
+            if (slide_end_bound.contains(mouse_pos)) {
+              renderer_manager->addRect(slide_end_bound,
+                                        slide_end_hovered_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            } else {
+              renderer_manager->addRect(slide_end_bound, slide_end_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
             break;
           }
           case ComplexInfo::HEAD: {
             // 多画个头-在尾处追加一个节点
-            renderer_manager->addRect(head_note_bound, head_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
+            if (head_note_bound.contains(mouse_pos)) {
+              renderer_manager->addRect(head_note_bound, head_hovered_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            } else {
+              renderer_manager->addRect(head_note_bound, head_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
             nodes.emplace_back(node_bound);
             break;
           }
@@ -993,17 +1062,24 @@ void MapWorkspaceCanvas::draw_hitobject() {
           case ComplexInfo::END: {
             // 补齐节点,画个尾
             for (const auto &noderect : nodes) {
-              renderer_manager->addRect(noderect, complex_note_node_texture,
-                                        QColor(0, 0, 0, 255), 0, true);
-              // if (noderect.contains(mouse_pos)) {
-              //   // 画个节点hover滤镜
-              //   renderer_manager->addRect(noderect, nullptr,
-              //                             QColor(255, 255, 255, 128), 0,
-              //                             true);
-              // }
+              if (noderect.contains(mouse_pos)) {
+                renderer_manager->addRect(noderect,
+                                          complex_note_node_hovered_texture,
+                                          QColor(0, 0, 0, 255), 0, true);
+              } else {
+                renderer_manager->addRect(noderect, complex_note_node_texture,
+                                          QColor(0, 0, 0, 255), 0, true);
+              }
             }
-            renderer_manager->addRect(slide_end_bound, slide_end_texture,
-                                      QColor(0, 0, 0, 255), 0, true);
+
+            if (slide_end_bound.contains(mouse_pos)) {
+              renderer_manager->addRect(slide_end_bound,
+                                        slide_end_hovered_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            } else {
+              renderer_manager->addRect(slide_end_bound, slide_end_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
+            }
             // 并清空节点缓存
             nodes.clear();
             break;

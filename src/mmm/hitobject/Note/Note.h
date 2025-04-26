@@ -6,12 +6,12 @@
 class ComplexNote;
 
 enum class NoteType {
-  // osu!mania的单键和长条
-  NOTE,
-  HOLD,
   // 另外的滑键和折线
-  SLIDE,
   COMPLEX,
+  SLIDE,
+  // osu!mania的单键和长条
+  HOLD,
+  NOTE,
 };
 
 enum class ComplexInfo {

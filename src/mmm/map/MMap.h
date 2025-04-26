@@ -87,7 +87,11 @@ class MMap {
   struct HitObjectComparator {
     bool operator()(const std::shared_ptr<HitObject>& a,
                     const std::shared_ptr<HitObject>& b) const {
-      return a->timestamp < b->timestamp;
+      if (a->timestamp != b->timestamp) {
+        return a->timestamp < b->timestamp;
+      } else {
+        return a->object_type > b->object_type;
+      }
     }
   };
 
