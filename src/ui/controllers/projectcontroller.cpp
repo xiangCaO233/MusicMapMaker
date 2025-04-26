@@ -89,7 +89,6 @@ void MProjectController::on_project_selector_currentIndexChanged(int index) {
 // 选择项目
 void MProjectController::select_project(
     std::shared_ptr<MapWorkProject>& project) {
-  selected_project = project;
   auto map_model =
       qobject_cast<QStandardItemModel*>(ui->map_list_view->model());
   map_model->clear();
@@ -141,21 +140,27 @@ void MProjectController::select_project(
                                Qt::UserRole + 1);
       video_model->appendRow(video_path_item);
     }
-
-    if (project->devicename != "unknown output device") {
-      device_sync_lock = true;
-      // 选中此设备
-      ui->audio_device_selector->setCurrentText(
-          QString::fromStdString(project->devicename));
-    }
   }
 
-  // 初始化设备列表并选中此项目选中的设备
-  ui->audio_device_selector->clear();
-  // 更新设备列表
-  for (const auto& [device_id, device] : (*BackgroundAudio::devices())) {
-    ui->audio_device_selector->addItem(
-        QString::fromStdString(device->device_name));
+  if (ui->audio_device_selector->count() == 0) {
+    // 初始化设备列表
+    ui->audio_device_selector->clear();
+    // 更新设备列表
+    for (const auto& [device_id, device] : (*BackgroundAudio::devices())) {
+      ui->audio_device_selector->addItem(
+          QString::fromStdString(device->device_name));
+    }
+  }
+  // 选中此项目选中的设备
+  if (project) {
+    if (selected_project != project) {
+      selected_project = project;
+    } else {
+      device_sync_lock = true;
+    }
+    // 选中此设备
+    ui->audio_device_selector->setCurrentText(
+        QString::fromStdString(project->devicename));
   }
 }
 
