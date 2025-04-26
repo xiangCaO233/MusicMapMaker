@@ -1,5 +1,6 @@
 #include "timecontroller.h"
 
+#include <qdir.h>
 #include <qtmetamacros.h>
 
 #include <memory>
@@ -84,17 +85,18 @@ void TimeController::update_global_volume_button() {
 // 更新音频状态
 void TimeController::update_audio_status() {
   if (binding_map) {
+    auto file = QDir(binding_map->audio_file_abs_path);
     if (pause) {
       BackgroundAudio::pause_audio(binding_map->project_reference->devicename,
-                                   binding_map->audio_file_abs_path);
+                                   file.canonicalPath().toStdString());
     } else {
       BackgroundAudio::play_audio(binding_map->project_reference->devicename,
-                                  binding_map->audio_file_abs_path);
+                                  file.canonicalPath().toStdString());
     }
     // 尝试添加回调
     BackgroundAudio::add_playpos_callback(
         binding_map->project_reference->devicename,
-        binding_map->audio_file_abs_path, binding_map->audio_pos_callback);
+        file.canonicalPath().toStdString(), binding_map->audio_pos_callback);
     // 暂停的话同步一下
     if (pause) {
       // 防止播放器已播放完暂停了死等待
@@ -105,7 +107,7 @@ void TimeController::update_audio_status() {
           XINFO("同步画布时间");
           BackgroundAudio::set_audio_pos(
               binding_map->project_reference->devicename,
-              binding_map->audio_file_abs_path,
+              file.canonicalPath().toStdString(),
               binding_map->project_reference->map_canvasposes.at(binding_map));
         });
       }
@@ -177,10 +179,11 @@ void TimeController::on_canvas_timestamp_changed(double time) {
 
   // 暂停可调
   if (!pause) return;
+  auto file = QDir(binding_map->audio_file_abs_path);
   // 更新音频播放位置
   if (binding_map &&
       binding_map->project_reference->devicename != "unknown output device") {
     BackgroundAudio::set_audio_pos(binding_map->project_reference->devicename,
-                                   binding_map->audio_file_abs_path, time);
+                                   file.canonicalPath().toStdString(), time);
   }
 }
