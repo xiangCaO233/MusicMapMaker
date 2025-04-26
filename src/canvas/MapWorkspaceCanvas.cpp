@@ -76,7 +76,7 @@ void MapWorkspaceCanvas::initializeGL() {
 }
 // 时间控制器暂停按钮触发
 void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
-  pasue = paused;
+  canvas_pasued = paused;
 }
 
 // qt事件
@@ -94,18 +94,18 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
   }
   lasttime = time;
 
-  if (!pasue) {
+  if (!canvas_pasued) {
     // 未暂停,更新当前时间戳
     current_time_stamp += actual_update_time;
     if (current_time_stamp < 0) {
       current_time_stamp = 0;
-      pasue = true;
-      emit pause_signal(pasue);
+      canvas_pasued = true;
+      emit pause_signal(canvas_pasued);
     }
     if (current_time_stamp > working_map->map_length) {
       current_time_stamp = working_map->map_length;
-      pasue = true;
-      emit pause_signal(pasue);
+      canvas_pasued = true;
+      emit pause_signal(canvas_pasued);
     }
     update_mapcanvas_timepos();
   }
@@ -287,13 +287,13 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   }
   if (current_time_stamp < 0) {
     current_time_stamp = 0;
-    pasue = true;
-    emit pause_signal(pasue);
+    canvas_pasued = true;
+    emit pause_signal(canvas_pasued);
   }
   if (current_time_stamp > working_map->map_length) {
     current_time_stamp = working_map->map_length;
-    pasue = true;
-    emit pause_signal(pasue);
+    canvas_pasued = true;
+    emit pause_signal(canvas_pasued);
   }
   update_mapcanvas_timepos();
 }
@@ -320,8 +320,8 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
         return;
       }
       // 空格
-      pasue = !pasue;
-      emit pause_signal(pasue);
+      canvas_pasued = !canvas_pasued;
+      emit pause_signal(canvas_pasued);
       break;
     }
     case Qt::Key_Delete: {
@@ -557,7 +557,7 @@ void MapWorkspaceCanvas::draw_beats() {
 
     // 每拍时间*时间线缩放=拍距
     double beat_distance =
-        60.0 / beat->bpm * 1000.0 * timeline_zoom * (pasue ? 1.0 : speed_zoom);
+        60.0 / beat->bpm * 1000.0 * timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
 
     // 分拍间距
     double divisor_distance = beat_distance / beat->divisors;
@@ -572,7 +572,7 @@ void MapWorkspaceCanvas::draw_beats() {
     // 当前拍起始位置
     auto beat_start_pos =
         judgeline_pos - (beat_start_time - current_time_stamp) * timeline_zoom *
-                            (pasue ? 1.0 : speed_zoom);
+                            (canvas_pasued ? 1.0 : speed_zoom);
 
     // 获取主题
     bool has_theme{false};
@@ -738,17 +738,17 @@ void MapWorkspaceCanvas::draw_hitobject() {
     // 当前物件头位置-中心
     auto note_center_pos_y =
         current_size.height() * (1.0 - judgeline_position) -
-        ((pause ? note->timestamp : note_visual_time) - current_time_stamp) *
-            timeline_zoom * (pasue ? 1.0 : speed_zoom);
+        (canvas_pasued ? note->timestamp : note_visual_time - current_time_stamp) *
+            timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
 
     // 物件头中心位置
     auto note_center_pos_x =
         edit_area_start_pos_x + orbit_width * note->orbit + orbit_width / 2.0;
 
     // 打击特效帧
-    if (std::abs((pause ? note->timestamp : note_visual_time) -
+    if (std::abs((canvas_pasued? note->timestamp : note_visual_time) -
                  current_time_stamp) < (des_update_time * 1.5) &&
-        !pasue) {
+        !canvas_pasued) {
       // 添加一序列的打击特效帧
       auto &framequeue = effects[note->orbit];
       auto w = hiteffects[0]->width * object_size_scale * 0.75;
@@ -809,10 +809,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 当前面条尾y轴位置
         auto long_note_end_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
-            ((pause ? long_note->hold_end_reference->timestamp
+            ((canvas_pasued? long_note->hold_end_reference->timestamp
                     : long_note_end_visual_time) -
              current_time_stamp) *
-                timeline_zoom * (pasue ? 1.0 : speed_zoom);
+                timeline_zoom * (canvas_pasued? 1.0 : speed_zoom);
         auto long_note_body_height = (long_note_end_pos_y - note_center_pos_y);
 
         // 当前面条身中心位置,y位置偏下一个note
@@ -1111,7 +1111,7 @@ void MapWorkspaceCanvas::push_shape() {
 
     draw_background();
 
-    if (pasue) {
+    if (canvas_pasued) {
       // 更新拍列表
       // 清除拍缓存
       current_beats.clear();
@@ -1142,12 +1142,12 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   // 此处确保了未打开项目是无法switchmap的(没有选项)
   working_map = map;
   preference_bpm = nullptr;
-  pasue = true;
+  canvas_pasued = true;
 
   if (map) {
     map_type = map->maptype;
-    auto s = QDir(map->audio_file_abs_path);
     // 更新谱面长度(如果音乐比谱面长)
+    auto s = QDir(map->audio_file_abs_path);
     auto map_audio_length =
         BackgroundAudio::get_audio_length(s.canonicalPath().toStdString());
     XINFO("maplength:" + std::to_string(map->map_length));
@@ -1162,6 +1162,6 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     current_time_stamp = 0;
   }
 
-  emit pause_signal(pasue);
+  emit pause_signal(canvas_pasued);
   emit current_time_stamp_changed(current_time_stamp);
 }

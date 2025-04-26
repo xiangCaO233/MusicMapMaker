@@ -62,7 +62,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   double actual_update_time{0};
 
   // 暂停播放
-  bool pasue{true};
+  bool canvas_pasued{true};
 
   // 播放速度
   double playspeed{1.0f};
@@ -184,7 +184,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   void switch_map(std::shared_ptr<MMap> map);
 
   // 获取暂停状态
-  inline bool &is_paused() { return pasue; }
+  inline bool &is_paused() { return canvas_pasued; }
 
   // 渲染实际图形
   void push_shape() override;
