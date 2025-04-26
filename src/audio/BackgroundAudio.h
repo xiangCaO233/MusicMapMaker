@@ -131,7 +131,6 @@ class BackgroundAudio {
   // 获取设备播放器播放状态
   inline static int32_t get_device_playerstatus(
       const std::string& device_full_name) {
-    if (device_full_name == "unknown output device") return -1;
     auto device_idit =
         audiomanager->get_outdevice_indicies()->find(device_full_name);
     if (device_idit == audiomanager->get_outdevice_indicies()->end()) return -1;

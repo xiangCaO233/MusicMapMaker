@@ -7,7 +7,6 @@
 #include <qtimer.h>
 #include <qtmetamacros.h>
 
-#include <QDir>
 #include <QKeyEvent>
 #include <QThread>
 #include <QTimer>
@@ -61,19 +60,16 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent) : GLCanvas(parent) {
   t4.emplace_back(blue);
   t4.emplace_back(red);
   t4.emplace_back(blue);
+
+  // 初始化特效纹理序列
+  for (int i = 1; i <= 17; ++i) {
+    hiteffects.emplace_back(
+        texture_full_map["onhit/" + std::to_string(i) + ".png"]);
+  }
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
 
-void MapWorkspaceCanvas::initializeGL() {
-  GLCanvas::initializeGL();
-  // 初始化特效纹理序列
-  for (int i = 1; i <= 51; ++i) {
-    auto name = "onhit/" + std::to_string(i) + ".png";
-    auto &t = texture_full_map.at(name);
-    hiteffects.emplace_back(t);
-  }
-}
 // 时间控制器暂停按钮触发
 void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
   canvas_pasued = paused;
@@ -306,31 +302,16 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
   // 捕获按键
   auto k = event->text();
   auto keycode = event->key();
-
-  qDebug() << "code:" << keycode << ",text:" << k;
-
-  switch (keycode) {
-    case Qt::Key::Key_Space: {
-      // 空格--播放与暂停
-      if (!working_map) return;
-
-      if (working_map->project_reference->devicename ==
-          "unknown output device") {
-        XWARN("未选择音频输出设备,无法切换暂停状态");
-        return;
-      }
-      // 空格
-      canvas_pasued = !canvas_pasued;
-      emit pause_signal(canvas_pasued);
-      break;
-    }
-    case Qt::Key_Delete: {
-      // del键-删除
-      break;
-    }
-  }
-
   if (keycode == 32) {
+    if (!working_map) return;
+
+    if (working_map->project_reference->devicename == "unknown output device") {
+      XWARN("未选择音频输出设备,无法切换暂停状态");
+      return;
+    }
+    // 空格
+    canvas_pasued = !canvas_pasued;
+    emit pause_signal(canvas_pasued);
   }
 }
 
@@ -357,6 +338,60 @@ void MapWorkspaceCanvas::update_mapcanvas_timepos() {
   // 更新项目中自己的位置
   working_map->project_reference->map_canvasposes.at(working_map) =
       current_time_stamp;
+  // 最后一次变速的速度
+  // static double last_speed_zoom{1.0};
+
+  // // 更新实际变速的时间线拉伸值
+  // // 拉伸原点速度--根据相对bpm
+  // double pre_speed = current_abs_timing->basebpm / *preference_bpm;
+  // if (pre_speed_timing) {
+  //   // 存在上一个变速timing--应用此变速
+  //   pre_speed *= pre_speed_timing->bpm;
+  // }
+
+  // // 拉伸结束点速度--根据下一个变速timing
+  // double end_speed = -1.0;
+  // if (next_speed_timing) {
+  //   // 存在下一个变速timing--使用此变速
+  //   end_speed = next_speed_timing->bpm;
+  // }
+
+  // // 拉伸长度--50ms
+  // double distance_with_pretiming;
+  // if (pre_speed_timing) {
+  //   // 从前一timing时间戳拉伸50ms
+  //   distance_with_pretiming = current_time_stamp -
+  //   pre_speed_timing->timestamp;
+  // } else {
+  //   // 从上一个绝对timing拉伸
+  //   distance_with_pretiming =
+  //       current_time_stamp - current_abs_timing->timestamp;
+  // }
+  // // 应用拉伸
+  // if (distance_with_pretiming > 0 && distance_with_pretiming <= 50) {
+  //   // 范围内
+  //   speed_zoom = last_speed_zoom +
+  //                (pre_speed - last_speed_zoom) / 50.0 *
+  //                distance_with_pretiming;
+  // } else {
+  //   // 超出拉伸范围-直接使用最终结果
+  //   speed_zoom = pre_speed;
+  // }
+
+  // double distance_with_nexttiming;
+  // if (end_speed != -1.0) {
+  //   distance_with_nexttiming =
+  //       next_speed_timing->timestamp - current_time_stamp;
+  //   // 应用拉伸
+  //   if (distance_with_nexttiming > 0 && distance_with_pretiming <= 50) {
+  //     // 范围内
+  //     speed_zoom = last_speed_zoom + (end_speed - last_speed_zoom) / 50.0 *
+  //                                        distance_with_nexttiming;
+  //   }
+  // }
+
+  // // 更新最后一次的变速值
+  // last_speed_zoom = speed_zoom;
   emit current_time_stamp_changed(current_time_stamp);
 }
 
@@ -386,8 +421,8 @@ void MapWorkspaceCanvas::draw_background() {
   auto texname = working_map->bg_path.parent_path().filename().string() + "/" +
                  working_map->bg_path.filename().string();
   renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
-  auto &t = texture_full_map[texname];
-  renderer_manager->addRect(des, t, QColor(0, 0, 0, 255), 0, false);
+  renderer_manager->addRect(des, texture_full_map[texname],
+                            QColor(255, 255, 255, 255), 0, false);
   // 绘制背景遮罩
   if (background_darken_ratio != 0.0) {
     renderer_manager->addRect(
@@ -684,9 +719,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 物件头的纹理
   std::shared_ptr<TextureInstace> head_texture =
       texture_full_map["hitobject/head.png"];
-  std::shared_ptr<TextureInstace> head_hovered_texture =
-      texture_full_map["hitobject/head_hover.png"];
-
   // 面条主体的纹理
   std::shared_ptr<TextureInstace> long_note_body_vertical_texture =
       texture_full_map["hitobject/holdbodyvertical.png"];
@@ -730,41 +762,16 @@ void MapWorkspaceCanvas::draw_hitobject() {
     auto head_note_size = QSizeF(head_texture->width * object_size_scale,
                                  head_texture->height * object_size_scale);
 
-    double note_visual_time =
-        current_time_stamp +
-        (note->timestamp - current_time_stamp) * speed_zoom;
-
     // 物件距离判定线距离从下往上--反转
     // 当前物件头位置-中心
     auto note_center_pos_y =
         current_size.height() * (1.0 - judgeline_position) -
-        (canvas_pasued ? note->timestamp
-                       : note_visual_time - current_time_stamp) *
-            timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
+        (note->timestamp - current_time_stamp) * timeline_zoom *
+            (canvas_pasued ? 1.0 : speed_zoom);
 
     // 物件头中心位置
     auto note_center_pos_x =
         edit_area_start_pos_x + orbit_width * note->orbit + orbit_width / 2.0;
-
-    // 打击特效帧
-    if (std::abs((canvas_pasued ? note->timestamp : note_visual_time) -
-                 current_time_stamp) < (des_update_time * 1.5) &&
-        !canvas_pasued) {
-      // 添加一序列的打击特效帧
-      auto &framequeue = effects[note->orbit];
-      auto w = hiteffects[0]->width * object_size_scale * 0.75;
-      auto h = hiteffects[0]->height * object_size_scale * 0.75;
-      for (const auto &hiteffect : hiteffects) {
-        auto frame = HitEffectFrame();
-        frame.effect_texture = hiteffect;
-        frame.effect_bound.setX(note_center_pos_x - w / 2.0);
-        frame.effect_bound.setY(
-            current_size.height() * (1 - judgeline_position) - h / 2.0);
-        frame.effect_bound.setWidth(w);
-        frame.effect_bound.setHeight(h);
-        framequeue.push(std::move(frame));
-      }
-    }
 
     // 物件头左上角位置
     double head_note_pos_x = note_center_pos_x - head_note_size.width() / 2.0;
@@ -787,13 +794,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
     switch (note->note_type) {
       case NoteType::NOTE: {
         // 直接绘制
-        if (head_note_bound.contains(mouse_pos)) {
-          renderer_manager->addRect(head_note_bound, head_hovered_texture,
-                                    QColor(0, 0, 0, 255), 0, true);
-        } else {
-          renderer_manager->addRect(head_note_bound, head_texture,
-                                    QColor(0, 0, 0, 255), 0, true);
-        }
+        renderer_manager->addRect(head_note_bound, head_texture,
+                                  QColor(0, 0, 0, 255), 0, true);
         break;
       }
       case NoteType::HOLD: {
@@ -802,17 +804,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 处于组合键内,不绘制
         if (!long_note) continue;
 
-        double long_note_end_visual_time =
-            current_time_stamp +
-            (long_note->hold_end_reference->timestamp - current_time_stamp) *
-                speed_zoom;
-
         // 当前面条尾y轴位置
         auto long_note_end_pos_y =
             current_size.height() * (1.0 - judgeline_position) -
-            ((canvas_pasued ? long_note->hold_end_reference->timestamp
-                            : long_note_end_visual_time) -
-             current_time_stamp) *
+            (long_note->hold_end_reference->timestamp - current_time_stamp) *
                 timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
         auto long_note_body_height = (long_note_end_pos_y - note_center_pos_y);
 
@@ -864,24 +859,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
             renderer_manager->addRect(long_note_end_bound,
                                       long_note_end_texture,
                                       QColor(0, 0, 0, 255), 0, true);
-            if (head_note_bound.contains(mouse_pos)) {
-              renderer_manager->addRect(head_note_bound, head_hovered_texture,
-                                        QColor(0, 0, 0, 255), 0, true);
-            } else {
-              renderer_manager->addRect(head_note_bound, head_texture,
-                                        QColor(0, 0, 0, 255), 0, true);
-            }
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
             break;
           }
           case ComplexInfo::HEAD: {
             // 多画个头-在尾处追加一个节点
-            if (head_note_bound.contains(mouse_pos)) {
-              renderer_manager->addRect(head_note_bound, head_hovered_texture,
-                                        QColor(0, 0, 0, 255), 0, true);
-            } else {
-              renderer_manager->addRect(head_note_bound, head_texture,
-                                        QColor(0, 0, 0, 255), 0, true);
-            }
+            renderer_manager->addRect(head_note_bound, head_texture,
+                                      QColor(0, 0, 0, 255), 0, true);
             nodes.emplace_back(node_bound);
             break;
           }
@@ -896,12 +881,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
             for (const auto &noderect : nodes) {
               renderer_manager->addRect(noderect, complex_note_node_texture,
                                         QColor(0, 0, 0, 255), 0, true);
-              // if (noderect.contains(mouse_pos)) {
-              //   // 画个节点hover滤镜
-              //   renderer_manager->addRect(noderect, nullptr,
-              //                             QColor(255, 255, 255, 128), 0,
-              //                             true);
-              // }
             }
             renderer_manager->addRect(long_note_end_bound,
                                       long_note_end_texture,
@@ -995,12 +974,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
             for (const auto &noderect : nodes) {
               renderer_manager->addRect(noderect, complex_note_node_texture,
                                         QColor(0, 0, 0, 255), 0, true);
-              // if (noderect.contains(mouse_pos)) {
-              //   // 画个节点hover滤镜
-              //   renderer_manager->addRect(noderect, nullptr,
-              //                             QColor(255, 255, 255, 128), 0,
-              //                             true);
-              // }
             }
             renderer_manager->addRect(slide_end_bound, slide_end_texture,
                                       QColor(0, 0, 0, 255), 0, true);
@@ -1012,15 +985,18 @@ void MapWorkspaceCanvas::draw_hitobject() {
         break;
       }
     }
-  }
-  // 最后给每个轨道添加特效动画
-  for (auto &[orbit, framequeue] : effects) {
-    if (!framequeue.empty()) {
-      renderer_manager->addRect(framequeue.front().effect_bound,
-                                framequeue.front().effect_texture,
-                                QColor(0, 0, 0, 255), 0, true);
-      framequeue.pop();
-    }
+    // 最后添加特效动画
+    // if (std::abs(note->timestamp - current_time_stamp) <= 3) {
+    //   // 与判定线相差3ms内
+    //   auto effect_work = [&]() {
+    //     for (int i = 0; i < hiteffects.size(); ++i) {
+    //       renderer_manager->addRect(head_note_bound, hiteffects[i],
+    //                                 QColor(0, 0, 0, 255), 0, true);
+    //     }
+    //   };
+    //   std::thread t(effect_work);
+    //   t.detach();
+    // }
   }
 }
 
@@ -1051,13 +1027,12 @@ void MapWorkspaceCanvas::push_shape() {
               preference_bpm = std::make_unique<double>();
               *preference_bpm = current_abs_timing->basebpm;
             }
-            speed_zoom = current_abs_timing->basebpm / *preference_bpm;
+            speed_zoom = 1.0;
             emit current_absbpm_changed(current_abs_timing->basebpm);
             emit current_timeline_speed_changed(speed_zoom);
           } else {
             // 变速timing--存储的倍速
-            speed_zoom =
-                current_abs_timing->basebpm / *preference_bpm * otiming->bpm;
+            speed_zoom = otiming->bpm;
             emit current_timeline_speed_changed(speed_zoom);
           }
           break;
@@ -1110,24 +1085,21 @@ void MapWorkspaceCanvas::push_shape() {
       processing_pos -= beat_distance;
     }
 
-    draw_background();
-
-    if (canvas_pasued) {
-      // 更新拍列表
-      // 清除拍缓存
-      current_beats.clear();
-      working_map->query_beat_in_range(current_beats,
-                                       int32_t(current_time_area_start),
-                                       int32_t(current_time_area_end));
-      draw_beats();
-    }
-
+    // 更新拍列表
+    // 清除拍缓存
+    current_beats.clear();
+    working_map->query_beat_in_range(current_beats,
+                                     int32_t(current_time_area_start),
+                                     int32_t(current_time_area_end));
     // 更新物件列表
     // 清除物件缓存
     buffer_objects.clear();
     working_map->query_object_in_range(buffer_objects,
                                        int32_t(current_time_area_start),
                                        int32_t(current_time_area_end), true);
+
+    draw_background();
+    draw_beats();
     draw_hitobject();
   }
   draw_preview_content();
@@ -1142,27 +1114,21 @@ void MapWorkspaceCanvas::push_shape() {
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   // 此处确保了未打开项目是无法switchmap的(没有选项)
   working_map = map;
-  preference_bpm = nullptr;
-  canvas_pasued = true;
 
   if (map) {
     map_type = map->maptype;
     // 更新谱面长度(如果音乐比谱面长)
-    auto s = QDir(map->audio_file_abs_path);
     auto map_audio_length =
-        BackgroundAudio::get_audio_length(s.canonicalPath().toStdString());
+        BackgroundAudio::get_audio_length(map->audio_file_abs_path);
     XINFO("maplength:" + std::to_string(map->map_length));
     XINFO("audiolength:" + std::to_string(map_audio_length));
     if (map->map_length < map_audio_length) map->map_length = map_audio_length;
-    // 设置谱面时间
-    current_time_stamp = map->project_reference->map_canvasposes.at(map);
 
     // 加载背景图纹理
     add_texture(map->bg_path);
-  } else {
-    current_time_stamp = 0;
   }
 
-  emit pause_signal(canvas_pasued);
-  emit current_time_stamp_changed(current_time_stamp);
+  // 重置谱面时间
+  current_time_stamp = 0;
+  emit current_time_stamp_changed(0);
 }
