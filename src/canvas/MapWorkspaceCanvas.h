@@ -5,7 +5,9 @@
 #include <qtmetamacros.h>
 
 #include <memory>
+#include <queue>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "../mmm/Beat.h"
@@ -20,6 +22,13 @@ enum class MouseOperationArea {
   PREVIEW,
   // 物件
   NOTE,
+  // 信息区
+  INFO,
+};
+
+struct HitEffectFrame {
+  std::shared_ptr<TextureInstace> effect_texture;
+  QRectF effect_bound;
 };
 
 class MapWorkspaceCanvas : public GLCanvas {
@@ -38,13 +47,16 @@ class MapWorkspaceCanvas : public GLCanvas {
   void resizeEvent(QResizeEvent *event) override;
   void paintEvent(QPaintEvent *event) override;
 
-  // 刷新定时器
-  QTimer *refresh_timer;
-  // 自补偿定时器
-  // QElapsedTimer frameTimer;
+  void initializeGL() override;
+
+  // 选中的物件
+  std::unordered_set<std::shared_ptr<HitObject>> selected_hitobjects;
 
   // 打击特效纹理序列
   std::vector<std::shared_ptr<TextureInstace>> hiteffects;
+
+  // 轨道特效帧队列
+  std::unordered_map<int32_t, std::queue<HitEffectFrame>> effects;
 
   // 实际刷新时间间隔
   double actual_update_time{0};

@@ -99,7 +99,8 @@ void TimeController::update_audio_status() {
     if (pause) {
       // 防止播放器已播放完暂停了死等待
       if (BackgroundAudio::get_device_playerstatus(
-              binding_map->project_reference->devicename) == 1) {
+              binding_map->project_reference->devicename) == 1 &&
+          !pause) {
         binding_map->audio_pos_callback->waitfor_clear_buffer([&]() {
           XINFO("同步画布时间");
           BackgroundAudio::set_audio_pos(
@@ -177,7 +178,8 @@ void TimeController::on_canvas_timestamp_changed(double time) {
   // 暂停可调
   if (!pause) return;
   // 更新音频播放位置
-  if (binding_map) {
+  if (binding_map &&
+      binding_map->project_reference->devicename != "unknown output device") {
     BackgroundAudio::set_audio_pos(binding_map->project_reference->devicename,
                                    binding_map->audio_file_abs_path, time);
   }
