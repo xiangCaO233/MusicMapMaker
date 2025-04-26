@@ -84,8 +84,8 @@ set(GLSL_FILES
 # 项目源文件
 set(PROJECT_SOURCES
   src/main.cpp
-	src/audio/BackgroundAudio.h
-	src/audio/BackgroundAudio.cpp
+  src/audio/BackgroundAudio.h
+  src/audio/BackgroundAudio.cpp
   src/ui/mainwindow.cpp
   src/ui/mainwindow.h
   src/ui/mainwindow.ui
@@ -104,15 +104,15 @@ set(PROJECT_SOURCES
   src/ui/pageui/editorui/meditorarea.h
   src/ui/pageui/editorui/meditorarea.cpp
   src/ui/pageui/editorui/meditorarea.ui
-	src/ui/pageui/editorui/CanvasContainer.h
-	src/ui/pageui/editorui/CanvasContainer.cpp
+  src/ui/pageui/editorui/CanvasContainer.h
+  src/ui/pageui/editorui/CanvasContainer.cpp
   src/ui/infoui/minfo.h
   src/ui/infoui/minfo.cpp
   src/ui/infoui/minfo.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
-	src/canvas/FrameRateCounter.h
-	src/canvas/FrameRateCounter.cpp
+  src/canvas/FrameRateCounter.h
+  src/canvas/FrameRateCounter.cpp
   src/canvas/MapWorkspaceCanvas.h
   src/canvas/MapWorkspaceCanvas.cpp
   src/canvas/renderer/shader/GLShader.h
@@ -166,6 +166,8 @@ else()
   endif()
 endif()
 
+add_dependencies(MusicMapMaker xaudio-dev)
+
 # 自动复制运行时文件和插件
 if(WIN32)
   # 复制 DLLs
@@ -187,7 +189,7 @@ if(WIN32)
     DESTINATION "${CMAKE_BINARY_DIR}/platforms")
 endif()
 
-# 链接 Qt 库
+# 链接库
 target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog Qt${QT_VERSION_MAJOR}::Core
