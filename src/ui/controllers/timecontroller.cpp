@@ -146,6 +146,11 @@ void TimeController::on_pausebutton_clicked() {
 void TimeController::on_canvas_pause(bool paused) {
   // 更新暂停状态和按钮图标
   pause = paused;
+  // 修改timeedit可用状态
+  // 暂停时不可使用
+  ui->lineEdit->setEnabled(pause);
+
+  // 更新暂停按钮图标
   update_pause_button();
 
   // 切换音频播放状态
@@ -186,4 +191,78 @@ void TimeController::on_canvas_timestamp_changed(double time) {
     BackgroundAudio::set_audio_pos(binding_map->project_reference->devicename,
                                    file.canonicalPath().toStdString(), time);
   }
+}
+
+// 变速设置
+void TimeController::on_doubleSpinBox_valueChanged(double arg1) {
+  // TODO(xiang 2025-04-26): 实现功能
+  auto speed_value = arg1 / 100.0;
+  // 为音频应用变速(根据是否启用变调)
+  BackgroundAudio::set_play_speed(binding_map->project_reference->devicename,
+                                  speed_value,
+                                  ui->enablepitchaltbutton->isChecked());
+  // 同步画布的时间倍率
+  emit playspeed_changed(speed_value);
+}
+
+// 重置变速按钮事件
+void TimeController::on_resetspeedbutton_clicked() {
+  // TODO(xiang 2025-04-26): 实现功能
+  // 重置音频速度为1.0
+  // 同步画布的时间倍率
+}
+
+// 启用变速变调按钮事件
+void TimeController::on_enablepitchaltbutton_clicked() {
+  enable_pitch_alt = ui->enablepitchaltbutton->isChecked();
+  BackgroundAudio::enable_pitch_alt = enable_pitch_alt;
+}
+
+// 全局音频音量slider值变化事件
+void TimeController::on_global_volume_slider_valueChanged(int value) {
+  BackgroundAudio::global_volume = float(value) / 100.0;
+}
+
+// 音乐音量slider值变化事件
+void TimeController::on_music_volume_slider_valueChanged(int value) {
+  BackgroundAudio::music_orbits_volume = float(value) / 100.0;
+}
+
+// 效果音量slider值变化事件
+void TimeController::on_effect_volume_slider_valueChanged(int value) {
+  BackgroundAudio::effect_orbits_volume = float(value) / 100.0;
+}
+
+// 静音全局按钮事件
+void TimeController::on_reset_global_volume_button_clicked() {
+  BackgroundAudio::global_volume = 0;
+}
+
+// 静音音乐按钮事件
+void TimeController::on_reset_music_volume_button_clicked() {
+  BackgroundAudio::music_orbits_volume = 0;
+}
+
+// 静音效果按钮事件
+void TimeController::on_reset_effect_volume_button_clicked() {
+  BackgroundAudio::effect_orbits_volume = 0;
+}
+
+// 快退按钮事件
+void TimeController::on_fastbackward_clicked() {
+  // TODO(xiang 2025-04-26): 实现功能
+  // 快退5s--并同步画布时间
+}
+
+// 快进按钮事件
+void TimeController::on_fastforward_clicked() {
+  // TODO(xiang 2025-04-26): 实现功能
+  // 快进5s--并同步画布时间
+}
+
+// 时间编辑框回车按下事件
+void TimeController::on_lineEdit_returnPressed() {
+  // TODO(xiang 2025-04-26): 实现功能
+  // 预先记录修改前的数据
+  // 检查输入数据是否合法--不合法恢复缓存数据
 }

@@ -16,13 +16,22 @@ MEditorArea::MEditorArea(QWidget* parent)
   connect(this, &MEditorArea::switched_map, ui->audio_time_controller,
           &TimeController::on_selectnewmap);
 
-  // 连接画布暂停信号和时间控制器暂停槽(来回)
+  // 连接画布信号和时间控制器暂停槽(来回)
   connect(ui->canvas_container->canvas.data(),
           &MapWorkspaceCanvas::pause_signal, ui->audio_time_controller,
           &TimeController::on_canvas_pause);
   connect(ui->audio_time_controller, &TimeController::pause_button_changed,
           ui->canvas_container->canvas.data(),
           &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
+
+  // 连接画布槽和时间控制器信号
+  connect(ui->audio_time_controller, &TimeController::on_canvas_pause,
+          canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
+
+  connect(ui->audio_time_controller, &TimeController::playspeed_changed,
+          canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::on_timecontroller_speed_changed);
 
   // 连接画布时间更新信号
   connect(ui->canvas_container->canvas.data(),
@@ -181,7 +190,8 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
       double ratio = (double)value / 10000.0;
       auto maptime = (double)(ui->canvas_container->canvas.data()
                                   ->working_map->map_length);
-      ui->canvas_container->canvas.data()->current_time_stamp = maptime * ratio;
+      ui->canvas_container->canvas.data()->current_visual_time_stamp =
+          maptime * ratio;
       emit progress_pos_changed(maptime * ratio);
     }
   }

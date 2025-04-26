@@ -76,9 +76,15 @@ void MapWorkspaceCanvas::initializeGL() {
   //   hiteffects.emplace_back(t);
   // }
 }
+
 // 时间控制器暂停按钮触发
 void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
   canvas_pasued = paused;
+}
+
+// 时间控制器播放速度变化
+void MapWorkspaceCanvas::on_timecontroller_speed_changed(double speed) {
+  playspeed = speed;
 }
 
 // qt事件
@@ -98,7 +104,8 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
 
   if (!canvas_pasued) {
     // 未暂停,更新当前时间戳
-    current_time_stamp += actual_update_time;
+    current_time_stamp = current_time_stamp + actual_update_time * playspeed;
+
     if (current_time_stamp < 0) {
       current_time_stamp = 0;
       canvas_pasued = true;
@@ -109,6 +116,7 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
       canvas_pasued = true;
       emit pause_signal(canvas_pasued);
     }
+    current_visual_time_stamp = current_time_stamp + static_time_offset;
     update_mapcanvas_timepos();
   }
 }
@@ -209,8 +217,8 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
         current_beat_it--;
         // auto second_tolast_beat = *current_beat_it;
         magnet_beats.emplace_back(*current_beat_it);
-      } else if (current_time_stamp > last_beat->start_timestamp &&
-                 current_time_stamp < last_beat->end_timestamp) {
+      } else if (current_visual_time_stamp > last_beat->start_timestamp &&
+                 current_visual_time_stamp < last_beat->end_timestamp) {
         // 在拍内--可只添加本拍小节线
       } else {
         // 在拍外--可只添加最后一拍的最后一个小节线
@@ -297,6 +305,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
     canvas_pasued = true;
     emit pause_signal(canvas_pasued);
   }
+  current_visual_time_stamp = current_time_stamp + static_time_offset;
   update_mapcanvas_timepos();
 }
 
@@ -508,8 +517,8 @@ void MapWorkspaceCanvas::draw_preview_content() {
     QSizeF preview_area_size(current_size.width() * preview_width_scale, 100);
     QRectF current_area(
         preview_x_startpos,
-        current_size.height() *
-                (1.0 - (current_time_stamp / double(working_map->map_length))) -
+        current_size.height() * (1.0 - (current_visual_time_stamp /
+                                        double(working_map->map_length))) -
             preview_area_size.height() / 2.0,
         preview_area_size.width(), preview_area_size.height());
     renderer_manager->addRect(current_area, nullptr, QColor(240, 240, 240, 75),
@@ -573,8 +582,8 @@ void MapWorkspaceCanvas::draw_beats() {
     // 拍距离判定线距离从下往上--反转
     // 当前拍起始位置
     auto beat_start_pos =
-        judgeline_pos - (beat_start_time - current_time_stamp) * timeline_zoom *
-                            (canvas_pasued ? 1.0 : speed_zoom);
+        judgeline_pos - (beat_start_time - current_visual_time_stamp) *
+                            timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
 
     // 获取主题
     bool has_theme{false};
@@ -753,15 +762,15 @@ void MapWorkspaceCanvas::draw_hitobject() {
       continue;
 
     double note_visual_time =
-        current_time_stamp +
-        (note->timestamp - current_time_stamp) * speed_zoom;
+        current_visual_time_stamp +
+        (note->timestamp - current_visual_time_stamp) * speed_zoom;
 
     // 物件距离判定线距离从下往上--反转
     // 当前物件头位置-中心
     auto note_center_pos_y =
         current_size.height() * (1.0 - judgeline_position) -
         ((canvas_pasued ? note->timestamp : note_visual_time) -
-         current_time_stamp) *
+         current_visual_time_stamp) *
             timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
 
     // 物件头中心位置
@@ -825,8 +834,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
         if (!long_note) continue;
 
         double long_note_end_visual_time =
-            current_time_stamp +
-            (long_note->hold_end_reference->timestamp - current_time_stamp) *
+            current_visual_time_stamp +
+            (long_note->hold_end_reference->timestamp -
+             current_visual_time_stamp) *
                 speed_zoom;
 
         // 当前面条尾y轴位置
@@ -834,7 +844,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
             current_size.height() * (1.0 - judgeline_position) -
             ((canvas_pasued ? long_note->hold_end_reference->timestamp
                             : long_note_end_visual_time) -
-             current_time_stamp) *
+             current_visual_time_stamp) *
                 timeline_zoom * (canvas_pasued ? 1.0 : speed_zoom);
         auto long_note_body_height = (long_note_end_pos_y - note_center_pos_y);
 
@@ -1107,7 +1117,7 @@ void MapWorkspaceCanvas::push_shape() {
     auto current_size = size();
     // 读取获取当前时间附近的timings
     std::vector<std::shared_ptr<Timing>> temp_timings;
-    working_map->query_around_timing(temp_timings, current_time_stamp);
+    working_map->query_around_timing(temp_timings, current_visual_time_stamp);
 
     if (temp_timings.empty()) {
       // 未查询到timing-不绘制时间线
@@ -1166,7 +1176,8 @@ void MapWorkspaceCanvas::push_shape() {
 
     // 距离此timing的拍数-1
     auto beat_count = int(
-        (current_time_stamp - current_abs_timing->timestamp) / beattime - 1);
+        (current_visual_time_stamp - current_abs_timing->timestamp) / beattime -
+        1);
 
     // TODO(xiang 2025-04-21):
     // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
@@ -1178,7 +1189,8 @@ void MapWorkspaceCanvas::push_shape() {
 
     // 拍距离判定线距离从下往上--反转
     // 拍起始位置
-    double distance = std::fabs(current_time_area_end - current_time_stamp);
+    double distance =
+        std::fabs(current_time_area_end - current_visual_time_stamp);
     auto processing_pos = judgeline_pos + (distance * timeline_zoom);
 
     while (processing_pos > -beattime) {
@@ -1231,14 +1243,14 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     XINFO("audiolength:" + std::to_string(map_audio_length));
     if (map->map_length < map_audio_length) map->map_length = map_audio_length;
     // 设置谱面时间
-    current_time_stamp = map->project_reference->map_canvasposes.at(map);
+    current_visual_time_stamp = map->project_reference->map_canvasposes.at(map);
 
     // 加载背景图纹理
     add_texture(map->bg_path);
   } else {
-    current_time_stamp = 0;
+    current_visual_time_stamp = 0;
   }
 
   emit pause_signal(canvas_pasued);
-  emit current_time_stamp_changed(current_time_stamp);
+  emit current_time_stamp_changed(current_visual_time_stamp);
 }

@@ -8,23 +8,33 @@
 #include "../log/colorful-log.h"
 #include "AudioManager.h"
 
+enum class AudioType {
+  MUSIC,
+  EFFECT,
+};
+
 class BackgroundAudio {
   // 音频管理器
   static std::shared_ptr<XAudioManager> audiomanager;
 
+ public:
+  // 变调是否启用
+  static bool enable_pitch_alt;
+
   // 轨道音量
-  static float orbit_volume;
+  static float music_orbits_volume;
+  static float effect_orbits_volume;
 
   // 轨道速度
   static float orbit_speed;
 
-  // 全局音量
-  static float global_volume;
-
   // 全局速度
   static float global_speed;
 
- public:
+  // 全局音量
+  static float global_volume;
+
+  // 初始化音频管理器
   inline static void init() {
     BackgroundAudio::audiomanager = XAudioManager::newmanager();
     // XLogger::setlevel(spdlog::level::warn);
@@ -36,6 +46,7 @@ class BackgroundAudio {
     return BackgroundAudio::audiomanager->get_outdevices();
   }
 
+  // 添加播放回调
   inline static void add_playpos_callback(
       const std::string& device_full_name, const std::string& audio_full_path,
       std::shared_ptr<PlayposCallBack> callback) {
@@ -140,6 +151,37 @@ class BackgroundAudio {
                    ->player->paused
                ? 0
                : 1;
+  }
+
+  // 设置设备播放器上全部音频的播放速度
+  inline static void set_play_speed(const std::string& device_full_name,
+                                    double speed_ratio,
+                                    bool enable_pitch_alt = false) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return;
+    auto& player =
+        audiomanager->get_outdevices()->at(device_idit->second)->player;
+    if (!player) return;
+    if (enable_pitch_alt) {
+      if (orbit_speed != 1.0) {
+        for (const auto& [id, orbit] : player->mixer->audio_orbits) {
+          orbit->speed = 1.0;
+        }
+      }
+      if (global_speed != speed_ratio) {
+        player->ratio(speed_ratio);
+      }
+      global_speed = speed_ratio;
+    } else {
+      if (global_speed != 1.0) {
+        player->ratio(1.0);
+      }
+      for (const auto& [id, orbit] : player->mixer->audio_orbits) {
+        orbit->speed = speed_ratio;
+      }
+      orbit_speed = speed_ratio;
+    }
   }
 };  // namespace BackgroundAudio
 

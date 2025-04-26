@@ -154,11 +154,17 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 正在工作的图类型
   MapType map_type;
 
+  // 当前视觉时间戳
+  double current_visual_time_stamp{0};
+
   // 当前时间戳
   double current_time_stamp{0};
 
   // 背景暗化
   double background_darken_ratio{0.55};
+
+  // 时间偏移
+  double static_time_offset{-23};
 
   // 用户调节的时间线缩放-- n * 1px/1ms
   double timeline_zoom{1.0};
@@ -195,6 +201,9 @@ class MapWorkspaceCanvas : public GLCanvas {
  public slots:
   // 时间控制器暂停按钮触发
   void on_timecontroller_pause_button_changed(bool paused);
+
+  // 时间控制器播放速度变化
+  void on_timecontroller_speed_changed(double speed);
 
  signals:
   // 时间戳更新信号
