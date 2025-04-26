@@ -122,10 +122,10 @@ class BackgroundAudio {
     auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
     if (audio_idit == audiomanager->get_handles()->end()) return -1;
     auto& audio = audiomanager->get_audios()->at(audio_idit->second);
-    return double(
-        xutil::plannerpcmpos2milliseconds(
-            audio->get_pcm_data_size(), static_cast<int>(Config::samplerate)) /
-        static_cast<int>(Config::channel));
+    return double(xutil::plannerpcmpos2milliseconds(
+                      audio->get_pcm_data_size(),
+                      static_cast<int>(x::Config::samplerate)) /
+                  static_cast<int>(x::Config::channel));
   }
 
   // 获取设备播放器播放状态
