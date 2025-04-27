@@ -63,9 +63,6 @@ class MEditorArea : public QWidget {
   // 进度条移动事件
   void on_progress_slider_valueChanged(int value);
 
-  // 切换显示音频控制器
-  void on_audio_time_controller_button_clicked();
-
  private:
   Ui::MEditorArea *ui;
 };

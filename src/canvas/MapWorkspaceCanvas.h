@@ -2,17 +2,30 @@
 #define M_MAPWORKSPACE_H
 
 #include <qpaintdevice.h>
+#include <qpoint.h>
 #include <qtmetamacros.h>
 
 #include <memory>
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "../mmm/Beat.h"
 #include "../mmm/map/MMap.h"
 #include "GLCanvas.h"
+
+enum class MouseEditMode {
+  // 仅预览
+  NONE,
+  // 仅编辑,不新增物件,仅调整hover位置的物件
+  EDIT,
+  // 点击放置,拖动时调整时间戳
+  PLACE_NOTE,
+  // 拖动放置(组合键,面条,长条,滑键)
+  PLACE_LONGNOTE,
+};
 
 // 鼠标正在操作的区域
 enum class MouseOperationArea {
@@ -20,8 +33,6 @@ enum class MouseOperationArea {
   EDIT,
   // 预览区
   PREVIEW,
-  // 物件
-  NOTE,
   // 信息区
   INFO,
 };
@@ -49,9 +60,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   void initializeGL() override;
 
-  // 选中的物件
-  std::unordered_set<std::shared_ptr<HitObject>> selected_hitobjects;
-
+  /*
+   *图形相关
+   */
   // 打击特效纹理序列
   std::vector<std::shared_ptr<TextureInstace>> hiteffects;
 
@@ -66,24 +77,6 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 播放速度
   double playspeed{1.0f};
-
-  // 鼠标操作区
-  MouseOperationArea operation_area;
-
-  // 物件缓存
-  std::vector<std::shared_ptr<HitObject>> buffer_objects;
-
-  // 预览物件缓存
-  std::vector<std::shared_ptr<HitObject>> buffer_preview_objects;
-
-  // 区域
-  // 编辑区
-  QRectF edit_area;
-  // 预览区
-  QRectF preview_area;
-
-  // 物件区域缓存--实时更新包含的物件,不包含得删
-  std::unordered_map<std::shared_ptr<HitObject>, QRectF *> hitobject_bounds_map;
 
   // 参考bpm
   std::unique_ptr<double> preference_bpm = nullptr;
@@ -114,11 +107,62 @@ class MapWorkspaceCanvas : public GLCanvas {
   double current_time_area_start{0.0};
   double current_time_area_end{0.0};
 
+  // 物件缓存
+  std::vector<std::shared_ptr<HitObject>> buffer_objects;
+
+  // 预览物件缓存
+  std::vector<std::shared_ptr<HitObject>> buffer_preview_objects;
+
+  /*
+   *编辑相关
+   */
+  // 鼠标悬停位置的物件(若不是面条尾或滑键尾,则bool为true时悬浮位置为头,false时为身)
+  std::shared_ptr<std::pair<std::shared_ptr<HitObject>, bool>>
+      hover_hitobject_info{nullptr};
+
+  // 选中的物件
+  std::unordered_set<std::shared_ptr<HitObject>> selected_hitobjects;
+
+  // 左键是否按下
+  bool mouse_left_pressed{false};
+  QPointF mouse_left_press_pos;
+
+  // 选中框定位点
+  std::shared_ptr<std::pair<QPointF, QPointF>> select_bound_locate_points;
+
+  // 选中区域
+  QRectF select_bound;
+
+  // 是否严格选中
+  bool strict_select{false};
+
+  // 鼠标当前的编辑模式
+  MouseEditMode edit_mode;
+
+  // 区域
+  // 鼠标当前的操作区
+  MouseOperationArea operation_area;
+
+  // 信息区
+  QRectF info_area;
+
+  // 编辑区
+  QRectF edit_area;
+
+  // 预览区
+  QRectF preview_area;
+
+  /*
+   *成员函数
+   */
   // 更新谱面时间位置
   void update_mapcanvas_timepos();
 
   // 绘制判定线
   void draw_judgeline();
+
+  // 绘制选中框
+  void draw_select_bound();
 
   // 绘制信息区
   void draw_infoarea();

@@ -6,6 +6,8 @@
 #include "../../HitObject.h"
 #include "../Note.h"
 
+class SlideEnd;
+
 // 滑键
 class Slide : public Note {
  public:
@@ -14,6 +16,9 @@ class Slide : public Note {
 
   // 析构Slide
   ~Slide() override;
+
+  // 滑键尾引用
+  std::shared_ptr<SlideEnd> slide_end_reference;
 
   // 正右负左,绝对值为滑动的轨道数
   int32_t slide_parameter;

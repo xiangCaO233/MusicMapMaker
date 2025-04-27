@@ -10,7 +10,7 @@ MEditorArea::MEditorArea(QWidget* parent)
   ui->setupUi(this);
   canvas_container = ui->canvas_container;
   // 默认隐藏音频控制器
-  ui->audio_time_controller->hide();
+  // ui->audio_time_controller->hide();
 
   // 连接时间控制器选择map槽
   connect(this, &MEditorArea::switched_map, ui->audio_time_controller,
@@ -80,9 +80,10 @@ void MEditorArea::use_theme(GlobalTheme theme) {
   mutil::set_toolbutton_svgcolor(ui->bookmark_toolbutton,
                                  ":/icons/bookmark.svg", file_button_color, 12,
                                  12);
-  mutil::set_button_svgcolor(ui->audio_time_controller_button,
-                             ":/icons/sliders-h.svg", file_button_color, 16,
-                             16);
+  mutil::set_toolbutton_svgcolor(ui->mode_toolbutton,
+                                 ":/icons/mouse-pointer.svg", file_button_color,
+                                 12, 12);
+
   mutil::set_button_svgcolor(ui->magnet_todivisor_button, ":/icons/magnet.svg",
                              file_button_color, 16, 16);
 
@@ -198,6 +199,6 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
 }
 
 // 切换音频控制器
-void MEditorArea::on_audio_time_controller_button_clicked() {
-  ui->audio_time_controller->setHidden(!ui->audio_time_controller->isHidden());
-}
+// void MEditorArea::on_audio_time_controller_button_clicked() {
+//   ui->audio_time_controller->setHidden(!ui->audio_time_controller->isHidden());
+// }
