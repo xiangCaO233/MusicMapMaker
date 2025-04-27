@@ -345,10 +345,10 @@ void OsuMap::load_from_file(const char* path) {
         basetimings.insert(osu_timing);
       }
     }
-    // 先倒序添加全部基准timing--生成分拍
-    for (auto rbegin = basetimings.rbegin(); rbegin != basetimings.rend();
-         ++rbegin) {
-      insert_timing(*rbegin);
+    // 先添加全部基准timing--生成分拍
+    for (auto begin = basetimings.begin(); begin != basetimings.end();
+         ++begin) {
+      insert_timing(*begin);
     }
     // 再倒序添加全部变速timing
     for (auto rbegin = notbasetimings.rbegin(); rbegin != notbasetimings.rend();

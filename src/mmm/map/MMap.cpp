@@ -199,32 +199,19 @@ void MMap::insert_timing(const std::shared_ptr<Timing>& timing) {
       end = map_length;
     }
 
-    // 擦除范围内的拍
-    erase_beats(start, end);
-
     // 生成新拍
+    // 修改范围内的拍的时间线缩放
     // 当前处理到的时间
-    auto current_process_time = double(start);
+    auto beatdummy = std::make_shared<Beat>(double(start));
+    auto current_process_beatit = beats.lower_bound(beatdummy);
+
     // 每一拍的实际时间
     double beattime = 60.0 / timing->basebpm * 1000.0;
 
-    while (current_process_time < end) {
-      // 每一拍
-      auto beat = std::make_shared<Beat>(timing->basebpm, current_process_time,
-                                         current_process_time + beattime);
-      // 时间线缩放
-      beat->timeline_zoom = timing->bpm;
-
-      // 计算这拍之内的可能分拍策略
-      generate_divisor_policy(beat);
-      if (beat->divisors != 1) {
-        // 锁定分拍策略
-        beat->divisors_customed = true;
-      }
-
-      // 插入beat结果
-      beats.insert(beat);
-      current_process_time += beattime;
+    while ((*current_process_beatit)->end_timestamp < end) {
+      // 修改时间线缩放
+      (*current_process_beatit)->timeline_zoom = timing->bpm;
+      ++current_process_beatit;
     }
   }
 }
