@@ -796,7 +796,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::shared_ptr<TextureInstace> head_hovered_texture =
       texture_full_map["hitobject/head_hover.png"];
   std::shared_ptr<TextureInstace> head_selected_texture =
-      texture_full_map["hitobject/head_hover.png"];
+      texture_full_map["hitobject/head_selected.png"];
 
   // 面条主体的纹理
   std::shared_ptr<TextureInstace> long_note_body_vertical_texture =
@@ -804,7 +804,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::shared_ptr<TextureInstace> long_note_body_vertical_hovered_texture =
       texture_full_map["hitobject/holdbodyvertical_hover.png"];
   std::shared_ptr<TextureInstace> long_note_body_vertical_selected_texture =
-      texture_full_map["hitobject/holdbodyvertical_hover.png"];
+      texture_full_map["hitobject/holdbodyvertical_selected.png"];
 
   // 横向面条主体的纹理
   std::shared_ptr<TextureInstace> long_note_body_horizontal_texture =
@@ -812,7 +812,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::shared_ptr<TextureInstace> long_note_body_horizontal_hovered_texture =
       texture_full_map["hitobject/holdbodyhorizontal_hover.png"];
   std::shared_ptr<TextureInstace> long_note_body_horizontal_selected_texture =
-      texture_full_map["hitobject/holdbodyhorizontal_hover.png"];
+      texture_full_map["hitobject/holdbodyhorizontal_selected.png"];
 
   // 组合键节点纹理
   std::shared_ptr<TextureInstace> complex_note_node_texture =
@@ -820,7 +820,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::shared_ptr<TextureInstace> complex_note_node_hovered_texture =
       texture_full_map["hitobject/node_hover.png"];
   std::shared_ptr<TextureInstace> complex_note_node_selected_texture =
-      texture_full_map["hitobject/node_hover.png"];
+      texture_full_map["hitobject/node_selected.png"];
 
   // 面条尾的纹理
   std::shared_ptr<TextureInstace> long_note_end_texture =
@@ -828,7 +828,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::shared_ptr<TextureInstace> long_note_end_hovered_texture =
       texture_full_map["hitobject/holdend_hover.png"];
   std::shared_ptr<TextureInstace> long_note_end_selected_texture =
-      texture_full_map["hitobject/holdend_hover.png"];
+      texture_full_map["hitobject/holdend_selected.png"];
 
   // 滑键尾的纹理
   std::shared_ptr<TextureInstace> slide_left_note_end_texture =
@@ -836,14 +836,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::shared_ptr<TextureInstace> slide_left_note_end_hovered_texture =
       texture_full_map["hitobject/arrowleft_hover.png"];
   std::shared_ptr<TextureInstace> slide_left_note_end_selected_texture =
-      texture_full_map["hitobject/arrowleft_hover.png"];
+      texture_full_map["hitobject/arrowleft_selected.png"];
 
   std::shared_ptr<TextureInstace> slide_right_note_end_texture =
       texture_full_map["hitobject/arrowright.png"];
   std::shared_ptr<TextureInstace> slide_right_note_end_hovered_texture =
       texture_full_map["hitobject/arrowright_hover.png"];
   std::shared_ptr<TextureInstace> slide_right_note_end_selected_texture =
-      texture_full_map["hitobject/arrowright_hover.png"];
+      texture_full_map["hitobject/arrowright_selected.png"];
 
   // 轨道宽度
   auto orbit_width = edit_area_width / max_orbit;
