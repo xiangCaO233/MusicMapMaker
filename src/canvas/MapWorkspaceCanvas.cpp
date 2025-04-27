@@ -938,6 +938,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
           // 优先鼠标悬停时的绘制
           renderer_manager->addRect(head_note_bound, head_hovered_texture,
                                     QColor(0, 0, 0, 255), 0, true);
+          hover_hitobject_info =
+              std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                  note, true);
           is_hover_note = true;
         } else if (strict_select ? select_bound.contains(head_note_bound)
                                  : select_bound.intersects(head_note_bound) ||
@@ -1020,11 +1023,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
                        : select_bound.intersects(long_note_body_bound) ||
                              selected_hitobjects.find(note) !=
                                  selected_hitobjects.end()) {
-          auto it = selected_hitobjects.find(note);
-          if (it == selected_hitobjects.end()) {
-            // 未选中则选中此物件
-            selected_hitobjects.emplace(note);
-          }
+          // 未选中则选中此物件
+          selected_hitobjects.emplace(note);
           renderer_manager->addRect(long_note_body_bound,
                                     long_note_body_vertical_selected_texture,
                                     QColor(0, 0, 0, 255), 0, true);
@@ -1059,12 +1059,8 @@ void MapWorkspaceCanvas::draw_hitobject() {
                            : select_bound.intersects(long_note_end_bound) ||
                                  selected_hitobjects.find(note) !=
                                      selected_hitobjects.end()) {
-              auto endit =
-                  selected_hitobjects.find(long_note->hold_end_reference);
-              if (endit == selected_hitobjects.end()) {
-                // 未选中则选中此面尾
-                selected_hitobjects.emplace(long_note->hold_end_reference);
-              }
+              // 未选中则选中此面尾
+              selected_hitobjects.emplace(long_note->hold_end_reference);
               renderer_manager->addRect(long_note_end_bound,
                                         long_note_end_selected_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -1083,8 +1079,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(head_note_bound)
-                           : select_bound.intersects(head_note_bound)) {
-              // 选中此物件
+                           : select_bound.intersects(head_note_bound) ||
+                                 selected_hitobjects.find(note) !=
+                                     selected_hitobjects.end()) {
+              // 未选中则选中此物件
               selected_hitobjects.emplace(note);
               // 选中时的绘制
               renderer_manager->addRect(head_note_bound, head_selected_texture,
@@ -1107,8 +1105,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(head_note_bound)
-                           : select_bound.intersects(head_note_bound)) {
-              // 选中此物件
+                           : select_bound.intersects(head_note_bound) ||
+                                 selected_hitobjects.find(note) !=
+                                     selected_hitobjects.end()) {
+              // 未选中则选中此物件
               selected_hitobjects.emplace(note);
               // 选中时的绘制
               renderer_manager->addRect(head_note_bound, head_selected_texture,
@@ -1138,8 +1138,11 @@ void MapWorkspaceCanvas::draw_hitobject() {
                     std::pair<std::shared_ptr<HitObject>, bool>>(notereference,
                                                                  true);
                 is_hover_note = true;
-              } else if (strict_select ? select_bound.contains(noderect)
-                                       : select_bound.intersects(noderect)) {
+              } else if (strict_select
+                             ? select_bound.contains(noderect)
+                             : select_bound.intersects(noderect) ||
+                                   selected_hitobjects.find(notereference) !=
+                                       selected_hitobjects.end()) {
                 selected_hitobjects.emplace(notereference);
                 renderer_manager->addRect(noderect,
                                           complex_note_node_selected_texture,
@@ -1160,7 +1163,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(long_note_end_bound)
-                           : select_bound.intersects(long_note_end_bound)) {
+                           : select_bound.intersects(long_note_end_bound) ||
+                                 selected_hitobjects.find(
+                                     long_note->hold_end_reference) !=
+                                     selected_hitobjects.end()) {
               // 选中此面尾
               selected_hitobjects.emplace(long_note->hold_end_reference);
               renderer_manager->addRect(long_note_end_bound,
@@ -1239,7 +1245,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
           is_hover_note = true;
         } else if (strict_select
                        ? select_bound.contains(horizon_body_bound)
-                       : select_bound.intersects(horizon_body_bound)) {
+                       : select_bound.intersects(horizon_body_bound) ||
+                             selected_hitobjects.find(note) !=
+                                 selected_hitobjects.end()) {
           // 选中此物件
           selected_hitobjects.emplace(note);
           renderer_manager->addRect(horizon_body_bound,
@@ -1272,7 +1280,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(head_note_bound)
-                           : select_bound.intersects(head_note_bound)) {
+                           : select_bound.intersects(head_note_bound) ||
+                                 selected_hitobjects.find(note) !=
+                                     selected_hitobjects.end()) {
               // 选中此物件
               selected_hitobjects.emplace(note);
               // 选中时的绘制
@@ -1293,7 +1303,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(slide_end_bound)
-                           : select_bound.intersects(slide_end_bound)) {
+                           : select_bound.intersects(slide_end_bound) ||
+                                 selected_hitobjects.find(note) !=
+                                     selected_hitobjects.end()) {
               // 选中此物件
               selected_hitobjects.emplace(note);
               renderer_manager->addRect(slide_end_bound,
@@ -1316,7 +1328,9 @@ void MapWorkspaceCanvas::draw_hitobject() {
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(head_note_bound)
-                           : select_bound.intersects(head_note_bound)) {
+                           : select_bound.intersects(head_note_bound) ||
+                                 selected_hitobjects.find(note) !=
+                                     selected_hitobjects.end()) {
               // 选中此物件
               selected_hitobjects.emplace(note);
               // 选中时的绘制
@@ -1346,8 +1360,11 @@ void MapWorkspaceCanvas::draw_hitobject() {
                     std::pair<std::shared_ptr<HitObject>, bool>>(notereference,
                                                                  true);
                 is_hover_note = true;
-              } else if (strict_select ? select_bound.contains(noderect)
-                                       : select_bound.intersects(noderect)) {
+              } else if (strict_select
+                             ? select_bound.contains(noderect)
+                             : select_bound.intersects(noderect) ||
+                                   selected_hitobjects.find(notereference) !=
+                                       selected_hitobjects.end()) {
                 selected_hitobjects.emplace(notereference);
                 renderer_manager->addRect(noderect,
                                           complex_note_node_selected_texture,
@@ -1368,7 +1385,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(slide_end_bound)
-                           : select_bound.intersects(slide_end_bound)) {
+                           : select_bound.intersects(slide_end_bound) ||
+                                 selected_hitobjects.find(
+                                     slide->slide_end_reference) !=
+                                     selected_hitobjects.end()) {
               selected_hitobjects.emplace(slide->slide_end_reference);
               renderer_manager->addRect(slide_end_bound,
                                         slide_end_selected_texture,
