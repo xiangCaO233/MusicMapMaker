@@ -134,9 +134,6 @@ set(PROJECT_SOURCES
   src/canvas/texture/pool/Atlas.cpp
   src/canvas/texture/pool/MTexturePool.h
   src/canvas/texture/pool/MTexturePool.cpp
-  src/canvas/texture/pool/MaxRectsBinPack.h
-  src/canvas/texture/pool/MaxRectsBinPack.cpp
-  src/canvas/texture/pool/Rect.h
   src/log/colorful-log.h
   src/log/colorful_log.cpp
   ${MMM_SOURCES}

@@ -192,6 +192,9 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
       auto maptime = (double)(ui->canvas_container->canvas.data()
                                   ->working_map->map_length);
       ui->canvas_container->canvas.data()->current_time_stamp = maptime * ratio;
+      ui->canvas_container->canvas.data()->current_visual_time_stamp =
+          ui->canvas_container->canvas.data()->current_time_stamp +
+          ui->canvas_container->canvas.data()->static_time_offset;
       emit progress_pos_changed(maptime * ratio);
     }
   }

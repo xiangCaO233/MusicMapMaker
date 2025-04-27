@@ -1122,6 +1122,12 @@ void MapWorkspaceCanvas::draw_hitobject() {
                     std::pair<std::shared_ptr<HitObject>, bool>>(notereference,
                                                                  true);
                 is_hover_note = true;
+              } else if (strict_select ? select_bound.contains(noderect)
+                                       : select_bound.intersects(noderect)) {
+                selected_hitobjects.emplace(notereference);
+                renderer_manager->addRect(noderect,
+                                          complex_note_node_selected_texture,
+                                          QColor(0, 0, 0, 255), 0, true);
               } else {
                 renderer_manager->addRect(noderect, complex_note_node_texture,
                                           QColor(0, 0, 0, 255), 0, true);
@@ -1136,6 +1142,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       long_note->hold_end_reference, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(long_note_end_bound)
+                           : select_bound.intersects(long_note_end_bound)) {
+              // 选中此面尾
+              selected_hitobjects.emplace(long_note->hold_end_reference);
+              renderer_manager->addRect(long_note_end_bound,
+                                        long_note_end_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(long_note_end_bound,
                                         long_note_end_texture,
@@ -1164,8 +1178,11 @@ void MapWorkspaceCanvas::draw_hitobject() {
             std::abs(horizon_body_end_pos_x - note_center_pos_x) +
             horizon_body_height;
 
+        // 滑尾纹理
         std::shared_ptr<TextureInstace> slide_end_texture;
         std::shared_ptr<TextureInstace> slide_end_hovered_texture;
+        std::shared_ptr<TextureInstace> slide_end_selected_texture;
+
         // 横向身的具体位置
         double horizon_body_pos_x = -horizon_body_height / 2.0;
         if (slide->slide_parameter > 0) {
@@ -1173,12 +1190,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
           horizon_body_pos_x += note_center_pos_x;
           slide_end_texture = slide_right_note_end_texture;
           slide_end_hovered_texture = slide_right_note_end_hovered_texture;
+          slide_end_selected_texture = slide_right_note_end_selected_texture;
         } else {
           // 左滑,矩形整体左移矩形宽度的位置
           horizon_body_pos_x = horizon_body_pos_x + note_center_pos_x -
                                horizon_body_width + horizon_body_height;
           slide_end_texture = slide_left_note_end_texture;
           slide_end_hovered_texture = slide_left_note_end_hovered_texture;
+          slide_end_selected_texture = slide_left_note_end_selected_texture;
         }
         auto horizon_body_bound = QRectF(
             horizon_body_pos_x, note_center_pos_y - horizon_body_height / 2.0,
@@ -1202,6 +1221,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
               std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                   note, false);
           is_hover_note = true;
+        } else if (strict_select
+                       ? select_bound.contains(horizon_body_bound)
+                       : select_bound.intersects(horizon_body_bound)) {
+          // 选中此物件
+          selected_hitobjects.emplace(note);
+          renderer_manager->addRect(horizon_body_bound,
+                                    long_note_body_horizontal_selected_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
         } else {
           renderer_manager->addRect(horizon_body_bound,
                                     long_note_body_horizontal_texture,
@@ -1248,6 +1275,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       slide->slide_end_reference, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(slide_end_bound)
+                           : select_bound.intersects(slide_end_bound)) {
+              // 选中此物件
+              selected_hitobjects.emplace(note);
+              renderer_manager->addRect(slide_end_bound,
+                                        slide_end_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(slide_end_bound, slide_end_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -1295,6 +1330,12 @@ void MapWorkspaceCanvas::draw_hitobject() {
                     std::pair<std::shared_ptr<HitObject>, bool>>(notereference,
                                                                  true);
                 is_hover_note = true;
+              } else if (strict_select ? select_bound.contains(noderect)
+                                       : select_bound.intersects(noderect)) {
+                selected_hitobjects.emplace(notereference);
+                renderer_manager->addRect(noderect,
+                                          complex_note_node_selected_texture,
+                                          QColor(0, 0, 0, 255), 0, true);
               } else {
                 renderer_manager->addRect(noderect, complex_note_node_texture,
                                           QColor(0, 0, 0, 255), 0, true);
@@ -1309,6 +1350,13 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       slide->slide_end_reference, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(slide_end_bound)
+                           : select_bound.intersects(slide_end_bound)) {
+              selected_hitobjects.emplace(slide->slide_end_reference);
+              renderer_manager->addRect(slide_end_bound,
+                                        slide_end_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(slide_end_bound, slide_end_texture,
                                         QColor(0, 0, 0, 255), 0, true);

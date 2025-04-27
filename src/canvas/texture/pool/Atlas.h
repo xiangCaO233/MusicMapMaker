@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "MaxRectsBinPack.h"
+class TextureInstace;
 
 class Atlas {
  public:
@@ -17,8 +17,11 @@ class Atlas {
   // 默认最大图集子纹理数量
   const uint32_t max_subimage_count{512};
 
-  // 打包器
-  MaxRectsBinPack packer;
+  // 纹理集信息
+  int32_t current_x{0};
+  int32_t current_y{0};
+  int32_t atlas_width{0};
+  int32_t atlas_height{0};
 
   // 纹理集内的全部子纹理
   std::vector<std::shared_ptr<TextureInstace>> sub_textures;
