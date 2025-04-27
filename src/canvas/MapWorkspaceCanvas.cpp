@@ -1044,6 +1044,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       note, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(long_note_end_bound)
+                           : select_bound.intersects(long_note_end_bound)) {
+              // 选中此面尾
+              selected_hitobjects.emplace(long_note->hold_end_reference);
+              renderer_manager->addRect(long_note_end_bound,
+                                        long_note_end_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(long_note_end_bound,
                                         long_note_end_texture,
@@ -1057,6 +1065,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       long_note->hold_end_reference, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(head_note_bound)
+                           : select_bound.intersects(head_note_bound)) {
+              // 选中此物件
+              selected_hitobjects.emplace(note);
+              // 选中时的绘制
+              renderer_manager->addRect(head_note_bound, head_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -1073,6 +1089,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       note, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(head_note_bound)
+                           : select_bound.intersects(head_note_bound)) {
+              // 选中此物件
+              selected_hitobjects.emplace(note);
+              // 选中时的绘制
+              renderer_manager->addRect(head_note_bound, head_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -1203,10 +1227,19 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       note, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(head_note_bound)
+                           : select_bound.intersects(head_note_bound)) {
+              // 选中此物件
+              selected_hitobjects.emplace(note);
+              // 选中时的绘制
+              renderer_manager->addRect(head_note_bound, head_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
             }
+
             if (slide_end_bound.contains(mouse_pos)) {
               renderer_manager->addRect(slide_end_bound,
                                         slide_end_hovered_texture,
@@ -1230,6 +1263,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
                       note, true);
               is_hover_note = true;
+            } else if (strict_select
+                           ? select_bound.contains(head_note_bound)
+                           : select_bound.intersects(head_note_bound)) {
+              // 选中此物件
+              selected_hitobjects.emplace(note);
+              // 选中时的绘制
+              renderer_manager->addRect(head_note_bound, head_selected_texture,
+                                        QColor(0, 0, 0, 255), 0, true);
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
