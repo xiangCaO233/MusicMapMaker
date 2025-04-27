@@ -221,10 +221,13 @@ void RMMap::load_from_file(const char* path) {
         // 滑键
         temp_note =
             std::make_shared<Slide>(note_timestamp, note_orbit, note_parameter);
+        auto slide = std::static_pointer_cast<Slide>(temp_note);
 
         // 构造一个滑键尾物件
-        auto slide_end = std::make_shared<SlideEnd>(
-            std::static_pointer_cast<Slide>(temp_note));
+        auto slide_end = std::make_shared<SlideEnd>(slide);
+        // 设置滑键物件的滑尾引用
+        slide->slide_end_reference = slide_end;
+
         hitobjects.insert(slide_end);
 
         break;
@@ -237,6 +240,8 @@ void RMMap::load_from_file(const char* path) {
         // 构造一个面条尾物件
         auto hold_end = std::make_shared<HoldEnd>(hold);
         hitobjects.insert(hold_end);
+        // 设置面条物件的面尾引用
+        hold->hold_end_reference = hold_end;
         // 面尾也需要更新谱面长度
         if (hold_end->timestamp > map_length) map_length = hold_end->timestamp;
         // 把长条物件加入缓存

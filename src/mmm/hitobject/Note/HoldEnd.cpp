@@ -3,8 +3,8 @@
 HoldEnd::HoldEnd(const std::shared_ptr<Hold>& hold)
     : HitObject(hold->timestamp + hold->hold_time), reference(hold.get()) {
   object_type = HitObjectType::HOLDEND;
-  // 设置面条物件的面尾引用
-  hold->hold_end_reference = this;
+
+  // hold->hold_end_reference = this;
 }
 
 HoldEnd::~HoldEnd() = default;

@@ -21,6 +21,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "../mmm/MapWorkProject.h"
@@ -138,12 +139,46 @@ void MapWorkspaceCanvas::updateFpsDisplay(int fps) {
 void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mousePressEvent(event);
+
+  qDebug() << event->button();
+  // 如果当前悬停的位置有物件,左键时选中此物件,右键时删除此物件(组合键头时删除组合键)
+  // 没有物件则根据当前模式添加物件到鼠标位置对应的时间戳
+  switch (event->button()) {
+    case Qt::MouseButton::LeftButton: {
+      mouse_left_pressed = true;
+      mouse_left_press_pos = event->pos();
+      if (select_bound_locate_points) {
+        // 关闭选中框
+        select_bound_locate_points = nullptr;
+        select_bound.setWidth(0);
+        select_bound.setHeight(0);
+      }
+      if (!(event->modifiers() & Qt::ControlModifier)) {
+        // 未按住controll清空选中列表
+        selected_hitobjects.clear();
+      }
+      // 按住controll左键多选
+      if (hover_hitobject_info) {
+        // 有悬浮在物件上
+        selected_hitobjects.emplace(hover_hitobject_info->first);
+      }
+      break;
+    }
+    case Qt::MouseButton::RightButton: {
+      break;
+    }
+  }
 }
 
 // 鼠标释放事件
 void MapWorkspaceCanvas::mouseReleaseEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mouseReleaseEvent(event);
+  switch (event->button()) {
+    case Qt::MouseButton::LeftButton: {
+      mouse_left_pressed = false;
+    }
+  }
 }
 
 // 鼠标双击事件
@@ -158,6 +193,40 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
   GLCanvas::mouseMoveEvent(event);
 
   // 更新鼠标操作区
+  if (edit_area.contains(mouse_pos)) {
+    operation_area = MouseOperationArea::EDIT;
+  } else if (preview_area.contains(mouse_pos)) {
+    operation_area = MouseOperationArea::PREVIEW;
+  } else if (info_area.contains(mouse_pos)) {
+    operation_area = MouseOperationArea::INFO;
+  }
+
+  if (mouse_left_pressed) {
+    // 设置选中框定位点
+    if (!select_bound_locate_points) {
+      select_bound_locate_points =
+          std::make_shared<std::pair<QPointF, QPointF>>(mouse_left_press_pos,
+                                                        event->pos());
+    } else {
+      select_bound_locate_points->second = event->pos();
+    }
+
+    // 更新选中区域
+    select_bound.setX(std::min(select_bound_locate_points->first.x(),
+                               select_bound_locate_points->second.x()));
+    select_bound.setY(std::min(select_bound_locate_points->first.y(),
+                               select_bound_locate_points->second.y()));
+    select_bound.setWidth(std::abs(select_bound_locate_points->first.x() -
+                                   select_bound_locate_points->second.x()));
+    select_bound.setHeight(std::abs(select_bound_locate_points->first.y() -
+                                    select_bound_locate_points->second.y()));
+
+    // 更新选中的物件内容
+    if (!event->modifiers() & Qt::ControlModifier) {
+      // 没按ctrl,先清空当前选中的
+      selected_hitobjects.clear();
+    }
+  }
 }
 
 // 鼠标滚动事件
@@ -377,11 +446,19 @@ void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
   GLCanvas::resizeEvent(event);
 
   // 更新区域缓存
+  // 信息区
+  info_area.setX(0);
+  info_area.setY(0);
+  info_area.setWidth(width() * infoarea_width_scale);
+  info_area.setHeight(height());
+
+  // 编辑区
   edit_area.setX(0);
   edit_area.setY(0);
   edit_area.setWidth(width() * (1.0 - preview_width_scale));
   edit_area.setHeight(height());
 
+  // 预览区
   preview_area.setX(width() * (1.0 - preview_width_scale));
   preview_area.setY(0);
   preview_area.setWidth(width() * preview_width_scale);
@@ -423,6 +500,27 @@ void MapWorkspaceCanvas::draw_top_bar() {
                                  0, 1.3, false);
   renderer_manager->addLine(QPointF(0, 0), QPointF(current_size.width(), 0),
                             2.0f, nullptr, QColor(255, 255, 255, 240), false);
+}
+
+// 绘制选中框
+void MapWorkspaceCanvas::draw_select_bound() {
+  if (select_bound_locate_points) {
+    auto p1 = select_bound_locate_points->first;
+    auto p2 = QPointF(select_bound_locate_points->first.x(),
+                      select_bound_locate_points->second.y());
+    auto p3 = select_bound_locate_points->second;
+    auto p4 = QPointF(select_bound_locate_points->second.x(),
+                      select_bound_locate_points->first.y());
+
+    renderer_manager->addLine(p1, p2, 2, nullptr, QColor(255, 182, 193, 220),
+                              true);
+    renderer_manager->addLine(p2, p3, 2, nullptr, QColor(255, 182, 193, 220),
+                              true);
+    renderer_manager->addLine(p3, p4, 2, nullptr, QColor(255, 182, 193, 220),
+                              true);
+    renderer_manager->addLine(p1, p4, 2, nullptr, QColor(255, 182, 193, 220),
+                              true);
+  }
 }
 
 // 绘制预览
@@ -697,11 +795,15 @@ void MapWorkspaceCanvas::draw_hitobject() {
       texture_full_map["hitobject/head.png"];
   std::shared_ptr<TextureInstace> head_hovered_texture =
       texture_full_map["hitobject/head_hover.png"];
+  std::shared_ptr<TextureInstace> head_selected_texture =
+      texture_full_map["hitobject/head_hover.png"];
 
   // 面条主体的纹理
   std::shared_ptr<TextureInstace> long_note_body_vertical_texture =
       texture_full_map["hitobject/holdbodyvertical.png"];
   std::shared_ptr<TextureInstace> long_note_body_vertical_hovered_texture =
+      texture_full_map["hitobject/holdbodyvertical_hover.png"];
+  std::shared_ptr<TextureInstace> long_note_body_vertical_selected_texture =
       texture_full_map["hitobject/holdbodyvertical_hover.png"];
 
   // 横向面条主体的纹理
@@ -709,11 +811,15 @@ void MapWorkspaceCanvas::draw_hitobject() {
       texture_full_map["hitobject/holdbodyhorizontal.png"];
   std::shared_ptr<TextureInstace> long_note_body_horizontal_hovered_texture =
       texture_full_map["hitobject/holdbodyhorizontal_hover.png"];
+  std::shared_ptr<TextureInstace> long_note_body_horizontal_selected_texture =
+      texture_full_map["hitobject/holdbodyhorizontal_hover.png"];
 
   // 组合键节点纹理
   std::shared_ptr<TextureInstace> complex_note_node_texture =
       texture_full_map["hitobject/node.png"];
   std::shared_ptr<TextureInstace> complex_note_node_hovered_texture =
+      texture_full_map["hitobject/node_hover.png"];
+  std::shared_ptr<TextureInstace> complex_note_node_selected_texture =
       texture_full_map["hitobject/node_hover.png"];
 
   // 面条尾的纹理
@@ -721,15 +827,22 @@ void MapWorkspaceCanvas::draw_hitobject() {
       texture_full_map["hitobject/holdend.png"];
   std::shared_ptr<TextureInstace> long_note_end_hovered_texture =
       texture_full_map["hitobject/holdend_hover.png"];
+  std::shared_ptr<TextureInstace> long_note_end_selected_texture =
+      texture_full_map["hitobject/holdend_hover.png"];
 
   // 滑键尾的纹理
   std::shared_ptr<TextureInstace> slide_left_note_end_texture =
       texture_full_map["hitobject/arrowleft.png"];
   std::shared_ptr<TextureInstace> slide_left_note_end_hovered_texture =
       texture_full_map["hitobject/arrowleft_hover.png"];
+  std::shared_ptr<TextureInstace> slide_left_note_end_selected_texture =
+      texture_full_map["hitobject/arrowleft_hover.png"];
+
   std::shared_ptr<TextureInstace> slide_right_note_end_texture =
       texture_full_map["hitobject/arrowright.png"];
   std::shared_ptr<TextureInstace> slide_right_note_end_hovered_texture =
+      texture_full_map["hitobject/arrowright_hover.png"];
+  std::shared_ptr<TextureInstace> slide_right_note_end_selected_texture =
       texture_full_map["hitobject/arrowright_hover.png"];
 
   // 轨道宽度
@@ -745,8 +858,11 @@ void MapWorkspaceCanvas::draw_hitobject() {
   auto head_note_size = QSizeF(head_texture->width * object_size_scale,
                                head_texture->height * object_size_scale);
 
+  // 是否悬停在某一物件上
+  bool is_hover_note{false};
+
   // 节点区域缓存
-  std::vector<QRectF> nodes;
+  std::map<std::shared_ptr<HitObject>, QRectF> nodes;
 
   // 防止重复绘制
   std::unordered_map<std::shared_ptr<HitObject>, bool> drawed_objects;
@@ -819,7 +935,16 @@ void MapWorkspaceCanvas::draw_hitobject() {
       case NoteType::NOTE: {
         // 直接绘制
         if (head_note_bound.contains(mouse_pos)) {
+          // 优先鼠标悬停时的绘制
           renderer_manager->addRect(head_note_bound, head_hovered_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
+          is_hover_note = true;
+        } else if (strict_select ? select_bound.contains(head_note_bound)
+                                 : select_bound.intersects(head_note_bound)) {
+          // 选中此物件
+          selected_hitobjects.emplace(note);
+          // 选中时的绘制
+          renderer_manager->addRect(head_note_bound, head_selected_texture,
                                     QColor(0, 0, 0, 255), 0, true);
         } else {
           renderer_manager->addRect(head_note_bound, head_texture,
@@ -881,6 +1006,18 @@ void MapWorkspaceCanvas::draw_hitobject() {
           renderer_manager->addRect(long_note_body_bound,
                                     long_note_body_vertical_hovered_texture,
                                     QColor(0, 0, 0, 255), 0, true);
+          hover_hitobject_info =
+              std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                  note, false);
+          is_hover_note = true;
+        } else if (strict_select
+                       ? select_bound.contains(long_note_body_bound)
+                       : select_bound.intersects(long_note_body_bound)) {
+          // 选中此物件
+          selected_hitobjects.emplace(note);
+          renderer_manager->addRect(long_note_body_bound,
+                                    long_note_body_vertical_selected_texture,
+                                    QColor(0, 0, 0, 255), 0, true);
         } else {
           renderer_manager->addRect(long_note_body_bound,
                                     long_note_body_vertical_texture,
@@ -903,6 +1040,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               renderer_manager->addRect(long_note_end_bound,
                                         long_note_end_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      note, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(long_note_end_bound,
                                         long_note_end_texture,
@@ -912,37 +1053,51 @@ void MapWorkspaceCanvas::draw_hitobject() {
             if (head_note_bound.contains(mouse_pos)) {
               renderer_manager->addRect(head_note_bound, head_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      long_note->hold_end_reference, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
             }
             break;
           }
+            //  组合键中的子键
           case ComplexInfo::HEAD: {
             // 多画个头-在尾处追加一个节点
             if (head_note_bound.contains(mouse_pos)) {
               renderer_manager->addRect(head_note_bound, head_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      note, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
             }
-            nodes.emplace_back(node_bound);
+            nodes.try_emplace(note, node_bound);
             break;
           }
           case ComplexInfo::BODY: {
             // 仅在尾处追加一个节点
-            nodes.emplace_back(node_bound);
+            nodes.try_emplace(note, node_bound);
 
             break;
           }
           case ComplexInfo::END: {
             // 补齐节点,画个尾
-            for (const auto &noderect : nodes) {
+            for (const auto &[notereference, noderect] : nodes) {
               if (noderect.contains(mouse_pos)) {
                 renderer_manager->addRect(noderect,
                                           complex_note_node_hovered_texture,
                                           QColor(0, 0, 0, 255), 0, true);
+                // 组合键的节点(节点是相当于那一物件的尾)
+                hover_hitobject_info = std::make_shared<
+                    std::pair<std::shared_ptr<HitObject>, bool>>(notereference,
+                                                                 true);
+                is_hover_note = true;
               } else {
                 renderer_manager->addRect(noderect, complex_note_node_texture,
                                           QColor(0, 0, 0, 255), 0, true);
@@ -953,7 +1108,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               renderer_manager->addRect(long_note_end_bound,
                                         long_note_end_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
-
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      long_note->hold_end_reference, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(long_note_end_bound,
                                         long_note_end_texture,
@@ -1016,6 +1174,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
           renderer_manager->addRect(horizon_body_bound,
                                     long_note_body_horizontal_hovered_texture,
                                     QColor(0, 0, 0, 255), 0, true);
+          hover_hitobject_info =
+              std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                  note, false);
+          is_hover_note = true;
         } else {
           renderer_manager->addRect(horizon_body_bound,
                                     long_note_body_horizontal_texture,
@@ -1037,6 +1199,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
             if (head_note_bound.contains(mouse_pos)) {
               renderer_manager->addRect(head_note_bound, head_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      note, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -1045,6 +1211,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               renderer_manager->addRect(slide_end_bound,
                                         slide_end_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      slide->slide_end_reference, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(slide_end_bound, slide_end_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -1056,26 +1226,34 @@ void MapWorkspaceCanvas::draw_hitobject() {
             if (head_note_bound.contains(mouse_pos)) {
               renderer_manager->addRect(head_note_bound, head_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      note, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(head_note_bound, head_texture,
                                         QColor(0, 0, 0, 255), 0, true);
             }
-            nodes.emplace_back(node_bound);
+            nodes.try_emplace(note, node_bound);
             break;
           }
           case ComplexInfo::BODY: {
             // 仅在尾处追加一个节点
-            nodes.emplace_back(node_bound);
-
+            nodes.try_emplace(note, node_bound);
             break;
           }
           case ComplexInfo::END: {
             // 补齐节点,画个尾
-            for (const auto &noderect : nodes) {
+            for (const auto &[notereference, noderect] : nodes) {
               if (noderect.contains(mouse_pos)) {
                 renderer_manager->addRect(noderect,
                                           complex_note_node_hovered_texture,
                                           QColor(0, 0, 0, 255), 0, true);
+                // 组合键的节点(节点是相当于那一物件的尾)
+                hover_hitobject_info = std::make_shared<
+                    std::pair<std::shared_ptr<HitObject>, bool>>(notereference,
+                                                                 true);
+                is_hover_note = true;
               } else {
                 renderer_manager->addRect(noderect, complex_note_node_texture,
                                           QColor(0, 0, 0, 255), 0, true);
@@ -1086,6 +1264,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
               renderer_manager->addRect(slide_end_bound,
                                         slide_end_hovered_texture,
                                         QColor(0, 0, 0, 255), 0, true);
+              hover_hitobject_info =
+                  std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
+                      slide->slide_end_reference, true);
+              is_hover_note = true;
             } else {
               renderer_manager->addRect(slide_end_bound, slide_end_texture,
                                         QColor(0, 0, 0, 255), 0, true);
@@ -1098,6 +1280,10 @@ void MapWorkspaceCanvas::draw_hitobject() {
         break;
       }
     }
+  }
+  if (!is_hover_note) {
+    // 未悬浮在任何一个物件或物件身体上
+    hover_hitobject_info = nullptr;
   }
   // 最后给每个轨道添加特效动画
   // for (auto &[orbit, framequeue] : effects) {
@@ -1218,6 +1404,7 @@ void MapWorkspaceCanvas::push_shape() {
                                        int32_t(current_time_area_end), true);
     draw_hitobject();
   }
+  draw_select_bound();
   draw_preview_content();
 
   draw_judgeline();

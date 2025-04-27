@@ -300,6 +300,8 @@ void OsuMap::load_from_file(const char* path) {
         auto holdend = std::make_shared<OsuHoldEnd>(hold);
         holdend->is_hold_end = true;
         hitobjects.insert(holdend);
+        // 设置面条物件的面尾引用
+        hold->hold_end_reference = holdend;
 
         // 更新谱面时长
         if (holdend->timestamp > map_length) map_length = holdend->timestamp;

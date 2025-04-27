@@ -15,7 +15,7 @@ class Hold : public Note {
   // 析构Hold
   ~Hold() override;
 
-  HoldEnd* hold_end_reference;
+  std::shared_ptr<HoldEnd> hold_end_reference;
 
   // 持续时间
   uint32_t hold_time;
