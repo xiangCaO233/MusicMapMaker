@@ -212,6 +212,7 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
     layers.emplace_back(atlas);
     layer_index = layers.size() - 1;
   }
+  if (texture->width == -1) return false;
 
   // 载入纹理到纹理集
   auto res = atlas->add_texture(texture);
@@ -222,10 +223,9 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
     atlas = newatlas;
     layer_index = layers.size() - 1;
 
-    auto res = atlas->add_texture(texture);
+    res = atlas->add_texture(texture);
     if (!res) {
-      XERROR("放那么大纹理干嘛,此纹理池每层最大[" + std::to_string(layerw) +
-             "x" + std::to_string(layerh) + "]");
+      XERROR("载入纹理[" + texture->name + "]失败");
       return false;
     }
   }
@@ -243,7 +243,7 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
                               texture->height, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                               texture->data));
   // 更新纹理id--符合层索引和子纹理id
-  texture->texture_id = ((uint32_t)layer_index << 16) | texture->texture_id;
+  texture->texture_id = (layer_index << 16) | texture->texture_id;
   // XINFO("纹理:[" + std::to_string(texture->texture_id) + "]" + texture->name
   // +
   //       "已上传到gpu");

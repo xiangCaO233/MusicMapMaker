@@ -1001,6 +1001,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         }
         break;
       }
+
       case NoteType::HOLD: {
         // 添加long_note_body
         auto long_note = std::dynamic_pointer_cast<Hold>(note);
@@ -1093,12 +1094,12 @@ void MapWorkspaceCanvas::draw_hitobject() {
                                         QColor(0, 0, 0, 255), 0, true);
               hover_hitobject_info =
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-                      note, true);
+                      long_note, true);
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(long_note_end_bound)
                            : select_bound.intersects(long_note_end_bound) ||
-                                 selected_hitobjects.find(note) !=
+                                 selected_hitobjects.find(long_note) !=
                                      selected_hitobjects.end()) {
               // 未选中则选中此面尾
               selected_hitobjects.emplace(long_note->hold_end_reference);
@@ -1116,14 +1117,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
                                         QColor(0, 0, 0, 255), 0, true);
               hover_hitobject_info =
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-                      long_note->hold_end_reference, true);
+                      long_note, true);
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(head_note_bound)
                            : select_bound.intersects(head_note_bound) ||
                                  selected_hitobjects.find(note) !=
                                      selected_hitobjects.end()) {
-              // 未选中则选中此物件
+              // 选中此物件
               selected_hitobjects.emplace(note);
               // 选中时的绘制
               renderer_manager->addRect(head_note_bound, head_selected_texture,
@@ -1142,7 +1143,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
                                         QColor(0, 0, 0, 255), 0, true);
               hover_hitobject_info =
                   std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-                      note, true);
+                      long_note, true);
               is_hover_note = true;
             } else if (strict_select
                            ? select_bound.contains(head_note_bound)

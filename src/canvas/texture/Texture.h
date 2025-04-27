@@ -77,8 +77,8 @@ class TextureInstace {
   uint32_t texture_layer;
 
   // 纹理尺寸
-  int32_t width;
-  int32_t height;
+  int32_t width{-1};
+  int32_t height{-1};
 
   // 纹理通道数
   int32_t channels;
