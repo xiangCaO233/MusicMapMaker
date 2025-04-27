@@ -505,21 +505,62 @@ void MapWorkspaceCanvas::draw_top_bar() {
 // 绘制选中框
 void MapWorkspaceCanvas::draw_select_bound() {
   if (select_bound_locate_points) {
+    auto &border_left_texture =
+        texture_full_map["hitobject/select_boarder_left.png"];
+    auto &border_right_texture =
+        texture_full_map["hitobject/select_boarder_right.png"];
+    auto &border_top_texture =
+        texture_full_map["hitobject/select_boarder_top.png"];
+    auto &border_bottom_texture =
+        texture_full_map["hitobject/select_boarder_bottom.png"];
+
     auto p1 = select_bound_locate_points->first;
     auto p2 = QPointF(select_bound_locate_points->first.x(),
                       select_bound_locate_points->second.y());
     auto p3 = select_bound_locate_points->second;
     auto p4 = QPointF(select_bound_locate_points->second.x(),
                       select_bound_locate_points->first.y());
+    // 矩形
+    // auto leftrect = QRectF(
+    //     p1.x() - select_border_width / 2.0, p1.y() - select_border_width
+    //     / 2.0, p2.x() - p1.x() + select_border_width, select_border_width);
 
-    renderer_manager->addLine(p1, p2, 2, nullptr, QColor(255, 182, 193, 220),
-                              true);
-    renderer_manager->addLine(p2, p3, 2, nullptr, QColor(255, 182, 193, 220),
-                              true);
-    renderer_manager->addLine(p3, p4, 2, nullptr, QColor(255, 182, 193, 220),
-                              true);
-    renderer_manager->addLine(p1, p4, 2, nullptr, QColor(255, 182, 193, 220),
-                              true);
+    // 左矩形p1-p2
+    auto leftrect = QRectF(p1.x() - select_border_width / 2.0,
+                           p1.y() < p2.y() ? p1.y() - select_border_width / 2.0
+                                           : p2.y() - select_border_width / 2.0,
+                           select_border_width,
+                           std::abs(p2.y() - p1.y()) + select_border_width);
+
+    // 右矩形p3-p4
+    auto rightrect = QRectF(
+        p4.x() - select_border_width / 2.0,
+        p4.y() < p3.y() ? p4.y() - select_border_width / 2.0
+                        : p3.y() - select_border_width / 2.0,
+        select_border_width, std::abs(p3.y() - p4.y()) + select_border_width);
+
+    // 上矩形p1-p4
+    auto toprect = QRectF(p1.x() < p4.x() ? p1.x() - select_border_width / 2.0
+                                          : p4.x() - select_border_width / 2.0,
+                          p1.y() - select_border_width / 2.0,
+                          std::abs(p4.x() - p1.x()) + select_border_width,
+                          select_border_width);
+
+    // 下矩形p2-p3
+    auto bottomrect = QRectF(
+        p2.x() < p3.x() ? p2.x() - select_border_width / 2.0
+                        : p3.x() - select_border_width / 2.0,
+        p2.y() - select_border_width / 2.0,
+        std::abs(p3.x() - p2.x()) + select_border_width, select_border_width);
+
+    renderer_manager->addRect(leftrect, border_left_texture,
+                              QColor(0, 0, 0, 255), 0, true);
+    renderer_manager->addRect(rightrect, border_right_texture,
+                              QColor(0, 0, 0, 255), 0, true);
+    renderer_manager->addRect(toprect, border_top_texture, QColor(0, 0, 0, 255),
+                              0, true);
+    renderer_manager->addRect(bottomrect, border_bottom_texture,
+                              QColor(0, 0, 0, 255), 0, true);
   }
 }
 

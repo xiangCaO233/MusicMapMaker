@@ -127,6 +127,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   bool mouse_left_pressed{false};
   QPointF mouse_left_press_pos;
 
+  // 选中框边框宽度(pix)
+  double select_border_width{4};
+
   // 选中框定位点
   std::shared_ptr<std::pair<QPointF, QPointF>> select_bound_locate_points;
 
