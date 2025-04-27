@@ -34,7 +34,7 @@
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
      </property>
-     <widget class="QWidget" name="mapmeta_edit" native="true">
+     <widget class="MMetas" name="mapmeta_edit" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -129,6 +129,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MMetas</class>
+   <extends>QWidget</extends>
+   <header location="global">mmetas.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

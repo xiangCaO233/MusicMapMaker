@@ -201,6 +201,8 @@ void TimeController::on_doubleSpinBox_valueChanged(double arg1) {
   if (!ui->enablepitchaltbutton->isChecked()) {
     // 非变速可以实时调整
     // 为音频应用变速(根据是否启用变调)
+    if (binding_map->project_reference->devicename == "unknown output device")
+      return;
     BackgroundAudio::set_play_speed(binding_map->project_reference->devicename,
                                     speed_value,
                                     ui->enablepitchaltbutton->isChecked());
@@ -216,6 +218,8 @@ void TimeController::on_doubleSpinBox_editingFinished() {
   if (ui->enablepitchaltbutton->isChecked()) {
     // 变速不可以实时调整
     // 为音频应用变速(根据是否启用变调)
+    if (binding_map->project_reference->devicename == "unknown output device")
+      return;
     BackgroundAudio::set_play_speed(binding_map->project_reference->devicename,
                                     speed_value,
                                     ui->enablepitchaltbutton->isChecked());

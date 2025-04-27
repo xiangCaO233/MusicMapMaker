@@ -109,6 +109,9 @@ set(PROJECT_SOURCES
   src/ui/infoui/minfo.h
   src/ui/infoui/minfo.cpp
   src/ui/infoui/minfo.ui
+	src/ui/infoui/metaui/mmetas.h 
+	src/ui/infoui/metaui/mmetas.cpp 
+	src/ui/infoui/metaui/mmetas.ui
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/FrameRateCounter.h
@@ -144,6 +147,7 @@ include_directories(
   ./src
   ./src/ui
   ./src/ui/infoui
+  ./src/ui/infoui/metaui
   ./src/ui/pageui
   ./src/ui/pageui/editorui
   ./src/ui/controllers
@@ -154,6 +158,7 @@ include_directories(
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
     resources/glsrcs.qrc
+    
   )
 else()
   if(ANDROID)
@@ -164,27 +169,6 @@ else()
 endif()
 
 add_dependencies(MusicMapMaker xaudio-dev)
-
-# 自动复制运行时文件和插件
-if(WIN32)
-  # 复制 DLLs
-  add_custom_command(TARGET MusicMapMaker POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:Qt6::Core>
-    $<TARGET_FILE:Qt6::Gui>
-    $<TARGET_FILE_DIR:MusicMapMaker>
-  )
-
-  # message(STATUS ${QT_DIR})
-
-  # 复制平台插件
-  get_target_property(Qt6_plugin_dir Qt6::Gui LOCATION)
-  get_filename_component(QT_DIR "${Qt6_plugin_dir}" DIRECTORY)
-  file(COPY "${QT_DIR}/../plugins/platforms/qwindows.dll"
-    DESTINATION "${CMAKE_BINARY_DIR}/platforms")
-  file(COPY "${QT_DIR}/../plugins/platforms/qwindowsd.dll"
-    DESTINATION "${CMAKE_BINARY_DIR}/platforms")
-endif()
 
 # 链接库
 target_link_libraries(
