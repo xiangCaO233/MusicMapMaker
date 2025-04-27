@@ -75,6 +75,9 @@ class TimeController : public QWidget {
   // 变速设置
   void on_doubleSpinBox_valueChanged(double arg1);
 
+  // 变速设置完成
+  void on_doubleSpinBox_editingFinished();
+
   // 重置变速按钮事件
   void on_resetspeedbutton_clicked();
 

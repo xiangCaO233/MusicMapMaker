@@ -164,7 +164,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   double background_darken_ratio{0.55};
 
   // 时间偏移
-  double static_time_offset{-23};
+  double static_time_offset{-20};
 
   // 用户调节的时间线缩放-- n * 1px/1ms
   double timeline_zoom{1.0};

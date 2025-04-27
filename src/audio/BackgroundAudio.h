@@ -1,8 +1,10 @@
 #ifndef M_BACKGROUNDAUDIO_H
 #define M_BACKGROUNDAUDIO_H
 
+#include <chrono>
 #include <memory>
 #include <string>
+#include <thread>
 #include <unordered_map>
 
 #include "../log/colorful-log.h"
@@ -175,7 +177,12 @@ class BackgroundAudio {
       global_speed = speed_ratio;
     } else {
       if (global_speed != 1.0) {
+        if (!player->paused) {
+          player->pause();
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
         player->ratio(1.0);
+        global_speed = 1.0;
       }
       for (const auto& [id, orbit] : player->mixer->audio_orbits) {
         orbit->speed = speed_ratio;

@@ -1,6 +1,7 @@
 #include "timecontroller.h"
 
 #include <qdir.h>
+#include <qlogging.h>
 #include <qtmetamacros.h>
 
 #include <memory>
@@ -148,7 +149,7 @@ void TimeController::on_canvas_pause(bool paused) {
   pause = paused;
   // 修改timeedit可用状态
   // 暂停时不可使用
-  ui->lineEdit->setEnabled(pause);
+  // ui->lineEdit->setEnabled(pause);
 
   // 更新暂停按钮图标
   update_pause_button();
@@ -197,12 +198,30 @@ void TimeController::on_canvas_timestamp_changed(double time) {
 void TimeController::on_doubleSpinBox_valueChanged(double arg1) {
   // TODO(xiang 2025-04-26): 实现功能
   auto speed_value = arg1 / 100.0;
-  // 为音频应用变速(根据是否启用变调)
-  BackgroundAudio::set_play_speed(binding_map->project_reference->devicename,
-                                  speed_value,
-                                  ui->enablepitchaltbutton->isChecked());
-  // 同步画布的时间倍率
-  emit playspeed_changed(speed_value);
+  if (!ui->enablepitchaltbutton->isChecked()) {
+    // 非变速可以实时调整
+    // 为音频应用变速(根据是否启用变调)
+    BackgroundAudio::set_play_speed(binding_map->project_reference->devicename,
+                                    speed_value,
+                                    ui->enablepitchaltbutton->isChecked());
+    // 同步画布的时间倍率
+    emit playspeed_changed(speed_value);
+  }
+}
+
+// 变速设置完成
+void TimeController::on_doubleSpinBox_editingFinished() {
+  auto speed_value = ui->doubleSpinBox->value() / 100.0;
+  qDebug() << "finished:" << speed_value;
+  if (ui->enablepitchaltbutton->isChecked()) {
+    // 变速不可以实时调整
+    // 为音频应用变速(根据是否启用变调)
+    BackgroundAudio::set_play_speed(binding_map->project_reference->devicename,
+                                    speed_value,
+                                    ui->enablepitchaltbutton->isChecked());
+    // 同步画布的时间倍率
+    emit playspeed_changed(speed_value);
+  }
 }
 
 // 重置变速按钮事件
