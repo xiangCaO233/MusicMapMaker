@@ -17,6 +17,9 @@ class Hold : public Note {
 
   std::shared_ptr<HoldEnd> hold_end_reference;
 
+  // 动画播放完成标识
+  bool effect_play_over{false};
+
   // 持续时间
   uint32_t hold_time;
 

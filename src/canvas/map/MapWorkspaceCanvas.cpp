@@ -20,6 +20,7 @@
 #include <random>
 #include <set>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -643,6 +644,7 @@ void MapWorkspaceCanvas::draw_beats() {
 
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
+                                     std::shared_ptr<HitObject> ref,
                                      EffectType etype) {
   std::shared_ptr<TextureInstace> effect_frame_texture;
   switch (etype) {
@@ -655,7 +657,8 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
         effect_frame_queue_map[xpos].emplace(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.nomal_hit_effect_dir + "/" +
-                             std::to_string(i) + ".png"]);
+                             std::to_string(i) + ".png"],
+            ref, i == 30);
       }
       break;
     }
@@ -669,7 +672,8 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                    effect_frame_texture->width / 4.0,
                    effect_frame_texture->height / 4.0),
             texture_full_map[skin.slide_hit_effect_dir + "/" +
-                             std::to_string(i) + ".png"]);
+                             std::to_string(i) + ".png"],
+            ref, i == 16);
       }
       break;
     }
@@ -694,33 +698,88 @@ void MapWorkspaceCanvas::draw_hitobject() {
       drawed_objects.insert({note, true});
     else
       continue;
-    // 经过判定线
-    if (!played_effects_objects.contains(obj) &&
-        std::abs(obj->timestamp - editor->current_visual_time_stamp) <
-            des_update_time * 2) {
-      played_effects_objects.emplace(obj);
-      std::thread playthread([&]() {
-        auto x =
-            editor->edit_area_start_pos_x +
-            editor->orbit_width * std::static_pointer_cast<Note>(obj)->orbit +
-            editor->orbit_width / 2.0;
-        EffectType t;
-        switch (note->note_type) {
-          case NoteType::SLIDE: {
-            t = EffectType::SLIDEARROW;
-            x += (std::static_pointer_cast<Slide>(note))->slide_parameter *
-                 editor->orbit_width;
-            break;
+    // 启动播放线程
+    std::thread playthread;
+    // 物件的横向偏移
+    auto x = editor->edit_area_start_pos_x +
+             editor->orbit_width * std::static_pointer_cast<Note>(obj)->orbit +
+             editor->orbit_width / 2.0;
+    // 轨道宽度
+    auto ow = editor->orbit_width;
+    // 画布引用
+    auto canvas = this;
+    if (!played_effects_objects.contains(obj)) {
+      if (std::abs(obj->timestamp - editor->current_visual_time_stamp) <
+          des_update_time * 2) {
+        // 播放物件添加到的位置
+        auto obj_it = played_effects_objects.emplace(obj).first;
+
+        // 播放线程
+        playthread = std::thread([=]() {
+          auto px = x;
+          EffectType t;
+          if (note) {
+            switch (note->note_type) {
+              case NoteType::SLIDE: {
+                t = EffectType::SLIDEARROW;
+                px += (std::static_pointer_cast<Slide>(note))->slide_parameter *
+                      ow;
+                break;
+              }
+              default: {
+                t = EffectType::NORMAL;
+                break;
+              }
+            }
+            canvas->play_effect(px,
+                                canvas->size().height() *
+                                    (1 - canvas->editor->judgeline_position),
+                                note, t);
           }
-          default: {
-            t = EffectType::NORMAL;
-            break;
+        });
+        playthread.detach();
+      }
+    } else {
+      // 播放过的物件
+      if (note->note_type == NoteType::HOLD) {
+        // 如果是长条,播放过
+        auto hold = std::static_pointer_cast<Hold>(note);
+        static bool is_waiting{false};
+        if (editor->current_time_stamp > hold->timestamp + hold->hold_time) {
+          // 移除播放
+          played_effects_objects.erase(played_effects_objects.find(hold));
+          // TODO(xiang 2025-04-30): 数据竞争
+          // 清理剩余动画帧
+          // std::thread clear_thread([&]() {
+          //  while (!effect_frame_queue_map[x].empty()) {
+          //    effect_frame_queue_map[x].pop();
+          //  }
+          // });
+          // clear_thread.detach();
+          is_waiting = false;
+        } else {
+          if (!is_waiting) {
+            // 启动播放线程再播放一遍
+            std::thread holdplaythread = std::thread([=]() {
+              auto px = x;
+              is_waiting = true;
+              while (hold && hold->effect_play_over) {
+                std::this_thread::yield();
+              }
+              hold->effect_play_over = false;
+              canvas->play_effect(px,
+                                  canvas->size().height() *
+                                      (1 - canvas->editor->judgeline_position),
+                                  note, EffectType::NORMAL);
+              is_waiting = false;
+            });
+            holdplaythread.detach();
           }
         }
-        play_effect(x, size().height() * (1 - editor->judgeline_position), t);
-      });
-      playthread.detach();
+      }
     }
+    // 经过判定线
+
     // 生成物件
     auto &generator = objgenerators[note->note_type];
     generator->generate(obj);
@@ -780,9 +839,17 @@ void MapWorkspaceCanvas::push_shape() {
   }
   for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
     if (!effect_frame_queue.empty()) {
-      renderer_manager->addRect(effect_frame_queue.front().first,
-                                effect_frame_queue.front().second,
+      renderer_manager->addRect(effect_frame_queue.front().frame_bound,
+                                effect_frame_queue.front().texture,
                                 QColor(255, 182, 193, 240), 0, true);
+      if (effect_frame_queue.front().is_last_frame) {
+        auto note =
+            std::static_pointer_cast<Note>(effect_frame_queue.front().obj_ref);
+        if (note->note_type == NoteType::HOLD) {
+          std::static_pointer_cast<Hold>(note)->effect_play_over = true;
+        }
+      }
+      // 弹出队首
       effect_frame_queue.pop();
     }
   }

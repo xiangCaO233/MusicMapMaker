@@ -26,6 +26,13 @@ enum class EffectType {
   SLIDEARROW,
 };
 
+struct EffectFrame {
+  QRectF frame_bound;
+  std::shared_ptr<TextureInstace> texture;
+  std::shared_ptr<HitObject> obj_ref;
+  bool is_last_frame{false};
+};
+
 class MapWorkspaceCanvas : public GLCanvas {
   Q_OBJECT
  protected:
@@ -59,10 +66,8 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 实际的帧更新时间-qt
   double actual_update_time{0};
 
-  // 特效帧队列
-  std::unordered_map<
-      double, std::queue<std::pair<QRectF, std::shared_ptr<TextureInstace>>>>
-      effect_frame_queue_map;
+  // x位置-特效帧队列
+  std::unordered_map<double, std::queue<EffectFrame>> effect_frame_queue_map;
 
   /*
    *成员函数
@@ -114,7 +119,8 @@ class MapWorkspaceCanvas : public GLCanvas {
   std::unordered_set<std::shared_ptr<HitObject>> played_effects_objects;
 
   // 播放特效
-  void play_effect(double xpos, double ypos, EffectType etype);
+  void play_effect(double xpos, double ypos, std::shared_ptr<HitObject> ref,
+                   EffectType etype);
 
   // 切换到指定图
   void switch_map(std::shared_ptr<MMap> map);

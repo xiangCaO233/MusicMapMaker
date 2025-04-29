@@ -111,6 +111,7 @@ class MapWorkspaceSkin {
   // 击中特效纹理配置
   json hit_effect_config;
 
+  // 特效纹理目录
   std::string nomal_hit_effect_dir;
   std::string slide_hit_effect_dir;
 
