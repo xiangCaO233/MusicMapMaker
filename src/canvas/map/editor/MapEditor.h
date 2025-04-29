@@ -60,6 +60,9 @@ class MapEditor {
   // 播放速度
   double playspeed{1.0f};
 
+  // 显示时间线选项
+  bool show_timeline{true};
+
   // 参考bpm
   std::unique_ptr<double> preference_bpm = nullptr;
 

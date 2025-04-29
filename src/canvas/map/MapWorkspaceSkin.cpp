@@ -59,10 +59,15 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
   right_slide_end_texture_config = object_texture_config["slide"]["arrowright"];
 
   // 颜色配置
-  timeinfo_font_color = QColor::fromString(
-      skin_config.value<std::string>("timeinfo-font-color", "#000000FF"));
   preview_area_bg_color = QColor::fromString(skin_config.value<std::string>(
       "previewarea-background-color", "#000000FF"));
+
+  // 字体配置
+  auto font_config = skin_config["font"];
+  font_family = font_config.value<std::string>("font-family", "Noto Sans");
+  timeinfo_font_color = QColor::fromString(
+      font_config.value<std::string>("timeinfo-font-color", "#000000FF"));
+  timeinfo_font_size = font_config.value<int32_t>("timeinfo-font-size", 16);
 
   // 读取分拍线主题配置
   auto divisor_config = skin_config["divisortheme"]["divisor-info"];

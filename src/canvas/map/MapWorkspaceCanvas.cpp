@@ -14,7 +14,6 @@
 #include <QTimer>
 #include <QWheelEvent>
 #include <algorithm>
-#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
@@ -28,16 +27,8 @@
 #include "../../log/colorful-log.h"
 #include "../../mmm/MapWorkProject.h"
 #include "../../mmm/hitobject/HitObject.h"
-#include "../../mmm/hitobject/Note/Hold.h"
-#include "../../mmm/hitobject/Note/HoldEnd.h"
 #include "../../mmm/hitobject/Note/Note.h"
-#include "../../mmm/map/osu/OsuMap.h"
-#include "../../mmm/map/rm/RMMap.h"
-#include "../../mmm/timing/Timing.h"
-#include "../../mmm/timing/osu/OsuTiming.h"
-#include "../../util/mutil.h"
 #include "../audio/BackgroundAudio.h"
-#include "../mmm/hitobject/Note/rm/Slide.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
 #include "generator/general/HoldGenerator.h"
@@ -50,11 +41,17 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
   editor = std::make_shared<MapEditor>(this);
   // 注册物件生成器
   // 单物件
-  generators[NoteType::NOTE] = std::make_shared<NoteGenerator>(editor);
+  objgenerators[NoteType::NOTE] = std::make_shared<NoteGenerator>(editor);
   // 面条物件
-  generators[NoteType::HOLD] = std::make_shared<HoldGenerator>(editor);
+  objgenerators[NoteType::HOLD] = std::make_shared<HoldGenerator>(editor);
   // 滑键物件
-  generators[NoteType::SLIDE] = std::make_shared<SlideGenerator>(editor);
+  objgenerators[NoteType::SLIDE] = std::make_shared<SlideGenerator>(editor);
+
+  // 初始化节拍生成器
+  beatgenerator = std::make_shared<BeatGenerator>(editor);
+
+  // 初始化时间区域信息生成器
+  areagenerator = std::make_shared<AreaInfoGenerator>(editor);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
@@ -410,9 +407,6 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
       break;
     }
   }
-
-  if (keycode == 32) {
-  }
 }
 
 // 键盘释放事件
@@ -585,96 +579,6 @@ void MapWorkspaceCanvas::draw_preview_content() {
       current_size.height());
   renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75),
                             0, false);
-
-  // TODO(xiang 2025-04-15): 绘制预览内容
-  // if (working_map) {
-  //   // 绘制整个map
-  //   switch (working_map->maptype) {
-  //     case MapType::OSUMAP: {
-  //       auto omap = std::static_pointer_cast<OsuMap>(working_map);
-  //       auto orbits = omap->CircleSize;
-  //       size_t objindex = 0;
-
-  //       // 获取预览区物件
-
-  //       for (const auto &obj : buffer_preview_objects) {
-  //         auto note = std::static_pointer_cast<Note>(obj);
-
-  //         // 轨道宽度
-  //         auto orbit_width =
-  //             current_size.width() * preview_width_scale / orbits;
-
-  //         // 最终纹理缩放倍率
-  //         double texture_ratio{1.0};
-
-  //         auto note_head_size = QSizeF(orbit_width * 0.8, 1.0);
-
-  //         // 物件头中心位置
-  //         auto note_center_pos_x = preview_x_startpos +
-  //                                  orbit_width * note->orbit +
-  //                                  orbit_width / 2.0;
-
-  //         // 物件头左上角位置
-  //         double head_note_pos_x =
-  //             note_center_pos_x - note_head_size.width() / 2.0;
-
-  //         double head_note_pos_y =
-  //             current_size.height() *
-  //                 (1.0 -
-  //                  double(note->timestamp) / double(working_map->map_length))
-  //                  -
-  //             note_head_size.height() / 2.0;
-  //         // qDebug() << head_note_pos_y;
-
-  //         // 物件头的实际区域
-  //         QRectF head_note_bound(
-  //             head_note_pos_x, head_note_pos_y - note_head_size.height()
-  //             / 2.0, note_head_size.width(), note_head_size.height());
-
-  //         // 切换纹理绘制方式为填充
-  //         renderer_manager->texture_fillmode = TextureFillMode::FILL;
-  //         // 切换纹理绘制补齐方式为重采样
-  //         renderer_manager->texture_complementmode =
-  //             TextureComplementMode::REPEAT_TEXTURE;
-
-  //         switch (obj->object_type) {
-  //           case HitObjectType::OSUNOTE: {
-  //             // 单物件
-  //             // 直接绘制
-  //             renderer_manager->addRoundRect(head_note_bound, nullptr,
-  //                                            QColor(255, 182, 193, 255),
-  //                                            0, 1.3, false);
-  //             break;
-  //           }
-  //           case HitObjectType::OSUHOLD: {
-  //             break;
-  //           }
-  //           default:
-  //             break;
-  //         }
-  //         ++objindex;
-  //       }
-  //       break;
-  //     }
-  //     case MapType::MALODYMAP: {
-  //       break;
-  //     }
-  //     case MapType::RMMAP: {
-  //       break;
-  //     }
-  //   }
-  //   // 绘制当前位置--小框
-  //   QSizeF preview_area_size(current_size.width() * preview_width_scale,
-  //   100); QRectF current_area(
-  //       preview_x_startpos,
-  //       current_size.height() * (1.0 - (current_visual_time_stamp /
-  //                                       double(working_map->map_length))) -
-  //           preview_area_size.height() / 2.0,
-  //       preview_area_size.width(), preview_area_size.height());
-  //   renderer_manager->addRect(current_area, nullptr, QColor(240, 240, 240,
-  //   75),
-  //                             0, false);
-  // }
 }
 // 绘制判定线
 void MapWorkspaceCanvas::draw_judgeline() {
@@ -710,97 +614,26 @@ void MapWorkspaceCanvas::draw_infoarea() {
 // 绘制拍
 void MapWorkspaceCanvas::draw_beats() {
   if (!working_map) return;
+  // 生成图形数据
+  beatgenerator->generate();
 
-  auto current_size = size();
+  // 先绘制所有节拍线
+  while (!BeatGenerator::line_queue.empty()) {
+    auto &line = BeatGenerator::line_queue.front();
+    renderer_manager->addLine(
+        QPointF(line.x1, line.y1), QPointF(line.x2, line.y2), line.line_width,
+        nullptr, QColor(line.r, line.g, line.b, line.a), true);
 
-  std::unordered_map<std::u32string, QPointF> timestr_rects;
-  for (int i = 0; i < editor->current_beats.size(); ++i) {
-    auto &beat = editor->current_beats[i];
-
-    // 每拍时间*时间线缩放=拍距
-    double beat_distance = 60.0 / beat->bpm * 1000.0 * editor->timeline_zoom *
-                           (editor->canvas_pasued ? 1.0 : editor->speed_zoom);
-
-    // 分拍间距
-    double divisor_distance = beat_distance / beat->divisors;
-
-    // 判定线位置
-    auto judgeline_pos =
-        current_size.height() * (1.0 - editor->judgeline_position);
-
-    // 拍起始时间
-    auto &beat_start_time = beat->start_timestamp;
-
-    // 拍距离判定线距离从下往上--反转
-    // 当前拍起始位置
-    auto beat_start_pos =
-        judgeline_pos - (beat_start_time - editor->current_visual_time_stamp) *
-                            editor->timeline_zoom *
-                            (editor->canvas_pasued ? 1.0 : editor->speed_zoom);
-
-    // 绘制小节线
-    for (int j = 0; j < beat->divisors; ++j) {
-      auto divisor_time =
-          (beat->start_timestamp +
-           (beat->end_timestamp - beat_start_time) / beat->divisors * j);
-      // 筛选越界分拍线
-      if (i < editor->current_beats.size() - 1) {
-        // 并非这波最后一拍
-        // 取出下一拍引用
-        auto &nextbeat = editor->current_beats[i + 1];
-        if (divisor_time > nextbeat->start_timestamp) {
-          // 这个分拍线超过了下一拍的起始时间--跳过此分拍线的绘制
-          continue;
-        }
-      }
-
-      // 小节线的位置
-      double divisor_pos = beat_start_pos - j * divisor_distance;
-      if (divisor_pos >= -beat_distance &&
-          divisor_pos <= current_size.height() + beat_distance) {
-        // 只绘制在可视范围内的小节线
-        // 过滤abstiming之前的小节线
-        if (divisor_time >= editor->current_abs_timing->timestamp) {
-          if (j == 0) {
-            // 小节线头画粗一点
-            // 白色
-            renderer_manager->addLine(
-                QPointF(0, divisor_pos),
-                QPointF(
-                    current_size.width() * (1 - editor->preview_width_scale),
-                    divisor_pos),
-                6, nullptr, QColor(255, 255, 255, 240), true);
-          } else {
-            auto divinfos = skin.divisors_color_theme[beat->divisors];
-            std::pair<QColor, int32_t> divinfo;
-            if (divinfos.empty()) {
-              divinfo =
-                  std::pair<QColor, int32_t>(QColor(128, 128, 128, 255), 2);
-            } else {
-              divinfo = divinfos[j - 1];
-            }
-            renderer_manager->addLine(
-                QPointF(0, divisor_pos),
-                QPointF(
-                    current_size.width() * (1 - editor->preview_width_scale),
-                    divisor_pos),
-                divinfo.second, nullptr, divinfo.first, true);
-          }
-
-          // 添加绘制精确时间
-          // 计算精确时间--格式化
-          std::u32string timestr;
-          mutil::format_music_time2u32(timestr, divisor_time);
-          timestr_rects.try_emplace(timestr).first->second =
-              QPointF(4, divisor_pos - 4);
-        }
-      }
-    }
+    BeatGenerator::line_queue.pop();
   }
-  // 一次全部绘制所有文本
-  for (const auto &[str, pointf] : timestr_rects) {
-    renderer_manager->addText(pointf, str, 16, "ComicShannsMono Nerd Font",
-                              QColor(255, 182, 193, 240), 0, true);
+
+  // 绘制所有时间字符串
+  while (!BeatGenerator::text_queue.empty()) {
+    auto &text = BeatGenerator::text_queue.front();
+    renderer_manager->addText(QPointF(text.x, text.y), text.text,
+                              skin.timeinfo_font_size, skin.font_family,
+                              skin.timeinfo_font_color, 0, true);
+    BeatGenerator::text_queue.pop();
   }
 }
 
@@ -823,7 +656,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
     else
       continue;
     // 生成物件
-    auto &generator = generators[note->note_type];
+    auto &generator = objgenerators[note->note_type];
     generator->generate(obj);
     if (note->note_type == NoteType::NOTE) {
       // 除单键外的物件已经处理了头
@@ -855,108 +688,12 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
 // 渲染实际图形
 void MapWorkspaceCanvas::push_shape() {
+  // 绘制背景
+  draw_background();
   if (working_map) {
-    // 当前有绑定图
-    auto current_size = size();
-    // 读取获取当前时间附近的timings
-    std::vector<std::shared_ptr<Timing>> temp_timings;
-    working_map->query_around_timing(temp_timings,
-                                     editor->current_visual_time_stamp);
-
-    if (temp_timings.empty()) {
-      // 未查询到timing-不绘制时间线
-      return;
-    }
-
-    // 更新参考绝对timing
-    for (const auto &timing : temp_timings) {
-      switch (timing->type) {
-        case TimingType::OSUTIMING: {
-          auto otiming = std::static_pointer_cast<OsuTiming>(timing);
-          if (!otiming->is_inherit_timing) {
-            // 非变速timing--存储的实际bpm
-            editor->current_abs_timing = otiming;
-            if (!editor->preference_bpm) {
-              // 只更新一次参考bpm
-              editor->preference_bpm = std::make_unique<double>();
-              *editor->preference_bpm = editor->current_abs_timing->basebpm;
-            }
-            editor->speed_zoom =
-                editor->current_abs_timing->basebpm / *editor->preference_bpm;
-            emit current_absbpm_changed(editor->current_abs_timing->basebpm);
-            emit current_timeline_speed_changed(editor->speed_zoom);
-          } else {
-            // 变速timing--存储的倍速
-            editor->speed_zoom = editor->current_abs_timing->basebpm /
-                                 *editor->preference_bpm * otiming->bpm;
-            emit current_timeline_speed_changed(editor->speed_zoom);
-          }
-          break;
-        }
-        case TimingType::RMTIMING: {
-          // rmtiming只能存bpm
-          auto rmtiming = std::static_pointer_cast<Timing>(timing);
-          editor->current_abs_timing = rmtiming;
-          editor->speed_zoom = 1.0;
-          emit current_absbpm_changed(editor->current_abs_timing->basebpm);
-          emit current_timeline_speed_changed(editor->speed_zoom);
-          break;
-        }
-        case TimingType::MALODYTIMING: {
-          break;
-        }
-        case TimingType::UNKNOWN:
-          return;
-      }
-    }
-
-    // 使用timing计算时间
-    // 每拍时间
-    auto beattime = 60.0 / editor->current_abs_timing->bpm * 1000.0;
-    // 每拍时间*时间线缩放=拍距
-    double beat_distance =
-        beattime * editor->timeline_zoom * editor->speed_zoom;
-
-    // 判定线位置
-    auto judgeline_pos =
-        current_size.height() * (1.0 - editor->judgeline_position);
-
-    // 距离此timing的拍数-1
-    auto beat_count = int((editor->current_visual_time_stamp -
-                           editor->current_abs_timing->timestamp) /
-                              beattime -
-                          1);
-
-    // TODO(xiang 2025-04-21):
-    // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
-    // 当前处理的时间范围--大致
-    editor->current_time_area_start =
-        editor->current_abs_timing->timestamp + beat_count * beattime;
-    editor->current_time_area_end =
-        editor->current_abs_timing->timestamp + beat_count * beattime;
-
-    // 拍距离判定线距离从下往上--反转
-    // 拍起始位置
-    double distance = std::fabs(editor->current_time_area_end -
-                                editor->current_visual_time_stamp);
-    auto processing_pos = judgeline_pos + (distance * editor->timeline_zoom);
-
-    while (processing_pos > -beattime) {
-      editor->current_time_area_end += beattime;
-      processing_pos -= beat_distance;
-    }
-
-    draw_background();
-
-    if (editor->canvas_pasued) {
-      // 更新拍列表
-      // 清除拍缓存
-      editor->current_beats.clear();
-      working_map->query_beat_in_range(editor->current_beats,
-                                       int32_t(editor->current_time_area_start),
-                                       int32_t(editor->current_time_area_end));
-      draw_beats();
-    }
+    // 生成区域信息
+    areagenerator->generate();
+    if (editor->canvas_pasued) draw_beats();
 
     // 更新物件列表
     // 清除物件缓存

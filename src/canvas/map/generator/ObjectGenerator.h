@@ -6,13 +6,12 @@
 #include <memory>
 #include <queue>
 
-class TextureInstace;
-class RendererManager;
 class MapEditor;
 class HitObject;
 class Note;
 class Hold;
 class Slide;
+class TextureInstace;
 
 struct ObjectRenderData {
   double x;

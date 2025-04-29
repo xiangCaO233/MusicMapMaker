@@ -17,6 +17,8 @@
 #include "../GLCanvas.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
+#include "generator/AreaInfoGenerator.h"
+#include "generator/BeatGenerator.h"
 #include "generator/ObjectGenerator.h"
 
 class MapWorkspaceCanvas : public GLCanvas {
@@ -41,8 +43,15 @@ class MapWorkspaceCanvas : public GLCanvas {
    *图形相关
    */
   // 物件生成器
-  std::unordered_map<NoteType, std::shared_ptr<ObjectGenerator>> generators;
+  std::unordered_map<NoteType, std::shared_ptr<ObjectGenerator>> objgenerators;
 
+  // 节拍生成器
+  std::shared_ptr<BeatGenerator> beatgenerator;
+
+  // 时间区域信息生成器
+  std::shared_ptr<AreaInfoGenerator> areagenerator;
+
+  // 实际的帧更新时间-qt
   double actual_update_time{0};
 
   /*

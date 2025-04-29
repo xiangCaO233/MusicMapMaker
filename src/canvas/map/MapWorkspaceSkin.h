@@ -3,6 +3,7 @@
 
 #include <qcolor.h>
 
+#include <cstdint>
 #include <filesystem>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -59,8 +60,14 @@ class MapWorkspaceSkin {
   // 作者名
   std::string authorname;
 
+  // 全局字体
+  std::string font_family;
+
   // 时间字体颜色
   QColor timeinfo_font_color;
+
+  // 时间字体尺寸
+  int32_t timeinfo_font_size;
 
   // 预览区背景色
   QColor preview_area_bg_color;

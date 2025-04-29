@@ -130,6 +130,10 @@ set(PROJECT_SOURCES
 	src/canvas/map/generator/general/HoldGenerator.cpp
 	src/canvas/map/generator/general/SlideGenerator.h
 	src/canvas/map/generator/general/SlideGenerator.cpp
+	src/canvas/map/generator/BeatGenerator.h
+	src/canvas/map/generator/BeatGenerator.cpp
+	src/canvas/map/generator/AreaInfoGenerator.h
+	src/canvas/map/generator/AreaInfoGenerator.cpp
   src/canvas/renderer/shader/GLShader.h
   src/canvas/renderer/shader/GLShader.cpp
   src/canvas/renderer/RenderCommand.h
