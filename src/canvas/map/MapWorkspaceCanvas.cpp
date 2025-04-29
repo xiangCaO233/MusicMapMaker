@@ -29,6 +29,7 @@
 #include "../../mmm/MapWorkProject.h"
 #include "../../mmm/hitobject/HitObject.h"
 #include "../../mmm/hitobject/Note/Note.h"
+#include "../../mmm/hitobject/Note/rm/Slide.h"
 #include "../audio/BackgroundAudio.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
@@ -637,16 +638,38 @@ void MapWorkspaceCanvas::draw_beats() {
 }
 
 // 播放特效
-void MapWorkspaceCanvas::play_effect(double xpos, double ypos) {
-  auto effect_frame_texture = texture_full_map[skin.hit_effect_dir + "/1.png"];
-  for (int i = 1; i <= 30; ++i) {
-    effect_frame_queue_map[xpos].emplace(
-        QRectF(xpos - effect_frame_texture->width / 8.0,
-               ypos - effect_frame_texture->height / 8.0,
-               effect_frame_texture->width / 4.0,
-               effect_frame_texture->height / 4.0),
-        texture_full_map[skin.hit_effect_dir + "/" + std::to_string(i) +
-                         ".png"]);
+void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
+                                     EffectType etype) {
+  std::shared_ptr<TextureInstace> effect_frame_texture;
+  switch (etype) {
+    case EffectType::NORMAL: {
+      effect_frame_texture =
+          texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
+      for (int i = 1; i <= 30; ++i) {
+        effect_frame_queue_map[xpos].emplace(
+            QRectF(xpos - effect_frame_texture->width / 8.0,
+                   ypos - effect_frame_texture->height / 8.0,
+                   effect_frame_texture->width / 4.0,
+                   effect_frame_texture->height / 4.0),
+            texture_full_map[skin.nomal_hit_effect_dir + "/" +
+                             std::to_string(i) + ".png"]);
+      }
+      break;
+    }
+    case EffectType::SLIDEARROW: {
+      effect_frame_texture =
+          texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
+      for (int i = 1; i <= 16; ++i) {
+        effect_frame_queue_map[xpos].emplace(
+            QRectF(xpos - effect_frame_texture->width / 8.0,
+                   ypos - effect_frame_texture->height / 8.0,
+                   effect_frame_texture->width / 4.0,
+                   effect_frame_texture->height / 4.0),
+            texture_full_map[skin.slide_hit_effect_dir + "/" +
+                             std::to_string(i) + ".png"]);
+      }
+      break;
+    }
   }
 }
 
@@ -674,11 +697,24 @@ void MapWorkspaceCanvas::draw_hitobject() {
             des_update_time * 2) {
       played_effects_objects.emplace(obj);
       std::thread playthread([&]() {
-        play_effect(editor->edit_area_start_pos_x +
-                        editor->orbit_width *
-                            std::static_pointer_cast<Note>(obj)->orbit +
-                        editor->orbit_width / 2.0,
-                    size().height() * (1 - editor->judgeline_position));
+        auto x =
+            editor->edit_area_start_pos_x +
+            editor->orbit_width * std::static_pointer_cast<Note>(obj)->orbit +
+            editor->orbit_width / 2.0;
+        EffectType t;
+        switch (note->note_type) {
+          case NoteType::SLIDE: {
+            t = EffectType::SLIDEARROW;
+            x += (std::static_pointer_cast<Slide>(note))->slide_parameter *
+                 editor->orbit_width;
+            break;
+          }
+          default: {
+            t = EffectType::NORMAL;
+            break;
+          }
+        }
+        play_effect(x, size().height() * (1 - editor->judgeline_position), t);
       });
       playthread.detach();
     }

@@ -61,7 +61,12 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
   // 选中框纹理配置
   selected_config = bg_texture_config["select-border"];
 
-  hit_effect_dir = texture_config["effects"].value<std::string>("dir", "");
+  // 打击特效配置
+  hit_effect_config = texture_config["effects"];
+  nomal_hit_effect_dir =
+      hit_effect_config.value<std::string>("note-effectdir", "");
+  slide_hit_effect_dir =
+      hit_effect_config.value<std::string>("slide-effectdir", "");
 
   // 颜色配置
   preview_area_bg_color = QColor::fromString(skin_config.value<std::string>(

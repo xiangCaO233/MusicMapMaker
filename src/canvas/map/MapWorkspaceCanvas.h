@@ -21,6 +21,11 @@
 #include "generator/BeatGenerator.h"
 #include "generator/ObjectGenerator.h"
 
+enum class EffectType {
+  NORMAL,
+  SLIDEARROW,
+};
+
 class MapWorkspaceCanvas : public GLCanvas {
   Q_OBJECT
  protected:
@@ -109,7 +114,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   std::unordered_set<std::shared_ptr<HitObject>> played_effects_objects;
 
   // 播放特效
-  void play_effect(double xpos, double ypos);
+  void play_effect(double xpos, double ypos, EffectType etype);
 
   // 切换到指定图
   void switch_map(std::shared_ptr<MMap> map);
