@@ -17,7 +17,7 @@ SlideGenerator::~SlideGenerator() {}
 void SlideGenerator::generate(Slide& slide) {
   NoteGenerator::generate(slide);
   // 滑键
-  auto slide_ptr = std::shared_ptr<HitObject>(&slide, [](Slide*) {});
+  auto slide_ptr = std::shared_ptr<Slide>(&slide, [](Slide*) {});
   objref = slide_ptr;
   auto endorbit = slide.orbit + slide.slide_parameter;
 
@@ -110,6 +110,9 @@ void SlideGenerator::generate(Slide& slide) {
       // 使用选中纹理
       slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
           TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::SELECTED);
+      // 发送更新选中物件信号
+      emit editor_ref->canvas_ref->select_object(
+          objref, editor_ref->current_abs_timing);
     } else {
       // 使用常规纹理
       slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -156,6 +159,9 @@ void SlideGenerator::generate(Slide& slide) {
           editor_ref->selected_hitobjects.emplace(slide_ptr);
           // 使用选中纹理
           actual_use_end_texture = slide_end_selected_texture;
+          // 发送更新选中物件信号
+          emit editor_ref->canvas_ref->select_object(
+              objref, editor_ref->current_abs_timing);
         } else {
           // 使用常规纹理
           actual_use_end_texture = slide_end_texture;
@@ -199,6 +205,9 @@ void SlideGenerator::generate(Slide& slide) {
           editor_ref->selected_hitobjects.emplace(slide_ptr);
           // 使用选中纹理
           actual_use_end_texture = slide_end_selected_texture;
+          // 发送更新选中物件信号
+          emit editor_ref->canvas_ref->select_object(
+              objref, editor_ref->current_abs_timing);
         } else {
           // 使用常规纹理
           actual_use_end_texture = slide_end_texture;

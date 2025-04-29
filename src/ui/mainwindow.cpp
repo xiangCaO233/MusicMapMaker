@@ -11,6 +11,7 @@
 #include "./ui_mainwindow.h"
 #include "audio/BackgroundAudio.h"
 #include "controllers/timecontroller.h"
+#include "mmetas.h"
 #include "pageui/editorui/CanvasContainer.h"
 #include "pageui/editorui/meditorarea.h"
 #include "pageui/mpage.h"
@@ -45,6 +46,11 @@ MainWindow::MainWindow(QWidget* parent)
   connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
           &GLCanvas::update_window_title_suffix, this,
           &MainWindow::update_window_title);
+
+  // 连接选择物件槽
+  connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::select_object, ui->infomation_widget->mmetas,
+          &MMetas::on_canvas_select_object);
 }
 
 MainWindow::~MainWindow() { delete ui; }

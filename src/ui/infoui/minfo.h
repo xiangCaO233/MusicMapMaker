@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class MMetas;
+
 namespace Ui {
 class MInfo;
 }
@@ -13,6 +15,7 @@ class MInfo : public QWidget {
  public:
   explicit MInfo(QWidget *parent = nullptr);
   ~MInfo();
+  MMetas *mmetas;
 
  private:
   Ui::MInfo *ui;

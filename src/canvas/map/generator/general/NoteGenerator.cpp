@@ -74,6 +74,9 @@ void NoteGenerator::generate(Note& note) {
       if (it == editor_ref->selected_hitobjects.end()) {
         // 未选中则选中此物件
         editor_ref->selected_hitobjects.emplace(note_ptr);
+        // 发送更新选中物件信号
+        emit editor_ref->canvas_ref->select_object(
+            note_ptr, editor_ref->current_abs_timing);
       }
       // 选中时的纹理
       head_texture = editor_ref->canvas_ref->skin.get_object_texture(

@@ -142,6 +142,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   void current_absbpm_changed(double bpm);
   // 时间线速度变化信号
   void current_timeline_speed_changed(double timeline_speed);
+  // 选中物件的信号
+  void select_object(std::shared_ptr<HitObject> &obj,
+                     std::shared_ptr<Timing> &ref_timing);
   // 是否暂停播放信号
   void pause_signal(bool paused);
 };

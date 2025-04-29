@@ -153,6 +153,10 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
         editor->selected_hitobjects.emplace(
             editor->hover_hitobject_info->first);
       }
+
+      // 发送更新选中物件信号
+      emit select_object(editor->hover_hitobject_info->first,
+                         editor->current_abs_timing);
       break;
     }
     case Qt::MouseButton::RightButton: {
@@ -646,11 +650,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= 30; ++i) {
+        auto w = effect_frame_texture->width * editor->object_size_scale;
+        auto h = effect_frame_texture->height * editor->object_size_scale;
         effect_frame_queue_map[xpos].emplace(
-            QRectF(xpos - effect_frame_texture->width / 8.0,
-                   ypos - effect_frame_texture->height / 8.0,
-                   effect_frame_texture->width / 4.0,
-                   effect_frame_texture->height / 4.0),
+            QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.nomal_hit_effect_dir + "/" +
                              std::to_string(i) + ".png"]);
       }

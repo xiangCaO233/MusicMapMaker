@@ -90,6 +90,9 @@ void HoldGenerator::generate(Hold &hold) {
       // 使用选中纹理
       hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
           TexType::HOLD_BODY_VERTICAL, ObjectStatus::SELECTED);
+      // 发送更新选中物件信号
+      emit editor_ref->canvas_ref->select_object(
+          objref, editor_ref->current_abs_timing);
     } else {
       // 使用默认纹理
       hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -139,6 +142,9 @@ void HoldGenerator::generate(Hold &hold) {
           // 使用选中的纹理
           hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
               TexType::HOLD_END, ObjectStatus::SELECTED);
+          // 发送更新选中物件信号
+          emit editor_ref->canvas_ref->select_object(
+              objref, editor_ref->current_abs_timing);
         } else {
           // 使用普通纹理
           hold_end_texture = long_note_end_texture;
@@ -188,6 +194,9 @@ void HoldGenerator::generate(Hold &hold) {
           // 使用选中的纹理
           hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
               TexType::HOLD_END, ObjectStatus::SELECTED);
+          // 发送更新选中物件信号
+          emit editor_ref->canvas_ref->select_object(
+              objref, editor_ref->current_abs_timing);
         } else {
           // 使用普通纹理
           hold_end_texture = long_note_end_texture;
