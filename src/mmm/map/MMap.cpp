@@ -291,7 +291,8 @@ void MMap::query_object_in_range(
     std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
     const int32_t end, bool with_longhold) {
   // 全部物件
-  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> adding_objects;
+  thread_local std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+      adding_objects;
 
   // 自动去重+排序
   // std::set<std::shared_ptr<HitObject>, SharedPtrCompare> adding_objects;
@@ -331,4 +332,5 @@ void MMap::query_object_in_range(
 
   // 按set遍历加入结果
   for (const auto& obj : adding_objects) result_objects.emplace_back(obj);
+  adding_objects.clear();
 }

@@ -9,7 +9,7 @@
 
 // 构造OsuHoldEnd
 OsuHoldEnd::OsuHoldEnd(const std::shared_ptr<OsuHold>& ohold)
-    : HoldEnd(ohold), reference(ohold) {
+    : HoldEnd(ohold), reference(ohold.get()) {
   object_type = HitObjectType::OSUHOLDEND;
 }
 

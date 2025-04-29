@@ -38,7 +38,7 @@ class OsuHoldEnd : public HoldEnd {
   ~OsuHoldEnd() override;
 
   // 对应面条物件引用
-  std::shared_ptr<OsuHold> reference;
+  OsuHold* reference;
 
   // 打印用
   std::string toString() override;

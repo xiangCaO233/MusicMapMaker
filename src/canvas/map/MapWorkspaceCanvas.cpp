@@ -650,8 +650,8 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= 30; ++i) {
-        auto w = effect_frame_texture->width * editor->object_size_scale;
-        auto h = effect_frame_texture->height * editor->object_size_scale;
+        auto w = effect_frame_texture->width * (editor->object_size_scale);
+        auto h = effect_frame_texture->height * (editor->object_size_scale);
         effect_frame_queue_map[xpos].emplace(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.nomal_hit_effect_dir + "/" +
@@ -741,11 +741,13 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
     if (!editor->canvas_pasued && shape.objref &&
         shape.objref->timestamp <= editor->current_time_stamp) {
-      // 播放中且过了判定线时间的使用另一个纹理绘制
+      // 播放中且过了判定线时间使用半透明效果
+      renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
     } else {
-      renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
-                                shape.tex, QColor(0, 0, 0, 255), 0, true);
+      renderer_manager->texture_effect = TextureEffect::NONE;
     }
+    renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
+                              shape.tex, QColor(0, 0, 0, 255), 0, true);
     ObjectGenerator::shape_queue.pop();
   }
 
@@ -774,6 +776,7 @@ void MapWorkspaceCanvas::push_shape() {
         editor->buffer_objects, int32_t(editor->current_time_area_start),
         int32_t(editor->current_time_area_end), true);
     draw_hitobject();
+    renderer_manager->texture_effect = TextureEffect::NONE;
   }
   for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
     if (!effect_frame_queue.empty()) {

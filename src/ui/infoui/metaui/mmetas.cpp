@@ -14,6 +14,11 @@ MMetas::~MMetas() { delete ui; }
 void MMetas::on_canvas_select_object(std::shared_ptr<HitObject>& obj,
                                      std::shared_ptr<Timing>& ref_timing) {
   // 更新标签信息显示
-  ui->timestam_value->setText(QString::number(obj->timestamp, 'f', 0));
-  ui->ntiming_bpm_value->setText(QString::number(ref_timing->basebpm, 'f', 2));
+  // if (obj) {
+  //   ui->timestam_value->setText(QString::number(obj->timestamp, 'f', 0));
+  // }
+  // if (ref_timing) {
+  //   ui->ntiming_bpm_value->setText(
+  //       QString::number(ref_timing->basebpm, 'f', 2));
+  // }
 }

@@ -73,6 +73,8 @@ const uint BLUR = 0x1000;
 const uint GRAYSCALE = 0x2000;
 // 发光
 const uint GLOWING = 0x3000;
+// 半透明
+const uint HALF_TRANSPARENT = 0x4000;
 
 // 纹理补充模式
 // 使用填充色
@@ -391,6 +393,11 @@ void main() {
     case GLOWING: {
       // 实现发光特效
       FragColor = texture_color;
+      break;
+    }
+    case HALF_TRANSPARENT: {
+      // 实现1/4半透明特效
+      FragColor = vec4(texture_color.rgb, 0.25);
       break;
     }
     default:
