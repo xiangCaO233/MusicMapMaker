@@ -13,52 +13,52 @@
       "background": "background/background.png",
       "sprite": "background/sprite.png",
       "select-border": {
-        "left": "hitobject/select_boarder_left.png",
-        "right": "hitobject/select_boarder_right.png",
-        "top": "hitobject/select_boarder_top.png",
-        "bottom": "hitobject/select_boarder_bottom.png"
+        "left": "选中/select_boarder_left.png",
+        "right": "选中/select_boarder_right.png",
+        "top": "选中/select_boarder_top.png",
+        "bottom": "选中/select_boarder_bottom.png"
       }
     },
     "hitobject": {
       "head": {
-        "common": "hitobject/head.png",
-        "hover": "hitobject/head_hover.png",
-        "selected": "hitobject/head_selected.png"
+        "common": "物件/head.png",
+        "hover": "物件/head_hover.png",
+        "selected": "物件/head_selected.png"
       },
       "node": {
-        "common": "hitobject/node.png",
-        "hover": "hitobject/node_hover.png",
-        "selected": "hitobject/node_selected.png"
+        "common": "物件/node.png",
+        "hover": "物件/node_hover.png",
+        "selected": "物件/node_selected.png"
       },
       "hold": {
         "body": {
           "vertical": {
-            "common": "hitobject/holdbodyvertical.png",
-            "hover": "hitobject/holdbodyvertical_hover.png",
-            "selected": "hitobject/holdbodyvertical_selected.png"
+            "common": "物件/holdbodyvertical.png",
+            "hover": "物件/holdbodyvertical_hover.png",
+            "selected": "物件/holdbodyvertical_selected.png"
           },
           "horizontal": {
-            "common": "hitobject/holdbodyhorizontal.png",
-            "hover": "hitobject/holdbodyhorizontal_hover.png",
-            "selected": "hitobject/holdbodyhorizontal_selected.png"
+            "common": "物件/holdbodyhorizontal.png",
+            "hover": "物件/holdbodyhorizontal_hover.png",
+            "selected": "物件/holdbodyhorizontal_selected.png"
           }
         },
         "end": {
-          "common": "hitobject/holdend.png",
-          "hover": "hitobject/holdend_hover.png",
-          "selected": "hitobject/holdend_selected.png"
+          "common": "物件/holdend.png",
+          "hover": "物件/holdend_hover.png",
+          "selected": "物件/holdend_selected.png"
         }
       },
       "slide": {
         "arrowleft": {
-          "common": "hitobject/arrowleft.png",
-          "hover": "hitobject/arrowleft_hover.png",
-          "selected": "hitobject/arrowleft_selected.png"
+          "common": "物件/arrowleft.png",
+          "hover": "物件/arrowleft_hover.png",
+          "selected": "物件/arrowleft_selected.png"
         },
         "arrowright": {
-          "common": "hitobject/arrowright.png",
-          "hover": "hitobject/arrowright_hover.png",
-          "selected": "hitobject/arrowright_selected.png"
+          "common": "物件/arrowright.png",
+          "hover": "物件/arrowright_hover.png",
+          "selected": "物件/arrowright_selected.png"
         }
       }
     }
