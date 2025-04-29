@@ -77,7 +77,8 @@ void AreaInfoGenerator::generate() {
   auto beattime = 60.0 / editor_ref->current_abs_timing->bpm * 1000.0;
   // 每拍时间*时间线缩放=拍距
   double beat_distance =
-      beattime * editor_ref->timeline_zoom * editor_ref->speed_zoom;
+      beattime * editor_ref->timeline_zoom *
+      (editor_ref->canvas_pasued ? 1.0 : editor_ref->speed_zoom);
 
   // 判定线位置
   auto judgeline_pos =

@@ -17,7 +17,8 @@ SlideGenerator::~SlideGenerator() {}
 void SlideGenerator::generate(Slide& slide) {
   NoteGenerator::generate(slide);
   // 滑键
-  auto slide_ptr = std::shared_ptr<HitObject>(&slide, [](HitObject*) {});
+  auto slide_ptr = std::shared_ptr<HitObject>(&slide, [](Slide*) {});
+  objref = slide_ptr;
   auto endorbit = slide.orbit + slide.slide_parameter;
 
   // 横向身的终点位置
@@ -118,7 +119,8 @@ void SlideGenerator::generate(Slide& slide) {
   // 直接添加滑身到图形队列
   shape_queue.emplace(slide_hori_body_rect.x(), slide_hori_body_rect.y(),
                       slide_hori_body_rect.width(),
-                      slide_hori_body_rect.height(), slide_hori_body_texture);
+                      slide_hori_body_rect.height(), slide_hori_body_texture,
+                      objref);
 
   // 节点的实际区域--也在面身缺的那note位置
   QRectF node_bound(horizon_body_end_pos_x - node_size.width() / 2.0,
@@ -162,7 +164,7 @@ void SlideGenerator::generate(Slide& slide) {
       // 直接添加滑尾图形到队列
       shape_queue.emplace(slide_end_rect.x(), slide_end_rect.y(),
                           slide_end_rect.width(), slide_end_rect.height(),
-                          actual_use_end_texture);
+                          actual_use_end_texture, objref);
 
       // 滑头--直接将NoteGenerator中结果enqueue
       NoteGenerator::object_enqueue();
@@ -205,7 +207,7 @@ void SlideGenerator::generate(Slide& slide) {
       // 添加滑尾图形到队列
       shape_queue.emplace(slide_end_rect.x(), slide_end_rect.y(),
                           slide_end_rect.width(), slide_end_rect.height(),
-                          actual_use_end_texture);
+                          actual_use_end_texture, objref);
       break;
     }
   }

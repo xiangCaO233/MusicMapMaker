@@ -1,6 +1,7 @@
 #include "NoteGenerator.h"
 
 #include <memory>
+#include <thread>
 
 #include "../../../../mmm/hitobject/Note/Note.h"
 #include "../../MapWorkspaceCanvas.h"
@@ -16,7 +17,7 @@ NoteGenerator::~NoteGenerator() = default;
 
 // 生成物件渲染指令
 void NoteGenerator::generate(Note& note) {
-  auto note_ptr = std::shared_ptr<HitObject>(&note, [](HitObject*) {});
+  auto note_ptr = std::shared_ptr<HitObject>(&note, [](Note*) {});
   auto head_note_size =
       QSizeF(editor_ref->head_texture->width * editor_ref->object_size_scale,
              editor_ref->head_texture->height * editor_ref->object_size_scale);
@@ -32,8 +33,7 @@ void NoteGenerator::generate(Note& note) {
           (1.0 - editor_ref->judgeline_position) -
       ((editor_ref->canvas_pasued ? note.timestamp : note_visual_time) -
        editor_ref->current_visual_time_stamp) *
-          editor_ref->timeline_zoom *
-          (editor_ref->canvas_pasued ? 1.0 : editor_ref->speed_zoom);
+          editor_ref->timeline_zoom;
 
   // 物件头中心位置
   auto note_center_pos_x = editor_ref->edit_area_start_pos_x +

@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <random>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -373,6 +374,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   }
   editor->current_visual_time_stamp =
       editor->current_time_stamp + editor->static_time_offset;
+  played_effects_objects.clear();
   update_mapcanvas_timepos();
 }
 
@@ -634,6 +636,20 @@ void MapWorkspaceCanvas::draw_beats() {
   }
 }
 
+// 播放特效
+void MapWorkspaceCanvas::play_effect(double xpos, double ypos) {
+  auto effect_frame_texture = texture_full_map[skin.hit_effect_dir + "/1.png"];
+  for (int i = 1; i <= 30; ++i) {
+    effect_frame_queue_map[xpos].emplace(
+        QRectF(xpos - effect_frame_texture->width / 8.0,
+               ypos - effect_frame_texture->height / 8.0,
+               effect_frame_texture->width / 4.0,
+               effect_frame_texture->height / 4.0),
+        texture_full_map[skin.hit_effect_dir + "/" + std::to_string(i) +
+                         ".png"]);
+  }
+}
+
 // 绘制物件
 void MapWorkspaceCanvas::draw_hitobject() {
   if (!working_map) return;
@@ -652,6 +668,20 @@ void MapWorkspaceCanvas::draw_hitobject() {
       drawed_objects.insert({note, true});
     else
       continue;
+    // 经过判定线
+    if (!played_effects_objects.contains(obj) &&
+        std::abs(obj->timestamp - editor->current_visual_time_stamp) <
+            des_update_time * 2) {
+      played_effects_objects.emplace(obj);
+      std::thread playthread([&]() {
+        play_effect(editor->edit_area_start_pos_x +
+                        editor->orbit_width *
+                            std::static_pointer_cast<Note>(obj)->orbit +
+                        editor->orbit_width / 2.0,
+                    size().height() * (1 - editor->judgeline_position));
+      });
+      playthread.detach();
+    }
     // 生成物件
     auto &generator = objgenerators[note->note_type];
     generator->generate(obj);
@@ -670,7 +700,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   while (!ObjectGenerator::shape_queue.empty()) {
     auto &shape = ObjectGenerator::shape_queue.front();
 
-    if (!editor->canvas_pasued &&
+    if (!editor->canvas_pasued && shape.objref &&
         shape.objref->timestamp <= editor->current_time_stamp) {
       // 播放中且过了判定线时间的使用另一个纹理绘制
     } else {
@@ -705,6 +735,14 @@ void MapWorkspaceCanvas::push_shape() {
         editor->buffer_objects, int32_t(editor->current_time_area_start),
         int32_t(editor->current_time_area_end), true);
     draw_hitobject();
+  }
+  for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
+    if (!effect_frame_queue.empty()) {
+      renderer_manager->addRect(effect_frame_queue.front().first,
+                                effect_frame_queue.front().second,
+                                QColor(255, 182, 193, 240), 0, true);
+      effect_frame_queue.pop();
+    }
   }
   draw_select_bound();
   draw_preview_content();

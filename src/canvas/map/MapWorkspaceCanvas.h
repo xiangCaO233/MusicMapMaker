@@ -54,6 +54,11 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 实际的帧更新时间-qt
   double actual_update_time{0};
 
+  // 特效帧队列
+  std::unordered_map<
+      double, std::queue<std::pair<QRectF, std::shared_ptr<TextureInstace>>>>
+      effect_frame_queue_map;
+
   /*
    *成员函数
    */
@@ -99,6 +104,12 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 皮肤
   MapWorkspaceSkin skin;
+
+  // 播放过特效的物件
+  std::unordered_set<std::shared_ptr<HitObject>> played_effects_objects;
+
+  // 播放特效
+  void play_effect(double xpos, double ypos);
 
   // 切换到指定图
   void switch_map(std::shared_ptr<MMap> map);

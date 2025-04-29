@@ -31,8 +31,7 @@ void HoldGenerator::generate(Hold &hold) {
       ((editor_ref->canvas_pasued ? hold.hold_end_reference->timestamp
                                   : long_note_end_visual_time) -
        editor_ref->current_visual_time_stamp) *
-          editor_ref->timeline_zoom *
-          (editor_ref->canvas_pasued ? 1.0 : editor_ref->speed_zoom);
+          editor_ref->timeline_zoom;
   auto long_note_body_height = (long_note_end_pos_y - head_cp.y());
 
   // 当前面条身中心位置,y位置偏下一个note

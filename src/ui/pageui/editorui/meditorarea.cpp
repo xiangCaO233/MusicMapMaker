@@ -197,6 +197,7 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
       ui->canvas_container->canvas.data()->editor->current_visual_time_stamp =
           ui->canvas_container->canvas.data()->editor->current_time_stamp +
           ui->canvas_container->canvas.data()->editor->static_time_offset;
+      ui->canvas_container->canvas.data()->played_effects_objects.clear();
       emit progress_pos_changed(maptime * ratio);
     }
   }
