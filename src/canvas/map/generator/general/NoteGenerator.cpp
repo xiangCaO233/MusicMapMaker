@@ -84,10 +84,11 @@ void NoteGenerator::generate(Note& note) {
           TexType::NOTE_HEAD, ObjectStatus::COMMON);
     }
   }
+  objref = note_ptr;
 }
 
 // 完成物件头的生成-添加到渲染队列
 void NoteGenerator::object_enqueue() {
   shape_queue.emplace(head_rect.x(), head_rect.y(), head_rect.width(),
-                      head_rect.height(), head_texture);
+                      head_rect.height(), head_texture, objref);
 }

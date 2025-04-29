@@ -36,6 +36,14 @@ enum TexType {
   SLIDE_END_RIGHT,
 };
 
+// 选中框纹理的方向
+enum SelectBorderDirection {
+  LEFT,
+  RIGHT,
+  TOP,
+  BOTTOM,
+};
+
 // 击打特效帧
 struct HitEffectFrame {
   std::shared_ptr<TextureInstace> effect_texture;
@@ -97,6 +105,12 @@ class MapWorkspaceSkin {
 
   json right_slide_end_texture_config;
 
+  // 选中框纹理配置
+  json selected_config;
+
+  // 击中特效纹理配置
+  std::string hit_effect_dir;
+
   // 时间分割线主题-(1/n-(颜色-宽度)列表)
   std::unordered_map<int32_t, std::vector<std::pair<QColor, int32_t>>>
       divisors_color_theme;
@@ -109,6 +123,10 @@ class MapWorkspaceSkin {
 
   // 获取精灵的纹理
   std::shared_ptr<TextureInstace>& get_sprite_texture();
+
+  // 获取选择框纹理
+  std::shared_ptr<TextureInstace>& get_selected_border_texture(
+      SelectBorderDirection direction);
 
   // 获取判定线的纹理
   std::shared_ptr<TextureInstace>& get_judgeline_texture();

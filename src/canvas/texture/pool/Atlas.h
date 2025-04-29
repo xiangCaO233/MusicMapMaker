@@ -23,6 +23,8 @@ class Atlas {
   int32_t atlas_width{0};
   int32_t atlas_height{0};
 
+  int current_line_height{0};
+
   // 纹理集内的全部子纹理
   std::vector<std::shared_ptr<TextureInstace>> sub_textures;
 

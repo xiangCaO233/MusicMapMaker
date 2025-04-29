@@ -19,6 +19,7 @@ struct ObjectRenderData {
   double w;
   double h;
   std::shared_ptr<TextureInstace> tex;
+  std::shared_ptr<HitObject> objref;
 };
 
 class ObjectGenerator {

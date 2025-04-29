@@ -58,6 +58,11 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
 
   right_slide_end_texture_config = object_texture_config["slide"]["arrowright"];
 
+  // 选中框纹理配置
+  selected_config = bg_texture_config["select-border"];
+
+  hit_effect_dir = texture_config["effects"].value<std::string>("dir", "");
+
   // 颜色配置
   preview_area_bg_color = QColor::fromString(skin_config.value<std::string>(
       "previewarea-background-color", "#000000FF"));
@@ -110,10 +115,39 @@ std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_judgeline_texture() {
                                                                     "none")];
 }
 
+// 获取选择框纹理
+std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_selected_border_texture(
+    SelectBorderDirection direction) {
+  switch (direction) {
+    case SelectBorderDirection::LEFT: {
+      return cvs->texture_full_map[selected_config.value<std::string>("left",
+                                                                      "none")];
+      break;
+    }
+    case SelectBorderDirection::RIGHT: {
+      return cvs->texture_full_map[selected_config.value<std::string>("right",
+                                                                      "none")];
+      break;
+    }
+    case SelectBorderDirection::TOP: {
+      return cvs
+          ->texture_full_map[selected_config.value<std::string>("top", "none")];
+      break;
+    }
+    case SelectBorderDirection::BOTTOM: {
+      return cvs->texture_full_map[selected_config.value<std::string>("bottom",
+                                                                      "none")];
+      break;
+    }
+    default:
+      return cvs->texture_full_map["none"];
+  }
+}
+
 // 获取物件的纹理
 std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_object_texture(
     TexType type, ObjectStatus status) {
-  json* config;
+  json* config = nullptr;
   std::string key;
 
   switch (type) {

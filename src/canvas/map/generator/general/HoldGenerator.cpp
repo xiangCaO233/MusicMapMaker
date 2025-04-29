@@ -14,7 +14,9 @@ HoldGenerator::~HoldGenerator() {}
 // 生成面条
 void HoldGenerator::generate(Hold &hold) {
   NoteGenerator::generate(hold);
-  auto hold_ptr = std::shared_ptr<HitObject>(&hold, [](HitObject *) {});
+  auto hold_ptr = std::shared_ptr<Hold>(&hold, [](HitObject *) {});
+  // 面条使用面尾标识
+  objref = hold_ptr->hold_end_reference;
   // 添加long_note_body
   auto head_cp = head_rect.center();
   double long_note_end_visual_time = editor_ref->current_visual_time_stamp +
@@ -98,7 +100,7 @@ void HoldGenerator::generate(Hold &hold) {
   // 直接添加图形到队列
   shape_queue.emplace(hold_vert_body_rect.x(), hold_vert_body_rect.y(),
                       hold_vert_body_rect.width(), hold_vert_body_rect.height(),
-                      hold_vert_body_texture);
+                      hold_vert_body_texture, objref);
 
   // 节点的实际区域--也在面身缺的那note位置
   QRectF node_bound(long_note_end_pos_x - node_size.width() / 2.0,
@@ -146,7 +148,7 @@ void HoldGenerator::generate(Hold &hold) {
       // 直接添加面尾图形到队列
       shape_queue.emplace(hold_end_rect.x(), hold_end_rect.y(),
                           hold_end_rect.width(), hold_end_rect.height(),
-                          hold_end_texture);
+                          hold_end_texture, objref);
 
       // 面头--直接将NoteGenerator中结果enqueue
       NoteGenerator::object_enqueue();
@@ -194,7 +196,7 @@ void HoldGenerator::generate(Hold &hold) {
       }
       shape_queue.emplace(hold_end_rect.x(), hold_end_rect.y(),
                           hold_end_rect.width(), hold_end_rect.height(),
-                          hold_end_texture);
+                          hold_end_texture, objref);
       break;
     }
   }

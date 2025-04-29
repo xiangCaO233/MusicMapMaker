@@ -18,14 +18,27 @@ bool Atlas::add_texture(std::shared_ptr<TextureInstace> &texture) {
 
   if (current_y + texture->height > atlas_height) return false;
 
+  // 尝试当前行放置
   if (current_x + texture->width > atlas_width) {
-    // 放下一行
-    current_y += texture->height;
+    // 换行处理
+    current_y += current_line_height;  // 使用当前行最高高度
     current_x = 0;
+    current_line_height = 0;
+
+    // 检查换行后是否有足够空间
+    if (current_y + texture->height > atlas_height) {
+      return false;
+    }
   }
 
-  // 下一行高度不足
-  if (current_y + texture->height > atlas_height) return false;
+  // 检查当前行高度是否足够
+  if (texture->height > current_line_height) {
+    // 如果增加行高后超出图集高度，则失败
+    if (current_y + texture->height > atlas_height) {
+      return false;
+    }
+    current_line_height = texture->height;
+  }
 
   // 成功添加映射
   texture->woffset = current_x;

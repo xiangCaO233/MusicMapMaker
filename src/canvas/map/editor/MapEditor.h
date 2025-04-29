@@ -141,7 +141,7 @@ class MapEditor {
   QPointF mouse_left_press_pos;
 
   // 选中框边框宽度(pix)
-  double select_border_width{10};
+  double select_border_width{6};
 
   // 物件头的纹理
   std::shared_ptr<TextureInstace> head_texture;

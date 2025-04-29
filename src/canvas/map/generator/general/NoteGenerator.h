@@ -22,6 +22,9 @@ class NoteGenerator : public ObjectGenerator {
   // 物件头的纹理
   std::shared_ptr<TextureInstace> head_texture;
 
+  // 物件引用
+  std::shared_ptr<HitObject> objref;
+
   // 生成物件
   void generate(Note& note) override;
 

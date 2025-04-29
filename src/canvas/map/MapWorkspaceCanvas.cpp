@@ -504,13 +504,13 @@ void MapWorkspaceCanvas::draw_top_bar() {
 void MapWorkspaceCanvas::draw_select_bound() {
   if (editor->select_bound_locate_points) {
     auto &border_left_texture =
-        texture_full_map["hitobject/select_boarder_left.png"];
+        skin.get_selected_border_texture(SelectBorderDirection::LEFT);
     auto &border_right_texture =
-        texture_full_map["hitobject/select_boarder_right.png"];
+        skin.get_selected_border_texture(SelectBorderDirection::RIGHT);
     auto &border_top_texture =
-        texture_full_map["hitobject/select_boarder_top.png"];
+        skin.get_selected_border_texture(SelectBorderDirection::TOP);
     auto &border_bottom_texture =
-        texture_full_map["hitobject/select_boarder_bottom.png"];
+        skin.get_selected_border_texture(SelectBorderDirection::BOTTOM);
 
     auto p1 = editor->select_bound_locate_points->first;
     auto p2 = QPointF(editor->select_bound_locate_points->first.x(),
@@ -518,10 +518,6 @@ void MapWorkspaceCanvas::draw_select_bound() {
     auto p3 = editor->select_bound_locate_points->second;
     auto p4 = QPointF(editor->select_bound_locate_points->second.x(),
                       editor->select_bound_locate_points->first.y());
-    // 矩形
-    // auto leftrect = QRectF(
-    //     p1.x() - select_border_width / 2.0, p1.y() - select_border_width
-    //     / 2.0, p2.x() - p1.x() + select_border_width, select_border_width);
 
     // 左矩形p1-p2
     auto leftrect =
@@ -580,6 +576,7 @@ void MapWorkspaceCanvas::draw_preview_content() {
   renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75),
                             0, false);
 }
+
 // 绘制判定线
 void MapWorkspaceCanvas::draw_judgeline() {
   auto current_size = size();
@@ -672,8 +669,14 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 按计算层级渲染图形
   while (!ObjectGenerator::shape_queue.empty()) {
     auto &shape = ObjectGenerator::shape_queue.front();
-    renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
-                              shape.tex, QColor(0, 0, 0, 255), 0, true);
+
+    if (!editor->canvas_pasued &&
+        shape.objref->timestamp <= editor->current_time_stamp) {
+      // 播放中且过了判定线时间的使用另一个纹理绘制
+    } else {
+      renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
+                                shape.tex, QColor(0, 0, 0, 255), 0, true);
+    }
     ObjectGenerator::shape_queue.pop();
   }
 
