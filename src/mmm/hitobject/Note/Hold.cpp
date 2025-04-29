@@ -1,5 +1,7 @@
 #include "Hold.h"
 
+#include "../../canvas/map/generator/ObjectGenerator.h"
+
 Hold::Hold(uint32_t time, int32_t orbit_pos, uint32_t holdtime)
     : Note(time, orbit_pos), hold_time(holdtime) {
   object_type = HitObjectType::HOLD;
@@ -7,6 +9,11 @@ Hold::Hold(uint32_t time, int32_t orbit_pos, uint32_t holdtime)
 }
 
 Hold::~Hold() = default;
+
+// 接收处理
+void Hold::accept_generate(ObjectGenerator& generator) {
+  generator.generate(*this);
+}
 
 // 打印用
 std::string Hold::toString() { return ""; }

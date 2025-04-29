@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "texture/pool/Atlas.h"
+#include "Atlas.h"
 
 class GLCanvas;
 class TextureInstace;

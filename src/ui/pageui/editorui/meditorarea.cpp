@@ -2,6 +2,7 @@
 
 #include <qtmetamacros.h>
 
+#include "../../../canvas/map/editor/MapEditor.h"
 #include "../../../util/mutil.h"
 #include "ui_meditorarea.h"
 
@@ -127,7 +128,7 @@ void MEditorArea::on_selectnewmap(std::shared_ptr<MMap>& map) {
 
 // 滚动方向切换按钮触发
 void MEditorArea::on_wheel_direction_button_toggled(bool checked) {
-  ui->canvas_container->canvas.data()->scroll_direction =
+  ui->canvas_container->canvas.data()->editor->scroll_direction =
       (checked ? -1.0 : 1.0);
 
   // 根据主题切换图标颜色
@@ -152,7 +153,7 @@ void MEditorArea::on_wheel_direction_button_toggled(bool checked) {
 
 // 吸附到分拍线按钮状态切换事件
 void MEditorArea::on_magnet_todivisor_button_toggled(bool checked) {
-  ui->canvas_container->canvas.data()->magnet_to_divisor = checked;
+  ui->canvas_container->canvas.data()->editor->magnet_to_divisor = checked;
 }
 
 // 模式锁定按钮状态切换事件
@@ -191,10 +192,11 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
       double ratio = (double)value / 10000.0;
       auto maptime = (double)(ui->canvas_container->canvas.data()
                                   ->working_map->map_length);
-      ui->canvas_container->canvas.data()->current_time_stamp = maptime * ratio;
-      ui->canvas_container->canvas.data()->current_visual_time_stamp =
-          ui->canvas_container->canvas.data()->current_time_stamp +
-          ui->canvas_container->canvas.data()->static_time_offset;
+      ui->canvas_container->canvas.data()->editor->current_time_stamp =
+          maptime * ratio;
+      ui->canvas_container->canvas.data()->editor->current_visual_time_stamp =
+          ui->canvas_container->canvas.data()->editor->current_time_stamp +
+          ui->canvas_container->canvas.data()->editor->static_time_offset;
       emit progress_pos_changed(maptime * ratio);
     }
   }

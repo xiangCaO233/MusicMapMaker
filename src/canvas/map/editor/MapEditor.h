@@ -1,20 +1,19 @@
-#ifndef M_MAPWORKSPACE_H
-#define M_MAPWORKSPACE_H
+#ifndef M_MAPEDITOR_H
+#define M_MAPEDITOR_H
 
-#include <qpaintdevice.h>
-#include <qpoint.h>
-#include <qtmetamacros.h>
-
+#include <QPointF>
+#include <QRectF>
 #include <memory>
-#include <queue>
-#include <unordered_map>
 #include <unordered_set>
-#include <utility>
 #include <vector>
 
-#include "../mmm/Beat.h"
-#include "../mmm/map/MMap.h"
-#include "GLCanvas.h"
+#include "../../../mmm/Beat.h"
+#include "../../../mmm/hitobject/HitObject.h"
+#include "../../../mmm/timing/Timing.h"
+#include "mmm/map/MMap.h"
+
+class MapWorkspaceCanvas;
+class TextureInstace;
 
 enum class MouseEditMode {
   // 仅预览
@@ -37,40 +36,23 @@ enum class MouseOperationArea {
   INFO,
 };
 
-struct HitEffectFrame {
-  std::shared_ptr<TextureInstace> effect_texture;
-  QRectF effect_bound;
-};
+// 编辑器
+class MapEditor {
+ public:
+  // 构造MapEditor
+  explicit MapEditor(MapWorkspaceCanvas* canvas);
 
-class MapWorkspaceCanvas : public GLCanvas {
-  Q_OBJECT
- protected:
-  // qt事件
-  void mousePressEvent(QMouseEvent *event) override;
-  void mouseReleaseEvent(QMouseEvent *event) override;
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
-  void mouseMoveEvent(QMouseEvent *event) override;
-  void wheelEvent(QWheelEvent *event) override;
-  void keyPressEvent(QKeyEvent *event) override;
-  void keyReleaseEvent(QKeyEvent *event) override;
-  void focusInEvent(QFocusEvent *event) override;
-  void focusOutEvent(QFocusEvent *event) override;
-  void resizeEvent(QResizeEvent *event) override;
-  void paintEvent(QPaintEvent *event) override;
+  // 析构MapEditor
+  virtual ~MapEditor();
 
-  void initializeGL() override;
+  // 画布引用
+  MapWorkspaceCanvas* canvas_ref;
 
-  /*
-   *图形相关
-   */
-  // 打击特效纹理序列
-  std::vector<std::shared_ptr<TextureInstace>> hiteffects;
+  // 画布尺寸
+  QSize canvas_size;
 
-  // 轨道特效帧队列
-  std::unordered_map<int32_t, std::queue<HitEffectFrame>> effects;
-
-  // 实际刷新时间间隔
-  double actual_update_time{0};
+  // 正绑定的图类型
+  MapType map_type;
 
   // 暂停播放
   bool canvas_pasued{true};
@@ -107,6 +89,15 @@ class MapWorkspaceCanvas : public GLCanvas {
   double current_time_area_start{0.0};
   double current_time_area_end{0.0};
 
+  // 编辑区x起始位置
+  double edit_area_start_pos_x;
+
+  // 编辑区宽度
+  double edit_area_width;
+
+  // 轨道数
+  int32_t max_orbit;
+
   // 物件缓存
   std::vector<std::shared_ptr<HitObject>> buffer_objects;
 
@@ -116,19 +107,51 @@ class MapWorkspaceCanvas : public GLCanvas {
   /*
    *编辑相关
    */
+  // 是否悬停在某一物件上
+  bool is_hover_note{false};
+
   // 鼠标悬停位置的物件(若不是面条尾或滑键尾,则bool为true时悬浮位置为头,false时为身)
   std::shared_ptr<std::pair<std::shared_ptr<HitObject>, bool>>
       hover_hitobject_info{nullptr};
 
   // 选中的物件
-  std::unordered_set<std::shared_ptr<HitObject>> selected_hitobjects;
+  // 哈希函数和比较函数
+  struct RawPtrHash {
+    size_t operator()(const std::shared_ptr<HitObject>& ptr) const {
+      return std::hash<HitObject*>()(ptr.get());
+    }
+  };
+
+  struct RawPtrEqual {
+    bool operator()(const std::shared_ptr<HitObject>& lhs,
+                    const std::shared_ptr<HitObject>& rhs) const {
+      return lhs.get() == rhs.get();
+    }
+  };
+  std::unordered_set<std::shared_ptr<HitObject>, RawPtrHash, RawPtrEqual>
+      selected_hitobjects;
 
   // 左键是否按下
   bool mouse_left_pressed{false};
+
+  // 鼠标左键按下时的快照位置
   QPointF mouse_left_press_pos;
 
   // 选中框边框宽度(pix)
   double select_border_width{10};
+
+  // 物件头的纹理
+  std::shared_ptr<TextureInstace> head_texture;
+
+  // 轨道宽度
+  double orbit_width;
+
+  // 依据轨道宽度自动适应物件纹理尺寸
+  // 物件尺寸缩放--相对于纹理尺寸
+  double width_scale;
+
+  // 不大于1--不放大纹理
+  double object_size_scale = std::min(width_scale, 1.0);
 
   // 选中框定位点
   std::shared_ptr<std::pair<QPointF, QPointF>> select_bound_locate_points;
@@ -154,52 +177,6 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 预览区
   QRectF preview_area;
-
-  /*
-   *成员函数
-   */
-  // 更新谱面时间位置
-  void update_mapcanvas_timepos();
-
-  // 绘制判定线
-  void draw_judgeline();
-
-  // 绘制选中框
-  void draw_select_bound();
-
-  // 绘制信息区
-  void draw_infoarea();
-
-  // 绘制拍
-  void draw_beats();
-
-  // 绘制物件
-  void draw_hitobject();
-
-  // 绘制顶部栏
-  void draw_top_bar();
-
-  // 绘制背景
-  void draw_background();
-
-  // 绘制预览
-  void draw_preview_content();
-
- public:
-  // 构造MapWorkspaceCanvas
-  explicit MapWorkspaceCanvas(QWidget *parent = nullptr);
-
-  // 析构MapWorkspaceCanvas
-  ~MapWorkspaceCanvas() override;
-
-  // 分拍线颜色主题
-  std::unordered_map<int32_t, std::vector<QColor>> divisors_color_theme;
-
-  // 正在工作的图
-  std::shared_ptr<MMap> working_map;
-
-  // 正在工作的图类型
-  MapType map_type;
 
   // 当前视觉时间戳
   double current_visual_time_stamp{0};
@@ -233,34 +210,11 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 滚动时吸附到小节线
   bool magnet_to_divisor{false};
 
-  // 切换到指定图
-  void switch_map(std::shared_ptr<MMap> map);
+  // 切换map
+  void switch_map(std::shared_ptr<MMap>& map);
 
-  // 获取暂停状态
-  inline bool &is_paused() { return canvas_pasued; }
-
-  // 渲染实际图形
-  void push_shape() override;
-
-  // 更新fps显示
-  virtual void updateFpsDisplay(int fps) override;
-
- public slots:
-  // 时间控制器暂停按钮触发
-  void on_timecontroller_pause_button_changed(bool paused);
-
-  // 时间控制器播放速度变化
-  void on_timecontroller_speed_changed(double speed);
-
- signals:
-  // 时间戳更新信号
-  void current_time_stamp_changed(double current_time_stamp);
-  // 绝对bpm变化信号
-  void current_absbpm_changed(double bpm);
-  // 时间线速度变化信号
-  void current_timeline_speed_changed(double timeline_speed);
-  // 是否暂停播放信号
-  void pause_signal(bool paused);
+  // 画布更新尺寸
+  void update_size(const QSize& current_canvas_size);
 };
 
-#endif  // M_MAPWORKSPACE_H
+#endif  // M_MAPEDITOR_H

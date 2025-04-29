@@ -73,6 +73,15 @@ MTexturePool::MTexturePool(GLCanvas *canvas, uint32_t layer_width,
     // 绑定纹理到选中的纹理单元
     GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY,
                               current_gl_texture_array_handle));
+    // glTexImage3D(GL_TEXTURE_3D,
+    //              // mipmap 级别
+    //              0,
+    //              // 内部格式
+    //              GL_RGBA, layer_width, layer_height, current_max_layer,
+    //              // 必须为0
+    //              0,
+    //              // 数据格式
+    //              GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 #ifdef __APPLE__
 #else
     // 分配存储空间-先16层

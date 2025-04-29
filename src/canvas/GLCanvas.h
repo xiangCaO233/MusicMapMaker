@@ -85,11 +85,15 @@ class GLCanvas : public QOpenGLWindow,
   // 从指定目录添加纹理
   void load_texture_from_path(const char *path);
 
-  // 添加纹理
-  void add_texture(const char *path);
+  // 从指定目录添加纹理
+  void load_texture_from_path(std::filesystem::path &path);
 
   // 添加纹理
-  void add_texture(std::filesystem::path &path);
+  void add_texture(const char *relative_path, const char *path);
+
+  // 添加纹理
+  void add_texture(std::filesystem::path &relative_path,
+                   std::filesystem::path &path);
 
   // 设置垂直同步
   void set_Vsync(bool flag);

@@ -9,6 +9,11 @@ HoldEnd::HoldEnd(const std::shared_ptr<Hold>& hold)
 
 HoldEnd::~HoldEnd() = default;
 
+// 接收处理
+void HoldEnd::accept_generate(ObjectGenerator& generator) {
+  // 面尾不处理
+};
+
 // 打印用
 std::string HoldEnd::toString() { return ""; }
 

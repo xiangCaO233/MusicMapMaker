@@ -185,11 +185,7 @@ void GLCanvas::initializeGL() {
   // 初始化渲染管理器
   renderer_manager = new RendererManager(this, 64, 65536);
 
-  // 初始化默认纹理
-  load_texture_from_path("../resources/textures/default");
-  // 初始化默认特效
-  // load_texture_from_path("../resources/textures/effects");
-
+  // 启动gl渲染器
   start_render();
 }
 
@@ -275,9 +271,15 @@ void GLCanvas::push_shape() {}
 
 // 从指定目录添加纹理
 void GLCanvas::load_texture_from_path(const char *p) {
-  QString qps(p);
-  QString path = QDir::currentPath() + "/" + qps + "/";
-  QDir dir(path);
+  auto path = std::filesystem::path(p);
+  load_texture_from_path(p);
+}
+
+// 从指定目录添加纹理
+void GLCanvas::load_texture_from_path(std::filesystem::path &path) {
+  QString qps = QString::fromStdString(path.string());
+  QString apath = QDir::currentPath() + "/" + qps + "/";
+  QDir dir(apath);
   if (!dir.exists()) {
     qWarning() << "Directory does not exist:" << path;
     return;
@@ -297,25 +299,28 @@ void GLCanvas::load_texture_from_path(const char *p) {
       if (image_extention.find(extention) != image_extention.end()) {
         std::string filestr = filePath.toStdString();
         auto file = filestr.c_str();
-        add_texture(file);
+        add_texture(apath.toStdString().c_str(), file);
       }
     }
   }
 }
+
 // 设置垂直同步
 void GLCanvas::set_Vsync(bool flag) {
   // 切换V-Sync
   context()->format().setSwapInterval(flag);
 }
 
-void GLCanvas::add_texture(const char *qrc_path) {
-  std::filesystem::path p(qrc_path);
-  add_texture(p);
-}
 // 添加纹理
-void GLCanvas::add_texture(std::filesystem::path &path) {
+void GLCanvas::add_texture(const char *relative_path, const char *qrc_path) {
+  std::filesystem::path p(qrc_path);
+  std::filesystem::path rp(relative_path);
+  add_texture(rp, p);
+}
+void GLCanvas::add_texture(std::filesystem::path &relative_path,
+                           std::filesystem::path &path) {
   // 初始化纹理
-  auto texture = std::make_shared<TextureInstace>(path);
+  auto texture = std::make_shared<TextureInstace>(relative_path, path);
 
   // 检查纹理是否已载入过
   auto texit = texture_full_map.find(texture->name);

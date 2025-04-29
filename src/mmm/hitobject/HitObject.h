@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <string>
 
+class ObjectGenerator;
+
 // 基本打击物件---之后可以实现更多音游的物件
 enum class HitObjectType {
   NOTE,
@@ -35,6 +37,9 @@ class HitObject {
 
   // 物件时间戳
   uint32_t timestamp;
+
+  // 接收处理
+  virtual void accept_generate(ObjectGenerator& generator) = 0;
 
   // 打印用
   virtual std::string toString() = 0;

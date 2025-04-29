@@ -116,8 +116,20 @@ set(PROJECT_SOURCES
   src/canvas/GLCanvas.cpp
   src/canvas/FrameRateCounter.h
   src/canvas/FrameRateCounter.cpp
-  src/canvas/MapWorkspaceCanvas.h
-  src/canvas/MapWorkspaceCanvas.cpp
+  src/canvas/map/MapWorkspaceCanvas.h
+  src/canvas/map/MapWorkspaceCanvas.cpp
+	src/canvas/map/MapWorkspaceSkin.h
+	src/canvas/map/MapWorkspaceSkin.cpp
+	src/canvas/map/editor/MapEditor.h
+	src/canvas/map/editor/MapEditor.cpp
+	src/canvas/map/generator/ObjectGenerator.h
+	src/canvas/map/generator/ObjectGenerator.cpp
+	src/canvas/map/generator/general/NoteGenerator.h
+	src/canvas/map/generator/general/NoteGenerator.cpp
+	src/canvas/map/generator/general/HoldGenerator.h
+	src/canvas/map/generator/general/HoldGenerator.cpp
+	src/canvas/map/generator/general/SlideGenerator.h
+	src/canvas/map/generator/general/SlideGenerator.cpp
   src/canvas/renderer/shader/GLShader.h
   src/canvas/renderer/shader/GLShader.cpp
   src/canvas/renderer/RenderCommand.h
@@ -151,6 +163,7 @@ include_directories(
   ./src/ui/pageui
   ./src/ui/pageui/editorui
   ./src/ui/controllers
+  ./src/canvas/map
   ./src/canvas
   ./src/log)
 

@@ -2,6 +2,8 @@
 
 #include <typeinfo>
 
+#include "../../canvas/map/generator/ObjectGenerator.h"
+
 Note::Note(uint32_t time, int32_t orbit_pos)
     : HitObject(time), orbit(orbit_pos) {
   is_note = true;
@@ -11,6 +13,11 @@ Note::Note(uint32_t time, int32_t orbit_pos)
 }
 
 Note::~Note() {}
+
+// 接收处理
+void Note::accept_generate(ObjectGenerator& generator) {
+  generator.generate(*this);
+};
 
 // 打印用
 std::string Note::toString() { return ""; }

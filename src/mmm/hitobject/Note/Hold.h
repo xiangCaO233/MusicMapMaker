@@ -20,6 +20,9 @@ class Hold : public Note {
   // 持续时间
   uint32_t hold_time;
 
+  // 接收处理
+  void accept_generate(ObjectGenerator& generator) override;
+
   // 打印用
   std::string toString() override;
 

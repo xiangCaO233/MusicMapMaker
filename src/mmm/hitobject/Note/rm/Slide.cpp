@@ -1,6 +1,7 @@
 #include "Slide.h"
 
 #include "../../HitObject.h"
+#include "../../canvas/map/generator/ObjectGenerator.h"
 
 SlideEnd::SlideEnd(const std::shared_ptr<Slide>& head)
     : HitObject(head->timestamp), reference(head.get()) {
@@ -9,6 +10,11 @@ SlideEnd::SlideEnd(const std::shared_ptr<Slide>& head)
 }
 
 SlideEnd::~SlideEnd() = default;
+
+// 接收处理
+void SlideEnd::accept_generate(ObjectGenerator& generator) {
+  // 滑键尾不处理
+}
 
 // 比较器使用
 bool SlideEnd::lessThan(const HitObject* other) const {
@@ -43,6 +49,11 @@ Slide::Slide(uint32_t time, int32_t orbit_pos, int32_t slide_par)
 }
 
 Slide::~Slide() = default;
+
+// 接收处理
+void Slide::accept_generate(ObjectGenerator& generator) {
+  generator.generate(*this);
+}
 
 // 打印用
 std::string Slide::toString() { return ""; }

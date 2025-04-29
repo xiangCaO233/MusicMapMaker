@@ -16,6 +16,9 @@ class HoldEnd : public HitObject {
   // 对应面条物件引用
   Hold* reference;
 
+  // 接收处理
+  void accept_generate(ObjectGenerator& generator) override;
+
   // 打印用
   std::string toString() override;
 

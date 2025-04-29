@@ -16,10 +16,11 @@ class TextureInstace {
  public:
   TextureInstace();
 
-  TextureInstace(std::filesystem::path& path,
+  TextureInstace(std::filesystem::path& relative_path,
+                 std::filesystem::path& path,
                  std::shared_ptr<MTexturePool> preference = nullptr);
 
-  TextureInstace(const char* path,
+  TextureInstace(const char* relative_path, const char* path,
                  std::shared_ptr<MTexturePool> preference = nullptr);
 
   virtual ~TextureInstace();
@@ -94,7 +95,8 @@ class TextureInstace {
   std::shared_ptr<MTexturePool> poolreference;
 
   // 从文件加载
-  void load_from_file(std::filesystem::path& file_path);
+  void load_from_file(std::filesystem::path& relative_path,
+                      std::filesystem::path& file_path);
 };
 
 enum class TextureEffect : uint32_t {

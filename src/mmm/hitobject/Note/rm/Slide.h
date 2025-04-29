@@ -23,6 +23,9 @@ class Slide : public Note {
   // 正右负左,绝对值为滑动的轨道数
   int32_t slide_parameter;
 
+  // 接收处理
+  void accept_generate(ObjectGenerator& generator) override;
+
   // 打印用
   std::string toString() override;
 
@@ -43,6 +46,9 @@ class SlideEnd : public HitObject {
 
   // 对应的滑键引用
   Slide* reference;
+
+  // 接收处理
+  void accept_generate(ObjectGenerator& generator) override;
 
   // 打印用
   std::string toString() override;
