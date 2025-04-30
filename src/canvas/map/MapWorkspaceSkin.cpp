@@ -2,11 +2,13 @@
 
 #include <qlogging.h>
 
+#include <QDir>
 #include <filesystem>
 #include <fstream>
 #include <string>
 
 #include "MapWorkspaceCanvas.h"
+#include "audio/BackgroundAudio.h"
 #include "colorful-log.h"
 
 MapWorkspaceSkin::MapWorkspaceSkin(MapWorkspaceCanvas* canvas) : cvs(canvas) {}
@@ -62,9 +64,25 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
   auto sound_effects_config = skin_config["sounds"];
 
   sound_effects[SoundEffectType::COMMON_HIT] =
-      sound_effects_config.value<std::string>("commonhit", "none");
+      QDir((skin_path /
+            sound_effects_config.value<std::string>("commonhit", "none")))
+          .canonicalPath()
+          .toStdString();
   sound_effects[SoundEffectType::SLIDE] =
-      sound_effects_config.value<std::string>("slidehit", "none");
+      QDir((skin_path /
+            sound_effects_config.value<std::string>("commonhit", "none")))
+          .canonicalPath()
+          .toStdString();
+
+  // 载入key音
+  BackgroundAudio::loadin_audio(
+      QString::fromStdString(
+          (skin_path / sound_effects[SoundEffectType::COMMON_HIT]).string())
+          .toStdString());
+  BackgroundAudio::loadin_audio(
+      QString::fromStdString(
+          (skin_path / sound_effects[SoundEffectType::SLIDE]).string())
+          .toStdString());
 
   // 选中框纹理配置
   selected_config = bg_texture_config["select-border"];
@@ -110,7 +128,9 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
 }
 
 // 获取音效
-std::string& MapWorkspaceSkin::get_sound_effect(SoundEffectType type) {}
+std::string& MapWorkspaceSkin::get_sound_effect(SoundEffectType type) {
+  return sound_effects[type];
+}
 
 // 获取背景的纹理
 std::shared_ptr<TextureInstace>&

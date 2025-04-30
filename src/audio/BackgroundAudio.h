@@ -100,8 +100,35 @@ class BackgroundAudio {
     if (device_idit == audiomanager->get_outdevice_indicies()->end()) return;
     auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
     if (audio_idit == audiomanager->get_handles()->end()) return;
-
     audiomanager->playAudio(device_idit->second, audio_idit->second, false);
+  }
+
+  // 从指定位置播放特定设备音频
+  inline static void play_audio(const std::string& device_full_name,
+                                const std::string& audio_full_path,
+                                double pos) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return;
+    auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
+    if (audio_idit == audiomanager->get_handles()->end()) return;
+    auto& device = audiomanager->get_outdevices()->at(device_idit->second);
+    auto orbit_it =
+        device->player->mixer->audio_orbits.find(audio_idit->second);
+    if (orbit_it == device->player->mixer->audio_orbits.end()) {
+      // 无此音轨-自动添加
+      audiomanager->playAudio(device_idit->second, audio_idit->second, false);
+    } else {
+      // 有此音轨-设置位置后从播放
+      orbit_it->second->playpos =
+          xutil::milliseconds2plannerpcmpos(
+              pos, static_cast<int>(x::Config::samplerate)) *
+          static_cast<int>(x::Config::channel);
+      orbit_it->second->paused = false;
+      if (device->player->paused) {
+        device->player->resume();
+      }
+    }
   }
 
   // 暂停特定设备音频

@@ -649,12 +649,10 @@ void MapWorkspaceCanvas::draw_beats() {
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                                      int32_t frame_count, EffectType etype) {
-  // 听觉
-
-  // 视觉
   std::shared_ptr<TextureInstace> effect_frame_texture;
   switch (etype) {
     case EffectType::NORMAL: {
+      // 视觉
       effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
@@ -665,9 +663,14 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
             texture_full_map[skin.nomal_hit_effect_dir + "/" +
                              std::to_string(i % 30 + 1) + ".png"]);
       }
+      // 听觉
+      BackgroundAudio::play_audio(
+          working_map->project_reference->devicename,
+          skin.get_sound_effect(SoundEffectType::COMMON_HIT), 0);
       break;
     }
     case EffectType::SLIDEARROW: {
+      // 视觉
       effect_frame_texture =
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
@@ -678,6 +681,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
             texture_full_map[skin.slide_hit_effect_dir + "/" +
                              std::to_string(i % 16 + 1) + ".png"]);
       }
+      // 听觉
+      BackgroundAudio::play_audio(working_map->project_reference->devicename,
+                                  skin.get_sound_effect(SoundEffectType::SLIDE),
+                                  0);
       break;
     }
   }
