@@ -86,6 +86,9 @@ class MMap {
   // 全部物件
   std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> hitobjects;
 
+  // 编辑锁
+  std::mutex hitobjects_mutex;
+
   // 用于识别重叠时间域的长条物件缓存表
   std::multiset<std::shared_ptr<Hold>> temp_hold_list;
 

@@ -20,6 +20,7 @@
 #include "generator/AreaInfoGenerator.h"
 #include "generator/BeatGenerator.h"
 #include "generator/ObjectGenerator.h"
+#include "threads/EffectThread.h"
 
 enum class EffectType {
   NORMAL,
@@ -55,9 +56,6 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 时间区域信息生成器
   std::shared_ptr<AreaInfoGenerator> areagenerator;
-
-  // 实际的帧更新时间-qt
-  double actual_update_time{0};
 
   // x位置-特效帧队列
   std::unordered_map<
@@ -101,8 +99,14 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 析构MapWorkspaceCanvas
   ~MapWorkspaceCanvas() override;
 
+  // 实际的帧更新时间-qt
+  double actual_update_time{0};
+
   // 编辑器
   std::shared_ptr<MapEditor> editor;
+
+  // 效果线程
+  std::unique_ptr<EffectThread> effect_thread;
 
   // 正在工作的图
   std::shared_ptr<MMap> working_map;

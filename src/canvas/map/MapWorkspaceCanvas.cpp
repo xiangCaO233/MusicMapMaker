@@ -41,6 +41,11 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
     : skin(this), GLCanvas(parent) {
   // 初始化编辑器
   editor = std::make_shared<MapEditor>(this);
+  // 初始化特效线程
+  effect_thread = std::make_unique<EffectThread>(editor);
+  // 连接信号
+  connect(this, &MapWorkspaceCanvas::pause_signal, effect_thread.get(),
+          &EffectThread::on_canvas_pause);
   // 注册物件生成器
   // 单物件
   objgenerators[NoteType::NOTE] = std::make_shared<NoteGenerator>(editor);
@@ -652,6 +657,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
   std::shared_ptr<TextureInstace> effect_frame_texture;
   switch (etype) {
     case EffectType::NORMAL: {
+      // 听觉
+      // BackgroundAudio::play_audio_with_new_orbit(
+      //     working_map->project_reference->devicename,
+      //     skin.get_sound_effect(SoundEffectType::COMMON_HIT), 0);
       // 视觉
       effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
@@ -663,13 +672,13 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
             texture_full_map[skin.nomal_hit_effect_dir + "/" +
                              std::to_string(i % 30 + 1) + ".png"]);
       }
-      // 听觉
-      BackgroundAudio::play_audio(
-          working_map->project_reference->devicename,
-          skin.get_sound_effect(SoundEffectType::COMMON_HIT), 0);
       break;
     }
     case EffectType::SLIDEARROW: {
+      // 听觉
+      // BackgroundAudio::play_audio_with_new_orbit(
+      //     working_map->project_reference->devicename,
+      //     skin.get_sound_effect(SoundEffectType::SLIDE), 0);
       // 视觉
       effect_frame_texture =
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
@@ -681,10 +690,6 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
             texture_full_map[skin.slide_hit_effect_dir + "/" +
                              std::to_string(i % 16 + 1) + ".png"]);
       }
-      // 听觉
-      BackgroundAudio::play_audio(working_map->project_reference->devicename,
-                                  skin.get_sound_effect(SoundEffectType::SLIDE),
-                                  0);
       break;
     }
   }

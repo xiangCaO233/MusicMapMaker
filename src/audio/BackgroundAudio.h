@@ -1,6 +1,8 @@
 #ifndef M_BACKGROUNDAUDIO_H
 #define M_BACKGROUNDAUDIO_H
 
+#include <util/utils.h>
+
 #include <chrono>
 #include <memory>
 #include <string>
@@ -39,7 +41,7 @@ class BackgroundAudio {
   // 初始化音频管理器
   inline static void init() {
     BackgroundAudio::audiomanager = XAudioManager::newmanager();
-    // XLogger::setlevel(spdlog::level::warn);
+    XLogger::setlevel(spdlog::level::warn);
     // audiomanager->disableLoggin();
   }
 
@@ -59,10 +61,12 @@ class BackgroundAudio {
     auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
     if (audio_idit == audiomanager->get_handles()->end()) return;
     auto& device = audiomanager->get_outdevices()->at(device_idit->second);
-    auto orbit_it =
-        device->player->mixer->audio_orbits.find(audio_idit->second);
-    if (orbit_it == device->player->mixer->audio_orbits.end()) return;
-    orbit_it->second->add_playpos_callback(callback);
+    auto orbits_it = device->player->mixer->audio_orbits.find(
+        audiomanager->get_audios()->at(audio_idit->second));
+    if (orbits_it == device->player->mixer->audio_orbits.end()) return;
+    for (auto& orbit : orbits_it->second) {
+      orbit->add_playpos_callback(callback);
+    }
   }
 
   // 初始化设备
@@ -113,21 +117,47 @@ class BackgroundAudio {
     auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
     if (audio_idit == audiomanager->get_handles()->end()) return;
     auto& device = audiomanager->get_outdevices()->at(device_idit->second);
-    auto orbit_it =
-        device->player->mixer->audio_orbits.find(audio_idit->second);
-    if (orbit_it == device->player->mixer->audio_orbits.end()) {
+    auto orbits_it = device->player->mixer->audio_orbits.find(
+        audiomanager->get_audios()->at(audio_idit->second));
+    if (orbits_it == device->player->mixer->audio_orbits.end()) {
       // 无此音轨-自动添加
       audiomanager->playAudio(device_idit->second, audio_idit->second, false);
     } else {
-      // 有此音轨-设置位置后从播放
-      orbit_it->second->playpos =
-          xutil::milliseconds2plannerpcmpos(
-              pos, static_cast<int>(x::Config::samplerate)) *
-          static_cast<int>(x::Config::channel);
-      orbit_it->second->paused = false;
+      for (auto& orbit : orbits_it->second) {
+        // 有此音源-设置所有轨道位置后从播放
+        orbit->playpos = xutil::milliseconds2plannerpcmpos(
+                             pos, static_cast<int>(x::Config::samplerate)) *
+                         static_cast<int>(x::Config::channel);
+        orbit->paused = false;
+      }
       if (device->player->paused) {
         device->player->resume();
       }
+    }
+  }
+
+  // 从指定位置播放特定设备音频(新建轨道)
+  inline static void play_audio_with_new_orbit(
+      const std::string& device_full_name, const std::string& audio_full_path,
+      double pos) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return;
+    auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
+    if (audio_idit == audiomanager->get_handles()->end()) return;
+    auto audio_it = audiomanager->get_audios()->find(audio_idit->second);
+    if (audio_it == audiomanager->get_audios()->end()) return;
+    auto& device = audiomanager->get_outdevices()->at(device_idit->second);
+    auto orbit = std::make_shared<XAudioOrbit>(audio_it->second);
+    orbit->playpos = xutil::milliseconds2plannerpcmpos(
+                         pos, static_cast<int>(x::Config::samplerate)) *
+                     static_cast<int>(x::Config::channel);
+    // 添加此音轨到播放器
+    device->player->mixer->add_orbit(orbit);
+
+    // 检查是否暂停,自动恢复播放
+    if (device->player->paused) {
+      device->player->resume();
     }
   }
 
@@ -141,6 +171,27 @@ class BackgroundAudio {
     if (audio_idit == audiomanager->get_handles()->end()) return;
 
     audiomanager->pauseAudio(device_idit->second, audio_idit->second);
+  }
+
+  // 获取特定设备音频播放位置-暂停时精确
+  inline static double get_audio_pos(const std::string& device_full_name,
+                                     const std::string& audio_full_path) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return -1;
+    auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
+    if (audio_idit == audiomanager->get_handles()->end()) return -1;
+    auto& device = audiomanager->get_outdevices()->at(device_idit->second);
+    if (!device->player) return 0;
+
+    auto orbitsit = device->player->mixer->audio_orbits.find(
+        audiomanager->get_audios()->at(audio_idit->second));
+    if (orbitsit == device->player->mixer->audio_orbits.end()) return 0;
+
+    for (const auto& orbit : orbitsit->second) {
+      return xutil::plannerpcmpos2milliseconds(
+          orbit->playpos, static_cast<int>(x::Config::samplerate));
+    }
   }
 
   // 设定特定设备音频播放位置
@@ -194,8 +245,10 @@ class BackgroundAudio {
     if (!player) return;
     if (enable_pitch_alt) {
       if (orbit_speed != 1.0) {
-        for (const auto& [id, orbit] : player->mixer->audio_orbits) {
-          orbit->speed = 1.0;
+        for (const auto& [id, orbits] : player->mixer->audio_orbits) {
+          for (auto& orbit : orbits) {
+            orbit->speed = 1.0;
+          }
         }
       }
       if (global_speed != speed_ratio) {
@@ -211,8 +264,10 @@ class BackgroundAudio {
         player->ratio(1.0);
         global_speed = 1.0;
       }
-      for (const auto& [id, orbit] : player->mixer->audio_orbits) {
-        orbit->speed = speed_ratio;
+      for (const auto& [id, orbits] : player->mixer->audio_orbits) {
+        for (auto& orbit : orbits) {
+          orbit->speed = speed_ratio;
+        }
       }
       orbit_speed = speed_ratio;
     }

@@ -112,6 +112,8 @@ set(PROJECT_SOURCES
 	src/ui/infoui/metaui/mmetas.h 
 	src/ui/infoui/metaui/mmetas.cpp 
 	src/ui/infoui/metaui/mmetas.ui
+	src/threads/EffectThread.h
+	src/threads/EffectThread.cpp
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/FrameRateCounter.h
