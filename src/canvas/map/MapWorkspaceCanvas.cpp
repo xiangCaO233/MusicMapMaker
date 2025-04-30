@@ -644,36 +644,32 @@ void MapWorkspaceCanvas::draw_beats() {
 
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
-                                     std::shared_ptr<HitObject> ref,
-                                     EffectType etype) {
+                                     int32_t frame_count, EffectType etype) {
   std::shared_ptr<TextureInstace> effect_frame_texture;
   switch (etype) {
     case EffectType::NORMAL: {
       effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
-      for (int i = 1; i <= 30; ++i) {
+      for (int i = 1; i <= frame_count; ++i) {
         auto w = effect_frame_texture->width * (editor->object_size_scale);
         auto h = effect_frame_texture->height * (editor->object_size_scale);
         effect_frame_queue_map[xpos].emplace(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.nomal_hit_effect_dir + "/" +
-                             std::to_string(i) + ".png"],
-            ref, i == 30);
+                             std::to_string(i % 30 + 1) + ".png"]);
       }
       break;
     }
     case EffectType::SLIDEARROW: {
       effect_frame_texture =
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
-      for (int i = 1; i <= 16; ++i) {
+      for (int i = 1; i <= frame_count; ++i) {
+        auto w = effect_frame_texture->width * (editor->object_size_scale);
+        auto h = effect_frame_texture->height * (editor->object_size_scale);
         effect_frame_queue_map[xpos].emplace(
-            QRectF(xpos - effect_frame_texture->width / 8.0,
-                   ypos - effect_frame_texture->height / 8.0,
-                   effect_frame_texture->width / 4.0,
-                   effect_frame_texture->height / 4.0),
+            QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.slide_hit_effect_dir + "/" +
-                             std::to_string(i) + ".png"],
-            ref, i == 16);
+                             std::to_string(i % 16 + 1) + ".png"]);
       }
       break;
     }
@@ -709,6 +705,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
     // 画布引用
     auto canvas = this;
     if (!played_effects_objects.contains(obj)) {
+      // 经过判定线
       if (std::abs(obj->timestamp - editor->current_visual_time_stamp) <
           des_update_time * 2) {
         // 播放物件添加到的位置
@@ -716,76 +713,53 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
         // 播放线程
         playthread = std::thread([=]() {
-          auto px = x;
+          auto play_x = x;
+          // 特效类型
           EffectType t;
+          // 特效帧数
+          int32_t frames;
           if (note) {
             switch (note->note_type) {
               case NoteType::SLIDE: {
+                if (note->compinfo != ComplexInfo::NONE &&
+                    note->compinfo != ComplexInfo::END)
+                  return;
+
                 t = EffectType::SLIDEARROW;
-                px += (std::static_pointer_cast<Slide>(note))->slide_parameter *
-                      ow;
+                play_x +=
+                    (std::static_pointer_cast<Slide>(note))->slide_parameter *
+                    ow;
+                frames = 16;
                 break;
               }
               default: {
                 t = EffectType::NORMAL;
+                frames = 30;
                 break;
               }
             }
-            canvas->play_effect(px,
+            if (note->note_type == NoteType::HOLD) {
+              auto hold = std::static_pointer_cast<Hold>(note);
+              frames = hold->hold_time / canvas->des_update_time * 2;
+            }
+
+            canvas->play_effect(play_x,
                                 canvas->size().height() *
                                     (1 - canvas->editor->judgeline_position),
-                                note, t);
+                                frames, t);
           }
         });
         playthread.detach();
       }
-    } else {
-      // 播放过的物件
-      if (note->note_type == NoteType::HOLD) {
-        // 如果是长条,播放过
-        auto hold = std::static_pointer_cast<Hold>(note);
-        static bool is_waiting{false};
-        if (editor->current_time_stamp > hold->timestamp + hold->hold_time) {
-          // 移除播放
-          played_effects_objects.erase(played_effects_objects.find(hold));
-          // TODO(xiang 2025-04-30): 数据竞争
-          // 清理剩余动画帧
-          // std::thread clear_thread([&]() {
-          //  while (!effect_frame_queue_map[x].empty()) {
-          //    effect_frame_queue_map[x].pop();
-          //  }
-          // });
-          // clear_thread.detach();
-          is_waiting = false;
-        } else {
-          if (!is_waiting) {
-            // 启动播放线程再播放一遍
-            std::thread holdplaythread = std::thread([=]() {
-              auto px = x;
-              is_waiting = true;
-              while (hold && hold->effect_play_over) {
-                std::this_thread::yield();
-              }
-              hold->effect_play_over = false;
-              canvas->play_effect(px,
-                                  canvas->size().height() *
-                                      (1 - canvas->editor->judgeline_position),
-                                  note, EffectType::NORMAL);
-              is_waiting = false;
-            });
-            holdplaythread.detach();
-          }
-        }
-      }
     }
-    // 经过判定线
-
-    // 生成物件
-    auto &generator = objgenerators[note->note_type];
-    generator->generate(obj);
-    if (note->note_type == NoteType::NOTE) {
-      // 除单键外的物件已经处理了头
-      generator->object_enqueue();
+    if (note) {
+      // 生成物件
+      const auto &generator = objgenerators[note->note_type];
+      generator->generate(obj);
+      if (note->note_type == NoteType::NOTE) {
+        // 除单键外的物件已经处理了头
+        generator->object_enqueue();
+      }
     }
   }
 
@@ -839,18 +813,18 @@ void MapWorkspaceCanvas::push_shape() {
   }
   for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
     if (!effect_frame_queue.empty()) {
-      renderer_manager->addRect(effect_frame_queue.front().frame_bound,
-                                effect_frame_queue.front().texture,
+      renderer_manager->addRect(effect_frame_queue.front().first,
+                                effect_frame_queue.front().second,
                                 QColor(255, 182, 193, 240), 0, true);
-      if (effect_frame_queue.front().is_last_frame) {
-        auto note =
-            std::static_pointer_cast<Note>(effect_frame_queue.front().obj_ref);
-        if (note->note_type == NoteType::HOLD) {
-          std::static_pointer_cast<Hold>(note)->effect_play_over = true;
-        }
-      }
+      // if (effect_frame_queue.front().is_last_frame) {
+      //   auto note =
+      //       std::static_pointer_cast<Note>(effect_frame_queue.front().obj_ref);
+      //   if (note->note_type == NoteType::HOLD) {
+      //     std::static_pointer_cast<Hold>(note)->effect_play_over = true;
+      //   }
+      // }
       // 弹出队首
-      effect_frame_queue.pop();
+      if (!effect_frame_queue.empty()) effect_frame_queue.pop();
     }
   }
   draw_select_bound();
