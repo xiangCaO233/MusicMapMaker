@@ -58,6 +58,14 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
 
   right_slide_end_texture_config = object_texture_config["slide"]["arrowright"];
 
+  // 音效配置
+  auto sound_effects_config = skin_config["sounds"];
+
+  sound_effects[SoundEffectType::COMMON_HIT] =
+      sound_effects_config.value<std::string>("commonhit", "none");
+  sound_effects[SoundEffectType::SLIDE] =
+      sound_effects_config.value<std::string>("slidehit", "none");
+
   // 选中框纹理配置
   selected_config = bg_texture_config["select-border"];
 
@@ -100,6 +108,9 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
   //   }
   // }
 }
+
+// 获取音效
+std::string& MapWorkspaceSkin::get_sound_effect(SoundEffectType type) {}
 
 // 获取背景的纹理
 std::shared_ptr<TextureInstace>&

@@ -139,10 +139,13 @@ class MapWorkspaceCanvas : public GLCanvas {
  signals:
   // 时间戳更新信号
   void current_time_stamp_changed(double current_time_stamp);
+
   // 绝对bpm变化信号
   void current_absbpm_changed(double bpm);
+
   // 时间线速度变化信号
   void current_timeline_speed_changed(double timeline_speed);
+
   // 选中物件的信号
   void select_object(std::shared_ptr<Beat> beatinfo,
                      std::shared_ptr<HitObject> obj,

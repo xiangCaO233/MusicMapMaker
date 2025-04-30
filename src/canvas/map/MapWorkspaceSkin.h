@@ -18,6 +18,18 @@ class MapWorkspaceCanvas;
 
 using json = nlohmann::json;
 
+// 音效类型
+enum SoundEffectType {
+  // 正常击中
+  COMMON_HIT,
+  // 滑动
+  SLIDE,
+  // 长条按住
+  HOLDING,
+  // 长条释放
+  HOLD_RELEASE,
+};
+
 // 物件状态
 enum ObjectStatus {
   COMMON,
@@ -111,6 +123,9 @@ class MapWorkspaceSkin {
   // 击中特效纹理配置
   json hit_effect_config;
 
+  // 音效表
+  std::unordered_map<SoundEffectType, std::string> sound_effects;
+
   // 特效纹理目录
   std::string nomal_hit_effect_dir;
   std::string slide_hit_effect_dir;
@@ -138,6 +153,9 @@ class MapWorkspaceSkin {
   // 获取物件的纹理
   std::shared_ptr<TextureInstace>& get_object_texture(TexType type,
                                                       ObjectStatus status);
+
+  // 获取音效
+  std::string& get_sound_effect(SoundEffectType type);
 };
 
 #endif  // M_MAPWORKSPACE_PALLETE_H

@@ -109,12 +109,10 @@ void AreaInfoGenerator::generate() {
     processing_pos -= beat_distance;
   }
 
-  if (editor_ref->show_timeline) {
-    // 清除拍缓存
-    editor_ref->current_beats.clear();
-    // 更新拍列表
-    editor_ref->canvas_ref->working_map->query_beat_in_range(
-        editor_ref->current_beats, int32_t(editor_ref->current_time_area_start),
-        int32_t(editor_ref->current_time_area_end));
-  }
+  // 清除拍缓存
+  editor_ref->current_beats.clear();
+  // 更新拍列表
+  editor_ref->canvas_ref->working_map->query_beat_in_range(
+      editor_ref->current_beats, int32_t(editor_ref->current_time_area_start),
+      int32_t(editor_ref->current_time_area_end));
 }

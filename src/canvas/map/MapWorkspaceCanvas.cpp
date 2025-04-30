@@ -649,6 +649,9 @@ void MapWorkspaceCanvas::draw_beats() {
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                                      int32_t frame_count, EffectType etype) {
+  // 听觉
+
+  // 视觉
   std::shared_ptr<TextureInstace> effect_frame_texture;
   switch (etype) {
     case EffectType::NORMAL: {

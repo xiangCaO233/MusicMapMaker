@@ -60,9 +60,6 @@ class MapEditor {
   // 播放速度
   double playspeed{1.0f};
 
-  // 显示时间线选项
-  bool show_timeline{true};
-
   // 参考bpm
   std::unique_ptr<double> preference_bpm = nullptr;
 
@@ -154,7 +151,7 @@ class MapEditor {
   double width_scale;
 
   // 不大于1--不放大纹理
-  double object_size_scale = std::min(width_scale, 1.0);
+  double object_size_scale;
 
   // 选中框定位点
   std::shared_ptr<std::pair<QPointF, QPointF>> select_bound_locate_points;
