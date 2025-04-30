@@ -2,9 +2,11 @@
 #define M_HITOBJECT_H
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 class ObjectGenerator;
+class Beat;
 
 // 基本打击物件---之后可以实现更多音游的物件
 enum class HitObjectType {
@@ -36,7 +38,13 @@ class HitObject {
   bool is_hold_end{false};
 
   // 物件时间戳
-  uint32_t timestamp;
+  int32_t timestamp;
+
+  // 拍信息
+  std::shared_ptr<Beat> beatinfo;
+
+  // 位置
+  int32_t divpos{0};
 
   // 接收处理
   virtual void accept_generate(ObjectGenerator& generator) = 0;
@@ -46,6 +54,18 @@ class HitObject {
 
   // 比较器使用
   virtual bool lessThan(const HitObject* other) const = 0;
+};
+
+// 物件比较器
+struct HitObjectComparator {
+  bool operator()(const std::shared_ptr<HitObject>& a,
+                  const std::shared_ptr<HitObject>& b) const {
+    if (a->timestamp != b->timestamp) {
+      return a->timestamp < b->timestamp;
+    } else {
+      return a->object_type > b->object_type;
+    }
+  }
 };
 
 #endif  // M_HITOBJECT_H

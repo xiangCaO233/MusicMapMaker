@@ -20,6 +20,7 @@ struct ObjectRenderData {
   double h;
   std::shared_ptr<TextureInstace> tex;
   std::shared_ptr<HitObject> objref;
+  bool is_over_current_time{false};
 };
 
 class ObjectGenerator {
@@ -40,7 +41,7 @@ class ObjectGenerator {
   std::shared_ptr<MapEditor> editor_ref;
 
   // 转移全部缓存节点到队列中
-  void dump_nodes_to_queue();
+  void dump_nodes_to_queue(bool is_over_current_time = false);
 
   // 生成物件渲染指令
   void generate(const std::shared_ptr<HitObject>& hitobject);

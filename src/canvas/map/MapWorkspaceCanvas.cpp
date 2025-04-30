@@ -17,7 +17,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
-#include <random>
 #include <set>
 #include <string>
 #include <thread>
@@ -156,8 +155,13 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
       }
 
       // 发送更新选中物件信号
-      emit select_object(editor->hover_hitobject_info->first,
-                         editor->current_abs_timing);
+      if (editor->hover_hitobject_info) {
+        emit select_object(editor->hover_hitobject_info->second,
+                           editor->hover_hitobject_info->first,
+                           editor->current_abs_timing);
+      } else {
+        emit select_object(nullptr, nullptr, nullptr);
+      }
       break;
     }
     case Qt::MouseButton::RightButton: {
@@ -729,18 +733,19 @@ void MapWorkspaceCanvas::draw_hitobject() {
                 play_x +=
                     (std::static_pointer_cast<Slide>(note))->slide_parameter *
                     ow;
-                frames = 16;
+                frames = 16 * (1 / canvas->editor->playspeed);
                 break;
               }
               default: {
                 t = EffectType::NORMAL;
-                frames = 30;
+                frames = 30 * (1 / canvas->editor->playspeed);
                 break;
               }
             }
             if (note->note_type == NoteType::HOLD) {
               auto hold = std::static_pointer_cast<Hold>(note);
-              frames = hold->hold_time / canvas->des_update_time * 2;
+              frames = hold->hold_time / canvas->des_update_time * 2 *
+                       (1 / canvas->editor->playspeed);
             }
 
             canvas->play_effect(play_x,
@@ -771,16 +776,18 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 按计算层级渲染图形
   while (!ObjectGenerator::shape_queue.empty()) {
     auto &shape = ObjectGenerator::shape_queue.front();
+    if (shape.is_over_current_time) {
+      renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
+    }
 
     if (!editor->canvas_pasued && shape.objref &&
         shape.objref->timestamp <= editor->current_time_stamp) {
       // 播放中且过了判定线时间使用半透明效果
       renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
-    } else {
-      renderer_manager->texture_effect = TextureEffect::NONE;
     }
     renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
                               shape.tex, QColor(0, 0, 0, 255), 0, true);
+    renderer_manager->texture_effect = TextureEffect::NONE;
     ObjectGenerator::shape_queue.pop();
   }
 

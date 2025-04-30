@@ -117,43 +117,84 @@
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
         <source>object info</source>
-        <translation type="unfinished"></translation>
+        <translation>Object info</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="68"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="68"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="134"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
+        <source>Object type:</source>
+        <translation>Object type:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="176"/>
         <source>timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Timestamp</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="119"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="119"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="230"/>
+        <source>orbit:</source>
+        <translation>Orbit:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="320"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="227"/>
         <source>divisor position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Divisor position:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="159"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="159"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="368"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="275"/>
         <source>nearest timing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nearest timing:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="214"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="214"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="423"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="330"/>
         <source>time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Time:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="299"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="299"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="527"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="434"/>
         <source>go to this timing position</source>
-        <translation type="unfinished"></translation>
+        <translation>Go to this timing position</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="339"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="339"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="567"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="474"/>
         <source>map metadatas</source>
-        <translation type="unfinished"></translation>
+        <translation>Map metadatas</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="47"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="28"/>
+        <source>Note</source>
+        <translation>Note</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="56"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="35"/>
+        <source>Hold</source>
+        <translation>Hold</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="60"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="39"/>
+        <source>Slide</source>
+        <translation>Slide</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="64"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="43"/>
+        <source>Unknown</source>
+        <translation>Unknown</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="76"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="54"/>
+        <source>Hold time:</source>
+        <translation>Hold time:</translation>
     </message>
 </context>
 <context>
@@ -402,8 +443,8 @@
         <translation>Insane</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="54"/>
-        <location filename="../src/ui/mainwindow.cpp" line="54"/>
+        <location filename="../src/ui/mainwindow.cpp" line="60"/>
+        <location filename="../src/ui/mainwindow.cpp" line="60"/>
         <source>Music Map Maker -</source>
         <translation>Music Map Maker -&gt;</translation>
     </message>

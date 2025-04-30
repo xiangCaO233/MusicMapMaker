@@ -113,8 +113,8 @@ class MapEditor {
   // 是否悬停在某一物件上
   bool is_hover_note{false};
 
-  // 鼠标悬停位置的物件(若不是面条尾或滑键尾,则bool为true时悬浮位置为头,false时为身)
-  std::shared_ptr<std::pair<std::shared_ptr<HitObject>, bool>>
+  // 鼠标悬停位置的物件-物件所在拍的指针
+  std::shared_ptr<std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>
       hover_hitobject_info{nullptr};
 
   // 选中的物件

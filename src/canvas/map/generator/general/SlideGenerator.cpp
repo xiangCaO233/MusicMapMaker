@@ -98,9 +98,9 @@ void SlideGenerator::generate(Slide& slide) {
     // 使用hover纹理
     slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::HOVER);
-    editor_ref->hover_hitobject_info =
-        std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(slide_ptr,
-                                                                      false);
+    editor_ref->hover_hitobject_info = std::make_shared<
+        std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+        slide_ptr, slide.beatinfo);
     editor_ref->is_hover_note = true;
   } else {
     if (slide_blody_in_select_bound ||
@@ -112,7 +112,7 @@ void SlideGenerator::generate(Slide& slide) {
           TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::SELECTED);
       // 发送更新选中物件信号
       emit editor_ref->canvas_ref->select_object(
-          objref, editor_ref->current_abs_timing);
+          objref->beatinfo, slide_ptr, editor_ref->current_abs_timing);
     } else {
       // 使用常规纹理
       slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -148,9 +148,9 @@ void SlideGenerator::generate(Slide& slide) {
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->hover_hitobject_info =
-            std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-                slide.slide_end_reference, true);
+        editor_ref->hover_hitobject_info = std::make_shared<
+            std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+            slide.slide_end_reference, objref->beatinfo);
         editor_ref->is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||
@@ -161,7 +161,7 @@ void SlideGenerator::generate(Slide& slide) {
           actual_use_end_texture = slide_end_selected_texture;
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              objref, editor_ref->current_abs_timing);
+              objref->beatinfo, slide_ptr, editor_ref->current_abs_timing);
         } else {
           // 使用常规纹理
           actual_use_end_texture = slide_end_texture;
@@ -189,14 +189,15 @@ void SlideGenerator::generate(Slide& slide) {
     }
     case ComplexInfo::END: {
       // 补齐节点,画个尾
-      dump_nodes_to_queue();
+      // 滑键是否完全过了当前时间
+      dump_nodes_to_queue(slide.timestamp < editor_ref->current_time_stamp);
 
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->hover_hitobject_info =
-            std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-                slide.slide_end_reference, true);
+        editor_ref->hover_hitobject_info = std::make_shared<
+            std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+            slide.slide_end_reference, slide.beatinfo);
         editor_ref->is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||
@@ -207,7 +208,7 @@ void SlideGenerator::generate(Slide& slide) {
           actual_use_end_texture = slide_end_selected_texture;
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              objref, editor_ref->current_abs_timing);
+              objref->beatinfo, slide_ptr, editor_ref->current_abs_timing);
         } else {
           // 使用常规纹理
           actual_use_end_texture = slide_end_texture;

@@ -114,4 +114,7 @@ void MainWindow::use_theme(GlobalTheme theme) {
 
   // 设置page主题
   ui->page_widget->use_theme(theme);
+
+  // 设置info主题
+  ui->infomation_widget->use_theme(theme);
 }

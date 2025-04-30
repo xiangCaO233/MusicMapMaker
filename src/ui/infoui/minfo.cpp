@@ -8,3 +8,6 @@ MInfo::MInfo(QWidget *parent) : QWidget(parent), ui(new Ui::MInfo) {
 }
 
 MInfo::~MInfo() { delete ui; }
+
+// 使用主题
+void MInfo::use_theme(GlobalTheme theme) { ui->mapmeta_edit->use_theme(theme); }

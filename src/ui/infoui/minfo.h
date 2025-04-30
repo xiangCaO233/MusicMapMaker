@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class MMetas;
+enum class GlobalTheme;
 
 namespace Ui {
 class MInfo;
@@ -16,6 +17,12 @@ class MInfo : public QWidget {
   explicit MInfo(QWidget *parent = nullptr);
   ~MInfo();
   MMetas *mmetas;
+
+  // 当前主题
+  GlobalTheme current_theme;
+
+  // 使用主题
+  void use_theme(GlobalTheme theme);
 
  private:
   Ui::MInfo *ui;

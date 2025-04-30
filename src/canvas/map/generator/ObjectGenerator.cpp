@@ -1,5 +1,7 @@
 #include "ObjectGenerator.h"
 
+#include <memory>
+
 #include "../MapWorkspaceCanvas.h"
 #include "../editor/MapEditor.h"
 #include "mmm/hitobject/Note/Note.h"
@@ -18,7 +20,7 @@ ObjectGenerator::ObjectGenerator(std::shared_ptr<MapEditor>& editor)
 ObjectGenerator::~ObjectGenerator() = default;
 
 // 转移全部缓存节点到队列中
-void ObjectGenerator::dump_nodes_to_queue() {
+void ObjectGenerator::dump_nodes_to_queue(bool is_over_current_time) {
   for (const auto& [notereference, noderect] : temp_node_map) {
     auto is_node_hover = noderect.contains(editor_ref->canvas_ref->mouse_pos);
     auto is_node_in_selected_bound =
@@ -29,15 +31,16 @@ void ObjectGenerator::dump_nodes_to_queue() {
     if (is_node_hover) {
       // 使用hover纹理
       // 将node直接加入当前队列
-      shape_queue.emplace(noderect.x(), noderect.y(), noderect.width(),
-                          noderect.height(),
-                          editor_ref->canvas_ref->skin.get_object_texture(
-                              TexType::NODE, ObjectStatus::HOVER));
+      shape_queue.emplace(
+          noderect.x(), noderect.y(), noderect.width(), noderect.height(),
+          editor_ref->canvas_ref->skin.get_object_texture(TexType::NODE,
+                                                          ObjectStatus::HOVER),
+          nullptr, is_over_current_time && !editor_ref->canvas_pasued);
 
       // 选中组合键的节点(节点是相当于那一物件的尾)
-      editor_ref->hover_hitobject_info =
-          std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-              notereference, true);
+      editor_ref->hover_hitobject_info = std::make_shared<
+          std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+          notereference, notereference->beatinfo);
       editor_ref->is_hover_note = true;
     } else if (is_node_in_selected_bound ||
                noteref_selectit != editor_ref->selected_hitobjects.end()) {
@@ -45,17 +48,19 @@ void ObjectGenerator::dump_nodes_to_queue() {
       editor_ref->selected_hitobjects.emplace(notereference);
       // 使用选中纹理
       // 将node直接加入当前队列
-      shape_queue.emplace(noderect.x(), noderect.y(), noderect.width(),
-                          noderect.height(),
-                          editor_ref->canvas_ref->skin.get_object_texture(
-                              TexType::NODE, ObjectStatus::SELECTED));
+      shape_queue.emplace(
+          noderect.x(), noderect.y(), noderect.width(), noderect.height(),
+          editor_ref->canvas_ref->skin.get_object_texture(
+              TexType::NODE, ObjectStatus::SELECTED),
+          nullptr, is_over_current_time && !editor_ref->canvas_pasued);
     } else {
       // 使用常规纹理
       // 将node直接加入当前队列
-      shape_queue.emplace(noderect.x(), noderect.y(), noderect.width(),
-                          noderect.height(),
-                          editor_ref->canvas_ref->skin.get_object_texture(
-                              TexType::NODE, ObjectStatus::COMMON));
+      shape_queue.emplace(
+          noderect.x(), noderect.y(), noderect.width(), noderect.height(),
+          editor_ref->canvas_ref->skin.get_object_texture(TexType::NODE,
+                                                          ObjectStatus::COMMON),
+          nullptr, is_over_current_time && !editor_ref->canvas_pasued);
     }
   }
   // 并清空节点缓存

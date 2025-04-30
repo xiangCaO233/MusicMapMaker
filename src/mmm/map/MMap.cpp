@@ -1,6 +1,7 @@
 #include "MMap.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <memory>
 #include <vector>
 
@@ -28,15 +29,16 @@ void MMap::generate_divisor_policy(const std::shared_ptr<Beat>& beat) {
     // 没有物件,默认1分
     beat->divisors = 1;
   } else {
-    std::set<double> timestamps;
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> objs;
     for (const auto& note : notes) {
-      // set自动排序+去重
-      timestamps.insert(note->timestamp);
+      // 设置拍引用
+      note->beatinfo = beat;
+      // set自动排序
+      objs.insert(note);
     }
+
     // 允许5ms误差
-    beat->divisors = mutil::calculateDivisionStrategy(
-        timestamps, beat->start_timestamp,
-        beat->end_timestamp - beat->start_timestamp, 5);
+    beat->divisors = mutil::calculateDivisionStrategy(objs, beat, 5);
   }
 }
 
@@ -312,6 +314,23 @@ void MMap::query_object_in_range(
 
   // 窗口内的物件
   auto startit = hitobjects.lower_bound(std::make_shared<Note>(start, 0));
+  int count = 0;
+  int deviation = 0;
+  while (startit != hitobjects.end() && startit != hitobjects.begin() &&
+         deviation < 5) {
+    --startit;
+    ++count;
+    deviation = std::abs((*startit)->timestamp - start);
+    if (deviation < 5) {
+      adding_objects.insert(*startit);
+    }
+  }
+
+  // 返回
+  while (count > 0) {
+    ++startit;
+    --count;
+  }
 
   ComplexNote* temp_comp = nullptr;
 

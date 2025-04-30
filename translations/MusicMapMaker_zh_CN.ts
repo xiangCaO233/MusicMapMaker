@@ -120,40 +120,81 @@
         <translation>物件信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="68"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="68"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="134"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
+        <source>Object type:</source>
+        <translation>类型:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="176"/>
         <source>timestamp</source>
         <translation>时间戳</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="119"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="119"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="230"/>
+        <source>orbit:</source>
+        <translation>轨道:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="320"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="227"/>
         <source>divisor position:</source>
         <translation>分拍位置:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="159"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="159"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="368"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="275"/>
         <source>nearest timing:</source>
         <translation>参考时间点:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="214"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="214"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="423"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="330"/>
         <source>time:</source>
         <translation>时间:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="299"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="299"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="527"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="434"/>
         <source>go to this timing position</source>
         <translation>去此时间点处</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="339"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="339"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="567"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="474"/>
         <source>map metadatas</source>
         <translation>谱面元数据表</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="47"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="28"/>
+        <source>Note</source>
+        <translation>单键</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="56"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="35"/>
+        <source>Hold</source>
+        <translation>长条</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="60"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="39"/>
+        <source>Slide</source>
+        <translation>滑键</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="64"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="43"/>
+        <source>Unknown</source>
+        <translation>未知</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="76"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="54"/>
+        <source>Hold time:</source>
+        <translation>持续:</translation>
     </message>
 </context>
 <context>
@@ -402,8 +443,8 @@
         <translation>疯狂</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="54"/>
-        <location filename="../src/ui/mainwindow.cpp" line="54"/>
+        <location filename="../src/ui/mainwindow.cpp" line="60"/>
+        <location filename="../src/ui/mainwindow.cpp" line="60"/>
         <source>Music Map Maker -</source>
         <translation>音游谱面制作器 -&gt;</translation>
     </message>

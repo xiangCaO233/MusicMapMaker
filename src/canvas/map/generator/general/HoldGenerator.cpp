@@ -1,5 +1,7 @@
 #include "HoldGenerator.h"
 
+#include <memory>
+
 #include "../../../../mmm/hitobject/Note/Hold.h"
 #include "../../../../mmm/hitobject/Note/HoldEnd.h"
 #include "../../MapWorkspaceCanvas.h"
@@ -79,9 +81,9 @@ void HoldGenerator::generate(Hold &hold) {
   if (is_hover_body) {
     hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::HOLD_BODY_VERTICAL, ObjectStatus::HOVER);
-    editor_ref->hover_hitobject_info =
-        std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(hold_ptr,
-                                                                      false);
+    editor_ref->hover_hitobject_info = std::make_shared<
+        std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+        hold_ptr, hold.beatinfo);
     editor_ref->is_hover_note = true;
   } else {
     if (body_in_select_bound ||
@@ -92,7 +94,7 @@ void HoldGenerator::generate(Hold &hold) {
           TexType::HOLD_BODY_VERTICAL, ObjectStatus::SELECTED);
       // 发送更新选中物件信号
       emit editor_ref->canvas_ref->select_object(
-          objref, editor_ref->current_abs_timing);
+          hold.beatinfo, hold_ptr, editor_ref->current_abs_timing);
     } else {
       // 使用默认纹理
       hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -130,9 +132,9 @@ void HoldGenerator::generate(Hold &hold) {
         // 使用hover纹理
         hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
             TexType::HOLD_END, ObjectStatus::HOVER);
-        editor_ref->hover_hitobject_info =
-            std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-                hold_ptr, true);
+        editor_ref->hover_hitobject_info = std::make_shared<
+            std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+            hold_ptr, hold.beatinfo);
         editor_ref->is_hover_note = true;
       } else {
         if (hold_end_in_select_bound ||
@@ -144,7 +146,7 @@ void HoldGenerator::generate(Hold &hold) {
               TexType::HOLD_END, ObjectStatus::SELECTED);
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              objref, editor_ref->current_abs_timing);
+              hold.beatinfo, hold_ptr, editor_ref->current_abs_timing);
         } else {
           // 使用普通纹理
           hold_end_texture = long_note_end_texture;
@@ -174,7 +176,10 @@ void HoldGenerator::generate(Hold &hold) {
     }
     case ComplexInfo::END: {
       // 补齐节点,画个尾
-      dump_nodes_to_queue();
+
+      // 面条是否完全过了当前时间
+      dump_nodes_to_queue(hold.hold_end_reference->timestamp <
+                          editor_ref->current_time_stamp);
 
       // 再添加个面尾图形到队列
       if (is_hover_hold_end) {
@@ -182,9 +187,9 @@ void HoldGenerator::generate(Hold &hold) {
         hold_vert_body_texture =
             editor_ref->canvas_ref->skin.get_object_texture(
                 TexType::HOLD_END, ObjectStatus::HOVER);
-        editor_ref->hover_hitobject_info =
-            std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(
-                hold_ptr, true);
+        editor_ref->hover_hitobject_info = std::make_shared<
+            std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+            hold_ptr, hold.beatinfo);
         editor_ref->is_hover_note = true;
       } else {
         if (hold_end_in_select_bound ||
@@ -196,7 +201,7 @@ void HoldGenerator::generate(Hold &hold) {
               TexType::HOLD_END, ObjectStatus::SELECTED);
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              objref, editor_ref->current_abs_timing);
+              hold.beatinfo, objref, editor_ref->current_abs_timing);
         } else {
           // 使用普通纹理
           hold_end_texture = long_note_end_texture;

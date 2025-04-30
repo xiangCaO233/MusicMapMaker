@@ -83,18 +83,6 @@ class MMap {
   // 谱面时长--计算
   int32_t map_length = 0;
 
-  // 物件比较器
-  struct HitObjectComparator {
-    bool operator()(const std::shared_ptr<HitObject>& a,
-                    const std::shared_ptr<HitObject>& b) const {
-      if (a->timestamp != b->timestamp) {
-        return a->timestamp < b->timestamp;
-      } else {
-        return a->object_type > b->object_type;
-      }
-    }
-  };
-
   // 全部物件
   std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> hitobjects;
 

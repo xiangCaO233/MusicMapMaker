@@ -14,12 +14,16 @@
 #include <QPainter>
 #include <QSvgRenderer>
 #include <QtSvgWidgets/QSvgWidget>
+#include <memory>
 #include <string>
 
 #ifdef _WIN32
 #define NOMINMAX
 #include <Windows.h>
 #endif
+
+#include "../mmm/Beat.h"
+#include "../mmm/hitobject/HitObject.h"
 
 namespace mutil {
 #ifdef _WIN32
@@ -68,50 +72,53 @@ inline void string2u32sring(const std::string& src, std::u32string& des) {
 inline bool isApproxEqual(double a, double b, double tolerance) {
   return std::abs(a - b) <= tolerance;
 }
+// 计算分音策略(2~64)并在找到有效策略时设置divpos
+inline int calculateDivisionStrategy(
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>& hitobjects,
+    const std::shared_ptr<Beat>& beat, double tolerance) {
+  auto beat_length = beat->end_timestamp - beat->start_timestamp;
+  if (hitobjects.empty() || beat_length <= 0) return 1;
 
-// 计算分音策略(2~64)
-inline int calculateDivisionStrategy(const std::set<double>& timestamps,
-                                     double beat_start, double beat_length,
-                                     double tolerance) {
-  if (timestamps.empty() || beat_length <= 0) return 1;
-
-  double beat_end = beat_start + beat_length;
-  std::vector<double> current_beat_timestamps;
-
-  // 收集当前拍内的时间戳 [beat_start, beat_end)
-  for (double ts : timestamps) {
-    if (ts >= beat_start && ts < beat_end) {
-      current_beat_timestamps.push_back(ts);
+  // 收集当前拍内的所有物件(包括重复时间戳的) [beat_start, beat_end)
+  std::vector<std::shared_ptr<HitObject>> current_beat_objects;
+  for (const auto& obj : hitobjects) {
+    if (obj->timestamp >= beat->start_timestamp &&
+        obj->timestamp < beat->end_timestamp) {
+      current_beat_objects.push_back(obj);
     }
   }
-  if (current_beat_timestamps.empty()) return 1;
+  if (current_beat_objects.empty()) return 1;
 
   // 从最小分音数开始检查（2到64）
   for (int n = 2; n <= 64; ++n) {
     bool valid = true;
     double sub_beat = beat_length / n;
 
-    // 生成当前拍的分音点
-    std::vector<double> subdivisions;
-    for (int k = 0; k < n; ++k) {
-      subdivisions.push_back(beat_start + k * sub_beat);
-    }
+    // 临时存储divpos值，验证通过后再设置
+    std::unordered_map<std::shared_ptr<HitObject>, int32_t> divpos_map;
 
-    // 检查所有时间戳是否对齐分音点
-    for (double ts : current_beat_timestamps) {
-      bool aligned = false;
-      for (double sub : subdivisions) {
-        if (isApproxEqual(ts, sub, tolerance)) {
-          aligned = true;
-          break;
-        }
-      }
-      if (!aligned) {
+    for (const auto& obj : current_beat_objects) {
+      double ts = obj->timestamp;
+      // 计算最接近的分音点位置
+      double pos = (ts - beat->start_timestamp) / sub_beat;
+      int32_t rounded_pos = static_cast<int32_t>(std::round(pos));
+      double closest_sub = beat->start_timestamp + rounded_pos * sub_beat;
+
+      if (isApproxEqual(ts, closest_sub, tolerance)) {
+        divpos_map[obj] = rounded_pos;
+      } else {
         valid = false;
         break;
       }
     }
-    if (valid) return n;
+
+    if (valid) {
+      // 设置所有匹配物件的divpos
+      for (const auto& [obj, pos] : divpos_map) {
+        obj->divpos = pos;
+      }
+      return n;
+    }
   }
 
   return 1;  // 无有效分音策略

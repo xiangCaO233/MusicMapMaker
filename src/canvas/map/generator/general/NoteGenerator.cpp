@@ -61,9 +61,9 @@ void NoteGenerator::generate(Note& note) {
     // 优先使用悬停时的纹理
     head_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::NOTE_HEAD, ObjectStatus::HOVER);
-    editor_ref->hover_hitobject_info =
-        std::make_shared<std::pair<std::shared_ptr<HitObject>, bool>>(note_ptr,
-                                                                      true);
+    editor_ref->hover_hitobject_info = std::make_shared<
+        std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
+        note_ptr, note.beatinfo);
     editor_ref->is_hover_note = true;
   } else {
     auto in_select_bound = editor_ref->strict_select
@@ -76,7 +76,7 @@ void NoteGenerator::generate(Note& note) {
         editor_ref->selected_hitobjects.emplace(note_ptr);
         // 发送更新选中物件信号
         emit editor_ref->canvas_ref->select_object(
-            note_ptr, editor_ref->current_abs_timing);
+            note.beatinfo, note_ptr, editor_ref->current_abs_timing);
       }
       // 选中时的纹理
       head_texture = editor_ref->canvas_ref->skin.get_object_texture(
