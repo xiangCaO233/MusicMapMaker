@@ -19,7 +19,6 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -29,7 +28,6 @@
 #include "../../mmm/MapWorkProject.h"
 #include "../../mmm/hitobject/HitObject.h"
 #include "../../mmm/hitobject/Note/Note.h"
-#include "../../mmm/hitobject/Note/rm/Slide.h"
 #include "../audio/BackgroundAudio.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
@@ -397,6 +395,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   played_effects_objects.clear();
   update_mapcanvas_timepos();
   effect_thread->sync_music_time(editor->current_time_stamp);
+  AudioEnginPlayCallback::count = 0;
 }
 
 // 键盘按下事件
@@ -423,6 +422,7 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
       // 空格
       editor->canvas_pasued = !editor->canvas_pasued;
       emit pause_signal(editor->canvas_pasued);
+      AudioEnginPlayCallback::count = 0;
       break;
     }
     case Qt::Key_Delete: {
@@ -667,6 +667,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       for (int i = 1; i <= frame_count; ++i) {
         auto w = effect_frame_texture->width * (editor->object_size_scale);
         auto h = effect_frame_texture->height * (editor->object_size_scale);
+        // TODO-xiang-:不知名入队bug
         effect_frame_queue_map[xpos].emplace(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.nomal_hit_effect_dir + "/" +

@@ -54,7 +54,7 @@ void EffectThread::update_map() {
 
 // 同步音乐音频的时间
 void EffectThread::sync_music_time(double time) {
-  last_sync_audio_time_ms = time - editor->canvas_ref->des_update_time / 2.0;
+  last_sync_audio_time_ms = time;
   last_sync_real_time = std::chrono::steady_clock::now();  // 记录当前现实时间
   if (is_playing) {
     // ----- 恢复播放时 (paused == false) -----
@@ -87,14 +87,15 @@ void EffectThread::sync_music_time(double time) {
           std::to_string(last_triggered_timestamp));
   }
   // 同步画布
-  editor->current_time_stamp = time - editor->canvas_ref->des_update_time / 2.0;
+  editor->current_time_stamp = time;
   editor->current_visual_time_stamp =
       editor->current_time_stamp + editor->static_time_offset;
 }
 
 // 音乐播放回调槽
 void EffectThread::on_music_play_callback(double time) {
-  XWARN("音乐播放位置回调-----当前位置[" + std::to_string(time) + "]ms");
+  XWARN("音乐播放位置回调-----当前位置[" +
+        std::to_string(time - editor->canvas_ref->actual_update_time) + "]ms");
   sync_music_time(time);
   // on_canvas_pause(editor->canvas_pasued);
 }

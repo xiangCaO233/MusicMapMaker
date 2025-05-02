@@ -18,6 +18,7 @@ class AudioEnginPlayCallback : public QObject, public PlayposCallBack {
   std::atomic<bool> synclock{true};
   AudioEnginPlayCallback();
   ~AudioEnginPlayCallback();
+  static int32_t count;
 
   void playpos_call(double playpos);
 
@@ -33,9 +34,8 @@ class AudioEnginPlayCallback : public QObject, public PlayposCallBack {
 
     // 执行任意传入lambda
     f();
-    static int32_t count = 0;
     ++count;
-    if (count % 500 == 0) {
+    if (count % 2000 == 0) {
       emit music_play_callback(current_audio_time);
       count = 0;
     }

@@ -1,5 +1,5 @@
 #include "AudioEnginPlayCallback.h"
-
+int32_t AudioEnginPlayCallback::count = 0;
 AudioEnginPlayCallback::AudioEnginPlayCallback() {}
 
 AudioEnginPlayCallback::~AudioEnginPlayCallback() = default;
