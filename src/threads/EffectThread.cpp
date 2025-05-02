@@ -3,6 +3,7 @@
 #include <qdir.h>
 
 #include <chrono>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -150,22 +151,42 @@ void EffectThread::effect_thread() {
 
           while (iter != hitobjects.end()) {
             const auto& current_object = *iter;
+
             // 使用推算出的时间进行比较
             if (current_object->timestamp <=
                 current_estimated_audio_time_ms + epsilon) {
               // --- 触发效果 ---
               // XWARN("触发事件");
-              XWARN("触发事件: EventTS=" +
-                    std::to_string(current_object->timestamp) +
-                    ", EstimatedAudioTime=" +
-                    std::to_string(current_estimated_audio_time_ms));
-              // TODO: 实际的音频播放调用
-              BackgroundAudio::play_audio_with_new_orbit(
-                  editor->canvas_ref->working_map->project_reference
-                      ->devicename,
-                  editor->canvas_ref->skin.get_sound_effect(
-                      SoundEffectType::COMMON_HIT),
-                  0);
+              // XWARN("触发事件: EventTS=" +
+              //       std::to_string(current_object->timestamp) +
+              //       ", EstimatedAudioTime=" +
+              //       std::to_string(current_estimated_audio_time_ms) +
+              //       ",obj:\n" + iter->get()->toString());
+              if (current_object->is_note) {
+                auto note = std::static_pointer_cast<Note>(current_object);
+                // TODO: 实际的音频播放调用
+                switch (note->note_type) {
+                  case NoteType::NOTE:
+                  case NoteType::HOLD: {
+                    BackgroundAudio::play_audio_with_new_orbit(
+                        editor->canvas_ref->working_map->project_reference
+                            ->devicename,
+                        editor->canvas_ref->skin.get_sound_effect(
+                            SoundEffectType::COMMON_HIT),
+                        0);
+                    break;
+                  }
+                  case NoteType::SLIDE: {
+                    BackgroundAudio::play_audio_with_new_orbit(
+                        editor->canvas_ref->working_map->project_reference
+                            ->devicename,
+                        editor->canvas_ref->skin.get_sound_effect(
+                            SoundEffectType::SLIDE),
+                        0);
+                    break;
+                  }
+                }
+              }
 
               last_triggered_timestamp =
                   current_object->timestamp;  // 更新最后触发的时间戳

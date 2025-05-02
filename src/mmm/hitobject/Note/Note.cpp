@@ -20,7 +20,43 @@ void Note::accept_generate(ObjectGenerator& generator) {
 };
 
 // 打印用
-std::string Note::toString() { return ""; }
+std::string Note::toString() {
+  std::string typeStr;
+  switch (note_type) {
+    case NoteType::COMPLEX:
+      typeStr = "COMPLEX";
+      break;
+    case NoteType::SLIDE:
+      typeStr = "SLIDE";
+      break;
+    case NoteType::HOLD:
+      typeStr = "HOLD";
+      break;
+    case NoteType::NOTE:
+      typeStr = "NOTE";
+      break;
+  }
+
+  std::string compStr;
+  switch (compinfo) {
+    case ComplexInfo::NONE:
+      compStr = "NONE";
+      break;
+    case ComplexInfo::HEAD:
+      compStr = "HEAD";
+      break;
+    case ComplexInfo::BODY:
+      compStr = "BODY";
+      break;
+    case ComplexInfo::END:
+      compStr = "END";
+      break;
+  }
+
+  return "Note{timestamp=" + std::to_string(timestamp) +
+         ", orbit=" + std::to_string(orbit) + ", type=" + typeStr +
+         ", compinfo=" + compStr + "}";
+}
 
 // 比较器使用
 bool Note::lessThan(const HitObject* other) const {

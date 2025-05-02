@@ -16,7 +16,11 @@ void Hold::accept_generate(ObjectGenerator& generator) {
 }
 
 // 打印用
-std::string Hold::toString() { return ""; }
+std::string Hold::toString() {
+  return "Hold{timestamp=" + std::to_string(timestamp) +
+         ", orbit=" + std::to_string(orbit) +
+         ", hold_time=" + std::to_string(hold_time) + "}";
+}
 
 // 比较器使用
 bool Hold::lessThan(const HitObject* other) const {

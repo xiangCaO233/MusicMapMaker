@@ -8,6 +8,8 @@
 #include <qsize.h>
 #include <qtoolbutton.h>
 #include <unicode/ucnv.h>
+#include <unicode/unistr.h>
+#include <unicode/ustream.h>
 #include <unicode/ustring.h>
 
 #include <QFile>
@@ -53,20 +55,18 @@ inline std::u32string utf8_to_utf32(const std::string& utf8) {
   return utf16_to_utf32(utf16);
 }
 #endif
-inline void string2u32sring(const std::string& src, std::u32string& des) {
-  UErrorCode status = U_ZERO_ERROR;
-  UConverter* conv = ucnv_open("UTF-8", &status);
+// 替换弃用的 wstring_convert
+inline std::u32string cu32(const std::string& utf8) {
+  icu_76::UnicodeString utf16 = icu_76::UnicodeString::fromUTF8(utf8);
+  std::u32string utf32;
+  utf32.reserve(utf16.length());
 
-  // 计算所需缓冲区大小
-  int32_t destLength = 0;
-  u_strFromUTF8(nullptr, 0, &destLength, src.c_str(), src.length(), &status);
-  // 重置状态
-  status = U_ZERO_ERROR;
-
-  // 分配缓冲区并转换
-  u_strFromUTF8(reinterpret_cast<UChar*>(&des[0]), destLength, nullptr,
-                src.c_str(), src.length(), &status);
-  ucnv_close(conv);
+  for (int32_t i = 0; i < utf16.length();) {
+    UChar32 c = utf16.char32At(i);
+    utf32.push_back(c);
+    i += U16_LENGTH(c);
+  }
+  return utf32;
 }
 
 inline bool isApproxEqual(double a, double b, double tolerance) {
@@ -166,8 +166,7 @@ inline void format_music_time2u32(std::u32string& res, double srcmilliseconds) {
 #ifdef _WIN32
   res = utf8_to_utf32(temp);
 #else
-  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-  res = converter.from_bytes(temp);
+  res = cu32(temp);
 #endif  //_WIN32
 }
 

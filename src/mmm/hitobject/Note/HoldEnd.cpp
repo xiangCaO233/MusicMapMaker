@@ -15,7 +15,11 @@ void HoldEnd::accept_generate(ObjectGenerator& generator) {
 };
 
 // 打印用
-std::string HoldEnd::toString() { return ""; }
+std::string HoldEnd::toString() {
+  return "HoldEnd{timestamp=" + std::to_string(timestamp) +
+         ", ref_timestamp=" + std::to_string(reference->timestamp) +
+         ", ref_orbit=" + std::to_string(reference->orbit) + "}";
+}
 
 // 比较器使用
 bool HoldEnd::lessThan(const HitObject* other) const {

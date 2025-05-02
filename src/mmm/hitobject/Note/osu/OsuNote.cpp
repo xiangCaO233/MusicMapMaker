@@ -18,7 +18,30 @@ OsuNote::OsuNote(uint32_t time, int32_t orbit_pos) : Note(time, orbit_pos) {
 OsuNote::~OsuNote() = default;
 
 // 打印用
-std::string OsuNote::toString() { return ""; }
+std::string OsuNote::toString() {
+  std::string sampleStr;
+  switch (sample) {
+    case NoteSample::NORMAL:
+      sampleStr = "NORMAL";
+      break;
+    case NoteSample::WHISTLE:
+      sampleStr = "WHISTLE";
+      break;
+    case NoteSample::FINISH:
+      sampleStr = "FINISH";
+      break;
+    case NoteSample::CLAP:
+      sampleStr = "CLAP";
+      break;
+  }
+
+  return "OsuNote{timestamp=" + std::to_string(timestamp) +
+         ", orbit=" + std::to_string(orbit) + ", sample=" + sampleStr +
+         ", normalSet=" +
+         std::to_string(static_cast<int>(sample_group.normalSet)) +
+         ", additionalSet=" +
+         std::to_string(static_cast<int>(sample_group.additionalSet)) + "}";
+}
 
 // 从osu描述加载
 void OsuNote::from_osu_description(std::vector<std::string>& description,

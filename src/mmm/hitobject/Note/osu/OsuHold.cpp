@@ -17,7 +17,11 @@ OsuHoldEnd::OsuHoldEnd(const std::shared_ptr<OsuHold>& ohold)
 OsuHoldEnd::~OsuHoldEnd() = default;
 
 // 打印用
-std::string OsuHoldEnd::toString() { return ""; }
+std::string OsuHoldEnd::toString() {
+  return "OsuHoldEnd{timestamp=" + std::to_string(timestamp) +
+         ", ref_timestamp=" + std::to_string(reference->timestamp) +
+         ", ref_orbit=" + std::to_string(reference->orbit) + "}";
+}
 
 OsuHold::OsuHold() : Hold(0, 0, 0) {
   note_type = NoteType::HOLD;
@@ -33,7 +37,31 @@ OsuHold::OsuHold(uint32_t time, int32_t orbit_pos, uint32_t holdtime)
 OsuHold::~OsuHold() {}
 
 // 打印用
-std::string OsuHold::toString() { return ""; }
+std::string OsuHold::toString() {
+  std::string sampleStr;
+  switch (sample) {
+    case NoteSample::NORMAL:
+      sampleStr = "NORMAL";
+      break;
+    case NoteSample::WHISTLE:
+      sampleStr = "WHISTLE";
+      break;
+    case NoteSample::FINISH:
+      sampleStr = "FINISH";
+      break;
+    case NoteSample::CLAP:
+      sampleStr = "CLAP";
+      break;
+  }
+
+  return "OsuHold{timestamp=" + std::to_string(timestamp) +
+         ", orbit=" + std::to_string(orbit) +
+         ", hold_time=" + std::to_string(hold_time) + ", sample=" + sampleStr +
+         ", normalSet=" +
+         std::to_string(static_cast<int>(sample_group.normalSet)) +
+         ", additionalSet=" +
+         std::to_string(static_cast<int>(sample_group.additionalSet)) + "}";
+}
 
 // 从osu描述加载
 void OsuHold::from_osu_description(std::vector<std::string>& description,

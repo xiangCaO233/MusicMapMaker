@@ -40,7 +40,12 @@ bool SlideEnd::lessThan(const HitObject* other) const {
 }
 
 // 打印用
-std::string SlideEnd::toString() { return ""; }
+std::string SlideEnd::toString() {
+  return "SlideEnd{timestamp=" + std::to_string(timestamp) +
+         ", endorbit=" + std::to_string(endorbit) +
+         ", ref_timestamp=" + std::to_string(reference->timestamp) +
+         ", ref_orbit=" + std::to_string(reference->orbit) + "}";
+}
 
 Slide::Slide(uint32_t time, int32_t orbit_pos, int32_t slide_par)
     : Note(time, orbit_pos), slide_parameter(slide_par) {
@@ -56,7 +61,11 @@ void Slide::accept_generate(ObjectGenerator& generator) {
 }
 
 // 打印用
-std::string Slide::toString() { return ""; }
+std::string Slide::toString() {
+  return "Slide{timestamp=" + std::to_string(timestamp) +
+         ", orbit=" + std::to_string(orbit) +
+         ", slide_param=" + std::to_string(slide_parameter) + "}";
+}
 
 // 比较器使用
 bool Slide::lessThan(const HitObject* other) const {

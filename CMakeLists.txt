@@ -34,6 +34,12 @@ find_package(Freetype REQUIRED)
 # 查找pugixml包
 find_package(pugixml REQUIRED)
 
+find_package(ICU REQUIRED COMPONENTS uc i18n data)
+
+# set(ICU_FOUND TRUE)
+# set(ICU_INCLUDE_DIRS "/usr/include/unicode")
+# set(ICU_LIBRARIES "icuuc" "icui18n" "icudata")
+
 # 设置mmm相关文件
 set(MMM_SOURCES
   src/mmm/SampleSet.h
@@ -109,33 +115,33 @@ set(PROJECT_SOURCES
   src/ui/infoui/minfo.h
   src/ui/infoui/minfo.cpp
   src/ui/infoui/minfo.ui
-	src/ui/infoui/metaui/mmetas.h 
-	src/ui/infoui/metaui/mmetas.cpp 
-	src/ui/infoui/metaui/mmetas.ui
-	src/threads/EffectThread.h
-	src/threads/EffectThread.cpp
+  src/ui/infoui/metaui/mmetas.h
+  src/ui/infoui/metaui/mmetas.cpp
+  src/ui/infoui/metaui/mmetas.ui
+  src/threads/EffectThread.h
+  src/threads/EffectThread.cpp
   src/canvas/GLCanvas.h
   src/canvas/GLCanvas.cpp
   src/canvas/FrameRateCounter.h
   src/canvas/FrameRateCounter.cpp
   src/canvas/map/MapWorkspaceCanvas.h
   src/canvas/map/MapWorkspaceCanvas.cpp
-	src/canvas/map/MapWorkspaceSkin.h
-	src/canvas/map/MapWorkspaceSkin.cpp
-	src/canvas/map/editor/MapEditor.h
-	src/canvas/map/editor/MapEditor.cpp
-	src/canvas/map/generator/ObjectGenerator.h
-	src/canvas/map/generator/ObjectGenerator.cpp
-	src/canvas/map/generator/general/NoteGenerator.h
-	src/canvas/map/generator/general/NoteGenerator.cpp
-	src/canvas/map/generator/general/HoldGenerator.h
-	src/canvas/map/generator/general/HoldGenerator.cpp
-	src/canvas/map/generator/general/SlideGenerator.h
-	src/canvas/map/generator/general/SlideGenerator.cpp
-	src/canvas/map/generator/BeatGenerator.h
-	src/canvas/map/generator/BeatGenerator.cpp
-	src/canvas/map/generator/AreaInfoGenerator.h
-	src/canvas/map/generator/AreaInfoGenerator.cpp
+  src/canvas/map/MapWorkspaceSkin.h
+  src/canvas/map/MapWorkspaceSkin.cpp
+  src/canvas/map/editor/MapEditor.h
+  src/canvas/map/editor/MapEditor.cpp
+  src/canvas/map/generator/ObjectGenerator.h
+  src/canvas/map/generator/ObjectGenerator.cpp
+  src/canvas/map/generator/general/NoteGenerator.h
+  src/canvas/map/generator/general/NoteGenerator.cpp
+  src/canvas/map/generator/general/HoldGenerator.h
+  src/canvas/map/generator/general/HoldGenerator.cpp
+  src/canvas/map/generator/general/SlideGenerator.h
+  src/canvas/map/generator/general/SlideGenerator.cpp
+  src/canvas/map/generator/BeatGenerator.h
+  src/canvas/map/generator/BeatGenerator.cpp
+  src/canvas/map/generator/AreaInfoGenerator.h
+  src/canvas/map/generator/AreaInfoGenerator.cpp
   src/canvas/renderer/shader/GLShader.h
   src/canvas/renderer/shader/GLShader.cpp
   src/canvas/renderer/RenderCommand.h
@@ -177,7 +183,6 @@ include_directories(
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
     resources/glsrcs.qrc
-    
   )
 else()
   if(ANDROID)
@@ -196,6 +201,7 @@ target_link_libraries(
   Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::OpenGLWidgets
   Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::Svg
   Qt${QT_VERSION_MAJOR}::SvgWidgets
+  ICU::uc ICU::i18n ICU::data ${LIBXML2_LIBRARIES}
   Freetype::Freetype pugixml::pugixml xaudio-dev)
 
 # 设置翻译系统
