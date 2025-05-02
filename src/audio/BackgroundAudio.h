@@ -192,6 +192,7 @@ class BackgroundAudio {
       return xutil::plannerpcmpos2milliseconds(
           orbit->playpos, static_cast<int>(x::Config::samplerate));
     }
+    return 0;
   }
 
   // 设定特定设备音频播放位置

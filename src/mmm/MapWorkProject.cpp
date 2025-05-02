@@ -32,8 +32,7 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
   auto config_file_name = config.project_name + ".xml";
   auto config_path = project_path / config_file_name;
 
-  static const std::unordered_set<std::string> map_extention = {".osu", ".imd",
-                                                                ".mc"};
+  static const std::unordered_set<std::string> map_extention = {".osu", ".imd"};
   static const std::unordered_set<std::string> audio_extention = {
       ".mp3", ".ogg", ".wav"};
   static const std::unordered_set<std::string> image_extention = {

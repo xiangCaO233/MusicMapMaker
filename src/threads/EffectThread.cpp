@@ -13,6 +13,7 @@
 #include "colorful-log.h"
 #include "mmm/hitobject/HitObject.h"
 #include "mmm/hitobject/Note/Note.h"
+#include "mmm/hitobject/Note/rm/Slide.h"
 
 // 构造EffectThread
 EffectThread::EffectThread(std::shared_ptr<MapEditor> e) : editor(e) {
@@ -165,34 +166,80 @@ void EffectThread::effect_thread() {
               if (current_object->is_note) {
                 auto note = std::static_pointer_cast<Note>(current_object);
                 // TODO: 实际的音频播放调用
-                switch (note->note_type) {
-                  case NoteType::NOTE:
-                  case NoteType::HOLD: {
-                    BackgroundAudio::play_audio_with_new_orbit(
-                        editor->canvas_ref->working_map->project_reference
-                            ->devicename,
-                        editor->canvas_ref->skin.get_sound_effect(
-                            SoundEffectType::COMMON_HIT),
-                        0);
-                    break;
-                  }
-                  case NoteType::SLIDE: {
-                    BackgroundAudio::play_audio_with_new_orbit(
-                        editor->canvas_ref->working_map->project_reference
-                            ->devicename,
-                        editor->canvas_ref->skin.get_sound_effect(
-                            SoundEffectType::SLIDE),
-                        0);
-                    break;
-                  }
+                // 启动播放线程
+                std::thread framethread;
+                // 物件的横向偏移
+                auto x = editor->edit_area_start_pos_x +
+                         editor->orbit_width * note->orbit +
+                         editor->orbit_width / 2.0;
+                // 轨道宽度
+                auto ow = editor->orbit_width;
+                // 画布引用
+                auto canvas = editor->canvas_ref;
+                if (!canvas->played_effects_objects.contains(note)) {
+                  // 播放物件添加到的位置
+                  auto obj_it =
+                      canvas->played_effects_objects.emplace(note).first;
+
+                  // 播放线程
+                  framethread = std::thread([=]() {
+                    auto play_x = x;
+                    // 特效类型
+                    EffectType t;
+                    // 音效类型
+                    SoundEffectType soundt;
+                    // 特效帧数
+                    int32_t frames;
+                    if (note) {
+                      switch (note->note_type) {
+                        case NoteType::SLIDE: {
+                          if (note->compinfo != ComplexInfo::NONE &&
+                              note->compinfo != ComplexInfo::END)
+                            return;
+
+                          t = EffectType::SLIDEARROW;
+                          play_x += (std::static_pointer_cast<Slide>(note))
+                                        ->slide_parameter *
+                                    ow;
+                          frames = 16 * (1 / canvas->editor->playspeed);
+                          soundt = SoundEffectType::SLIDE;
+                          break;
+                        }
+                        default: {
+                          t = EffectType::NORMAL;
+                          frames = 30 * (1 / canvas->editor->playspeed);
+                          soundt = SoundEffectType::COMMON_HIT;
+                          break;
+                        }
+                      }
+                      if (note->note_type == NoteType::HOLD) {
+                        auto hold = std::static_pointer_cast<Hold>(note);
+                        frames = hold->hold_time / canvas->des_update_time * 2 *
+                                 (1 / canvas->editor->playspeed);
+                      }
+
+                      // 播放音效
+                      BackgroundAudio::play_audio_with_new_orbit(
+                          canvas->working_map->project_reference->devicename,
+                          canvas->skin.get_sound_effect(soundt), 0);
+                      // 播放特效
+                      canvas->play_effect(
+                          play_x,
+                          canvas->size().height() *
+                              (1 - canvas->editor->judgeline_position),
+                          frames, t);
+                    }
+                  });
+                  framethread.detach();
                 }
               }
 
-              last_triggered_timestamp =
-                  current_object->timestamp;  // 更新最后触发的时间戳
+              // 更新最后触发的时间戳
+              last_triggered_timestamp = current_object->timestamp;
               ++iter;
             } else {
-              next_event = current_object;  // 找到下一个未到期的事件
+              // 找到下一个未到期的事件
+              next_event = current_object;
               break;
             }
           }

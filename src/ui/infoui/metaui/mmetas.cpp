@@ -43,7 +43,8 @@ void MMetas::on_canvas_select_object(std::shared_ptr<Beat> beatinfo,
     // 更新类型标签
     QString typev;
     switch (obj->object_type) {
-      case HitObjectType::NOTE: {
+      case HitObjectType::NOTE:
+      case HitObjectType::OSUNOTE: {
         typev = tr("Note");
         break;
       }

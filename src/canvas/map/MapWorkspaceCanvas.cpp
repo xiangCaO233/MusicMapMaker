@@ -379,13 +379,17 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   }
   if (editor->current_time_stamp < 0) {
     editor->current_time_stamp = 0;
-    editor->canvas_pasued = true;
-    emit pause_signal(editor->canvas_pasued);
+    if (!editor->canvas_pasued) {
+      editor->canvas_pasued = true;
+      emit pause_signal(editor->canvas_pasued);
+    }
   }
   if (editor->current_time_stamp > working_map->map_length) {
     editor->current_time_stamp = working_map->map_length;
-    editor->canvas_pasued = true;
-    emit pause_signal(editor->canvas_pasued);
+    if (!editor->canvas_pasued) {
+      editor->canvas_pasued = true;
+      emit pause_signal(editor->canvas_pasued);
+    }
   }
   editor->current_visual_time_stamp =
       editor->current_time_stamp + editor->static_time_offset;
@@ -657,11 +661,6 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
   std::shared_ptr<TextureInstace> effect_frame_texture;
   switch (etype) {
     case EffectType::NORMAL: {
-      // 听觉
-      // BackgroundAudio::play_audio_with_new_orbit(
-      //     working_map->project_reference->devicename,
-      //     skin.get_sound_effect(SoundEffectType::COMMON_HIT), 0);
-      // 视觉
       effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
@@ -675,11 +674,6 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       break;
     }
     case EffectType::SLIDEARROW: {
-      // 听觉
-      // BackgroundAudio::play_audio_with_new_orbit(
-      //     working_map->project_reference->devicename,
-      //     skin.get_sound_effect(SoundEffectType::SLIDE), 0);
-      // 视觉
       effect_frame_texture =
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
@@ -713,65 +707,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
       drawed_objects.insert({note, true});
     else
       continue;
-    // 启动播放线程
-    std::thread playthread;
-    // 物件的横向偏移
-    auto x = editor->edit_area_start_pos_x +
-             editor->orbit_width * std::static_pointer_cast<Note>(obj)->orbit +
-             editor->orbit_width / 2.0;
-    // 轨道宽度
-    auto ow = editor->orbit_width;
-    // 画布引用
-    auto canvas = this;
-    if (!played_effects_objects.contains(obj)) {
-      // 经过判定线
-      if (std::abs(obj->timestamp - editor->current_visual_time_stamp) <
-          des_update_time * 2) {
-        // 播放物件添加到的位置
-        auto obj_it = played_effects_objects.emplace(obj).first;
-
-        // 播放线程
-        playthread = std::thread([=]() {
-          auto play_x = x;
-          // 特效类型
-          EffectType t;
-          // 特效帧数
-          int32_t frames;
-          if (note) {
-            switch (note->note_type) {
-              case NoteType::SLIDE: {
-                if (note->compinfo != ComplexInfo::NONE &&
-                    note->compinfo != ComplexInfo::END)
-                  return;
-
-                t = EffectType::SLIDEARROW;
-                play_x +=
-                    (std::static_pointer_cast<Slide>(note))->slide_parameter *
-                    ow;
-                frames = 16 * (1 / canvas->editor->playspeed);
-                break;
-              }
-              default: {
-                t = EffectType::NORMAL;
-                frames = 30 * (1 / canvas->editor->playspeed);
-                break;
-              }
-            }
-            if (note->note_type == NoteType::HOLD) {
-              auto hold = std::static_pointer_cast<Hold>(note);
-              frames = hold->hold_time / canvas->des_update_time * 2 *
-                       (1 / canvas->editor->playspeed);
-            }
-
-            canvas->play_effect(play_x,
-                                canvas->size().height() *
-                                    (1 - canvas->editor->judgeline_position),
-                                frames, t);
-          }
-        });
-        playthread.detach();
-      }
-    }
     if (note) {
       // 生成物件
       const auto &generator = objgenerators[note->note_type];
