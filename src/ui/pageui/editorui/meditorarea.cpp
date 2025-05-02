@@ -26,10 +26,12 @@ MEditorArea::MEditorArea(QWidget* parent)
           &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
 
   // 连接画布槽和时间控制器信号
+  // 时间控制器暂停->画布暂停响应
   connect(ui->audio_time_controller, &TimeController::on_canvas_pause,
           canvas_container->canvas.data(),
           &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
 
+  // 时间控制器变速->画布变速响应
   connect(ui->audio_time_controller, &TimeController::playspeed_changed,
           canvas_container->canvas.data(),
           &MapWorkspaceCanvas::on_timecontroller_speed_changed);

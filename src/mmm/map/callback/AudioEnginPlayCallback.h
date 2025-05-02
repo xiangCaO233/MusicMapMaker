@@ -10,6 +10,7 @@
 
 class AudioEnginPlayCallback : public QObject, public PlayposCallBack {
   Q_OBJECT
+  double current_audio_time{0};
  signals:
   void music_play_callback(double time);
 
@@ -32,6 +33,12 @@ class AudioEnginPlayCallback : public QObject, public PlayposCallBack {
 
     // 执行任意传入lambda
     f();
+    static int32_t count = 0;
+    ++count;
+    if (count % 500 == 0) {
+      emit music_play_callback(current_audio_time);
+      count = 0;
+    }
   }
 };
 

@@ -70,7 +70,7 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
           .toStdString();
   sound_effects[SoundEffectType::SLIDE] =
       QDir((skin_path /
-            sound_effects_config.value<std::string>("commonhit", "none")))
+            sound_effects_config.value<std::string>("slidehit", "none")))
           .canonicalPath()
           .toStdString();
 

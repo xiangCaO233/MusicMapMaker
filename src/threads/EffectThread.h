@@ -4,6 +4,7 @@
 #include <qobject.h>
 #include <qtmetamacros.h>
 
+#include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -16,6 +17,8 @@ class EffectThread : public QObject {
   std::atomic<bool> exit{false};
 
   std::thread thread;
+  std::condition_variable threadcv;
+  std::mutex threadmtx;
 
   // 是否正在播放
   std::atomic<bool> is_playing{false};
@@ -34,6 +37,11 @@ class EffectThread : public QObject {
 
   // 编辑器
   std::shared_ptr<MapEditor> editor;
+
+  // 启动线程
+  void start();
+  // 停止线程
+  void stop();
 
  public slots:
   // 画布暂停事件

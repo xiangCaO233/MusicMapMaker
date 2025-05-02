@@ -17,26 +17,44 @@
 
 // 构造EffectThread
 EffectThread::EffectThread(std::shared_ptr<MapEditor> e) : editor(e) {
-  // 创建效果线程
-  thread = std::thread(&EffectThread::effect_thread, this);
-  thread.detach();
+  // 启动效果线程
+  start();
 
   // update_map();
 }
 
 // 析构EffectThread
-EffectThread::~EffectThread() { exit = true; }
+EffectThread::~EffectThread() { stop(); }
+
+// 启动线程
+void EffectThread::start() {
+  exit = false;
+  thread = std::thread(&EffectThread::effect_thread, this);
+  thread.detach();
+}
+
+// 停止线程
+void EffectThread::stop() {
+  exit = true;
+  threadcv.notify_all();
+  if (thread.joinable()) {
+    thread.join();
+  }
+}
 
 // 更新map
 void EffectThread::update_map() {
   connect(editor->canvas_ref->working_map->audio_pos_callback.get(),
           &AudioEnginPlayCallback::music_play_callback, this,
           &EffectThread::on_music_play_callback);
+  // 重启线程
+  stop();
+  start();
 }
 
 // 同步音乐音频的时间
 void EffectThread::sync_music_time(double time) {
-  last_sync_audio_time_ms = time - 10;
+  last_sync_audio_time_ms = time - editor->canvas_ref->des_update_time / 2.0;
   last_sync_real_time = std::chrono::steady_clock::now();  // 记录当前现实时间
   if (is_playing) {
     // ----- 恢复播放时 (paused == false) -----
@@ -68,6 +86,10 @@ void EffectThread::sync_music_time(double time) {
           "last_triggered_timestamp to:" +
           std::to_string(last_triggered_timestamp));
   }
+  // 同步画布
+  editor->current_time_stamp = time - editor->canvas_ref->des_update_time / 2.0;
+  editor->current_visual_time_stamp =
+      editor->current_time_stamp + editor->static_time_offset;
 }
 
 // 音乐播放回调槽
@@ -170,7 +192,7 @@ void EffectThread::effect_thread() {
           //       ". LastTriggeredTS=" +
           //       std::to_string(last_triggered_timestamp));
           // }
-          const double epsilon = 0.001;
+          const double epsilon = 5;
 
           while (iter != hitobjects.end()) {
             const auto& current_object = *iter;
@@ -324,10 +346,9 @@ void EffectThread::effect_thread() {
       sleep_duration = max_sleep;
     }
     // else (正在播放但没有下一个事件，或速度为0) -> 使用默认的 max_sleep
-
     // 执行休眠
-    if (!exit) {
-      std::this_thread::sleep_for(sleep_duration);
-    }
+    std::unique_lock<std::mutex> lock(threadmtx);
+    // 等待 sleep_duration 或 exit 变为 true
+    threadcv.wait_for(lock, sleep_duration, [&] { return exit.load(); });
   }
 }

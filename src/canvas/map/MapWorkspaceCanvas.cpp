@@ -79,6 +79,8 @@ void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
 // 时间控制器播放速度变化
 void MapWorkspaceCanvas::on_timecontroller_speed_changed(double speed) {
   editor->playspeed = speed;
+  // 同步一下时间
+  effect_thread->sync_music_time(editor->current_time_stamp);
 }
 
 // qt事件
@@ -347,7 +349,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
     // 根据滑动方向选择吸附哪一个
     if (event->angleDelta().y() * editor->scroll_direction > 0) {
       // 向上吸附小节线
-      if (std::abs(*current_divisor_it - editor->current_time_stamp) < 2) {
+      if (std::abs(*current_divisor_it - editor->current_time_stamp) < 10) {
         // 防止非法访问最后一个元素后的元素
         auto lasttime = divisor_times.end();
         lasttime--;
@@ -358,7 +360,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
         } else {
           // 不动
         }
-      } else if (current_divisor_it == divisor_times.begin()) {
+      } else {
         // 选择的大于自己的第一个
         editor->current_time_stamp = *current_divisor_it;
       }
@@ -391,10 +393,10 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
       emit pause_signal(editor->canvas_pasued);
     }
   }
-  editor->current_visual_time_stamp =
-      editor->current_time_stamp + editor->static_time_offset;
+  editor->current_visual_time_stamp = editor->current_time_stamp;
   played_effects_objects.clear();
   update_mapcanvas_timepos();
+  effect_thread->sync_music_time(editor->current_time_stamp);
 }
 
 // 键盘按下事件
@@ -811,9 +813,19 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     // XINFO("maplength:" + std::to_string(map->map_length));
     // XINFO("audiolength:" + std::to_string(map_audio_length));
     if (map->map_length < map_audio_length) map->map_length = map_audio_length;
-    // 设置谱面时间
-    editor->current_visual_time_stamp =
+    // 同步谱面时间
+    editor->current_time_stamp =
         map->project_reference->map_canvasposes.at(map);
+    editor->current_visual_time_stamp =
+        editor->current_time_stamp + editor->static_time_offset;
+    effect_thread->sync_music_time(editor->current_time_stamp);
+
+    // 同步音频的时间
+    if (working_map->project_reference->devicename != "unknown output device") {
+      BackgroundAudio::set_audio_pos(working_map->project_reference->devicename,
+                                     working_map->audio_file_abs_path,
+                                     editor->current_time_stamp);
+    }
 
     // 加载背景图纹理
     auto ppath = map->bg_path.root_path();
