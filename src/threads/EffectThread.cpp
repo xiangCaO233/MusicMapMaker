@@ -17,29 +17,31 @@
 
 // 构造EffectThread
 EffectThread::EffectThread(std::shared_ptr<MapEditor> e) : editor(e) {
+  // 创建效果线程
   thread = std::thread(&EffectThread::effect_thread, this);
   thread.detach();
+
+  // update_map();
 }
 
 // 析构EffectThread
 EffectThread::~EffectThread() { exit = true; }
 
-// 画布暂停事件
-void EffectThread::on_canvas_pause(bool paused) {
-  std::lock_guard<std::mutex> lock(state_mutex);
-  is_playing = !paused;
-  // 获取精确时间
-  last_sync_audio_time_ms = BackgroundAudio::get_audio_pos(
-      editor->canvas_ref->working_map->project_reference->devicename,
-      QDir(editor->canvas_ref->working_map->audio_file_abs_path)
-          .canonicalPath()
-          .toStdString());
+// 更新map
+void EffectThread::update_map() {
+  connect(editor->canvas_ref->working_map->audio_pos_callback.get(),
+          &AudioEnginPlayCallback::music_play_callback, this,
+          &EffectThread::on_music_play_callback);
+}
+
+// 同步音乐音频的时间
+void EffectThread::sync_music_time(double time) {
+  last_sync_audio_time_ms = time - 10;
   last_sync_real_time = std::chrono::steady_clock::now();  // 记录当前现实时间
   if (is_playing) {
     // ----- 恢复播放时 (paused == false) -----
     // 重置 last_triggered_timestamp 到当前同步时间点之前一点点。
     // 这样 upper_bound 就能找到 >= last_sync_audio_time_ms 的第一个事件。
-    // 将 double 时间转换为 long long 可能会截断小数部分，
     // 所以减去 1 确保我们查找的 key 肯定小于或等于实际的同步时间戳。
     // 这假设时间戳的最小间隔大于 1ms，如果不是，需要更小的偏移或不同逻辑。
     last_triggered_timestamp = last_sync_audio_time_ms - 1;
@@ -66,6 +68,26 @@ void EffectThread::on_canvas_pause(bool paused) {
           "last_triggered_timestamp to:" +
           std::to_string(last_triggered_timestamp));
   }
+}
+
+// 音乐播放回调槽
+void EffectThread::on_music_play_callback(double time) {
+  XWARN("音乐播放位置回调-----当前位置[" + std::to_string(time) + "]ms");
+  sync_music_time(time);
+  // on_canvas_pause(editor->canvas_pasued);
+}
+
+// 画布暂停事件--更新参考时间
+void EffectThread::on_canvas_pause(bool paused) {
+  std::lock_guard<std::mutex> lock(state_mutex);
+  is_playing = !paused;
+  if (!editor->canvas_ref->working_map) return;
+  // 获取精确时间
+  sync_music_time(BackgroundAudio::get_audio_pos(
+      editor->canvas_ref->working_map->project_reference->devicename,
+      QDir(editor->canvas_ref->working_map->audio_file_abs_path)
+          .canonicalPath()
+          .toStdString()));
 }
 
 // 实际运行函数

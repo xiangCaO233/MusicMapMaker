@@ -658,10 +658,9 @@ void MapWorkspaceCanvas::draw_beats() {
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                                      int32_t frame_count, EffectType etype) {
-  std::shared_ptr<TextureInstace> effect_frame_texture;
   switch (etype) {
     case EffectType::NORMAL: {
-      effect_frame_texture =
+      std::shared_ptr<TextureInstace> &effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
         auto w = effect_frame_texture->width * (editor->object_size_scale);
@@ -674,7 +673,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       break;
     }
     case EffectType::SLIDEARROW: {
-      effect_frame_texture =
+      std::shared_ptr<TextureInstace> &effect_frame_texture =
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
         auto w = effect_frame_texture->width * (editor->object_size_scale);
@@ -823,6 +822,7 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     editor->current_visual_time_stamp = 0;
   }
 
+  effect_thread->update_map();
   emit pause_signal(editor->canvas_pasued);
   emit current_time_stamp_changed(editor->current_visual_time_stamp);
 }

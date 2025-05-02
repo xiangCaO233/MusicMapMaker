@@ -8,39 +8,13 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../log/colorful-log.h"
 #include "../Beat.h"
 #include "../hitobject/HitObject.h"
 #include "../hitobject/Note/Hold.h"
 #include "../timing/Timing.h"
-#include "AudioManager.h"
+#include "callback/AudioEnginPlayCallback.h"
 
 class MapWorkProject;
-
-class AudioEnginPlayCallback : public PlayposCallBack {
-  std::atomic<bool> synclock{true};
-
-  void playpos_call(double playpos) override {
-    XINFO("mixer callback pos:" + std::to_string(playpos));
-    XINFO("本轨道缓冲区已清空");
-    synclock.store(false, std::memory_order_release);
-  }
-
- public:
-  template <typename func>
-  void waitfor_clear_buffer(func&& f) {
-    synclock.store(true, std::memory_order_relaxed);
-    XINFO("等待缓冲区清空");
-    // 等到回调执行
-    while (synclock.load(std::memory_order_acquire)) {
-      // 让出CPU时间片--等待播放线程清空缓冲区并修改同步锁为true
-      std::this_thread::yield();
-    }
-
-    // 执行任意传入lambda
-    f();
-  }
-};
 
 enum class MapType {
   OSUMAP,

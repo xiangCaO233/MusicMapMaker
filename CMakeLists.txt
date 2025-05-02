@@ -47,6 +47,8 @@ set(MMM_SOURCES
   src/mmm/MapWorkProject.cpp
   src/mmm/map/MMap.h
   src/mmm/map/MMap.cpp
+  src/mmm/map/callback/AudioEnginPlayCallback.h
+  src/mmm/map/callback/AudioEnginPlayCallback.cpp
   src/mmm/map/osu/OsuMap.h
   src/mmm/map/osu/OsuMap.cpp
   src/mmm/map/rm/RMMap.h

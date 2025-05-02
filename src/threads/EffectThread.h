@@ -39,6 +39,9 @@ class EffectThread : public QObject {
   // 画布暂停事件
   void on_canvas_pause(bool paused);
 
+  // 音乐播放回调槽
+  void on_music_play_callback(double time);
+
  public:
   // 构造EffectThread
   EffectThread(std::shared_ptr<MapEditor> e);
@@ -46,8 +49,14 @@ class EffectThread : public QObject {
   // 析构EffectThread
   virtual ~EffectThread();
 
+  // 同步音乐音频的时间
+  void sync_music_time(double time);
+
   // 实际运行函数
   void effect_thread();
+
+  // 更新map
+  void update_map();
 };
 
 #endif  // M_EFFECTTHREAD_H

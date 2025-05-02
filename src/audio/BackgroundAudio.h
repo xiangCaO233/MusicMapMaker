@@ -152,6 +152,7 @@ class BackgroundAudio {
     orbit->playpos = xutil::milliseconds2plannerpcmpos(
                          pos, static_cast<int>(x::Config::samplerate)) *
                      static_cast<int>(x::Config::channel);
+    orbit->autoremove = true;
     // 添加此音轨到播放器
     device->player->mixer->add_orbit(orbit);
 
