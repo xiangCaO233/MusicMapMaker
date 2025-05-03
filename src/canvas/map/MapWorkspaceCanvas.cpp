@@ -656,6 +656,8 @@ void MapWorkspaceCanvas::draw_timing_points() {
   working_map->query_timing_in_range(timings_in_area,
                                      editor->current_time_area_start,
                                      editor->current_time_area_end);
+  QSizeF connectionSize(12, 16);
+
   // 判定线位置
   auto judgeline_pos =
       editor->canvas_size.height() * (1.0 - editor->judgeline_position);
@@ -719,15 +721,16 @@ void MapWorkspaceCanvas::draw_timing_points() {
                     1.0) < 0.01) {
       } else {
         // 先画绝对bpm
-        renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
-                                   timing_y_pos - speed_info_string_height -
-                                       skin.timeinfo_font_size / 2},
-                                  absbpm, skin.timeinfo_font_size,
-                                  skin.font_family, skin.timeinfo_font_color,
-                                  0);
+        renderer_manager->addText(
+            {timing_x_pos - skin.timeinfo_font_size / 2,
+             timing_y_pos - speed_info_string_height -
+                 skin.timeinfo_font_size / 2 - connectionSize.height()},
+            absbpm, skin.timeinfo_font_size, skin.font_family,
+            skin.timeinfo_font_color, 0);
         // 再画变速bpm
         renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
-                                   timing_y_pos - skin.timeinfo_font_size / 2},
+                                   timing_y_pos - skin.timeinfo_font_size / 2 -
+                                       connectionSize.height()},
                                   speed, skin.timeinfo_font_size,
                                   skin.font_family, skin.timeinfo_font_color,
                                   0);
@@ -737,7 +740,8 @@ void MapWorkspaceCanvas::draw_timing_points() {
     if (timing->is_base_timing) {
       // 只画绝对bpm
       renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
-                                 timing_y_pos - skin.timeinfo_font_size / 2},
+                                 timing_y_pos - skin.timeinfo_font_size / 2 -
+                                     connectionSize.height()},
                                 absbpm, skin.timeinfo_font_size,
                                 skin.font_family, skin.timeinfo_font_color, 0);
     }
