@@ -1,6 +1,7 @@
 #include "MapWorkspaceCanvas.h"
 
 #include <qcolor.h>
+#include <qcontainerfwd.h>
 #include <qdir.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -646,6 +647,8 @@ void MapWorkspaceCanvas::draw_infoarea() {
 
 // 绘制时间点
 void MapWorkspaceCanvas::draw_timing_points() {
+  if (!working_map) return;
+
   std::string bpm_prefix = "bpm:";
   std::vector<std::shared_ptr<Timing>> timings_in_area;
 
@@ -653,9 +656,20 @@ void MapWorkspaceCanvas::draw_timing_points() {
   working_map->query_timing_in_range(timings_in_area,
                                      editor->current_time_area_start,
                                      editor->current_time_area_end);
+  // 判定线位置
+  auto judgeline_pos =
+      editor->canvas_size.height() * (1.0 - editor->judgeline_position);
 
   for (const auto &timing : timings_in_area) {
-    std::string bpmvalue = std::to_string(timing->basebpm);
+    auto timing_y_pos =
+        judgeline_pos -
+        (timing->timestamp - editor->current_visual_time_stamp) *
+            editor->timeline_zoom *
+            (editor->canvas_pasued ? 1.0 : editor->speed_zoom);
+    double timing_x_pos;
+
+    std::string bpmvalue =
+        QString::number(timing->basebpm, 'f', 2).toStdString();
     auto absbpm_info = bpm_prefix + bpmvalue;
 
 #ifdef _WIN32
@@ -666,16 +680,20 @@ void MapWorkspaceCanvas::draw_timing_points() {
     auto absbpm_info_string_width{0};
     auto absbpm_info_string_height{0};
     for (const auto &character : absbpm) {
-      auto charsize = renderer_manager->get_character_size("", 16, character);
+      auto charsize = renderer_manager->get_character_size(
+          skin.font_family, skin.timeinfo_font_size, character);
       absbpm_info_string_width += charsize.width();
+
       if (charsize.height() > absbpm_info_string_height) {
         absbpm_info_string_height = charsize.height();
       }
     }
+    timing_x_pos = editor->edit_area_start_pos_x - absbpm_info_string_width;
 
     if (!timing->is_base_timing) {
       std::string speed_prefix = tr("speed:").toStdString();
-      std::string speedvalue = std::to_string(timing->bpm);
+      std::string speedvalue =
+          QString::number(timing->bpm, 'f', 2).toStdString();
       auto speed_info = speed_prefix + speedvalue;
 #ifdef _WIN32
 #else
@@ -685,12 +703,35 @@ void MapWorkspaceCanvas::draw_timing_points() {
       auto speed_info_string_width{0};
       auto speed_info_string_height{0};
       for (const auto &character : speed) {
-        auto charsize = renderer_manager->get_character_size("", 16, character);
+        auto charsize = renderer_manager->get_character_size(
+            skin.font_family, skin.timeinfo_font_size, character);
         speed_info_string_width += charsize.width();
         if (charsize.height() > speed_info_string_height) {
           speed_info_string_height = charsize.height();
         }
       }
+      if (editor->edit_area_start_pos_x - speed_info_string_width <
+          timing_x_pos)
+        timing_x_pos = editor->edit_area_start_pos_x - speed_info_string_width;
+      // 先画绝对bpm
+      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 4,
+                                 timing_y_pos - speed_info_string_height -
+                                     skin.timeinfo_font_size / 4},
+                                absbpm, skin.timeinfo_font_size,
+                                skin.font_family, skin.timeinfo_font_color, 0);
+      // 再画变速bpm
+      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 4,
+                                 timing_y_pos - skin.timeinfo_font_size / 4},
+                                speed, skin.timeinfo_font_size,
+                                skin.font_family, skin.timeinfo_font_color, 0);
+    }
+
+    if (timing->is_base_timing) {
+      // 只画绝对bpm
+      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 4,
+                                 timing_y_pos - skin.timeinfo_font_size / 4},
+                                absbpm, skin.timeinfo_font_size,
+                                skin.font_family, skin.timeinfo_font_color, 0);
     }
   }
 }

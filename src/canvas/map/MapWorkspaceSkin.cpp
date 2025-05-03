@@ -100,7 +100,10 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
 
   // 字体配置
   auto font_config = skin_config["font"];
+
   font_family = font_config.value<std::string>("font-family", "Noto Sans");
+  // XERROR("family:" + font_family);
+
   timeinfo_font_color = QColor::fromString(
       font_config.value<std::string>("timeinfo-font-color", "#000000FF"));
   timeinfo_font_size = font_config.value<int32_t>("timeinfo-font-size", 16);

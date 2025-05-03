@@ -264,6 +264,18 @@ void MMap::query_timing_in_range(
     std::vector<std::shared_ptr<Timing>>& result_timings, int32_t start,
     int32_t end) {
   // TODO(xiang 2025-05-03): 实现在指定区间内查询timing
+  result_timings.clear();
+  auto lower_bound = std::make_shared<Timing>();
+  lower_bound->timestamp = start;
+
+  // 找到第一个大于或等于 lower_bound 的元素
+  auto it = timings.lower_bound(lower_bound);
+
+  // 遍历直到超出 upper_bound
+  while (it != timings.end() && (*it)->timestamp < end) {
+    result_timings.push_back(*it);
+    ++it;
+  }
 }
 
 // 查询时间区间窗口内的拍
