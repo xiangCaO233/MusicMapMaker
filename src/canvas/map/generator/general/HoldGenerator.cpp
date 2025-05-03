@@ -48,7 +48,7 @@ void HoldGenerator::generate(Hold &hold) {
   // 面身实际尺寸高度-0.5note
   auto long_note_body_size = QSizeF(
       long_note_body_vertical_texture->width * editor_ref->object_size_scale,
-      long_note_body_height - 0.5 * head_rect.height());
+      long_note_body_height);
 
   // 面身的实际区域--
   hold_vert_body_rect =
