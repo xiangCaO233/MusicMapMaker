@@ -97,6 +97,9 @@ void MEditorArea::use_theme(GlobalTheme theme) {
   mutil::set_button_svgcolor(ui->lock_edit_mode_button, ":/icons/lock-open.svg",
                              file_button_color, 16, 16);
 
+  mutil::set_button_svgcolor(ui->show_object_after_judgeline_button,
+                             ":/icons/glasses.svg", file_button_color, 16, 16);
+
   // 设置时间控制器主题
   ui->audio_time_controller->use_theme(theme);
 }
@@ -209,3 +212,7 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
 // void MEditorArea::on_audio_time_controller_button_clicked() {
 //   ui->audio_time_controller->setHidden(!ui->audio_time_controller->isHidden());
 // }
+
+void MEditorArea::on_show_object_after_judgeline_button_toggled(bool checked) {
+  canvas_container->canvas.get()->editor->show_object_after_judgeline = checked;
+}

@@ -63,6 +63,8 @@ class MEditorArea : public QWidget {
   // 进度条移动事件
   void on_progress_slider_valueChanged(int value);
 
+  void on_show_object_after_judgeline_button_toggled(bool checked);
+
  private:
   Ui::MEditorArea *ui;
 };
