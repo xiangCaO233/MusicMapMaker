@@ -290,7 +290,8 @@ void EffectThread::effect_thread() {
                               (1 - canvas->editor->judgeline_position),
                           frames, t);
                       std::this_thread::sleep_for(std::chrono::milliseconds(
-                          int(canvas->des_update_time * 2)));
+                          int(canvas->des_update_time * 2 /
+                              canvas->editor->playspeed)));
                       // 播放音效
                       BackgroundAudio::play_audio_with_new_orbit(
                           canvas->working_map->project_reference->devicename,
