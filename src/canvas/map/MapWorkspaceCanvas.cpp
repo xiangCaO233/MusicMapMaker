@@ -804,7 +804,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
             effect_frame_texture->width * (editor->object_size_scale * 0.75);
         auto h =
             effect_frame_texture->height * (editor->object_size_scale * 0.75);
-        auto frame_texname = skin.nomal_hit_effect_dir + "/" +
+        auto frame_texname = skin.slide_hit_effect_dir + "/" +
                              std::to_string(i % 16 + 1) + ".png";
         auto frame =
             std::make_pair(QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
