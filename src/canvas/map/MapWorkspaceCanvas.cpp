@@ -411,7 +411,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   played_effects_objects.clear();
   update_mapcanvas_timepos();
   effect_thread->sync_music_time(editor->current_time_stamp);
-  AudioEnginPlayCallback::count = 0;
+  // AudioEnginPlayCallback::count = 0;
 }
 
 // 键盘按下事件
@@ -438,7 +438,7 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
       // 空格
       editor->canvas_pasued = !editor->canvas_pasued;
       emit pause_signal(editor->canvas_pasued);
-      AudioEnginPlayCallback::count = 0;
+      // AudioEnginPlayCallback::count = 0;
       break;
     }
     case Qt::Key_Delete: {

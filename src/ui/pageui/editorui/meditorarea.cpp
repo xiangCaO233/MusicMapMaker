@@ -15,6 +15,7 @@ MEditorArea::MEditorArea(QWidget *parent)
     : QWidget(parent), ui(new Ui::MEditorArea) {
   ui->setupUi(this);
   canvas_container = ui->canvas_container;
+  ui->splitter->setCollapsible(1, true);
   // 初始化工具按钮菜单
   initialize_toolbuttons();
   // 默认隐藏音频控制器
@@ -135,8 +136,8 @@ void MEditorArea::initialize_toolbuttons() {
   auto custombgsliderWidget = new QWidget();
   auto bgslider = new QSlider(Qt::Vertical, custombgsliderWidget);
   bgslider->setRange(0, 100);
-  bgslider->setValue(40);
-  auto bgopacylabel = new QLabel("40");
+  bgslider->setValue(25);
+  auto bgopacylabel = new QLabel("25");
 
   auto layout = new QVBoxLayout(custombgsliderWidget);
   layout->setContentsMargins(2, 2, 2, 2);

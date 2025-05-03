@@ -11,6 +11,7 @@
 class AudioEnginPlayCallback : public QObject, public PlayposCallBack {
   Q_OBJECT
   double current_audio_time{0};
+  int32_t count{195};
  signals:
   void music_play_callback(double time);
 
@@ -18,7 +19,6 @@ class AudioEnginPlayCallback : public QObject, public PlayposCallBack {
   std::atomic<bool> synclock{true};
   AudioEnginPlayCallback();
   ~AudioEnginPlayCallback();
-  static int32_t count;
 
   void playpos_call(double playpos) override;
 
