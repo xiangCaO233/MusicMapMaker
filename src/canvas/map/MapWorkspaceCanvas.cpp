@@ -60,6 +60,9 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
 
   // 初始化时间区域信息生成器
   areagenerator = std::make_shared<AreaInfoGenerator>(editor);
+
+  // 初始化时间信息生成器
+  timegenerator = std::make_shared<TimeInfoGenerator>(editor);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
@@ -632,121 +635,7 @@ void MapWorkspaceCanvas::draw_judgeline() {
 }
 
 // 绘制信息区
-void MapWorkspaceCanvas::draw_infoarea() {
-  auto current_size = size();
-  // 分隔线
-  renderer_manager->addLine(
-      QPointF(current_size.width() * editor->infoarea_width_scale - 2, 0),
-      QPointF(current_size.width() * editor->infoarea_width_scale - 2,
-              current_size.height()),
-      4, nullptr, QColor(255, 182, 193, 235), false);
-
-  // 标记timing
-  draw_timing_points();
-}
-
-// 绘制时间点
-void MapWorkspaceCanvas::draw_timing_points() {
-  if (!working_map) return;
-
-  std::string bpm_prefix = "bpm:";
-  std::vector<std::shared_ptr<Timing>> timings_in_area;
-
-  // 查询区间内的timing
-  working_map->query_timing_in_range(timings_in_area,
-                                     editor->current_time_area_start,
-                                     editor->current_time_area_end);
-  QSizeF connectionSize(12, 16);
-
-  // 判定线位置
-  auto judgeline_pos =
-      editor->canvas_size.height() * (1.0 - editor->judgeline_position);
-
-  for (const auto &timing : timings_in_area) {
-    auto timing_y_pos =
-        judgeline_pos -
-        (timing->timestamp - editor->current_visual_time_stamp) *
-            editor->timeline_zoom *
-            (editor->canvas_pasued ? 1.0 : editor->speed_zoom);
-    double timing_x_pos;
-
-    std::string bpmvalue =
-        QString::number(timing->basebpm, 'f', 2).toStdString();
-
-    // 绝对bpm-参考
-    auto absbpm_info = bpm_prefix + bpmvalue;
-
-#ifdef _WIN32
-#else
-    std::u32string absbpm = mutil::cu32(absbpm_info);
-#endif  //_WIN32
-    // 计算bpm字符串尺寸
-    auto absbpm_info_string_width{0};
-    auto absbpm_info_string_height{0};
-    for (const auto &character : absbpm) {
-      auto charsize = renderer_manager->get_character_size(
-          skin.font_family, skin.timeinfo_font_size, character);
-      absbpm_info_string_width += charsize.width();
-
-      if (charsize.height() > absbpm_info_string_height) {
-        absbpm_info_string_height = charsize.height();
-      }
-    }
-    timing_x_pos = editor->edit_area_start_pos_x - absbpm_info_string_width;
-
-    if (!timing->is_base_timing) {
-      std::string speed_prefix = tr("speed:").toStdString();
-      std::string speedvalue =
-          QString::number(timing->bpm, 'f', 2).toStdString();
-      auto speed_info = speed_prefix + speedvalue;
-#ifdef _WIN32
-#else
-      std::u32string speed = mutil::cu32(speed_info);
-#endif  //_WIN32
-      // 计算变速字符串尺寸
-      auto speed_info_string_width{0};
-      auto speed_info_string_height{0};
-      for (const auto &character : speed) {
-        auto charsize = renderer_manager->get_character_size(
-            skin.font_family, skin.timeinfo_font_size, character);
-        speed_info_string_width += charsize.width();
-        if (charsize.height() > speed_info_string_height) {
-          speed_info_string_height = charsize.height();
-        }
-      }
-      if (editor->edit_area_start_pos_x - speed_info_string_width <
-          timing_x_pos)
-        timing_x_pos = editor->edit_area_start_pos_x - speed_info_string_width;
-      if (std::fabs(timing->bpm * timing->basebpm / *editor->preference_bpm -
-                    1.0) < 0.01) {
-      } else {
-        // 先画绝对bpm
-        renderer_manager->addText(
-            {timing_x_pos - skin.timeinfo_font_size / 2,
-             timing_y_pos - speed_info_string_height -
-                 skin.timeinfo_font_size / 2 - connectionSize.height()},
-            absbpm, skin.timeinfo_font_size, skin.font_family,
-            skin.timeinfo_font_color, 0);
-        // 再画变速bpm
-        renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
-                                   timing_y_pos - skin.timeinfo_font_size / 2 -
-                                       connectionSize.height()},
-                                  speed, skin.timeinfo_font_size,
-                                  skin.font_family, skin.timeinfo_font_color,
-                                  0);
-      }
-    }
-
-    if (timing->is_base_timing) {
-      // 只画绝对bpm
-      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
-                                 timing_y_pos - skin.timeinfo_font_size / 2 -
-                                     connectionSize.height()},
-                                absbpm, skin.timeinfo_font_size,
-                                skin.font_family, skin.timeinfo_font_color, 0);
-    }
-  }
-}
+void MapWorkspaceCanvas::draw_infoarea() { timegenerator->generate(); }
 
 // 绘制拍
 void MapWorkspaceCanvas::draw_beats() {
@@ -824,7 +713,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
   std::unordered_map<std::shared_ptr<HitObject>, bool> drawed_objects;
 
   // 渲染物件
-  // new
   // 计算图形
   for (const auto &obj : editor->buffer_objects) {
     if (!obj->is_note || obj->object_type == HitObjectType::RMCOMPLEX) continue;
@@ -908,13 +796,6 @@ void MapWorkspaceCanvas::push_shape() {
       renderer_manager->addRect(effect_frame_queue.front().first,
                                 effect_frame_queue.front().second,
                                 QColor(255, 182, 193, 240), 0, true);
-      // if (effect_frame_queue.front().is_last_frame) {
-      //   auto note =
-      //       std::static_pointer_cast<Note>(effect_frame_queue.front().obj_ref);
-      //   if (note->note_type == NoteType::HOLD) {
-      //     std::static_pointer_cast<Hold>(note)->effect_play_over = true;
-      //   }
-      // }
       // 弹出队首
       if (!effect_frame_queue.empty()) effect_frame_queue.pop();
     }

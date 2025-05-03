@@ -1,15 +1,22 @@
 #include "meditorarea.h"
 
+#include <qlabel.h>
+#include <qmenu.h>
+#include <qnamespace.h>
+#include <qslider.h>
 #include <qtmetamacros.h>
+#include <qwidgetaction.h>
 
 #include "../../../canvas/map/editor/MapEditor.h"
 #include "../../../util/mutil.h"
 #include "ui_meditorarea.h"
 
-MEditorArea::MEditorArea(QWidget* parent)
+MEditorArea::MEditorArea(QWidget *parent)
     : QWidget(parent), ui(new Ui::MEditorArea) {
   ui->setupUi(this);
   canvas_container = ui->canvas_container;
+  // 初始化工具按钮菜单
+  initialize_toolbuttons();
   // 默认隐藏音频控制器
   // ui->audio_time_controller->hide();
 
@@ -86,6 +93,9 @@ void MEditorArea::use_theme(GlobalTheme theme) {
   mutil::set_toolbutton_svgcolor(ui->mode_toolbutton,
                                  ":/icons/mouse-pointer.svg", file_button_color,
                                  12, 12);
+  mutil::set_toolbutton_svgcolor(ui->background_opacy_toolbutton,
+                                 ":/icons/background.svg", file_button_color,
+                                 12, 12);
 
   mutil::set_button_svgcolor(ui->magnet_todivisor_button, ":/icons/magnet.svg",
                              file_button_color, 16, 16);
@@ -104,6 +114,57 @@ void MEditorArea::use_theme(GlobalTheme theme) {
   ui->audio_time_controller->use_theme(theme);
 }
 
+// 初始化工具按钮菜单
+void MEditorArea::initialize_toolbuttons() {
+  //
+  //
+  // 模式选择按钮
+  //
+  //
+  // 分拍策略按钮
+  //
+  //
+  // 背景透明度调节按钮
+  //
+  //
+  // 创建自定义 Widget（例如一个 QSlider）
+  //
+  //
+  // 创建菜单
+  auto bgmenu = new QMenu(ui->background_opacy_toolbutton);
+  auto custombgsliderWidget = new QWidget();
+  auto bgslider = new QSlider(Qt::Vertical, custombgsliderWidget);
+  bgslider->setRange(0, 100);
+  bgslider->setValue(40);
+  auto bgopacylabel = new QLabel("40");
+
+  auto layout = new QVBoxLayout(custombgsliderWidget);
+  layout->setContentsMargins(2, 2, 2, 2);
+  layout->setSpacing(2);
+  layout->addWidget(bgslider);
+  layout->addWidget(bgopacylabel);
+  custombgsliderWidget->setLayout(layout);
+
+  auto canvas = canvas_container->canvas.data();
+  connect(bgslider, &QSlider::valueChanged, [=](int value) {
+    bgopacylabel->setText(QString::number(value));
+    canvas->editor->background_darken_ratio = 1.0 - double(value) / 100.0;
+  });
+
+  // 将自定义 Widget 包装成 QWidgetAction
+  auto *bgwidgetAction = new QWidgetAction(bgmenu);
+  bgwidgetAction->setDefaultWidget(custombgsliderWidget);
+
+  // 添加到菜单
+  bgmenu->addAction(bgwidgetAction);
+  // 设置背景按钮菜单
+  ui->background_opacy_toolbutton->setMenu(bgmenu);
+
+  //
+  //
+  // 书签按钮
+}
+
 // 画布时间变化事件
 // 更新进度条
 void MEditorArea::on_canvas_timestamp_changed(double time) {
@@ -120,7 +181,7 @@ void MEditorArea::on_canvas_timestamp_changed(double time) {
 }
 
 // page选择了新map事件
-void MEditorArea::on_selectnewmap(std::shared_ptr<MMap>& map) {
+void MEditorArea::on_selectnewmap(std::shared_ptr<MMap> &map) {
   // 为画布切换map
   ui->canvas_container->canvas.data()->switch_map(map);
 

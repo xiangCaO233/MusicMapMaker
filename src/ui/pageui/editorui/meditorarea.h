@@ -67,6 +67,8 @@ class MEditorArea : public QWidget {
 
  private:
   Ui::MEditorArea *ui;
+
+  void initialize_toolbuttons();
 };
 
 #endif  // MEDITORAREA_H

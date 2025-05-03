@@ -10,7 +10,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
-#include <vector>
 
 #include "../../mmm/Beat.h"
 #include "../../mmm/map/MMap.h"
@@ -20,6 +19,7 @@
 #include "generator/AreaInfoGenerator.h"
 #include "generator/BeatGenerator.h"
 #include "generator/ObjectGenerator.h"
+#include "generator/TimeInfoGenerator.h"
 #include "threads/EffectThread.h"
 
 enum class EffectType {
@@ -57,6 +57,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 时间区域信息生成器
   std::shared_ptr<AreaInfoGenerator> areagenerator;
 
+  // 时间信息生成器
+  std::shared_ptr<TimeInfoGenerator> timegenerator;
+
   // x位置-特效帧队列
   std::unordered_map<
       double, std::queue<std::pair<QRectF, std::shared_ptr<TextureInstace>>>>
@@ -79,9 +82,6 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 绘制拍
   void draw_beats();
-
-  // 绘制时间点
-  void draw_timing_points();
 
   // 绘制物件
   void draw_hitobject();

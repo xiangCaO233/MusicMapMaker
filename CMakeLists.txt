@@ -144,6 +144,8 @@ set(PROJECT_SOURCES
   src/canvas/map/generator/BeatGenerator.cpp
   src/canvas/map/generator/AreaInfoGenerator.h
   src/canvas/map/generator/AreaInfoGenerator.cpp
+  src/canvas/map/generator/TimeInfoGenerator.h
+  src/canvas/map/generator/TimeInfoGenerator.cpp
   src/canvas/renderer/shader/GLShader.h
   src/canvas/renderer/shader/GLShader.cpp
   src/canvas/renderer/RenderCommand.h

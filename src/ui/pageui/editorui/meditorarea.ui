@@ -73,6 +73,9 @@
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>switch edit mode</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -81,7 +84,7 @@
           <normaloff>:/icons/mouse-pointer.svg</normaloff>:/icons/mouse-pointer.svg</iconset>
         </property>
         <property name="popupMode">
-         <enum>QToolButton::ToolButtonPopupMode::MenuButtonPopup</enum>
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -125,7 +128,45 @@
          </size>
         </property>
         <property name="popupMode">
-         <enum>QToolButton::ToolButtonPopupMode::MenuButtonPopup</enum>
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="background_opacy_toolbutton">
+        <property name="minimumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>adjust the background opacy</string>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/background.svg</normaloff>:/icons/background.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -166,7 +207,7 @@
          </size>
         </property>
         <property name="popupMode">
-         <enum>QToolButton::ToolButtonPopupMode::MenuButtonPopup</enum>
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -199,6 +240,9 @@
           <width>28</width>
           <height>28</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>check to show object after judgeline</string>
         </property>
         <property name="text">
          <string notr="true"/>

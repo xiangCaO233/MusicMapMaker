@@ -188,7 +188,7 @@ class MapEditor {
   double current_time_stamp{0};
 
   // 背景暗化
-  double background_darken_ratio{0.55};
+  double background_darken_ratio{0.6};
 
   // 时间偏移
   double static_time_offset{-15};
