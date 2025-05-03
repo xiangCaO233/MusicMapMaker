@@ -670,6 +670,8 @@ void MapWorkspaceCanvas::draw_timing_points() {
 
     std::string bpmvalue =
         QString::number(timing->basebpm, 'f', 2).toStdString();
+
+    // 绝对bpm-参考
     auto absbpm_info = bpm_prefix + bpmvalue;
 
 #ifdef _WIN32
@@ -713,23 +715,29 @@ void MapWorkspaceCanvas::draw_timing_points() {
       if (editor->edit_area_start_pos_x - speed_info_string_width <
           timing_x_pos)
         timing_x_pos = editor->edit_area_start_pos_x - speed_info_string_width;
-      // 先画绝对bpm
-      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 4,
-                                 timing_y_pos - speed_info_string_height -
-                                     skin.timeinfo_font_size / 4},
-                                absbpm, skin.timeinfo_font_size,
-                                skin.font_family, skin.timeinfo_font_color, 0);
-      // 再画变速bpm
-      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 4,
-                                 timing_y_pos - skin.timeinfo_font_size / 4},
-                                speed, skin.timeinfo_font_size,
-                                skin.font_family, skin.timeinfo_font_color, 0);
+      if (std::fabs(timing->bpm * timing->basebpm / *editor->preference_bpm -
+                    1.0) < 0.01) {
+      } else {
+        // 先画绝对bpm
+        renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
+                                   timing_y_pos - speed_info_string_height -
+                                       skin.timeinfo_font_size / 2},
+                                  absbpm, skin.timeinfo_font_size,
+                                  skin.font_family, skin.timeinfo_font_color,
+                                  0);
+        // 再画变速bpm
+        renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
+                                   timing_y_pos - skin.timeinfo_font_size / 2},
+                                  speed, skin.timeinfo_font_size,
+                                  skin.font_family, skin.timeinfo_font_color,
+                                  0);
+      }
     }
 
     if (timing->is_base_timing) {
       // 只画绝对bpm
-      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 4,
-                                 timing_y_pos - skin.timeinfo_font_size / 4},
+      renderer_manager->addText({timing_x_pos - skin.timeinfo_font_size / 2,
+                                 timing_y_pos - skin.timeinfo_font_size / 2},
                                 absbpm, skin.timeinfo_font_size,
                                 skin.font_family, skin.timeinfo_font_color, 0);
     }
