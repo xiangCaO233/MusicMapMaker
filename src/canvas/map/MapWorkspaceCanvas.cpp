@@ -782,8 +782,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       std::shared_ptr<TextureInstace> &effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
-        auto w = effect_frame_texture->width * (editor->object_size_scale);
-        auto h = effect_frame_texture->height * (editor->object_size_scale);
+        auto w =
+            effect_frame_texture->width * (editor->object_size_scale * 0.75);
+        auto h =
+            effect_frame_texture->height * (editor->object_size_scale * 0.75);
         // TODO-xiang-:不知名入队bug
         auto frame = std::make_pair(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
@@ -797,8 +799,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       std::shared_ptr<TextureInstace> &effect_frame_texture =
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
-        auto w = effect_frame_texture->width * (editor->object_size_scale);
-        auto h = effect_frame_texture->height * (editor->object_size_scale);
+        auto w =
+            effect_frame_texture->width * (editor->object_size_scale * 0.75);
+        auto h =
+            effect_frame_texture->height * (editor->object_size_scale * 0.75);
         auto frame = std::make_pair(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.slide_hit_effect_dir + "/" +

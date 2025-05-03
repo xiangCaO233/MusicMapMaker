@@ -75,14 +75,14 @@ void SlideGenerator::generate(Slide& slide) {
       QRectF(horizon_body_pos_x, head_cp.y() - horizon_body_height / 2.0,
              horizon_body_width, horizon_body_height);
 
+  auto slide_end_size =
+      QSizeF(slide_end_texture->width * editor_ref->object_size_scale * 0.75,
+             slide_end_texture->height * editor_ref->object_size_scale * 0.75);
+
   // 箭头位置--滑键结束轨道的位置
-  slide_end_rect =
-      QRectF(horizon_body_end_pos_x -
-                 slide_end_texture->width * editor_ref->object_size_scale / 2.5,
-             head_cp.y() - slide_end_texture->height *
-                               editor_ref->object_size_scale / 2.5,
-             slide_end_texture->width * editor_ref->object_size_scale,
-             slide_end_texture->height * editor_ref->object_size_scale);
+  slide_end_rect = QRectF(horizon_body_end_pos_x - slide_end_size.width() / 2.0,
+                          head_cp.y() - slide_end_size.height() / 2.0,
+                          slide_end_size.width(), slide_end_size.height());
 
   // 先绘制横向身,然后头和箭头
   // 是否有鼠标悬停

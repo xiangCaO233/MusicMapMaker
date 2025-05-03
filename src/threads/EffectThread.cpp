@@ -289,8 +289,8 @@ void EffectThread::effect_thread() {
                           canvas->size().height() *
                               (1 - canvas->editor->judgeline_position),
                           frames, t);
-                      // std::this_thread::sleep_for(std::chrono::milliseconds(
-                      //     int(canvas->des_update_time * 4)));
+                      std::this_thread::sleep_for(std::chrono::milliseconds(
+                          int(canvas->des_update_time * 2)));
                       // 播放音效
                       BackgroundAudio::play_audio_with_new_orbit(
                           canvas->working_map->project_reference->devicename,
