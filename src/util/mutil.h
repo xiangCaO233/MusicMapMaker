@@ -55,6 +55,7 @@ inline std::u32string utf8_to_utf32(const std::string& utf8) {
   return utf16_to_utf32(utf16);
 }
 #endif
+
 // 替换弃用的 wstring_convert
 inline std::u32string cu32(const std::string& utf8) {
   icu_76::UnicodeString utf16 = icu_76::UnicodeString::fromUTF8(utf8);

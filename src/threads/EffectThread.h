@@ -63,6 +63,9 @@ class EffectThread : public QObject {
   // 实际运行函数
   void effect_thread();
 
+  // 断开当前回调
+  void disconnect_current_callback();
+
   // 更新map
   void update_map();
 };

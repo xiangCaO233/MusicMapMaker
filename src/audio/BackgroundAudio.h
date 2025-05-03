@@ -41,7 +41,7 @@ class BackgroundAudio {
   // 初始化音频管理器
   inline static void init() {
     BackgroundAudio::audiomanager = XAudioManager::newmanager();
-    XLogger::setlevel(spdlog::level::warn);
+    // XLogger::setlevel(spdlog::level::warn);
     // audiomanager->disableLoggin();
   }
 
@@ -105,6 +105,8 @@ class BackgroundAudio {
     auto audio_idit = audiomanager->get_handles()->find(audio_full_path);
     if (audio_idit == audiomanager->get_handles()->end()) return;
     audiomanager->playAudio(device_idit->second, audio_idit->second, false);
+    audiomanager->setAudioVolume(device_idit->second, audio_idit->second,
+                                 music_orbits_volume);
   }
 
   // 从指定位置播放特定设备音频
@@ -128,15 +130,14 @@ class BackgroundAudio {
         orbit->playpos = xutil::milliseconds2plannerpcmpos(
                              pos, static_cast<int>(x::Config::samplerate)) *
                          static_cast<int>(x::Config::channel);
+        // 使用当前设置的音频音量
+        orbit->volume = music_orbits_volume;
         orbit->paused = false;
-      }
-      if (device->player->paused) {
-        device->player->resume();
       }
     }
   }
 
-  // 从指定位置播放特定设备音频(新建轨道)
+  // 从指定位置播放特定设备音频(新建轨道-实时音轨)
   inline static void play_audio_with_new_orbit(
       const std::string& device_full_name, const std::string& audio_full_path,
       double pos) {
@@ -152,14 +153,9 @@ class BackgroundAudio {
     orbit->playpos = xutil::milliseconds2plannerpcmpos(
                          pos, static_cast<int>(x::Config::samplerate)) *
                      static_cast<int>(x::Config::channel);
-    orbit->autoremove = true;
+    orbit->volume = effect_orbits_volume;
     // 添加此音轨到播放器
-    device->player->mixer->add_orbit(orbit);
-
-    // 检查是否暂停,自动恢复播放
-    if (device->player->paused) {
-      device->player->resume();
-    }
+    device->player->mixer->add_orbit_immediatly(orbit);
   }
 
   // 暂停特定设备音频
@@ -272,6 +268,55 @@ class BackgroundAudio {
         }
       }
       orbit_speed = speed_ratio;
+    }
+  }
+
+  // 设置全局音量
+  inline static void set_global_volume(const std::string& device_full_name,
+                                       float volume) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return;
+    auto& player =
+        audiomanager->get_outdevices()->at(device_idit->second)->player;
+    if (!player) return;
+    global_volume = volume;
+    player->global_volume = volume;
+  }
+
+  // 设置全局音乐音量
+  inline static void set_music_volume(const std::string& device_full_name,
+                                      float volume) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return;
+    auto& player =
+        audiomanager->get_outdevices()->at(device_idit->second)->player;
+    if (!player) return;
+    music_orbits_volume = volume;
+    // 设置所有非实时轨道音量
+    for (auto& [sound, orbits] : player->mixer->audio_orbits) {
+      for (auto& orbit : orbits) {
+        orbit->volume = music_orbits_volume;
+      }
+    }
+  }
+
+  // 设置全局特效音量
+  inline static void set_effects_volume(const std::string& device_full_name,
+                                        float volume) {
+    auto device_idit =
+        audiomanager->get_outdevice_indicies()->find(device_full_name);
+    if (device_idit == audiomanager->get_outdevice_indicies()->end()) return;
+    auto& player =
+        audiomanager->get_outdevices()->at(device_idit->second)->player;
+    if (!player) return;
+    effect_orbits_volume = volume;
+    // 设置所有实时轨道音量
+    for (auto& [sound, orbits] : player->mixer->immediate_orbits) {
+      for (auto& orbit : orbits) {
+        orbit->volume = effect_orbits_volume;
+      }
     }
   }
 };  // namespace BackgroundAudio

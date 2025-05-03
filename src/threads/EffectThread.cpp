@@ -18,7 +18,7 @@
 // 构造EffectThread
 EffectThread::EffectThread(std::shared_ptr<MapEditor> e) : editor(e) {
   // 启动效果线程
-  start();
+  // start();
 
   // update_map();
 }
@@ -41,12 +41,18 @@ void EffectThread::stop() {
     thread.join();
   }
 }
+// 断开当前回调
+void EffectThread::disconnect_current_callback() {
+  disconnect(editor->canvas_ref->working_map->audio_pos_callback.get(),
+             &AudioEnginPlayCallback::music_play_callback, this,
+             &EffectThread::on_music_play_callback);
+}
 
 // 更新map
 void EffectThread::update_map() {
   connect(editor->canvas_ref->working_map->audio_pos_callback.get(),
           &AudioEnginPlayCallback::music_play_callback, this,
-          &EffectThread::on_music_play_callback);
+          &EffectThread::on_music_play_callback, Qt::QueuedConnection);
   // 重启线程
   stop();
   start();
@@ -94,10 +100,11 @@ void EffectThread::sync_music_time(double time) {
 
 // 音乐播放回调槽
 void EffectThread::on_music_play_callback(double time) {
-  XWARN("音乐播放位置回调-----当前位置[" +
-        std::to_string(time - editor->canvas_ref->actual_update_time) + "]ms");
-  sync_music_time(time);
-  // on_canvas_pause(editor->canvas_pasued);
+  XWARN("音乐播放位置回调-----上一回调结束位置[" + std::to_string(time) +
+        "]ms");
+
+  sync_music_time(time -
+                  (1.0 - editor->playspeed) * editor->audio_buffer_offset);
 }
 
 // 画布暂停事件--更新参考时间
@@ -106,6 +113,15 @@ void EffectThread::on_canvas_pause(bool paused) {
   is_playing = !paused;
   if (!editor->canvas_ref->working_map) return;
   // 获取精确时间
+  XERROR("Pos Off:[" +
+         std::to_string(
+             BackgroundAudio::get_audio_pos(
+                 editor->canvas_ref->working_map->project_reference->devicename,
+                 QDir(editor->canvas_ref->working_map->audio_file_abs_path)
+                     .canonicalPath()
+                     .toStdString()) -
+             editor->current_time_stamp) +
+         "]");
   sync_music_time(BackgroundAudio::get_audio_pos(
       editor->canvas_ref->working_map->project_reference->devicename,
       QDir(editor->canvas_ref->working_map->audio_file_abs_path)
@@ -247,7 +263,11 @@ void EffectThread::effect_thread() {
                                         ->slide_parameter *
                                     ow;
                           frames = 16 * (1 / canvas->editor->playspeed);
-                          soundt = SoundEffectType::SLIDE;
+                          if (note->compinfo == ComplexInfo::NONE) {
+                            soundt = SoundEffectType::SLIDE;
+                          } else {
+                            soundt = SoundEffectType::COMMON_HIT;
+                          }
                           break;
                         }
                         default: {
@@ -263,16 +283,18 @@ void EffectThread::effect_thread() {
                                  (1 / canvas->editor->playspeed);
                       }
 
-                      // 播放音效
-                      BackgroundAudio::play_audio_with_new_orbit(
-                          canvas->working_map->project_reference->devicename,
-                          canvas->skin.get_sound_effect(soundt), 0);
                       // 播放特效
                       canvas->play_effect(
                           play_x,
                           canvas->size().height() *
                               (1 - canvas->editor->judgeline_position),
                           frames, t);
+                      // std::this_thread::sleep_for(std::chrono::milliseconds(
+                      //     int(canvas->des_update_time * 4)));
+                      // 播放音效
+                      BackgroundAudio::play_audio_with_new_orbit(
+                          canvas->working_map->project_reference->devicename,
+                          canvas->skin.get_sound_effect(soundt), 0);
                     }
                   });
                   framethread.detach();

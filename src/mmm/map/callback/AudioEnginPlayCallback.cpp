@@ -12,4 +12,12 @@ void AudioEnginPlayCallback::playpos_call(double playpos) {
   current_audio_time = xutil::plannerpcmpos2milliseconds(
       playpos, static_cast<int>(x::Config::samplerate));
   synclock.store(false, std::memory_order_release);
+  ++count;
+  if (count % 200 == 0) {
+    emit music_play_callback(current_audio_time -
+                             xutil::plannerpcmpos2milliseconds(
+                                 x::Config::mix_buffer_size / 3.0,
+                                 static_cast<int>(x::Config::samplerate)));
+    count = 0;
+  }
 }

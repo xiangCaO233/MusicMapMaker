@@ -93,6 +93,10 @@ class RendererManager {
                std::shared_ptr<TextureInstace> texture,
                const QColor& fill_color, bool is_volatile);
 
+  // 获取指定字符的尺寸
+  QSize get_character_size(const std::string& font_family, int32_t font_size,
+                           char32_t character);
+
   // 添加文本
   void addText(const QPointF& pos, const std::u32string& text, float font_size,
                const std::string font_family, const QColor& fill_color,

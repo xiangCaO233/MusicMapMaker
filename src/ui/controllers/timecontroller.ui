@@ -722,7 +722,7 @@
             <bool>false</bool>
            </property>
            <property name="alignment">
-            <set>Qt::AlignmentFlag::AlignCenter</set>
+            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
            </property>
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
@@ -790,13 +790,13 @@
          <number>100</number>
         </property>
         <property name="singleStep">
-         <number>5</number>
+         <number>2</number>
         </property>
         <property name="pageStep">
-         <number>25</number>
+         <number>10</number>
         </property>
         <property name="value">
-         <number>100</number>
+         <number>50</number>
         </property>
         <property name="orientation">
          <enum>Qt::Orientation::Vertical</enum>
@@ -811,7 +811,7 @@
          </font>
         </property>
         <property name="text">
-         <string notr="true">100</string>
+         <string notr="true">50</string>
         </property>
        </widget>
       </item>
@@ -877,10 +877,10 @@
          <number>100</number>
         </property>
         <property name="singleStep">
-         <number>5</number>
+         <number>2</number>
         </property>
         <property name="pageStep">
-         <number>25</number>
+         <number>10</number>
         </property>
         <property name="value">
          <number>100</number>
@@ -964,10 +964,10 @@
          <number>100</number>
         </property>
         <property name="singleStep">
-         <number>5</number>
+         <number>2</number>
         </property>
         <property name="pageStep">
-         <number>25</number>
+         <number>10</number>
         </property>
         <property name="value">
          <number>100</number>

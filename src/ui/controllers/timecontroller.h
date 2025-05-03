@@ -68,6 +68,9 @@ class TimeController : public QWidget {
   // 时间控制器播放速度变化信号
   void playspeed_changed(double speed);
 
+  // 音乐位置同步信号
+  void music_pos_synchronized(double time);
+
  private slots:
   // 暂停按钮
   void on_pausebutton_clicked();

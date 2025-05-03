@@ -77,7 +77,7 @@ class MapEditor {
   double judgeline_position{0.16};
 
   // 信息区宽度倍率:实际宽度为总宽度*preview_width_scale
-  double infoarea_width_scale{0.16};
+  double infoarea_width_scale{0.24};
 
   // 预览区宽度倍率:实际宽度为总宽度*preview_width_scale
   double preview_width_scale{0.22};
@@ -189,6 +189,11 @@ class MapEditor {
 
   // 时间偏移
   double static_time_offset{-15};
+
+  // 音频缓冲区偏移
+  double audio_buffer_offset{double(-xutil::plannerpcmpos2milliseconds(
+      x::Config::mix_buffer_size / 3.0,
+      static_cast<int>(x::Config::samplerate)))};
 
   // 用户调节的时间线缩放-- n * 1px/1ms
   double timeline_zoom{1.0};

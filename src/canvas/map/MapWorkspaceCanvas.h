@@ -80,6 +80,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 绘制拍
   void draw_beats();
 
+  // 绘制时间点
+  void draw_timing_points();
+
   // 绘制物件
   void draw_hitobject();
 
@@ -139,6 +142,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 时间控制器播放速度变化
   void on_timecontroller_speed_changed(double speed);
+
+  // 同步音频播放时间
+  void on_music_pos_sync(double time);
 
  signals:
   // 时间戳更新信号

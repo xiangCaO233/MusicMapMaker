@@ -1,6 +1,7 @@
 #include "MapWorkspaceCanvas.h"
 
 #include <qcolor.h>
+#include <qdir.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <qnumeric.h>
@@ -34,6 +35,7 @@
 #include "generator/general/HoldGenerator.h"
 #include "generator/general/NoteGenerator.h"
 #include "generator/general/SlideGenerator.h"
+#include "util/mutil.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
     : skin(this), GLCanvas(parent) {
@@ -78,7 +80,16 @@ void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
 void MapWorkspaceCanvas::on_timecontroller_speed_changed(double speed) {
   editor->playspeed = speed;
   // 同步一下时间
-  effect_thread->sync_music_time(editor->current_time_stamp);
+  effect_thread->sync_music_time(editor->current_time_stamp -
+                                 (1.0 - editor->playspeed) *
+                                     editor->audio_buffer_offset);
+}
+// 同步音频播放时间
+void MapWorkspaceCanvas::on_music_pos_sync(double time) {
+  editor->current_time_stamp =
+      time - (1.0 - editor->playspeed) * editor->audio_buffer_offset;
+  editor->current_visual_time_stamp =
+      editor->current_time_stamp + editor->static_time_offset;
 }
 
 // qt事件
@@ -391,7 +402,8 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
       emit pause_signal(editor->canvas_pasued);
     }
   }
-  editor->current_visual_time_stamp = editor->current_time_stamp;
+  editor->current_visual_time_stamp =
+      editor->current_time_stamp + editor->static_time_offset;
   played_effects_objects.clear();
   update_mapcanvas_timepos();
   effect_thread->sync_music_time(editor->current_time_stamp);
@@ -629,6 +641,58 @@ void MapWorkspaceCanvas::draw_infoarea() {
       4, nullptr, QColor(255, 182, 193, 235), false);
 
   // 标记timing
+  draw_timing_points();
+}
+
+// 绘制时间点
+void MapWorkspaceCanvas::draw_timing_points() {
+  std::string bpm_prefix = "bpm:";
+  std::vector<std::shared_ptr<Timing>> timings_in_area;
+
+  // 查询区间内的timing
+  working_map->query_timing_in_range(timings_in_area,
+                                     editor->current_time_area_start,
+                                     editor->current_time_area_end);
+
+  for (const auto &timing : timings_in_area) {
+    std::string bpmvalue = std::to_string(timing->basebpm);
+    auto absbpm_info = bpm_prefix + bpmvalue;
+
+#ifdef _WIN32
+#else
+    std::u32string absbpm = mutil::cu32(absbpm_info);
+#endif  //_WIN32
+    // 计算bpm字符串尺寸
+    auto absbpm_info_string_width{0};
+    auto absbpm_info_string_height{0};
+    for (const auto &character : absbpm) {
+      auto charsize = renderer_manager->get_character_size("", 16, character);
+      absbpm_info_string_width += charsize.width();
+      if (charsize.height() > absbpm_info_string_height) {
+        absbpm_info_string_height = charsize.height();
+      }
+    }
+
+    if (!timing->is_base_timing) {
+      std::string speed_prefix = tr("speed:").toStdString();
+      std::string speedvalue = std::to_string(timing->bpm);
+      auto speed_info = speed_prefix + speedvalue;
+#ifdef _WIN32
+#else
+      std::u32string speed = mutil::cu32(speed_info);
+#endif  //_WIN32
+      // 计算变速字符串尺寸
+      auto speed_info_string_width{0};
+      auto speed_info_string_height{0};
+      for (const auto &character : speed) {
+        auto charsize = renderer_manager->get_character_size("", 16, character);
+        speed_info_string_width += charsize.width();
+        if (charsize.height() > speed_info_string_height) {
+          speed_info_string_height = charsize.height();
+        }
+      }
+    }
+  }
 }
 
 // 绘制拍
@@ -668,10 +732,11 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
         auto w = effect_frame_texture->width * (editor->object_size_scale);
         auto h = effect_frame_texture->height * (editor->object_size_scale);
         // TODO-xiang-:不知名入队bug
-        effect_frame_queue_map[xpos].emplace(
+        auto frame = std::make_pair(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.nomal_hit_effect_dir + "/" +
                              std::to_string(i % 30 + 1) + ".png"]);
+        effect_frame_queue_map[xpos].push(frame);
       }
       break;
     }
@@ -681,10 +746,11 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       for (int i = 1; i <= frame_count; ++i) {
         auto w = effect_frame_texture->width * (editor->object_size_scale);
         auto h = effect_frame_texture->height * (editor->object_size_scale);
-        effect_frame_queue_map[xpos].emplace(
+        auto frame = std::make_pair(
             QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
             texture_full_map[skin.slide_hit_effect_dir + "/" +
                              std::to_string(i % 16 + 1) + ".png"]);
+        effect_frame_queue_map[xpos].push(frame);
       }
       break;
     }
@@ -798,6 +864,11 @@ void MapWorkspaceCanvas::push_shape() {
 // 切换到指定图
 void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
   // 此处确保了未打开项目是无法switchmap的(没有选项)
+  // 先断开当前信号
+  if (working_map)
+    disconnect(working_map->audio_pos_callback.get(),
+               &AudioEnginPlayCallback::music_play_callback, this,
+               &MapWorkspaceCanvas::on_music_pos_sync);
   working_map = map;
   editor->preference_bpm = nullptr;
   editor->canvas_pasued = true;
@@ -814,6 +885,12 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     // XINFO("maplength:" + std::to_string(map->map_length));
     // XINFO("audiolength:" + std::to_string(map_audio_length));
     if (map->map_length < map_audio_length) map->map_length = map_audio_length;
+
+    BackgroundAudio::play_audio(working_map->project_reference->devicename,
+                                s.canonicalPath().toStdString());
+    BackgroundAudio::pause_audio(working_map->project_reference->devicename,
+                                 s.canonicalPath().toStdString());
+
     // 同步谱面时间
     editor->current_time_stamp =
         map->project_reference->map_canvasposes.at(map);
@@ -821,10 +898,19 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
         editor->current_time_stamp + editor->static_time_offset;
     effect_thread->sync_music_time(editor->current_time_stamp);
 
+    // 同步特效线程的map
+    effect_thread->disconnect_current_callback();
+    effect_thread->update_map();
+
+    // 同步槽新信号
+    connect(working_map->audio_pos_callback.get(),
+            &AudioEnginPlayCallback::music_play_callback, this,
+            &MapWorkspaceCanvas::on_music_pos_sync);
+
     // 同步音频的时间
     if (working_map->project_reference->devicename != "unknown output device") {
       BackgroundAudio::set_audio_pos(working_map->project_reference->devicename,
-                                     working_map->audio_file_abs_path,
+                                     s.canonicalPath().toStdString(),
                                      editor->current_time_stamp);
     }
 
@@ -835,7 +921,6 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     editor->current_visual_time_stamp = 0;
   }
 
-  effect_thread->update_map();
   emit pause_signal(editor->canvas_pasued);
   emit current_time_stamp_changed(editor->current_visual_time_stamp);
 }

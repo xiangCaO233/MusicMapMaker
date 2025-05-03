@@ -262,7 +262,9 @@ void MMap::query_around_timing(
 // 查询区间窗口内的timing
 void MMap::query_timing_in_range(
     std::vector<std::shared_ptr<Timing>>& result_timings, int32_t start,
-    int32_t end) {}
+    int32_t end) {
+  // TODO(xiang 2025-05-03): 实现在指定区间内查询timing
+}
 
 // 查询时间区间窗口内的拍
 void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,

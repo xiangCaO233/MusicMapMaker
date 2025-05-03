@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/matrix.hpp>
 #include <memory>
+#include <string>
 
 #include "../../log/colorful-log.h"
 #include "../texture/pool/MTexturePool.h"
@@ -305,6 +306,31 @@ void RendererManager::sync_renderer(
         (command.is_volatile ? dynamic_instance_index : static_instance_index),
         &command.radius);
   }
+}
+
+// 获取指定字符的尺寸
+QSize RendererManager::get_character_size(const std::string& font_family,
+                                          int32_t font_size,
+                                          char32_t character) {
+  auto font_family_pack_it =
+      font_renderer->font_packs_mapping.find(font_family);
+  if (font_family_pack_it == font_renderer->font_packs_mapping.end()) {
+    XWARN("未加载过字体[" + font_family + "]");
+    return {0, 0};
+  }
+  auto font_pack_it = font_family_pack_it->second.find(font_size);
+  if (font_pack_it == font_family_pack_it->second.end()) {
+    XWARN("未加载过" + std::to_string(font_size) + "号[" + font_family +
+          "]字体");
+    return {0, 0};
+  }
+  auto character_it = font_pack_it->second.character_set.find(character);
+  if (character_it == font_pack_it->second.character_set.end()) {
+    XWARN("[" + font_family + "]字体不存在字符-[" + std::to_string(character) +
+          "]");
+    return {0, 0};
+  }
+  return character_it->second.size;
 }
 
 // 添加直线

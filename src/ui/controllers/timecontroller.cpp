@@ -94,23 +94,38 @@ void TimeController::update_audio_status() {
       BackgroundAudio::play_audio(binding_map->project_reference->devicename,
                                   file.canonicalPath().toStdString());
     }
-    // 尝试添加回调
+    QDir s(binding_map->audio_file_abs_path);
+    // 添加回调
     BackgroundAudio::add_playpos_callback(
         binding_map->project_reference->devicename,
-        file.canonicalPath().toStdString(), binding_map->audio_pos_callback);
+        s.canonicalPath().toStdString(), binding_map->audio_pos_callback);
     // 暂停的话同步一下
     if (pause) {
       // 防止播放器已播放完暂停了死等待
       if (BackgroundAudio::get_device_playerstatus(
-              binding_map->project_reference->devicename) == 1 &&
-          !pause) {
-        binding_map->audio_pos_callback->waitfor_clear_buffer([&]() {
-          XINFO("同步画布时间");
-          BackgroundAudio::set_audio_pos(
-              binding_map->project_reference->devicename,
-              file.canonicalPath().toStdString(),
-              binding_map->project_reference->map_canvasposes.at(binding_map));
-        });
+              binding_map->project_reference->devicename) == 1) {
+        XINFO("同步画布时间");
+        auto canvas_pos =
+            binding_map->project_reference->map_canvasposes.at(binding_map);
+        // XWARN("画布与音频时间差:[" +
+        //       std::to_string(current_audio_time - canvas_pos) + "]");
+        // 同步音频时间为画布时间
+        BackgroundAudio::set_audio_pos(
+            binding_map->project_reference->devicename,
+            file.canonicalPath().toStdString(), canvas_pos);
+        emit music_pos_synchronized(
+            canvas_pos - xutil::plannerpcmpos2milliseconds(
+                             x::Config::mix_buffer_size / 3.0,
+                             static_cast<int>(x::Config::samplerate)));
+        emit binding_map->audio_pos_callback->music_play_callback(canvas_pos);
+
+        // binding_map->audio_pos_callback->waitfor_clear_buffer(
+        //     [&](double current_audio_time) {
+        //       //
+        //       binding_map->project_reference->map_canvasposes.at(binding_map)
+        //       // =
+        //       //     current_audio_time;
+        //     });
       }
     }
   }
@@ -148,8 +163,8 @@ void TimeController::on_canvas_pause(bool paused) {
   // 更新暂停状态和按钮图标
   pause = paused;
   // 修改timeedit可用状态
-  // 暂停时不可使用
-  // ui->lineEdit->setEnabled(pause);
+  // 非暂停时不可使用
+  ui->lineEdit->setEnabled(pause);
 
   // 更新暂停按钮图标
   update_pause_button();
@@ -243,32 +258,67 @@ void TimeController::on_enablepitchaltbutton_clicked() {
 
 // 全局音频音量slider值变化事件
 void TimeController::on_global_volume_slider_valueChanged(int value) {
-  BackgroundAudio::global_volume = float(value) / 100.0;
+  if (binding_map) {
+    auto volume_value = float(value) / 100.0;
+    BackgroundAudio::set_global_volume(
+        binding_map->project_reference->devicename, volume_value);
+    // 更新标签
+    ui->global_volume_value_label->setText(QString::number(volume_value * 100));
+    update_global_volume_button();
+  }
 }
 
 // 音乐音量slider值变化事件
 void TimeController::on_music_volume_slider_valueChanged(int value) {
-  BackgroundAudio::music_orbits_volume = float(value) / 100.0;
+  if (binding_map) {
+    auto volume_value = float(value) / 100.0;
+    BackgroundAudio::set_music_volume(
+        binding_map->project_reference->devicename, volume_value);
+    // 更新标签
+    ui->music_volume_value_label->setText(QString::number(volume_value * 100));
+  }
 }
 
 // 效果音量slider值变化事件
 void TimeController::on_effect_volume_slider_valueChanged(int value) {
-  BackgroundAudio::effect_orbits_volume = float(value) / 100.0;
+  if (binding_map) {
+    auto volume_value = float(value) / 100.0;
+    BackgroundAudio::set_effects_volume(
+        binding_map->project_reference->devicename, volume_value);
+    // 更新标签
+    ui->effect_volume_value_label->setText(QString::number(volume_value * 100));
+  }
 }
 
 // 静音全局按钮事件
 void TimeController::on_reset_global_volume_button_clicked() {
-  BackgroundAudio::global_volume = 0;
+  if (binding_map) {
+    BackgroundAudio::set_global_volume(
+        binding_map->project_reference->devicename, 0);
+    // 更新标签
+    ui->global_volume_value_label->setText(QString::number(0));
+    update_global_volume_button();
+  }
 }
 
 // 静音音乐按钮事件
 void TimeController::on_reset_music_volume_button_clicked() {
-  BackgroundAudio::music_orbits_volume = 0;
+  if (binding_map) {
+    BackgroundAudio::set_music_volume(
+        binding_map->project_reference->devicename, 0);
+    // 更新标签
+    ui->music_volume_value_label->setText(QString::number(0));
+  }
 }
 
 // 静音效果按钮事件
 void TimeController::on_reset_effect_volume_button_clicked() {
-  BackgroundAudio::effect_orbits_volume = 0;
+  if (binding_map) {
+    BackgroundAudio::set_effects_volume(
+        binding_map->project_reference->devicename, 0);
+    // 更新标签
+    ui->effect_volume_value_label->setText(QString::number(0));
+  }
 }
 
 // 快退按钮事件
