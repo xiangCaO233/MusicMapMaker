@@ -64,8 +64,8 @@ void HoldGenerator::generate(Hold &hold) {
   auto long_note_end_pos_x = head_cp.x();
   // 面尾实际尺寸
   auto long_note_end_size = QSizeF(
-      long_note_end_texture->width * editor_ref->object_size_scale * 1.35,
-      long_note_end_texture->height * editor_ref->object_size_scale * 1.35);
+      long_note_end_texture->width * editor_ref->object_size_scale * 1.1,
+      long_note_end_texture->height * editor_ref->object_size_scale * 1.1);
 
   // 先添加body图形
   // 是否有鼠标悬停
