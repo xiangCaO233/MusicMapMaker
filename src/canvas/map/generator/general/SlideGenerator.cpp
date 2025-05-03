@@ -78,9 +78,9 @@ void SlideGenerator::generate(Slide& slide) {
   // 箭头位置--滑键结束轨道的位置
   slide_end_rect =
       QRectF(horizon_body_end_pos_x -
-                 slide_end_texture->width * editor_ref->object_size_scale / 2.0,
+                 slide_end_texture->width * editor_ref->object_size_scale / 2.5,
              head_cp.y() - slide_end_texture->height *
-                               editor_ref->object_size_scale / 2.0,
+                               editor_ref->object_size_scale / 2.5,
              slide_end_texture->width * editor_ref->object_size_scale,
              slide_end_texture->height * editor_ref->object_size_scale);
 

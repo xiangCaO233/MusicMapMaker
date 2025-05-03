@@ -52,9 +52,9 @@ void NoteGenerator::generate(Note& note) {
   const auto& complex_note_node_texture =
       editor_ref->canvas_ref->skin.get_object_texture(TexType::NODE,
                                                       ObjectStatus::COMMON);
-  node_size =
-      QSizeF(complex_note_node_texture->width * editor_ref->object_size_scale,
-             complex_note_node_texture->height * editor_ref->object_size_scale);
+  node_size = QSizeF(
+      complex_note_node_texture->width * editor_ref->object_size_scale * 0.75,
+      complex_note_node_texture->height * editor_ref->object_size_scale * 0.75);
 
   // 生成图形
   if (head_rect.contains(editor_ref->canvas_ref->mouse_pos)) {

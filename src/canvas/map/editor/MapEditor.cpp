@@ -49,7 +49,7 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
 
   // 依据轨道宽度自动适应物件纹理尺寸
   // 物件尺寸缩放--相对于纹理尺寸
-  width_scale = (orbit_width - 4.0) / double(head_texture->width);
+  width_scale = (orbit_width * 1.2) / double(head_texture->width);
 
   // 不大于1--不放大纹理
   object_size_scale = std::min(width_scale, 1.0);
