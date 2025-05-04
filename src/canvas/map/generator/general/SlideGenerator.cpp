@@ -22,9 +22,9 @@ void SlideGenerator::generate(Slide& slide) {
   auto endorbit = slide.orbit + slide.slide_parameter;
 
   // 横向身的终点位置
-  auto horizon_body_end_pos_x = editor_ref->edit_area_start_pos_x +
-                                editor_ref->orbit_width * endorbit +
-                                editor_ref->orbit_width / 2.0;
+  auto horizon_body_end_pos_x = editor_ref->ebuffer.edit_area_start_pos_x +
+                                editor_ref->ebuffer.orbit_width * endorbit +
+                                editor_ref->ebuffer.orbit_width / 2.0;
 
   auto head_cp = head_rect.center();
 
@@ -34,11 +34,11 @@ void SlideGenerator::generate(Slide& slide) {
 
   // 横向身的尺寸
   // 横向身的高度
-  auto horizon_body_height =
-      long_note_body_horizontal_texture->height * editor_ref->object_size_scale;
+  auto horizon_body_height = long_note_body_horizontal_texture->height *
+                             editor_ref->ebuffer.object_size_scale;
   // 横向身的宽度
-  auto horizon_body_width =
-      std::abs(horizon_body_end_pos_x - head_cp.x()) + horizon_body_height;
+  auto horizon_body_width = std::abs(horizon_body_end_pos_x - head_cp.x()) +
+                            horizon_body_height - horizon_body_height;
 
   // 滑尾纹理
   std::shared_ptr<TextureInstace> slide_end_texture;
@@ -49,7 +49,7 @@ void SlideGenerator::generate(Slide& slide) {
   double horizon_body_pos_x = -horizon_body_height / 2.0;
   if (slide.slide_parameter > 0) {
     // 右滑,矩形就在头物件中心位置
-    horizon_body_pos_x += head_cp.x();
+    horizon_body_pos_x += (head_cp.x() + horizon_body_height / 2.0);
     slide_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::SLIDE_END_RIGHT, ObjectStatus::COMMON);
     slide_end_hovered_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -60,7 +60,7 @@ void SlideGenerator::generate(Slide& slide) {
   } else {
     // 左滑,矩形整体左移矩形宽度的位置
     horizon_body_pos_x = horizon_body_pos_x + head_cp.x() - horizon_body_width +
-                         horizon_body_height;
+                         horizon_body_height / 2.0;
     slide_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::SLIDE_END_LEFT, ObjectStatus::COMMON);
     slide_end_hovered_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -75,9 +75,9 @@ void SlideGenerator::generate(Slide& slide) {
       QRectF(horizon_body_pos_x, head_cp.y() - horizon_body_height / 2.0,
              horizon_body_width, horizon_body_height);
 
-  auto slide_end_size =
-      QSizeF(slide_end_texture->width * editor_ref->object_size_scale * 0.75,
-             slide_end_texture->height * editor_ref->object_size_scale * 0.75);
+  auto slide_end_size = QSizeF(
+      slide_end_texture->width * editor_ref->ebuffer.object_size_scale * 0.75,
+      slide_end_texture->height * editor_ref->ebuffer.object_size_scale * 0.75);
 
   // 箭头位置--滑键结束轨道的位置
   slide_end_rect = QRectF(horizon_body_end_pos_x - slide_end_size.width() / 2.0,
@@ -90,29 +90,30 @@ void SlideGenerator::generate(Slide& slide) {
       slide_hori_body_rect.contains(editor_ref->canvas_ref->mouse_pos);
   // 是否选中横向身
   auto slide_blody_in_select_bound =
-      editor_ref->strict_select
-          ? editor_ref->select_bound.contains(slide_hori_body_rect)
-          : editor_ref->select_bound.intersects(slide_hori_body_rect);
-  auto body_selected_it = editor_ref->selected_hitobjects.find(slide_ptr);
+      editor_ref->csettings.strict_select
+          ? editor_ref->ebuffer.select_bound.contains(slide_hori_body_rect)
+          : editor_ref->ebuffer.select_bound.intersects(slide_hori_body_rect);
+  auto body_selected_it =
+      editor_ref->ebuffer.selected_hitobjects.find(slide_ptr);
   if (is_hover_body) {
     // 使用hover纹理
     slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::HOVER);
-    editor_ref->hover_hitobject_info = std::make_shared<
+    editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
         std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
         slide_ptr, slide.beatinfo);
-    editor_ref->is_hover_note = true;
+    editor_ref->cstatus.is_hover_note = true;
   } else {
     if (slide_blody_in_select_bound ||
-        body_selected_it != editor_ref->selected_hitobjects.end()) {
+        body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
       // 选中此物件
-      editor_ref->selected_hitobjects.emplace(slide_ptr);
+      editor_ref->ebuffer.selected_hitobjects.emplace(slide_ptr);
       // 使用选中纹理
       slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
           TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::SELECTED);
       // 发送更新选中物件信号
       emit editor_ref->canvas_ref->select_object(
-          objref->beatinfo, slide_ptr, editor_ref->current_abs_timing);
+          objref->beatinfo, slide_ptr, editor_ref->ebuffer.current_abs_timing);
     } else {
       // 使用常规纹理
       slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -135,9 +136,9 @@ void SlideGenerator::generate(Slide& slide) {
       slide_end_rect.contains(editor_ref->canvas_ref->mouse_pos);
   // 滑尾是否选中
   auto slide_end_in_select_bound =
-      editor_ref->strict_select
-          ? editor_ref->select_bound.contains(slide_end_rect)
-          : editor_ref->select_bound.intersects(slide_end_rect);
+      editor_ref->csettings.strict_select
+          ? editor_ref->ebuffer.select_bound.contains(slide_end_rect)
+          : editor_ref->ebuffer.select_bound.intersects(slide_end_rect);
 
   std::shared_ptr<TextureInstace> actual_use_end_texture;
   // 处理组合键中的情况
@@ -148,20 +149,21 @@ void SlideGenerator::generate(Slide& slide) {
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->hover_hitobject_info = std::make_shared<
+        editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
             std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
             slide.slide_end_reference, objref->beatinfo);
-        editor_ref->is_hover_note = true;
+        editor_ref->cstatus.is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||
-            body_selected_it != editor_ref->selected_hitobjects.end()) {
+            body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
           // 选中此物件
-          editor_ref->selected_hitobjects.emplace(slide_ptr);
+          editor_ref->ebuffer.selected_hitobjects.emplace(slide_ptr);
           // 使用选中纹理
           actual_use_end_texture = slide_end_selected_texture;
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              objref->beatinfo, slide_ptr, editor_ref->current_abs_timing);
+              objref->beatinfo, slide_ptr,
+              editor_ref->ebuffer.current_abs_timing);
         } else {
           // 使用常规纹理
           actual_use_end_texture = slide_end_texture;
@@ -190,25 +192,27 @@ void SlideGenerator::generate(Slide& slide) {
     case ComplexInfo::END: {
       // 补齐节点,画个尾
       // 滑键是否完全过了当前时间
-      dump_nodes_to_queue(slide.timestamp < editor_ref->current_time_stamp);
+      dump_nodes_to_queue(slide.timestamp <
+                          editor_ref->cstatus.current_time_stamp);
 
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->hover_hitobject_info = std::make_shared<
+        editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
             std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
             slide.slide_end_reference, slide.beatinfo);
-        editor_ref->is_hover_note = true;
+        editor_ref->cstatus.is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||
-            body_selected_it != editor_ref->selected_hitobjects.end()) {
+            body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
           // 选中此物件
-          editor_ref->selected_hitobjects.emplace(slide_ptr);
+          editor_ref->ebuffer.selected_hitobjects.emplace(slide_ptr);
           // 使用选中纹理
           actual_use_end_texture = slide_end_selected_texture;
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              objref->beatinfo, slide_ptr, editor_ref->current_abs_timing);
+              objref->beatinfo, slide_ptr,
+              editor_ref->ebuffer.current_abs_timing);
         } else {
           // 使用常规纹理
           actual_use_end_texture = slide_end_texture;

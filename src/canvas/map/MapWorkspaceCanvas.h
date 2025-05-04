@@ -126,7 +126,7 @@ class MapWorkspaceCanvas : public GLCanvas {
   void switch_map(std::shared_ptr<MMap> map);
 
   // 获取暂停状态
-  inline bool &is_paused() { return editor->canvas_pasued; }
+  inline bool &is_paused() { return editor->cstatus.canvas_pasued; }
 
   // 渲染实际图形
   void push_shape() override;

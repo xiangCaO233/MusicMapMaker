@@ -22,6 +22,9 @@ class BackgroundAudio {
   static std::shared_ptr<XAudioManager> audiomanager;
 
  public:
+  // 音频缓冲区偏移
+  static double audio_buffer_offset;
+
   // 变调是否启用
   static bool enable_pitch_alt;
 

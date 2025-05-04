@@ -3,6 +3,11 @@
 // 音频管理器
 std::shared_ptr<XAudioManager> BackgroundAudio::audiomanager;
 
+double BackgroundAudio::audio_buffer_offset{
+    double(-xutil::plannerpcmpos2milliseconds(
+        x::Config::mix_buffer_size / 3.0,
+        static_cast<int>(x::Config::samplerate)))};
+
 // 变调是否启用
 bool BackgroundAudio::enable_pitch_alt{false};
 

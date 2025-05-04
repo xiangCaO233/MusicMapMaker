@@ -152,6 +152,7 @@ void TimeController::update_pause_button() {
 // 暂停按钮
 void TimeController::on_pausebutton_clicked() {
   pause = !pause;
+
   update_pause_button();
   // 切换音频播放状态
   update_audio_status();

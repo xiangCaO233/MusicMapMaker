@@ -97,9 +97,9 @@ void EffectThread::sync_music_time(double time) {
         "last_triggered_timestamp 为:" +
         std::to_string(last_triggered_timestamp) + "ms");
   // 同步画布
-  editor->current_time_stamp = time;
-  editor->current_visual_time_stamp =
-      editor->current_time_stamp + editor->static_time_offset;
+  editor->cstatus.current_time_stamp = time;
+  editor->cstatus.current_visual_time_stamp =
+      editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
 }
 
 // 音乐播放回调槽
@@ -107,8 +107,8 @@ void EffectThread::on_music_play_callback(double time) {
   XWARN("音乐播放位置回调-----上一回调结束位置[" + std::to_string(time) +
         "]ms");
 
-  sync_music_time(time -
-                  (1.0 - editor->playspeed) * editor->audio_buffer_offset);
+  sync_music_time(time - (1.0 - editor->cstatus.playspeed) *
+                             BackgroundAudio::audio_buffer_offset);
 }
 
 // 画布暂停事件--更新参考时间
@@ -151,7 +151,7 @@ void EffectThread::effect_thread() {
     // 当前速度
     if (!editor) continue;
 
-    double current_playspeed = editor->playspeed;
+    double current_playspeed = editor->cstatus.playspeed;
 
     {
       // 锁定状态变量读取区
@@ -234,11 +234,11 @@ void EffectThread::effect_thread() {
                 // 启动播放线程
                 std::thread framethread;
                 // 物件的横向偏移
-                auto x = editor->edit_area_start_pos_x +
-                         editor->orbit_width * note->orbit +
-                         editor->orbit_width / 2.0;
+                auto x = editor->ebuffer.edit_area_start_pos_x +
+                         editor->ebuffer.orbit_width * note->orbit +
+                         editor->ebuffer.orbit_width / 2.0;
                 // 轨道宽度
-                auto ow = editor->orbit_width;
+                auto ow = editor->ebuffer.orbit_width;
                 // 画布引用
                 auto canvas = editor->canvas_ref;
                 if (!canvas->played_effects_objects.contains(note)) {
@@ -266,7 +266,7 @@ void EffectThread::effect_thread() {
                           play_x += (std::static_pointer_cast<Slide>(note))
                                         ->slide_parameter *
                                     ow;
-                          frames = 16 * (1 / canvas->editor->playspeed);
+                          frames = 16 * (1 / canvas->editor->cstatus.playspeed);
                           if (note->compinfo == ComplexInfo::NONE) {
                             soundt = SoundEffectType::SLIDE;
                           } else {
@@ -276,7 +276,7 @@ void EffectThread::effect_thread() {
                         }
                         default: {
                           t = EffectType::NORMAL;
-                          frames = 30 * (1 / canvas->editor->playspeed);
+                          frames = 30 * (1 / canvas->editor->cstatus.playspeed);
                           soundt = SoundEffectType::COMMON_HIT;
                           break;
                         }
@@ -284,18 +284,19 @@ void EffectThread::effect_thread() {
                       if (note->note_type == NoteType::HOLD) {
                         auto hold = std::static_pointer_cast<Hold>(note);
                         frames = hold->hold_time / canvas->des_update_time * 2 *
-                                 (1 / canvas->editor->playspeed);
+                                 (1 / canvas->editor->cstatus.playspeed);
                       }
 
                       // 播放特效
                       canvas->play_effect(
                           play_x,
                           canvas->size().height() *
-                              (1 - canvas->editor->judgeline_position),
+                              (1 -
+                               canvas->editor->csettings.judgeline_position),
                           frames, t);
                       std::this_thread::sleep_for(std::chrono::milliseconds(
                           int(canvas->des_update_time * 2 /
-                              canvas->editor->playspeed)));
+                              canvas->editor->cstatus.playspeed)));
                       // 播放音效
                       BackgroundAudio::play_audio_with_new_orbit(
                           canvas->working_map->project_reference->devicename,

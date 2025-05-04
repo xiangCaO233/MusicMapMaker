@@ -76,24 +76,26 @@ void MapWorkspaceCanvas::initializeGL() {
 
 // 时间控制器暂停按钮触发
 void MapWorkspaceCanvas::on_timecontroller_pause_button_changed(bool paused) {
-  editor->canvas_pasued = paused;
+  editor->cstatus.canvas_pasued = paused;
+  emit pause_signal(paused);
 }
 
 // 时间控制器播放速度变化
 void MapWorkspaceCanvas::on_timecontroller_speed_changed(double speed) {
-  editor->playspeed = speed;
+  editor->cstatus.playspeed = speed;
   // 同步一下时间
-  effect_thread->sync_music_time(editor->current_time_stamp -
-                                 (1.0 - editor->playspeed) *
-                                     editor->audio_buffer_offset);
+  effect_thread->sync_music_time(editor->cstatus.current_time_stamp -
+                                 (1.0 - editor->cstatus.playspeed) *
+                                     BackgroundAudio::audio_buffer_offset);
 }
 
 // 同步音频播放时间
 void MapWorkspaceCanvas::on_music_pos_sync(double time) {
-  editor->current_time_stamp =
-      time - (1.0 - editor->playspeed) * editor->audio_buffer_offset;
-  editor->current_visual_time_stamp =
-      editor->current_time_stamp + editor->static_time_offset;
+  editor->cstatus.current_time_stamp =
+      time -
+      (1.0 - editor->cstatus.playspeed) * BackgroundAudio::audio_buffer_offset;
+  editor->cstatus.current_visual_time_stamp =
+      editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
 }
 
 // qt事件
@@ -111,26 +113,27 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
   }
   lasttime = time;
 
-  if (!editor->canvas_pasued) {
+  if (!editor->cstatus.canvas_pasued) {
     // 未暂停,更新当前时间戳
-    editor->current_time_stamp =
-        editor->current_time_stamp + actual_update_time * editor->playspeed;
+    editor->cstatus.current_time_stamp =
+        editor->cstatus.current_time_stamp +
+        actual_update_time * editor->cstatus.playspeed;
 
-    if (editor->current_time_stamp < 0) {
-      editor->current_time_stamp = 0;
-      editor->canvas_pasued = true;
-      emit pause_signal(editor->canvas_pasued);
+    if (editor->cstatus.current_time_stamp < 0) {
+      editor->cstatus.current_time_stamp = 0;
+      editor->cstatus.canvas_pasued = true;
+      emit pause_signal(editor->cstatus.canvas_pasued);
     }
-    if (editor->current_time_stamp > working_map->map_length) {
-      editor->current_time_stamp = working_map->map_length;
-      editor->canvas_pasued = true;
-      emit pause_signal(editor->canvas_pasued);
+    if (editor->cstatus.current_time_stamp > working_map->map_length) {
+      editor->cstatus.current_time_stamp = working_map->map_length;
+      editor->cstatus.canvas_pasued = true;
+      emit pause_signal(editor->cstatus.canvas_pasued);
     }
-    editor->current_visual_time_stamp =
-        editor->current_time_stamp + editor->static_time_offset;
+    editor->cstatus.current_visual_time_stamp =
+        editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
     working_map->project_reference->map_canvasposes.at(working_map) =
-        editor->current_time_stamp;
-    emit current_time_stamp_changed(editor->current_time_stamp);
+        editor->cstatus.current_time_stamp;
+    emit current_time_stamp_changed(editor->cstatus.current_time_stamp);
   }
 }
 
@@ -159,8 +162,8 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   switch (event->button()) {
     case Qt::MouseButton::LeftButton: {
       // 设置状态和位置快照
-      editor->mouse_left_pressed = true;
-      editor->mouse_left_press_pos = event->pos();
+      editor->cstatus.mouse_left_pressed = true;
+      editor->cstatus.mouse_left_press_pos = event->pos();
       // 更新选中信息
       editor->update_selections(event->modifiers() & Qt::ControlModifier);
       break;
@@ -177,7 +180,7 @@ void MapWorkspaceCanvas::mouseReleaseEvent(QMouseEvent *event) {
   GLCanvas::mouseReleaseEvent(event);
   switch (event->button()) {
     case Qt::MouseButton::LeftButton: {
-      editor->mouse_left_pressed = false;
+      editor->cstatus.mouse_left_pressed = false;
     }
   }
 }
@@ -194,20 +197,20 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
   GLCanvas::mouseMoveEvent(event);
 
   // 更新鼠标操作区
-  if (editor->edit_area.contains(mouse_pos)) {
-    editor->operation_area = MouseOperationArea::EDIT;
-  } else if (editor->preview_area.contains(mouse_pos)) {
-    editor->operation_area = MouseOperationArea::PREVIEW;
-  } else if (editor->info_area.contains(mouse_pos)) {
-    editor->operation_area = MouseOperationArea::INFO;
+  if (editor->cstatus.edit_area.contains(mouse_pos)) {
+    editor->cstatus.operation_area = MouseOperationArea::EDIT;
+  } else if (editor->cstatus.preview_area.contains(mouse_pos)) {
+    editor->cstatus.operation_area = MouseOperationArea::PREVIEW;
+  } else if (editor->cstatus.info_area.contains(mouse_pos)) {
+    editor->cstatus.operation_area = MouseOperationArea::INFO;
   }
 
-  if (editor->mouse_left_pressed) {
+  if (editor->cstatus.mouse_left_pressed) {
     // 正在拖动
-    if (editor->edit_mode == MouseEditMode::SELECT) {
+    if (editor->cstatus.edit_mode == MouseEditMode::SELECT) {
       // 选择模式-更新选中信息
       // 正悬浮在物件上
-      if (editor->hover_hitobject_info) {
+      if (editor->ebuffer.hover_hitobject_info) {
         // 调整物件时间戳等属性
       } else {
         // 未悬浮在任何物件上-更新选中框定位点
@@ -216,11 +219,11 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
       }
     }
 
-    if (editor->edit_mode == MouseEditMode::PLACE_NOTE) {
+    if (editor->cstatus.edit_mode == MouseEditMode::PLACE_NOTE) {
       // 放置物件模式-拖动中--更新正在放置的物件的时间戳
     }
 
-    if (editor->edit_mode == MouseEditMode::PLACE_LONGNOTE) {
+    if (editor->cstatus.edit_mode == MouseEditMode::PLACE_LONGNOTE) {
       // 放置长键模式-拖动中--更新正在放置的长条的持续时间
     }
   }
@@ -265,8 +268,9 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_3:
     case Qt::Key_4: {
       // 快速切换编辑模式
-      editor->edit_mode = static_cast<MouseEditMode>(keycode - Qt::Key_0);
-      emit switch_edit_mode(editor->edit_mode);
+      editor->cstatus.edit_mode =
+          static_cast<MouseEditMode>(keycode - Qt::Key_0);
+      emit switch_edit_mode(editor->cstatus.edit_mode);
       break;
     }
     case Qt::Key_Space: {
@@ -280,8 +284,8 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
       }
 
       // 空格
-      editor->canvas_pasued = !editor->canvas_pasued;
-      emit pause_signal(editor->canvas_pasued);
+      editor->cstatus.canvas_pasued = !editor->cstatus.canvas_pasued;
+      emit pause_signal(editor->cstatus.canvas_pasued);
       // AudioEnginPlayCallback::count = 0;
       break;
     }
@@ -330,9 +334,10 @@ void MapWorkspaceCanvas::draw_background() {
                            .toStdString()];
   renderer_manager->addRect(des, t, QColor(0, 0, 0, 255), 0, false);
   // 绘制背景遮罩
-  if (editor->background_darken_ratio != 0.0) {
+  if (editor->cstatus.background_darken_ratio != 0.0) {
     renderer_manager->addRect(
-        des, nullptr, QColor(0, 0, 0, 255 * editor->background_darken_ratio), 0,
+        des, nullptr,
+        QColor(0, 0, 0, 255 * editor->cstatus.background_darken_ratio), 0,
         false);
   }
   // XINFO("bg_path:" + working_map->bg_path.string());
@@ -358,7 +363,7 @@ void MapWorkspaceCanvas::draw_top_bar() {
 
 // 绘制选中框
 void MapWorkspaceCanvas::draw_select_bound() {
-  if (editor->select_bound_locate_points) {
+  if (editor->ebuffer.select_bound_locate_points) {
     auto &border_left_texture =
         skin.get_selected_border_texture(SelectBorderDirection::LEFT);
     auto &border_right_texture =
@@ -368,44 +373,44 @@ void MapWorkspaceCanvas::draw_select_bound() {
     auto &border_bottom_texture =
         skin.get_selected_border_texture(SelectBorderDirection::BOTTOM);
 
-    auto p1 = editor->select_bound_locate_points->first;
-    auto p2 = QPointF(editor->select_bound_locate_points->first.x(),
-                      editor->select_bound_locate_points->second.y());
-    auto p3 = editor->select_bound_locate_points->second;
-    auto p4 = QPointF(editor->select_bound_locate_points->second.x(),
-                      editor->select_bound_locate_points->first.y());
+    auto p1 = editor->ebuffer.select_bound_locate_points->first;
+    auto p2 = QPointF(editor->ebuffer.select_bound_locate_points->first.x(),
+                      editor->ebuffer.select_bound_locate_points->second.y());
+    auto p3 = editor->ebuffer.select_bound_locate_points->second;
+    auto p4 = QPointF(editor->ebuffer.select_bound_locate_points->second.x(),
+                      editor->ebuffer.select_bound_locate_points->first.y());
 
     // 左矩形p1-p2
-    auto leftrect =
-        QRectF(p1.x() - editor->select_border_width / 2.0,
-               p1.y() < p2.y() ? p1.y() - editor->select_border_width / 2.0
-                               : p2.y() - editor->select_border_width / 2.0,
-               editor->select_border_width,
-               std::abs(p2.y() - p1.y()) + editor->select_border_width);
+    auto leftrect = QRectF(
+        p1.x() - editor->csettings.select_border_width / 2.0,
+        p1.y() < p2.y() ? p1.y() - editor->csettings.select_border_width / 2.0
+                        : p2.y() - editor->csettings.select_border_width / 2.0,
+        editor->csettings.select_border_width,
+        std::abs(p2.y() - p1.y()) + editor->csettings.select_border_width);
 
     // 右矩形p3-p4
-    auto rightrect =
-        QRectF(p4.x() - editor->select_border_width / 2.0,
-               p4.y() < p3.y() ? p4.y() - editor->select_border_width / 2.0
-                               : p3.y() - editor->select_border_width / 2.0,
-               editor->select_border_width,
-               std::abs(p3.y() - p4.y()) + editor->select_border_width);
+    auto rightrect = QRectF(
+        p4.x() - editor->csettings.select_border_width / 2.0,
+        p4.y() < p3.y() ? p4.y() - editor->csettings.select_border_width / 2.0
+                        : p3.y() - editor->csettings.select_border_width / 2.0,
+        editor->csettings.select_border_width,
+        std::abs(p3.y() - p4.y()) + editor->csettings.select_border_width);
 
     // 上矩形p1-p4
-    auto toprect =
-        QRectF(p1.x() < p4.x() ? p1.x() - editor->select_border_width / 2.0
-                               : p4.x() - editor->select_border_width / 2.0,
-               p1.y() - editor->select_border_width / 2.0,
-               std::abs(p4.x() - p1.x()) + editor->select_border_width,
-               editor->select_border_width);
+    auto toprect = QRectF(
+        p1.x() < p4.x() ? p1.x() - editor->csettings.select_border_width / 2.0
+                        : p4.x() - editor->csettings.select_border_width / 2.0,
+        p1.y() - editor->csettings.select_border_width / 2.0,
+        std::abs(p4.x() - p1.x()) + editor->csettings.select_border_width,
+        editor->csettings.select_border_width);
 
     // 下矩形p2-p3
-    auto bottomrect =
-        QRectF(p2.x() < p3.x() ? p2.x() - editor->select_border_width / 2.0
-                               : p3.x() - editor->select_border_width / 2.0,
-               p2.y() - editor->select_border_width / 2.0,
-               std::abs(p3.x() - p2.x()) + editor->select_border_width,
-               editor->select_border_width);
+    auto bottomrect = QRectF(
+        p2.x() < p3.x() ? p2.x() - editor->csettings.select_border_width / 2.0
+                        : p3.x() - editor->csettings.select_border_width / 2.0,
+        p2.y() - editor->csettings.select_border_width / 2.0,
+        std::abs(p3.x() - p2.x()) + editor->csettings.select_border_width,
+        editor->csettings.select_border_width);
 
     renderer_manager->addRect(leftrect, border_left_texture,
                               QColor(0, 0, 0, 255), 0, true);
@@ -422,12 +427,12 @@ void MapWorkspaceCanvas::draw_select_bound() {
 void MapWorkspaceCanvas::draw_preview_content() {
   auto current_size = size();
   auto preview_x_startpos =
-      current_size.width() * (1 - editor->preview_width_scale);
+      current_size.width() * (1 - editor->csettings.preview_width_scale);
 
   // 绘制一层滤镜
   QRectF preview_area_bg_bound(
       preview_x_startpos, 0.0,
-      current_size.width() * editor->preview_width_scale,
+      current_size.width() * editor->csettings.preview_width_scale,
       current_size.height());
   renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75),
                             0, false);
@@ -446,9 +451,11 @@ void MapWorkspaceCanvas::draw_judgeline() {
 
   // 主区域判定线
   renderer_manager->addLine(
-      QPointF(0, current_size.height() * (1.0 - editor->judgeline_position)),
-      QPointF(current_size.width() * (1 - editor->preview_width_scale),
-              current_size.height() * (1.0 - editor->judgeline_position)),
+      QPointF(0, current_size.height() *
+                     (1.0 - editor->csettings.judgeline_position)),
+      QPointF(
+          current_size.width() * (1 - editor->csettings.preview_width_scale),
+          current_size.height() * (1.0 - editor->csettings.judgeline_position)),
       8, nullptr, QColor(0, 255, 255, 235), false);
 }
 
@@ -489,10 +496,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       std::shared_ptr<TextureInstace> &effect_frame_texture =
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
-        auto w =
-            effect_frame_texture->width * (editor->object_size_scale * 0.75);
-        auto h =
-            effect_frame_texture->height * (editor->object_size_scale * 0.75);
+        auto w = effect_frame_texture->width *
+                 (editor->ebuffer.object_size_scale * 0.75);
+        auto h = effect_frame_texture->height *
+                 (editor->ebuffer.object_size_scale * 0.75);
         // TODO-xiang-:不知名入队bug
         auto frame_texname =
             skin.nomal_hit_effect_dir + "/" +
@@ -508,10 +515,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
       std::shared_ptr<TextureInstace> &effect_frame_texture =
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
-        auto w =
-            effect_frame_texture->width * (editor->object_size_scale * 0.75);
-        auto h =
-            effect_frame_texture->height * (editor->object_size_scale * 0.75);
+        auto w = effect_frame_texture->width *
+                 (editor->ebuffer.object_size_scale * 0.75);
+        auto h = effect_frame_texture->height *
+                 (editor->ebuffer.object_size_scale * 0.75);
         auto frame_texname =
             skin.slide_hit_effect_dir + "/" +
             std::to_string(i % skin.slide_hit_effect_frame_count + 1) + ".png";
@@ -534,7 +541,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
 
   // 渲染物件
   // 计算图形
-  for (const auto &obj : editor->buffer_objects) {
+  for (const auto &obj : editor->ebuffer.buffer_objects) {
     if (!obj->is_note || obj->object_type == HitObjectType::RMCOMPLEX) continue;
     auto note = std::static_pointer_cast<Note>(obj);
     if (!note) continue;
@@ -561,20 +568,20 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 按计算层级渲染图形
   while (!ObjectGenerator::shape_queue.empty()) {
     auto &shape = ObjectGenerator::shape_queue.front();
-    if (editor->show_object_after_judgeline) {
+    if (editor->csettings.show_object_after_judgeline) {
       if (shape.is_over_current_time) {
         renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
       }
-      if (!editor->canvas_pasued && shape.objref &&
-          shape.objref->timestamp <= editor->current_time_stamp) {
+      if (!editor->cstatus.canvas_pasued && shape.objref &&
+          shape.objref->timestamp <= editor->cstatus.current_time_stamp) {
         // 播放中且过了判定线时间使用半透明效果
         renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
       }
       renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
                                 shape.tex, QColor(0, 0, 0, 255), 0, true);
     } else {
-      if (!editor->canvas_pasued && shape.objref &&
-          shape.objref->timestamp <= editor->current_time_stamp) {
+      if (!editor->cstatus.canvas_pasued && shape.objref &&
+          shape.objref->timestamp <= editor->cstatus.current_time_stamp) {
       } else {
         renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
                                   shape.tex, QColor(0, 0, 0, 255), 0, true);
@@ -585,11 +592,11 @@ void MapWorkspaceCanvas::draw_hitobject() {
   }
 
   // 更新hover信息
-  if (!editor->is_hover_note) {
+  if (!editor->cstatus.is_hover_note) {
     // 未悬浮在任何一个物件或物件身体上
-    editor->hover_hitobject_info = nullptr;
+    editor->ebuffer.hover_hitobject_info = nullptr;
   } else {
-    editor->is_hover_note = false;
+    editor->cstatus.is_hover_note = false;
   }
 }
 
@@ -600,14 +607,15 @@ void MapWorkspaceCanvas::push_shape() {
   if (working_map) {
     // 生成区域信息
     areagenerator->generate();
-    if (editor->canvas_pasued) draw_beats();
+    if (editor->cstatus.canvas_pasued) draw_beats();
 
     // 更新物件列表
     // 清除物件缓存
-    editor->buffer_objects.clear();
+    editor->ebuffer.buffer_objects.clear();
     working_map->query_object_in_range(
-        editor->buffer_objects, int32_t(editor->current_time_area_start),
-        int32_t(editor->current_time_area_end), true);
+        editor->ebuffer.buffer_objects,
+        int32_t(editor->ebuffer.current_time_area_start),
+        int32_t(editor->ebuffer.current_time_area_end), true);
 
     // 绘制物件
     draw_hitobject();
@@ -648,10 +656,10 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
                &AudioEnginPlayCallback::music_play_callback, this,
                &MapWorkspaceCanvas::on_music_pos_sync);
   working_map = map;
-  editor->canvas_pasued = true;
+  editor->cstatus.canvas_pasued = true;
 
   if (map) {
-    editor->map_type = map->maptype;
+    editor->cstatus.map_type = map->maptype;
     auto s = QDir(map->audio_file_abs_path);
     // 更新谱面长度(如果音乐比谱面长)
     auto map_audio_length =
@@ -669,11 +677,11 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
                                  s.canonicalPath().toStdString());
 
     // 同步谱面时间
-    editor->current_time_stamp =
+    editor->cstatus.current_time_stamp =
         map->project_reference->map_canvasposes.at(map);
-    editor->current_visual_time_stamp =
-        editor->current_time_stamp + editor->static_time_offset;
-    effect_thread->sync_music_time(editor->current_time_stamp);
+    editor->cstatus.current_visual_time_stamp =
+        editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
+    effect_thread->sync_music_time(editor->cstatus.current_time_stamp);
 
     // 同步特效线程的map
     effect_thread->disconnect_current_callback();
@@ -688,16 +696,16 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     if (working_map->project_reference->devicename != "unknown output device") {
       BackgroundAudio::set_audio_pos(working_map->project_reference->devicename,
                                      s.canonicalPath().toStdString(),
-                                     editor->current_time_stamp);
+                                     editor->cstatus.current_time_stamp);
     }
 
     // 加载背景图纹理
     auto ppath = map->bg_path.root_path();
     add_texture(ppath, map->bg_path);
   } else {
-    editor->current_visual_time_stamp = 0;
+    editor->cstatus.current_visual_time_stamp = 0;
   }
 
-  emit pause_signal(editor->canvas_pasued);
-  emit current_time_stamp_changed(editor->current_visual_time_stamp);
+  emit pause_signal(editor->cstatus.canvas_pasued);
+  emit current_time_stamp_changed(editor->cstatus.current_visual_time_stamp);
 }

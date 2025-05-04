@@ -38,6 +38,10 @@ MEditorArea::MEditorArea(QWidget *parent)
   connect(ui->audio_time_controller, &TimeController::pause_button_changed,
           ui->canvas_container->canvas.data(),
           &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
+  // 连接时间控制器暂停信号到效果线程
+  // connect(ui->audio_time_controller, &TimeController::pause_button_changed,
+  //         canvas_container->canvas->effect_thread,
+  //         &EffectThread::on_canvas_pause);
 
   // 连接画布槽和时间控制器信号
   // 时间控制器暂停->画布暂停响应
@@ -209,7 +213,7 @@ void MEditorArea::initialize_toolbuttons() {
             mode_toolbutton->setIcon(button->icon());
             // 切换当前编辑器的模式
             if (c->working_map) {
-              c->editor->edit_mode =
+              c->editor->cstatus.edit_mode =
                   static_cast<MouseEditMode>(group->id(button));
             }
           });
@@ -250,7 +254,8 @@ void MEditorArea::initialize_toolbuttons() {
   auto canvas = canvas_container->canvas.data();
   connect(bgslider, &QSlider::valueChanged, [=](int value) {
     bgopacylabel->setText(QString::number(value));
-    canvas->editor->background_darken_ratio = 1.0 - double(value) / 100.0;
+    canvas->editor->cstatus.background_darken_ratio =
+        1.0 - double(value) / 100.0;
   });
 
   // 将自定义 Widget 包装成 QWidgetAction
@@ -311,7 +316,7 @@ void MEditorArea::on_selectnewmap(std::shared_ptr<MMap> &map) {
 
 // 滚动方向切换按钮触发
 void MEditorArea::on_wheel_direction_button_toggled(bool checked) {
-  ui->canvas_container->canvas.data()->editor->scroll_direction =
+  ui->canvas_container->canvas.data()->editor->cstatus.scroll_direction =
       (checked ? -1.0 : 1.0);
 
   // 根据主题切换图标颜色
@@ -336,7 +341,8 @@ void MEditorArea::on_wheel_direction_button_toggled(bool checked) {
 
 // 吸附到分拍线按钮状态切换事件
 void MEditorArea::on_magnet_todivisor_button_toggled(bool checked) {
-  ui->canvas_container->canvas.data()->editor->is_magnet_to_divisor = checked;
+  ui->canvas_container->canvas.data()->editor->cstatus.is_magnet_to_divisor =
+      checked;
 }
 
 // 模式锁定按钮状态切换事件
@@ -375,11 +381,14 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
       double ratio = (double)value / 10000.0;
       auto maptime = (double)(ui->canvas_container->canvas.data()
                                   ->working_map->map_length);
-      ui->canvas_container->canvas.data()->editor->current_time_stamp =
+      ui->canvas_container->canvas.data()->editor->cstatus.current_time_stamp =
           maptime * ratio;
-      ui->canvas_container->canvas.data()->editor->current_visual_time_stamp =
-          ui->canvas_container->canvas.data()->editor->current_time_stamp +
-          ui->canvas_container->canvas.data()->editor->static_time_offset;
+      ui->canvas_container->canvas.data()
+          ->editor->cstatus.current_visual_time_stamp =
+          ui->canvas_container->canvas.data()
+              ->editor->cstatus.current_time_stamp +
+          ui->canvas_container->canvas.data()
+              ->editor->cstatus.static_time_offset;
       ui->canvas_container->canvas.data()->played_effects_objects.clear();
       emit progress_pos_changed(maptime * ratio);
     }
@@ -392,5 +401,6 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
 // }
 
 void MEditorArea::on_show_object_after_judgeline_button_toggled(bool checked) {
-  canvas_container->canvas.get()->editor->show_object_after_judgeline = checked;
+  canvas_container->canvas.get()
+      ->editor->csettings.show_object_after_judgeline = checked;
 }

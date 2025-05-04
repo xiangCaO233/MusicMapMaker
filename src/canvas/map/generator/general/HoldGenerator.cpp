@@ -21,19 +21,20 @@ void HoldGenerator::generate(Hold &hold) {
   objref = hold_ptr->hold_end_reference;
   // 添加long_note_body
   auto head_cp = head_rect.center();
-  double long_note_end_visual_time = editor_ref->current_visual_time_stamp +
-                                     (hold.hold_end_reference->timestamp -
-                                      editor_ref->current_visual_time_stamp) *
-                                         editor_ref->speed_zoom;
+  double long_note_end_visual_time =
+      editor_ref->cstatus.current_visual_time_stamp +
+      (hold.hold_end_reference->timestamp -
+       editor_ref->cstatus.current_visual_time_stamp) *
+          editor_ref->cstatus.speed_zoom;
 
   // 当前面条尾y轴位置
   auto long_note_end_pos_y =
-      editor_ref->canvas_size.height() *
-          (1.0 - editor_ref->judgeline_position) -
-      ((editor_ref->canvas_pasued ? hold.hold_end_reference->timestamp
-                                  : long_note_end_visual_time) -
-       editor_ref->current_visual_time_stamp) *
-          editor_ref->timeline_zoom;
+      editor_ref->cstatus.canvas_size.height() *
+          (1.0 - editor_ref->csettings.judgeline_position) -
+      ((editor_ref->cstatus.canvas_pasued ? hold.hold_end_reference->timestamp
+                                          : long_note_end_visual_time) -
+       editor_ref->cstatus.current_visual_time_stamp) *
+          editor_ref->cstatus.timeline_zoom;
   auto long_note_body_height = (long_note_end_pos_y - head_cp.y());
 
   // 当前面条身中心位置,y位置偏下一个note
@@ -46,9 +47,9 @@ void HoldGenerator::generate(Hold &hold) {
           TexType::HOLD_BODY_VERTICAL, ObjectStatus::COMMON);
 
   // 面身实际尺寸高度-0.5note
-  auto long_note_body_size = QSizeF(
-      long_note_body_vertical_texture->width * editor_ref->object_size_scale,
-      long_note_body_height);
+  auto long_note_body_size = QSizeF(long_note_body_vertical_texture->width *
+                                        editor_ref->ebuffer.object_size_scale,
+                                    long_note_body_height);
 
   // 面身的实际区域--
   hold_vert_body_rect =
@@ -63,9 +64,11 @@ void HoldGenerator::generate(Hold &hold) {
   // 当前面条尾中心位置
   auto long_note_end_pos_x = head_cp.x();
   // 面尾实际尺寸
-  auto long_note_end_size = QSizeF(
-      long_note_end_texture->width * editor_ref->object_size_scale * 1.1,
-      long_note_end_texture->height * editor_ref->object_size_scale * 1.1);
+  auto long_note_end_size =
+      QSizeF(long_note_end_texture->width *
+                 editor_ref->ebuffer.object_size_scale * 1.1,
+             long_note_end_texture->height *
+                 editor_ref->ebuffer.object_size_scale * 1.1);
 
   // 先添加body图形
   // 是否有鼠标悬停
@@ -73,28 +76,29 @@ void HoldGenerator::generate(Hold &hold) {
       hold_vert_body_rect.contains(editor_ref->canvas_ref->mouse_pos);
   // 是否选中
   auto body_in_select_bound =
-      editor_ref->strict_select
-          ? editor_ref->select_bound.contains(hold_vert_body_rect)
-          : editor_ref->select_bound.intersects(hold_vert_body_rect);
-  auto body_selected_it = editor_ref->selected_hitobjects.find(hold_ptr);
+      editor_ref->csettings.strict_select
+          ? editor_ref->ebuffer.select_bound.contains(hold_vert_body_rect)
+          : editor_ref->ebuffer.select_bound.intersects(hold_vert_body_rect);
+  auto body_selected_it =
+      editor_ref->ebuffer.selected_hitobjects.find(hold_ptr);
 
   if (is_hover_body) {
     hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::HOLD_BODY_VERTICAL, ObjectStatus::HOVER);
-    editor_ref->hover_hitobject_info = std::make_shared<
+    editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
         std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
         hold_ptr, hold.beatinfo);
-    editor_ref->is_hover_note = true;
+    editor_ref->cstatus.is_hover_note = true;
   } else {
     if (body_in_select_bound ||
-        body_selected_it != editor_ref->selected_hitobjects.end()) {
-      editor_ref->selected_hitobjects.emplace(hold_ptr);
+        body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
+      editor_ref->ebuffer.selected_hitobjects.emplace(hold_ptr);
       // 使用选中纹理
       hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
           TexType::HOLD_BODY_VERTICAL, ObjectStatus::SELECTED);
       // 发送更新选中物件信号
       emit editor_ref->canvas_ref->select_object(
-          hold.beatinfo, hold_ptr, editor_ref->current_abs_timing);
+          hold.beatinfo, hold_ptr, editor_ref->ebuffer.current_abs_timing);
     } else {
       // 使用默认纹理
       hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
@@ -121,9 +125,9 @@ void HoldGenerator::generate(Hold &hold) {
       hold_end_rect.contains(editor_ref->canvas_ref->mouse_pos);
   // 面尾是否选中
   auto hold_end_in_select_bound =
-      editor_ref->strict_select
-          ? editor_ref->select_bound.contains(hold_end_rect)
-          : editor_ref->select_bound.intersects(hold_end_rect);
+      editor_ref->csettings.strict_select
+          ? editor_ref->ebuffer.select_bound.contains(hold_end_rect)
+          : editor_ref->ebuffer.select_bound.intersects(hold_end_rect);
   switch (hold.compinfo) {
     case ComplexInfo::NONE: {
       // 单独的面条,头尾都画
@@ -132,21 +136,22 @@ void HoldGenerator::generate(Hold &hold) {
         // 使用hover纹理
         hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
             TexType::HOLD_END, ObjectStatus::HOVER);
-        editor_ref->hover_hitobject_info = std::make_shared<
+        editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
             std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
             hold_ptr, hold.beatinfo);
-        editor_ref->is_hover_note = true;
+        editor_ref->cstatus.is_hover_note = true;
       } else {
         if (hold_end_in_select_bound ||
-            body_selected_it != editor_ref->selected_hitobjects.end()) {
+            body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
           // 未选中则选中此面尾
-          editor_ref->selected_hitobjects.emplace(hold.hold_end_reference);
+          editor_ref->ebuffer.selected_hitobjects.emplace(
+              hold.hold_end_reference);
           // 使用选中的纹理
           hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
               TexType::HOLD_END, ObjectStatus::SELECTED);
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              hold.beatinfo, hold_ptr, editor_ref->current_abs_timing);
+              hold.beatinfo, hold_ptr, editor_ref->ebuffer.current_abs_timing);
         } else {
           // 使用普通纹理
           hold_end_texture = long_note_end_texture;
@@ -179,7 +184,7 @@ void HoldGenerator::generate(Hold &hold) {
 
       // 面条是否完全过了当前时间
       dump_nodes_to_queue(hold.hold_end_reference->timestamp <
-                          editor_ref->current_time_stamp);
+                          editor_ref->cstatus.current_time_stamp);
 
       // 再添加个面尾图形到队列
       if (is_hover_hold_end) {
@@ -187,21 +192,22 @@ void HoldGenerator::generate(Hold &hold) {
         hold_vert_body_texture =
             editor_ref->canvas_ref->skin.get_object_texture(
                 TexType::HOLD_END, ObjectStatus::HOVER);
-        editor_ref->hover_hitobject_info = std::make_shared<
+        editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
             std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
             hold_ptr, hold.beatinfo);
-        editor_ref->is_hover_note = true;
+        editor_ref->cstatus.is_hover_note = true;
       } else {
         if (hold_end_in_select_bound ||
-            body_selected_it != editor_ref->selected_hitobjects.end()) {
+            body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
           // 未选中则选中此面尾
-          editor_ref->selected_hitobjects.emplace(hold.hold_end_reference);
+          editor_ref->ebuffer.selected_hitobjects.emplace(
+              hold.hold_end_reference);
           // 使用选中的纹理
           hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
               TexType::HOLD_END, ObjectStatus::SELECTED);
           // 发送更新选中物件信号
           emit editor_ref->canvas_ref->select_object(
-              hold.beatinfo, objref, editor_ref->current_abs_timing);
+              hold.beatinfo, objref, editor_ref->ebuffer.current_abs_timing);
         } else {
           // 使用普通纹理
           hold_end_texture = long_note_end_texture;

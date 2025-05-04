@@ -19,14 +19,14 @@ TimeInfoGenerator::~TimeInfoGenerator() = default;
 void TimeInfoGenerator::generate() {
   // 分隔线
   editor_ref->canvas_ref->renderer_manager->addLine(
-      QPointF(
-          editor_ref->canvas_size.width() * editor_ref->infoarea_width_scale -
-              2,
-          0),
-      QPointF(
-          editor_ref->canvas_size.width() * editor_ref->infoarea_width_scale -
-              2,
-          editor_ref->canvas_size.height()),
+      QPointF(editor_ref->cstatus.canvas_size.width() *
+                      editor_ref->csettings.infoarea_width_scale -
+                  2,
+              0),
+      QPointF(editor_ref->cstatus.canvas_size.width() *
+                      editor_ref->csettings.infoarea_width_scale -
+                  2,
+              editor_ref->cstatus.canvas_size.height()),
       4, nullptr, QColor(255, 182, 193, 235), false);
 
   // 标记timing
@@ -38,8 +38,8 @@ void TimeInfoGenerator::draw_timing_points() {
   if (!editor_ref->canvas_ref->working_map) return;
 
   // 判定线位置
-  auto judgeline_pos =
-      editor_ref->canvas_size.height() * (1.0 - editor_ref->judgeline_position);
+  auto judgeline_pos = editor_ref->cstatus.canvas_size.height() *
+                       (1.0 - editor_ref->csettings.judgeline_position);
 
   std::string bpm_prefix = "bpm:";
   std::vector<std::vector<std::shared_ptr<Timing>> *> timingss_in_area;
@@ -49,12 +49,12 @@ void TimeInfoGenerator::draw_timing_points() {
 
   // 查询区间内的timing
   editor_ref->canvas_ref->working_map->query_timing_in_range(
-      timings_in_area, editor_ref->current_time_area_start,
-      editor_ref->current_time_area_end);
+      timings_in_area, editor_ref->ebuffer.current_time_area_start,
+      editor_ref->ebuffer.current_time_area_end);
 
   editor_ref->canvas_ref->working_map->query_timing_in_range(
-      timingss_in_area, editor_ref->current_time_area_start,
-      editor_ref->current_time_area_end);
+      timingss_in_area, editor_ref->ebuffer.current_time_area_start,
+      editor_ref->ebuffer.current_time_area_end);
 
   for (const auto &timings : timingss_in_area) {
     // 实际在此时间点显示的timing的bpm值
@@ -149,9 +149,11 @@ void TimeInfoGenerator::draw_timing_points() {
   for (const auto &timing : timings_in_area) {
     auto timing_y_pos =
         judgeline_pos -
-        (timing->timestamp - editor_ref->current_visual_time_stamp) *
-            editor_ref->timeline_zoom *
-            (editor_ref->canvas_pasued ? 1.0 : editor_ref->speed_zoom);
+        (timing->timestamp - editor_ref->cstatus.current_visual_time_stamp) *
+            editor_ref->cstatus.timeline_zoom *
+            (editor_ref->cstatus.canvas_pasued
+                 ? 1.0
+                 : editor_ref->cstatus.speed_zoom);
     double timing_x_pos;
 
     std::string bpmvalue =
@@ -178,7 +180,8 @@ void TimeInfoGenerator::draw_timing_points() {
         absbpm_info_string_height = charsize.height();
       }
     }
-    timing_x_pos = editor_ref->edit_area_start_pos_x - absbpm_info_string_width;
+    timing_x_pos =
+        editor_ref->ebuffer.edit_area_start_pos_x - absbpm_info_string_width;
 
     if (!timing->is_base_timing) {
       std::string speed_prefix = tr("speed:").toStdString();
@@ -202,10 +205,10 @@ void TimeInfoGenerator::draw_timing_points() {
           speed_info_string_height = charsize.height();
         }
       }
-      if (editor_ref->edit_area_start_pos_x - speed_info_string_width <
+      if (editor_ref->ebuffer.edit_area_start_pos_x - speed_info_string_width <
           timing_x_pos)
         timing_x_pos =
-            editor_ref->edit_area_start_pos_x - speed_info_string_width;
+            editor_ref->ebuffer.edit_area_start_pos_x - speed_info_string_width;
       if (std::fabs(timing->bpm * timing->basebpm /
                         editor_ref->canvas_ref->working_map->preference_bpm -
                     1.0) < 0.01) {
