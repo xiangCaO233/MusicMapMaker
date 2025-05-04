@@ -114,7 +114,7 @@ class MapEditor {
       selected_hitobjects;
 
   // 判定线后是否显示物件
-  bool show_object_after_judgeline{false};
+  bool show_object_after_judgeline{true};
 
   // 左键是否按下
   bool mouse_left_pressed{false};

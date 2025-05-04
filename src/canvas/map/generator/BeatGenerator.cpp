@@ -90,7 +90,7 @@ void BeatGenerator::generate() {
             line_queue.emplace(0, divisor_pos,
                                editor_ref->canvas_size.width() *
                                    (1 - editor_ref->preview_width_scale),
-                               divisor_pos, 255, 255, 255, 255, 6);
+                               divisor_pos, 255, 255, 255, 255, 8);
           } else {
             auto divinfos = editor_ref->canvas_ref->skin
                                 .divisors_color_theme[beat->divisors];

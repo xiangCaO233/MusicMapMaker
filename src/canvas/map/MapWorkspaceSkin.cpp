@@ -15,6 +15,18 @@ MapWorkspaceSkin::MapWorkspaceSkin(MapWorkspaceCanvas* canvas) : cvs(canvas) {}
 
 MapWorkspaceSkin::~MapWorkspaceSkin() = default;
 
+// 统计目录下的文件数
+int count_files_recursive(const std::filesystem::path& dir_path) {
+  int count = 0;
+  for (const auto& entry :
+       std::filesystem::recursive_directory_iterator(dir_path)) {
+    if (entry.is_regular_file()) {
+      count++;
+    }
+  }
+  return count;
+}
+
 // 载入皮肤
 void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
   // 读取配置文件
@@ -91,8 +103,16 @@ void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
   hit_effect_config = texture_config["effects"];
   nomal_hit_effect_dir =
       hit_effect_config.value<std::string>("note-effectdir", "");
+  nomal_hit_effect_frame_count =
+      count_files_recursive(skin_path / nomal_hit_effect_dir);
+
   slide_hit_effect_dir =
       hit_effect_config.value<std::string>("slide-effectdir", "");
+  slide_hit_effect_frame_count =
+      count_files_recursive(skin_path / slide_hit_effect_dir);
+
+  XINFO("ncount:[" + std::to_string(nomal_hit_effect_frame_count) + "]");
+  XINFO("scount:[" + std::to_string(slide_hit_effect_frame_count) + "]");
 
   // 颜色配置
   preview_area_bg_color = QColor::fromString(skin_config.value<std::string>(
