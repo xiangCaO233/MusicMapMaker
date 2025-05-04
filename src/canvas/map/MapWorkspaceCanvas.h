@@ -68,8 +68,6 @@ class MapWorkspaceCanvas : public GLCanvas {
   /*
    *成员函数
    */
-  // 更新谱面时间位置
-  void update_mapcanvas_timepos();
 
   // 绘制判定线
   void draw_judgeline();
@@ -149,6 +147,9 @@ class MapWorkspaceCanvas : public GLCanvas {
  signals:
   // 时间戳更新信号
   void current_time_stamp_changed(double current_time_stamp);
+
+  // 根据快捷键切换模式
+  void switch_edit_mode(MouseEditMode mode);
 
   // 绝对bpm变化信号
   void current_absbpm_changed(double bpm);

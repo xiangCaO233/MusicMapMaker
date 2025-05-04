@@ -113,15 +113,15 @@ void EffectThread::on_canvas_pause(bool paused) {
   is_playing = !paused;
   if (!editor->canvas_ref->working_map) return;
   // 获取精确时间
-  XERROR("Pos Off:[" +
-         std::to_string(
-             BackgroundAudio::get_audio_pos(
-                 editor->canvas_ref->working_map->project_reference->devicename,
-                 QDir(editor->canvas_ref->working_map->audio_file_abs_path)
-                     .canonicalPath()
-                     .toStdString()) -
-             editor->current_time_stamp) +
-         "]");
+  // XERROR("Pos Off:[" +
+  //        std::to_string(
+  //            BackgroundAudio::get_audio_pos(
+  //                editor->canvas_ref->working_map->project_reference->devicename,
+  //                QDir(editor->canvas_ref->working_map->audio_file_abs_path)
+  //                    .canonicalPath()
+  //                    .toStdString()) -
+  //            editor->current_time_stamp) +
+  //        "]");
   sync_music_time(BackgroundAudio::get_audio_pos(
       editor->canvas_ref->working_map->project_reference->devicename,
       QDir(editor->canvas_ref->working_map->audio_file_abs_path)

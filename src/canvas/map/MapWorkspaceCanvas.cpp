@@ -36,7 +36,6 @@
 #include "generator/general/HoldGenerator.h"
 #include "generator/general/NoteGenerator.h"
 #include "generator/general/SlideGenerator.h"
-#include "util/mutil.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
     : skin(this), GLCanvas(parent) {
@@ -88,6 +87,7 @@ void MapWorkspaceCanvas::on_timecontroller_speed_changed(double speed) {
                                  (1.0 - editor->playspeed) *
                                      editor->audio_buffer_offset);
 }
+
 // 同步音频播放时间
 void MapWorkspaceCanvas::on_music_pos_sync(double time) {
   editor->current_time_stamp =
@@ -128,7 +128,9 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
     }
     editor->current_visual_time_stamp =
         editor->current_time_stamp + editor->static_time_offset;
-    update_mapcanvas_timepos();
+    working_map->project_reference->map_canvasposes.at(working_map) =
+        editor->current_time_stamp;
+    emit current_time_stamp_changed(editor->current_time_stamp);
   }
 }
 
@@ -151,37 +153,16 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   GLCanvas::mousePressEvent(event);
 
   qDebug() << event->button();
+
   // 如果当前悬停的位置有物件,左键时选中此物件,右键时删除此物件(组合键头时删除组合键)
   // 没有物件则根据当前模式添加物件到鼠标位置对应的时间戳
   switch (event->button()) {
     case Qt::MouseButton::LeftButton: {
+      // 设置状态和位置快照
       editor->mouse_left_pressed = true;
       editor->mouse_left_press_pos = event->pos();
-      if (editor->select_bound_locate_points) {
-        // 关闭选中框
-        editor->select_bound_locate_points = nullptr;
-        editor->select_bound.setWidth(0);
-        editor->select_bound.setHeight(0);
-      }
-      if (!(event->modifiers() & Qt::ControlModifier)) {
-        // 未按住controll清空选中列表
-        editor->selected_hitobjects.clear();
-      }
-      // 按住controll左键多选
-      if (editor->hover_hitobject_info) {
-        // 有悬浮在物件上
-        editor->selected_hitobjects.emplace(
-            editor->hover_hitobject_info->first);
-      }
-
-      // 发送更新选中物件信号
-      if (editor->hover_hitobject_info) {
-        emit select_object(editor->hover_hitobject_info->second,
-                           editor->hover_hitobject_info->first,
-                           editor->current_abs_timing);
-      } else {
-        emit select_object(nullptr, nullptr, nullptr);
-      }
+      // 更新选中信息
+      editor->update_selections(event->modifiers() & Qt::ControlModifier);
       break;
     }
     case Qt::MouseButton::RightButton: {
@@ -222,33 +203,25 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
   }
 
   if (editor->mouse_left_pressed) {
-    // 设置选中框定位点
-    if (!editor->select_bound_locate_points) {
-      editor->select_bound_locate_points =
-          std::make_shared<std::pair<QPointF, QPointF>>(
-              editor->mouse_left_press_pos, event->pos());
-    } else {
-      editor->select_bound_locate_points->second = event->pos();
+    // 正在拖动
+    if (editor->edit_mode == MouseEditMode::SELECT) {
+      // 选择模式-更新选中信息
+      // 正悬浮在物件上
+      if (editor->hover_hitobject_info) {
+        // 调整物件时间戳等属性
+      } else {
+        // 未悬浮在任何物件上-更新选中框定位点
+        editor->update_selection_area(event->pos(),
+                                      event->modifiers() & Qt::ControlModifier);
+      }
     }
 
-    // 更新选中区域
-    editor->select_bound.setX(
-        std::min(editor->select_bound_locate_points->first.x(),
-                 editor->select_bound_locate_points->second.x()));
-    editor->select_bound.setY(
-        std::min(editor->select_bound_locate_points->first.y(),
-                 editor->select_bound_locate_points->second.y()));
-    editor->select_bound.setWidth(
-        std::abs(editor->select_bound_locate_points->first.x() -
-                 editor->select_bound_locate_points->second.x()));
-    editor->select_bound.setHeight(
-        std::abs(editor->select_bound_locate_points->first.y() -
-                 editor->select_bound_locate_points->second.y()));
+    if (editor->edit_mode == MouseEditMode::PLACE_NOTE) {
+      // 放置物件模式-拖动中--更新正在放置的物件的时间戳
+    }
 
-    // 更新选中的物件内容
-    if (!event->modifiers() & Qt::ControlModifier) {
-      // 没按ctrl,先清空当前选中的
-      editor->selected_hitobjects.clear();
+    if (editor->edit_mode == MouseEditMode::PLACE_LONGNOTE) {
+      // 放置长键模式-拖动中--更新正在放置的长条的持续时间
     }
   }
 }
@@ -258,160 +231,24 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
   if (!working_map) return;
-
   // 修饰符
   auto modifiers = event->modifiers();
 
+  auto dy = event->angleDelta().y();
   // 编辑区
-  double temp_scroll_ration{1.0};
   if (modifiers & Qt::ControlModifier) {
     // 在编辑区-按下controll滚动
     // 修改时间线缩放
-    double res_timeline_zoom = editor->timeline_zoom;
-    if (event->angleDelta().y() > 0) {
-      res_timeline_zoom += 0.05;
-    } else {
-      res_timeline_zoom -= 0.05;
-    }
-    if (res_timeline_zoom >= 0.5 && res_timeline_zoom <= 2.0) {
-      editor->timeline_zoom = res_timeline_zoom;
-    }
+    editor->scroll_update_timelinezoom(dy);
     return;
   }
   if (modifiers & Qt::AltModifier) {
     // 在编辑区-按下alt滚动
     // 获取鼠标位置的拍--修改此拍分拍策略/改为自定义
+    return;
   }
-  if (modifiers & Qt::ShiftModifier) {
-    // 在编辑区-按下shift滚动
-    // 短暂增加滚动倍率
-    temp_scroll_ration = 3.0;
-  }
-  if (editor->magnet_to_divisor) {
-    // 获取当前时间附近的拍
-    // 找到第一个拍起始时间大于或等于当前时间的拍迭代器
-    auto current_beat_it =
-        working_map->beats.lower_bound(std::make_shared<Beat>(
-            200, editor->current_time_stamp, editor->current_time_stamp));
 
-    // TODO(xiang 2025-04-24): 修复吸附的bug
-    // 待吸附列表
-    std::vector<std::shared_ptr<Beat>> magnet_beats;
-
-    // 区分分支
-    if (current_beat_it == working_map->beats.end()) {
-      // 没有比当前时间更靠后的拍了
-      current_beat_it--;
-      auto last_beat = *current_beat_it;
-      // 添加最后一拍
-      magnet_beats.emplace_back(last_beat);
-
-      if (editor->current_time_stamp == last_beat->start_timestamp) {
-        // 在拍头--添加倒数第二拍的小节线和本拍小节线
-        current_beat_it--;
-        // auto second_tolast_beat = *current_beat_it;
-        magnet_beats.emplace_back(*current_beat_it);
-      } else if (editor->current_visual_time_stamp >
-                     last_beat->start_timestamp &&
-                 editor->current_visual_time_stamp < last_beat->end_timestamp) {
-        // 在拍内--可只添加本拍小节线
-      } else {
-        // 在拍外--可只添加最后一拍的最后一个小节线
-      }
-    } else if (current_beat_it == working_map->beats.begin()) {
-      // 只有第一拍比当前时间更靠后了-比拍头更靠前或在拍头
-      auto first_beat = *current_beat_it;
-      magnet_beats.emplace_back(first_beat);
-      // if (current_time_stamp < first_beat->start_timestamp) {
-      //   // 在拍外--只添加第一拍的拍头
-      //   magnet_beats.emplace_back(first_beat);
-      // } else {
-      //   // 在拍头--只添加本拍小节线
-      //   magnet_beats.emplace_back(first_beat);
-      // }
-      //  在拍内--不会走此分支
-    } else {
-      // 附近都有拍--本拍前一拍后一拍的所有小节线全部加入吸附
-      // auto current_beat = *current_beat_it;
-      magnet_beats.emplace_back(*current_beat_it);
-      --current_beat_it;
-      // auto previous_beat = *current_beat_it;
-      magnet_beats.emplace_back(*current_beat_it);
-      ++current_beat_it;
-      ++current_beat_it;
-      if (current_beat_it != working_map->beats.end()) {
-        // auto next_beat = *current_beat_it;
-        magnet_beats.emplace_back(*current_beat_it);
-      }
-    }
-    // 待吸附时间集合
-    std::set<double> divisor_times;
-    // 初始化时间集合
-    for (const auto &magnet_beat : magnet_beats) {
-      for (int i = 0; i < magnet_beat->divisors; i++) {
-        divisor_times.insert(
-            magnet_beat->start_timestamp +
-            i * (magnet_beat->end_timestamp - magnet_beat->start_timestamp) /
-                magnet_beat->divisors);
-      }
-    }
-
-    // 找到第一个时间大于或等于当前时间的小节线时间迭代器
-    auto current_divisor_it =
-        divisor_times.lower_bound(editor->current_time_stamp);
-    // 根据滑动方向选择吸附哪一个
-    if (event->angleDelta().y() * editor->scroll_direction > 0) {
-      // 向上吸附小节线
-      if (std::abs(*current_divisor_it - editor->current_time_stamp) < 10) {
-        // 防止非法访问最后一个元素后的元素
-        auto lasttime = divisor_times.end();
-        lasttime--;
-        if (current_divisor_it != lasttime) {
-          // 找到自己了-吸下一个
-          ++current_divisor_it;
-          editor->current_time_stamp = *current_divisor_it;
-        } else {
-          // 不动
-        }
-      } else {
-        // 选择的大于自己的第一个
-        editor->current_time_stamp = *current_divisor_it;
-      }
-    } else {
-      // 防止非法访问第一个元素前的元素
-      if (current_divisor_it != divisor_times.begin()) {
-        // 向下吸附小节线--不管是找到自己还是找到下一个,吸上一个
-        --current_divisor_it;
-        editor->current_time_stamp = *current_divisor_it;
-      }
-    }
-  } else {
-    auto scroll_unit = (event->angleDelta().y() > 0 ? 1.0 : -1.0) *
-                       editor->timeline_zoom * height() / 10.0;
-    editor->current_time_stamp += scroll_unit * temp_scroll_ration *
-                                  editor->scroll_ratio *
-                                  editor->scroll_direction;
-  }
-  if (editor->current_time_stamp < 0) {
-    editor->current_time_stamp = 0;
-    if (!editor->canvas_pasued) {
-      editor->canvas_pasued = true;
-      emit pause_signal(editor->canvas_pasued);
-    }
-  }
-  if (editor->current_time_stamp > working_map->map_length) {
-    editor->current_time_stamp = working_map->map_length;
-    if (!editor->canvas_pasued) {
-      editor->canvas_pasued = true;
-      emit pause_signal(editor->canvas_pasued);
-    }
-  }
-  editor->current_visual_time_stamp =
-      editor->current_time_stamp + editor->static_time_offset;
-  played_effects_objects.clear();
-  update_mapcanvas_timepos();
-  effect_thread->sync_music_time(editor->current_time_stamp);
-  // AudioEnginPlayCallback::count = 0;
+  editor->update_timepos(dy, modifiers & Qt::ShiftModifier);
 }
 
 // 键盘按下事件
@@ -420,13 +257,19 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
   GLCanvas::keyPressEvent(event);
 
   // 捕获按键
-  auto k = event->text();
   auto keycode = event->key();
 
-  qDebug() << "code:" << keycode << ",text:" << k;
-
   switch (keycode) {
-    case Qt::Key::Key_Space: {
+    case Qt::Key_1:
+    case Qt::Key_2:
+    case Qt::Key_3:
+    case Qt::Key_4: {
+      // 快速切换编辑模式
+      editor->edit_mode = static_cast<MouseEditMode>(keycode - Qt::Key_0);
+      emit switch_edit_mode(editor->edit_mode);
+      break;
+    }
+    case Qt::Key_Space: {
       // 空格--播放与暂停
       if (!working_map) return;
 
@@ -435,6 +278,7 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
         XWARN("未选择音频输出设备,无法切换暂停状态");
         return;
       }
+
       // 空格
       editor->canvas_pasued = !editor->canvas_pasued;
       emit pause_signal(editor->canvas_pasued);
@@ -466,39 +310,12 @@ void MapWorkspaceCanvas::focusOutEvent(QFocusEvent *event) {
   GLCanvas::focusOutEvent(event);
 }
 
-// 更新谱面时间位置
-void MapWorkspaceCanvas::update_mapcanvas_timepos() {
-  // 更新项目中自己的位置
-  working_map->project_reference->map_canvasposes.at(working_map) =
-      editor->current_time_stamp;
-  emit current_time_stamp_changed(editor->current_time_stamp);
-}
-
 // 调整尺寸事件
 void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
   // 传递事件
   GLCanvas::resizeEvent(event);
-
-  // 更新区域缓存
-  // 信息区
-  editor->info_area.setX(0);
-  editor->info_area.setY(0);
-  editor->info_area.setWidth(width() * editor->infoarea_width_scale);
-  editor->info_area.setHeight(height());
-
-  // 编辑区
-  editor->edit_area.setX(0);
-  editor->edit_area.setY(0);
-  editor->edit_area.setWidth(width() * (1.0 - editor->preview_width_scale));
-  editor->edit_area.setHeight(height());
-
   editor->update_size(size());
-
-  // 预览区
-  editor->preview_area.setX(width() * (1.0 - editor->preview_width_scale));
-  editor->preview_area.setY(0);
-  editor->preview_area.setWidth(width() * editor->preview_width_scale);
-  editor->edit_area.setHeight(height());
+  editor->update_areas();
 }
 
 // 绘制背景
@@ -614,6 +431,13 @@ void MapWorkspaceCanvas::draw_preview_content() {
       current_size.height());
   renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75),
                             0, false);
+
+  // 预览区域判定线
+  // renderer_manager->addLine(
+  //     QPointF(current_size.width() * (1 - editor->preview_width_scale),
+  //             current_size.height() / 2.0),
+  //     QPointF(current_size.width(), current_size.height() / 2.0), 6, nullptr,
+  //     QColor(0, 255, 255, 235), false);
 }
 
 // 绘制判定线
@@ -626,12 +450,6 @@ void MapWorkspaceCanvas::draw_judgeline() {
       QPointF(current_size.width() * (1 - editor->preview_width_scale),
               current_size.height() * (1.0 - editor->judgeline_position)),
       8, nullptr, QColor(0, 255, 255, 235), false);
-  // 预览区域判定线
-  renderer_manager->addLine(
-      QPointF(current_size.width() * (1 - editor->preview_width_scale),
-              current_size.height() / 2.0),
-      QPointF(current_size.width(), current_size.height() / 2.0), 6, nullptr,
-      QColor(0, 255, 255, 235), false);
 }
 
 // 绘制信息区
@@ -788,9 +606,13 @@ void MapWorkspaceCanvas::push_shape() {
     working_map->query_object_in_range(
         editor->buffer_objects, int32_t(editor->current_time_area_start),
         int32_t(editor->current_time_area_end), true);
+
+    // 绘制物件
     draw_hitobject();
     renderer_manager->texture_effect = TextureEffect::NONE;
   }
+
+  // 绘制特效
   for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
     if (!effect_frame_queue.empty()) {
       renderer_manager->addRect(effect_frame_queue.front().first,
@@ -800,12 +622,18 @@ void MapWorkspaceCanvas::push_shape() {
       if (!effect_frame_queue.empty()) effect_frame_queue.pop();
     }
   }
+
+  // 绘制选中区域
   draw_select_bound();
+  // 绘制预览区域
   draw_preview_content();
 
+  // 绘制判定线
   draw_judgeline();
+  // 绘制信息区域
   draw_infoarea();
 
+  // 绘制顶部栏
   draw_top_bar();
 }
 

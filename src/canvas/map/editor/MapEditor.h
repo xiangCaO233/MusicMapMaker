@@ -1,6 +1,10 @@
 #ifndef M_MAPEDITOR_H
 #define M_MAPEDITOR_H
 
+#include <qflags.h>
+#include <qnamespace.h>
+#include <qpoint.h>
+
 #include <QPointF>
 #include <QRectF>
 #include <memory>
@@ -10,31 +14,11 @@
 #include "../../../mmm/Beat.h"
 #include "../../../mmm/hitobject/HitObject.h"
 #include "../../../mmm/timing/Timing.h"
+#include "EditorEnumerations.h"
 #include "mmm/map/MMap.h"
 
 class MapWorkspaceCanvas;
 class TextureInstace;
-
-enum class MouseEditMode {
-  // 仅预览
-  NONE,
-  // 仅编辑,不新增物件,仅调整hover位置的物件
-  EDIT,
-  // 点击放置,拖动时调整时间戳
-  PLACE_NOTE,
-  // 拖动放置(组合键,面条,长条,滑键)
-  PLACE_LONGNOTE,
-};
-
-// 鼠标正在操作的区域
-enum class MouseOperationArea {
-  // 编辑区
-  EDIT,
-  // 预览区
-  PREVIEW,
-  // 信息区
-  INFO,
-};
 
 // 编辑器
 class MapEditor {
@@ -213,13 +197,31 @@ class MapEditor {
   double scroll_direction{1.0};
 
   // 滚动时吸附到小节线
-  bool magnet_to_divisor{false};
+  bool is_magnet_to_divisor{false};
 
   // 切换map
   void switch_map(std::shared_ptr<MMap>& map);
 
   // 画布更新尺寸
   void update_size(const QSize& current_canvas_size);
+
+  // 更新区域信息
+  void update_areas();
+
+  // 更新时间线缩放-滚动
+  void scroll_update_timelinezoom(int scrolldy);
+
+  // 吸附到附近分拍线
+  void magnet_to_divisor(int scrolldy);
+
+  // 更新谱面位置
+  void update_timepos(int scrolldy, bool is_shift_down);
+
+  // 更新选中信息
+  void update_selections(bool is_ctrl_down);
+
+  // 更新选中区域
+  void update_selection_area(QPoint&& p, bool ctrl_down);
 };
 
 #endif  // M_MAPEDITOR_H
