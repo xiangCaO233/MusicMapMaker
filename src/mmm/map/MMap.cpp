@@ -264,7 +264,6 @@ void MMap::query_around_timing(
 void MMap::query_timing_in_range(
     std::vector<std::shared_ptr<Timing>>& result_timings, int32_t start,
     int32_t end) {
-  // TODO(xiang 2025-05-03): 实现在指定区间内查询timing
   result_timings.clear();
   auto lower_bound = std::make_shared<Timing>();
   lower_bound->timestamp = start;
@@ -279,6 +278,22 @@ void MMap::query_timing_in_range(
   }
 }
 
+// 查询区间窗口内的timings
+void MMap::query_timing_in_range(
+    std::vector<std::vector<std::shared_ptr<Timing>>*>& result_timingss,
+    int32_t start, int32_t end) {
+  result_timingss.clear();
+
+  // 找到第一个大于或等于 lower_bound 的元素
+  auto it = temp_timing_map.lower_bound(start);
+
+  // 遍历直到超出 upper_bound
+  while (it != temp_timing_map.end() && it->first < end) {
+    result_timingss.push_back(&it->second);
+    ++it;
+  }
+}
+
 // 查询时间区间窗口内的拍
 void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
                                int32_t start, const int32_t end) {
@@ -289,7 +304,7 @@ void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
   auto it = beats.lower_bound(lower_bound);
 
   // 遍历直到超出 upper_bound
-  while (it != beats.end() && (*it)->end_timestamp < end) {
+  while (it != beats.end() && (*it)->start_timestamp < end) {
     result_beats.push_back(*it);
     ++it;
   }

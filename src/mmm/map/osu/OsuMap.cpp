@@ -366,6 +366,7 @@ void OsuMap::load_from_file(const char* path) {
         break;
       }
     }
+
     // 没找到单独存在的绝对时间点-找同时存在变速值为1.00的时间点
     if (!finded) {
       for (const auto& [time, timings] : temp_timing_map) {
@@ -375,6 +376,15 @@ void OsuMap::load_from_file(const char* path) {
           finded = true;
           break;
         }
+      }
+    }
+
+    // 再没找到就用第一个timing的绝对bpm-没有用200
+    if (!finded) {
+      if (timings.empty()) {
+        preference_bpm = 200;
+      } else {
+        preference_bpm = timings.begin()->get()->basebpm;
       }
     }
 

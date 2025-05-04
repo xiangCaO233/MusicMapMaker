@@ -87,8 +87,7 @@ class MMap {
   std::multiset<std::shared_ptr<Timing>, TimingComparator> timings;
 
   // 用于识别重叠时间的timing列表缓存map
-  std::unordered_map<int32_t, std::vector<std::shared_ptr<Timing>>>
-      temp_timing_map;
+  std::map<int32_t, std::vector<std::shared_ptr<Timing>>> temp_timing_map;
 
   // beat比较器
   struct BeatComparator {
@@ -124,6 +123,11 @@ class MMap {
   virtual void query_timing_in_range(
       std::vector<std::shared_ptr<Timing>>& result_timings, int32_t start,
       int32_t end);
+
+  // 查询区间窗口内的timings
+  virtual void query_timing_in_range(
+      std::vector<std::vector<std::shared_ptr<Timing>>*>& result_timingss,
+      int32_t start, int32_t end);
 
   // 查询区间窗口内的拍
   virtual void query_beat_in_range(
