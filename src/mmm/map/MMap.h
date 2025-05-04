@@ -132,8 +132,9 @@ class MMap {
 
   // 查询区间内有的物件
   virtual void query_object_in_range(
-      std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-      int32_t end, bool with_longhold = false);
+      std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>&
+          result_objects,
+      int32_t start, int32_t end, bool with_longhold = false);
 };
 
 #endif  // M_MAP_H

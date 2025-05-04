@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "../../util/mutil.h"
@@ -22,7 +23,7 @@ MMap::~MMap() = default;
 void MMap::generate_divisor_policy(const std::shared_ptr<Beat>& beat) {
   // 计算这拍之内的可能分拍策略
   // 获取此拍范围内的物件
-  std::vector<std::shared_ptr<HitObject>> notes;
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> notes;
   query_object_in_range(notes, beat->start_timestamp, beat->end_timestamp);
 
   if (notes.empty()) {
@@ -304,12 +305,9 @@ struct SharedPtrCompare {
 
 // 查询区间窗口内有的物件
 void MMap::query_object_in_range(
-    std::vector<std::shared_ptr<HitObject>>& result_objects, int32_t start,
-    const int32_t end, bool with_longhold) {
-  // 全部物件
-  thread_local std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
-      adding_objects;
-
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>&
+        result_objects,
+    int32_t start, const int32_t end, bool with_longhold) {
   // 自动去重+排序
   // std::set<std::shared_ptr<HitObject>, SharedPtrCompare> adding_objects;
   /*
@@ -321,7 +319,7 @@ void MMap::query_object_in_range(
     // 面尾时间>窗口起始时间且面头<结束时间就加入列表
     for (const auto& hold : temp_hold_list) {
       if (hold->timestamp < end && hold->timestamp + hold->hold_time > start) {
-        adding_objects.insert(hold);
+        result_objects.insert(hold);
       }
     }
   }
@@ -336,7 +334,7 @@ void MMap::query_object_in_range(
     ++count;
     deviation = std::abs((*startit)->timestamp - start);
     if (deviation < 5) {
-      adding_objects.insert(*startit);
+      result_objects.insert(*startit);
     }
   }
 
@@ -356,14 +354,10 @@ void MMap::query_object_in_range(
       temp_comp = note->parent_reference;
       // 将所有子物件加入渲染队列
       for (const auto& subnote : temp_comp->child_notes) {
-        adding_objects.insert(subnote);
+        result_objects.insert(subnote);
       }
     }
     // 添加窗口内物件
-    adding_objects.insert(*startit);
+    result_objects.insert(*startit);
   }
-
-  // 按set遍历加入结果
-  for (const auto& obj : adding_objects) result_objects.emplace_back(obj);
-  adding_objects.clear();
 }

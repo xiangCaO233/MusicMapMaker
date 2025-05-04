@@ -76,22 +76,26 @@ void EffectThread::sync_music_time(double time) {
       last_triggered_timestamp = -1;
     }
 
-    // 打印日志，方便调试
-    XWARN("EffectThread: Resumed. Sync Time: " +
-          std::to_string(int(last_sync_audio_time_ms)) +
-          " ms. Reset "
-          "last_triggered_timestamp to:" +
-          std::to_string(last_triggered_timestamp));
+    // XWARN("EffectThread: Resumed. Sync Time: " +
+    //       std::to_string(int(last_sync_audio_time_ms)) +
+    //       " ms. Reset "
+    //       "last_triggered_timestamp to:" +
+    //       std::to_string(last_triggered_timestamp));
 
   } else {
     // ----- 暂停时 (paused == true) -----
     // 不需要修改 last_triggered_timestamp，它记录了暂停前的状态。
-    XWARN("EffectThread: Paused. Sync Time: " +
-          std::to_string(int(last_sync_audio_time_ms)) +
-          " ms. Reset "
-          "last_triggered_timestamp to:" +
-          std::to_string(last_triggered_timestamp));
+    // XWARN("EffectThread: Paused. Sync Time: " +
+    //       std::to_string(int(last_sync_audio_time_ms)) +
+    //       " ms. Reset "
+    //       "last_triggered_timestamp to:" +
+    //       std::to_string(last_triggered_timestamp));
   }
+  XINFO("同步特效线程[" + std::string(is_playing ? "运行中" : "暂停") +
+        "] 同步时间: " + std::to_string(int(last_sync_audio_time_ms)) +
+        " ms. 重置"
+        "last_triggered_timestamp 为:" +
+        std::to_string(last_triggered_timestamp) + "ms");
   // 同步画布
   editor->current_time_stamp = time;
   editor->current_visual_time_stamp =

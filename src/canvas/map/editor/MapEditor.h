@@ -80,10 +80,11 @@ class MapEditor {
   int32_t max_orbit;
 
   // 物件缓存
-  std::vector<std::shared_ptr<HitObject>> buffer_objects;
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> buffer_objects;
 
   // 预览物件缓存
-  std::vector<std::shared_ptr<HitObject>> buffer_preview_objects;
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+      buffer_preview_objects;
 
   /*
    *编辑相关
