@@ -132,6 +132,13 @@ set(PROJECT_SOURCES
   src/canvas/map/MapWorkspaceSkin.cpp
   src/canvas/map/editor/MapEditor.h
   src/canvas/map/editor/MapEditor.cpp
+	src/canvas/map/editor/EditorBuffer.h
+	src/canvas/map/editor/CanvasStatus.h
+	src/canvas/map/editor/CanvasSettings.h
+	src/canvas/map/editor/HitObjectEditor.h
+	src/canvas/map/editor/HitObjectEditor.cpp
+	src/canvas/map/editor/TimingEditor.h
+	src/canvas/map/editor/TimingEditor.cpp
   src/canvas/map/generator/ObjectGenerator.h
   src/canvas/map/generator/ObjectGenerator.cpp
   src/canvas/map/generator/general/NoteGenerator.h
@@ -239,7 +246,7 @@ qt_add_resources(
 
 # 设置 macOS 和 Windows 目标属性
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.MusicMapMaker)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.github.MusicMapMaker)
 endif()
 
 set_target_properties(

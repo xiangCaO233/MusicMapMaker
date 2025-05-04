@@ -9,6 +9,47 @@ MapEditor::MapEditor(MapWorkspaceCanvas* canvas) : canvas_ref(canvas) {}
 
 MapEditor::~MapEditor() {}
 
+// 撤销
+void MapEditor::undo() {
+  if (operation_type_stack.empty()) return;
+  // 加入撤回栈
+  undo_type_stack.push(operation_type_stack.top());
+  // 根据类型调用编辑器撤回
+  switch (operation_type_stack.top()) {
+    case HITOBJECT: {
+      obj_editor.undo();
+      break;
+    }
+    case TIMING: {
+      timing_editor.undo();
+      break;
+    }
+  }
+  // 弹出此操作
+  operation_type_stack.pop();
+}
+
+// 重做
+void MapEditor::redo() {
+  if (undo_type_stack.empty()) return;
+
+  // 加入操作栈
+  operation_type_stack.push(undo_type_stack.top());
+  // 根据类型调用编辑器撤回
+  switch (undo_type_stack.top()) {
+    case HITOBJECT: {
+      obj_editor.redo();
+      break;
+    }
+    case TIMING: {
+      timing_editor.redo();
+      break;
+    }
+  }
+  // 弹出此撤回
+  undo_type_stack.pop();
+}
+
 // 画布更新尺寸
 void MapEditor::update_size(const QSize& current_canvas_size) {
   cstatus.canvas_size = current_canvas_size;

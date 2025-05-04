@@ -69,20 +69,6 @@ class MMap {
   // 用于识别重叠时间域的长条物件缓存表
   std::multiset<std::shared_ptr<Hold>> temp_hold_list;
 
-  // timing比较器
-  struct TimingComparator {
-    bool operator()(const std::shared_ptr<Timing>& a,
-                    const std::shared_ptr<Timing>& b) const {
-      if (a->timestamp < b->timestamp) {
-        return true;
-      } else if (a->timestamp == b->timestamp) {
-        return a->is_base_timing > b->is_base_timing;
-      } else {
-        return false;
-      }
-    }
-  };
-
   // 全部timing
   std::multiset<std::shared_ptr<Timing>, TimingComparator> timings;
 

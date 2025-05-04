@@ -2,6 +2,7 @@
 #define M_TIMING_H
 
 #include <compare>
+#include <memory>
 
 // 时间点
 #include <cstdint>
@@ -53,6 +54,20 @@ class Timing {
 
   auto operator<=>(const Timing& other) const {
     return timestamp <=> other.timestamp;
+  }
+};
+
+// timing比较器
+struct TimingComparator {
+  bool operator()(const std::shared_ptr<Timing>& a,
+                  const std::shared_ptr<Timing>& b) const {
+    if (a->timestamp < b->timestamp) {
+      return true;
+    } else if (a->timestamp == b->timestamp) {
+      return a->is_base_timing > b->is_base_timing;
+    } else {
+      return false;
+    }
   }
 };
 
