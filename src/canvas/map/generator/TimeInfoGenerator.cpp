@@ -109,7 +109,7 @@ void TimeInfoGenerator::draw_timing_points() {
         timing_x_pos =
             editor_ref->edit_area_start_pos_x - speed_info_string_width;
       if (std::fabs(timing->bpm * timing->basebpm /
-                        *editor_ref->preference_bpm -
+                        editor_ref->canvas_ref->working_map->preference_bpm -
                     1.0) < 0.01) {
       } else {
         // 先画绝对bpm

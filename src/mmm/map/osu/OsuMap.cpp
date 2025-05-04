@@ -356,6 +356,28 @@ void OsuMap::load_from_file(const char* path) {
       insert_timing(*rbegin);
     }
 
+    bool finded{false};
+    // 读取全图参考bpm
+    for (const auto& [time, timings] : temp_timing_map) {
+      // 使用第一个不带变速的绝对bpm
+      if (timings.size() == 1 && timings[0]->is_base_timing) {
+        preference_bpm = timings[0]->basebpm;
+        finded = true;
+        break;
+      }
+    }
+    // 没找到单独存在的绝对时间点-找同时存在变速值为1.00的时间点
+    if (!finded) {
+      for (const auto& [time, timings] : temp_timing_map) {
+        // 使用第一个不带变速的绝对bpm
+        if (timings.size() == 2 && std::fabs(timings[1]->bpm - 1.00) < 0.0001) {
+          preference_bpm = timings[0]->basebpm;
+          finded = true;
+          break;
+        }
+      }
+    }
+
   } else {
     XWARN("非.osu格式,读取失败");
   }

@@ -818,7 +818,6 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
                &AudioEnginPlayCallback::music_play_callback, this,
                &MapWorkspaceCanvas::on_music_pos_sync);
   working_map = map;
-  editor->preference_bpm = nullptr;
   editor->canvas_pasued = true;
 
   if (map) {

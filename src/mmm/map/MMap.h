@@ -54,6 +54,9 @@ class MMap {
   // 背景图-如果有
   std::filesystem::path bg_path;
 
+  // 全图参考bpm
+  double preference_bpm{0};
+
   // 谱面时长--计算
   int32_t map_length = 0;
 
@@ -82,6 +85,7 @@ class MMap {
 
   // 全部timing
   std::multiset<std::shared_ptr<Timing>, TimingComparator> timings;
+
   // 用于识别重叠时间的timing列表缓存map
   std::unordered_map<int32_t, std::vector<std::shared_ptr<Timing>>>
       temp_timing_map;

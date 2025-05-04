@@ -60,9 +60,6 @@ class MapEditor {
   // 播放速度
   double playspeed{1.0f};
 
-  // 参考bpm
-  std::unique_ptr<double> preference_bpm = nullptr;
-
   // 当前正在使用的绝对timing--非变速timing
   std::shared_ptr<Timing> current_abs_timing;
 

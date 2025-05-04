@@ -24,7 +24,7 @@ void AreaInfoGenerator::generate() {
   // 未查询到timing-不绘制时间线
   if (temp_timings.empty()) return;
 
-  // 更新参考绝对timing
+  // 更新绝对timing
   for (const auto &timing : temp_timings) {
     switch (timing->type) {
       case TimingType::OSUTIMING: {
@@ -32,22 +32,19 @@ void AreaInfoGenerator::generate() {
         if (!otiming->is_inherit_timing) {
           // 非变速timing--存储的实际bpm
           editor_ref->current_abs_timing = otiming;
-          if (!editor_ref->preference_bpm) {
-            // 只更新一次参考bpm
-            editor_ref->preference_bpm = std::make_unique<double>();
-            *editor_ref->preference_bpm =
-                editor_ref->current_abs_timing->basebpm;
-          }
-          editor_ref->speed_zoom = editor_ref->current_abs_timing->basebpm /
-                                   *editor_ref->preference_bpm;
+          editor_ref->speed_zoom =
+              editor_ref->current_abs_timing->basebpm /
+              editor_ref->canvas_ref->working_map->preference_bpm;
           emit editor_ref->canvas_ref->current_absbpm_changed(
               editor_ref->current_abs_timing->basebpm);
           emit editor_ref->canvas_ref->current_timeline_speed_changed(
               editor_ref->speed_zoom);
         } else {
           // 变速timing--存储的倍速
-          editor_ref->speed_zoom = editor_ref->current_abs_timing->basebpm /
-                                   *editor_ref->preference_bpm * otiming->bpm;
+          editor_ref->speed_zoom =
+              editor_ref->current_abs_timing->basebpm /
+              editor_ref->canvas_ref->working_map->preference_bpm *
+              otiming->bpm;
           emit editor_ref->canvas_ref->current_timeline_speed_changed(
               editor_ref->speed_zoom);
         }

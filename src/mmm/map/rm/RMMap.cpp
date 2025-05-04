@@ -304,4 +304,13 @@ void RMMap::load_from_file(const char* path) {
   for (const auto& temp_timing : temp_timings) {
     insert_timing(temp_timing);
   }
+
+  // 读取全图参考bpm
+  for (const auto& [time, timings] : temp_timing_map) {
+    // 使用第一个不带变速的绝对bpm
+    if (timings.size() == 1 && timings[0]->is_base_timing) {
+      preference_bpm = timings[0]->basebpm;
+      break;
+    }
+  }
 }
