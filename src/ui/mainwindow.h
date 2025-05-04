@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <qevent.h>
 #include <qobject.h>
 #include <qtmetamacros.h>
 

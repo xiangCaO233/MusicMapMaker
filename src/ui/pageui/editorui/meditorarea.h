@@ -3,10 +3,12 @@
 
 #include <qtmetamacros.h>
 
+#include <QPushButton>
 #include <QWidget>
 #include <memory>
 
 #include "../../GlobalSettings.h"
+#include "../../canvas/map/editor/EditorEnumerations.h"
 
 class MMap;
 class CanvasContainer;
@@ -28,6 +30,13 @@ class MEditorArea : public QWidget {
   // 当前主题
   GlobalTheme current_theme;
 
+  // 模式按钮组
+  QButtonGroup *modesbuttonGroup;
+  QPushButton *drawnote_mode_button;
+  QPushButton *drawline_mode_button;
+  QPushButton *selection_mode_button;
+  QPushButton *none_mode_button;
+
   // 锁定模式-不自动切换
   bool lock_mode_auto_switch{false};
 
@@ -40,6 +49,10 @@ class MEditorArea : public QWidget {
  public slots:
   // page选择了新map事件
   void on_selectnewmap(std::shared_ptr<MMap> &map);
+
+  // 画布通过快捷键切换模式
+  void on_canvas_switchmode(MouseEditMode mode);
+
  signals:
   // 切换map信号
   void switched_map(std::shared_ptr<MMap> &map);
@@ -68,6 +81,10 @@ class MEditorArea : public QWidget {
  private:
   Ui::MEditorArea *ui;
 
+  // 更新书签
+  void update_bookmarks();
+
+  // 初始化所有工具按钮
   void initialize_toolbuttons();
 };
 

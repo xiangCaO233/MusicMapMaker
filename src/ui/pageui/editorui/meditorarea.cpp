@@ -1,5 +1,6 @@
 #include "meditorarea.h"
 
+#include <qbuttongroup.h>
 #include <qlabel.h>
 #include <qmenu.h>
 #include <qnamespace.h>
@@ -20,6 +21,11 @@ MEditorArea::MEditorArea(QWidget *parent)
   initialize_toolbuttons();
   // 默认隐藏音频控制器
   // ui->audio_time_controller->hide();
+
+  // 连接快捷键切换模式槽
+  connect(canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::switch_edit_mode, this,
+          &MEditorArea::on_canvas_switchmode);
 
   // 连接时间控制器选择map槽
   connect(this, &MEditorArea::switched_map, ui->audio_time_controller,
@@ -101,15 +107,25 @@ void MEditorArea::use_theme(GlobalTheme theme) {
   mutil::set_button_svgcolor(ui->magnet_todivisor_button, ":/icons/magnet.svg",
                              file_button_color, 16, 16);
 
+  mutil::set_button_svgcolor(ui->show_object_after_judgeline_button,
+                             ":/icons/glasses.svg", file_button_color, 16, 16);
+
+  // 模式选择菜单内的按钮组
+  mutil::set_button_svgcolor(drawnote_mode_button, ":/icons/drawnote.svg",
+                             file_button_color, 16, 16);
+  mutil::set_button_svgcolor(drawline_mode_button, ":/icons/drawline.svg",
+                             file_button_color, 16, 16);
+  mutil::set_button_svgcolor(selection_mode_button, ":/icons/selection.svg",
+                             file_button_color, 16, 16);
+  mutil::set_button_svgcolor(none_mode_button, ":/icons/mouse-pointer.svg",
+                             file_button_color, 16, 16);
+
   // 两个状态
   mutil::set_button_svgcolor(ui->wheel_direction_button,
                              ":/icons/long-arrow-alt-up.svg", file_button_color,
                              16, 16);
   mutil::set_button_svgcolor(ui->lock_edit_mode_button, ":/icons/lock-open.svg",
                              file_button_color, 16, 16);
-
-  mutil::set_button_svgcolor(ui->show_object_after_judgeline_button,
-                             ":/icons/glasses.svg", file_button_color, 16, 16);
 
   // 设置时间控制器主题
   ui->audio_time_controller->use_theme(theme);
@@ -120,15 +136,100 @@ void MEditorArea::initialize_toolbuttons() {
   //
   //
   // 模式选择按钮
+  auto modemenu = new QMenu(ui->mode_toolbutton);
+  auto custommodemenuwidget = new QWidget();
+
+  // 创建按钮组
+  modesbuttonGroup = new QButtonGroup(this);
+  // 设置独占模式（单选）
+  modesbuttonGroup->setExclusive(true);
+
+  // 创建子模式按钮
+  drawnote_mode_button = new QPushButton();
+  drawline_mode_button = new QPushButton();
+  selection_mode_button = new QPushButton();
+  none_mode_button = new QPushButton();
+
+  // 初始化按钮类型尺寸
+  drawnote_mode_button->setFlat(true);
+  drawnote_mode_button->setCheckable(true);
+  drawnote_mode_button->setMinimumSize(QSize(24, 24));
+  drawnote_mode_button->setMaximumSize(QSize(24, 24));
+
+  drawline_mode_button->setFlat(true);
+  drawline_mode_button->setCheckable(true);
+  drawline_mode_button->setMinimumSize(QSize(24, 24));
+  drawline_mode_button->setMaximumSize(QSize(24, 24));
+
+  selection_mode_button->setFlat(true);
+  selection_mode_button->setCheckable(true);
+  selection_mode_button->setMinimumSize(QSize(24, 24));
+  selection_mode_button->setMaximumSize(QSize(24, 24));
+
+  none_mode_button->setFlat(true);
+  none_mode_button->setCheckable(true);
+  none_mode_button->setMinimumSize(QSize(24, 24));
+  none_mode_button->setMaximumSize(QSize(24, 24));
+
+  // 将按钮添加到按钮组
+  // 第二个参数是按钮ID
+  modesbuttonGroup->addButton(drawnote_mode_button,
+                              static_cast<int32_t>(MouseEditMode::PLACE_NOTE));
+  modesbuttonGroup->addButton(
+      drawline_mode_button,
+      static_cast<int32_t>(MouseEditMode::PLACE_LONGNOTE));
+  modesbuttonGroup->addButton(selection_mode_button,
+                              static_cast<int32_t>(MouseEditMode::SELECT));
+  modesbuttonGroup->addButton(none_mode_button,
+                              static_cast<int32_t>(MouseEditMode::NONE));
+
+  // 布局
+  QVBoxLayout *modemenulayout = new QVBoxLayout;
+  modemenulayout->setContentsMargins(0, 0, 0, 0);
+  modemenulayout->setSpacing(0);
+  modemenulayout->addWidget(drawnote_mode_button);
+  modemenulayout->addWidget(drawline_mode_button);
+  modemenulayout->addWidget(selection_mode_button);
+  modemenulayout->addWidget(none_mode_button);
+
+  custommodemenuwidget->setLayout(modemenulayout);
+
+  // 默认选中无模式按钮
+  none_mode_button->setChecked(true);
+
+  auto c = canvas_container->canvas.data();
+  auto mode_toolbutton = ui->mode_toolbutton;
+  auto group = modesbuttonGroup;
+
+  // 监听选中按钮变化
+  connect(modesbuttonGroup,
+          QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
+          [=](QAbstractButton *button) {
+            // 切换工具按钮的图标
+            mode_toolbutton->setIcon(button->icon());
+            // 切换当前编辑器的模式
+            if (c->working_map) {
+              c->editor->edit_mode =
+                  static_cast<MouseEditMode>(group->id(button));
+            }
+          });
+
+  // 将自定义 Widget 包装成 QWidgetAction
+  auto *modewidgetAction = new QWidgetAction(modemenu);
+  modewidgetAction->setDefaultWidget(custommodemenuwidget);
+  modemenu->setContentsMargins(0, 0, 0, 0);
+
+  // 添加到菜单
+  modemenu->addAction(modewidgetAction);
+  // 设置模式按钮菜单
+  ui->mode_toolbutton->setMenu(modemenu);
+
   //
   //
   // 分拍策略按钮
   //
   //
   // 背景透明度调节按钮
-  //
-  //
-  // 创建自定义 Widget（例如一个 QSlider）
   //
   //
   // 创建菜单
@@ -139,12 +240,12 @@ void MEditorArea::initialize_toolbuttons() {
   bgslider->setValue(25);
   auto bgopacylabel = new QLabel("25");
 
-  auto layout = new QVBoxLayout(custombgsliderWidget);
-  layout->setContentsMargins(2, 2, 2, 2);
-  layout->setSpacing(2);
-  layout->addWidget(bgslider);
-  layout->addWidget(bgopacylabel);
-  custombgsliderWidget->setLayout(layout);
+  auto bgmenulayout = new QVBoxLayout(custombgsliderWidget);
+  bgmenulayout->setContentsMargins(2, 2, 2, 2);
+  bgmenulayout->setSpacing(2);
+  bgmenulayout->addWidget(bgslider);
+  bgmenulayout->addWidget(bgopacylabel);
+  custombgsliderWidget->setLayout(bgmenulayout);
 
   auto canvas = canvas_container->canvas.data();
   connect(bgslider, &QSlider::valueChanged, [=](int value) {
@@ -164,6 +265,19 @@ void MEditorArea::initialize_toolbuttons() {
   //
   //
   // 书签按钮
+  update_bookmarks();
+}
+
+// 更新书签
+void MEditorArea::update_bookmarks() {}
+
+// 画布通过快捷键切换模式
+void MEditorArea::on_canvas_switchmode(MouseEditMode mode) {
+  // 选中对应按钮
+  auto button = modesbuttonGroup->button(static_cast<int32_t>(mode));
+  button->setChecked(true);
+  // 切换工具按钮的图标
+  ui->mode_toolbutton->setIcon(button->icon());
 }
 
 // 画布时间变化事件
@@ -191,6 +305,8 @@ void MEditorArea::on_selectnewmap(std::shared_ptr<MMap> &map) {
 
   // 更新一下
   ui->canvas_container->canvas.data()->update();
+
+  // 根据项目配置更新工作区选项和配置
 }
 
 // 滚动方向切换按钮触发
@@ -220,7 +336,7 @@ void MEditorArea::on_wheel_direction_button_toggled(bool checked) {
 
 // 吸附到分拍线按钮状态切换事件
 void MEditorArea::on_magnet_todivisor_button_toggled(bool checked) {
-  ui->canvas_container->canvas.data()->editor->magnet_to_divisor = checked;
+  ui->canvas_container->canvas.data()->editor->is_magnet_to_divisor = checked;
 }
 
 // 模式锁定按钮状态切换事件
