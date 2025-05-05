@@ -140,7 +140,7 @@ void TimeInfoGenerator::draw_timing_points() {
     QSizeF strs_size(std::max(prebpmstr_width, speedstr_width),
                      prebpmstr_height + speedstr_height);
 
-    // 内外框的尺寸
+    // 内框的尺寸
     QSizeF inner_bound_size(
         strs_size.width() + editor_ref->canvas_ref->skin.timeinfo_font_size,
         strs_size.height() + editor_ref->canvas_ref->skin.timeinfo_font_size);

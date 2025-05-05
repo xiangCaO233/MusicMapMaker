@@ -158,7 +158,7 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mousePressEvent(event);
 
-  qDebug() << event->button();
+  // qDebug() << event->button();
 
   // 如果当前悬停的位置有物件,左键时选中此物件,右键时删除此物件(组合键头时删除组合键)
   // 没有物件则根据当前模式添加物件到鼠标位置对应的时间戳
