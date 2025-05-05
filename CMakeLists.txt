@@ -97,6 +97,7 @@ set(PROJECT_SOURCES
   src/ui/mainwindow.cpp
   src/ui/mainwindow.h
   src/ui/mainwindow.ui
+  src/ui/log/uilogger.h
   src/ui/controllers/mfilebrowsercontroller.cpp
   src/ui/controllers/mfilebrowsercontroller.h
   src/ui/controllers/mfilebrowsercontroller.ui

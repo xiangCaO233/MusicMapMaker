@@ -94,7 +94,7 @@ void TimeInfoGenerator::draw_timing_points() {
     std::string speed_str = "";
 
     if (show_speed) {
-      speed_str = tr("speed:").toStdString() +
+      speed_str = "speed:" +
                   QString::number(speed_timing_ref->bpm, 'f', 2).toStdString();
     }
 

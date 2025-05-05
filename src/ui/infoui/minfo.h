@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "../log/loglevel.h"
+
 class MMetas;
 enum class GlobalTheme;
 
@@ -23,6 +25,9 @@ class MInfo : public QWidget {
 
   // 使用主题
   void use_theme(GlobalTheme theme);
+
+  // 输出日志
+  void log(MLogLevel level, const QString &message);
 
  private:
   Ui::MInfo *ui;

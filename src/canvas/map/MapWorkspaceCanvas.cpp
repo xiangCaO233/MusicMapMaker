@@ -36,6 +36,7 @@
 #include "generator/general/HoldGenerator.h"
 #include "generator/general/NoteGenerator.h"
 #include "generator/general/SlideGenerator.h"
+#include "mainwindow.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
     : skin(this), GLCanvas(parent) {
@@ -108,8 +109,10 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
                   .count();
   auto atime = time - lasttime;
   actual_update_time = double(atime) / 1000.0;
-  if (actual_update_time - des_update_time > 1.5) {
-    XWARN("qt update delayed:" + std::to_string(actual_update_time));
+  if (lasttime > 0 && actual_update_time - des_update_time > des_update_time) {
+    auto log = tr("qt update substantially delayed:%1ms")
+                   .arg(QString::number(actual_update_time, 'f', 2));
+    XWARN(log.toStdString());
   }
   lasttime = time;
 

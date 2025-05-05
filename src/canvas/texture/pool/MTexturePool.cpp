@@ -316,11 +316,12 @@ bool MTexturePool::load_texture(std::shared_ptr<TextureInstace> &texture) {
   GLCALL(cvs->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, (subindex + 1) % 32,
                               (subindex + 1) / 32, layer_index, 1, 1, 1,
                               GL_RGBA, GL_FLOAT, metadata.data()));
-  XINFO("纹理元数据:[atlaslayer:" + std::to_string(layer_index) +
-        ",woff:" + std::to_string(texture->woffset) +
-        ",hoff:" + std::to_string(texture->hoffset) +
-        ",w:" + std::to_string(texture->width) + ",h:" +
-        std::to_string(texture->height) + "]" + texture->name + "添加到纹理集");
+  // XINFO("纹理元数据:[atlaslayer:" + std::to_string(layer_index) +
+  //       ",woff:" + std::to_string(texture->woffset) +
+  //       ",hoff:" + std::to_string(texture->hoffset) +
+  //       ",w:" + std::to_string(texture->width) + ",h:" +
+  //       std::to_string(texture->height) + "]" + texture->name +
+  //       "添加到纹理集");
 
   // 成功添加映射
   texture_map.try_emplace(texture->name, texture);

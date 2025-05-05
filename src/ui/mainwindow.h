@@ -9,6 +9,7 @@
 #include <QMainWindow>
 #include <memory>
 
+#include "../log/uilogger.h"
 #include "GlobalSettings.h"
 
 class MapWorkspaceCanvas;

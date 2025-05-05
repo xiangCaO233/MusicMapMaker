@@ -14,6 +14,7 @@
 #include "AudioManager.h"
 #include "audio/BackgroundAudio.h"
 #include "colorful-log.h"
+#include "mainwindow.h"
 #include "ui_timecontroller.h"
 
 TimeController::TimeController(QWidget *parent)

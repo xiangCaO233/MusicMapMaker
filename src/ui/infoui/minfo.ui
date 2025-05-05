@@ -50,7 +50,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="logTab">
        <attribute name="title">
@@ -114,6 +114,12 @@
         </property>
         <item>
          <widget class="QTextEdit" name="errorTextArea">
+          <property name="font">
+           <font>
+            <family>Noto Sans</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="undoRedoEnabled">
            <bool>false</bool>
           </property>

@@ -14,11 +14,19 @@
 
 #include <memory>
 
+#include "../ui/log/uilogger.h"
+
 #define XTRACE(msg) SPDLOG_TRACE(msg)
 #define XDEBUG(msg) SPDLOG_DEBUG(msg)
-#define XINFO(msg) SPDLOG_INFO(msg)
-#define XWARN(msg) SPDLOG_WARN(msg)
-#define XERROR(msg) SPDLOG_ERROR(msg)
+#define XINFO(msg)  \
+  SPDLOG_INFO(msg); \
+  emit XLogger::uilogger->info(QString::fromStdString(msg));
+#define XWARN(msg)  \
+  SPDLOG_WARN(msg); \
+  emit XLogger::uilogger->warn(QString::fromStdString(msg));
+#define XERROR(msg)  \
+  SPDLOG_ERROR(msg); \
+  emit XLogger::uilogger->error(QString::fromStdString(msg));
 #define XCRITICAL(msg) SPDLOG_CRITICAL(msg)
 
 class ColorfulFormatter : public spdlog::formatter {
@@ -32,10 +40,12 @@ class ColorfulFormatter : public spdlog::formatter {
 };
 
 class XLogger {
-  // 日志实体
+  // 终端日志实体
   static std::shared_ptr<spdlog::logger> logger;
 
  public:
+  // ui日志实体
+  static MUiLogger* uilogger;
   static uint32_t glcalls;
   static uint32_t drawcalls;
   static void init(const char* name);

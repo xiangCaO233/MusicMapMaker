@@ -11,17 +11,13 @@
 #include "../mmm/MapWorkProject.h"
 #include "audio/BackgroundAudio.h"
 #include "colorful-log.h"
+#include "mainwindow.h"
 #include "mmm/hitobject/HitObject.h"
 #include "mmm/hitobject/Note/Note.h"
 #include "mmm/hitobject/Note/rm/Slide.h"
 
 // 构造EffectThread
-EffectThread::EffectThread(std::shared_ptr<MapEditor> e) : editor(e) {
-  // 启动效果线程
-  // start();
-
-  // update_map();
-}
+EffectThread::EffectThread(std::shared_ptr<MapEditor> e) : editor(e) {}
 
 // 析构EffectThread
 EffectThread::~EffectThread() { stop(); }
@@ -31,6 +27,8 @@ void EffectThread::start() {
   exit = false;
   thread = std::thread(&EffectThread::effect_thread, this);
   thread.detach();
+
+  XINFO("启动特效线程");
 }
 
 // 停止线程

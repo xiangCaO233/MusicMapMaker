@@ -20,6 +20,19 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
+
+  auto infoui = ui->infomation_widget;
+
+  connect(XLogger::uilogger, &MUiLogger::info, [=](const QString& message) {
+    infoui->log(MLogLevel::INFO, message);
+  });
+  connect(XLogger::uilogger, &MUiLogger::warn, [=](const QString& message) {
+    infoui->log(MLogLevel::WARN, message);
+  });
+  connect(XLogger::uilogger, &MUiLogger::error, [=](const QString& message) {
+    infoui->log(MLogLevel::ERROR, message);
+  });
+
   BackgroundAudio::init();
 
   // 注册QVariant数据类型

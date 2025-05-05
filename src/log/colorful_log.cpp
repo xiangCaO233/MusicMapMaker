@@ -2,6 +2,8 @@
 
 #include "colorful-log.h"
 
+MUiLogger *XLogger::uilogger = new MUiLogger;
+
 void ColorfulFormatter::format(const spdlog::details::log_msg &msg,
                                spdlog::memory_buf_t &dest) {
   // 时间处理
