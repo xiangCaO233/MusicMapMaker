@@ -5,6 +5,8 @@
 
 #include "../ObjectGenerator.h"
 
+struct HoverInfo;
+
 class NoteGenerator : public ObjectGenerator {
  public:
   // 构造NoteGenerator

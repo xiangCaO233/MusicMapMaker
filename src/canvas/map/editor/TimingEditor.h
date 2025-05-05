@@ -7,6 +7,8 @@
 
 #include "mmm/timing/Timing.h"
 
+class MapEditor;
+
 class TimingEditOperation {
  public:
   std::multiset<std::shared_ptr<Timing>, TimingComparator> src_timings;
@@ -16,6 +18,7 @@ class TimingEditOperation {
     TimingEditOperation reversed_operation;
     reversed_operation.des_timings = src_timings;
     reversed_operation.src_timings = des_timings;
+    return reversed_operation;
   }
 };
 
@@ -27,9 +30,12 @@ class TimingEditor {
 
  public:
   // 构造TimingEditor
-  TimingEditor();
+  TimingEditor(MapEditor* meditor_ref);
   // 析构TimingEditor
   virtual ~TimingEditor();
+
+  // 图编辑器引用
+  MapEditor* editor_ref;
 
   // 撤销
   void undo();

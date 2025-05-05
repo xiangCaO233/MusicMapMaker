@@ -11,6 +11,25 @@
 #include "../../../mmm/timing/Timing.h"
 #include "../../texture/Texture.h"
 
+enum class HoverPart {
+  // 悬浮于物件头
+  HEAD,
+  // 悬浮于长条身
+  HOLD_BODY,
+  // 悬浮于长条尾
+  HOLD_END,
+  // 悬浮于滑键尾
+  SLIDE_END,
+  // 悬浮于组合键节点
+  COMPLEX_NODE,
+};
+
+struct HoverInfo {
+  std::shared_ptr<HitObject> hoverobj;
+  std::shared_ptr<Beat> hoverbeat;
+  HoverPart part;
+};
+
 struct EditorBuffer {
   // 上一次编辑区绘制的时间区域
   double current_time_area_start{0.0};
@@ -43,8 +62,7 @@ struct EditorBuffer {
       buffer_preview_objects;
 
   // 鼠标悬停位置的物件-物件所在拍的指针
-  std::shared_ptr<std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>
-      hover_hitobject_info{nullptr};
+  std::shared_ptr<HoverInfo> hover_info{nullptr};
 
   // 选中的物件
   // 哈希函数和比较函数

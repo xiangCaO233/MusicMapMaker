@@ -11,7 +11,44 @@
 SlideGenerator::SlideGenerator(std::shared_ptr<MapEditor>& editor)
     : NoteGenerator(editor) {}
 
-SlideGenerator::~SlideGenerator() {}
+SlideGenerator::~SlideGenerator() = default;
+
+// body是否应显示悬浮
+bool SlideGenerator::should_body_hover(
+    const std::shared_ptr<Slide>& obj,
+    const std::shared_ptr<HoverInfo>& current_hoverinfo) const {
+  // 当前没悬浮任何部分
+  if (!current_hoverinfo) return true;
+  // 悬浮到不同物件
+  if (current_hoverinfo->hoverobj.get() != obj.get()) return true;
+  switch (obj->compinfo) {
+    case ComplexInfo::HEAD: {
+      // 处于组合键头,若已hover于头或节点则不显示
+      return !(current_hoverinfo->part == HoverPart::HEAD ||
+               current_hoverinfo->part == HoverPart::COMPLEX_NODE);
+    }
+    case ComplexInfo::NONE: {
+      // 不处于组合键中若已hover于头或尾则不显示
+      return !(current_hoverinfo->part == HoverPart::HEAD ||
+               current_hoverinfo->part == HoverPart::SLIDE_END);
+    }
+    case ComplexInfo::BODY: {
+      // 处于组合键内,若已hover于当前节点或上一节点(缓存节点back)则不显示
+      auto hover_pre_node = temp_node_map.rbegin()->second.contains(
+          editor_ref->canvas_ref->mouse_pos);
+      return !(current_hoverinfo->part == HoverPart::COMPLEX_NODE ||
+               hover_pre_node);
+    }
+    case ComplexInfo::END: {
+      // 处于组合键尾,若已hover于尾或上一节点(缓存节点back)则不显示
+      auto hover_pre_node = temp_node_map.rbegin()->second.contains(
+          editor_ref->canvas_ref->mouse_pos);
+      return !(current_hoverinfo->part == HoverPart::SLIDE_END ||
+               hover_pre_node);
+    }
+  }
+  return false;
+}
 
 // 生成滑键
 void SlideGenerator::generate(Slide& slide) {
@@ -96,13 +133,16 @@ void SlideGenerator::generate(Slide& slide) {
   auto body_selected_it =
       editor_ref->ebuffer.selected_hitobjects.find(slide_ptr);
   if (is_hover_body) {
-    // 使用hover纹理
-    slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
-        TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::HOVER);
-    editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
-        std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
-        slide_ptr, slide.beatinfo);
-    editor_ref->cstatus.is_hover_note = true;
+    // 若已悬浮于滑键头或尾或组合键节点,不切换悬浮部分和纹理使用
+    auto& hoverinfo = editor_ref->ebuffer.hover_info;
+    if (should_body_hover(slide_ptr, hoverinfo)) {
+      // 使用hover纹理
+      slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
+          TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::HOVER);
+      hoverinfo = std::make_shared<HoverInfo>(slide_ptr, slide.beatinfo,
+                                              HoverPart::HOLD_BODY);
+      editor_ref->cstatus.is_hover_note = true;
+    }
   } else {
     if (slide_blody_in_select_bound ||
         body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
@@ -149,9 +189,8 @@ void SlideGenerator::generate(Slide& slide) {
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
-            std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
-            slide.slide_end_reference, objref->beatinfo);
+        editor_ref->ebuffer.hover_info = std::make_shared<HoverInfo>(
+            slide_ptr, objref->beatinfo, HoverPart::SLIDE_END);
         editor_ref->cstatus.is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||
@@ -198,9 +237,8 @@ void SlideGenerator::generate(Slide& slide) {
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->ebuffer.hover_hitobject_info = std::make_shared<
-            std::pair<std::shared_ptr<HitObject>, std::shared_ptr<Beat>>>(
-            slide.slide_end_reference, slide.beatinfo);
+        editor_ref->ebuffer.hover_info = std::make_shared<HoverInfo>(
+            slide_ptr, slide.beatinfo, HoverPart::SLIDE_END);
         editor_ref->cstatus.is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||

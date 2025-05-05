@@ -6,6 +6,11 @@
 #include "NoteGenerator.h"
 
 class HoldGenerator : public NoteGenerator {
+  // body是否应显示悬浮
+  bool should_body_hover(
+      const std::shared_ptr<Hold>& obj,
+      const std::shared_ptr<HoverInfo>& current_hoverinfo) const;
+
  public:
   // 构造HoldGenerator
   explicit HoldGenerator(std::shared_ptr<MapEditor>& editor);

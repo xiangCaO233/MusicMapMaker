@@ -210,8 +210,9 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
     if (editor->cstatus.edit_mode == MouseEditMode::SELECT) {
       // 选择模式-更新选中信息
       // 正悬浮在物件上
-      if (editor->ebuffer.hover_hitobject_info) {
+      if (editor->ebuffer.hover_info) {
         // 调整物件时间戳等属性
+
       } else {
         // 未悬浮在任何物件上-更新选中框定位点
         editor->update_selection_area(event->pos(),
@@ -507,7 +508,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
         auto frame =
             std::make_pair(QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
                            texture_full_map[frame_texname]);
-        effect_frame_queue_map[xpos].push(frame);
+        effect_frame_queue_map[xpos].push(std::move(frame));
       }
       break;
     }
@@ -525,7 +526,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
         auto frame =
             std::make_pair(QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
                            texture_full_map[frame_texname]);
-        effect_frame_queue_map[xpos].push(frame);
+        effect_frame_queue_map[xpos].push(std::move(frame));
       }
       break;
     }
@@ -594,7 +595,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 更新hover信息
   if (!editor->cstatus.is_hover_note) {
     // 未悬浮在任何一个物件或物件身体上
-    editor->ebuffer.hover_hitobject_info = nullptr;
+    editor->ebuffer.hover_info = nullptr;
   } else {
     editor->cstatus.is_hover_note = false;
   }
@@ -605,6 +606,7 @@ void MapWorkspaceCanvas::push_shape() {
   // 绘制背景
   draw_background();
   if (working_map) {
+    // 清除hover信息
     // 生成区域信息
     areagenerator->generate();
     if (editor->cstatus.canvas_pasued) draw_beats();

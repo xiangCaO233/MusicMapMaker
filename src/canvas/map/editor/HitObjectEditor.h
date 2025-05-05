@@ -4,8 +4,11 @@
 #include <memory>
 #include <set>
 #include <stack>
+#include <utility>
 
 #include "../../../mmm/hitobject/HitObject.h"
+
+class MapEditor;
 
 class ObjEditOperation {
  public:
@@ -16,6 +19,7 @@ class ObjEditOperation {
     ObjEditOperation reversed_operation;
     reversed_operation.des_objects = src_objects;
     reversed_operation.src_objects = des_objects;
+    return reversed_operation;
   }
 };
 
@@ -27,9 +31,22 @@ class HitObjectEditor {
 
  public:
   // 构造HitObjectEditor
-  HitObjectEditor();
+  HitObjectEditor(MapEditor* meditor_ref);
   // 析构HitObjectEditor
   virtual ~HitObjectEditor();
+
+  // 图编辑器引用
+  MapEditor* editor_ref;
+
+  // 正在编辑的原物件
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+      editing_src_objects;
+
+  // 正在编辑的缓存物件
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+      editing_temp_objects;
+
+  // void drag_object()
 
   // 撤销
   void undo();

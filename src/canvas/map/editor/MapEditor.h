@@ -68,7 +68,7 @@ class MapEditor {
   // 更新时间线缩放-滚动
   void scroll_update_timelinezoom(int scrolldy);
   // 吸附到附近分拍线
-  void magnet_to_divisor(int scrolldy);
+  void scroll_magnet_to_divisor(int scrolldy);
   // 更新谱面位置
   void update_timepos(int scrolldy, bool is_shift_down);
   // 更新选中信息

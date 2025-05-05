@@ -4,8 +4,11 @@
 #include "../../mmm/map/osu/OsuMap.h"
 #include "../../mmm/map/rm/RMMap.h"
 #include "../MapWorkspaceCanvas.h"
+#include "editor/HitObjectEditor.h"
+#include "editor/TimingEditor.h"
 
-MapEditor::MapEditor(MapWorkspaceCanvas* canvas) : canvas_ref(canvas) {}
+MapEditor::MapEditor(MapWorkspaceCanvas* canvas)
+    : canvas_ref(canvas), obj_editor(this), timing_editor(this) {}
 
 MapEditor::~MapEditor() {}
 
@@ -140,7 +143,7 @@ void MapEditor::scroll_update_timelinezoom(int dy) {
 }
 
 // 吸附到附近分拍线
-void MapEditor::magnet_to_divisor(int scrolldy) {
+void MapEditor::scroll_magnet_to_divisor(int scrolldy) {
   // 获取当前时间附近的拍
   // 找到第一个拍起始时间大于或等于当前时间的拍迭代器
   auto current_beat_it =
@@ -248,7 +251,7 @@ void MapEditor::update_timepos(int scrolldy, bool is_shift_down) {
   }
 
   if (cstatus.is_magnet_to_divisor) {
-    magnet_to_divisor(scrolldy);
+    scroll_magnet_to_divisor(scrolldy);
   } else {
     auto scroll_unit = (scrolldy > 0 ? 1.0 : -1.0) * cstatus.timeline_zoom *
                        cstatus.canvas_size.height() / 10.0;
@@ -298,15 +301,15 @@ void MapEditor::update_selections(bool is_ctrl_down) {
       ebuffer.selected_hitobjects.clear();
     }
     // 按住controll左键多选
-    if (ebuffer.hover_hitobject_info) {
+    if (ebuffer.hover_info) {
       // 有悬浮在物件上
-      ebuffer.selected_hitobjects.emplace(ebuffer.hover_hitobject_info->first);
+      ebuffer.selected_hitobjects.emplace(ebuffer.hover_info->hoverobj);
     }
 
     // 发送更新选中物件信号
-    if (ebuffer.hover_hitobject_info) {
-      emit canvas_ref->select_object(ebuffer.hover_hitobject_info->second,
-                                     ebuffer.hover_hitobject_info->first,
+    if (ebuffer.hover_info) {
+      emit canvas_ref->select_object(ebuffer.hover_info->hoverbeat,
+                                     ebuffer.hover_info->hoverobj,
                                      ebuffer.current_abs_timing);
     } else {
       emit canvas_ref->select_object(nullptr, nullptr, nullptr);
