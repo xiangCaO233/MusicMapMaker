@@ -126,6 +126,15 @@ class TimeController : public QWidget {
   // 时间线缩放调节事件
   void on_timeline_zoom_slider_valueChanged(int value);
 
+  // 重置宽度缩放按钮
+  void on_owidth_scale_button_clicked();
+
+  // 重置高度缩放按钮
+  void on_oheight_scale_button_clicked();
+
+  // 重置时间线缩放按钮
+  void on_timeline_zoom_button_clicked();
+
  private:
   Ui::audio_time_controller *ui;
 

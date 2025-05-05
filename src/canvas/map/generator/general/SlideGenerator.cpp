@@ -35,6 +35,7 @@ bool SlideGenerator::should_body_hover(
     }
     case ComplexInfo::BODY: {
       // 处于组合键内,若已hover于当前节点或上一节点(缓存节点back)则不显示
+      if (temp_node_map.empty()) return true;
       auto hover_pre_node = temp_node_map.rbegin()->second.contains(
           editor_ref->canvas_ref->mouse_pos);
       return !(current_hoverinfo->part == HoverPart::COMPLEX_NODE ||
@@ -42,6 +43,7 @@ bool SlideGenerator::should_body_hover(
     }
     case ComplexInfo::END: {
       // 处于组合键尾,若已hover于尾或上一节点(缓存节点back)则不显示
+      if (temp_node_map.empty()) return true;
       auto hover_pre_node = temp_node_map.rbegin()->second.contains(
           editor_ref->canvas_ref->mouse_pos);
       return !(current_hoverinfo->part == HoverPart::SLIDE_END ||

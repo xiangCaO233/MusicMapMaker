@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>639</width>
-    <height>431</height>
+    <width>710</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -548,7 +548,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="timeline_zoom_value_label">
+             <widget class="QPushButton" name="timeline_zoom_button">
               <property name="font">
                <font>
                 <pointsize>16</pointsize>
@@ -556,6 +556,9 @@
               </property>
               <property name="text">
                <string notr="true">100</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -615,14 +618,20 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="oheight_value_label">
+             <widget class="QPushButton" name="oheight_scale_button">
               <property name="font">
                <font>
                 <pointsize>12</pointsize>
                </font>
               </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
               <property name="text">
                <string notr="true">100</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -631,7 +640,7 @@
          </item>
          <item row="1" column="0" colspan="2">
           <widget class="QWidget" name="object_width_scale" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1,0">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -682,14 +691,20 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="owidth_value_label">
+             <widget class="QPushButton" name="owidth_scale_button">
               <property name="font">
                <font>
                 <pointsize>12</pointsize>
                </font>
               </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
               <property name="text">
                <string notr="true">100</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
               </property>
              </widget>
             </item>

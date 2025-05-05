@@ -189,6 +189,22 @@ void TimeController::on_current_timeline_speed_changed(double timeline_speed) {
 // page选择了新map事件
 void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
   binding_map = map;
+  // 读取项目的设置
+  auto project_owidth_value =
+      int(map->project_reference->config.object_width_ratio * 100);
+  ui->owidth_scale_button->setText(QString::number(project_owidth_value));
+  ui->owidth_scale_slider->setValue(project_owidth_value);
+
+  auto project_oheight_value =
+      int(map->project_reference->config.object_height_ratio * 100);
+  ui->oheight_scale_button->setText(QString::number(project_oheight_value));
+  ui->oheight_scale_slider->setValue(project_oheight_value);
+
+  auto project_timeline_zoom_value =
+      int(map->project_reference->config.timeline_zoom * 100);
+  ui->timeline_zoom_button->setText(
+      QString::number(project_timeline_zoom_value));
+  ui->timeline_zoom_slider->setValue(project_timeline_zoom_value);
 }
 
 // 画布时间变化事件
@@ -342,33 +358,48 @@ void TimeController::on_lineEdit_returnPressed() {
   // 检查输入数据是否合法--不合法恢复缓存数据
 }
 
-// 物件宽度缩放调节时间
+// 物件宽度缩放调节
 void TimeController::on_owidth_scale_slider_valueChanged(int value) {
   binding_map->project_reference->config.object_width_ratio =
       double(value) / 100.0;
-  ui->owidth_value_label->setText(QString::number(value));
+  ui->owidth_scale_button->setText(QString::number(value));
 }
 
-// 物件高度缩放调节时间
+// 物件高度缩放调节
 void TimeController::on_oheight_scale_slider_valueChanged(int value) {
   binding_map->project_reference->config.object_height_ratio =
       double(value) / 100.0;
-  ui->oheight_value_label->setText(QString::number(value));
+  ui->oheight_scale_button->setText(QString::number(value));
 }
 
 // 画布调节时间线缩放
 void TimeController::on_canvas_adjust_timeline_zoom(int value) {
   timeline_zoom_sync_lock = true;
   ui->timeline_zoom_slider->setValue(value);
-  ui->timeline_zoom_value_label->setText(QString::number(value));
+  ui->timeline_zoom_button->setText(QString::number(value));
 }
 
-// 时间线缩放调节时间
+// 时间线缩放调节
 void TimeController::on_timeline_zoom_slider_valueChanged(int value) {
   if (timeline_zoom_sync_lock) {
     timeline_zoom_sync_lock = false;
     return;
   }
   binding_map->project_reference->config.timeline_zoom = double(value) / 100.0;
-  ui->timeline_zoom_value_label->setText(QString::number(value));
+  ui->timeline_zoom_button->setText(QString::number(value));
+}
+
+// 重置宽度缩放按钮
+void TimeController::on_owidth_scale_button_clicked() {
+  ui->owidth_scale_slider->setValue(100);
+}
+
+// 重置高度缩放按钮
+void TimeController::on_oheight_scale_button_clicked() {
+  ui->oheight_scale_slider->setValue(100);
+}
+
+// 重置时间线缩放按钮
+void TimeController::on_timeline_zoom_button_clicked() {
+  ui->timeline_zoom_slider->setValue(100);
 }
