@@ -502,9 +502,11 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
           texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
         auto w = effect_frame_texture->width *
-                 (editor->ebuffer.object_size_scale * 0.75);
+                 (editor->ebuffer.object_size_scale * 0.75 *
+                  working_map->project_reference->config.object_width_ratio);
         auto h = effect_frame_texture->height *
-                 (editor->ebuffer.object_size_scale * 0.75);
+                 (editor->ebuffer.object_size_scale * 0.75 *
+                  working_map->project_reference->config.object_height_ratio);
         // TODO-xiang-:不知名入队bug
         auto frame_texname =
             skin.nomal_hit_effect_dir + "/" +
@@ -521,9 +523,11 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
           texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
       for (int i = 1; i <= frame_count; ++i) {
         auto w = effect_frame_texture->width *
-                 (editor->ebuffer.object_size_scale * 0.75);
+                 (editor->ebuffer.object_size_scale * 0.75 *
+                  working_map->project_reference->config.object_width_ratio);
         auto h = effect_frame_texture->height *
-                 (editor->ebuffer.object_size_scale * 0.75);
+                 (editor->ebuffer.object_size_scale * 0.75 *
+                  working_map->project_reference->config.object_height_ratio);
         auto frame_texname =
             skin.slide_hit_effect_dir + "/" +
             std::to_string(i % skin.slide_hit_effect_frame_count + 1) + ".png";

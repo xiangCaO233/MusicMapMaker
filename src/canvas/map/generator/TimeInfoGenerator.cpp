@@ -177,7 +177,7 @@ void TimeInfoGenerator::draw_timing_points() {
     editor_ref->canvas_ref->renderer_manager->addRoundRect(
         QRectF(inner_bound_pos.x(), inner_bound_pos.y(),
                inner_bound_size.width(), inner_bound_size.height()),
-        nullptr, QColor(0, 0, 0, 75), 0, 0.15, true);
+        nullptr, QColor(0, 0, 0, 255), 0, 0.15, true);
 
     // 画文本
     auto prebpmstrpos_x = inner_bound_pos.x() +
@@ -220,114 +220,4 @@ void TimeInfoGenerator::draw_timing_points() {
           editor_ref->canvas_ref->skin.timeinfo_font_color, 0);
     }
   }
-
-  //   for (const auto &timing : timings_in_area) {
-  //     auto timing_y_pos =
-  //         judgeline_pos -
-  //         (timing->timestamp - editor_ref->cstatus.current_visual_time_stamp)
-  //         *
-  //             editor_ref->cstatus.timeline_zoom *
-  //             (editor_ref->cstatus.canvas_pasued
-  //                  ? 1.0
-  //                  : editor_ref->cstatus.speed_zoom);
-  //     double timing_x_pos;
-  //
-  //     std::string bpmvalue =
-  //         QString::number(timing->basebpm, 'f', 2).toStdString();
-  //
-  //     // 绝对bpm-参考
-  //     auto absbpm_info = bpm_prefix + bpmvalue;
-  //
-  // #ifdef _WIN32
-  // #else
-  //     std::u32string absbpm = mutil::cu32(absbpm_info);
-  // #endif  //_WIN32
-  //     // 计算bpm字符串尺寸
-  //     auto absbpm_info_string_width{0};
-  //     auto absbpm_info_string_height{0};
-  //     for (const auto &character : absbpm) {
-  //       auto charsize =
-  //           editor_ref->canvas_ref->renderer_manager->get_character_size(
-  //               editor_ref->canvas_ref->skin.font_family,
-  //               editor_ref->canvas_ref->skin.timeinfo_font_size, character);
-  //       absbpm_info_string_width += charsize.width();
-  //
-  //       if (charsize.height() > absbpm_info_string_height) {
-  //         absbpm_info_string_height = charsize.height();
-  //       }
-  //     }
-  //     timing_x_pos =
-  //         editor_ref->ebuffer.edit_area_start_pos_x -
-  //         absbpm_info_string_width;
-  //
-  //     if (!timing->is_base_timing) {
-  //       std::string speed_prefix = tr("speed:").toStdString();
-  //       std::string speedvalue =
-  //           QString::number(timing->bpm, 'f', 2).toStdString();
-  //       auto speed_info = speed_prefix + speedvalue;
-  // #ifdef _WIN32
-  // #else
-  //       std::u32string speed = mutil::cu32(speed_info);
-  // #endif  //_WIN32
-  //       // 计算变速字符串尺寸
-  //       auto speed_info_string_width{0};
-  //       auto speed_info_string_height{0};
-  //       for (const auto &character : speed) {
-  //         auto charsize =
-  //             editor_ref->canvas_ref->renderer_manager->get_character_size(
-  //                 editor_ref->canvas_ref->skin.font_family,
-  //                 editor_ref->canvas_ref->skin.timeinfo_font_size,
-  //                 character);
-  //         speed_info_string_width += charsize.width();
-  //         if (charsize.height() > speed_info_string_height) {
-  //           speed_info_string_height = charsize.height();
-  //         }
-  //       }
-  //       if (editor_ref->ebuffer.edit_area_start_pos_x -
-  //       speed_info_string_width <
-  //           timing_x_pos)
-  //         timing_x_pos =
-  //             editor_ref->ebuffer.edit_area_start_pos_x -
-  //             speed_info_string_width;
-  //       if (std::fabs(timing->bpm * timing->basebpm /
-  //                         editor_ref->canvas_ref->working_map->preference_bpm
-  //                         -
-  //                     1.0) < 0.01) {
-  //       } else {
-  //         // 先画绝对bpm
-  //         editor_ref->canvas_ref->renderer_manager->addText(
-  //             {timing_x_pos - editor_ref->canvas_ref->skin.timeinfo_font_size
-  //             / 2,
-  //              timing_y_pos - speed_info_string_height -
-  //                  editor_ref->canvas_ref->skin.timeinfo_font_size / 2 -
-  //                  connectionSize.height()},
-  //             absbpm, editor_ref->canvas_ref->skin.timeinfo_font_size,
-  //             editor_ref->canvas_ref->skin.font_family,
-  //             editor_ref->canvas_ref->skin.timeinfo_font_color, 0);
-  //         // 再画变速bpm
-  //         editor_ref->canvas_ref->renderer_manager->addText(
-  //             {timing_x_pos - editor_ref->canvas_ref->skin.timeinfo_font_size
-  //             / 2,
-  //              timing_y_pos -
-  //                  editor_ref->canvas_ref->skin.timeinfo_font_size / 2 -
-  //                  connectionSize.height()},
-  //             speed, editor_ref->canvas_ref->skin.timeinfo_font_size,
-  //             editor_ref->canvas_ref->skin.font_family,
-  //             editor_ref->canvas_ref->skin.timeinfo_font_color, 0);
-  //       }
-  //     }
-  //
-  //     if (timing->is_base_timing) {
-  //       // 只画绝对bpm
-  //       editor_ref->canvas_ref->renderer_manager->addText(
-  //           {timing_x_pos - editor_ref->canvas_ref->skin.timeinfo_font_size /
-  //           2,
-  //            timing_y_pos - editor_ref->canvas_ref->skin.timeinfo_font_size /
-  //            2 -
-  //                connectionSize.height()},
-  //           absbpm, editor_ref->canvas_ref->skin.timeinfo_font_size,
-  //           editor_ref->canvas_ref->skin.font_family,
-  //           editor_ref->canvas_ref->skin.timeinfo_font_color, 0);
-  //     }
-  //   }
 }
