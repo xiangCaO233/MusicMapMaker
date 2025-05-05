@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "../../../../mmm/MapWorkProject.h"
 #include "../../../../mmm/hitobject/Note/rm/Slide.h"
 #include "../../MapWorkspaceCanvas.h"
 #include "../../editor/MapEditor.h"
@@ -71,8 +72,11 @@ void SlideGenerator::generate(Slide& slide) {
 
   // 横向身的尺寸
   // 横向身的高度
-  auto horizon_body_height = long_note_body_horizontal_texture->height *
-                             editor_ref->ebuffer.object_size_scale;
+  auto horizon_body_height =
+      long_note_body_horizontal_texture->height *
+      editor_ref->ebuffer.object_size_scale *
+      editor_ref->canvas_ref->working_map->project_reference->config
+          .object_height_ratio;
   // 横向身的宽度
   auto horizon_body_width = std::abs(horizon_body_end_pos_x - head_cp.x()) +
                             horizon_body_height - horizon_body_height;
@@ -113,8 +117,12 @@ void SlideGenerator::generate(Slide& slide) {
              horizon_body_width, horizon_body_height);
 
   auto slide_end_size = QSizeF(
-      slide_end_texture->width * editor_ref->ebuffer.object_size_scale * 0.75,
-      slide_end_texture->height * editor_ref->ebuffer.object_size_scale * 0.75);
+      slide_end_texture->width * editor_ref->ebuffer.object_size_scale * 0.75 *
+          editor_ref->canvas_ref->working_map->project_reference->config
+              .object_width_ratio,
+      slide_end_texture->height * editor_ref->ebuffer.object_size_scale * 0.75 *
+          editor_ref->canvas_ref->working_map->project_reference->config
+              .object_height_ratio);
 
   // 箭头位置--滑键结束轨道的位置
   slide_end_rect = QRectF(horizon_body_end_pos_x - slide_end_size.width() / 2.0,

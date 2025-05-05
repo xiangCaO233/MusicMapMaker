@@ -127,7 +127,8 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
       editor->cstatus.canvas_pasued = true;
       emit pause_signal(editor->cstatus.canvas_pasued);
     }
-    if (editor->cstatus.current_time_stamp > working_map->map_length) {
+    if (working_map &&
+        editor->cstatus.current_time_stamp > working_map->map_length) {
       editor->cstatus.current_time_stamp = working_map->map_length;
       editor->cstatus.canvas_pasued = true;
       emit pause_signal(editor->cstatus.canvas_pasued);

@@ -25,6 +25,13 @@ struct ProjectConfig {
   uint32_t canvas_resolution_width;
   uint32_t canvas_resolution_height;
 
+  // 物件缩放策略
+  double object_width_ratio{1.0};
+  double object_height_ratio{1.0};
+
+  // 用户调节的时间线缩放-- n * 1px/1ms
+  double timeline_zoom{1.0};
+
   // 使用的音频设备名
   std::string device;
 };

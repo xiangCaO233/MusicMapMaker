@@ -523,19 +523,34 @@
         <translation>Fast forward (5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="603"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="508"/>
+        <source>Timeline zoom:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="575"/>
+        <source>Object height scale:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="652"/>
+        <source>Object width scale:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="724"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="603"/>
         <source>change the pitch</source>
         <translation>Enable change the pitch</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="731"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="852"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="731"/>
         <source>audio speed </source>
         <translation>Audio speed </translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="644"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="765"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="644"/>
         <source>reset speed</source>
         <translation>Reset audio play speed</translation>

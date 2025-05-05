@@ -3,6 +3,7 @@
 #include <memory>
 #include <thread>
 
+#include "../../../../mmm/MapWorkProject.h"
 #include "../../../../mmm/hitobject/Note/Note.h"
 #include "../../MapWorkspaceCanvas.h"
 #include "../../editor/MapEditor.h"
@@ -18,10 +19,15 @@ NoteGenerator::~NoteGenerator() = default;
 // 生成物件渲染指令
 void NoteGenerator::generate(Note& note) {
   auto note_ptr = std::shared_ptr<HitObject>(&note, [](Note*) {});
-  auto head_note_size = QSizeF(editor_ref->ebuffer.head_texture->width *
-                                   editor_ref->ebuffer.object_size_scale,
-                               editor_ref->ebuffer.head_texture->height *
-                                   editor_ref->ebuffer.object_size_scale);
+  auto head_note_size =
+      QSizeF(editor_ref->ebuffer.head_texture->width *
+                 editor_ref->ebuffer.object_size_scale *
+                 editor_ref->canvas_ref->working_map->project_reference->config
+                     .object_width_ratio,
+             editor_ref->ebuffer.head_texture->height *
+                 editor_ref->ebuffer.object_size_scale *
+                 editor_ref->canvas_ref->working_map->project_reference->config
+                     .object_height_ratio);
   double note_visual_time =
       editor_ref->cstatus.current_visual_time_stamp +
       (note.timestamp - editor_ref->cstatus.current_visual_time_stamp) *
@@ -34,7 +40,8 @@ void NoteGenerator::generate(Note& note) {
           (1.0 - editor_ref->csettings.judgeline_position) -
       ((editor_ref->cstatus.canvas_pasued ? note.timestamp : note_visual_time) -
        editor_ref->cstatus.current_visual_time_stamp) *
-          editor_ref->cstatus.timeline_zoom;
+          editor_ref->canvas_ref->working_map->project_reference->config
+              .timeline_zoom;
 
   // 物件头中心位置
   auto note_center_pos_x = editor_ref->ebuffer.edit_area_start_pos_x +
@@ -54,9 +61,13 @@ void NoteGenerator::generate(Note& note) {
       editor_ref->canvas_ref->skin.get_object_texture(TexType::NODE,
                                                       ObjectStatus::COMMON);
   node_size = QSizeF(complex_note_node_texture->width *
-                         editor_ref->ebuffer.object_size_scale * 0.75,
+                         editor_ref->ebuffer.object_size_scale * 0.75 *
+                         editor_ref->canvas_ref->working_map->project_reference
+                             ->config.object_width_ratio,
                      complex_note_node_texture->height *
-                         editor_ref->ebuffer.object_size_scale * 0.75);
+                         editor_ref->ebuffer.object_size_scale * 0.75 *
+                         editor_ref->canvas_ref->working_map->project_reference
+                             ->config.object_height_ratio);
 
   // 生成图形
   if (head_rect.contains(editor_ref->canvas_ref->mouse_pos)) {

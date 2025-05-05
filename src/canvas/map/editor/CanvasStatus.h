@@ -60,9 +60,6 @@ struct CanvasStatus {
   // 时间偏移
   double static_time_offset{-15};
 
-  // 用户调节的时间线缩放-- n * 1px/1ms
-  double timeline_zoom{1.0};
-
   // TODO(xiang 2025-04-25):
   // 在两个变速timing间插值-下一个是基准timing时保持最后一个变速timing的速度作为时间线缩放
   // 变速缩放

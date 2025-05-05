@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "../../../../mmm/MapWorkProject.h"
 #include "../../../../mmm/hitobject/Note/Hold.h"
 #include "../../../../mmm/hitobject/Note/HoldEnd.h"
 #include "../../MapWorkspaceCanvas.h"
@@ -71,7 +72,8 @@ void HoldGenerator::generate(Hold &hold) {
       ((editor_ref->cstatus.canvas_pasued ? hold.hold_end_reference->timestamp
                                           : long_note_end_visual_time) -
        editor_ref->cstatus.current_visual_time_stamp) *
-          editor_ref->cstatus.timeline_zoom;
+          editor_ref->canvas_ref->working_map->project_reference->config
+              .timeline_zoom;
   auto long_note_body_height = (long_note_end_pos_y - head_cp.y());
 
   // 当前面条身中心位置,y位置偏下一个note
@@ -84,9 +86,12 @@ void HoldGenerator::generate(Hold &hold) {
           TexType::HOLD_BODY_VERTICAL, ObjectStatus::COMMON);
 
   // 面身实际尺寸高度-0.5note
-  auto long_note_body_size = QSizeF(long_note_body_vertical_texture->width *
-                                        editor_ref->ebuffer.object_size_scale,
-                                    long_note_body_height);
+  auto long_note_body_size =
+      QSizeF(long_note_body_vertical_texture->width *
+                 editor_ref->ebuffer.object_size_scale *
+                 editor_ref->canvas_ref->working_map->project_reference->config
+                     .object_width_ratio,
+             long_note_body_height);
 
   // 面身的实际区域--
   hold_vert_body_rect =
@@ -103,9 +108,13 @@ void HoldGenerator::generate(Hold &hold) {
   // 面尾实际尺寸
   auto long_note_end_size =
       QSizeF(long_note_end_texture->width *
-                 editor_ref->ebuffer.object_size_scale * 1.1,
+                 editor_ref->ebuffer.object_size_scale * 1.1 *
+                 editor_ref->canvas_ref->working_map->project_reference->config
+                     .object_width_ratio,
              long_note_end_texture->height *
-                 editor_ref->ebuffer.object_size_scale * 1.1);
+                 editor_ref->ebuffer.object_size_scale * 1.1 *
+                 editor_ref->canvas_ref->working_map->project_reference->config
+                     .object_height_ratio);
 
   // 先添加body图形
   // 是否有鼠标悬停

@@ -523,19 +523,34 @@
         <translation>快进(5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="603"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="508"/>
+        <source>Timeline zoom:</source>
+        <translation>时间线缩放:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="575"/>
+        <source>Object height scale:</source>
+        <translation>物件高度缩放:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="652"/>
+        <source>Object width scale:</source>
+        <translation>物件宽度缩放:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="724"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="603"/>
         <source>change the pitch</source>
         <translation>启用变调</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="731"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="852"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="731"/>
         <source>audio speed </source>
         <translation>音频速度 </translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="644"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="765"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="644"/>
         <source>reset speed</source>
         <translation>重置播放速度</translation>

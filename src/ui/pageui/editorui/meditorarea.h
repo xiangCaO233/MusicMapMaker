@@ -86,6 +86,9 @@ class MEditorArea : public QWidget {
 
   // 初始化所有工具按钮
   void initialize_toolbuttons();
+
+  // 初始化所有信号连接
+  void initialize_signals();
 };
 
 #endif  // MEDITORAREA_H

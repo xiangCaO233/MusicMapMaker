@@ -131,14 +131,19 @@ void MapEditor::update_areas() {
 
 // 更新时间线缩放-滚动
 void MapEditor::scroll_update_timelinezoom(int dy) {
-  double res_timeline_zoom = cstatus.timeline_zoom;
+  double res_timeline_zoom =
+      canvas_ref->working_map->project_reference->config.timeline_zoom;
   if (dy > 0) {
     res_timeline_zoom += 0.05;
   } else {
     res_timeline_zoom -= 0.05;
   }
   if (res_timeline_zoom >= 0.2 && res_timeline_zoom <= 3.0) {
-    cstatus.timeline_zoom = res_timeline_zoom;
+    canvas_ref->working_map->project_reference->config.timeline_zoom =
+        res_timeline_zoom;
+    // 调节成功传递调节信号
+    emit canvas_ref->timeline_zoom_adjusted(
+        canvas_ref->working_map->project_reference->config.timeline_zoom * 100);
   }
 }
 
@@ -253,8 +258,10 @@ void MapEditor::update_timepos(int scrolldy, bool is_shift_down) {
   if (cstatus.is_magnet_to_divisor) {
     scroll_magnet_to_divisor(scrolldy);
   } else {
-    auto scroll_unit = (scrolldy > 0 ? 1.0 : -1.0) * cstatus.timeline_zoom *
-                       cstatus.canvas_size.height() / 10.0;
+    auto scroll_unit =
+        (scrolldy > 0 ? 1.0 : -1.0) *
+        canvas_ref->working_map->project_reference->config.timeline_zoom *
+        cstatus.canvas_size.height() / 10.0;
     cstatus.current_time_stamp += scroll_unit * temp_scroll_ration *
                                   cstatus.scroll_ratio *
                                   cstatus.scroll_direction;

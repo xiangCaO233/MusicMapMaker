@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "../../../mmm/MapWorkProject.h"
 #include "../../../util/mutil.h"
 #include "../MapWorkspaceCanvas.h"
 #include "../editor/MapEditor.h"
@@ -26,7 +27,9 @@ void BeatGenerator::generate() {
 
     // 每拍时间*时间线缩放=拍距
     double beat_distance =
-        60.0 / beat->bpm * 1000.0 * editor_ref->cstatus.timeline_zoom *
+        60.0 / beat->bpm * 1000.0 *
+        editor_ref->canvas_ref->working_map->project_reference->config
+            .timeline_zoom *
         (editor_ref->cstatus.canvas_pasued ? 1.0
                                            : editor_ref->cstatus.speed_zoom);
 
@@ -45,7 +48,8 @@ void BeatGenerator::generate() {
     auto beat_start_pos =
         judgeline_pos -
         (beat_start_time - editor_ref->cstatus.current_visual_time_stamp) *
-            editor_ref->cstatus.timeline_zoom *
+            editor_ref->canvas_ref->working_map->project_reference->config
+                .timeline_zoom *
             (editor_ref->cstatus.canvas_pasued
                  ? 1.0
                  : editor_ref->cstatus.speed_zoom);

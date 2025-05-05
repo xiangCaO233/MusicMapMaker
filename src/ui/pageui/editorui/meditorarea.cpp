@@ -21,11 +21,23 @@ MEditorArea::MEditorArea(QWidget *parent)
   initialize_toolbuttons();
   // 默认隐藏音频控制器
   // ui->audio_time_controller->hide();
+  initialize_signals();
+}
 
+MEditorArea::~MEditorArea() { delete ui; }
+
+// 初始化所有信号连接
+void MEditorArea::initialize_signals() {
   // 连接快捷键切换模式槽
   connect(canvas_container->canvas.data(),
           &MapWorkspaceCanvas::switch_edit_mode, this,
           &MEditorArea::on_canvas_switchmode);
+
+  // 连接调节时间线信号槽
+  connect(canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::timeline_zoom_adjusted,
+          ui->audio_time_controller,
+          &TimeController::on_canvas_adjust_timeline_zoom);
 
   // 连接时间控制器选择map槽
   connect(this, &MEditorArea::switched_map, ui->audio_time_controller,
@@ -76,8 +88,6 @@ MEditorArea::MEditorArea(QWidget *parent)
   connect(this, &MEditorArea::progress_pos_changed, ui->audio_time_controller,
           &TimeController::on_canvas_timestamp_changed);
 }
-
-MEditorArea::~MEditorArea() { delete ui; }
 
 // 使用主题
 void MEditorArea::use_theme(GlobalTheme theme) {

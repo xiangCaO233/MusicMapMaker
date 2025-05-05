@@ -58,6 +58,9 @@ class TimeController : public QWidget {
   void on_current_bpm_changed(double bpm);
   void on_current_timeline_speed_changed(double timeline_speed);
 
+  // 画布调节时间线缩放
+  void on_canvas_adjust_timeline_zoom(int value);
+
  signals:
   // 时间控制器编辑时间信号
   void time_edited(double time);
@@ -114,8 +117,20 @@ class TimeController : public QWidget {
   // 时间编辑框回车按下事件
   void on_lineEdit_returnPressed();
 
+  // 物件宽度缩放调节事件
+  void on_owidth_scale_slider_valueChanged(int value);
+
+  // 物件高度缩放调节事件
+  void on_oheight_scale_slider_valueChanged(int value);
+
+  // 时间线缩放调节事件
+  void on_timeline_zoom_slider_valueChanged(int value);
+
  private:
   Ui::audio_time_controller *ui;
+
+  // 时间线缩放同步锁
+  bool timeline_zoom_sync_lock{false};
 };
 
 #endif  // TIMECONTROLLER_H

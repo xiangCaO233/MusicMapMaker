@@ -161,8 +161,12 @@ class MapWorkspaceCanvas : public GLCanvas {
   void select_object(std::shared_ptr<Beat> beatinfo,
                      std::shared_ptr<HitObject> obj,
                      std::shared_ptr<Timing> ref_timing);
+
   // 是否暂停播放信号
   void pause_signal(bool paused);
+
+  // 时间线缩放调节信号
+  void timeline_zoom_adjusted(int value);
 };
 
 #endif  // M_MAPWORKSPACE_H

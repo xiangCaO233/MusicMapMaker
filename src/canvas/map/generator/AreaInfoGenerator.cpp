@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "../../../mmm/MapWorkProject.h"
 #include "../../../mmm/timing/Timing.h"
 #include "../../../mmm/timing/osu/OsuTiming.h"
 #include "../MapWorkspaceCanvas.h"
@@ -74,7 +75,9 @@ void AreaInfoGenerator::generate() {
   auto beattime = 60.0 / editor_ref->ebuffer.current_abs_timing->bpm * 1000.0;
   // 每拍时间*时间线缩放=拍距
   double beat_distance =
-      beattime * editor_ref->cstatus.timeline_zoom *
+      beattime *
+      editor_ref->canvas_ref->working_map->project_reference->config
+          .timeline_zoom *
       (editor_ref->cstatus.canvas_pasued ? 1.0
                                          : editor_ref->cstatus.speed_zoom);
 
@@ -101,7 +104,9 @@ void AreaInfoGenerator::generate() {
   double distance = std::fabs(editor_ref->ebuffer.current_time_area_end -
                               editor_ref->cstatus.current_visual_time_stamp);
   auto processing_pos =
-      judgeline_pos + (distance * editor_ref->cstatus.timeline_zoom);
+      judgeline_pos +
+      (distance * editor_ref->canvas_ref->working_map->project_reference->config
+                      .timeline_zoom);
 
   while (processing_pos > -beattime) {
     editor_ref->ebuffer.current_time_area_end += beattime;
