@@ -38,6 +38,10 @@ void MEditorArea::initialize_signals() {
           &MapWorkspaceCanvas::timeline_zoom_adjusted,
           ui->audio_time_controller,
           &TimeController::on_canvas_adjust_timeline_zoom);
+  // 连接调节时间信号槽
+  connect(ui->audio_time_controller, &TimeController::time_edited,
+          canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::on_timeedit_setpos);
 
   // 连接时间控制器选择map槽
   connect(this, &MEditorArea::switched_map, ui->audio_time_controller,

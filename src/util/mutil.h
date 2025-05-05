@@ -15,6 +15,7 @@
 #include <QFile>
 #include <QPainter>
 #include <QSvgRenderer>
+#include <QTime>
 #include <QtSvgWidgets/QSvgWidget>
 #include <memory>
 #include <string>
@@ -68,6 +69,100 @@ inline std::u32string cu32(const std::string& utf8) {
     i += U16_LENGTH(c);
   }
   return utf32;
+}
+
+inline bool isStringAllDigits_Iteration(const QString& str) {
+  // 1. 处理空字符串的情况 (根据需求，空字符串可能算 true 或 false)
+  // 通常认为空字符串不全是数字，所以返回 false
+  if (str.isEmpty()) {
+    return false;
+  }
+
+  // 2. 遍历字符串中的每个字符
+  for (const QChar& ch : str) {
+    // 3. 如果遇到任何一个非数字字符，立即返回 false
+    if (!ch.isDigit()) {
+      return false;
+    }
+  }
+
+  // 4. 如果循环结束都没有返回 false，说明所有字符都是数字
+  return true;
+}
+
+// 将毫秒值转换为 "hh:mm:ss.zzz" 格式 QString
+inline QString millisecondsToQString(long long totalMilliseconds) {
+  if (totalMilliseconds < 0) {
+    totalMilliseconds = 0;  // QTime 不直接处理负的总毫秒数，这里将其视为0
+  }
+  // QTime::fromMSecsSinceStartOfDay 处理的是一天内的毫秒数
+  // 如果毫秒数可能超过一天 (24 * 3600 * 1000)，需要手动计算小时
+  const qlonglong msPerDay = 24LL * 60 * 60 * 1000;
+  qlonglong days = totalMilliseconds / msPerDay;
+  int msecs = totalMilliseconds % msPerDay;
+
+  QTime time = QTime::fromMSecsSinceStartOfDay(msecs);
+
+  // 手动加上超过24小时的部分
+  qlonglong totalHours = days * 24 + time.hour();
+
+  // 格式化输出，注意小时数可能超过两位
+  return QString("%1:%2:%3.%4")
+      .arg(totalHours, 2, 10, QChar('0'))  // 至少2位，用0填充
+      .arg(time.minute(), 2, 10, QChar('0'))
+      .arg(time.second(), 2, 10, QChar('0'))
+      .arg(time.msec(), 3, 10, QChar('0'));  // 毫秒总是3位
+
+  // --- 或者，如果保证毫秒数不超过一天，可以简化 ---
+  // QTime time = QTime(0,0,0,0).addMSecs(static_cast<int>(totalMilliseconds %
+  // msPerDay)); // 注意 addMSecs 参数是 int return
+  // time.toString("hh:mm:ss.zzz"); 但这种方式对于超过 int
+  // 范围或超过一天的毫秒数会出问题或不准确
+  // 因此，上面的手动计算方式更可靠处理任意大的 long long 毫秒值
+}
+
+// 将 "hh:mm:ss.zzz" 格式 QString 转换为毫秒值
+inline long long qstringToMilliseconds(const QString& timeString) {
+  // QTime::fromString 不能直接处理超过 23:59:59.999 的时间
+  // 我们需要手动解析
+  QStringList parts = timeString.split(':');
+  if (parts.size() != 3) {
+    qWarning() << "Invalid time string format (parts based on ':'). Expected "
+                  "hh:mm:ss.zzz, got:"
+               << timeString;
+    return -1;  // 或者抛出异常
+  }
+
+  QStringList secMsPart = parts[2].split('.');
+  if (secMsPart.size() != 2) {
+    qWarning() << "Invalid time string format (parts based on '.'). Expected "
+                  "hh:mm:ss.zzz, got:"
+               << timeString;
+    return -1;  // 或者抛出异常
+  }
+
+  bool okH, okM, okS, okMs;
+  qlonglong hh = parts[0].toLongLong(&okH);
+  int mm = parts[1].toInt(&okM);
+  int ss = secMsPart[0].toInt(&okS);
+  int ms = secMsPart[1].toInt(&okMs);
+
+  // 检查转换是否成功和基本范围
+  if (!okH || !okM || !okS || !okMs || hh < 0 || mm < 0 || mm >= 60 || ss < 0 ||
+      ss >= 60 || ms < 0 || ms >= 1000) {
+    qWarning()
+        << "Invalid time component values or conversion failed in string:"
+        << timeString;
+    return -1;  // 或者抛出异常
+  }
+
+  long long totalMilliseconds = 0;
+  totalMilliseconds += hh * 60 * 60 * 1000;
+  totalMilliseconds += static_cast<long long>(mm) * 60 * 1000;
+  totalMilliseconds += static_cast<long long>(ss) * 1000;
+  totalMilliseconds += ms;
+
+  return totalMilliseconds;
 }
 
 inline bool isApproxEqual(double a, double b, double tolerance) {

@@ -144,6 +144,9 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 同步音频播放时间
   void on_music_pos_sync(double time);
 
+  // 时间编辑器设置精确时间
+  void on_timeedit_setpos(double time);
+
  signals:
   // 时间戳更新信号
   void current_time_stamp_changed(double current_time_stamp);

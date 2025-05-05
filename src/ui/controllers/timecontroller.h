@@ -9,6 +9,12 @@
 class MMap;
 enum class GlobalTheme;
 
+// 时间格式
+enum class TimeFormat {
+  MILLISECONDS,
+  HHMMSSZZZ,
+};
+
 namespace Ui {
 class audio_time_controller;
 }
@@ -31,6 +37,12 @@ class TimeController : public QWidget {
 
   // 时间控制器绑定的map
   std::shared_ptr<MMap> binding_map;
+
+  // 时间编辑器最后一次的时间值
+  QString latest_time_edit_value{"0"};
+
+  // 时间格式
+  TimeFormat tformat{TimeFormat::MILLISECONDS};
 
   // 使用主题
   void use_theme(GlobalTheme theme);
@@ -108,14 +120,14 @@ class TimeController : public QWidget {
   // 静音效果按钮事件
   void on_reset_effect_volume_button_clicked();
 
-  // 快退按钮事件
-  void on_fastbackward_clicked();
-
-  // 快进按钮事件
-  void on_fastforward_clicked();
+  // 时间编辑框内容变化事件
+  void on_lineEdit_textChanged(const QString &arg1);
 
   // 时间编辑框回车按下事件
   void on_lineEdit_returnPressed();
+
+  // 时间编辑框编辑完成事件
+  void on_lineEdit_editingFinished();
 
   // 物件宽度缩放调节事件
   void on_owidth_scale_slider_valueChanged(int value);
@@ -134,6 +146,9 @@ class TimeController : public QWidget {
 
   // 重置时间线缩放按钮
   void on_timeline_zoom_button_clicked();
+
+  // 切换时间格式按钮事件
+  void on_time_format_button_clicked();
 
  private:
   Ui::audio_time_controller *ui;

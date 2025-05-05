@@ -99,6 +99,13 @@ void MapWorkspaceCanvas::on_music_pos_sync(double time) {
       editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
 }
 
+// 时间编辑器设置精确时间
+void MapWorkspaceCanvas::on_timeedit_setpos(double time) {
+  editor->cstatus.current_time_stamp = time;
+  editor->cstatus.current_visual_time_stamp =
+      editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
+}
+
 // qt事件
 void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
   GLCanvas::paintEvent(event);

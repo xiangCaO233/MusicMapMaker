@@ -42,10 +42,6 @@ void TimeController::use_theme(GlobalTheme theme) {
   // 设置按钮图标颜色
   mutil::set_button_svgcolor(ui->pausebutton, ":/icons/play.svg",
                              file_button_color, 16, 16);
-  mutil::set_button_svgcolor(ui->fastbackward, ":/icons/backward.svg",
-                             file_button_color, 16, 16);
-  mutil::set_button_svgcolor(ui->fastforward, ":/icons/forward.svg",
-                             file_button_color, 16, 16);
   mutil::set_button_svgcolor(ui->enablepitchaltbutton, ":/icons/pitch-alt.svg",
                              file_button_color, 16, 16);
   mutil::set_button_svgcolor(ui->resetspeedbutton, ":/icons/bolt.svg",
@@ -213,7 +209,12 @@ void TimeController::on_canvas_timestamp_changed(double time) {
   // 计算进度
   auto progress = time / binding_map->map_length;
   // 更新lineedit和progress
-  ui->lineEdit->setText(QString::number(int32_t(time)));
+  if (tformat == TimeFormat::MILLISECONDS) {
+    ui->lineEdit->setText(QString::number(int32_t(time)));
+  }
+  if (tformat == TimeFormat::HHMMSSZZZ) {
+    ui->lineEdit->setText(mutil::millisecondsToQString(int32_t(time)));
+  }
   ui->playprogress->setValue(ui->playprogress->maximum() * progress);
 
   // 暂停可调
@@ -339,23 +340,66 @@ void TimeController::on_reset_effect_volume_button_clicked() {
   }
 }
 
-// 快退按钮事件
-void TimeController::on_fastbackward_clicked() {
-  // TODO(xiang 2025-04-26): 实现功能
-  // 快退5s--并同步画布时间
+// 切换时间格式按钮事件
+void TimeController::on_time_format_button_clicked() {
+  if (tformat == TimeFormat::HHMMSSZZZ) {
+    // 当前是HHMMSSZZZ--切换为毫秒
+    ui->time_format_button->setText("ms");
+    // 更新时间编辑框内容
+    ui->lineEdit->setText(
+        QString::number(mutil::qstringToMilliseconds(latest_time_edit_value)));
+    tformat = TimeFormat::MILLISECONDS;
+    return;
+  }
+  if (tformat == TimeFormat::MILLISECONDS) {
+    // 当前是毫秒--切换为HHMMSSZZZ
+    ui->time_format_button->setText("hh:mm:ss.zzz");
+    // 更新时间编辑框内容
+    ui->lineEdit->setText(mutil::millisecondsToQString(
+        std::stoi(latest_time_edit_value.toStdString())));
+    tformat = TimeFormat::HHMMSSZZZ;
+  }
 }
 
-// 快进按钮事件
-void TimeController::on_fastforward_clicked() {
-  // TODO(xiang 2025-04-26): 实现功能
-  // 快进5s--并同步画布时间
+// 时间编辑框内容变化事件
+void TimeController::on_lineEdit_textChanged(const QString &arg1) {
+  latest_time_edit_value = arg1;
 }
 
 // 时间编辑框回车按下事件
 void TimeController::on_lineEdit_returnPressed() {
+  on_lineEdit_editingFinished();
+}
+
+// 时间编辑框编辑完成事件
+void TimeController::on_lineEdit_editingFinished() {
   // TODO(xiang 2025-04-26): 实现功能
   // 预先记录修改前的数据
   // 检查输入数据是否合法--不合法恢复缓存数据
+  if (tformat == TimeFormat::HHMMSSZZZ) {
+    auto milliseconds = mutil::qstringToMilliseconds(ui->lineEdit->text());
+    if (milliseconds == -1) {
+      // 格式错误
+      XERROR("时间格式错误-->需要[hh:mm:ss.zzz]");
+      ui->lineEdit->setText(latest_time_edit_value);
+    } else {
+      ui->lineEdit->setText(mutil::millisecondsToQString(milliseconds));
+      on_canvas_timestamp_changed(milliseconds);
+      emit time_edited(milliseconds);
+    }
+  } else if (tformat == TimeFormat::MILLISECONDS) {
+    bool isalldigits = mutil::isStringAllDigits_Iteration(ui->lineEdit->text());
+    if (isalldigits) {
+      auto timem = std::stoi(ui->lineEdit->text().toStdString());
+      ui->lineEdit->setText(QString::number(timem));
+      on_canvas_timestamp_changed(timem);
+      emit time_edited(timem);
+    } else {
+      // 格式错误
+      XERROR("时间格式错误-->需要[0-9]");
+      ui->lineEdit->setText(latest_time_edit_value);
+    }
+  }
 }
 
 // 物件宽度缩放调节
