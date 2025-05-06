@@ -183,7 +183,7 @@ void GLCanvas::initializeGL() {
   GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
   // 初始化渲染管理器
-  renderer_manager = new RendererManager(this, 64, 65536);
+  renderer_manager = new RendererManager(this, 64, 131072);
 
   // 启动gl渲染器
   start_render();

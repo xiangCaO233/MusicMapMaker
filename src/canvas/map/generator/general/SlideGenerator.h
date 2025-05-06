@@ -9,7 +9,7 @@ class SlideGenerator : public NoteGenerator {
   // body是否应显示悬浮
   bool should_body_hover(
       const std::shared_ptr<Slide>& obj,
-      const std::shared_ptr<HoverInfo>& current_hoverinfo) const;
+      const std::shared_ptr<HoverObjectInfo>& current_hoverinfo) const;
 
  public:
   // 构造SlideGenerator

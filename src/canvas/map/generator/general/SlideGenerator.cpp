@@ -17,7 +17,7 @@ SlideGenerator::~SlideGenerator() = default;
 // body是否应显示悬浮
 bool SlideGenerator::should_body_hover(
     const std::shared_ptr<Slide>& obj,
-    const std::shared_ptr<HoverInfo>& current_hoverinfo) const {
+    const std::shared_ptr<HoverObjectInfo>& current_hoverinfo) const {
   // 当前没悬浮任何部分
   if (!current_hoverinfo) return true;
   // 悬浮到不同物件
@@ -144,13 +144,13 @@ void SlideGenerator::generate(Slide& slide) {
       editor_ref->ebuffer.selected_hitobjects.find(slide_ptr);
   if (is_hover_body) {
     // 若已悬浮于滑键头或尾或组合键节点,不切换悬浮部分和纹理使用
-    auto& hoverinfo = editor_ref->ebuffer.hover_info;
+    auto& hoverinfo = editor_ref->ebuffer.hover_object_info;
     if (should_body_hover(slide_ptr, hoverinfo)) {
       // 使用hover纹理
       slide_hori_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
           TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::HOVER);
-      hoverinfo = std::make_shared<HoverInfo>(slide_ptr, slide.beatinfo,
-                                              HoverPart::HOLD_BODY);
+      hoverinfo = std::make_shared<HoverObjectInfo>(slide_ptr, slide.beatinfo,
+                                                    HoverPart::HOLD_BODY);
       editor_ref->cstatus.is_hover_note = true;
     }
   } else {
@@ -199,8 +199,9 @@ void SlideGenerator::generate(Slide& slide) {
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->ebuffer.hover_info = std::make_shared<HoverInfo>(
-            slide_ptr, objref->beatinfo, HoverPart::SLIDE_END);
+        editor_ref->ebuffer.hover_object_info =
+            std::make_shared<HoverObjectInfo>(slide_ptr, objref->beatinfo,
+                                              HoverPart::SLIDE_END);
         editor_ref->cstatus.is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||
@@ -247,8 +248,9 @@ void SlideGenerator::generate(Slide& slide) {
       if (is_hover_slide_end) {
         // 使用hover纹理
         actual_use_end_texture = slide_end_hovered_texture;
-        editor_ref->ebuffer.hover_info = std::make_shared<HoverInfo>(
-            slide_ptr, slide.beatinfo, HoverPart::SLIDE_END);
+        editor_ref->ebuffer.hover_object_info =
+            std::make_shared<HoverObjectInfo>(slide_ptr, slide.beatinfo,
+                                              HoverPart::SLIDE_END);
         editor_ref->cstatus.is_hover_note = true;
       } else {
         if (slide_end_in_select_bound ||

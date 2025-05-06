@@ -40,6 +40,7 @@ void ObjectInfoui::on_canvas_select_object(std::shared_ptr<Beat> beatinfo,
   current_obj = obj;
   current_beatinfo = beatinfo;
   current_ref_timing = ref_timing;
+  update_selected_uiinfo();
 }
 
 // 更新选中的ui信息

@@ -17,6 +17,7 @@
 #include "pageui/editorui/meditorarea.h"
 #include "pageui/mpage.h"
 #include "src/util/mutil.h"
+#include "timinginfoui.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -66,6 +67,12 @@ MainWindow::MainWindow(QWidget* parent)
           &MapWorkspaceCanvas::select_object,
           ui->infomation_widget->mmetas->objinfo_ref,
           &ObjectInfoui::on_canvas_select_object);
+
+  // 连接选择timing槽
+  connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+          &MapWorkspaceCanvas::select_timing,
+          ui->infomation_widget->mmetas->timinginfo_ref,
+          &TimingInfoui::on_canvas_select_timings);
 }
 
 MainWindow::~MainWindow() { delete ui; }

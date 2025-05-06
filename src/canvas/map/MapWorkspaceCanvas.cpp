@@ -15,16 +15,13 @@
 #include <QThread>
 #include <QTimer>
 #include <QWheelEvent>
-#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
-#include <vector>
 
 #include "../../log/colorful-log.h"
 #include "../../mmm/MapWorkProject.h"
@@ -221,7 +218,7 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
     if (editor->cstatus.edit_mode == MouseEditMode::SELECT) {
       // 选择模式-更新选中信息
       // 正悬浮在物件上
-      if (editor->ebuffer.hover_info) {
+      if (editor->ebuffer.hover_object_info) {
         // 调整物件时间戳等属性
 
       } else {
@@ -592,6 +589,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
         // 播放中且过了判定线时间使用半透明效果
         renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
       }
+
       renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
                                 shape.tex, QColor(0, 0, 0, 255), 0, true);
     } else {
@@ -609,7 +607,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 更新hover信息
   if (!editor->cstatus.is_hover_note) {
     // 未悬浮在任何一个物件或物件身体上
-    editor->ebuffer.hover_info = nullptr;
+    editor->ebuffer.hover_object_info = nullptr;
   } else {
     editor->cstatus.is_hover_note = false;
   }
