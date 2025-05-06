@@ -130,15 +130,10 @@ void TimeInfoGenerator::draw_timing_points() {
     QSizeF strs_size(std::max(prebpmstr_width, speedstr_width),
                      prebpmstr_height + speedstr_height);
 
-    // 内外框的尺寸
+    // 框的尺寸
     QSizeF inner_bound_size(
         strs_size.width() + editor_ref->canvas_ref->skin.timeinfo_font_size,
         strs_size.height() + editor_ref->canvas_ref->skin.timeinfo_font_size);
-    // QSizeF outter_bound_size(
-    //     inner_bound_size.width() +
-    //         editor_ref->canvas_ref->skin.timeinfo_font_size,
-    //     inner_bound_size.height() +
-    //         editor_ref->canvas_ref->skin.timeinfo_font_size);
     auto timing_y_pos = editor_ref->ebuffer.judgeline_position -
                         (timings->at(0)->timestamp -
                          editor_ref->cstatus.current_visual_time_stamp) *
@@ -147,19 +142,7 @@ void TimeInfoGenerator::draw_timing_points() {
                             (editor_ref->cstatus.canvas_pasued
                                  ? 1.0
                                  : editor_ref->cstatus.speed_zoom);
-    // timing_x_pos =
-    //     editor_ref->ebuffer.edit_area_start_pos_x - absbpm_info_string_width;
-    // 画外框
-    // QPointF outter_bound_pos(
-    //     editor_ref->ebuffer.edit_area_start_pos_x - outter_bound_size.width()
-    //     -
-    //         editor_ref->canvas_ref->skin.timeinfo_font_size,
-    //     timing_y_pos - outter_bound_size.height() / 2.0);
-    // editor_ref->canvas_ref->renderer_manager->addRoundRect(
-    //     QRectF(outter_bound_pos.x(), outter_bound_pos.y(),
-    //            outter_bound_size.width(), outter_bound_size.height()),
-    //     nullptr, QColor(0, 0, 0, 128), 0, 0.2, true);
-    // 画内框
+    // 画框
     QPointF inner_bound_pos(
         editor_ref->ebuffer.edit_area_start_pos_x - inner_bound_size.width() -
             1.5 * editor_ref->canvas_ref->skin.timeinfo_font_size,
@@ -168,14 +151,14 @@ void TimeInfoGenerator::draw_timing_points() {
         QRectF(inner_bound_pos.x(), inner_bound_pos.y(),
                inner_bound_size.width(), inner_bound_size.height());
 
-    // 判断悬浮
+    // 判断悬浮选中状态
     if (inner_bound.contains(editor_ref->canvas_ref->mouse_pos)) {
       editor_ref->ebuffer.hover_timings = timings;
       editor_ref->canvas_ref->renderer_manager->addRoundRect(
-          inner_bound, nullptr, QColor(45, 45, 45, 255), 0, 0.15, true);
+          inner_bound, nullptr, QColor(45, 45, 45, 255), 0, 1.2, true);
     } else {
       editor_ref->canvas_ref->renderer_manager->addRoundRect(
-          inner_bound, nullptr, QColor(0, 0, 0, 255), 0, 0.15, true);
+          inner_bound, nullptr, QColor(0, 0, 0, 255), 0, 1.2, true);
     }
 
     // 画文本

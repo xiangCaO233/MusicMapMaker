@@ -19,7 +19,7 @@ const char *time_expr =
 
 // 3号根据日志等级设置粗细
 const char *level_expr =
-    "<span style='color: %1; font-weight: %2;'>[%3]: </span>";
+    "[<span style='color: %1; font-weight: %2;'>%3 </span>]:";
 
 const char *message_expr =
     "<span style='color: %1; font-weight: %2;'>%3</span>";

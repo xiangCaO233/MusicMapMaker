@@ -17,7 +17,7 @@ HoldGenerator::~HoldGenerator() = default;
 // body是否应显示悬浮
 bool HoldGenerator::should_body_hover(
     const std::shared_ptr<Hold> &obj,
-    const std::shared_ptr<HoverInfo> &current_hoverinfo) const {
+    const std::shared_ptr<HoverObjectInfo> &current_hoverinfo) const {
   // 当前没悬浮任何部分
   if (!current_hoverinfo) return true;
   // 悬浮到不同物件
@@ -131,12 +131,12 @@ void HoldGenerator::generate(Hold &hold) {
 
   if (is_hover_body) {
     // 若已悬浮于长条头或尾或组合键节点,不切换悬浮部分和纹理使用
-    auto &hoverinfo = editor_ref->ebuffer.hover_info;
+    auto &hoverinfo = editor_ref->ebuffer.hover_object_info;
     if (should_body_hover(hold_ptr, hoverinfo)) {
       hold_vert_body_texture = editor_ref->canvas_ref->skin.get_object_texture(
           TexType::HOLD_BODY_VERTICAL, ObjectStatus::HOVER);
-      hoverinfo = std::make_shared<HoverInfo>(hold_ptr, hold.beatinfo,
-                                              HoverPart::HOLD_BODY);
+      hoverinfo = std::make_shared<HoverObjectInfo>(hold_ptr, hold.beatinfo,
+                                                    HoverPart::HOLD_BODY);
       editor_ref->cstatus.is_hover_note = true;
     }
   } else {
@@ -186,8 +186,9 @@ void HoldGenerator::generate(Hold &hold) {
         // 使用hover纹理
         hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
             TexType::HOLD_END, ObjectStatus::HOVER);
-        editor_ref->ebuffer.hover_info = std::make_shared<HoverInfo>(
-            hold_ptr, hold.beatinfo, HoverPart::HOLD_END);
+        editor_ref->ebuffer.hover_object_info =
+            std::make_shared<HoverObjectInfo>(hold_ptr, hold.beatinfo,
+                                              HoverPart::HOLD_END);
         editor_ref->cstatus.is_hover_note = true;
       } else {
         if (hold_end_in_select_bound ||
@@ -240,8 +241,9 @@ void HoldGenerator::generate(Hold &hold) {
         // 使用hover纹理
         hold_end_texture = editor_ref->canvas_ref->skin.get_object_texture(
             TexType::HOLD_END, ObjectStatus::HOVER);
-        editor_ref->ebuffer.hover_info = std::make_shared<HoverInfo>(
-            hold_ptr, hold.beatinfo, HoverPart::HOLD_END);
+        editor_ref->ebuffer.hover_object_info =
+            std::make_shared<HoverObjectInfo>(hold_ptr, hold.beatinfo,
+                                              HoverPart::HOLD_END);
         editor_ref->cstatus.is_hover_note = true;
       } else {
         if (hold_end_in_select_bound ||

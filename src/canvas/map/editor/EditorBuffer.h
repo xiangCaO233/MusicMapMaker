@@ -24,7 +24,7 @@ enum class HoverPart {
   COMPLEX_NODE,
 };
 
-struct HoverInfo {
+struct HoverObjectInfo {
   std::shared_ptr<HitObject> hoverobj;
   std::shared_ptr<Beat> hoverbeat;
   HoverPart part;
@@ -68,10 +68,13 @@ struct EditorBuffer {
       buffer_preview_objects;
 
   // 鼠标悬停位置的物件信息
-  std::shared_ptr<HoverInfo> hover_info{nullptr};
+  std::shared_ptr<HoverObjectInfo> hover_object_info{nullptr};
 
   // 鼠标悬停位置的timings信息(可能是两个同时间timing)
   std::vector<std::shared_ptr<Timing>>* hover_timings{nullptr};
+
+  // 选中的timings
+  std::vector<std::shared_ptr<Timing>>* selected_timings{nullptr};
 
   // 选中的物件
   // 哈希函数和比较函数

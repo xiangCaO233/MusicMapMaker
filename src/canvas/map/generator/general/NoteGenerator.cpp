@@ -74,8 +74,8 @@ void NoteGenerator::generate(Note& note) {
     // 优先使用悬停时的纹理
     head_texture = editor_ref->canvas_ref->skin.get_object_texture(
         TexType::NOTE_HEAD, ObjectStatus::HOVER);
-    editor_ref->ebuffer.hover_info =
-        std::make_shared<HoverInfo>(note_ptr, note.beatinfo, HoverPart::HEAD);
+    editor_ref->ebuffer.hover_object_info = std::make_shared<HoverObjectInfo>(
+        note_ptr, note.beatinfo, HoverPart::HEAD);
 
     editor_ref->cstatus.is_hover_note = true;
   } else {

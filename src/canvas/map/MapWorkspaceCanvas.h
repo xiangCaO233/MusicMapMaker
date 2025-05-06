@@ -165,6 +165,9 @@ class MapWorkspaceCanvas : public GLCanvas {
                      std::shared_ptr<HitObject> obj,
                      std::shared_ptr<Timing> ref_timing);
 
+  // 选中timing的信号
+  void select_timing(std::vector<std::shared_ptr<Timing>> *timings);
+
   // 是否暂停播放信号
   void pause_signal(bool paused);
 
