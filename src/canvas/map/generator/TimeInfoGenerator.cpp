@@ -38,10 +38,6 @@ void TimeInfoGenerator::generate() {
 void TimeInfoGenerator::draw_timing_points() {
   if (!editor_ref->canvas_ref->working_map) return;
 
-  // 判定线位置
-  auto judgeline_pos = editor_ref->cstatus.canvas_size.height() *
-                       (1.0 - editor_ref->csettings.judgeline_position);
-
   std::string bpm_prefix = "bpm:";
   std::vector<std::vector<std::shared_ptr<Timing>> *> timingss_in_area;
   std::vector<std::shared_ptr<Timing>> timings_in_area;
@@ -145,13 +141,13 @@ void TimeInfoGenerator::draw_timing_points() {
     QSizeF inner_bound_size(
         strs_size.width() + editor_ref->canvas_ref->skin.timeinfo_font_size,
         strs_size.height() + editor_ref->canvas_ref->skin.timeinfo_font_size);
-    QSizeF outter_bound_size(
-        inner_bound_size.width() +
-            editor_ref->canvas_ref->skin.timeinfo_font_size,
-        inner_bound_size.height() +
-            editor_ref->canvas_ref->skin.timeinfo_font_size);
-    auto timing_y_pos =
-        judgeline_pos - (timings->at(0)->timestamp -
+    // QSizeF outter_bound_size(
+    //     inner_bound_size.width() +
+    //         editor_ref->canvas_ref->skin.timeinfo_font_size,
+    //     inner_bound_size.height() +
+    //         editor_ref->canvas_ref->skin.timeinfo_font_size);
+    auto timing_y_pos = editor_ref->ebuffer.judgeline_position -
+                        (timings->at(0)->timestamp -
                          editor_ref->cstatus.current_visual_time_stamp) *
                             editor_ref->canvas_ref->working_map
                                 ->project_reference->config.timeline_zoom *
@@ -161,23 +157,30 @@ void TimeInfoGenerator::draw_timing_points() {
     // timing_x_pos =
     //     editor_ref->ebuffer.edit_area_start_pos_x - absbpm_info_string_width;
     // 画外框
-    QPointF outter_bound_pos(
-        editor_ref->ebuffer.edit_area_start_pos_x - outter_bound_size.width() -
-            editor_ref->canvas_ref->skin.timeinfo_font_size,
-        timing_y_pos - outter_bound_size.height() / 2.0);
-    editor_ref->canvas_ref->renderer_manager->addRoundRect(
-        QRectF(outter_bound_pos.x(), outter_bound_pos.y(),
-               outter_bound_size.width(), outter_bound_size.height()),
-        nullptr, QColor(0, 0, 0, 128), 0, 0.2, true);
+    // QPointF outter_bound_pos(
+    //     editor_ref->ebuffer.edit_area_start_pos_x - outter_bound_size.width()
+    //     -
+    //         editor_ref->canvas_ref->skin.timeinfo_font_size,
+    //     timing_y_pos - outter_bound_size.height() / 2.0);
+    // editor_ref->canvas_ref->renderer_manager->addRoundRect(
+    //     QRectF(outter_bound_pos.x(), outter_bound_pos.y(),
+    //            outter_bound_size.width(), outter_bound_size.height()),
+    //     nullptr, QColor(0, 0, 0, 128), 0, 0.2, true);
     // 画内框
     QPointF inner_bound_pos(
         editor_ref->ebuffer.edit_area_start_pos_x - inner_bound_size.width() -
             1.5 * editor_ref->canvas_ref->skin.timeinfo_font_size,
         timing_y_pos - inner_bound_size.height() / 2.0);
-    editor_ref->canvas_ref->renderer_manager->addRoundRect(
+    auto inner_bound =
         QRectF(inner_bound_pos.x(), inner_bound_pos.y(),
-               inner_bound_size.width(), inner_bound_size.height()),
-        nullptr, QColor(0, 0, 0, 255), 0, 0.15, true);
+               inner_bound_size.width(), inner_bound_size.height());
+    if (inner_bound.contains(editor_ref->canvas_ref->mouse_pos)) {
+      editor_ref->canvas_ref->renderer_manager->addRoundRect(
+          inner_bound, nullptr, QColor(45, 45, 45, 255), 0, 0.15, true);
+    } else {
+      editor_ref->canvas_ref->renderer_manager->addRoundRect(
+          inner_bound, nullptr, QColor(0, 0, 0, 255), 0, 0.15, true);
+    }
 
     // 画文本
     auto prebpmstrpos_x = inner_bound_pos.x() +

@@ -81,19 +81,13 @@ void AreaInfoGenerator::generate() {
       (editor_ref->cstatus.canvas_pasued ? 1.0
                                          : editor_ref->cstatus.speed_zoom);
 
-  // 判定线位置
-  auto judgeline_pos = editor_ref->cstatus.canvas_size.height() *
-                       (1.0 - editor_ref->csettings.judgeline_position);
-
   // 距离此timing的拍数-1
   auto beat_count = int((editor_ref->cstatus.current_visual_time_stamp -
                          editor_ref->ebuffer.current_abs_timing->timestamp) /
                             beattime -
                         1);
 
-  // TODO(xiang 2025-04-21):
   // 精确计算获取需要绘制的拍--保证不多不少(算入时间线缩放,变速缩放)
-  // 当前处理的时间范围--大致
   editor_ref->ebuffer.current_time_area_start =
       editor_ref->ebuffer.current_abs_timing->timestamp + beat_count * beattime;
   editor_ref->ebuffer.current_time_area_end =
@@ -104,7 +98,7 @@ void AreaInfoGenerator::generate() {
   double distance = std::fabs(editor_ref->ebuffer.current_time_area_end -
                               editor_ref->cstatus.current_visual_time_stamp);
   auto processing_pos =
-      judgeline_pos +
+      editor_ref->ebuffer.judgeline_position +
       (distance * editor_ref->canvas_ref->working_map->project_reference->config
                       .timeline_zoom);
 

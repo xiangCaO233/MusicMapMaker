@@ -51,6 +51,12 @@ struct EditorBuffer {
   // 编辑区宽度
   double edit_area_width;
 
+  // 判定线位置
+  double judgeline_position;
+
+  // 判定线视觉位置
+  double judgeline_visual_position;
+
   // 轨道数
   int32_t max_orbit;
 

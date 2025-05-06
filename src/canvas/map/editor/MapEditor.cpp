@@ -4,6 +4,7 @@
 #include "../../mmm/map/osu/OsuMap.h"
 #include "../../mmm/map/rm/RMMap.h"
 #include "../MapWorkspaceCanvas.h"
+#include "audio/BackgroundAudio.h"
 #include "editor/HitObjectEditor.h"
 #include "editor/TimingEditor.h"
 
@@ -101,6 +102,13 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
 
   // 不大于1--不放大纹理
   ebuffer.object_size_scale = std::min(ebuffer.width_scale, 1.0);
+
+  // 更新判定线位置和视觉位置
+  ebuffer.judgeline_position =
+      (1 - csettings.judgeline_position) * current_canvas_size.height();
+  ebuffer.judgeline_visual_position =
+      ebuffer.judgeline_position +
+      (cstatus.static_time_offset) * cstatus.speed_zoom;
 }
 
 // 更新区域信息

@@ -463,11 +463,10 @@ void MapWorkspaceCanvas::draw_judgeline() {
 
   // 主区域判定线
   renderer_manager->addLine(
-      QPointF(0, current_size.height() *
-                     (1.0 - editor->csettings.judgeline_position)),
+      QPointF(0, editor->ebuffer.judgeline_visual_position),
       QPointF(
           current_size.width() * (1 - editor->csettings.preview_width_scale),
-          current_size.height() * (1.0 - editor->csettings.judgeline_position)),
+          editor->ebuffer.judgeline_visual_position),
       8, nullptr, QColor(0, 255, 255, 235), false);
 }
 
@@ -646,7 +645,7 @@ void MapWorkspaceCanvas::push_shape() {
                                 effect_frame_queue.front().second,
                                 QColor(255, 182, 193, 240), 0, true);
       // 弹出队首
-      if (!effect_frame_queue.empty()) effect_frame_queue.pop();
+      effect_frame_queue.pop();
     }
   }
 

@@ -69,8 +69,7 @@ void HoldGenerator::generate(Hold &hold) {
 
   // 当前面条尾y轴位置
   auto long_note_end_pos_y =
-      editor_ref->cstatus.canvas_size.height() *
-          (1.0 - editor_ref->csettings.judgeline_position) -
+      editor_ref->ebuffer.judgeline_position -
       ((editor_ref->cstatus.canvas_pasued ? hold.hold_end_reference->timestamp
                                           : long_note_end_visual_time) -
        editor_ref->cstatus.current_visual_time_stamp) *

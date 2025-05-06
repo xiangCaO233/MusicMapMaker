@@ -36,17 +36,13 @@ void BeatGenerator::generate() {
     // 分拍间距
     double divisor_distance = beat_distance / beat->divisors;
 
-    // 判定线位置
-    auto judgeline_pos = editor_ref->cstatus.canvas_size.height() *
-                         (1.0 - editor_ref->csettings.judgeline_position);
-
     // 拍起始时间
     auto &beat_start_time = beat->start_timestamp;
 
     // 拍距离判定线距离从下往上--反转
     // 当前拍起始位置
     auto beat_start_pos =
-        judgeline_pos -
+        editor_ref->ebuffer.judgeline_position -
         (beat_start_time - editor_ref->cstatus.current_visual_time_stamp) *
             editor_ref->canvas_ref->working_map->project_reference->config
                 .timeline_zoom *

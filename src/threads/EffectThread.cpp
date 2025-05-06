@@ -288,9 +288,7 @@ void EffectThread::effect_thread() {
                       // 播放特效
                       canvas->play_effect(
                           play_x,
-                          canvas->size().height() *
-                              (1 -
-                               canvas->editor->csettings.judgeline_position),
+                          canvas->editor->ebuffer.judgeline_visual_position,
                           frames, t);
                       std::this_thread::sleep_for(std::chrono::milliseconds(
                           int(canvas->des_update_time * 2 /
