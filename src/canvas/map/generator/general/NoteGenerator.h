@@ -30,8 +30,14 @@ class NoteGenerator : public ObjectGenerator {
   // 生成物件
   void generate(Note& note) override;
 
+  // 生成预览物件
+  void generate_preview(Note& note) override;
+
   // 完成生成-添加到渲染列表
   void object_enqueue() override;
+
+  // 完成生成-添加到预览渲染列表
+  void preview_object_enqueue() override;
 };
 
 #endif  // M_NOTEGENERATOR_H

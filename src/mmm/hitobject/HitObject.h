@@ -48,6 +48,7 @@ class HitObject {
 
   // 接收处理
   virtual void accept_generate(ObjectGenerator& generator) = 0;
+  virtual void accept_generate_preview(ObjectGenerator& generator) = 0;
 
   // 打印用
   virtual std::string toString() = 0;

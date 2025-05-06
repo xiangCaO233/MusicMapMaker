@@ -31,6 +31,9 @@ class HoldGenerator : public NoteGenerator {
 
   // 生成面条
   void generate(Hold& hold) override;
+
+  // 生成面条
+  void generate_preview(Hold& hold) override;
 };
 
 #endif  // M_HOLDGENERATOR_H

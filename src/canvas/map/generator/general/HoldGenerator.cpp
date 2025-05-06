@@ -269,3 +269,6 @@ void HoldGenerator::generate(Hold &hold) {
     }
   }
 }
+
+// 生成面条
+void HoldGenerator::generate_preview(Hold &hold) {}

@@ -51,6 +51,12 @@ struct EditorBuffer {
   // 编辑区宽度
   double edit_area_width;
 
+  // 预览区x起始位置
+  double preview_area_start_pos_x;
+
+  // 预览区宽度
+  double preview_area_width;
+
   // 判定线位置
   double judgeline_position;
 
@@ -157,13 +163,16 @@ struct EditorBuffer {
 
   // 轨道宽度
   double orbit_width;
+  double preview_orbit_width;
 
   // 依据轨道宽度自动适应物件纹理尺寸
   // 物件尺寸缩放--相对于纹理尺寸
   double width_scale;
+  double preview_width_scale;
 
   // 不大于1--不放大纹理
   double object_size_scale;
+  double preview_object_size_scale;
 
   // 选中框定位点
   std::shared_ptr<std::pair<QPointF, QPointF>> select_bound_locate_points;

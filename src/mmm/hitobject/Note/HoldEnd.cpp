@@ -10,9 +10,9 @@ HoldEnd::HoldEnd(const std::shared_ptr<Hold>& hold)
 HoldEnd::~HoldEnd() = default;
 
 // 接收处理
-void HoldEnd::accept_generate(ObjectGenerator& generator) {
-  // 面尾不处理
-};
+// 面尾不处理
+void HoldEnd::accept_generate(ObjectGenerator& generator) {}
+void HoldEnd::accept_generate_preview(ObjectGenerator& generator) {}
 
 // 打印用
 std::string HoldEnd::toString() {

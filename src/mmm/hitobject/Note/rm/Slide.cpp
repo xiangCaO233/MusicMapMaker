@@ -12,9 +12,9 @@ SlideEnd::SlideEnd(const std::shared_ptr<Slide>& head)
 SlideEnd::~SlideEnd() = default;
 
 // 接收处理
-void SlideEnd::accept_generate(ObjectGenerator& generator) {
-  // 滑键尾不处理
-}
+// 滑键尾不处理
+void SlideEnd::accept_generate(ObjectGenerator& generator) {}
+void SlideEnd::accept_generate_preview(ObjectGenerator& generator) {}
 
 // 比较器使用
 bool SlideEnd::lessThan(const HitObject* other) const {
@@ -58,6 +58,9 @@ Slide::~Slide() = default;
 // 接收处理
 void Slide::accept_generate(ObjectGenerator& generator) {
   generator.generate(*this);
+}
+void Slide::accept_generate_preview(ObjectGenerator& generator) {
+  generator.generate_preview(*this);
 }
 
 // 打印用

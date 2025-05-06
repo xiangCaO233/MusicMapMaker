@@ -276,3 +276,6 @@ void SlideGenerator::generate(Slide& slide) {
     }
   }
 }
+
+// 生成滑键
+void SlideGenerator::generate_preview(Slide& slide) {}

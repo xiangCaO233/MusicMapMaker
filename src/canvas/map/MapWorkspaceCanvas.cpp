@@ -60,6 +60,9 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
 
   // 初始化时间信息生成器
   timegenerator = std::make_shared<TimeInfoGenerator>(editor);
+
+  // 初始化预览生成器
+  previewgenerator = std::make_shared<PreviewGenerator>(editor);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
@@ -418,24 +421,7 @@ void MapWorkspaceCanvas::draw_select_bound() {
 
 // 绘制预览
 void MapWorkspaceCanvas::draw_preview_content() {
-  auto current_size = size();
-  auto preview_x_startpos =
-      current_size.width() * (1 - editor->csettings.preview_width_scale);
-
-  // 绘制一层滤镜
-  QRectF preview_area_bg_bound(
-      preview_x_startpos, 0.0,
-      current_size.width() * editor->csettings.preview_width_scale,
-      current_size.height());
-  renderer_manager->addRect(preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75),
-                            0, false);
-
-  // 预览区域判定线
-  // renderer_manager->addLine(
-  //     QPointF(current_size.width() * (1 - editor->preview_width_scale),
-  //             current_size.height() / 2.0),
-  //     QPointF(current_size.width(), current_size.height() / 2.0), 6, nullptr,
-  //     QColor(0, 255, 255, 235), false);
+  previewgenerator->generate();
 }
 
 // 绘制判定线
@@ -531,7 +517,6 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
 // 绘制物件
 void MapWorkspaceCanvas::draw_hitobject() {
   if (!working_map) return;
-  auto current_size = size();
   // 防止重复绘制
   std::unordered_map<std::shared_ptr<HitObject>, bool> drawed_objects;
 

@@ -65,6 +65,12 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
   ebuffer.edit_area_width =
       current_canvas_size.width() *
       (1.0 - csettings.infoarea_width_scale - csettings.preview_width_scale);
+  // 预览区x起始位置
+  ebuffer.preview_area_start_pos_x =
+      current_canvas_size.width() * (1 - csettings.preview_width_scale);
+  // 预览区宽度
+  ebuffer.preview_area_width =
+      current_canvas_size.width() * csettings.preview_width_scale;
   // 物件头的纹理
   ebuffer.head_texture = canvas_ref->skin.get_object_texture(
       TexType::NOTE_HEAD, ObjectStatus::COMMON);
@@ -95,14 +101,19 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
 
   // 更新轨道宽度
   ebuffer.orbit_width = ebuffer.edit_area_width / ebuffer.max_orbit;
+  ebuffer.preview_orbit_width = ebuffer.preview_area_width / ebuffer.max_orbit;
 
   // 依据轨道宽度自动适应物件纹理尺寸
   // 物件尺寸缩放--相对于纹理尺寸
   ebuffer.width_scale =
       (ebuffer.orbit_width * 1.2) / double(ebuffer.head_texture->width);
+  ebuffer.preview_width_scale =
+      (ebuffer.preview_orbit_width * 1.2) / double(ebuffer.head_texture->width);
 
   // 不大于1--不放大纹理
   ebuffer.object_size_scale = std::min(ebuffer.width_scale, 1.0);
+  ebuffer.preview_object_size_scale =
+      std::min(ebuffer.preview_object_size_scale, 1.0);
 
   // 更新判定线位置和视觉位置
   ebuffer.judgeline_position =

@@ -160,6 +160,8 @@ set(PROJECT_SOURCES
   src/canvas/map/generator/AreaInfoGenerator.cpp
   src/canvas/map/generator/TimeInfoGenerator.h
   src/canvas/map/generator/TimeInfoGenerator.cpp
+  src/canvas/map/generator/PreviewGenerator.h
+  src/canvas/map/generator/PreviewGenerator.cpp
   src/canvas/renderer/shader/GLShader.h
   src/canvas/renderer/shader/GLShader.cpp
   src/canvas/renderer/RenderCommand.h

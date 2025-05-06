@@ -19,6 +19,7 @@
 #include "generator/AreaInfoGenerator.h"
 #include "generator/BeatGenerator.h"
 #include "generator/ObjectGenerator.h"
+#include "generator/PreviewGenerator.h"
 #include "generator/TimeInfoGenerator.h"
 #include "threads/EffectThread.h"
 
@@ -59,6 +60,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 时间信息生成器
   std::shared_ptr<TimeInfoGenerator> timegenerator;
+
+  // 预览生成器
+  std::shared_ptr<PreviewGenerator> previewgenerator;
 
   // x位置-特效帧队列
   std::unordered_map<

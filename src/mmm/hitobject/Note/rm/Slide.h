@@ -25,6 +25,7 @@ class Slide : public Note {
 
   // 接收处理
   void accept_generate(ObjectGenerator& generator) override;
+  void accept_generate_preview(ObjectGenerator& generator) override;
 
   // 打印用
   std::string toString() override;
@@ -49,6 +50,7 @@ class SlideEnd : public HitObject {
 
   // 接收处理
   void accept_generate(ObjectGenerator& generator) override;
+  void accept_generate_preview(ObjectGenerator& generator) override;
 
   // 打印用
   std::string toString() override;

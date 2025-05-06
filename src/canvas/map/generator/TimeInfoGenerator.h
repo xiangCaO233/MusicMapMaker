@@ -6,8 +6,7 @@
 
 class MapEditor;
 
-class TimeInfoGenerator : public QObject {
-  Q_OBJECT
+class TimeInfoGenerator {
  public:
   // 构造TimeInfoGenerator
   TimeInfoGenerator(std::shared_ptr<MapEditor>& editor);

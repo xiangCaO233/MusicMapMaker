@@ -113,8 +113,8 @@ void MEditorArea::use_theme(GlobalTheme theme) {
                                  ":/icons/stream.svg", button_color, 12, 12);
   mutil::set_toolbutton_svgcolor(ui->bookmark_toolbutton,
                                  ":/icons/bookmark.svg", button_color, 12, 12);
-  mutil::set_toolbutton_svgcolor(
-      ui->mode_toolbutton, ":/icons/mouse-pointer.svg", button_color, 12, 12);
+  mutil::set_toolbutton_svgcolor(ui->mode_toolbutton, ":/icons/eye.svg",
+                                 button_color, 12, 12);
   mutil::set_toolbutton_svgcolor(ui->background_opacy_toolbutton,
                                  ":/icons/background.svg", button_color, 12,
                                  12);

@@ -31,6 +31,9 @@ class SlideGenerator : public NoteGenerator {
 
   // 生成滑键
   void generate(Slide& slide) override;
+
+  // 生成滑键
+  void generate_preview(Slide& slide) override;
 };
 
 #endif  // M_SLIDEGENERATOR_H

@@ -17,7 +17,10 @@ Note::~Note() {}
 // 接收处理
 void Note::accept_generate(ObjectGenerator& generator) {
   generator.generate(*this);
-};
+}
+void Note::accept_generate_preview(ObjectGenerator& generator) {
+  generator.generate_preview(*this);
+}
 
 // 打印用
 std::string Note::toString() {

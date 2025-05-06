@@ -14,6 +14,9 @@ Hold::~Hold() = default;
 void Hold::accept_generate(ObjectGenerator& generator) {
   generator.generate(*this);
 }
+void Hold::accept_generate_preview(ObjectGenerator& generator) {
+  generator.generate_preview(*this);
+}
 
 // 打印用
 std::string Hold::toString() {
