@@ -12,6 +12,7 @@
 #include "audio/BackgroundAudio.h"
 #include "controllers/timecontroller.h"
 #include "mmetas.h"
+#include "objectinfoui.h"
 #include "pageui/editorui/CanvasContainer.h"
 #include "pageui/editorui/meditorarea.h"
 #include "pageui/mpage.h"
@@ -62,8 +63,9 @@ MainWindow::MainWindow(QWidget* parent)
 
   // 连接选择物件槽
   connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
-          &MapWorkspaceCanvas::select_object, ui->infomation_widget->mmetas,
-          &MMetas::on_canvas_select_object);
+          &MapWorkspaceCanvas::select_object,
+          ui->infomation_widget->mmetas->objinfo_ref,
+          &ObjectInfoui::on_canvas_select_object);
 }
 
 MainWindow::~MainWindow() { delete ui; }

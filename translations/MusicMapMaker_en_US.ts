@@ -126,12 +126,6 @@
 <context>
     <name>MMetas</name>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="14"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="14"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
         <source>object info</source>

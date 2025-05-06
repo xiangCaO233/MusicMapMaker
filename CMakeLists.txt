@@ -121,6 +121,12 @@ set(PROJECT_SOURCES
   src/ui/infoui/metaui/mmetas.h
   src/ui/infoui/metaui/mmetas.cpp
   src/ui/infoui/metaui/mmetas.ui
+	src/ui/infoui/metaui/editinfo/objectinfoui.h 
+	src/ui/infoui/metaui/editinfo/objectinfoui.cpp 
+	src/ui/infoui/metaui/editinfo/objectinfoui.ui
+  src/ui/infoui/metaui/editinfo/timinginfoui.h 
+	src/ui/infoui/metaui/editinfo/timinginfoui.cpp 
+	src/ui/infoui/metaui/editinfo/timinginfoui.ui
   src/threads/EffectThread.h
   src/threads/EffectThread.cpp
   src/canvas/GLCanvas.h
@@ -184,6 +190,7 @@ include_directories(
   ./src/ui
   ./src/ui/infoui
   ./src/ui/infoui/metaui
+  ./src/ui/infoui/metaui/editinfo
   ./src/ui/pageui
   ./src/ui/pageui/editorui
   ./src/ui/controllers
@@ -195,6 +202,7 @@ include_directories(
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
     resources/glsrcs.qrc
+    
   )
 else()
   if(ANDROID)

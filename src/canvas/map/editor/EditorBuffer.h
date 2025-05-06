@@ -67,8 +67,11 @@ struct EditorBuffer {
   std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
       buffer_preview_objects;
 
-  // 鼠标悬停位置的物件-物件所在拍的指针
+  // 鼠标悬停位置的物件信息
   std::shared_ptr<HoverInfo> hover_info{nullptr};
+
+  // 鼠标悬停位置的timings信息(可能是两个同时间timing)
+  std::vector<std::shared_ptr<Timing>>* hover_timings{nullptr};
 
   // 选中的物件
   // 哈希函数和比较函数

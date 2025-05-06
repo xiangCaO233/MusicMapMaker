@@ -40,15 +40,8 @@ void TimeInfoGenerator::draw_timing_points() {
 
   std::string bpm_prefix = "bpm:";
   std::vector<std::vector<std::shared_ptr<Timing>> *> timingss_in_area;
-  std::vector<std::shared_ptr<Timing>> timings_in_area;
 
-  QSize connectionSize(12, 20);
-
-  // 查询区间内的timing
-  editor_ref->canvas_ref->working_map->query_timing_in_range(
-      timings_in_area, editor_ref->ebuffer.current_time_area_start,
-      editor_ref->ebuffer.current_time_area_end);
-
+  // 查询区间内的timings
   editor_ref->canvas_ref->working_map->query_timing_in_range(
       timingss_in_area, editor_ref->ebuffer.current_time_area_start,
       editor_ref->ebuffer.current_time_area_end);
@@ -77,7 +70,7 @@ void TimeInfoGenerator::draw_timing_points() {
         }
       }
     } else {
-      // 单独timing
+      // 单独timing-可能是参考bpm也可能是变速
       display_bpm_value = timings->at(0)->basebpm;
       if (!timings->at(0)->is_base_timing) {
         show_speed = true;
@@ -174,7 +167,10 @@ void TimeInfoGenerator::draw_timing_points() {
     auto inner_bound =
         QRectF(inner_bound_pos.x(), inner_bound_pos.y(),
                inner_bound_size.width(), inner_bound_size.height());
+
+    // 判断悬浮
     if (inner_bound.contains(editor_ref->canvas_ref->mouse_pos)) {
+      editor_ref->ebuffer.hover_timings = timings;
       editor_ref->canvas_ref->renderer_manager->addRoundRect(
           inner_bound, nullptr, QColor(45, 45, 45, 255), 0, 0.15, true);
     } else {
