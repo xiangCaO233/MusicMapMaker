@@ -25,6 +25,8 @@ struct CanvasStatus {
    */
   // 是否悬停在某一物件上
   bool is_hover_note{false};
+  // 是否悬停在某一timing上
+  bool is_hover_timing{false};
 
   // 左键是否按下
   bool mouse_left_pressed{false};

@@ -127,87 +127,13 @@
     <name>MMetas</name>
     <message>
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
-        <source>object info</source>
-        <translation>物件信息</translation>
+        <source>edit info</source>
+        <translation>编辑信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="134"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="134"/>
-        <source>Object type:</source>
-        <translation>类型:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
-        <source>timestamp</source>
-        <translation>时间戳</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="230"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="230"/>
-        <source>orbit:</source>
-        <translation>轨道:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="320"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="320"/>
-        <source>divisor position:</source>
-        <translation>分拍位置:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="368"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="368"/>
-        <source>nearest timing:</source>
-        <translation>参考时间点:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="423"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="423"/>
-        <source>time:</source>
-        <translation>时间:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="527"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="527"/>
-        <source>go to this timing position</source>
-        <translation>去此时间点处</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="567"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="567"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="114"/>
         <source>map metadatas</source>
-        <translation>谱面元数据表</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="48"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="48"/>
-        <source>Note</source>
-        <translation>单键</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="57"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="57"/>
-        <source>Hold</source>
-        <translation>长条</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="61"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="61"/>
-        <source>Slide</source>
-        <translation>滑键</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="65"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="65"/>
-        <source>Unknown</source>
-        <translation>未知</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="77"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="77"/>
-        <source>Hold time:</source>
-        <translation>持续:</translation>
+        <translation>谱面元数据</translation>
     </message>
 </context>
 <context>
@@ -306,157 +232,157 @@
         <translation>音频设备</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="260"/>
+        <location filename="../src/ui/mainwindow.ui" line="272"/>
         <location filename="../src/ui/mainwindow.ui" line="260"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="264"/>
+        <location filename="../src/ui/mainwindow.ui" line="276"/>
         <location filename="../src/ui/mainwindow.ui" line="264"/>
         <source>Switch Version</source>
         <translation>切换版本</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="285"/>
+        <location filename="../src/ui/mainwindow.ui" line="297"/>
         <location filename="../src/ui/mainwindow.ui" line="285"/>
         <source>Modify</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="298"/>
+        <location filename="../src/ui/mainwindow.ui" line="310"/>
         <location filename="../src/ui/mainwindow.ui" line="298"/>
         <source>View</source>
         <translation>视图</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="305"/>
+        <location filename="../src/ui/mainwindow.ui" line="317"/>
         <location filename="../src/ui/mainwindow.ui" line="305"/>
         <source>Tool</source>
         <translation>工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="311"/>
+        <location filename="../src/ui/mainwindow.ui" line="323"/>
         <location filename="../src/ui/mainwindow.ui" line="311"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="328"/>
+        <location filename="../src/ui/mainwindow.ui" line="340"/>
         <location filename="../src/ui/mainwindow.ui" line="328"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="337"/>
+        <location filename="../src/ui/mainwindow.ui" line="349"/>
         <location filename="../src/ui/mainwindow.ui" line="337"/>
         <source>Open Directory</source>
         <translation>打开目录</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="346"/>
+        <location filename="../src/ui/mainwindow.ui" line="358"/>
         <location filename="../src/ui/mainwindow.ui" line="346"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="355"/>
+        <location filename="../src/ui/mainwindow.ui" line="367"/>
         <location filename="../src/ui/mainwindow.ui" line="355"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="364"/>
+        <location filename="../src/ui/mainwindow.ui" line="376"/>
         <location filename="../src/ui/mainwindow.ui" line="364"/>
         <source>Yank</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="373"/>
+        <location filename="../src/ui/mainwindow.ui" line="385"/>
         <location filename="../src/ui/mainwindow.ui" line="373"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="382"/>
+        <location filename="../src/ui/mainwindow.ui" line="394"/>
         <location filename="../src/ui/mainwindow.ui" line="382"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="391"/>
+        <location filename="../src/ui/mainwindow.ui" line="403"/>
         <location filename="../src/ui/mainwindow.ui" line="391"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="396"/>
+        <location filename="../src/ui/mainwindow.ui" line="408"/>
         <location filename="../src/ui/mainwindow.ui" line="396"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="407"/>
+        <location filename="../src/ui/mainwindow.ui" line="419"/>
         <location filename="../src/ui/mainwindow.ui" line="407"/>
         <source>Show Logs</source>
         <translation>显示日志</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="416"/>
+        <location filename="../src/ui/mainwindow.ui" line="428"/>
         <location filename="../src/ui/mainwindow.ui" line="416"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="425"/>
+        <location filename="../src/ui/mainwindow.ui" line="437"/>
         <location filename="../src/ui/mainwindow.ui" line="425"/>
         <source>Save As</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="430"/>
+        <location filename="../src/ui/mainwindow.ui" line="442"/>
         <location filename="../src/ui/mainwindow.ui" line="430"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="435"/>
+        <location filename="../src/ui/mainwindow.ui" line="447"/>
         <location filename="../src/ui/mainwindow.ui" line="435"/>
         <source>Check Stack Object</source>
         <translation>检查重叠物件</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="446"/>
+        <location filename="../src/ui/mainwindow.ui" line="458"/>
         <location filename="../src/ui/mainwindow.ui" line="446"/>
         <source>Show Files</source>
         <translation>显示文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="455"/>
+        <location filename="../src/ui/mainwindow.ui" line="467"/>
         <location filename="../src/ui/mainwindow.ui" line="455"/>
         <source>Pack</source>
         <translation>打包</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="464"/>
+        <location filename="../src/ui/mainwindow.ui" line="476"/>
         <location filename="../src/ui/mainwindow.ui" line="464"/>
         <source>Pack As</source>
         <translation>打包为</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="473"/>
+        <location filename="../src/ui/mainwindow.ui" line="485"/>
         <location filename="../src/ui/mainwindow.ui" line="473"/>
         <source>New Version</source>
         <translation>新建版本</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="478"/>
+        <location filename="../src/ui/mainwindow.ui" line="490"/>
         <location filename="../src/ui/mainwindow.ui" line="478"/>
         <source>Insane</source>
         <translation>疯狂</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="73"/>
+        <location filename="../src/ui/mainwindow.cpp" line="82"/>
         <location filename="../src/ui/mainwindow.cpp" line="73"/>
         <source>Music Map Maker -</source>
         <translation>音游谱面制作器 -&gt;</translation>
@@ -465,10 +391,78 @@
 <context>
     <name>MapWorkspaceCanvas</name>
     <message>
-        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="113"/>
+        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="117"/>
         <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="113"/>
         <source>qt update substantially delayed:%1ms</source>
         <translation>Qt发生大幅更新延迟:%1ms</translation>
+    </message>
+</context>
+<context>
+    <name>ObjectInfoui</name>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="58"/>
+        <source>currently selected object</source>
+        <translation>当前选中的物件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="73"/>
+        <source>timestamp</source>
+        <translation>时间戳</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="124"/>
+        <source>Object type:</source>
+        <translation>物件类型:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="220"/>
+        <source>orbit:</source>
+        <translation>轨道:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="310"/>
+        <source>divisor position:</source>
+        <translation>分拍位置:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="358"/>
+        <source>nearest timing:</source>
+        <translation>最近的时间点:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="413"/>
+        <source>time:</source>
+        <translation>时间:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="517"/>
+        <source>go to this timing position</source>
+        <translation>前往此时间点处</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="55"/>
+        <source>Note</source>
+        <translation>单键</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="64"/>
+        <source>Hold</source>
+        <translation>面条</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="68"/>
+        <source>Slide</source>
+        <translation>滑键</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="72"/>
+        <source>Unknown</source>
+        <translation>未知</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="84"/>
+        <source>Hold time:</source>
+        <translation>持续时间:</translation>
     </message>
 </context>
 <context>
@@ -482,6 +476,29 @@
         <location filename="../src/ui/controllers/timecontroller.ui" line="495"/>
         <source>audio speed </source>
         <translation>音频速度 </translation>
+    </message>
+</context>
+<context>
+    <name>TimingInfoui</name>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="40"/>
+        <source>currently selected timing</source>
+        <translation>当前选中的时间点</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="55"/>
+        <source>timestamp</source>
+        <translation>时间戳</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="110"/>
+        <source>bpm:</source>
+        <translation>bpm:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="151"/>
+        <source>speed:</source>
+        <translation>速度:</translation>
     </message>
 </context>
 <context>
@@ -505,7 +522,7 @@
         <translation>快退(5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="390"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="323"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="390"/>
         <source>pause</source>
         <translation>切换暂停状态</translation>
@@ -517,35 +534,38 @@
         <translation>快进(5s)</translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="443"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="508"/>
         <source>Timeline zoom:</source>
         <translation>时间线缩放:</translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="513"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="575"/>
         <source>Object height scale:</source>
         <translation>物件高度缩放:</translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="586"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="652"/>
         <source>Object width scale:</source>
         <translation>物件宽度缩放:</translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="667"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="724"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="603"/>
         <source>change the pitch</source>
         <translation>启用变调</translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="795"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="852"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="731"/>
         <source>audio speed </source>
         <translation>音频速度 </translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="708"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="765"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="644"/>
         <source>reset speed</source>
         <translation>重置播放速度</translation>
     </message>

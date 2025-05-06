@@ -73,8 +73,67 @@ struct EditorBuffer {
   // 鼠标悬停位置的timings信息(可能是两个同时间timing)
   std::vector<std::shared_ptr<Timing>>* hover_timings{nullptr};
 
+  // 哈希函数和比较函数
+  struct VectorSharedPtrTimingHash {
+    std::size_t operator()(
+        const std::vector<std::shared_ptr<Timing>>* ptr) const {
+      if (ptr == nullptr) {
+        return 0;  // 统一处理 nullptr
+      }
+
+      std::size_t seed = ptr->size();
+      for (const auto& shared_timing : *ptr) {
+        // 使用 combine 技术混合哈希值
+        if (shared_timing) {
+          const Timing& timing = *shared_timing;
+          seed ^= std::hash<double>{}(timing.timestamp) + 0x9e3779b9 +
+                  (seed << 6) + (seed >> 2);
+          seed ^= std::hash<double>{}(timing.bpm) + 0x9e3779b9 + (seed << 6) +
+                  (seed >> 2);
+          seed ^= std::hash<double>{}(timing.basebpm) + 0x9e3779b9 +
+                  (seed << 6) + (seed >> 2);
+        } else {
+          // 统一处理 nullptr
+          seed ^= 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+      }
+      return seed;
+    }
+  };
+  struct VectorSharedPtrTimingEqual {
+    bool operator()(const std::vector<std::shared_ptr<Timing>>* lhs,
+                    const std::vector<std::shared_ptr<Timing>>* rhs) const {
+      // 处理 nullptr 情况
+      if (lhs == rhs) return true;
+      if (lhs == nullptr || rhs == nullptr) return false;
+
+      // 比较大小
+      if (lhs->size() != rhs->size()) return false;
+
+      // 逐个比较元素
+      for (size_t i = 0; i < lhs->size(); ++i) {
+        const auto& l = (*lhs)[i];
+        const auto& r = (*rhs)[i];
+
+        // 处理 nullptr 情况
+        if (!l && !r) continue;
+        if (!l || !r) return false;
+
+        // 比较 Timing 对象的属性
+        if (l->timestamp != r->timestamp || l->bpm != r->bpm ||
+            l->basebpm != r->basebpm) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  };
+
   // 选中的timings
-  std::vector<std::shared_ptr<Timing>>* selected_timings{nullptr};
+  std::unordered_set<std::vector<std::shared_ptr<Timing>>*,
+                     VectorSharedPtrTimingHash, VectorSharedPtrTimingEqual>
+      selected_timingss{nullptr};
 
   // 选中的物件
   // 哈希函数和比较函数

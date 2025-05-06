@@ -127,87 +127,13 @@
     <name>MMetas</name>
     <message>
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
-        <source>object info</source>
-        <translation>Object info</translation>
+        <source>edit info</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="134"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="134"/>
-        <source>Object type:</source>
-        <translation>Object type:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="83"/>
-        <source>timestamp</source>
-        <translation>Timestamp</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="230"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="230"/>
-        <source>orbit:</source>
-        <translation>Orbit:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="320"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="320"/>
-        <source>divisor position:</source>
-        <translation>Divisor position:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="368"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="368"/>
-        <source>nearest timing:</source>
-        <translation>Nearest timing:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="423"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="423"/>
-        <source>time:</source>
-        <translation>Time:</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="527"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="527"/>
-        <source>go to this timing position</source>
-        <translation>Go to this timing position</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="567"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="567"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="114"/>
         <source>map metadatas</source>
-        <translation>Map metadatas</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="48"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="48"/>
-        <source>Note</source>
-        <translation>Note</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="57"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="57"/>
-        <source>Hold</source>
-        <translation>Hold</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="61"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="61"/>
-        <source>Slide</source>
-        <translation>Slide</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="65"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="65"/>
-        <source>Unknown</source>
-        <translation>Unknown</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="77"/>
-        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="77"/>
-        <source>Hold time:</source>
-        <translation>Hold time:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -306,157 +232,157 @@
         <translation>Audio Device</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="260"/>
+        <location filename="../src/ui/mainwindow.ui" line="272"/>
         <location filename="../src/ui/mainwindow.ui" line="260"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="264"/>
+        <location filename="../src/ui/mainwindow.ui" line="276"/>
         <location filename="../src/ui/mainwindow.ui" line="264"/>
         <source>Switch Version</source>
         <translation>Switch Version</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="285"/>
+        <location filename="../src/ui/mainwindow.ui" line="297"/>
         <location filename="../src/ui/mainwindow.ui" line="285"/>
         <source>Modify</source>
         <translation>Modify</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="298"/>
+        <location filename="../src/ui/mainwindow.ui" line="310"/>
         <location filename="../src/ui/mainwindow.ui" line="298"/>
         <source>View</source>
         <translation>View</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="305"/>
+        <location filename="../src/ui/mainwindow.ui" line="317"/>
         <location filename="../src/ui/mainwindow.ui" line="305"/>
         <source>Tool</source>
         <translation>Tool</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="311"/>
+        <location filename="../src/ui/mainwindow.ui" line="323"/>
         <location filename="../src/ui/mainwindow.ui" line="311"/>
         <source>Help</source>
         <translation>Help</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="328"/>
+        <location filename="../src/ui/mainwindow.ui" line="340"/>
         <location filename="../src/ui/mainwindow.ui" line="328"/>
         <source>Open</source>
         <translation>Open</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="337"/>
+        <location filename="../src/ui/mainwindow.ui" line="349"/>
         <location filename="../src/ui/mainwindow.ui" line="337"/>
         <source>Open Directory</source>
         <translation>Open Directory</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="346"/>
+        <location filename="../src/ui/mainwindow.ui" line="358"/>
         <location filename="../src/ui/mainwindow.ui" line="346"/>
         <source>Undo</source>
         <translation>Undo</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="355"/>
+        <location filename="../src/ui/mainwindow.ui" line="367"/>
         <location filename="../src/ui/mainwindow.ui" line="355"/>
         <source>Redo</source>
         <translation>Redo</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="364"/>
+        <location filename="../src/ui/mainwindow.ui" line="376"/>
         <location filename="../src/ui/mainwindow.ui" line="364"/>
         <source>Yank</source>
         <translation>Yank</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="373"/>
+        <location filename="../src/ui/mainwindow.ui" line="385"/>
         <location filename="../src/ui/mainwindow.ui" line="373"/>
         <source>Cut</source>
         <translation>Cut</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="382"/>
+        <location filename="../src/ui/mainwindow.ui" line="394"/>
         <location filename="../src/ui/mainwindow.ui" line="382"/>
         <source>Paste</source>
         <translation>Paste</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="391"/>
+        <location filename="../src/ui/mainwindow.ui" line="403"/>
         <location filename="../src/ui/mainwindow.ui" line="391"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="396"/>
+        <location filename="../src/ui/mainwindow.ui" line="408"/>
         <location filename="../src/ui/mainwindow.ui" line="396"/>
         <source>Select All</source>
         <translation>Select All</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="407"/>
+        <location filename="../src/ui/mainwindow.ui" line="419"/>
         <location filename="../src/ui/mainwindow.ui" line="407"/>
         <source>Show Logs</source>
         <translation>Show Logs</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="416"/>
+        <location filename="../src/ui/mainwindow.ui" line="428"/>
         <location filename="../src/ui/mainwindow.ui" line="416"/>
         <source>Save</source>
         <translation>Save</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="425"/>
+        <location filename="../src/ui/mainwindow.ui" line="437"/>
         <location filename="../src/ui/mainwindow.ui" line="425"/>
         <source>Save As</source>
         <translation>Save As</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="430"/>
+        <location filename="../src/ui/mainwindow.ui" line="442"/>
         <location filename="../src/ui/mainwindow.ui" line="430"/>
         <source>About</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="435"/>
+        <location filename="../src/ui/mainwindow.ui" line="447"/>
         <location filename="../src/ui/mainwindow.ui" line="435"/>
         <source>Check Stack Object</source>
         <translation>Check Stack Object</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="446"/>
+        <location filename="../src/ui/mainwindow.ui" line="458"/>
         <location filename="../src/ui/mainwindow.ui" line="446"/>
         <source>Show Files</source>
         <translation>Show Files</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="455"/>
+        <location filename="../src/ui/mainwindow.ui" line="467"/>
         <location filename="../src/ui/mainwindow.ui" line="455"/>
         <source>Pack</source>
         <translation>Pack</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="464"/>
+        <location filename="../src/ui/mainwindow.ui" line="476"/>
         <location filename="../src/ui/mainwindow.ui" line="464"/>
         <source>Pack As</source>
         <translation>Pack As</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="473"/>
+        <location filename="../src/ui/mainwindow.ui" line="485"/>
         <location filename="../src/ui/mainwindow.ui" line="473"/>
         <source>New Version</source>
         <translation>New Version</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="478"/>
+        <location filename="../src/ui/mainwindow.ui" line="490"/>
         <location filename="../src/ui/mainwindow.ui" line="478"/>
         <source>Insane</source>
         <translation>Insane</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="73"/>
+        <location filename="../src/ui/mainwindow.cpp" line="82"/>
         <location filename="../src/ui/mainwindow.cpp" line="73"/>
         <source>Music Map Maker -</source>
         <translation>Music Map Maker -&gt;</translation>
@@ -465,9 +391,77 @@
 <context>
     <name>MapWorkspaceCanvas</name>
     <message>
-        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="113"/>
+        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="117"/>
         <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="113"/>
         <source>qt update substantially delayed:%1ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ObjectInfoui</name>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="58"/>
+        <source>currently selected object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="73"/>
+        <source>timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="124"/>
+        <source>Object type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="220"/>
+        <source>orbit:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="310"/>
+        <source>divisor position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="358"/>
+        <source>nearest timing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="413"/>
+        <source>time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="517"/>
+        <source>go to this timing position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="55"/>
+        <source>Note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="64"/>
+        <source>Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="68"/>
+        <source>Slide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="72"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.cpp" line="84"/>
+        <source>Hold time:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -482,6 +476,29 @@
         <location filename="../src/ui/controllers/timecontroller.ui" line="495"/>
         <source>audio speed </source>
         <translation>Audio Speed </translation>
+    </message>
+</context>
+<context>
+    <name>TimingInfoui</name>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="40"/>
+        <source>currently selected timing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="55"/>
+        <source>timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="110"/>
+        <source>bpm:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="151"/>
+        <source>speed:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -505,7 +522,7 @@
         <translation>Fast backward (5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="390"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="323"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="390"/>
         <source>pause</source>
         <translation>Switch pause status</translation>
@@ -517,35 +534,38 @@
         <translation>Fast forward (5s)</translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="443"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="508"/>
         <source>Timeline zoom:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="513"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="575"/>
         <source>Object height scale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="586"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="652"/>
         <source>Object width scale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="667"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="724"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="603"/>
         <source>change the pitch</source>
         <translation>Enable change the pitch</translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="795"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="852"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="731"/>
         <source>audio speed </source>
         <translation>Audio speed </translation>
     </message>
     <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="708"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="765"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="644"/>
         <source>reset speed</source>
         <translation>Reset audio play speed</translation>
     </message>

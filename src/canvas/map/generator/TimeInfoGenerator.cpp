@@ -151,15 +151,35 @@ void TimeInfoGenerator::draw_timing_points() {
         QRectF(inner_bound_pos.x(), inner_bound_pos.y(),
                inner_bound_size.width(), inner_bound_size.height());
 
-    // 判断悬浮选中状态
+    QColor background_color;
+
+    // 优先判断悬浮选中状态
     if (inner_bound.contains(editor_ref->canvas_ref->mouse_pos)) {
+      editor_ref->cstatus.is_hover_timing = true;
       editor_ref->ebuffer.hover_timings = timings;
-      editor_ref->canvas_ref->renderer_manager->addRoundRect(
-          inner_bound, nullptr, QColor(45, 45, 45, 255), 0, 1.2, true);
+      background_color = QColor(45, 45, 45, 255);
     } else {
-      editor_ref->canvas_ref->renderer_manager->addRoundRect(
-          inner_bound, nullptr, QColor(0, 0, 0, 255), 0, 1.2, true);
+      auto in_select_bound =
+          editor_ref->csettings.strict_select
+              ? editor_ref->ebuffer.select_bound.contains(inner_bound)
+              : editor_ref->ebuffer.select_bound.intersects(inner_bound);
+      auto it = editor_ref->ebuffer.selected_timingss.find(timings);
+      if (in_select_bound ||
+          it != editor_ref->ebuffer.selected_timingss.end()) {
+        if (it == editor_ref->ebuffer.selected_timingss.end()) {
+          // 未选中则选中此物件
+          editor_ref->ebuffer.selected_timingss.emplace(timings);
+          // 发送更新选中物件信号
+          emit editor_ref->canvas_ref->select_timing(timings);
+        }
+        // 选中时的颜色
+        background_color = QColor(128, 128, 128, 255);
+      } else {
+        background_color = QColor(0, 0, 0, 255);
+      }
     }
+    editor_ref->canvas_ref->renderer_manager->addRoundRect(
+        inner_bound, nullptr, background_color, 0, 1.2, true);
 
     // 画文本
     auto prebpmstrpos_x = inner_bound_pos.x() +
@@ -201,5 +221,13 @@ void TimeInfoGenerator::draw_timing_points() {
           editor_ref->canvas_ref->skin.font_family,
           editor_ref->canvas_ref->skin.timeinfo_font_color, 0);
     }
+  }
+
+  // 更新hover信息
+  if (!editor_ref->cstatus.is_hover_timing) {
+    // 未悬浮在任何一个timing上
+    editor_ref->ebuffer.hover_timings = nullptr;
+  } else {
+    editor_ref->cstatus.is_hover_timing = false;
   }
 }

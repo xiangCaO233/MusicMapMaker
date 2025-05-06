@@ -1,5 +1,6 @@
 #include "timinginfoui.h"
 
+#include "../../../../mmm/timing/Timing.h"
 #include "../../GlobalSettings.h"
 #include "../../util/mutil.h"
 #include "ui_timinginfoui.h"
@@ -40,7 +41,35 @@ void TimingInfoui::on_canvas_select_timings(
 // 更新选中的ui信息
 void TimingInfoui::update_selected_uiinfo() {
   if (current_select_timings) {
+    if (current_select_timings->empty()) return;
     // 有选中内容时更新ui
+    ui->timestamp_edit->setText(
+        QString::number(current_select_timings->at(0)->timestamp, 'f', 0));
+
+    // 检查变速
+    bool show_speed{false};
+    if (current_select_timings->size() >= 2) {
+      show_speed = true;
+      ui->speed_value_lineEdit->setText(
+          QString::number(current_select_timings->at(1)->bpm, 'f', 2));
+    } else {
+      if (!current_select_timings->at(0)->is_base_timing) {
+        // 就一个-看这个是不是变速
+        show_speed = true;
+        ui->speed_value_lineEdit->setText(
+            QString::number(current_select_timings->at(0)->bpm, 'f', 2));
+      }
+    }
+    ui->bpm_value_lineEdit->setText(
+        QString::number(current_select_timings->at(0)->basebpm, 'f', 2));
+
+    // 是否展示变速
+    if (show_speed) {
+      ui->speed_edit_container->setHidden(false);
+    } else {
+      ui->speed_edit_container->hide();
+    }
+
     if (isHidden()) {
       setHidden(false);
     }

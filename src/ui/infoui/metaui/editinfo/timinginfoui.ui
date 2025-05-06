@@ -66,6 +66,9 @@
        <pointsize>26</pointsize>
       </font>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
     </widget>
    </item>
    <item>
@@ -125,7 +128,11 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLineEdit" name="bpm_value_lineEdit"/>
+          <widget class="QLineEdit" name="bpm_value_lineEdit">
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -166,7 +173,11 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLineEdit" name="speed_value_lineEdit"/>
+          <widget class="QLineEdit" name="speed_value_lineEdit">
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

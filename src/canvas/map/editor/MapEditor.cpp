@@ -311,12 +311,12 @@ void MapEditor::update_selections(bool is_ctrl_down) {
 
   if (cstatus.edit_mode == MouseEditMode::SELECT) {
     // 选中模式
-    ebuffer.selected_timings = nullptr;
 
     // 按住controll左键多选
     if (!is_ctrl_down) {
       // 未按住controll清空选中列表
       ebuffer.selected_hitobjects.clear();
+      ebuffer.selected_timingss.clear();
     }
 
     // 选中
@@ -326,7 +326,7 @@ void MapEditor::update_selections(bool is_ctrl_down) {
     }
     if (ebuffer.hover_timings) {
       // 有悬浮在timing上
-      ebuffer.selected_timings = ebuffer.hover_timings;
+      ebuffer.selected_timingss.emplace(ebuffer.hover_timings);
     }
 
     // 发送更新选中物件信号
