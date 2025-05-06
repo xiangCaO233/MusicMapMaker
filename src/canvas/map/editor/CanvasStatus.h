@@ -31,9 +31,6 @@ struct CanvasStatus {
   // 左键是否按下
   bool mouse_left_pressed{false};
 
-  // 鼠标当前的编辑模式
-  MouseEditMode edit_mode;
-
   // 区域
   // 鼠标左键按下时的快照位置
   QPointF mouse_left_press_pos;

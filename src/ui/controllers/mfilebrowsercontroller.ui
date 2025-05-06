@@ -61,6 +61,9 @@
           <height>28</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -93,6 +96,9 @@
           <height>28</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -122,6 +128,9 @@
           <height>28</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="text">
          <string notr="true"/>
         </property>
@@ -144,6 +153,9 @@
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="text">
          <string notr="true">/home/xiang</string>
         </property>
@@ -162,6 +174,9 @@
           <width>28</width>
           <height>28</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -191,6 +206,9 @@
           <width>28</width>
           <height>28</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
         <property name="text">
          <string/>

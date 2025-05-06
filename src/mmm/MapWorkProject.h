@@ -13,6 +13,12 @@
 
 #include "map/MMap.h"
 
+// 偏好的编辑方式
+enum class EditMethodPreference {
+  MMM,
+  IVM,
+};
+
 struct ProjectConfig {
   // 项目名称
   std::string project_name;
@@ -31,6 +37,9 @@ struct ProjectConfig {
 
   // 用户调节的时间线缩放-- n * 1px/1ms
   double timeline_zoom{1.0};
+
+  // 项目偏好编辑方式
+  EditMethodPreference edit_method{EditMethodPreference::IVM};
 
   // 使用的音频设备名
   std::string device;

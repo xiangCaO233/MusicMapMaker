@@ -34,6 +34,7 @@ class MEditorArea : public QWidget {
   QButtonGroup *modesbuttonGroup;
   QPushButton *drawnote_mode_button;
   QPushButton *drawline_mode_button;
+  QPushButton *place_timing_mode_button;
   QPushButton *selection_mode_button;
   QPushButton *none_mode_button;
 

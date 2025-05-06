@@ -49,6 +49,9 @@
       </property>
       <item>
        <widget class="QComboBox" name="project_selector">
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="currentText">
          <string/>
         </property>
@@ -71,6 +74,9 @@
        <widget class="QPushButton" name="close_project_button">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
         <property name="text">
          <string>Close Project</string>
@@ -113,6 +119,9 @@
       </item>
       <item>
        <widget class="QTabWidget" name="tabWidget">
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="contextMenuPolicy">
          <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
         </property>
@@ -285,6 +294,9 @@
           <width>200</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
        </widget>
       </item>

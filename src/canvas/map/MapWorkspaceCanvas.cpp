@@ -162,24 +162,9 @@ void MapWorkspaceCanvas::updateFpsDisplay(int fps) {
 void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mousePressEvent(event);
+  editor->mouse_pressed(event);
 
   // qDebug() << event->button();
-
-  // 如果当前悬停的位置有物件,左键时选中此物件,右键时删除此物件(组合键头时删除组合键)
-  // 没有物件则根据当前模式添加物件到鼠标位置对应的时间戳
-  switch (event->button()) {
-    case Qt::MouseButton::LeftButton: {
-      // 设置状态和位置快照
-      editor->cstatus.mouse_left_pressed = true;
-      editor->cstatus.mouse_left_press_pos = event->pos();
-      // 更新选中信息
-      editor->update_selections(event->modifiers() & Qt::ControlModifier);
-      break;
-    }
-    case Qt::MouseButton::RightButton: {
-      break;
-    }
-  }
 }
 
 // 鼠标释放事件
@@ -215,7 +200,7 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
 
   if (editor->cstatus.mouse_left_pressed) {
     // 正在拖动
-    if (editor->cstatus.edit_mode == MouseEditMode::SELECT) {
+    if (editor->edit_mode == MouseEditMode::SELECT) {
       // 选择模式-更新选中信息
       // 正悬浮在物件上
       if (editor->ebuffer.hover_object_info) {
@@ -228,11 +213,11 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
       }
     }
 
-    if (editor->cstatus.edit_mode == MouseEditMode::PLACE_NOTE) {
+    if (editor->edit_mode == MouseEditMode::PLACE_NOTE) {
       // 放置物件模式-拖动中--更新正在放置的物件的时间戳
     }
 
-    if (editor->cstatus.edit_mode == MouseEditMode::PLACE_LONGNOTE) {
+    if (editor->edit_mode == MouseEditMode::PLACE_LONGNOTE) {
       // 放置长键模式-拖动中--更新正在放置的长条的持续时间
     }
   }
@@ -277,9 +262,8 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_3:
     case Qt::Key_4: {
       // 快速切换编辑模式
-      editor->cstatus.edit_mode =
-          static_cast<MouseEditMode>(keycode - Qt::Key_0);
-      emit switch_edit_mode(editor->cstatus.edit_mode);
+      editor->edit_mode = static_cast<MouseEditMode>(keycode - Qt::Key_0);
+      emit switch_edit_mode(editor->edit_mode);
       break;
     }
     case Qt::Key_Space: {
@@ -674,6 +658,7 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
 
   if (map) {
     editor->cstatus.map_type = map->maptype;
+    editor->edit_method = map->project_reference->config.edit_method;
     auto s = QDir(map->audio_file_abs_path);
     // 更新谱面长度(如果音乐比谱面长)
     auto map_audio_length =

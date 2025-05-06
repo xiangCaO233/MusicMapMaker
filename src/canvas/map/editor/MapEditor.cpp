@@ -1,17 +1,18 @@
 #include "MapEditor.h"
 
 #include "../../../mmm/MapWorkProject.h"
+#include "../../audio/BackgroundAudio.h"
 #include "../../mmm/map/osu/OsuMap.h"
 #include "../../mmm/map/rm/RMMap.h"
 #include "../MapWorkspaceCanvas.h"
-#include "audio/BackgroundAudio.h"
-#include "editor/HitObjectEditor.h"
-#include "editor/TimingEditor.h"
+#include "HitObjectEditor.h"
+#include "TimingEditor.h"
+#include "editor/EditorEnumerations.h"
 
 MapEditor::MapEditor(MapWorkspaceCanvas* canvas)
     : canvas_ref(canvas), obj_editor(this), timing_editor(this) {}
 
-MapEditor::~MapEditor() {}
+MapEditor::~MapEditor() = default;
 
 // 撤销
 void MapEditor::undo() {
@@ -135,6 +136,53 @@ void MapEditor::update_areas() {
   cstatus.preview_area.setWidth(cstatus.canvas_size.width() *
                                 csettings.preview_width_scale);
   cstatus.edit_area.setHeight(cstatus.canvas_size.height());
+}
+
+// 鼠标按下
+void MapEditor::mouse_pressed(QMouseEvent* e) {
+  // 选中框更新
+  if (ebuffer.select_bound_locate_points) {
+    // 关闭选中框
+    ebuffer.select_bound_locate_points = nullptr;
+    ebuffer.select_bound.setWidth(0);
+    ebuffer.select_bound.setHeight(0);
+  }
+
+  bool clear_selections{true};
+
+  // 检查并分派编辑事件
+  switch (edit_mode) {
+    case MouseEditMode::PLACE_NOTE:
+    case MouseEditMode::PLACE_LONGNOTE: {
+      // 编辑物件模式-传递事件给物件编辑器
+      obj_editor.mouse_pressed(e);
+      break;
+    }
+    case MouseEditMode::PLACE_TIMING: {
+      // 编辑timing模式-传递事件给timing编辑器
+      timing_editor.mouse_pressed(e);
+      break;
+    }
+    case MouseEditMode::SELECT: {
+      clear_selections = false;
+      if (e->button() == Qt::MouseButton::LeftButton) {
+        // 设置状态和位置快照
+        cstatus.mouse_left_pressed = true;
+        cstatus.mouse_left_press_pos = e->pos();
+        // 更新选中信息
+        update_selections(e->modifiers() & Qt::ControlModifier);
+      }
+      break;
+    }
+    case MouseEditMode::NONE: {
+      break;
+    }
+  }
+  if (clear_selections) {
+    // 其他模式直接清空选中列表
+    ebuffer.selected_hitobjects.clear();
+    ebuffer.selected_timingss.clear();
+  }
 }
 
 // 更新时间线缩放-滚动
@@ -302,45 +350,33 @@ void MapEditor::update_timepos(int scrolldy, bool is_shift_down) {
 
 // 更新选中信息
 void MapEditor::update_selections(bool is_ctrl_down) {
-  if (ebuffer.select_bound_locate_points) {
-    // 关闭选中框
-    ebuffer.select_bound_locate_points = nullptr;
-    ebuffer.select_bound.setWidth(0);
-    ebuffer.select_bound.setHeight(0);
+  // 按住controll左键多选
+  if (!is_ctrl_down) {
+    // 未按住controll清空选中列表
+    ebuffer.selected_hitobjects.clear();
+    ebuffer.selected_timingss.clear();
   }
 
-  if (cstatus.edit_mode == MouseEditMode::SELECT) {
-    // 选中模式
-
-    // 按住controll左键多选
-    if (!is_ctrl_down) {
-      // 未按住controll清空选中列表
-      ebuffer.selected_hitobjects.clear();
-      ebuffer.selected_timingss.clear();
-    }
-
-    // 选中
-    if (ebuffer.hover_object_info) {
-      // 有悬浮在物件上
-      ebuffer.selected_hitobjects.emplace(ebuffer.hover_object_info->hoverobj);
-    }
-    if (ebuffer.hover_timings) {
-      // 有悬浮在timing上
-      ebuffer.selected_timingss.emplace(ebuffer.hover_timings);
-    }
-
-    // 发送更新选中物件信号
-    if (ebuffer.hover_object_info) {
-      emit canvas_ref->select_object(ebuffer.hover_object_info->hoverbeat,
-                                     ebuffer.hover_object_info->hoverobj,
-                                     ebuffer.current_abs_timing);
-    } else {
-      emit canvas_ref->select_object(nullptr, nullptr, nullptr);
-    }
-
-    // 发送更新选中timing信号
-    emit canvas_ref->select_timing(ebuffer.hover_timings);
+  // 选中
+  if (ebuffer.hover_object_info) {
+    // 有悬浮在物件上
+    ebuffer.selected_hitobjects.emplace(ebuffer.hover_object_info->hoverobj);
   }
+  if (ebuffer.hover_timings) {
+    // 有悬浮在timing上
+    ebuffer.selected_timingss.emplace(ebuffer.hover_timings);
+  }
+
+  // 发送更新选中物件信号
+  if (ebuffer.hover_object_info) {
+    emit canvas_ref->select_object(ebuffer.hover_object_info->hoverbeat,
+                                   ebuffer.hover_object_info->hoverobj,
+                                   ebuffer.current_abs_timing);
+  } else {
+    emit canvas_ref->select_object(nullptr, nullptr, nullptr);
+  }
+  // 发送更新选中timing信号
+  emit canvas_ref->select_timing(ebuffer.hover_timings);
 }
 
 // 更新选中区域

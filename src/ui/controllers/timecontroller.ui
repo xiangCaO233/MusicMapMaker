@@ -75,6 +75,9 @@
              <pointsize>32</pointsize>
             </font>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::NoFocus</enum>
+           </property>
            <property name="toolTip">
             <string>edit play position</string>
            </property>
@@ -473,6 +476,9 @@
                 <pointsize>16</pointsize>
                </font>
               </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
               <property name="text">
                <string notr="true">100</string>
               </property>
@@ -780,7 +786,7 @@
                </font>
               </property>
               <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::WheelFocus</enum>
+               <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
               <property name="frame">
                <bool>false</bool>

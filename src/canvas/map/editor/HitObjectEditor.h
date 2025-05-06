@@ -1,6 +1,8 @@
 #ifndef M_HITOBJECTEDITOR_H
 #define M_HITOBJECTEDITOR_H
 
+#include <qevent.h>
+
 #include <memory>
 #include <set>
 #include <stack>
@@ -45,6 +47,9 @@ class HitObjectEditor {
   // 正在编辑的缓存物件
   std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
       editing_temp_objects;
+
+  // 鼠标按下事件-传递
+  void mouse_pressed(QMouseEvent* e);
 
   // void drag_object()
 

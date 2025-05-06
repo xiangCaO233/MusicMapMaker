@@ -8,7 +8,6 @@
 #include <QPointF>
 #include <QRectF>
 #include <memory>
-#include <set>
 #include <stack>
 
 #include "CanvasSettings.h"
@@ -20,7 +19,9 @@
 class MapWorkspaceCanvas;
 class TextureInstace;
 
-enum EditType {
+enum class EditMethodPreference;
+
+enum EditOperationType {
   HITOBJECT,
   TIMING,
 };
@@ -44,27 +45,34 @@ class MapEditor {
   // 编辑器缓存
   EditorBuffer ebuffer;
 
+  // 鼠标当前的编辑模式
+  MouseEditMode edit_mode;
+
+  // 编辑方式-ivm或mmm
+  EditMethodPreference edit_method;
+
   // 编辑
   // 物件编辑器
   HitObjectEditor obj_editor;
   // timing编辑器
   TimingEditor timing_editor;
   // 操作类型栈
-  std::stack<EditType> operation_type_stack;
+  std::stack<EditOperationType> operation_type_stack;
   // 撤回类型栈
-  std::stack<EditType> undo_type_stack;
+  std::stack<EditOperationType> undo_type_stack;
+
   // 撤销
   void undo();
   // 重做
   void redo();
 
   // 其他函数
-  // 切换map
-  void switch_map(std::shared_ptr<MMap>& map);
   // 画布更新尺寸
   void update_size(const QSize& current_canvas_size);
   // 更新区域信息
   void update_areas();
+  // 鼠标按下
+  void mouse_pressed(QMouseEvent* e);
   // 更新时间线缩放-滚动
   void scroll_update_timelinezoom(int scrolldy);
   // 吸附到附近分拍线

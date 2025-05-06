@@ -96,54 +96,53 @@ void MEditorArea::initialize_signals() {
 // 使用主题
 void MEditorArea::use_theme(GlobalTheme theme) {
   current_theme = theme;
-  QColor file_button_color;
+  QColor button_color;
   switch (theme) {
     case GlobalTheme::DARK: {
-      file_button_color = QColor(255, 255, 255);
+      button_color = QColor(255, 255, 255);
       break;
     }
     case GlobalTheme::LIGHT: {
-      file_button_color = QColor(0, 0, 0);
+      button_color = QColor(0, 0, 0);
       break;
     }
   }
 
   // 设置工具栏按钮图标颜色
   mutil::set_toolbutton_svgcolor(ui->default_divisor_policy_toolbutton,
-                                 ":/icons/stream.svg", file_button_color, 12,
-                                 12);
+                                 ":/icons/stream.svg", button_color, 12, 12);
   mutil::set_toolbutton_svgcolor(ui->bookmark_toolbutton,
-                                 ":/icons/bookmark.svg", file_button_color, 12,
-                                 12);
-  mutil::set_toolbutton_svgcolor(ui->mode_toolbutton,
-                                 ":/icons/mouse-pointer.svg", file_button_color,
-                                 12, 12);
+                                 ":/icons/bookmark.svg", button_color, 12, 12);
+  mutil::set_toolbutton_svgcolor(
+      ui->mode_toolbutton, ":/icons/mouse-pointer.svg", button_color, 12, 12);
   mutil::set_toolbutton_svgcolor(ui->background_opacy_toolbutton,
-                                 ":/icons/background.svg", file_button_color,
-                                 12, 12);
+                                 ":/icons/background.svg", button_color, 12,
+                                 12);
 
   mutil::set_button_svgcolor(ui->magnet_todivisor_button, ":/icons/magnet.svg",
-                             file_button_color, 16, 16);
+                             button_color, 16, 16);
 
   mutil::set_button_svgcolor(ui->show_object_after_judgeline_button,
-                             ":/icons/glasses.svg", file_button_color, 16, 16);
+                             ":/icons/glasses.svg", button_color, 16, 16);
 
   // 模式选择菜单内的按钮组
   mutil::set_button_svgcolor(drawnote_mode_button, ":/icons/drawnote.svg",
-                             file_button_color, 16, 16);
+                             button_color, 16, 16);
   mutil::set_button_svgcolor(drawline_mode_button, ":/icons/drawline.svg",
-                             file_button_color, 16, 16);
+                             button_color, 16, 16);
+  mutil::set_button_svgcolor(place_timing_mode_button, ":/icons/timing.svg",
+                             button_color, 16, 16);
   mutil::set_button_svgcolor(selection_mode_button, ":/icons/selection.svg",
-                             file_button_color, 16, 16);
-  mutil::set_button_svgcolor(none_mode_button, ":/icons/mouse-pointer.svg",
-                             file_button_color, 16, 16);
+                             button_color, 16, 16);
+  mutil::set_button_svgcolor(none_mode_button, ":/icons/eye.svg", button_color,
+                             16, 16);
 
   // 两个状态
   mutil::set_button_svgcolor(ui->wheel_direction_button,
-                             ":/icons/long-arrow-alt-up.svg", file_button_color,
-                             16, 16);
+                             ":/icons/long-arrow-alt-up.svg", button_color, 16,
+                             16);
   mutil::set_button_svgcolor(ui->lock_edit_mode_button, ":/icons/lock-open.svg",
-                             file_button_color, 16, 16);
+                             button_color, 16, 16);
 
   // 设置时间控制器主题
   ui->audio_time_controller->use_theme(theme);
@@ -163,31 +162,42 @@ void MEditorArea::initialize_toolbuttons() {
   modesbuttonGroup->setExclusive(true);
 
   // 创建子模式按钮
-  drawnote_mode_button = new QPushButton();
-  drawline_mode_button = new QPushButton();
-  selection_mode_button = new QPushButton();
-  none_mode_button = new QPushButton();
+  drawnote_mode_button = new QPushButton;
+  drawline_mode_button = new QPushButton;
+  place_timing_mode_button = new QPushButton;
+  selection_mode_button = new QPushButton;
+  none_mode_button = new QPushButton;
 
   // 初始化按钮类型尺寸
   drawnote_mode_button->setFlat(true);
   drawnote_mode_button->setCheckable(true);
   drawnote_mode_button->setMinimumSize(QSize(24, 24));
   drawnote_mode_button->setMaximumSize(QSize(24, 24));
+  drawnote_mode_button->setToolTip(tr("Place note mode"));
 
   drawline_mode_button->setFlat(true);
   drawline_mode_button->setCheckable(true);
   drawline_mode_button->setMinimumSize(QSize(24, 24));
   drawline_mode_button->setMaximumSize(QSize(24, 24));
+  drawline_mode_button->setToolTip(tr("Place line and slide mode"));
+
+  place_timing_mode_button->setFlat(true);
+  place_timing_mode_button->setCheckable(true);
+  place_timing_mode_button->setMinimumSize(QSize(24, 24));
+  place_timing_mode_button->setMaximumSize(QSize(24, 24));
+  place_timing_mode_button->setToolTip(tr("Place timing mode"));
 
   selection_mode_button->setFlat(true);
   selection_mode_button->setCheckable(true);
   selection_mode_button->setMinimumSize(QSize(24, 24));
   selection_mode_button->setMaximumSize(QSize(24, 24));
+  selection_mode_button->setToolTip(tr("Selection mode"));
 
   none_mode_button->setFlat(true);
   none_mode_button->setCheckable(true);
   none_mode_button->setMinimumSize(QSize(24, 24));
   none_mode_button->setMaximumSize(QSize(24, 24));
+  none_mode_button->setToolTip(tr("Observer mode"));
 
   // 将按钮添加到按钮组
   // 第二个参数是按钮ID
@@ -196,6 +206,9 @@ void MEditorArea::initialize_toolbuttons() {
   modesbuttonGroup->addButton(
       drawline_mode_button,
       static_cast<int32_t>(MouseEditMode::PLACE_LONGNOTE));
+  modesbuttonGroup->addButton(
+      place_timing_mode_button,
+      static_cast<int32_t>(MouseEditMode::PLACE_TIMING));
   modesbuttonGroup->addButton(selection_mode_button,
                               static_cast<int32_t>(MouseEditMode::SELECT));
   modesbuttonGroup->addButton(none_mode_button,
@@ -207,6 +220,7 @@ void MEditorArea::initialize_toolbuttons() {
   modemenulayout->setSpacing(0);
   modemenulayout->addWidget(drawnote_mode_button);
   modemenulayout->addWidget(drawline_mode_button);
+  modemenulayout->addWidget(place_timing_mode_button);
   modemenulayout->addWidget(selection_mode_button);
   modemenulayout->addWidget(none_mode_button);
 
@@ -227,7 +241,7 @@ void MEditorArea::initialize_toolbuttons() {
             mode_toolbutton->setIcon(button->icon());
             // 切换当前编辑器的模式
             if (c->working_map) {
-              c->editor->cstatus.edit_mode =
+              c->editor->edit_mode =
                   static_cast<MouseEditMode>(group->id(button));
             }
           });

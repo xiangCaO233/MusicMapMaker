@@ -1,6 +1,7 @@
 #ifndef M_TIMINGEDITOR_H
 #define M_TIMINGEDITOR_H
 
+#include <QMouseEvent>
 #include <memory>
 #include <set>
 #include <stack>
@@ -36,6 +37,9 @@ class TimingEditor {
 
   // 图编辑器引用
   MapEditor* editor_ref;
+
+  // 鼠标按下事件-传递
+  void mouse_pressed(QMouseEvent* e);
 
   // 撤销
   void undo();

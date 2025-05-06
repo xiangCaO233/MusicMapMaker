@@ -11,3 +11,6 @@ void HitObjectEditor::undo() {}
 
 // 重做
 void HitObjectEditor::redo() {}
+
+// 鼠标按下事件-传递
+void HitObjectEditor::mouse_pressed(QMouseEvent* e) {}
