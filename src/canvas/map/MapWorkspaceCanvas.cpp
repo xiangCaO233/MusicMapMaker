@@ -480,7 +480,6 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
         auto h = effect_frame_texture->height *
                  (editor->ebuffer.object_size_scale * 0.75 *
                   working_map->project_reference->config.object_height_ratio);
-        // TODO-xiang-:不知名入队bug
         auto frame_texname =
             skin.nomal_hit_effect_dir + "/" +
             std::to_string(i % skin.nomal_hit_effect_frame_count + 1) + ".png";

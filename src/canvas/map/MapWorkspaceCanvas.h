@@ -5,8 +5,10 @@
 #include <qpoint.h>
 #include <qtmetamacros.h>
 
+#include <deque>
 #include <memory>
 #include <queue>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -15,6 +17,7 @@
 #include "../../mmm/map/MMap.h"
 #include "../GLCanvas.h"
 #include "MapWorkspaceSkin.h"
+#include "RenderParam.h"
 #include "editor/MapEditor.h"
 #include "generator/AreaInfoGenerator.h"
 #include "generator/BeatGenerator.h"
@@ -63,6 +66,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
   // 预览生成器
   std::shared_ptr<PreviewGenerator> previewgenerator;
+
+  // 帧参数包队列
+  std::unordered_map<RenderType, std::queue<RenderParamsBundle>> frame_params;
 
   // x位置-特效帧队列
   std::unordered_map<
