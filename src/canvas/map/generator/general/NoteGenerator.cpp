@@ -61,11 +61,11 @@ void NoteGenerator::generate(Note& note) {
       editor_ref->canvas_ref->skin.get_object_texture(TexType::NODE,
                                                       ObjectStatus::COMMON);
   node_size = QSizeF(complex_note_node_texture->width *
-                         editor_ref->ebuffer.object_size_scale * 0.75 *
+                         editor_ref->ebuffer.object_size_scale * 0.75 * 0.75 *
                          editor_ref->canvas_ref->working_map->project_reference
                              ->config.object_width_ratio,
                      complex_note_node_texture->height *
-                         editor_ref->ebuffer.object_size_scale * 0.75 *
+                         editor_ref->ebuffer.object_size_scale * 0.75 * 0.75 *
                          editor_ref->canvas_ref->working_map->project_reference
                              ->config.object_height_ratio);
 
@@ -114,24 +114,18 @@ void NoteGenerator::generate_preview(Note& note) {
                  editor_ref->canvas_ref->working_map->project_reference->config
                      .object_width_ratio,
              editor_ref->ebuffer.head_texture->height *
-                 editor_ref->ebuffer.preview_object_size_scale *
+                 editor_ref->ebuffer.preview_object_size_scale * 0.75 *
                  editor_ref->canvas_ref->working_map->project_reference->config
                      .object_height_ratio);
-  double note_visual_time =
-      editor_ref->cstatus.current_visual_time_stamp +
-      (note.timestamp - editor_ref->cstatus.current_visual_time_stamp) *
-          editor_ref->cstatus.speed_zoom /
-          editor_ref->csettings.preview_time_scale;
 
   // 物件距离判定线距离从下往上--反转
   // 当前物件头位置-中心
   auto note_center_pos_y =
-      editor_ref->ebuffer.judgeline_position +
+      editor_ref->ebuffer.judgeline_position -
       // 偏移到画布中间
       std::abs(editor_ref->ebuffer.judgeline_position -
                editor_ref->cstatus.canvas_size.height() / 2.0) -
-      ((editor_ref->cstatus.canvas_pasued ? note.timestamp : note_visual_time) -
-       editor_ref->cstatus.current_visual_time_stamp) *
+      (note.timestamp - editor_ref->cstatus.current_visual_time_stamp) *
           editor_ref->canvas_ref->working_map->project_reference->config
               .timeline_zoom /
           editor_ref->csettings.preview_time_scale;
@@ -155,11 +149,11 @@ void NoteGenerator::generate_preview(Note& note) {
       editor_ref->canvas_ref->skin.get_object_texture(TexType::NODE,
                                                       ObjectStatus::COMMON);
   node_size = QSizeF(complex_note_node_texture->width *
-                         editor_ref->ebuffer.preview_object_size_scale * 0.75 *
+                         editor_ref->ebuffer.preview_object_size_scale * 0.5 *
                          editor_ref->canvas_ref->working_map->project_reference
                              ->config.object_width_ratio,
                      complex_note_node_texture->height *
-                         editor_ref->ebuffer.preview_object_size_scale * 0.75 *
+                         editor_ref->ebuffer.preview_object_size_scale * 0.5 *
                          editor_ref->canvas_ref->working_map->project_reference
                              ->config.object_height_ratio);
 

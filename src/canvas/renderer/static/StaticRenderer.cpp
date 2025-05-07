@@ -100,7 +100,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
         position_data.push_back(*pos);
         synchronize_update_mark(instance_index);
       } else {
-        if (*pos != position_data.at(instance_index)) {
+        if (*pos != position_data[instance_index]) {
           // 位置数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -117,7 +117,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
         size_data.push_back(*size);
         synchronize_update_mark(instance_index);
       } else {
-        if (*size != size_data.at(instance_index)) {
+        if (*size != size_data[instance_index]) {
           // 尺寸数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -134,7 +134,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
         rotation_data.push_back(*rotation);
         synchronize_update_mark(instance_index);
       } else {
-        if (*rotation != rotation_data.at(instance_index)) {
+        if (*rotation != rotation_data[instance_index]) {
           // 角度数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -152,7 +152,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
         texture_policy_data.push_back(*texture_policy);
         synchronize_update_mark(instance_index);
       } else {
-        if (*texture_policy != texture_policy_data.at(instance_index)) {
+        if (*texture_policy != texture_policy_data[instance_index]) {
           // 贴图策略数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -169,7 +169,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
         texture_id_data.push_back(*texture_id);
         synchronize_update_mark(instance_index);
       } else {
-        if (*texture_id != texture_id_data.at(instance_index)) {
+        if (*texture_id != texture_id_data[instance_index]) {
           // 贴图id数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -186,7 +186,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
         fill_color_data.push_back(*fill_color);
         synchronize_update_mark(instance_index);
       } else {
-        if (*fill_color != fill_color_data.at(instance_index)) {
+        if (*fill_color != fill_color_data[instance_index]) {
           // 填充颜色数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -203,7 +203,7 @@ void StaticRenderer::synchronize_data(InstanceDataType data_type,
         radius_data.push_back(*radius);
         synchronize_update_mark(instance_index);
       } else {
-        if (*radius != radius_data.at(instance_index)) {
+        if (*radius != radius_data[instance_index]) {
           // 圆角半径数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);

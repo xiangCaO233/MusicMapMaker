@@ -475,7 +475,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         position_data.push_back(*pos);
         synchronize_update_mark(instance_index);
       } else {
-        if (*pos != position_data.at(instance_index)) {
+        if (*pos != position_data[instance_index]) {
           // 位置数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -492,7 +492,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         rotation_data.push_back(*rotation);
         synchronize_update_mark(instance_index);
       } else {
-        if (*rotation != rotation_data.at(instance_index)) {
+        if (*rotation != rotation_data[instance_index]) {
           // 角度数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -509,7 +509,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         fill_color_data.push_back(*fill_color);
         synchronize_update_mark(instance_index);
       } else {
-        if (*fill_color != fill_color_data.at(instance_index)) {
+        if (*fill_color != fill_color_data[instance_index]) {
           // 填充颜色数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -534,7 +534,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         layer_index_data.push_back(layer_index);
         synchronize_update_mark(instance_index);
       } else {
-        if (layer_index != layer_index_data.at(instance_index)) {
+        if (layer_index != layer_index_data[instance_index]) {
           // 字符层数索引数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -550,7 +550,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         bearing_y_data.push_back(bearingY);
         synchronize_update_mark(instance_index);
       } else {
-        if (bearingY != bearing_y_data.at(instance_index)) {
+        if (bearingY != bearing_y_data[instance_index]) {
           // 字符y保留高度数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);
@@ -566,7 +566,7 @@ void FontRenderer::synchronize_data(InstanceDataType data_type,
         size_data.push_back(size);
         synchronize_update_mark(instance_index);
       } else {
-        if (size != size_data.at(instance_index)) {
+        if (size != size_data[instance_index]) {
           // 尺寸数据发生变化
           // 同步更新位置标记
           synchronize_update_mark(instance_index);

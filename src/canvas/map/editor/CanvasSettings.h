@@ -12,7 +12,7 @@ struct CanvasSettings {
   double preview_width_scale{0.22};
 
   // 预览区时间倍率:实际时间范围为当前时间范围*preview_time_scale
-  double preview_time_scale{10.0};
+  double preview_time_scale{5.0};
 
   // 判定线后是否显示物件
   bool show_object_after_judgeline{true};

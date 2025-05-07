@@ -206,9 +206,26 @@ std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_selected_border_texture(
 // 获取物件的纹理
 std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_object_texture(
     TexType type, ObjectStatus status) {
+  // TODO(xiang 2025-05-07): 优化性能-缓存json结果防止一直读取json
   json* config = nullptr;
   std::string key;
 
+  // 检查一层缓存
+  auto status_map_it = object_texture_buffer.find(type);
+  if (status_map_it == object_texture_buffer.end()) {
+    // 无一层缓存-创建对应一层缓存表
+    status_map_it = object_texture_buffer.try_emplace(type).first;
+  } else {
+    // 直接读取一层缓存检查二层缓存表
+    auto texture_it = status_map_it->second.find(status);
+    if (texture_it == status_map_it->second.end()) {
+      // 无一层缓存对应的二层缓存表-创建对应二层缓存表
+      texture_it = status_map_it->second.try_emplace(status).first;
+    } else {
+      // 直接读取结果
+      return texture_it->second;
+    }
+  }
   switch (type) {
     case TexType::NOTE_HEAD: {
       config = &head_texture_config;
@@ -239,6 +256,7 @@ std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_object_texture(
       break;
     }
   }
+
   switch (status) {
     case ObjectStatus::COMMON: {
       key = "common";
@@ -253,5 +271,9 @@ std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_object_texture(
       break;
     }
   }
-  return cvs->texture_full_map[config->value<std::string>(key, "unknown")];
+  // 填入缓存并返回
+  auto texture =
+      cvs->texture_full_map[config->value<std::string>(key, "unknown")];
+  object_texture_buffer[type][status] = texture;
+  return object_texture_buffer[type][status];
 }

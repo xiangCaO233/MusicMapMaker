@@ -113,7 +113,7 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
   // 不大于1--不放大纹理
   ebuffer.object_size_scale = std::min(ebuffer.width_scale, 1.0);
   ebuffer.preview_object_size_scale =
-      std::min(ebuffer.preview_object_size_scale, 1.0);
+      std::min(ebuffer.preview_width_scale, 1.0);
 
   // 更新判定线位置和视觉位置
   ebuffer.judgeline_position =

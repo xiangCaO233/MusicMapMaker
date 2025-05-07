@@ -586,6 +586,7 @@ void MapWorkspaceCanvas::draw_hitobject() {
 void MapWorkspaceCanvas::push_shape() {
   // 绘制背景
   draw_background();
+
   if (working_map) {
     // 清除hover信息
     // 生成区域信息
@@ -616,16 +617,16 @@ void MapWorkspaceCanvas::push_shape() {
     }
   }
 
-  // 绘制选中区域
-  draw_select_bound();
   // 绘制预览区域
   draw_preview_content();
+
+  // 绘制选中区域
+  draw_select_bound();
 
   // 绘制判定线
   draw_judgeline();
   // 绘制信息区域
   draw_infoarea();
-
   // 绘制顶部栏
   draw_top_bar();
 }

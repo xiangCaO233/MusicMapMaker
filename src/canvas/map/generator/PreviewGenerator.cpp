@@ -1,5 +1,6 @@
 #include "PreviewGenerator.h"
 
+#include "../../../mmm/MapWorkProject.h"
 #include "../MapWorkspaceCanvas.h"
 #include "../editor/MapEditor.h"
 #include "general/HoldGenerator.h"
@@ -24,8 +25,9 @@ PreviewGenerator::~PreviewGenerator() = default;
 // 生成预览
 void PreviewGenerator::generate() {
   if (!editor_ref->canvas_ref->working_map) return;
+  // TODO(xiang 2025-05-07): 优化性能
   // 确定区域
-  auto area_center_time = (editor_ref->ebuffer.current_time_area_end -
+  auto area_center_time = (editor_ref->ebuffer.current_time_area_end +
                            editor_ref->ebuffer.current_time_area_start) /
                           2.0;
   auto parea_start_time =
@@ -58,10 +60,10 @@ void PreviewGenerator::generate() {
       // 生成物件
       const auto &generator = objgenerators[note->note_type];
       generator->generate_preview(obj);
-      generator->preview_object_enqueue();
-      // if (note->note_type == NoteType::NOTE) {
-      //   // 除单键外的物件已经处理了头
-      // }
+      if (note->note_type == NoteType::NOTE) {
+        // 除单键外的物件已经处理了头
+        generator->preview_object_enqueue();
+      }
     }
   }
 
@@ -83,17 +85,32 @@ void PreviewGenerator::generate() {
     ObjectGenerator::preview_shape_queue.pop();
   }
 
+  // 预览区区域显示
+  auto preview_xpos = editor_ref->ebuffer.preview_area_start_pos_x;
   // 绘制一层滤镜
-  QRectF preview_area_bg_bound(editor_ref->ebuffer.preview_area_start_pos_x,
-                               0.0, editor_ref->ebuffer.preview_area_width,
+  QRectF preview_area_bg_bound(preview_xpos, 0.0,
+                               editor_ref->ebuffer.preview_area_width,
                                editor_ref->cstatus.canvas_size.height());
   editor_ref->canvas_ref->renderer_manager->addRect(
       preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75), 0, false);
 
   // 预览区域判定线
-  // renderer_manager->addLine(
-  //     QPointF(current_size.width() * (1 - editor->preview_width_scale),
-  //             current_size.height() / 2.0),
-  //     QPointF(current_size.width(), current_size.height() / 2.0), 6, nullptr,
-  //     QColor(0, 255, 255, 235), false);
+  auto preview_judgeline_ypos = editor_ref->cstatus.canvas_size.height() / 2.0;
+
+  // 预览区当前区域
+  auto preview_height = editor_ref->cstatus.canvas_size.height() /
+                            editor_ref->csettings.preview_time_scale +
+                        editor_ref->cstatus.static_time_offset *
+                            editor_ref->canvas_ref->working_map
+                                ->project_reference->config.timeline_zoom;
+
+  auto preview_ypos =
+      preview_judgeline_ypos -
+      preview_height * (1 - editor_ref->csettings.judgeline_position);
+
+  // 绘制预览区当前区域
+  editor_ref->canvas_ref->renderer_manager->addRect(
+      QRectF(preview_xpos, preview_ypos, editor_ref->ebuffer.preview_area_width,
+             preview_height),
+      nullptr, QColor(233, 233, 233, 75), 0, false);
 }

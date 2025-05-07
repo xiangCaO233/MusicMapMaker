@@ -19,37 +19,37 @@ class MapWorkspaceCanvas;
 using json = nlohmann::json;
 
 // 音效类型
-enum SoundEffectType {
+enum class SoundEffectType : int32_t {
   // 正常击中
-  COMMON_HIT,
+  COMMON_HIT = 0,
   // 滑动
-  SLIDE,
+  SLIDE = 1,
   // 长条按住
-  HOLDING,
+  HOLDING = 2,
   // 长条释放
-  HOLD_RELEASE,
+  HOLD_RELEASE = 3,
 };
 
 // 物件状态
-enum ObjectStatus {
-  COMMON,
-  HOVER,
-  SELECTED,
+enum class ObjectStatus : int32_t {
+  COMMON = 0,
+  HOVER = 1,
+  SELECTED = 2,
 };
 
 // 物件纹理类型
-enum TexType {
-  NOTE_HEAD,
-  HOLD_BODY_VERTICAL,
-  HOLD_BODY_HORIZONTAL,
-  HOLD_END,
-  NODE,
-  SLIDE_END_LEFT,
-  SLIDE_END_RIGHT,
+enum class TexType {
+  NOTE_HEAD = 0,
+  HOLD_BODY_VERTICAL = 1,
+  HOLD_BODY_HORIZONTAL = 2,
+  HOLD_END = 3,
+  NODE = 4,
+  SLIDE_END_LEFT = 5,
+  SLIDE_END_RIGHT = 6,
 };
 
 // 选中框纹理的方向
-enum SelectBorderDirection {
+enum class SelectBorderDirection {
   LEFT,
   RIGHT,
   TOP,
@@ -100,6 +100,12 @@ class MapWorkspaceSkin {
   json bg_texture_config;
 
   json object_texture_config;
+
+  // 物件纹理缓存
+  std::unordered_map<
+      TexType,
+      std::unordered_map<ObjectStatus, std::shared_ptr<TextureInstace>>>
+      object_texture_buffer;
 
   json head_texture_config;
 

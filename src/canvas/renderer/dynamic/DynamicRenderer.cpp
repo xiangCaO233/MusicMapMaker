@@ -128,6 +128,7 @@ DynamicRenderer::~DynamicRenderer() {
 // 同步数据
 void DynamicRenderer::synchronize_data(InstanceDataType data_type,
                                        size_t instance_index, void* data) {
+  // TODO(xiang 2025-05-07): 查变化==运算符耗时严重
   switch (data_type) {
     case InstanceDataType::POSITION: {
       auto pos = static_cast<QVector2D*>(data);
@@ -136,7 +137,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         position_data.push_back(*pos);
         synchronize_update_mark(data_type, instance_index);
       } else {
-        if (*pos != position_data.at(instance_index)) {
+        if (*pos != position_data[instance_index]) {
           // XWARN("位置数据更新");
           // 位置数据发生变化
           // 同步更新位置标记
@@ -154,7 +155,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         size_data.push_back(*size);
         synchronize_update_mark(data_type, instance_index);
       } else {
-        if (*size != size_data.at(instance_index)) {
+        if (*size != size_data[instance_index]) {
           // XWARN("尺寸更新");
           synchronize_update_mark(data_type, instance_index);
           size_data[instance_index] = *size;
@@ -169,7 +170,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         rotation_data.push_back(*rotation);
         synchronize_update_mark(data_type, instance_index);
       } else {
-        if (*rotation != rotation_data.at(instance_index)) {
+        if (*rotation != rotation_data[instance_index]) {
           // XWARN("旋转更新");
           synchronize_update_mark(data_type, instance_index);
           rotation_data[instance_index] = *rotation;
@@ -185,7 +186,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         texture_policy_data.push_back(*texture_policy);
         synchronize_update_mark(data_type, instance_index);
       } else {
-        if (*texture_policy != texture_policy_data.at(instance_index)) {
+        if (*texture_policy != texture_policy_data[instance_index]) {
           // XWARN("纹理填充策略更新");
           synchronize_update_mark(data_type, instance_index);
           texture_policy_data[instance_index] = *texture_policy;
@@ -200,7 +201,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         texture_id_data.push_back(*texture_id);
         synchronize_update_mark(data_type, instance_index);
       } else {
-        if (*texture_id != texture_id_data.at(instance_index)) {
+        if (*texture_id != texture_id_data[instance_index]) {
           // XWARN("纹理id更新");
           synchronize_update_mark(data_type, instance_index);
           texture_id_data[instance_index] = *texture_id;
@@ -215,7 +216,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         fill_color_data.push_back(*fill_color);
         synchronize_update_mark(data_type, instance_index);
       } else {
-        if (*fill_color != fill_color_data.at(instance_index)) {
+        if (*fill_color != fill_color_data[instance_index]) {
           // XWARN("填充颜色更新");
           synchronize_update_mark(data_type, instance_index);
           fill_color_data[instance_index] = *fill_color;
@@ -230,7 +231,7 @@ void DynamicRenderer::synchronize_data(InstanceDataType data_type,
         radius_data.push_back(*radius);
         synchronize_update_mark(data_type, instance_index);
       } else {
-        if (*radius != radius_data.at(instance_index)) {
+        if (*radius != radius_data[instance_index]) {
           // XWARN("圆角半径更新");
           synchronize_update_mark(data_type, instance_index);
           radius_data[instance_index] = *radius;

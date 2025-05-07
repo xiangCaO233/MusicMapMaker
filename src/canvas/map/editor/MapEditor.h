@@ -1,6 +1,7 @@
 #ifndef M_MAPEDITOR_H
 #define M_MAPEDITOR_H
 
+#include <qevent.h>
 #include <qflags.h>
 #include <qnamespace.h>
 #include <qpoint.h>
@@ -66,13 +67,18 @@ class MapEditor {
   // 重做
   void redo();
 
-  // 其他函数
+  // 画布鼠标事件接收和分发
+  // 鼠标滚动
+  void mouse_scrolled(QWheelEvent* e);
+
+  // 鼠标按下
+  void mouse_pressed(QMouseEvent* e);
+
+  // 其他实现函数
   // 画布更新尺寸
   void update_size(const QSize& current_canvas_size);
   // 更新区域信息
   void update_areas();
-  // 鼠标按下
-  void mouse_pressed(QMouseEvent* e);
   // 更新时间线缩放-滚动
   void scroll_update_timelinezoom(int scrolldy);
   // 吸附到附近分拍线
