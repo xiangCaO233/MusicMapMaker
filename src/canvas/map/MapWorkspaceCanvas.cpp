@@ -191,39 +191,8 @@ void MapWorkspaceCanvas::mouseDoubleClickEvent(QMouseEvent *event) {
 void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mouseMoveEvent(event);
-
-  // 更新鼠标操作区
-  if (editor->cstatus.edit_area.contains(mouse_pos)) {
-    editor->cstatus.operation_area = MouseOperationArea::EDIT;
-  } else if (editor->cstatus.preview_area.contains(mouse_pos)) {
-    editor->cstatus.operation_area = MouseOperationArea::PREVIEW;
-  } else {
-    editor->cstatus.operation_area = MouseOperationArea::INFO;
-  }
-
-  if (editor->cstatus.mouse_left_pressed) {
-    // 正在拖动
-    if (editor->edit_mode == MouseEditMode::SELECT) {
-      // 选择模式-更新选中信息
-      // 正悬浮在物件上
-      if (editor->ebuffer.hover_object_info) {
-        // 调整物件时间戳等属性
-
-      } else {
-        // 未悬浮在任何物件上-更新选中框定位点
-        editor->update_selection_area(event->pos(),
-                                      event->modifiers() & Qt::ControlModifier);
-      }
-    }
-
-    if (editor->edit_mode == MouseEditMode::PLACE_NOTE) {
-      // 放置物件模式-拖动中--更新正在放置的物件的时间戳
-    }
-
-    if (editor->edit_mode == MouseEditMode::PLACE_LONGNOTE) {
-      // 放置长键模式-拖动中--更新正在放置的长条的持续时间
-    }
-  }
+  // 传递事件给map编辑器
+  editor->mouse_moved(event);
 }
 
 // 鼠标滚动事件

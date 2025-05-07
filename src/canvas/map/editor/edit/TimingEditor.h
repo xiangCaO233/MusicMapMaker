@@ -2,32 +2,17 @@
 #define M_TIMINGEDITOR_H
 
 #include <QMouseEvent>
-#include <memory>
-#include <set>
 #include <stack>
 
-#include "mmm/timing/Timing.h"
+#include "../../../../mmm/map/MMap.h"
 
 class MapEditor;
 
-class TimingEditOperation {
- public:
-  std::multiset<std::shared_ptr<Timing>, TimingComparator> src_timings;
-  std::multiset<std::shared_ptr<Timing>, TimingComparator> des_timings;
-
-  TimingEditOperation reverse_clone() const {
-    TimingEditOperation reversed_operation;
-    reversed_operation.des_timings = src_timings;
-    reversed_operation.src_timings = des_timings;
-    return reversed_operation;
-  }
-};
-
 class TimingEditor {
   // 编辑操作栈
-  std::stack<TimingEditOperation> operation_stack;
+  static std::stack<TimingEditOperation> operation_stack;
   // 撤回操作栈
-  std::stack<TimingEditOperation> undo_stack;
+  static std::stack<TimingEditOperation> undo_stack;
 
  public:
   // 构造TimingEditor
@@ -39,13 +24,16 @@ class TimingEditor {
   MapEditor* editor_ref;
 
   // 鼠标按下事件-传递
-  void mouse_pressed(QMouseEvent* e);
+  virtual void mouse_pressed(QMouseEvent* e);
+
+  // 鼠标拖动事件-传递
+  virtual void mouse_dragged(QMouseEvent* e);
 
   // 撤销
-  void undo();
+  static void undo();
 
   // 重做
-  void redo();
+  static void redo();
 };
 
 #endif  // M_TIMINGEDITOR_H

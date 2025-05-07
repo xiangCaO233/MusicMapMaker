@@ -10,9 +10,11 @@
 #include <QRectF>
 #include <memory>
 #include <stack>
+#include <unordered_map>
 
-#include "edit/HitObjectEditor.h"
 #include "edit/TimingEditor.h"
+#include "editor/edit/IVMObjectEditor.h"
+#include "editor/edit/MMMObjectEditor.h"
 #include "info/CanvasSettings.h"
 #include "info/CanvasStatus.h"
 #include "info/EditorBuffer.h"
@@ -54,9 +56,11 @@ class MapEditor {
 
   // 编辑
   // 物件编辑器
-  HitObjectEditor obj_editor;
+  std::unordered_map<EditMethodPreference, std::shared_ptr<HitObjectEditor>>
+      obj_editors;
   // timing编辑器
   TimingEditor timing_editor;
+
   // 操作类型栈
   std::stack<EditOperationType> operation_type_stack;
   // 撤回类型栈
@@ -70,7 +74,8 @@ class MapEditor {
   // 画布鼠标事件接收和分发
   // 鼠标滚动
   void mouse_scrolled(QWheelEvent* e);
-
+  // 鼠标移动
+  void mouse_moved(QMouseEvent* e);
   // 鼠标按下
   void mouse_pressed(QMouseEvent* e);
 

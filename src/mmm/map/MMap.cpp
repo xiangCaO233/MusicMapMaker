@@ -19,6 +19,15 @@ MMap::MMap() {
 
 MMap::~MMap() = default;
 
+// 执行操作
+void MMap::execute_edit_operation(ObjEditOperation& operation) {
+  // 移除src的物件--包括面尾,滑尾,不完全的组合键
+
+  // 插入des的物件--检查组合键类型-且只插入一个组合键
+}
+
+void MMap::execute_edit_operation(TimingEditOperation& operation) {}
+
 // 生成此拍的分拍策略
 void MMap::generate_divisor_policy(const std::shared_ptr<Beat>& beat) {
   // 计算这拍之内的可能分拍策略

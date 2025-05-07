@@ -4,32 +4,18 @@
 #include <qevent.h>
 
 #include <memory>
-#include <set>
 #include <stack>
-#include <utility>
 
-#include "../../../mmm/hitobject/HitObject.h"
+#include "../../../../mmm/map/MMap.h"
 
 class MapEditor;
 
-class ObjEditOperation {
- public:
-  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> src_objects;
-  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> des_objects;
-
-  ObjEditOperation reverse_clone() const {
-    ObjEditOperation reversed_operation;
-    reversed_operation.des_objects = src_objects;
-    reversed_operation.src_objects = des_objects;
-    return reversed_operation;
-  }
-};
-
 class HitObjectEditor {
+ protected:
   // 编辑操作栈
-  std::stack<ObjEditOperation> operation_stack;
+  static std::stack<ObjEditOperation> operation_stack;
   // 撤回操作栈
-  std::stack<ObjEditOperation> undo_stack;
+  static std::stack<ObjEditOperation> undo_stack;
 
  public:
   // 构造HitObjectEditor
@@ -41,23 +27,26 @@ class HitObjectEditor {
   MapEditor* editor_ref;
 
   // 正在编辑的原物件
-  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+  static std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
       editing_src_objects;
 
   // 正在编辑的缓存物件
-  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+  static std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
       editing_temp_objects;
 
   // 鼠标按下事件-传递
   virtual void mouse_pressed(QMouseEvent* e);
 
+  // 鼠标拖动事件-传递
+  virtual void mouse_dragged(QMouseEvent* e);
+
   // void drag_object()
 
   // 撤销
-  void undo();
+  static void undo();
 
   // 重做
-  void redo();
+  static void redo();
 };
 
 #endif  // M_HITOBJECTEDITOR_H

@@ -31,6 +31,9 @@ struct CanvasStatus {
   // 左键是否按下
   bool mouse_left_pressed{false};
 
+  // 鼠标y轴位置对应的时间戳-实时更新
+  double mouse_pos_time;
+
   // 区域
   // 鼠标左键按下时的快照位置
   QPointF mouse_left_press_pos;

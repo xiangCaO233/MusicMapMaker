@@ -11,7 +11,13 @@
 #include "info/EditorEnumerations.h"
 
 MapEditor::MapEditor(MapWorkspaceCanvas* canvas)
-    : canvas_ref(canvas), obj_editor(this), timing_editor(this) {}
+    : canvas_ref(canvas), timing_editor(this) {
+  // 注册物件编辑器
+  obj_editors[EditMethodPreference::IVM] =
+      std::make_shared<IVMObjectEditor>(this);
+  obj_editors[EditMethodPreference::MMM] =
+      std::make_shared<MMMObjectEditor>(this);
+}
 
 MapEditor::~MapEditor() = default;
 
@@ -23,7 +29,7 @@ void MapEditor::undo() {
   // 根据类型调用编辑器撤回
   switch (operation_type_stack.top()) {
     case HITOBJECT: {
-      obj_editor.undo();
+      HitObjectEditor::undo();
       break;
     }
     case TIMING: {
@@ -44,7 +50,7 @@ void MapEditor::redo() {
   // 根据类型调用编辑器撤回
   switch (undo_type_stack.top()) {
     case HITOBJECT: {
-      obj_editor.redo();
+      HitObjectEditor::redo();
       break;
     }
     case TIMING: {
@@ -166,8 +172,12 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
       // 检查鼠标区域并传递事件给物件编辑器或切换模式
       switch (cstatus.operation_area) {
         case MouseOperationArea::EDIT: {
-          // 使用放置物件模式-仅在编辑区触发时向编辑器分派编辑事件
-          obj_editor.mouse_pressed(e);
+          // 使用放置物件模式
+          // 仅在编辑区触发时根据项目编辑偏好
+          // 向编辑器分派编辑事件
+          obj_editors[canvas_ref->working_map->project_reference->config
+                          .edit_method]
+              ->mouse_pressed(e);
           break;
         }
         default: {
@@ -220,6 +230,68 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
   }
 }
 
+// 鼠标移动
+void MapEditor::mouse_moved(QMouseEvent* e) {
+  // 更新鼠标位置的对应时间戳
+  cstatus.mouse_pos_time =
+      cstatus.current_time_stamp +
+      (ebuffer.judgeline_visual_position - canvas_ref->mouse_pos.y()) *
+          canvas_ref->working_map->project_reference->config.timeline_zoom;
+
+  // 更新鼠标操作区
+  if (cstatus.edit_area.contains(canvas_ref->mouse_pos)) {
+    cstatus.operation_area = MouseOperationArea::EDIT;
+  } else if (cstatus.preview_area.contains(canvas_ref->mouse_pos)) {
+    cstatus.operation_area = MouseOperationArea::PREVIEW;
+  } else {
+    cstatus.operation_area = MouseOperationArea::INFO;
+  }
+
+  if (cstatus.mouse_left_pressed) {
+    // 正在拖动
+    switch (edit_mode) {
+      case MouseEditMode::SELECT: {
+        // 选择模式-更新选中信息-不区分区域
+        // 正悬浮在物件上
+        if (ebuffer.hover_object_info) {
+          // 调整物件时间戳等属性
+        } else {
+          // 未悬浮在任何物件上-更新选中框定位点
+          update_selection_area(e->pos(), e->modifiers() & Qt::ControlModifier);
+        }
+        break;
+      }
+      case MouseEditMode::PLACE_NOTE:
+      case MouseEditMode::PLACE_LONGNOTE: {
+        // 编辑谱面模式-拖动鼠标事件
+        // 仅在编辑区域触发
+        switch (cstatus.operation_area) {
+          case MouseOperationArea::EDIT: {
+            // 根据编辑方式分派编辑拖动事件
+            obj_editors[canvas_ref->working_map->project_reference->config
+                            .edit_method]
+                ->mouse_dragged(e);
+            break;
+          }
+          default: {
+            // 其他区域拖动鼠标且当前模式是编辑-自动切换模式
+            break;
+          }
+        }
+      }
+      case MouseEditMode::PLACE_TIMING: {
+        // 编辑timing的拖动事件
+        timing_editor.mouse_dragged(e);
+        break;
+      }
+      case MouseEditMode::NONE: {
+        // 观察模式
+        break;
+      }
+    }
+  }
+}
+
 // 鼠标滚动
 void MapEditor::mouse_scrolled(QWheelEvent* e) {
   // 修饰符
@@ -266,13 +338,8 @@ void MapEditor::mouse_scrolled(QWheelEvent* e) {
     case MouseOperationArea::INFO: {
       // 信息区滚动-若此位置存在拍则更新此拍分拍策略
       // 计算当前鼠标位置对应的时间戳
-      auto mouse_pos_time =
-          cstatus.current_time_stamp +
-          (ebuffer.judgeline_visual_position - canvas_ref->mouse_pos.y()) *
-              canvas_ref->working_map->project_reference->config.timeline_zoom;
-      auto beat =
-          canvas_ref->working_map->query_beat_before_time(mouse_pos_time);
-
+      auto beat = canvas_ref->working_map->query_beat_before_time(
+          cstatus.mouse_pos_time);
       if (beat) {
         beat->divisors_customed = true;
         auto res_divisors = (dy > 0 ? beat->divisors + 1 : beat->divisors - 1);

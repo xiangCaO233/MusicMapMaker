@@ -22,6 +22,32 @@ enum class MapType {
   MALODYMAP,
 };
 
+class ObjEditOperation {
+ public:
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> src_objects;
+  std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> des_objects;
+
+  ObjEditOperation reverse_clone() const {
+    ObjEditOperation reversed_operation;
+    reversed_operation.des_objects = src_objects;
+    reversed_operation.src_objects = des_objects;
+    return reversed_operation;
+  }
+};
+
+class TimingEditOperation {
+ public:
+  std::multiset<std::shared_ptr<Timing>, TimingComparator> src_timings;
+  std::multiset<std::shared_ptr<Timing>, TimingComparator> des_timings;
+
+  TimingEditOperation reverse_clone() const {
+    TimingEditOperation reversed_operation;
+    reversed_operation.des_timings = src_timings;
+    reversed_operation.src_timings = des_timings;
+    return reversed_operation;
+  }
+};
+
 class HitObject;
 class Timing;
 
@@ -83,17 +109,21 @@ class MMap {
     }
   };
 
+  // 执行操作
+  void execute_edit_operation(ObjEditOperation& operation);
+  void execute_edit_operation(TimingEditOperation& operation);
+
   // 全部拍-自动分析分拍和bpm,变速
   std::multiset<std::shared_ptr<Beat>, BeatComparator> beats;
-
-  // 从文件读取谱面
-  virtual void load_from_file(const char* path) = 0;
 
   // 生成此拍的分拍策略
   void generate_divisor_policy(const std::shared_ptr<Beat>& beat);
 
   // 擦除指定范围内的拍
   void erase_beats(double start, double end);
+
+  // 从文件读取谱面
+  virtual void load_from_file(const char* path) = 0;
 
   // 有序的添加timing-会分析并更新拍
   virtual void insert_timing(const std::shared_ptr<Timing>& timing);
