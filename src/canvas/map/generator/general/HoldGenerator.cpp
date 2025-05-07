@@ -277,17 +277,26 @@ void HoldGenerator::generate_preview(Hold &hold) {
   // 添加long_note_body
   auto head_cp = head_rect.center();
 
+  auto preview_height = editor_ref->cstatus.canvas_size.height() /
+                            editor_ref->canvas_ref->working_map
+                                ->project_reference->config.preview_time_scale +
+                        editor_ref->cstatus.static_time_offset *
+                            editor_ref->canvas_ref->working_map
+                                ->project_reference->config.timeline_zoom;
+
   // 当前面条尾y轴位置
   auto long_note_end_pos_y =
       editor_ref->ebuffer.judgeline_position -
-      // 偏移到画布中间
+      // 偏移到预览画布判定线位置
       std::abs(editor_ref->ebuffer.judgeline_position -
-               editor_ref->cstatus.canvas_size.height() / 2.0) -
+               editor_ref->cstatus.canvas_size.height() / 2.0) +
+      preview_height * (0.5 - editor_ref->csettings.judgeline_position) -
       (hold.hold_end_reference->timestamp -
        editor_ref->cstatus.current_visual_time_stamp) *
           editor_ref->canvas_ref->working_map->project_reference->config
               .timeline_zoom /
-          editor_ref->csettings.preview_time_scale;
+          editor_ref->canvas_ref->working_map->project_reference->config
+              .preview_time_scale;
 
   auto long_note_body_height = (long_note_end_pos_y - head_cp.y());
 

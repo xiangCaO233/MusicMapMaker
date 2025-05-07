@@ -41,6 +41,12 @@ struct ProjectConfig {
   // 项目偏好编辑方式
   EditMethodPreference edit_method{EditMethodPreference::IVM};
 
+  // 预览区时间倍率:实际时间范围为当前时间范围*preview_time_scale
+  double preview_time_scale{5.0};
+
+  // 默认分拍策略
+  int32_t default_divisors{1};
+
   // 使用的音频设备名
   std::string device;
 };

@@ -2,6 +2,7 @@
 #define M_BEATGENERATOR_H
 
 #include <QColor>
+#include <QRectF>
 #include <map>
 #include <memory>
 #include <queue>
@@ -40,6 +41,9 @@ class BeatGenerator {
 
   // 节拍线渲染数据队列(确定层级)
   static std::queue<TimeTextRenderData> text_queue;
+
+  // 分拍背景渲染数据队列(确定层级)
+  static std::queue<QRectF> divbg_queue;
 
   // 编辑器引用
   std::shared_ptr<MapEditor> editor_ref;

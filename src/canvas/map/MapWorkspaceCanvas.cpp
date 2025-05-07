@@ -197,7 +197,7 @@ void MapWorkspaceCanvas::mouseMoveEvent(QMouseEvent *event) {
     editor->cstatus.operation_area = MouseOperationArea::EDIT;
   } else if (editor->cstatus.preview_area.contains(mouse_pos)) {
     editor->cstatus.operation_area = MouseOperationArea::PREVIEW;
-  } else if (editor->cstatus.info_area.contains(mouse_pos)) {
+  } else {
     editor->cstatus.operation_area = MouseOperationArea::INFO;
   }
 
@@ -231,24 +231,7 @@ void MapWorkspaceCanvas::wheelEvent(QWheelEvent *event) {
   // 传递事件
   GLCanvas::wheelEvent(event);
   if (!working_map) return;
-  // 修饰符
-  auto modifiers = event->modifiers();
-
-  auto dy = event->angleDelta().y();
-  // 编辑区
-  if (modifiers & Qt::ControlModifier) {
-    // 在编辑区-按下controll滚动
-    // 修改时间线缩放
-    editor->scroll_update_timelinezoom(dy);
-    return;
-  }
-  if (modifiers & Qt::AltModifier) {
-    // 在编辑区-按下alt滚动
-    // 获取鼠标位置的拍--修改此拍分拍策略/改为自定义
-    return;
-  }
-
-  editor->update_timepos(dy, modifiers & Qt::ShiftModifier);
+  editor->mouse_scrolled(event);
 }
 
 // 键盘按下事件
@@ -315,7 +298,6 @@ void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
   // 传递事件
   GLCanvas::resizeEvent(event);
   editor->update_size(size());
-  editor->update_areas();
 }
 
 // 绘制背景
@@ -445,6 +427,7 @@ void MapWorkspaceCanvas::draw_beats() {
   if (!working_map) return;
   // 生成图形数据
   beatgenerator->generate();
+  decltype(texture_full_map.begin()) s;
 
   // 先绘制所有节拍线
   while (!BeatGenerator::line_queue.empty()) {
@@ -454,6 +437,14 @@ void MapWorkspaceCanvas::draw_beats() {
         nullptr, QColor(line.r, line.g, line.b, line.a), true);
 
     BeatGenerator::line_queue.pop();
+  }
+
+  // 绘制分拍背景
+  while (!BeatGenerator::divbg_queue.empty()) {
+    auto &divbg_bound = BeatGenerator::divbg_queue.front();
+    renderer_manager->addRoundRect(divbg_bound, nullptr,
+                                   QColor(64, 64, 64, 233), 0, 1.1, true);
+    BeatGenerator::divbg_queue.pop();
   }
 
   // 绘制所有时间字符串

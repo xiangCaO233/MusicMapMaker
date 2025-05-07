@@ -120,6 +120,9 @@ class MMap {
       std::vector<std::shared_ptr<Beat>>& result_beats, int32_t start,
       int32_t end);
 
+  // 查询指定时间之前的拍
+  virtual std::shared_ptr<Beat> query_beat_before_time(int32_t time);
+
   // 查询区间内有的物件
   virtual void query_object_in_range(
       std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>&

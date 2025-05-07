@@ -13,6 +13,9 @@ std::queue<LineRenderData> BeatGenerator::line_queue;
 // 节拍线渲染数据队列(确定层级)
 std::queue<TimeTextRenderData> BeatGenerator::text_queue;
 
+// 分拍背景渲染数据队列(确定层级)
+std::queue<QRectF> BeatGenerator::divbg_queue;
+
 // 构造BeatGenerator
 BeatGenerator::BeatGenerator(std::shared_ptr<MapEditor> editor)
     : editor_ref(editor) {}
@@ -24,6 +27,12 @@ BeatGenerator::~BeatGenerator() = default;
 void BeatGenerator::generate() {
   for (int i = 0; i < editor_ref->ebuffer.current_beats.size(); ++i) {
     auto &beat = editor_ref->ebuffer.current_beats[i];
+    if (!beat->divisors_customed) {
+      // 未单独调节过分拍策略或是读取的
+      // 应用默认分拍策略
+      beat->divisors = editor_ref->canvas_ref->working_map->project_reference
+                           ->config.default_divisors;
+    }
 
     // 每拍时间*时间线缩放=拍距
     double beat_distance =
@@ -130,5 +139,42 @@ void BeatGenerator::generate() {
         }
       }
     }
+    // 分拍策略-绘制到此拍中间位置
+    std::u32string divinfo =
+        QString("1/%1").arg(beat->divisors).toStdU32String();
+    // 计算字符串metrics
+    double divstr_width{0};
+    double divstr_height{0};
+    for (const auto &character : divinfo) {
+      auto charsize =
+          editor_ref->canvas_ref->renderer_manager->get_character_size(
+              editor_ref->canvas_ref->skin.font_family,
+              editor_ref->canvas_ref->skin.timeinfo_font_size, character);
+      divstr_width += charsize.width();
+
+      if (charsize.height() > divstr_height) {
+        divstr_height = charsize.height();
+      }
+    }
+    // 框的尺寸
+    QSizeF bound_size(
+        divstr_width + editor_ref->canvas_ref->skin.timeinfo_font_size,
+        divstr_height + editor_ref->canvas_ref->skin.timeinfo_font_size);
+    QRectF str_bound(
+        (editor_ref->cstatus.info_area.width() - bound_size.width()) / 2.0,
+        beat_start_pos - (beat_distance - bound_size.height()) / 2.0 -
+            bound_size.height(),
+        bound_size.width(), bound_size.height());
+    // 添加绘制分拍信息框到队列
+    divbg_queue.emplace(str_bound);
+    // editor_ref->canvas_ref->renderer_manager->addRoundRect(
+    //     str_bound, nullptr, QColor(64, 64, 64, 200), 0, 1.1, true);
+
+    // 添加字符串绘制到队列
+    text_queue.emplace(
+        str_bound.x() + editor_ref->canvas_ref->skin.timeinfo_font_size / 2.0,
+        str_bound.y() + editor_ref->canvas_ref->skin.timeinfo_font_size / 2.0 +
+            divstr_height,
+        divinfo);
   }
 }

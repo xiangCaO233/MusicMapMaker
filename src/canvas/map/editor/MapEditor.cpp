@@ -1,13 +1,14 @@
 #include "MapEditor.h"
 
 #include "../../../mmm/MapWorkProject.h"
-#include "../../audio/BackgroundAudio.h"
+#include "../../mmm/Beat.h"
 #include "../../mmm/map/osu/OsuMap.h"
 #include "../../mmm/map/rm/RMMap.h"
 #include "../MapWorkspaceCanvas.h"
-#include "HitObjectEditor.h"
-#include "TimingEditor.h"
-#include "editor/EditorEnumerations.h"
+#include "colorful-log.h"
+#include "edit/HitObjectEditor.h"
+#include "edit/TimingEditor.h"
+#include "info/EditorEnumerations.h"
 
 MapEditor::MapEditor(MapWorkspaceCanvas* canvas)
     : canvas_ref(canvas), obj_editor(this), timing_editor(this) {}
@@ -75,6 +76,7 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
   ebuffer.head_texture = canvas_ref->skin.get_object_texture(
       TexType::NOTE_HEAD, ObjectStatus::COMMON);
 
+  update_areas();
   if (!canvas_ref->working_map) return;
 
   // 更新轨道数
@@ -106,9 +108,9 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
   // 依据轨道宽度自动适应物件纹理尺寸
   // 物件尺寸缩放--相对于纹理尺寸
   ebuffer.width_scale =
-      (ebuffer.orbit_width * 1.2) / double(ebuffer.head_texture->width);
-  ebuffer.preview_width_scale =
-      (ebuffer.preview_orbit_width * 1.2) / double(ebuffer.head_texture->width);
+      (ebuffer.orbit_width * 1.25) / double(ebuffer.head_texture->width);
+  ebuffer.preview_width_scale = (ebuffer.preview_orbit_width * 1.25) /
+                                double(ebuffer.head_texture->width);
 
   // 不大于1--不放大纹理
   ebuffer.object_size_scale = std::min(ebuffer.width_scale, 1.0);
@@ -134,19 +136,16 @@ void MapEditor::update_areas() {
   cstatus.info_area.setHeight(cstatus.canvas_size.height());
 
   // 编辑区
-  cstatus.edit_area.setX(0);
+  cstatus.edit_area.setX(ebuffer.edit_area_start_pos_x);
   cstatus.edit_area.setY(0);
-  cstatus.edit_area.setWidth(cstatus.canvas_size.width() *
-                             (1.0 - csettings.preview_width_scale));
+  cstatus.edit_area.setWidth(ebuffer.edit_area_width);
   cstatus.edit_area.setHeight(cstatus.canvas_size.height());
 
   // 预览区
-  cstatus.preview_area.setX(cstatus.canvas_size.width() *
-                            (1.0 - csettings.preview_width_scale));
+  cstatus.preview_area.setX(ebuffer.preview_area_start_pos_x);
   cstatus.preview_area.setY(0);
-  cstatus.preview_area.setWidth(cstatus.canvas_size.width() *
-                                csettings.preview_width_scale);
-  cstatus.edit_area.setHeight(cstatus.canvas_size.height());
+  cstatus.preview_area.setWidth(ebuffer.preview_area_width);
+  cstatus.preview_area.setHeight(cstatus.canvas_size.height());
 }
 
 // 鼠标按下
@@ -160,21 +159,44 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
   }
 
   bool clear_selections{true};
-
-  // 检查并分派编辑事件
   switch (edit_mode) {
     case MouseEditMode::PLACE_NOTE:
     case MouseEditMode::PLACE_LONGNOTE: {
-      // 编辑物件模式-传递事件给物件编辑器
-      obj_editor.mouse_pressed(e);
+      // 编辑物件模式
+      // 检查鼠标区域并传递事件给物件编辑器或切换模式
+      switch (cstatus.operation_area) {
+        case MouseOperationArea::EDIT: {
+          // 使用放置物件模式-仅在编辑区触发时向编辑器分派编辑事件
+          obj_editor.mouse_pressed(e);
+          break;
+        }
+        default: {
+          // 在其他区域触发的鼠标事件直接无视
+          // TODO(xiang 2025-05-07): 若启用自动切换模式则切换
+          break;
+        }
+      }
       break;
     }
     case MouseEditMode::PLACE_TIMING: {
       // 编辑timing模式-传递事件给timing编辑器
-      timing_editor.mouse_pressed(e);
+      // 检查鼠标区域并传递事件给timing编辑器或切换模式
+      switch (cstatus.operation_area) {
+        case MouseOperationArea::INFO: {
+          // 使用放置timing模式-在信息区才传递编辑timing事件
+          timing_editor.mouse_pressed(e);
+          break;
+        }
+        default: {
+          // 在其他区域触发的鼠标事件直接无视
+          // TODO(xiang 2025-05-07): 若启用自动切换模式则切换
+          break;
+        }
+      }
       break;
     }
     case MouseEditMode::SELECT: {
+      // 选择模式-不分操作区都可触发
       clear_selections = false;
       if (e->button() == Qt::MouseButton::LeftButton) {
         // 设置状态和位置快照
@@ -186,13 +208,83 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
       break;
     }
     case MouseEditMode::NONE: {
+      // 预览模式不传递任何事件-有选择区则清空
       break;
     }
   }
+
   if (clear_selections) {
     // 其他模式直接清空选中列表
     ebuffer.selected_hitobjects.clear();
     ebuffer.selected_timingss.clear();
+  }
+}
+
+// 鼠标滚动
+void MapEditor::mouse_scrolled(QWheelEvent* e) {
+  // 修饰符
+  auto modifiers = e->modifiers();
+  auto dy = e->angleDelta().y();
+
+  switch (cstatus.operation_area) {
+    case MouseOperationArea::EDIT: {
+      // 编辑区
+      if (modifiers & Qt::ControlModifier) {
+        // 在编辑区-按下controll滚动
+        // 修改时间线缩放
+        scroll_update_timelinezoom(dy);
+        return;
+      }
+      if (modifiers & Qt::AltModifier) {
+        // 在编辑区-按下alt滚动
+        // 获取鼠标位置的拍--修改此拍分拍策略/改为自定义
+        return;
+      }
+      update_timepos(dy, modifiers & Qt::ShiftModifier);
+      break;
+    }
+    case MouseOperationArea::PREVIEW: {
+      // 预览区滚动-切换预览区时间倍率
+      double res_preview_scale = canvas_ref->working_map->project_reference
+                                     ->config.preview_time_scale +
+                                 0.2 * (dy > 0 ? 1.0 : -1.0);
+      // 限定区间2.5x~10.0x
+      if (res_preview_scale < 2.5) {
+        canvas_ref->working_map->project_reference->config.preview_time_scale =
+            2.5;
+        break;
+      }
+      if (res_preview_scale > 10.0) {
+        canvas_ref->working_map->project_reference->config.preview_time_scale =
+            10.0;
+        break;
+      }
+      canvas_ref->working_map->project_reference->config.preview_time_scale =
+          res_preview_scale;
+      break;
+    }
+    case MouseOperationArea::INFO: {
+      // 信息区滚动-若此位置存在拍则更新此拍分拍策略
+      // 计算当前鼠标位置对应的时间戳
+      auto mouse_pos_time =
+          cstatus.current_time_stamp +
+          (ebuffer.judgeline_visual_position - canvas_ref->mouse_pos.y()) *
+              canvas_ref->working_map->project_reference->config.timeline_zoom;
+      auto beat =
+          canvas_ref->working_map->query_beat_before_time(mouse_pos_time);
+
+      if (beat) {
+        beat->divisors_customed = true;
+        auto res_divisors = (dy > 0 ? beat->divisors + 1 : beat->divisors - 1);
+        if (res_divisors < 1) {
+          res_divisors = 1;
+          break;
+        }
+        beat->divisors = res_divisors;
+      }
+
+      break;
+    }
   }
 }
 
@@ -316,7 +408,7 @@ void MapEditor::scroll_magnet_to_divisor(int scrolldy) {
 // 更新谱面位置
 void MapEditor::update_timepos(int scrolldy, bool is_shift_down) {
   double temp_scroll_ration{1.0};
-  if (is_shift_down & Qt::ShiftModifier) {
+  if (is_shift_down) {
     // 在编辑区-按下shift滚动
     // 短暂增加滚动倍率
     temp_scroll_ration = 3.0;

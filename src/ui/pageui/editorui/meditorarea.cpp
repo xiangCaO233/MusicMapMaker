@@ -9,6 +9,7 @@
 #include <qwidgetaction.h>
 
 #include "../../../canvas/map/editor/MapEditor.h"
+#include "../../../mmm/MapWorkProject.h"
 #include "../../../util/mutil.h"
 #include "ui_meditorarea.h"
 
@@ -150,6 +151,7 @@ void MEditorArea::use_theme(GlobalTheme theme) {
 
 // 初始化工具按钮菜单
 void MEditorArea::initialize_toolbuttons() {
+  auto canvas = canvas_container->canvas.data();
   //
   //
   // 模式选择按钮
@@ -259,6 +261,71 @@ void MEditorArea::initialize_toolbuttons() {
   //
   //
   // 分拍策略按钮
+  // 菜单
+  auto divisormenu = new QMenu(ui->default_divisor_policy_toolbutton);
+  auto customdivosorsliderWidget = new QWidget();
+
+  // 调整倍率按钮
+  static int div_ratio = 2;
+  static int slide_ratio = 1;
+
+  auto ratio_button = new QPushButton("2");
+  ratio_button->setFlat(true);
+  ratio_button->setMinimumSize(QSize(24, 24));
+  ratio_button->setMaximumSize(QSize(24, 24));
+  ratio_button->setToolTip(tr("Change beat type"));
+
+  // 显示的分拍策略
+  auto div_res_label = new QLabel(customdivosorsliderWidget);
+  div_res_label->setText("1/2");
+
+  connect(ratio_button, &QPushButton::clicked, [=]() {
+    if (div_ratio == 2) {
+      div_ratio = 3;
+      ratio_button->setText("3");
+    } else {
+      div_ratio = 2;
+      ratio_button->setText("2");
+    }
+    auto res_div = div_ratio * slide_ratio;
+    div_res_label->setText(QString("1/%1").arg(res_div));
+    if (canvas->working_map) {
+      canvas->working_map->project_reference->config.default_divisors = res_div;
+    }
+  });
+
+  // 分拍调整滑条
+  auto divisorslider = new QSlider(Qt::Horizontal, customdivosorsliderWidget);
+  divisorslider->setMinimum(1);
+  divisorslider->setMaximum(16);
+  divisorslider->setPageStep(1);
+  divisorslider->setSingleStep(1);
+
+  connect(divisorslider, &QSlider::valueChanged, [=](int value) {
+    slide_ratio = value;
+    auto res_div = div_ratio * slide_ratio;
+    div_res_label->setText(QString("1/%1").arg(res_div));
+    if (canvas->working_map) {
+      canvas->working_map->project_reference->config.default_divisors = res_div;
+    }
+  });
+  // 布局
+  auto divmenulayout = new QHBoxLayout(customdivosorsliderWidget);
+  divmenulayout->setContentsMargins(2, 2, 2, 2);
+  divmenulayout->setSpacing(2);
+  divmenulayout->addWidget(ratio_button);
+  divmenulayout->addWidget(div_res_label);
+  divmenulayout->addWidget(divisorslider);
+  customdivosorsliderWidget->setLayout(divmenulayout);
+  // 将自定义 Widget 包装成 QWidgetAction
+  auto *divwidgetAction = new QWidgetAction(divisormenu);
+  divwidgetAction->setDefaultWidget(customdivosorsliderWidget);
+
+  // 添加到菜单
+  divisormenu->addAction(divwidgetAction);
+  // 设置分拍策略按钮菜单
+  ui->default_divisor_policy_toolbutton->setMenu(divisormenu);
+
   //
   //
   // 背景透明度调节按钮
@@ -279,7 +346,6 @@ void MEditorArea::initialize_toolbuttons() {
   bgmenulayout->addWidget(bgopacylabel);
   custombgsliderWidget->setLayout(bgmenulayout);
 
-  auto canvas = canvas_container->canvas.data();
   connect(bgslider, &QSlider::valueChanged, [=](int value) {
     bgopacylabel->setText(QString::number(value));
     canvas->editor->cstatus.background_darken_ratio =

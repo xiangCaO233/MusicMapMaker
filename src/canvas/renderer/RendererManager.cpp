@@ -331,8 +331,7 @@ QSize RendererManager::get_character_size(const std::string& font_family,
     return {0, 0};
   }
   auto w = character_it->second.xadvance / 64;
-  auto h =
-      character_it->second.size.height() + character_it->second.bearing.y();
+  auto h = character_it->second.size.height();
   return {int(w), h};
 }
 

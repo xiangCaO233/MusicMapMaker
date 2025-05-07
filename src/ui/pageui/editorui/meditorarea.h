@@ -8,7 +8,7 @@
 #include <memory>
 
 #include "../../GlobalSettings.h"
-#include "../../canvas/map/editor/EditorEnumerations.h"
+#include "../../canvas/map/editor/info/EditorEnumerations.h"
 
 class MMap;
 class CanvasContainer;

@@ -27,17 +27,21 @@ void PreviewGenerator::generate() {
   if (!editor_ref->canvas_ref->working_map) return;
   // TODO(xiang 2025-05-07): 优化性能
   // 确定区域
+
   auto area_center_time = (editor_ref->ebuffer.current_time_area_end +
                            editor_ref->ebuffer.current_time_area_start) /
                           2.0;
+
   auto parea_start_time =
       area_center_time -
       std::abs(area_center_time - editor_ref->ebuffer.current_time_area_start) *
-          editor_ref->csettings.preview_time_scale;
+          editor_ref->canvas_ref->working_map->project_reference->config
+              .preview_time_scale;
   auto parea_end_time =
       area_center_time +
       std::abs(area_center_time - editor_ref->ebuffer.current_time_area_end) *
-          editor_ref->csettings.preview_time_scale;
+          editor_ref->canvas_ref->working_map->project_reference->config
+              .preview_time_scale;
 
   // 查询此区域内所有物件
   std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> temp_objects;
@@ -76,7 +80,7 @@ void PreviewGenerator::generate() {
   editor_ref->canvas_ref->renderer_manager->texture_effect =
       TextureEffect::NONE;
 
-  // 按计算层级渲染图形
+  // 按计算层级渲染预览图形
   while (!ObjectGenerator::preview_shape_queue.empty()) {
     auto &shape = ObjectGenerator::preview_shape_queue.front();
     editor_ref->canvas_ref->renderer_manager->addRect(
@@ -94,15 +98,25 @@ void PreviewGenerator::generate() {
   editor_ref->canvas_ref->renderer_manager->addRect(
       preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75), 0, false);
 
-  // 预览区域判定线
-  auto preview_judgeline_ypos = editor_ref->cstatus.canvas_size.height() / 2.0;
-
   // 预览区当前区域
   auto preview_height = editor_ref->cstatus.canvas_size.height() /
-                            editor_ref->csettings.preview_time_scale +
+                            editor_ref->canvas_ref->working_map
+                                ->project_reference->config.preview_time_scale +
                         editor_ref->cstatus.static_time_offset *
                             editor_ref->canvas_ref->working_map
                                 ->project_reference->config.timeline_zoom;
+
+  // 预览区域判定线
+  // 居中
+  auto preview_judgeline_ypos =
+      editor_ref->cstatus.canvas_size.height() / 2.0 +
+      preview_height * (0.5 - editor_ref->csettings.judgeline_position);
+
+  // 绘制预览区域判定线
+  editor_ref->canvas_ref->renderer_manager->addLine(
+      QPointF(preview_xpos, preview_judgeline_ypos),
+      QPointF(editor_ref->cstatus.canvas_size.width(), preview_judgeline_ypos),
+      2, nullptr, QColor(0, 255, 255, 255), false);
 
   auto preview_ypos =
       preview_judgeline_ypos -

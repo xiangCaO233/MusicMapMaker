@@ -294,6 +294,30 @@ void MMap::query_timing_in_range(
   }
 }
 
+// 查询指定时间之前的拍
+std::shared_ptr<Beat> MMap::query_beat_before_time(int32_t time) {
+  auto beatdummy = std::make_shared<Beat>(200, time, time);
+  // 找到第一个大于或等于 beatdummy 的元素
+  auto it = beats.lower_bound(beatdummy);
+  if (it == beats.end()) {
+    return nullptr;
+  } else {
+    if (it->get()->start_timestamp == time) {
+      return *it;
+    } else {
+      // 找到下一拍
+      if (it == beats.begin()) {
+        // 这拍就已经是第一拍
+        return nullptr;
+      } else {
+        // 返回上一拍
+        --it;
+        return *it;
+      }
+    }
+  }
+}
+
 // 查询时间区间窗口内的拍
 void MMap::query_beat_in_range(std::vector<std::shared_ptr<Beat>>& result_beats,
                                int32_t start, const int32_t end) {

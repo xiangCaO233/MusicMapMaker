@@ -11,11 +11,11 @@
 #include <memory>
 #include <stack>
 
-#include "CanvasSettings.h"
-#include "CanvasStatus.h"
-#include "EditorBuffer.h"
-#include "editor/HitObjectEditor.h"
-#include "editor/TimingEditor.h"
+#include "edit/HitObjectEditor.h"
+#include "edit/TimingEditor.h"
+#include "info/CanvasSettings.h"
+#include "info/CanvasStatus.h"
+#include "info/EditorBuffer.h"
 
 class MapWorkspaceCanvas;
 class TextureInstace;
