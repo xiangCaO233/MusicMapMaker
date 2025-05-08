@@ -14,6 +14,23 @@ Note::Note(uint32_t time, int32_t orbit_pos)
 
 Note::~Note() {}
 
+// 深拷贝
+Note* Note::clone() {
+  auto note = new Note(timestamp, orbit);
+  note->compinfo = compinfo;
+  return note;
+}
+
+NoteInfo* Note::generate_info() {
+  auto info = new NoteInfo;
+  info->time = timestamp;
+  info->orbit = orbit;
+}
+
+// 是否为相同物件
+bool Note::equals(const Note& other) const {}
+bool Note::equals(const std::shared_ptr<Note>& other) const {}
+
 // 接收处理
 void Note::accept_generate(ObjectGenerator& generator) {
   generator.generate(*this);

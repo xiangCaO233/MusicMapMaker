@@ -26,10 +26,11 @@ void MapEditor::undo() {
   if (operation_type_stack.empty()) return;
   // 加入撤回栈
   undo_type_stack.push(operation_type_stack.top());
+
   // 根据类型调用编辑器撤回
-  switch (operation_type_stack.top()) {
+  switch (operation_type_stack.top().first) {
     case HITOBJECT: {
-      HitObjectEditor::undo();
+      obj_editors[operation_type_stack.top().second]->undo();
       break;
     }
     case TIMING: {
@@ -48,9 +49,9 @@ void MapEditor::redo() {
   // 加入操作栈
   operation_type_stack.push(undo_type_stack.top());
   // 根据类型调用编辑器撤回
-  switch (undo_type_stack.top()) {
+  switch (undo_type_stack.top().first) {
     case HITOBJECT: {
-      HitObjectEditor::redo();
+      obj_editors[operation_type_stack.top().second]->redo();
       break;
     }
     case TIMING: {
@@ -175,9 +176,11 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
           // 使用放置物件模式
           // 仅在编辑区触发时根据项目编辑偏好
           // 向编辑器分派编辑事件
-          obj_editors[canvas_ref->working_map->project_reference->config
-                          .edit_method]
-              ->mouse_pressed(e);
+          if (canvas_ref->working_map) {
+            obj_editors[canvas_ref->working_map->project_reference->config
+                            .edit_method]
+                ->mouse_pressed(e);
+          }
           break;
         }
         default: {
@@ -208,13 +211,9 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
     case MouseEditMode::SELECT: {
       // 选择模式-不分操作区都可触发
       clear_selections = false;
-      if (e->button() == Qt::MouseButton::LeftButton) {
-        // 设置状态和位置快照
-        cstatus.mouse_left_pressed = true;
-        cstatus.mouse_left_press_pos = e->pos();
-        // 更新选中信息
-        update_selections(e->modifiers() & Qt::ControlModifier);
-      }
+      // 未悬浮在任何物件上
+      // 更新选中信息
+      update_selections(e->modifiers() & Qt::ControlModifier);
       break;
     }
     case MouseEditMode::NONE: {
@@ -230,13 +229,73 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
   }
 }
 
+void MapEditor::mouse_released(QMouseEvent* e) {
+  // 鼠标按键释放
+  switch (edit_mode) {
+    case MouseEditMode::PLACE_NOTE:
+    case MouseEditMode::PLACE_LONGNOTE: {
+      // 编辑物件模式
+      // 检查鼠标区域并传递事件给物件编辑器或切换模式
+      switch (cstatus.operation_area) {
+        case MouseOperationArea::EDIT: {
+          // 使用放置物件模式
+          // 仅在编辑区触发时根据项目编辑偏好
+          // 向编辑器分派编辑事件
+          if (canvas_ref->working_map) {
+            obj_editors[canvas_ref->working_map->project_reference->config
+                            .edit_method]
+                ->mouse_released(e);
+          }
+          break;
+        }
+        default: {
+          // 在其他区域触发的鼠标事件直接无视
+          // TODO(xiang 2025-05-07): 若启用自动切换模式则切换
+          break;
+        }
+      }
+      break;
+    }
+    case MouseEditMode::PLACE_TIMING: {
+      // 编辑timing模式-传递事件给timing编辑器
+      // 检查鼠标区域并传递事件给timing编辑器或切换模式
+      switch (cstatus.operation_area) {
+        case MouseOperationArea::INFO: {
+          // 使用放置timing模式-在信息区才传递编辑timing事件
+          timing_editor.mouse_pressed(e);
+          break;
+        }
+        default: {
+          // 在其他区域触发的鼠标事件直接无视
+          // TODO(xiang 2025-05-07): 若启用自动切换模式则切换
+          break;
+        }
+      }
+      break;
+    }
+    case MouseEditMode::SELECT: {
+      break;
+    }
+  }
+}
+
 // 鼠标移动
 void MapEditor::mouse_moved(QMouseEvent* e) {
   // 更新鼠标位置的对应时间戳
   cstatus.mouse_pos_time =
       cstatus.current_time_stamp +
       (ebuffer.judgeline_visual_position - canvas_ref->mouse_pos.y()) *
-          canvas_ref->working_map->project_reference->config.timeline_zoom;
+          (canvas_ref->working_map ? canvas_ref->working_map->project_reference
+                                         ->config.timeline_zoom
+                                   : 1.0);
+  // XINFO(QString("mouse_time:[%1]").arg(cstatus.mouse_pos_time).toStdString());
+  // 更新鼠标位置的对应轨道
+  auto pos_off = (e->pos().x() - ebuffer.edit_area_start_pos_x);
+  if (pos_off < 0 || pos_off > ebuffer.edit_area_width) {
+    cstatus.mouse_pos_orbit = -1;
+  } else {
+    cstatus.mouse_pos_orbit = pos_off / ebuffer.orbit_width;
+  }
 
   // 更新鼠标操作区
   if (cstatus.edit_area.contains(canvas_ref->mouse_pos)) {
@@ -251,14 +310,10 @@ void MapEditor::mouse_moved(QMouseEvent* e) {
     // 正在拖动
     switch (edit_mode) {
       case MouseEditMode::SELECT: {
-        // 选择模式-更新选中信息-不区分区域
-        // 正悬浮在物件上
-        if (ebuffer.hover_object_info) {
-          // 调整物件时间戳等属性
-        } else {
-          // 未悬浮在任何物件上-更新选中框定位点
-          update_selection_area(e->pos(), e->modifiers() & Qt::ControlModifier);
-        }
+        // 选择模式
+        // 更新选中信息-不区分区域
+        // 未悬浮在任何物件上-更新选中框定位点
+        update_selection_area(e->pos(), e->modifiers() & Qt::ControlModifier);
         break;
       }
       case MouseEditMode::PLACE_NOTE:
@@ -268,9 +323,11 @@ void MapEditor::mouse_moved(QMouseEvent* e) {
         switch (cstatus.operation_area) {
           case MouseOperationArea::EDIT: {
             // 根据编辑方式分派编辑拖动事件
-            obj_editors[canvas_ref->working_map->project_reference->config
-                            .edit_method]
-                ->mouse_dragged(e);
+            if (canvas_ref->working_map) {
+              obj_editors[canvas_ref->working_map->project_reference->config
+                              .edit_method]
+                  ->mouse_dragged(e);
+            }
             break;
           }
           default: {
@@ -337,17 +394,22 @@ void MapEditor::mouse_scrolled(QWheelEvent* e) {
     }
     case MouseOperationArea::INFO: {
       // 信息区滚动-若此位置存在拍则更新此拍分拍策略
-      // 计算当前鼠标位置对应的时间戳
-      auto beat = canvas_ref->working_map->query_beat_before_time(
+      auto beats = canvas_ref->working_map->query_beat_before_time(
           cstatus.mouse_pos_time);
-      if (beat) {
-        beat->divisors_customed = true;
-        auto res_divisors = (dy > 0 ? beat->divisors + 1 : beat->divisors - 1);
-        if (res_divisors < 1) {
-          res_divisors = 1;
-          break;
+
+      for (const auto& beat : beats) {
+        // 只修改所处的拍
+        if (beat->start_timestamp < cstatus.mouse_pos_time &&
+            beat->end_timestamp > cstatus.mouse_pos_time) {
+          beat->divisors_customed = true;
+          auto res_divisors =
+              (dy > 0 ? beat->divisors + 1 : beat->divisors - 1);
+          if (res_divisors < 1) {
+            res_divisors = 1;
+            break;
+          }
+          beat->divisors = res_divisors;
         }
-        beat->divisors = res_divisors;
       }
 
       break;

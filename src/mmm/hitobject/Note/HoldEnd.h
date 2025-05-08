@@ -23,6 +23,11 @@ class HoldEnd : public HitObject {
   // 打印用
   std::string toString() override;
 
+  // 深拷贝
+  HoldEnd* clone() override;
+
+  ObjectInfo* generate_info() override;
+
   // 比较器使用
   bool lessThan(const HitObject* other) const override;
 };

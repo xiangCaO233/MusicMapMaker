@@ -14,3 +14,6 @@ std::string ComplexNote::toString() {
          ", orbit=" + std::to_string(orbit) +
          ", child_count=" + std::to_string(child_notes.size()) + "}";
 }
+
+// 深拷贝
+ComplexNote* ComplexNote::clone() { return nullptr; }

@@ -165,6 +165,14 @@ void MapWorkspaceCanvas::updateFpsDisplay(int fps) {
 void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mousePressEvent(event);
+
+  switch (event->button()) {
+    case Qt::MouseButton::LeftButton: {
+      editor->cstatus.mouse_left_pressed = true;
+      editor->cstatus.mouse_left_press_pos = event->pos();
+    }
+  }
+
   editor->mouse_pressed(event);
 
   // qDebug() << event->button();
@@ -174,6 +182,9 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
 void MapWorkspaceCanvas::mouseReleaseEvent(QMouseEvent *event) {
   // 传递事件
   GLCanvas::mouseReleaseEvent(event);
+
+  editor->mouse_released(event);
+
   switch (event->button()) {
     case Qt::MouseButton::LeftButton: {
       editor->cstatus.mouse_left_pressed = false;
@@ -474,14 +485,15 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
 }
 
 // 绘制物件
-void MapWorkspaceCanvas::draw_hitobject() {
-  if (!working_map) return;
+void MapWorkspaceCanvas::draw_hitobject(
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> &objects,
+    HitObjectEffect e) {
   // 防止重复绘制
   std::unordered_map<std::shared_ptr<HitObject>, bool> drawed_objects;
 
   // 渲染物件
   // 计算图形
-  for (const auto &obj : editor->ebuffer.buffer_objects) {
+  for (const auto &obj : objects) {
     if (!obj->is_note || obj->object_type == HitObjectType::RMCOMPLEX) continue;
     auto note = std::static_pointer_cast<Note>(obj);
     if (!note) continue;
@@ -505,6 +517,21 @@ void MapWorkspaceCanvas::draw_hitobject() {
   // 切换纹理绘制补齐方式为重采样
   renderer_manager->texture_complementmode =
       TextureComplementMode::REPEAT_TEXTURE;
+
+  // 切换纹理填充效果
+  TextureEffect effect;
+  switch (e) {
+    case HitObjectEffect::NORMAL: {
+      effect = TextureEffect::NONE;
+      break;
+    }
+    case HitObjectEffect::SHADOW: {
+      effect = TextureEffect::HALF_TRANSPARENT;
+      break;
+    }
+  }
+  renderer_manager->texture_effect = effect;
+
   // 按计算层级渲染图形
   while (!ObjectGenerator::shape_queue.empty()) {
     auto &shape = ObjectGenerator::shape_queue.front();
@@ -531,14 +558,6 @@ void MapWorkspaceCanvas::draw_hitobject() {
     renderer_manager->texture_effect = TextureEffect::NONE;
     ObjectGenerator::shape_queue.pop();
   }
-
-  // 更新hover信息
-  if (!editor->cstatus.is_hover_note) {
-    // 未悬浮在任何一个物件或物件身体上
-    editor->ebuffer.hover_object_info = nullptr;
-  } else {
-    editor->cstatus.is_hover_note = false;
-  }
 }
 
 // 渲染实际图形
@@ -560,8 +579,39 @@ void MapWorkspaceCanvas::push_shape() {
         int32_t(editor->ebuffer.current_time_area_start),
         int32_t(editor->ebuffer.current_time_area_end), true);
 
-    // 绘制物件
-    draw_hitobject();
+    for (const auto &[type, obj_editor] : editor->obj_editors) {
+      // 不显示编辑中的物件-移除
+      for (const auto &o : obj_editor->editing_src_objects) {
+        auto it = editor->ebuffer.buffer_objects.lower_bound(o);
+        if (it != editor->ebuffer.buffer_objects.end() && *it == o) {
+          XWARN(QString("隐藏编辑中的源物件:[%1]")
+                    .arg(it->get()->timestamp)
+                    .toStdString());
+          editor->ebuffer.buffer_objects.erase(it);
+        }
+      }
+    }
+
+    // 绘制map原本的物件
+    draw_hitobject(editor->ebuffer.buffer_objects, HitObjectEffect::NORMAL);
+    // 更新hover信息
+    if (!editor->cstatus.is_hover_note) {
+      // 未悬浮在任何一个物件或物件身体上
+      editor->ebuffer.hover_object_info = nullptr;
+    } else {
+      editor->cstatus.is_hover_note = false;
+    }
+
+    // 绘制虚影物件-编辑缓存
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> editbuffers;
+    for (const auto &[type, obj_editor] : editor->obj_editors) {
+      if (obj_editor->editing_temp_objects.empty()) continue;
+      for (const auto &temp_shadow_obj : obj_editor->editing_temp_objects) {
+        editbuffers.insert(temp_shadow_obj);
+      }
+    }
+    draw_hitobject(editbuffers, HitObjectEffect::SHADOW);
+
     renderer_manager->texture_effect = TextureEffect::NONE;
   }
 

@@ -11,6 +11,7 @@
 #include "../hitobject/Note/Note.h"
 #include "../hitobject/Note/rm/ComplexNote.h"
 #include "../timing/Timing.h"
+#include "colorful-log.h"
 
 MMap::MMap() {
   // 初始化播放回调对象
@@ -21,9 +22,30 @@ MMap::~MMap() = default;
 
 // 执行操作
 void MMap::execute_edit_operation(ObjEditOperation& operation) {
-  // 移除src的物件--包括面尾,滑尾,不完全的组合键
+  // TODO(xiang 2025-05-08): 实现执行操作
 
-  // 插入des的物件--检查组合键类型-且只插入一个组合键
+  // 移除src的物件
+  if (!operation.src_objects.empty()) {
+    // 大于等于src第一个物件的物件迭代器
+    for (const auto& srcobj : operation.src_objects) {
+      auto it = hitobjects.lower_bound(srcobj);
+      if (it != hitobjects.end() && *it == srcobj) {
+        XWARN(QString("移除map源物件:t[%1]")
+                  .arg(it->get()->timestamp)
+                  .toStdString());
+        hitobjects.erase(it);
+      }
+    }
+  }
+
+  // 插入des的物件
+  if (!operation.des_objects.empty()) {
+    for (const auto& obj : operation.des_objects) {
+      // 添加处若有完全相同的物件-取消此次添加
+      hitobjects.insert(obj);
+      XWARN(QString("添加map目标物件:t[%1]").arg(obj->timestamp).toStdString());
+    }
+  }
 }
 
 void MMap::execute_edit_operation(TimingEditOperation& operation) {}
@@ -304,24 +326,51 @@ void MMap::query_timing_in_range(
 }
 
 // 查询指定时间之前的拍
-std::shared_ptr<Beat> MMap::query_beat_before_time(int32_t time) {
+std::list<std::shared_ptr<Beat>> MMap::query_beat_before_time(int32_t time) {
+  if (beats.empty()) return {};
+
   auto beatdummy = std::make_shared<Beat>(200, time, time);
   // 找到第一个大于或等于 beatdummy 的元素
   auto it = beats.lower_bound(beatdummy);
   if (it == beats.end()) {
-    return nullptr;
+    // 找不到比当前时间还靠后的拍
+    // 看上一拍是否存在(500ms内)
+    --it;
+    if (std::abs(it->get()->end_timestamp - time) < 500) {
+      return {*it};
+    } else {
+      return {};
+    }
   } else {
     if (it->get()->start_timestamp == time) {
-      return *it;
-    } else {
-      // 找到下一拍
-      if (it == beats.begin()) {
-        // 这拍就已经是第一拍
-        return nullptr;
+      // 鼠标位置已经有一拍
+      std::list<std::shared_ptr<Beat>> list = {*it};
+      ++it;
+      // 检查下一拍
+      if (it == beats.end()) {
+        // 不存在下一拍(最后一拍了)
       } else {
-        // 返回上一拍
+        // 添加下一拍
+        list.emplace_back(*it);
+      }
+
+      return list;
+    } else {
+      // 找到鼠标位置后的下一拍
+      if (it == beats.begin()) {
+        // 下拍就已经是第一拍
+        // 500ms内返回此拍-否则不返回
+        if (std::abs(it->get()->start_timestamp - time) < 500) {
+          return {*it};
+        } else {
+          return {};
+        }
+      } else {
+        // 返回此拍和上一拍
+        std::list<std::shared_ptr<Beat>> list = {*it};
         --it;
-        return *it;
+        list.emplace_back(*it);
+        return list;
       }
     }
   }

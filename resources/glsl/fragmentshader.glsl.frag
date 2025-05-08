@@ -397,7 +397,7 @@ void main() {
     }
     case HALF_TRANSPARENT: {
       // 实现1/4半透明特效
-      FragColor = vec4(texture_color.rgb, texture_color.a * 0.25);
+      FragColor = vec4(texture_color.rgb, texture_color.a * 0.5);
       break;
     }
     default:

@@ -13,6 +13,9 @@ TimingEditor::~TimingEditor() {}
 // 鼠标按下事件-传递
 void TimingEditor::mouse_pressed(QMouseEvent* e) {}
 
+// 鼠标释放事件-传递
+void TimingEditor::mouse_released(QMouseEvent* e) {}
+
 // 鼠标拖动事件-传递
 void TimingEditor::mouse_dragged(QMouseEvent* e) {}
 

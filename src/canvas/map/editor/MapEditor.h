@@ -11,6 +11,7 @@
 #include <memory>
 #include <stack>
 #include <unordered_map>
+#include <utility>
 
 #include "edit/TimingEditor.h"
 #include "editor/edit/IVMObjectEditor.h"
@@ -62,9 +63,11 @@ class MapEditor {
   TimingEditor timing_editor;
 
   // 操作类型栈
-  std::stack<EditOperationType> operation_type_stack;
+  std::stack<std::pair<EditOperationType, EditMethodPreference>>
+      operation_type_stack;
   // 撤回类型栈
-  std::stack<EditOperationType> undo_type_stack;
+  std::stack<std::pair<EditOperationType, EditMethodPreference>>
+      undo_type_stack;
 
   // 撤销
   void undo();
@@ -78,6 +81,7 @@ class MapEditor {
   void mouse_moved(QMouseEvent* e);
   // 鼠标按下
   void mouse_pressed(QMouseEvent* e);
+  void mouse_released(QMouseEvent* e);
 
   // 其他实现函数
   // 画布更新尺寸

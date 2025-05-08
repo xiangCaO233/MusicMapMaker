@@ -91,8 +91,17 @@ class MapWorkspaceCanvas : public GLCanvas {
   // 绘制拍
   void draw_beats();
 
+  enum class HitObjectEffect {
+    // 通常模式
+    NORMAL,
+    // 虚影模式
+    SHADOW,
+  };
+
   // 绘制物件
-  void draw_hitobject();
+  void draw_hitobject(
+      std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> &objects,
+      HitObjectEffect e);
 
   // 绘制顶部栏
   void draw_top_bar();

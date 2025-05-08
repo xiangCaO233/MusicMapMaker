@@ -10,6 +10,25 @@ Hold::Hold(uint32_t time, int32_t orbit_pos, uint32_t holdtime)
 
 Hold::~Hold() = default;
 
+// 深拷贝
+Hold* Hold::clone() {
+  auto hold = new Hold(timestamp, orbit, hold_time);
+  hold->compinfo = compinfo;
+  return hold;
+}
+HoldInfo* Hold::generate_info() {
+  auto info = new HoldInfo;
+  info->time = timestamp;
+  info->orbit = orbit;
+  info->hold_time = hold_time;
+  return info;
+}
+
+// 是否为相同物件
+bool Hold::equals(const Note& other) const {}
+
+bool Hold::equals(const std::shared_ptr<Note>& other) const {}
+
 // 接收处理
 void Hold::accept_generate(ObjectGenerator& generator) {
   generator.generate(*this);

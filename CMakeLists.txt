@@ -144,6 +144,10 @@ set(PROJECT_SOURCES
   src/canvas/map/editor/info/CanvasSettings.h
   src/canvas/map/editor/edit/HitObjectEditor.h
   src/canvas/map/editor/edit/HitObjectEditor.cpp
+	src/canvas/map/editor/edit/IVMObjectEditor.h
+	src/canvas/map/editor/edit/IVMObjectEditor.cpp
+	src/canvas/map/editor/edit/MMMObjectEditor.h
+	src/canvas/map/editor/edit/MMMObjectEditor.cpp
   src/canvas/map/editor/edit/TimingEditor.h
   src/canvas/map/editor/edit/TimingEditor.cpp
   src/canvas/map/generator/ObjectGenerator.h

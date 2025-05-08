@@ -12,5 +12,8 @@ MMMObjectEditor::~MMMObjectEditor() = default;
 // 鼠标按下事件-传递
 void MMMObjectEditor::mouse_pressed(QMouseEvent* e) {}
 
+// 鼠标释放事件-传递
+void MMMObjectEditor::mouse_released(QMouseEvent* e) {}
+
 // 鼠标拖动事件-传递
 void MMMObjectEditor::mouse_dragged(QMouseEvent* e) {}

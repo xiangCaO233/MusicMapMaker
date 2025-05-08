@@ -34,6 +34,9 @@ struct CanvasStatus {
   // 鼠标y轴位置对应的时间戳-实时更新
   double mouse_pos_time;
 
+  // 鼠标x轴位置对应的轨道-实时更新
+  int32_t mouse_pos_orbit;
+
   // 区域
   // 鼠标左键按下时的快照位置
   QPointF mouse_left_press_pos;

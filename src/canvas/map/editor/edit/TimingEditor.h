@@ -25,6 +25,7 @@ class TimingEditor {
 
   // 鼠标按下事件-传递
   virtual void mouse_pressed(QMouseEvent* e);
+  virtual void mouse_released(QMouseEvent* e);
 
   // 鼠标拖动事件-传递
   virtual void mouse_dragged(QMouseEvent* e);

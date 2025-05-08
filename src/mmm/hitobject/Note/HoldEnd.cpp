@@ -9,6 +9,15 @@ HoldEnd::HoldEnd(const std::shared_ptr<Hold>& hold)
 
 HoldEnd::~HoldEnd() = default;
 
+// 深拷贝
+HoldEnd* HoldEnd::clone() { return nullptr; }
+
+ObjectInfo* HoldEnd::generate_info() {
+  auto info = new ObjectInfo;
+  info->time = timestamp;
+  return info;
+}
+
 // 接收处理
 // 面尾不处理
 void HoldEnd::accept_generate(ObjectGenerator& generator) {}

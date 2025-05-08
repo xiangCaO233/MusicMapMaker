@@ -2,6 +2,7 @@
 #define M_MAP_H
 
 #include <filesystem>
+#include <list>
 #include <memory>
 #include <set>
 #include <string>
@@ -151,7 +152,7 @@ class MMap {
       int32_t end);
 
   // 查询指定时间之前的拍
-  virtual std::shared_ptr<Beat> query_beat_before_time(int32_t time);
+  virtual std::list<std::shared_ptr<Beat>> query_beat_before_time(int32_t time);
 
   // 查询区间内有的物件
   virtual void query_object_in_range(

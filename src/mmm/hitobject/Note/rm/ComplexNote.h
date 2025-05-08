@@ -19,6 +19,9 @@ class ComplexNote : public Note {
 
   // 打印用
   std::string toString() override;
+
+  // 深拷贝
+  virtual ComplexNote* clone() override;
 };
 
 #endif  // M_COMPLEXNOTE_H

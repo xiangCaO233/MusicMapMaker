@@ -7,6 +7,12 @@
 
 class HoldEnd;
 
+class HoldInfo : public NoteInfo {
+ public:
+  // 持续时间
+  double hold_time;
+};
+
 // 长条
 class Hold : public Note {
  public:
@@ -26,6 +32,15 @@ class Hold : public Note {
 
   // 打印用
   std::string toString() override;
+
+  // 深拷贝
+  virtual Hold* clone() override;
+
+  virtual HoldInfo* generate_info() override;
+
+  // 是否为相同物件
+  bool equals(const Note& other) const override;
+  bool equals(const std::shared_ptr<Note>& other) const override;
 
   // 比较器使用
   bool lessThan(const HitObject* other) const override;
