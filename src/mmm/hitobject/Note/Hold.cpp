@@ -1,6 +1,7 @@
 #include "Hold.h"
 
 #include "../../canvas/map/generator/ObjectGenerator.h"
+#include "HoldEnd.h"
 
 Hold::Hold(uint32_t time, int32_t orbit_pos, uint32_t holdtime)
     : Note(time, orbit_pos), hold_time(holdtime) {
@@ -14,6 +15,9 @@ Hold::~Hold() = default;
 Hold* Hold::clone() {
   auto hold = new Hold(timestamp, orbit, hold_time);
   hold->compinfo = compinfo;
+  hold->hold_end_reference =
+      std::shared_ptr<HoldEnd>(hold_end_reference->clone());
+  hold->hold_end_reference->reference = hold;
   return hold;
 }
 

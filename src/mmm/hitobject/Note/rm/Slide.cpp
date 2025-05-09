@@ -40,6 +40,9 @@ std::string Slide::toString() {
 Slide* Slide::clone() {
   auto slide = new Slide(timestamp, orbit, slide_parameter);
   slide->compinfo = compinfo;
+  slide->slide_end_reference =
+      std::shared_ptr<SlideEnd>(slide_end_reference->clone());
+  slide->slide_end_reference->reference = slide;
   return slide;
 }
 
@@ -120,7 +123,12 @@ std::string SlideEnd::toString() {
 }
 
 // 深拷贝
-SlideEnd* SlideEnd::clone() { return nullptr; }
+SlideEnd* SlideEnd::clone() { return new SlideEnd(*this); }
 
 // 是否为相同物件
-bool SlideEnd::equals(const std::shared_ptr<HitObject>& other) const {}
+bool SlideEnd::equals(const std::shared_ptr<HitObject>& other) const {
+  if (object_type != other->object_type) return false;
+  auto osend = std::static_pointer_cast<SlideEnd>(other);
+  return timestamp == other->timestamp && endorbit == osend->endorbit &&
+         reference == osend->reference;
+}

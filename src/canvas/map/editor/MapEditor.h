@@ -50,7 +50,7 @@ class MapEditor {
   EditorBuffer ebuffer;
 
   // 鼠标当前的编辑模式
-  MouseEditMode edit_mode;
+  MouseEditMode edit_mode{MouseEditMode::NONE};
 
   // 编辑方式-ivm或mmm
   EditMethodPreference edit_method;

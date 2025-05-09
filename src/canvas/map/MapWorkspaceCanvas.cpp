@@ -226,7 +226,8 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_1:
     case Qt::Key_2:
     case Qt::Key_3:
-    case Qt::Key_4: {
+    case Qt::Key_4:
+    case Qt::Key_5: {
       // 快速切换编辑模式
       editor->edit_mode = static_cast<MouseEditMode>(keycode - Qt::Key_0);
       emit switch_edit_mode(editor->edit_mode);
@@ -535,27 +536,32 @@ void MapWorkspaceCanvas::draw_hitobject(
   // 按计算层级渲染图形
   while (!ObjectGenerator::shape_queue.empty()) {
     auto &shape = ObjectGenerator::shape_queue.front();
-    if (editor->csettings.show_object_after_judgeline) {
-      if (shape.is_over_current_time) {
-        renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
-      }
-      if (!editor->cstatus.canvas_pasued && shape.objref &&
-          shape.objref->timestamp <= editor->cstatus.current_time_stamp) {
-        // 播放中且过了判定线时间使用半透明效果
-        renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
-      }
+    if (e == HitObjectEffect::NORMAL) {
+      if (editor->csettings.show_object_after_judgeline) {
+        if (shape.is_over_current_time) {
+          renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
+        }
+        if (!editor->cstatus.canvas_pasued && shape.objref &&
+            shape.objref->timestamp <= editor->cstatus.current_time_stamp) {
+          // 播放中且过了判定线时间使用半透明效果
+          renderer_manager->texture_effect = TextureEffect::HALF_TRANSPARENT;
+        }
 
-      renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
-                                shape.tex, QColor(0, 0, 0, 255), 0, true);
-    } else {
-      if (!editor->cstatus.canvas_pasued && shape.objref &&
-          shape.objref->timestamp <= editor->cstatus.current_time_stamp) {
-      } else {
         renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
                                   shape.tex, QColor(0, 0, 0, 255), 0, true);
+      } else {
+        if (!editor->cstatus.canvas_pasued && shape.objref &&
+            shape.objref->timestamp <= editor->cstatus.current_time_stamp) {
+        } else {
+          renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
+                                    shape.tex, QColor(0, 0, 0, 255), 0, true);
+        }
       }
+      renderer_manager->texture_effect = TextureEffect::NONE;
+    } else {
+      renderer_manager->addRect(QRectF(shape.x, shape.y, shape.w, shape.h),
+                                shape.tex, QColor(0, 0, 0, 255), 0, true);
     }
-    renderer_manager->texture_effect = TextureEffect::NONE;
     ObjectGenerator::shape_queue.pop();
   }
 }

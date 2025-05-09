@@ -10,7 +10,7 @@ HoldEnd::HoldEnd(const std::shared_ptr<Hold>& hold)
 HoldEnd::~HoldEnd() = default;
 
 // 深拷贝
-HoldEnd* HoldEnd::clone() { return nullptr; }
+HoldEnd* HoldEnd::clone() { return new HoldEnd(*this); }
 
 // 是否为相同物件
 bool HoldEnd::equals(const std::shared_ptr<HitObject>& other) const {

@@ -2,9 +2,8 @@
 #define M_IVMOBJECTEDITOR_H
 
 #include <memory>
-#include <unordered_map>
 
-#include "editor/edit/HitObjectEditor.h"
+#include "HitObjectEditor.h"
 
 class IVMObjectEditor : public HitObjectEditor {
  public:
@@ -17,10 +16,19 @@ class IVMObjectEditor : public HitObjectEditor {
   bool long_note_edit_mode{false};
 
   // 正在编辑的物件
-  std::shared_ptr<HitObject> current_edit_object;
+  std::shared_ptr<HitObject> current_edit_object{nullptr};
+
+  // 正在编辑的组合物件
+  std::shared_ptr<ComplexNote> current_edit_complex{nullptr};
 
   // 正在编辑的物件信息快照
   std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> info_shortcuts;
+
+  // 更新正编辑的当前组合键
+  void update_current_comp();
+
+  // 结束编辑-生成可撤回操作入栈
+  void end_edit();
 
   // 鼠标按下事件-传递
   void mouse_pressed(QMouseEvent* e) override;
