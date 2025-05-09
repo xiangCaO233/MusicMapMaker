@@ -29,7 +29,20 @@ void MMap::execute_edit_operation(ObjEditOperation& operation) {
     // 大于等于src第一个物件的物件迭代器
     for (const auto& srcobj : operation.src_objects) {
       auto it = hitobjects.lower_bound(srcobj);
-      if (it != hitobjects.end() && *it == srcobj) {
+      bool remove{false};
+      // 前移到上一时间戳
+      while (it != hitobjects.begin() &&
+             srcobj->timestamp - it->get()->timestamp < 10)
+        --it;
+      while (it != hitobjects.end() &&
+             (it->get()->timestamp - srcobj->timestamp) < 5) {
+        if (it->get()->equals(srcobj)) {
+          remove = true;
+          break;
+        }
+        ++it;
+      }
+      if (remove) {
         XWARN(QString("移除map源物件:t[%1]")
                   .arg(it->get()->timestamp)
                   .toStdString());
@@ -42,8 +55,29 @@ void MMap::execute_edit_operation(ObjEditOperation& operation) {
   if (!operation.des_objects.empty()) {
     for (const auto& obj : operation.des_objects) {
       // 添加处若有完全相同的物件-取消此次添加
-      hitobjects.insert(obj);
-      XWARN(QString("添加map目标物件:t[%1]").arg(obj->timestamp).toStdString());
+      bool add{true};
+      auto it = hitobjects.lower_bound(obj);
+      // 前移到上一时间戳
+      while (it != hitobjects.begin() &&
+             obj->timestamp - it->get()->timestamp < 10)
+        --it;
+      while (it != hitobjects.end() &&
+             (it->get()->timestamp - obj->timestamp) < 5) {
+        if (it->get()->equals(obj)) {
+          add = false;
+          break;
+        }
+        ++it;
+      }
+      if (add) {
+        hitobjects.insert(obj);
+        XWARN(
+            QString("添加map目标物件:t[%1]").arg(obj->timestamp).toStdString());
+      } else {
+        XWARN(QString("t[%1]已有物件,跳过添加")
+                  .arg(obj->timestamp)
+                  .toStdString());
+      }
     }
   }
 }

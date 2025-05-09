@@ -12,10 +12,11 @@ HoldEnd::~HoldEnd() = default;
 // 深拷贝
 HoldEnd* HoldEnd::clone() { return nullptr; }
 
-ObjectInfo* HoldEnd::generate_info() {
-  auto info = new ObjectInfo;
-  info->time = timestamp;
-  return info;
+// 是否为相同物件
+bool HoldEnd::equals(const std::shared_ptr<HitObject>& other) const {
+  if (other->object_type != object_type) return false;
+  auto end = std::static_pointer_cast<HoldEnd>(other);
+  return std::abs(timestamp - end->timestamp) < 5;
 }
 
 // 接收处理

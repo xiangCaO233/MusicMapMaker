@@ -8,12 +8,6 @@
 
 class SlideEnd;
 
-class SlideInfo : public NoteInfo {
- public:
-  // 正右负左,绝对值为滑动的轨道数
-  int32_t slide_parameter;
-};
-
 // 滑键
 class Slide : public Note {
  public:
@@ -39,11 +33,8 @@ class Slide : public Note {
   // 深拷贝
   virtual Slide* clone() override;
 
-  virtual SlideInfo* generate_info() override;
-
   // 是否为相同物件
-  bool equals(const Note& other) const override;
-  bool equals(const std::shared_ptr<Note>& other) const override;
+  bool equals(const std::shared_ptr<HitObject>& other) const override;
 
   // 比较器使用
   bool lessThan(const HitObject* other) const override;
@@ -72,7 +63,8 @@ class SlideEnd : public HitObject {
 
   // 深拷贝
   virtual SlideEnd* clone() override;
-  ObjectInfo* generate_info() override;
+  // 是否为相同物件
+  bool equals(const std::shared_ptr<HitObject>& other) const override;
 
   // 比较器使用
   bool lessThan(const HitObject* other) const override;

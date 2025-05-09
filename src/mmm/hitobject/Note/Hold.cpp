@@ -16,18 +16,16 @@ Hold* Hold::clone() {
   hold->compinfo = compinfo;
   return hold;
 }
-HoldInfo* Hold::generate_info() {
-  auto info = new HoldInfo;
-  info->time = timestamp;
-  info->orbit = orbit;
-  info->hold_time = hold_time;
-  return info;
-}
 
 // 是否为相同物件
-bool Hold::equals(const Note& other) const {}
-
-bool Hold::equals(const std::shared_ptr<Note>& other) const {}
+bool Hold::equals(const std::shared_ptr<HitObject>& other) const {
+  auto onote = std::dynamic_pointer_cast<Note>(other);
+  if (!onote) return false;
+  if (note_type != onote->note_type) return false;
+  auto ohold = std::static_pointer_cast<Hold>(onote);
+  return std::abs(timestamp - ohold->timestamp) < 5 && orbit == ohold->orbit &&
+         std::fabs(hold_time - ohold->hold_time) < 5;
+}
 
 // 接收处理
 void Hold::accept_generate(ObjectGenerator& generator) {

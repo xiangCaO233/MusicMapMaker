@@ -583,7 +583,20 @@ void MapWorkspaceCanvas::push_shape() {
       // 不显示编辑中的物件-移除
       for (const auto &o : obj_editor->editing_src_objects) {
         auto it = editor->ebuffer.buffer_objects.lower_bound(o);
-        if (it != editor->ebuffer.buffer_objects.end() && *it == o) {
+        bool remove{false};
+        // 前移到上一时间戳
+        while (it != editor->ebuffer.buffer_objects.begin() &&
+               o->timestamp - it->get()->timestamp < 10)
+          --it;
+        while (it != editor->ebuffer.buffer_objects.end() &&
+               (it->get()->timestamp - o->timestamp) < 5) {
+          if (it->get()->equals(o)) {
+            remove = true;
+            break;
+          }
+          ++it;
+        }
+        if (remove) {
           XWARN(QString("隐藏编辑中的源物件:[%1]")
                     .arg(it->get()->timestamp)
                     .toStdString());

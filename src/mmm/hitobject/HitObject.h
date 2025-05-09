@@ -20,11 +20,6 @@ enum class HitObjectType {
   RMCOMPLEX,
 };
 
-class ObjectInfo {
- public:
-  double time;
-};
-
 // 打击物件
 class HitObject {
  public:
@@ -61,10 +56,11 @@ class HitObject {
   // 深拷贝
   virtual HitObject* clone() = 0;
 
+  // 判同
+  virtual bool equals(const std::shared_ptr<HitObject>& other) const = 0;
+
   // 比较器使用
   virtual bool lessThan(const HitObject* other) const = 0;
-
-  virtual ObjectInfo* generate_info() = 0;
 };
 
 // 物件比较器

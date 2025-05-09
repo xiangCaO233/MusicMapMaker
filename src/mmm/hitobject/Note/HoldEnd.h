@@ -26,7 +26,8 @@ class HoldEnd : public HitObject {
   // 深拷贝
   HoldEnd* clone() override;
 
-  ObjectInfo* generate_info() override;
+  // 是否为相同物件
+  bool equals(const std::shared_ptr<HitObject>& other) const override;
 
   // 比较器使用
   bool lessThan(const HitObject* other) const override;

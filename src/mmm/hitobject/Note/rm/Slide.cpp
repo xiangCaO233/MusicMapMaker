@@ -12,9 +12,14 @@ Slide::Slide(uint32_t time, int32_t orbit_pos, int32_t slide_par)
 Slide::~Slide() = default;
 
 // 是否为相同物件
-bool Slide::equals(const Note& other) const {}
-
-bool Slide::equals(const std::shared_ptr<Note>& other) const {}
+bool Slide::equals(const std::shared_ptr<HitObject>& other) const {
+  auto onote = std::dynamic_pointer_cast<Note>(other);
+  if (!onote) return false;
+  if (note_type != onote->note_type) return false;
+  auto oslide = std::static_pointer_cast<Slide>(onote);
+  return std::abs(timestamp - oslide->timestamp) < 5 &&
+         orbit == oslide->orbit && slide_parameter == oslide->slide_parameter;
+}
 
 // 接收处理
 void Slide::accept_generate(ObjectGenerator& generator) {
@@ -36,13 +41,6 @@ Slide* Slide::clone() {
   auto slide = new Slide(timestamp, orbit, slide_parameter);
   slide->compinfo = compinfo;
   return slide;
-}
-SlideInfo* Slide::generate_info() {
-  auto info = new SlideInfo;
-  info->time = timestamp;
-  info->orbit = orbit;
-  info->slide_parameter = slide_parameter;
-  return info;
 }
 
 // 比较器使用
@@ -123,8 +121,6 @@ std::string SlideEnd::toString() {
 
 // 深拷贝
 SlideEnd* SlideEnd::clone() { return nullptr; }
-ObjectInfo* SlideEnd::generate_info() {
-  auto info = new ObjectInfo;
-  info->time = timestamp;
-  return info;
-}
+
+// 是否为相同物件
+bool SlideEnd::equals(const std::shared_ptr<HitObject>& other) const {}

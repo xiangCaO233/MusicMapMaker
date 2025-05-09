@@ -284,7 +284,7 @@ void MapEditor::mouse_moved(QMouseEvent* e) {
   // 更新鼠标位置的对应时间戳
   cstatus.mouse_pos_time =
       cstatus.current_time_stamp +
-      (ebuffer.judgeline_visual_position - canvas_ref->mouse_pos.y()) *
+      (ebuffer.judgeline_visual_position - canvas_ref->mouse_pos.y()) /
           (canvas_ref->working_map ? canvas_ref->working_map->project_reference
                                          ->config.timeline_zoom
                                    : 1.0);

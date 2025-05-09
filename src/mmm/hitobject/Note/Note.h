@@ -23,11 +23,6 @@ enum class ComplexInfo {
   END,
 };
 
-class NoteInfo : public ObjectInfo {
- public:
-  int32_t orbit;
-};
-
 class Note : public HitObject {
  public:
   // 构造Note
@@ -57,11 +52,8 @@ class Note : public HitObject {
   // 深拷贝
   virtual Note* clone() override;
 
-  virtual NoteInfo* generate_info() override;
-
   // 是否为相同物件
-  virtual bool equals(const Note& other) const;
-  virtual bool equals(const std::shared_ptr<Note>& other) const;
+  virtual bool equals(const std::shared_ptr<HitObject>& other) const override;
 
   // 比较器使用
   bool lessThan(const HitObject* other) const override;

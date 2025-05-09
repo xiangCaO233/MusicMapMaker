@@ -187,17 +187,17 @@ void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
   binding_map = map;
   // 读取项目的设置
   auto project_owidth_value =
-      int(map->project_reference->config.object_width_ratio * 100);
+      int(map ? map->project_reference->config.object_width_ratio * 100 : 0);
   ui->owidth_scale_button->setText(QString::number(project_owidth_value));
   ui->owidth_scale_slider->setValue(project_owidth_value);
 
   auto project_oheight_value =
-      int(map->project_reference->config.object_height_ratio * 100);
+      int(map ? map->project_reference->config.object_height_ratio * 100 : 0);
   ui->oheight_scale_button->setText(QString::number(project_oheight_value));
   ui->oheight_scale_slider->setValue(project_oheight_value);
 
   auto project_timeline_zoom_value =
-      int(map->project_reference->config.timeline_zoom * 100);
+      int(map ? map->project_reference->config.timeline_zoom * 100 : 0);
   ui->timeline_zoom_button->setText(
       QString::number(project_timeline_zoom_value));
   ui->timeline_zoom_slider->setValue(project_timeline_zoom_value);
