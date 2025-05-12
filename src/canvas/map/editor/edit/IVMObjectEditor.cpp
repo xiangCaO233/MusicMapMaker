@@ -128,6 +128,8 @@ void IVMObjectEditor::mouse_released(QMouseEvent* e) {
 
 // 鼠标拖动事件-传递
 void IVMObjectEditor::mouse_dragged(QMouseEvent* e) {
+    if (long_note_edit_mode) return;
+
     auto time = nearest_divisor_time();
     if (!(std::abs(time - (-1.0)) < 1e-16)) {
         // 根据编辑模式修改所有编辑缓存物件的

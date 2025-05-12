@@ -18,6 +18,7 @@ IVMPlaceNoteHandler::~IVMPlaceNoteHandler() = default;
 bool IVMPlaceNoteHandler::handle(HitObjectEditor* oeditor_context,
                                  QMouseEvent* e, double mouse_time,
                                  double mouse_orbit) {
+    XINFO("处理物件放置事件");
     // 鼠标附近无可用拍线-处理失败
     if (std::abs(mouse_time - (-1.0)) <= 1e-7) {
         XWARN("找不到分拍线");
@@ -79,6 +80,7 @@ bool IVMPlaceNoteHandler::handle(HitObjectEditor* oeditor_context,
                             // 修改面尾位置
                             hold->hold_end_reference->timestamp =
                                 hold->timestamp + hold->hold_time;
+                            XWARN("编辑面条持续时间");
                             return true;
                         } else {
                             // 1.1.2快照时间到鼠标时间<0面条持续时间非法,跳过修改并提示

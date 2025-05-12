@@ -17,6 +17,7 @@ IVMEditComplexHandler::~IVMEditComplexHandler() = default;
 bool IVMEditComplexHandler::handle(HitObjectEditor* oeditor_context,
                                    QMouseEvent* e, double mouse_time,
                                    double mouse_orbit) {
+    XINFO("处理组合键编辑事件");
     auto ivmobjecteditor = static_cast<IVMObjectEditor*>(oeditor_context);
     auto note =
         std::dynamic_pointer_cast<Note>(ivmobjecteditor->current_edit_object);

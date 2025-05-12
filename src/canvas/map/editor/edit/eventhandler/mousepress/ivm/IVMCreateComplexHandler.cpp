@@ -18,6 +18,7 @@ IVMCreateComplexHandler::~IVMCreateComplexHandler() = default;
 bool IVMCreateComplexHandler::handle(HitObjectEditor* oeditor_context,
                                      QMouseEvent* e, double mouse_time,
                                      double mouse_orbit) {
+    XINFO("处理组合键生成事件");
     auto ivmobjecteditor = static_cast<IVMObjectEditor*>(oeditor_context);
     if (!ivmobjecteditor->current_edit_complex) {
         XWARN("创建新组合键");
