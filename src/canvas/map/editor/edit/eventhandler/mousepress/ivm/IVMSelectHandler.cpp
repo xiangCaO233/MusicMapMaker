@@ -9,6 +9,7 @@ IVMSelectHandler::IVMSelectHandler() {}
 // 析构IVMSelectHandler
 IVMSelectHandler::~IVMSelectHandler() = default;
 
+// 抄抄ivm编辑逻辑
 // 处理事件
 bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
                               double mouse_time, double mouse_orbit) {

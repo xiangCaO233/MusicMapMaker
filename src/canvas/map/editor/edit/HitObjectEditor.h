@@ -8,6 +8,7 @@
 
 #include "../../../../mmm/map/MMap.h"
 #include "eventhandler/mousepress/IMousePressEventHandler.h"
+#include "eventhandler/mouserelease/IMouseReleaseEventHandler.h"
 
 class MapEditor;
 
@@ -29,6 +30,9 @@ class HitObjectEditor {
 
     // 鼠标按下事件处理器
     std::shared_ptr<IMousePressEventHandler> mpress_handler;
+
+    // 鼠标释放事件处理器
+    std::shared_ptr<IMouseReleaseEventHandler> mrelease_handler;
 
     // 正在编辑的原物件
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>

@@ -170,6 +170,9 @@ set(PROJECT_SOURCES
     src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMCreateComplexHandler.cpp
     src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMEditComplexHandler.h
     src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMEditComplexHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mouserelease/IMouseReleaseEventHandler.h
+    src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.h
+    src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.cpp
     src/canvas/map/generator/ObjectGenerator.h
     src/canvas/map/generator/ObjectGenerator.cpp
     src/canvas/map/generator/general/NoteGenerator.h

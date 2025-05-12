@@ -16,6 +16,7 @@
 #include "editor/edit/eventhandler/mousepress/ivm/IVMEditComplexHandler.h"
 #include "editor/edit/eventhandler/mousepress/ivm/IVMPlaceNoteHandler.h"
 #include "editor/edit/eventhandler/mousepress/ivm/IVMSelectHandler.h"
+#include "editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.h"
 #include "mmm/hitobject/Note/rm/Slide.h"
 
 // 构造IVMObjectEditor
@@ -36,6 +37,9 @@ IVMObjectEditor::IVMObjectEditor(MapEditor* meditor_ref)
     // 然后处理组合键的编辑
     auto compedit_handler = std::make_shared<IVMEditComplexHandler>();
     compcreate_handler->set_next_handler(compedit_handler);
+
+    // 初始化默认的鼠标释放处理器
+    mrelease_handler = std::make_shared<IVMMouseReleaseHandler>();
 }
 
 // 析构IVMObjectEditor
@@ -66,15 +70,22 @@ void IVMObjectEditor::end_edit() {
 
 // 鼠标按下事件-传递
 void IVMObjectEditor::mouse_pressed(QMouseEvent* e) {
-    // 抄抄ivm编辑逻辑
-    // 鼠标按钮
-    auto button = e->button();
     auto handle_res = mpress_handler->handle(
         this, e, nearest_divisor_time(), editor_ref->cstatus.mouse_pos_orbit);
     if (handle_res) {
         XINFO("鼠标按下事件已被处理");
     } else {
         XWARN("鼠标按下事件已忽略");
+    }
+}
+
+void IVMObjectEditor::mouse_released(QMouseEvent* e) {
+    auto handle_res = mrelease_handler->handle(
+        this, e, nearest_divisor_time(), editor_ref->cstatus.mouse_pos_orbit);
+    if (handle_res) {
+        XINFO("鼠标释放事件已被处理");
+    } else {
+        XWARN("鼠标释放事件已忽略");
     }
 }
 
@@ -86,43 +97,6 @@ void IVMObjectEditor::update_current_comp() {
         auto temp_note = std::dynamic_pointer_cast<Note>(obj);
         if (!temp_note) continue;
         current_edit_complex->child_notes.emplace_back(temp_note);
-    }
-}
-
-void IVMObjectEditor::mouse_released(QMouseEvent* e) {
-    // 鼠标按钮
-    auto button = e->button();
-    switch (button) {
-        case Qt::LeftButton: {
-            // 释放的是左键
-            //
-            //
-            // 若为面条编辑模式-
-            // 应用更改面条的结果到编辑缓存
-            //
-            // 若为单键编辑模式-
-            // 直接应用编辑缓存的修改到map
-            if (!long_note_edit_mode) {
-                end_edit();
-
-                XINFO(QString("编辑结束生成物件操作").toStdString());
-            } else {
-                // 编辑面条模式并非结束
-            }
-            break;
-        }
-        case Qt::RightButton: {
-            // 释放的是右键
-            // 若为面条编辑模式则面条编辑结束
-            // 否则删除鼠标悬浮位置的物件
-            if (!long_note_edit_mode) {
-            } else {
-                // 结束面条编辑
-                end_edit();
-                long_note_edit_mode = false;
-                XINFO("结束编辑面条");
-            }
-        }
     }
 }
 
@@ -150,6 +124,7 @@ void IVMObjectEditor::mouse_dragged(QMouseEvent* e) {
         // 同时遍历缓存和快照-
         auto it = editing_temp_objects.begin();
         auto info_it = info_shortcuts.begin();
+
         while (it != editing_temp_objects.end() &&
                info_it != info_shortcuts.end()) {
             auto tempnote = std::dynamic_pointer_cast<Note>(*it);

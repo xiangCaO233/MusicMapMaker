@@ -8,7 +8,7 @@ class IVMMouseReleaseHandler : public IMouseReleaseEventHandler {
     // 构造IVMMouseReleaseHandler
     IVMMouseReleaseHandler();
     // 析构IVMMouseReleaseHandler
-    ~IVMMouseReleaseHandler() override = default;
+    ~IVMMouseReleaseHandler() override;
 
     // 处理事件
     virtual bool handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
