@@ -1,0 +1,824 @@
+{
+    "signature": "BNDQ",
+    "version": "1.3.0",
+    "tempo": 185.000000,
+    "duration": 24701,
+    "durationtime": 166896,
+    "samples": [
+
+    ], 
+    "tracks": [
+        {
+            "track": 3, 
+            "note": [
+                  {"tick": 192, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 1297, "time_dur": 0, "idx": 0},
+                  {"tick": 216, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 1459, "time_dur": 0, "idx": 1},
+                  {"tick": 432, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 2918, "time_dur": 0, "idx": 10},
+                  {"tick": 456, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 3080, "time_dur": 0, "idx": 11},
+                  {"tick": 576, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 3891, "time_dur": 0, "idx": 16},
+                  {"tick": 600, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 4053, "time_dur": 0, "idx": 17},
+                  {"tick": 960, "key": 0, "dur": 144, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 6486, "time_dur": 973, "idx": 32},
+                  {"tick": 1344, "key": 0, "dur": 144, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 9081, "time_dur": 973, "idx": 44},
+                  {"tick": 1536, "key": 0, "dur": 144, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 10378, "time_dur": 973, "idx": 53},
+                  {"tick": 1728, "key": 0, "dur": 144, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 11675, "time_dur": 973, "idx": 54},
+                  {"tick": 2112, "key": 0, "dur": 144, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 14270, "time_dur": 973, "idx": 65},
+                  {"tick": 2496, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 16864, "time_dur": 325, "idx": 76},
+                  {"tick": 2664, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 17999, "time_dur": 0, "idx": 79},
+                  {"tick": 2880, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 19459, "time_dur": 324, "idx": 86},
+                  {"tick": 3144, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 21243, "time_dur": 324, "idx": 93},
+                  {"tick": 3192, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 21567, "time_dur": 1, "idx": 94},
+                  {"tick": 3528, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 23837, "time_dur": 325, "idx": 103},
+                  {"tick": 3576, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 24162, "time_dur": 1, "idx": 104},
+                  {"tick": 3840, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 25945, "time_dur": 162, "idx": 112},
+                  {"tick": 3864, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 26107, "time_dur": 1, "idx": 113},
+                  {"tick": 4032, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 27243, "time_dur": 324, "idx": 122},
+                  {"tick": 4296, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 29026, "time_dur": 325, "idx": 130},
+                  {"tick": 4344, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 29351, "time_dur": 1, "idx": 131},
+                  {"tick": 4608, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 31135, "time_dur": 162, "idx": 137},
+                  {"tick": 4632, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 31297, "time_dur": 1, "idx": 138},
+                  {"tick": 4800, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 32432, "time_dur": 324, "idx": 142},
+                  {"tick": 5064, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 34216, "time_dur": 324, "idx": 150},
+                  {"tick": 5112, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 34540, "time_dur": 1, "idx": 151},
+                  {"tick": 5328, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 36000, "time_dur": 1, "idx": 154},
+                  {"tick": 5472, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36972, "time_dur": 0, "idx": 165},
+                  {"tick": 5496, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 37134, "time_dur": 0, "idx": 167},
+                  {"tick": 5520, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 37297, "time_dur": 0, "idx": 169},
+                  {"tick": 5544, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 37459, "time_dur": 0, "idx": 171},
+                  {"tick": 5568, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 37621, "time_dur": 486, "idx": 173},
+                  {"tick": 5640, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 38107, "time_dur": 1, "idx": 174},
+                  {"tick": 5784, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 39080, "time_dur": 0, "idx": 183},
+                  {"tick": 5832, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 39405, "time_dur": 486, "idx": 185},
+                  {"tick": 6024, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 40702, "time_dur": 324, "idx": 189},
+                  {"tick": 6096, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 41189, "time_dur": 324, "idx": 193},
+                  {"tick": 6144, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 41513, "time_dur": 1, "idx": 194},
+                  {"tick": 6216, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 41999, "time_dur": 487, "idx": 197},
+                  {"tick": 6336, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 42810, "time_dur": 486, "idx": 203},
+                  {"tick": 6408, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 43297, "time_dur": 1, "idx": 204},
+                  {"tick": 6528, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 44108, "time_dur": 0, "idx": 211},
+                  {"tick": 6600, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 44594, "time_dur": 486, "idx": 215},
+                  {"tick": 6792, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 45891, "time_dur": 325, "idx": 221},
+                  {"tick": 6840, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 46216, "time_dur": 1, "idx": 222},
+                  {"tick": 6960, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 47027, "time_dur": 0, "idx": 227},
+                  {"tick": 7032, "key": 0, "dur": 360, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 47513, "time_dur": 2432, "idx": 230},
+                  {"tick": 7488, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 50594, "time_dur": 162, "idx": 241},
+                  {"tick": 7680, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 51891, "time_dur": 162, "idx": 249},
+                  {"tick": 7728, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 52216, "time_dur": 162, "idx": 251},
+                  {"tick": 7824, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 52864, "time_dur": 162, "idx": 255},
+                  {"tick": 7968, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 53837, "time_dur": 162, "idx": 261},
+                  {"tick": 8160, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 55134, "time_dur": 162, "idx": 269},
+                  {"tick": 8208, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 55459, "time_dur": 162, "idx": 271},
+                  {"tick": 8304, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 56107, "time_dur": 162, "idx": 275},
+                  {"tick": 9216, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 62270, "time_dur": 324, "idx": 309},
+                  {"tick": 9360, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 63243, "time_dur": 0, "idx": 312},
+                  {"tick": 9432, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 63729, "time_dur": 324, "idx": 316},
+                  {"tick": 9480, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 64053, "time_dur": 1, "idx": 317},
+                  {"tick": 9528, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 64378, "time_dur": 324, "idx": 320},
+                  {"tick": 9672, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 65351, "time_dur": 324, "idx": 325},
+                  {"tick": 9864, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 66648, "time_dur": 324, "idx": 332},
+                  {"tick": 9912, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 66972, "time_dur": 2, "idx": 333},
+                  {"tick": 10368, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 70054, "time_dur": 162, "idx": 344},
+                  {"tick": 10392, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 70216, "time_dur": 1, "idx": 345},
+                  {"tick": 10440, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 70540, "time_dur": 324, "idx": 350},
+                  {"tick": 10512, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 71027, "time_dur": 324, "idx": 351},
+                  {"tick": 10560, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 71351, "time_dur": 1, "idx": 352},
+                  {"tick": 11136, "key": 0, "dur": 192, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 75243, "time_dur": 1297, "idx": 368},
+                  {"tick": 11328, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 76540, "time_dur": 1, "idx": 369},
+                  {"tick": 11712, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 79135, "time_dur": 0, "idx": 382},
+                  {"tick": 11736, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 79297, "time_dur": 0, "idx": 383},
+                  {"tick": 11760, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 79459, "time_dur": 0, "idx": 384},
+                  {"tick": 12288, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 83027, "time_dur": 0, "idx": 405},
+                  {"tick": 12312, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 83189, "time_dur": 0, "idx": 406},
+                  {"tick": 12336, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 83351, "time_dur": 0, "idx": 407},
+                  {"tick": 12480, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 84324, "time_dur": 0, "idx": 413},
+                  {"tick": 12504, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 84486, "time_dur": 0, "idx": 414},
+                  {"tick": 12528, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 84648, "time_dur": 0, "idx": 415},
+                  {"tick": 12624, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 85297, "time_dur": 0, "idx": 419},
+                  {"tick": 12648, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 85459, "time_dur": 0, "idx": 420},
+                  {"tick": 13056, "key": 0, "dur": 336, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 88216, "time_dur": 2270, "idx": 436},
+                  {"tick": 13440, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 90810, "time_dur": 325, "idx": 438},
+                  {"tick": 13608, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 91945, "time_dur": 0, "idx": 441},
+                  {"tick": 13824, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 93405, "time_dur": 324, "idx": 448},
+                  {"tick": 13968, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 94378, "time_dur": 0, "idx": 450},
+                  {"tick": 14088, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 95189, "time_dur": 324, "idx": 455},
+                  {"tick": 14136, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 95513, "time_dur": 1, "idx": 456},
+                  {"tick": 14280, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 96486, "time_dur": 324, "idx": 459},
+                  {"tick": 14472, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 97783, "time_dur": 325, "idx": 465},
+                  {"tick": 14520, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 98107, "time_dur": 1, "idx": 466},
+                  {"tick": 14784, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 99891, "time_dur": 162, "idx": 474},
+                  {"tick": 14808, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 100053, "time_dur": 1, "idx": 475},
+                  {"tick": 15240, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 102972, "time_dur": 325, "idx": 487},
+                  {"tick": 15288, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 103297, "time_dur": 1, "idx": 488},
+                  {"tick": 15552, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 105081, "time_dur": 162, "idx": 494},
+                  {"tick": 15576, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 105243, "time_dur": 1, "idx": 495},
+                  {"tick": 15744, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 106378, "time_dur": 324, "idx": 499},
+                  {"tick": 16008, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 108161, "time_dur": 324, "idx": 507},
+                  {"tick": 16056, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 108485, "time_dur": 1, "idx": 508},
+                  {"tick": 16416, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110918, "time_dur": 0, "idx": 521},
+                  {"tick": 16440, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 111080, "time_dur": 0, "idx": 523},
+                  {"tick": 16464, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 111242, "time_dur": 0, "idx": 525},
+                  {"tick": 16488, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 111404, "time_dur": 0, "idx": 527},
+                  {"tick": 16512, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 111567, "time_dur": 486, "idx": 529},
+                  {"tick": 16584, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 112053, "time_dur": 1, "idx": 530},
+                  {"tick": 16704, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 112864, "time_dur": 0, "idx": 537},
+                  {"tick": 16776, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 113350, "time_dur": 486, "idx": 541},
+                  {"tick": 16968, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 114648, "time_dur": 324, "idx": 545},
+                  {"tick": 17040, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 115134, "time_dur": 325, "idx": 549},
+                  {"tick": 17088, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 115459, "time_dur": 1, "idx": 550},
+                  {"tick": 17160, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 115945, "time_dur": 487, "idx": 553},
+                  {"tick": 17280, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 116756, "time_dur": 486, "idx": 559},
+                  {"tick": 17352, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 117242, "time_dur": 1, "idx": 560},
+                  {"tick": 17496, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 118215, "time_dur": 0, "idx": 569},
+                  {"tick": 17544, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 118540, "time_dur": 486, "idx": 571},
+                  {"tick": 17736, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 119837, "time_dur": 324, "idx": 577},
+                  {"tick": 17784, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 120161, "time_dur": 1, "idx": 578},
+                  {"tick": 18048, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 121945, "time_dur": 486, "idx": 587},
+                  {"tick": 18120, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 122431, "time_dur": 1, "idx": 588},
+                  {"tick": 18264, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 123404, "time_dur": 0, "idx": 597},
+                  {"tick": 18312, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 123729, "time_dur": 486, "idx": 599},
+                  {"tick": 18504, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 125026, "time_dur": 324, "idx": 603},
+                  {"tick": 18576, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 125512, "time_dur": 325, "idx": 607},
+                  {"tick": 18624, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 125837, "time_dur": 1, "idx": 608},
+                  {"tick": 18696, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 126323, "time_dur": 487, "idx": 611},
+                  {"tick": 18816, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 127134, "time_dur": 486, "idx": 617},
+                  {"tick": 18888, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 127621, "time_dur": 1, "idx": 618},
+                  {"tick": 19032, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 128594, "time_dur": 0, "idx": 627},
+                  {"tick": 19272, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 130215, "time_dur": 325, "idx": 635},
+                  {"tick": 19320, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 130540, "time_dur": 1, "idx": 636},
+                  {"tick": 19512, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 131837, "time_dur": 325, "idx": 644},
+                  {"tick": 19584, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 132323, "time_dur": 487, "idx": 645},
+                  {"tick": 19656, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 132810, "time_dur": 1, "idx": 646},
+                  {"tick": 19728, "key": 0, "dur": 192, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 133296, "time_dur": 1298, "idx": 649},
+                  {"tick": 19968, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 134918, "time_dur": 486, "idx": 658},
+                  {"tick": 20040, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 135404, "time_dur": 1, "idx": 659},
+                  {"tick": 20112, "key": 0, "dur": 192, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 135891, "time_dur": 1297, "idx": 662},
+                  {"tick": 20352, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 137513, "time_dur": 0, "idx": 671},
+                  {"tick": 20448, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 138161, "time_dur": 0, "idx": 678},
+                  {"tick": 20664, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 139621, "time_dur": 1, "idx": 682},
+                  {"tick": 20736, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 140107, "time_dur": 0, "idx": 684},
+                  {"tick": 20832, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 140756, "time_dur": 0, "idx": 690},
+                  {"tick": 20952, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 141567, "time_dur": 0, "idx": 693},
+                  {"tick": 21048, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 142215, "time_dur": 0, "idx": 697},
+                  {"tick": 21192, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 143188, "time_dur": 1, "idx": 703},
+                  {"tick": 21312, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 143999, "time_dur": 162, "idx": 707},
+                  {"tick": 21336, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 144161, "time_dur": 1, "idx": 708},
+                  {"tick": 21384, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 144485, "time_dur": 487, "idx": 711},
+                  {"tick": 21576, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 145783, "time_dur": 324, "idx": 719},
+                  {"tick": 21696, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 146594, "time_dur": 486, "idx": 723},
+                  {"tick": 21768, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 147080, "time_dur": 1, "idx": 724},
+                  {"tick": 21888, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 147891, "time_dur": 0, "idx": 730},
+                  {"tick": 21936, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 148215, "time_dur": 0, "idx": 732},
+                  {"tick": 21984, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 148540, "time_dur": 0, "idx": 734},
+                  {"tick": 22032, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 148864, "time_dur": 0, "idx": 735},
+                  {"tick": 22080, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 149188, "time_dur": 0, "idx": 737},
+                  {"tick": 22128, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 149513, "time_dur": 0, "idx": 743},
+                  {"tick": 22176, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 149837, "time_dur": 0, "idx": 744},
+                  {"tick": 22224, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 150161, "time_dur": 0, "idx": 745},
+                  {"tick": 22272, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 150486, "time_dur": 0, "idx": 746},
+                  {"tick": 22320, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 150810, "time_dur": 0, "idx": 753},
+                  {"tick": 22368, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 151134, "time_dur": 0, "idx": 754},
+                  {"tick": 22416, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 151459, "time_dur": 0, "idx": 755},
+                  {"tick": 22656, "key": 0, "dur": 1152, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 153080, "time_dur": 7784, "idx": 773}
+            ]
+        },
+        {
+            "track": 4, 
+            "note": [
+                  {"tick": 336, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 2270, "time_dur": 0, "idx": 6},
+                  {"tick": 360, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 2432, "time_dur": 0, "idx": 7},
+                  {"tick": 528, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 3567, "time_dur": 0, "idx": 14},
+                  {"tick": 552, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 3729, "time_dur": 0, "idx": 15},
+                  {"tick": 624, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 4216, "time_dur": 0, "idx": 18},
+                  {"tick": 648, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 4378, "time_dur": 0, "idx": 19},
+                  {"tick": 768, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 5189, "time_dur": 0, "idx": 24},
+                  {"tick": 792, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 5351, "time_dur": 0, "idx": 25},
+                  {"tick": 912, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 6162, "time_dur": 0, "idx": 30},
+                  {"tick": 936, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 6324, "time_dur": 0, "idx": 31},
+                  {"tick": 1152, "key": 0, "dur": 96, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 7783, "time_dur": 649, "idx": 38},
+                  {"tick": 1296, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 8756, "time_dur": 162, "idx": 39},
+                  {"tick": 1320, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 8918, "time_dur": 1, "idx": 40},
+                  {"tick": 1608, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 10864, "time_dur": 487, "idx": 50},
+                  {"tick": 1680, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 11351, "time_dur": 1, "idx": 51},
+                  {"tick": 1800, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 12162, "time_dur": 324, "idx": 56},
+                  {"tick": 1920, "key": 0, "dur": 144, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 12972, "time_dur": 973, "idx": 64},
+                  {"tick": 2184, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 14756, "time_dur": 324, "idx": 67},
+                  {"tick": 2304, "key": 0, "dur": 144, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 15567, "time_dur": 973, "idx": 69},
+                  {"tick": 2496, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 16864, "time_dur": -1, "idx": 75},
+                  {"tick": 2712, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 18324, "time_dur": 0, "idx": 81},
+                  {"tick": 2880, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 19459, "time_dur": -1, "idx": 85},
+                  {"tick": 3024, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 20432, "time_dur": 0, "idx": 88},
+                  {"tick": 3108, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 20999, "time_dur": 0, "idx": 91},
+                  {"tick": 3144, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 21243, "time_dur": -1, "idx": 92},
+                  {"tick": 3336, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 22540, "time_dur": 324, "idx": 97},
+                  {"tick": 3432, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 23189, "time_dur": 0, "idx": 99},
+                  {"tick": 3528, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 23837, "time_dur": -1, "idx": 102},
+                  {"tick": 3792, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 25621, "time_dur": 0, "idx": 109},
+                  {"tick": 3840, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 25945, "time_dur": -1, "idx": 111},
+                  {"tick": 3912, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 26432, "time_dur": -1, "idx": 115},
+                  {"tick": 3960, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 26756, "time_dur": 0, "idx": 119},
+                  {"tick": 3984, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 26918, "time_dur": 0, "idx": 120},
+                  {"tick": 4008, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 27080, "time_dur": 0, "idx": 121},
+                  {"tick": 4200, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 28378, "time_dur": 0, "idx": 125},
+                  {"tick": 4296, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 29026, "time_dur": -1, "idx": 129},
+                  {"tick": 4488, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 30324, "time_dur": 324, "idx": 133},
+                  {"tick": 4608, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 31135, "time_dur": -1, "idx": 136},
+                  {"tick": 4968, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 33567, "time_dur": 0, "idx": 145},
+                  {"tick": 5064, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 34216, "time_dur": -1, "idx": 149},
+                  {"tick": 5256, "key": 0, "dur": 36, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 35513, "time_dur": 243, "idx": 153},
+                  {"tick": 5376, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36324, "time_dur": 0, "idx": 157},
+                  {"tick": 5400, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36486, "time_dur": 0, "idx": 159},
+                  {"tick": 5424, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36648, "time_dur": 0, "idx": 161},
+                  {"tick": 5448, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36810, "time_dur": 0, "idx": 163},
+                  {"tick": 5640, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 38107, "time_dur": 487, "idx": 175},
+                  {"tick": 5712, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 38594, "time_dur": -1, "idx": 176},
+                  {"tick": 5760, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 38918, "time_dur": 0, "idx": 181},
+                  {"tick": 5952, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 40216, "time_dur": 486, "idx": 187},
+                  {"tick": 6024, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 40702, "time_dur": -1, "idx": 188},
+                  {"tick": 6144, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 41513, "time_dur": 486, "idx": 195},
+                  {"tick": 6216, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 41999, "time_dur": -1, "idx": 196},
+                  {"tick": 6408, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 43297, "time_dur": 487, "idx": 205},
+                  {"tick": 6480, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 43783, "time_dur": -1, "idx": 206},
+                  {"tick": 6552, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 44270, "time_dur": 0, "idx": 213},
+                  {"tick": 6840, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 46216, "time_dur": 324, "idx": 223},
+                  {"tick": 6888, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 46540, "time_dur": -1, "idx": 224},
+                  {"tick": 6984, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 47189, "time_dur": 324, "idx": 228},
+                  {"tick": 7032, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 47513, "time_dur": -1, "idx": 229},
+                  {"tick": 7536, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 50918, "time_dur": 162, "idx": 243},
+                  {"tick": 7584, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 51243, "time_dur": 162, "idx": 245},
+                  {"tick": 7632, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 51567, "time_dur": 162, "idx": 247},
+                  {"tick": 7776, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 52540, "time_dur": 162, "idx": 253},
+                  {"tick": 7872, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 53189, "time_dur": 162, "idx": 257},
+                  {"tick": 8016, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 54161, "time_dur": 162, "idx": 263},
+                  {"tick": 8064, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 54486, "time_dur": 162, "idx": 265},
+                  {"tick": 8112, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 54810, "time_dur": 162, "idx": 267},
+                  {"tick": 8256, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 55783, "time_dur": 162, "idx": 273},
+                  {"tick": 8352, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 56432, "time_dur": 162, "idx": 277},
+                  {"tick": 8496, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 57405, "time_dur": -1, "idx": 282},
+                  {"tick": 8592, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 58054, "time_dur": -1, "idx": 284},
+                  {"tick": 8688, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 58702, "time_dur": -1, "idx": 293},
+                  {"tick": 8784, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 59351, "time_dur": -1, "idx": 294},
+                  {"tick": 8880, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 60000, "time_dur": -1, "idx": 296},
+                  {"tick": 8976, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 60648, "time_dur": -1, "idx": 298},
+                  {"tick": 9072, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 61297, "time_dur": -1, "idx": 307},
+                  {"tick": 9168, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 61945, "time_dur": -1, "idx": 308},
+                  {"tick": 9288, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 62756, "time_dur": 324, "idx": 311},
+                  {"tick": 9408, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 63567, "time_dur": 162, "idx": 314},
+                  {"tick": 9432, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 63729, "time_dur": -1, "idx": 315},
+                  {"tick": 9480, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 64053, "time_dur": 325, "idx": 318},
+                  {"tick": 9528, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 64378, "time_dur": -1, "idx": 319},
+                  {"tick": 9600, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 64864, "time_dur": 325, "idx": 323},
+                  {"tick": 9744, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 65837, "time_dur": 162, "idx": 326},
+                  {"tick": 9816, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 66324, "time_dur": 324, "idx": 330},
+                  {"tick": 9864, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 66648, "time_dur": -1, "idx": 331},
+                  {"tick": 10032, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 67783, "time_dur": 162, "idx": 339},
+                  {"tick": 10056, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 67945, "time_dur": 2, "idx": 340},
+                  {"tick": 10392, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 70216, "time_dur": 162, "idx": 346},
+                  {"tick": 10416, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 70378, "time_dur": 1, "idx": 347},
+                  {"tick": 10560, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 71351, "time_dur": 324, "idx": 353},
+                  {"tick": 10632, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 71837, "time_dur": 487, "idx": 354},
+                  {"tick": 10704, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 72324, "time_dur": -1, "idx": 355},
+                  {"tick": 10752, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 72648, "time_dur": 162, "idx": 356},
+                  {"tick": 10776, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 72810, "time_dur": 1, "idx": 357},
+                  {"tick": 10824, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 73134, "time_dur": 325, "idx": 362},
+                  {"tick": 10896, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 73621, "time_dur": 324, "idx": 363},
+                  {"tick": 10944, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 73945, "time_dur": 2, "idx": 364},
+                  {"tick": 11328, "key": 0, "dur": 120, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 76540, "time_dur": 811, "idx": 370},
+                  {"tick": 11520, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 77837, "time_dur": 0, "idx": 374},
+                  {"tick": 11544, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 77999, "time_dur": 0, "idx": 375},
+                  {"tick": 11568, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 78162, "time_dur": 0, "idx": 376},
+                  {"tick": 11856, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 80108, "time_dur": 0, "idx": 388},
+                  {"tick": 11880, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 80270, "time_dur": 0, "idx": 389},
+                  {"tick": 12048, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 81405, "time_dur": 0, "idx": 396},
+                  {"tick": 12072, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 81567, "time_dur": 0, "idx": 397},
+                  {"tick": 12228, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 82621, "time_dur": 162, "idx": 403},
+                  {"tick": 12672, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 85621, "time_dur": 0, "idx": 421},
+                  {"tick": 12696, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 85783, "time_dur": 0, "idx": 422},
+                  {"tick": 12720, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 85945, "time_dur": 0, "idx": 423},
+                  {"tick": 12816, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 86594, "time_dur": 0, "idx": 427},
+                  {"tick": 12840, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 86756, "time_dur": 0, "idx": 428},
+                  {"tick": 12996, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 87810, "time_dur": 162, "idx": 434},
+                  {"tick": 13440, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 90810, "time_dur": -1, "idx": 437},
+                  {"tick": 13656, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 92270, "time_dur": 0, "idx": 443},
+                  {"tick": 13824, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 93405, "time_dur": -1, "idx": 447},
+                  {"tick": 14016, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 94702, "time_dur": 0, "idx": 452},
+                  {"tick": 14088, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 95189, "time_dur": -1, "idx": 454},
+                  {"tick": 14376, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 97134, "time_dur": 0, "idx": 461},
+                  {"tick": 14472, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 97783, "time_dur": -1, "idx": 464},
+                  {"tick": 14736, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 99567, "time_dur": 0, "idx": 471},
+                  {"tick": 14784, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 99891, "time_dur": -1, "idx": 473},
+                  {"tick": 14976, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 101189, "time_dur": 324, "idx": 479},
+                  {"tick": 15144, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 102324, "time_dur": 0, "idx": 482},
+                  {"tick": 15240, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 102972, "time_dur": -1, "idx": 486},
+                  {"tick": 15432, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 104270, "time_dur": 324, "idx": 490},
+                  {"tick": 15552, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 105081, "time_dur": -1, "idx": 493},
+                  {"tick": 15912, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 107513, "time_dur": 0, "idx": 502},
+                  {"tick": 16008, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 108161, "time_dur": -1, "idx": 506},
+                  {"tick": 16200, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 109458, "time_dur": 325, "idx": 510},
+                  {"tick": 16272, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 109945, "time_dur": -1, "idx": 512},
+                  {"tick": 16320, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110269, "time_dur": 0, "idx": 513},
+                  {"tick": 16344, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110431, "time_dur": 0, "idx": 515},
+                  {"tick": 16368, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110594, "time_dur": 0, "idx": 517},
+                  {"tick": 16392, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110756, "time_dur": 0, "idx": 519},
+                  {"tick": 16584, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 112053, "time_dur": 487, "idx": 531},
+                  {"tick": 16656, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 112540, "time_dur": -1, "idx": 532},
+                  {"tick": 16728, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 113026, "time_dur": 0, "idx": 539},
+                  {"tick": 16896, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 114161, "time_dur": 486, "idx": 543},
+                  {"tick": 16968, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 114648, "time_dur": -1, "idx": 544},
+                  {"tick": 17088, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 115459, "time_dur": 486, "idx": 551},
+                  {"tick": 17160, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 115945, "time_dur": -1, "idx": 552},
+                  {"tick": 17352, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 117242, "time_dur": 487, "idx": 561},
+                  {"tick": 17424, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 117729, "time_dur": -1, "idx": 562},
+                  {"tick": 17472, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 118053, "time_dur": 0, "idx": 567},
+                  {"tick": 17544, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 118540, "time_dur": 486, "idx": 572},
+                  {"tick": 17784, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 120161, "time_dur": 324, "idx": 579},
+                  {"tick": 17832, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 120485, "time_dur": -1, "idx": 580},
+                  {"tick": 17880, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 120810, "time_dur": 0, "idx": 582},
+                  {"tick": 17928, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 121134, "time_dur": 324, "idx": 584},
+                  {"tick": 17976, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 121458, "time_dur": -1, "idx": 585},
+                  {"tick": 18120, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 122431, "time_dur": 487, "idx": 589},
+                  {"tick": 18192, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 122918, "time_dur": -1, "idx": 590},
+                  {"tick": 18240, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 123242, "time_dur": 0, "idx": 595},
+                  {"tick": 18432, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 124539, "time_dur": 486, "idx": 601},
+                  {"tick": 18504, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 125026, "time_dur": -1, "idx": 602},
+                  {"tick": 18624, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 125837, "time_dur": 486, "idx": 609},
+                  {"tick": 18696, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 126323, "time_dur": -1, "idx": 610},
+                  {"tick": 18888, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 127621, "time_dur": 487, "idx": 619},
+                  {"tick": 18960, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 128107, "time_dur": -1, "idx": 620},
+                  {"tick": 19008, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 128431, "time_dur": 0, "idx": 625},
+                  {"tick": 19080, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 128918, "time_dur": 486, "idx": 629},
+                  {"tick": 19320, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 130540, "time_dur": 324, "idx": 637},
+                  {"tick": 19368, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 130864, "time_dur": -1, "idx": 638},
+                  {"tick": 19464, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 131513, "time_dur": 324, "idx": 642},
+                  {"tick": 19512, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 131837, "time_dur": -1, "idx": 643},
+                  {"tick": 19656, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 132810, "time_dur": 486, "idx": 647},
+                  {"tick": 19728, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 133296, "time_dur": -1, "idx": 648},
+                  {"tick": 20040, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 135404, "time_dur": 487, "idx": 660},
+                  {"tick": 20112, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 135891, "time_dur": -1, "idx": 661},
+                  {"tick": 20400, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 137837, "time_dur": 0, "idx": 677},
+                  {"tick": 20496, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 138486, "time_dur": 0, "idx": 679},
+                  {"tick": 20544, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 138810, "time_dur": -1, "idx": 680},
+                  {"tick": 20616, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 139296, "time_dur": -1, "idx": 681},
+                  {"tick": 20712, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 139945, "time_dur": -1, "idx": 683},
+                  {"tick": 20784, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 140432, "time_dur": 0, "idx": 689},
+                  {"tick": 20880, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 141080, "time_dur": 0, "idx": 691},
+                  {"tick": 21000, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 141891, "time_dur": 0, "idx": 695},
+                  {"tick": 21096, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 142540, "time_dur": 0, "idx": 699},
+                  {"tick": 21120, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 142702, "time_dur": -1, "idx": 700},
+                  {"tick": 21264, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 143675, "time_dur": -1, "idx": 705},
+                  {"tick": 21336, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 144161, "time_dur": 324, "idx": 709},
+                  {"tick": 21384, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 144485, "time_dur": -1, "idx": 710},
+                  {"tick": 21504, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 145296, "time_dur": 325, "idx": 716},
+                  {"tick": 21648, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 3, "time": 146269, "time_dur": 162, "idx": 721},
+                  {"tick": 21768, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 147080, "time_dur": 487, "idx": 725},
+                  {"tick": 22464, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 151783, "time_dur": 0, "idx": 756},
+                  {"tick": 22488, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 151945, "time_dur": 0, "idx": 758},
+                  {"tick": 22512, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152107, "time_dur": 0, "idx": 760},
+                  {"tick": 22536, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152269, "time_dur": 0, "idx": 762},
+                  {"tick": 22560, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152432, "time_dur": 0, "idx": 764},
+                  {"tick": 22584, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152594, "time_dur": 0, "idx": 766},
+                  {"tick": 22608, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152756, "time_dur": 0, "idx": 768},
+                  {"tick": 22632, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152918, "time_dur": 0, "idx": 770},
+                  {"tick": 22656, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 3, "time": 153080, "time_dur": -1, "idx": 772}
+            ]
+        },
+        {
+            "track": 5, 
+            "note": [
+                  {"tick": 288, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 1945, "time_dur": 0, "idx": 4},
+                  {"tick": 312, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 2107, "time_dur": 0, "idx": 5},
+                  {"tick": 384, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 2594, "time_dur": 0, "idx": 8},
+                  {"tick": 408, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 2756, "time_dur": 0, "idx": 9},
+                  {"tick": 672, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 4540, "time_dur": 0, "idx": 20},
+                  {"tick": 696, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 4702, "time_dur": 0, "idx": 21},
+                  {"tick": 864, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 5837, "time_dur": 0, "idx": 28},
+                  {"tick": 888, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 5999, "time_dur": 0, "idx": 29},
+                  {"tick": 1032, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 6972, "time_dur": 325, "idx": 34},
+                  {"tick": 1104, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 7459, "time_dur": 324, "idx": 35},
+                  {"tick": 1152, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 7783, "time_dur": 1, "idx": 36},
+                  {"tick": 1320, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 8918, "time_dur": 163, "idx": 41},
+                  {"tick": 1344, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 9081, "time_dur": 1, "idx": 42},
+                  {"tick": 1416, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 9567, "time_dur": 324, "idx": 45},
+                  {"tick": 1536, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 10378, "time_dur": 486, "idx": 48},
+                  {"tick": 1608, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 10864, "time_dur": -1, "idx": 49},
+                  {"tick": 1680, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 11351, "time_dur": 162, "idx": 52},
+                  {"tick": 1872, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 12648, "time_dur": 324, "idx": 57},
+                  {"tick": 1920, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 12972, "time_dur": 1, "idx": 58},
+                  {"tick": 1992, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 13459, "time_dur": 486, "idx": 61},
+                  {"tick": 2064, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 13945, "time_dur": 1, "idx": 62},
+                  {"tick": 2304, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 15567, "time_dur": 486, "idx": 70},
+                  {"tick": 2376, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 16053, "time_dur": 1, "idx": 71},
+                  {"tick": 2448, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 16540, "time_dur": 162, "idx": 74},
+                  {"tick": 2568, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 17351, "time_dur": 324, "idx": 77},
+                  {"tick": 2640, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 17837, "time_dur": 0, "idx": 78},
+                  {"tick": 2760, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 18648, "time_dur": 1, "idx": 82},
+                  {"tick": 2952, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 19945, "time_dur": 325, "idx": 87},
+                  {"tick": 3072, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 20756, "time_dur": 0, "idx": 90},
+                  {"tick": 3264, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 22054, "time_dur": 1, "idx": 95},
+                  {"tick": 3408, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 23027, "time_dur": 0, "idx": 98},
+                  {"tick": 3480, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 23513, "time_dur": 0, "idx": 101},
+                  {"tick": 3648, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 24648, "time_dur": 1, "idx": 105},
+                  {"tick": 3720, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 25134, "time_dur": 325, "idx": 108},
+                  {"tick": 3816, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 25783, "time_dur": 0, "idx": 110},
+                  {"tick": 3864, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 26107, "time_dur": 1, "idx": 114},
+                  {"tick": 3912, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 26432, "time_dur": 1, "idx": 116},
+                  {"tick": 4176, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 28216, "time_dur": 0, "idx": 124},
+                  {"tick": 4224, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 28540, "time_dur": 1, "idx": 126},
+                  {"tick": 4416, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 29837, "time_dur": 325, "idx": 132},
+                  {"tick": 4680, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 31621, "time_dur": 1, "idx": 139},
+                  {"tick": 4872, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 32918, "time_dur": 325, "idx": 143},
+                  {"tick": 4992, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 33729, "time_dur": 1, "idx": 146},
+                  {"tick": 5376, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36324, "time_dur": 0, "idx": 158},
+                  {"tick": 5400, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36486, "time_dur": 0, "idx": 160},
+                  {"tick": 5424, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36648, "time_dur": 0, "idx": 162},
+                  {"tick": 5448, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36810, "time_dur": 0, "idx": 164},
+                  {"tick": 5640, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 38107, "time_dur": 487, "idx": 179},
+                  {"tick": 5712, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 38594, "time_dur": 1, "idx": 180},
+                  {"tick": 5760, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 38918, "time_dur": 0, "idx": 182},
+                  {"tick": 5832, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 39405, "time_dur": 486, "idx": 186},
+                  {"tick": 5952, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 40216, "time_dur": 486, "idx": 190},
+                  {"tick": 6024, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 40702, "time_dur": 1, "idx": 191},
+                  {"tick": 6096, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 41189, "time_dur": 324, "idx": 198},
+                  {"tick": 6144, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 41513, "time_dur": 1, "idx": 199},
+                  {"tick": 6216, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 41999, "time_dur": 487, "idx": 202},
+                  {"tick": 6408, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 43297, "time_dur": 487, "idx": 209},
+                  {"tick": 6480, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 43783, "time_dur": 1, "idx": 210},
+                  {"tick": 6552, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 44270, "time_dur": 0, "idx": 214},
+                  {"tick": 6600, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 44594, "time_dur": 486, "idx": 216},
+                  {"tick": 6720, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 45405, "time_dur": 1, "idx": 217},
+                  {"tick": 6744, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 45567, "time_dur": 324, "idx": 220},
+                  {"tick": 6936, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 46864, "time_dur": 0, "idx": 226},
+                  {"tick": 7104, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 48000, "time_dur": 1, "idx": 231},
+                  {"tick": 7128, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 48162, "time_dur": 162, "idx": 234},
+                  {"tick": 7152, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 48324, "time_dur": 1, "idx": 235},
+                  {"tick": 7176, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 48486, "time_dur": 324, "idx": 238},
+                  {"tick": 7224, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 48810, "time_dur": 1, "idx": 239},
+                  {"tick": 7536, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 50918, "time_dur": 162, "idx": 244},
+                  {"tick": 7584, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 51243, "time_dur": 162, "idx": 246},
+                  {"tick": 7680, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 51891, "time_dur": 162, "idx": 250},
+                  {"tick": 7728, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 52216, "time_dur": 162, "idx": 252},
+                  {"tick": 7824, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 52864, "time_dur": 162, "idx": 256},
+                  {"tick": 7872, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 53189, "time_dur": 162, "idx": 258},
+                  {"tick": 7920, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 53513, "time_dur": 162, "idx": 259},
+                  {"tick": 8016, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 54161, "time_dur": 162, "idx": 264},
+                  {"tick": 8064, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 54486, "time_dur": 162, "idx": 266},
+                  {"tick": 8160, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 55134, "time_dur": 162, "idx": 270},
+                  {"tick": 8208, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 55459, "time_dur": 162, "idx": 272},
+                  {"tick": 8304, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 56107, "time_dur": 162, "idx": 276},
+                  {"tick": 8352, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 56432, "time_dur": 162, "idx": 278},
+                  {"tick": 8400, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 56756, "time_dur": 162, "idx": 279},
+                  {"tick": 8520, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 57567, "time_dur": 324, "idx": 283},
+                  {"tick": 8664, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 58540, "time_dur": 324, "idx": 288},
+                  {"tick": 8712, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 58864, "time_dur": 1, "idx": 289},
+                  {"tick": 8760, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 59189, "time_dur": 324, "idx": 292},
+                  {"tick": 8904, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 60162, "time_dur": 324, "idx": 297},
+                  {"tick": 9048, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 61134, "time_dur": 325, "idx": 302},
+                  {"tick": 9096, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 61459, "time_dur": 1, "idx": 303},
+                  {"tick": 9144, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 61783, "time_dur": 324, "idx": 306},
+                  {"tick": 9264, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 62594, "time_dur": 1, "idx": 310},
+                  {"tick": 9360, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 63243, "time_dur": 1, "idx": 313},
+                  {"tick": 9456, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 63891, "time_dur": 1, "idx": 321},
+                  {"tick": 9552, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 64540, "time_dur": 1, "idx": 322},
+                  {"tick": 9648, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 65189, "time_dur": 1, "idx": 324},
+                  {"tick": 9744, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 65837, "time_dur": 1, "idx": 327},
+                  {"tick": 9792, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 66162, "time_dur": 162, "idx": 328},
+                  {"tick": 9816, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 66324, "time_dur": -1, "idx": 329},
+                  {"tick": 9912, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 66972, "time_dur": 325, "idx": 334},
+                  {"tick": 10008, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 67621, "time_dur": 162, "idx": 337},
+                  {"tick": 10032, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 67783, "time_dur": -1, "idx": 338},
+                  {"tick": 10416, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 70378, "time_dur": 162, "idx": 348},
+                  {"tick": 10440, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 3, "volume": 0, "pan": 0, "attr": 4, "time": 70540, "time_dur": -2, "idx": 349},
+                  {"tick": 10776, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 72810, "time_dur": 162, "idx": 358},
+                  {"tick": 10800, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 72972, "time_dur": 1, "idx": 359},
+                  {"tick": 11016, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 74432, "time_dur": 324, "idx": 366},
+                  {"tick": 11088, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 74918, "time_dur": 162, "idx": 367},
+                  {"tick": 11328, "key": 0, "dur": 120, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 76540, "time_dur": 811, "idx": 373},
+                  {"tick": 11664, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 78810, "time_dur": 0, "idx": 380},
+                  {"tick": 11688, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 78972, "time_dur": 0, "idx": 381},
+                  {"tick": 11784, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 79621, "time_dur": 0, "idx": 385},
+                  {"tick": 11808, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 79783, "time_dur": 0, "idx": 386},
+                  {"tick": 11832, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 79945, "time_dur": 0, "idx": 387},
+                  {"tick": 11904, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 80432, "time_dur": 0, "idx": 390},
+                  {"tick": 11928, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 80594, "time_dur": 0, "idx": 391},
+                  {"tick": 11952, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 80756, "time_dur": 0, "idx": 392},
+                  {"tick": 12264, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 82864, "time_dur": 163, "idx": 404},
+                  {"tick": 12432, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 84000, "time_dur": 0, "idx": 411},
+                  {"tick": 12456, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 84162, "time_dur": 0, "idx": 412},
+                  {"tick": 12552, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 84810, "time_dur": 0, "idx": 416},
+                  {"tick": 12576, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 84972, "time_dur": 0, "idx": 417},
+                  {"tick": 12600, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 85134, "time_dur": 0, "idx": 418},
+                  {"tick": 12744, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 86107, "time_dur": 0, "idx": 424},
+                  {"tick": 12768, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 86270, "time_dur": 0, "idx": 425},
+                  {"tick": 12792, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 86432, "time_dur": 0, "idx": 426},
+                  {"tick": 13032, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 88053, "time_dur": 163, "idx": 435},
+                  {"tick": 13512, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 91297, "time_dur": 324, "idx": 439},
+                  {"tick": 13584, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 91783, "time_dur": 0, "idx": 440},
+                  {"tick": 13704, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 92594, "time_dur": 1, "idx": 444},
+                  {"tick": 13896, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 93891, "time_dur": 325, "idx": 449},
+                  {"tick": 14208, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 96000, "time_dur": 1, "idx": 457},
+                  {"tick": 14352, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 96972, "time_dur": 0, "idx": 460},
+                  {"tick": 14424, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 97459, "time_dur": 0, "idx": 463},
+                  {"tick": 14592, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 98594, "time_dur": 1, "idx": 467},
+                  {"tick": 14664, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 99080, "time_dur": 325, "idx": 470},
+                  {"tick": 14856, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 100378, "time_dur": 1, "idx": 476},
+                  {"tick": 15120, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 102162, "time_dur": 0, "idx": 481},
+                  {"tick": 15168, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 102486, "time_dur": 1, "idx": 483},
+                  {"tick": 15504, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 104756, "time_dur": 0, "idx": 491},
+                  {"tick": 15528, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 104918, "time_dur": 0, "idx": 492},
+                  {"tick": 15624, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 105567, "time_dur": 1, "idx": 496},
+                  {"tick": 15888, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 107351, "time_dur": 0, "idx": 501},
+                  {"tick": 15936, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 107675, "time_dur": 1, "idx": 503},
+                  {"tick": 16128, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 108972, "time_dur": 324, "idx": 509},
+                  {"tick": 16224, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 109621, "time_dur": 1, "idx": 511},
+                  {"tick": 16320, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110269, "time_dur": 0, "idx": 514},
+                  {"tick": 16344, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110431, "time_dur": 0, "idx": 516},
+                  {"tick": 16368, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110594, "time_dur": 0, "idx": 518},
+                  {"tick": 16392, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110756, "time_dur": 0, "idx": 520},
+                  {"tick": 16584, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 112053, "time_dur": 487, "idx": 535},
+                  {"tick": 16656, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 112540, "time_dur": 1, "idx": 536},
+                  {"tick": 16728, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 113026, "time_dur": 0, "idx": 540},
+                  {"tick": 16776, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 113350, "time_dur": 486, "idx": 542},
+                  {"tick": 16896, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 114161, "time_dur": 486, "idx": 546},
+                  {"tick": 16968, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 114648, "time_dur": 1, "idx": 547},
+                  {"tick": 17040, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 115134, "time_dur": 325, "idx": 554},
+                  {"tick": 17088, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 115459, "time_dur": 1, "idx": 555},
+                  {"tick": 17160, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 115945, "time_dur": 487, "idx": 558},
+                  {"tick": 17352, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 117242, "time_dur": 487, "idx": 565},
+                  {"tick": 17424, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 117729, "time_dur": 1, "idx": 566},
+                  {"tick": 17472, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 118053, "time_dur": 0, "idx": 568},
+                  {"tick": 17664, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 119351, "time_dur": 1, "idx": 573},
+                  {"tick": 17688, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 119513, "time_dur": 324, "idx": 576},
+                  {"tick": 17856, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 120648, "time_dur": 0, "idx": 581},
+                  {"tick": 18000, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 121621, "time_dur": 1, "idx": 586},
+                  {"tick": 18120, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 122431, "time_dur": 487, "idx": 593},
+                  {"tick": 18192, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 122918, "time_dur": 1, "idx": 594},
+                  {"tick": 18240, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 123242, "time_dur": 0, "idx": 596},
+                  {"tick": 18312, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 123729, "time_dur": 486, "idx": 600},
+                  {"tick": 18432, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 124539, "time_dur": 486, "idx": 604},
+                  {"tick": 18504, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 125026, "time_dur": 1, "idx": 605},
+                  {"tick": 18576, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 125512, "time_dur": 325, "idx": 612},
+                  {"tick": 18624, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 125837, "time_dur": 1, "idx": 613},
+                  {"tick": 18696, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 126323, "time_dur": 487, "idx": 616},
+                  {"tick": 18888, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 127621, "time_dur": 487, "idx": 623},
+                  {"tick": 18960, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 128107, "time_dur": 1, "idx": 624},
+                  {"tick": 19008, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 128431, "time_dur": 0, "idx": 626},
+                  {"tick": 19080, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 128918, "time_dur": 486, "idx": 630},
+                  {"tick": 19200, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 129729, "time_dur": 1, "idx": 631},
+                  {"tick": 19224, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 129891, "time_dur": 324, "idx": 634},
+                  {"tick": 19632, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 132648, "time_dur": 0, "idx": 651},
+                  {"tick": 19728, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 133296, "time_dur": 0, "idx": 653},
+                  {"tick": 19776, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 133621, "time_dur": 1, "idx": 654},
+                  {"tick": 19848, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 134107, "time_dur": 1, "idx": 655},
+                  {"tick": 19944, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 134756, "time_dur": 1, "idx": 657},
+                  {"tick": 20016, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 135242, "time_dur": 0, "idx": 664},
+                  {"tick": 20112, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 135891, "time_dur": 0, "idx": 666},
+                  {"tick": 20160, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 136215, "time_dur": 1, "idx": 667},
+                  {"tick": 20232, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 136702, "time_dur": 1, "idx": 668},
+                  {"tick": 20328, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 137350, "time_dur": 1, "idx": 670},
+                  {"tick": 20424, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 137999, "time_dur": 487, "idx": 674},
+                  {"tick": 20496, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 138486, "time_dur": 1, "idx": 675},
+                  {"tick": 20736, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 140107, "time_dur": 487, "idx": 685},
+                  {"tick": 20808, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 140594, "time_dur": 1, "idx": 686},
+                  {"tick": 20928, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 141405, "time_dur": 0, "idx": 692},
+                  {"tick": 21168, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 143026, "time_dur": 0, "idx": 702},
+                  {"tick": 21264, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 143675, "time_dur": 0, "idx": 706},
+                  {"tick": 21360, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 144323, "time_dur": 0, "idx": 713},
+                  {"tick": 21456, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 144972, "time_dur": 0, "idx": 715},
+                  {"tick": 21552, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 145621, "time_dur": 0, "idx": 718},
+                  {"tick": 21648, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 146269, "time_dur": 0, "idx": 722},
+                  {"tick": 21744, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 146918, "time_dur": 0, "idx": 727},
+                  {"tick": 21840, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 147567, "time_dur": 1, "idx": 729},
+                  {"tick": 21888, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 147891, "time_dur": 324, "idx": 731},
+                  {"tick": 22032, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 148864, "time_dur": 162, "idx": 736},
+                  {"tick": 22104, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 149350, "time_dur": 325, "idx": 740},
+                  {"tick": 22152, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 149675, "time_dur": 1, "idx": 741},
+                  {"tick": 22296, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 150648, "time_dur": 324, "idx": 749},
+                  {"tick": 22344, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 150972, "time_dur": 1, "idx": 750},
+                  {"tick": 22464, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 151783, "time_dur": 0, "idx": 757},
+                  {"tick": 22488, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 151945, "time_dur": 0, "idx": 759},
+                  {"tick": 22512, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152107, "time_dur": 0, "idx": 761},
+                  {"tick": 22536, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152269, "time_dur": 0, "idx": 763},
+                  {"tick": 22560, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152432, "time_dur": 0, "idx": 765},
+                  {"tick": 22584, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152594, "time_dur": 0, "idx": 767},
+                  {"tick": 22608, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152756, "time_dur": 0, "idx": 769},
+                  {"tick": 22632, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 152918, "time_dur": 0, "idx": 771},
+                  {"tick": 22656, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 153080, "time_dur": 1, "idx": 774},
+                  {"tick": 22728, "key": 0, "dur": 60, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 153567, "time_dur": 405, "idx": 777},
+                  {"tick": 22788, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 153972, "time_dur": 1, "idx": 778},
+                  {"tick": 22848, "key": 0, "dur": 60, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 154378, "time_dur": 405, "idx": 781},
+                  {"tick": 22908, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 154783, "time_dur": 1, "idx": 782},
+                  {"tick": 22968, "key": 0, "dur": 360, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 155188, "time_dur": 2433, "idx": 785}
+            ]
+        },
+        {
+            "track": 6, 
+            "note": [
+                  {"tick": 240, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 1621, "time_dur": 0, "idx": 2},
+                  {"tick": 264, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 1783, "time_dur": 0, "idx": 3},
+                  {"tick": 480, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 3243, "time_dur": 0, "idx": 12},
+                  {"tick": 504, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 3405, "time_dur": 0, "idx": 13},
+                  {"tick": 720, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 4864, "time_dur": 0, "idx": 22},
+                  {"tick": 744, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 5026, "time_dur": 0, "idx": 23},
+                  {"tick": 816, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 5513, "time_dur": 0, "idx": 26},
+                  {"tick": 840, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 5675, "time_dur": 0, "idx": 27},
+                  {"tick": 960, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 6486, "time_dur": 324, "idx": 33},
+                  {"tick": 1152, "key": 0, "dur": 120, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 7783, "time_dur": 811, "idx": 37},
+                  {"tick": 1344, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 9081, "time_dur": 324, "idx": 43},
+                  {"tick": 1488, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 10054, "time_dur": 324, "idx": 46},
+                  {"tick": 1536, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 10378, "time_dur": -1, "idx": 47},
+                  {"tick": 1728, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 11675, "time_dur": 325, "idx": 55},
+                  {"tick": 1920, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 12972, "time_dur": 487, "idx": 59},
+                  {"tick": 1992, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 13459, "time_dur": -1, "idx": 60},
+                  {"tick": 2064, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 13945, "time_dur": 162, "idx": 63},
+                  {"tick": 2112, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 14270, "time_dur": 324, "idx": 66},
+                  {"tick": 2256, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 15243, "time_dur": 162, "idx": 68},
+                  {"tick": 2376, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 16053, "time_dur": 487, "idx": 72},
+                  {"tick": 2448, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 16540, "time_dur": -1, "idx": 73},
+                  {"tick": 2688, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 18162, "time_dur": 0, "idx": 80},
+                  {"tick": 2760, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 18648, "time_dur": 324, "idx": 83},
+                  {"tick": 2808, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 18972, "time_dur": -1, "idx": 84},
+                  {"tick": 3048, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 20594, "time_dur": 0, "idx": 89},
+                  {"tick": 3264, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 22054, "time_dur": 324, "idx": 96},
+                  {"tick": 3456, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 23351, "time_dur": 0, "idx": 100},
+                  {"tick": 3648, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 24648, "time_dur": 486, "idx": 106},
+                  {"tick": 3720, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 25134, "time_dur": -1, "idx": 107},
+                  {"tick": 3912, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 26432, "time_dur": 324, "idx": 117},
+                  {"tick": 3960, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 26756, "time_dur": -1, "idx": 118},
+                  {"tick": 4104, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 27729, "time_dur": 324, "idx": 123},
+                  {"tick": 4224, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 28540, "time_dur": 162, "idx": 127},
+                  {"tick": 4248, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 28702, "time_dur": -1, "idx": 128},
+                  {"tick": 4560, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 30810, "time_dur": 0, "idx": 134},
+                  {"tick": 4584, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 30972, "time_dur": 0, "idx": 135},
+                  {"tick": 4680, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 31621, "time_dur": 324, "idx": 140},
+                  {"tick": 4728, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 31945, "time_dur": -1, "idx": 141},
+                  {"tick": 4944, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 33405, "time_dur": 0, "idx": 144},
+                  {"tick": 4992, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 33729, "time_dur": 162, "idx": 147},
+                  {"tick": 5016, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 33891, "time_dur": -1, "idx": 148},
+                  {"tick": 5184, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 35027, "time_dur": 324, "idx": 152},
+                  {"tick": 5328, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36000, "time_dur": 0, "idx": 155},
+                  {"tick": 5352, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36162, "time_dur": 0, "idx": 156},
+                  {"tick": 5472, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 36972, "time_dur": 0, "idx": 166},
+                  {"tick": 5496, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 37134, "time_dur": 0, "idx": 168},
+                  {"tick": 5520, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 37297, "time_dur": 0, "idx": 170},
+                  {"tick": 5544, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 37459, "time_dur": 0, "idx": 172},
+                  {"tick": 5568, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 37621, "time_dur": 486, "idx": 177},
+                  {"tick": 5640, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 38107, "time_dur": -1, "idx": 178},
+                  {"tick": 5784, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 39080, "time_dur": 0, "idx": 184},
+                  {"tick": 6024, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 40702, "time_dur": 324, "idx": 192},
+                  {"tick": 6144, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 41513, "time_dur": 486, "idx": 200},
+                  {"tick": 6216, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 41999, "time_dur": -1, "idx": 201},
+                  {"tick": 6336, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 42810, "time_dur": 486, "idx": 207},
+                  {"tick": 6408, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 43297, "time_dur": -1, "idx": 208},
+                  {"tick": 6528, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 44108, "time_dur": 0, "idx": 212},
+                  {"tick": 6720, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 45405, "time_dur": 162, "idx": 218},
+                  {"tick": 6744, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 45567, "time_dur": -1, "idx": 219},
+                  {"tick": 6912, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 46702, "time_dur": 0, "idx": 225},
+                  {"tick": 7104, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 48000, "time_dur": 162, "idx": 232},
+                  {"tick": 7128, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 48162, "time_dur": -1, "idx": 233},
+                  {"tick": 7152, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 48324, "time_dur": 162, "idx": 236},
+                  {"tick": 7176, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 48486, "time_dur": -1, "idx": 237},
+                  {"tick": 7224, "key": 0, "dur": 168, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 48810, "time_dur": 1135, "idx": 240},
+                  {"tick": 7488, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 50594, "time_dur": 162, "idx": 242},
+                  {"tick": 7632, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 51567, "time_dur": 162, "idx": 248},
+                  {"tick": 7776, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 52540, "time_dur": 162, "idx": 254},
+                  {"tick": 7920, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 53513, "time_dur": 162, "idx": 260},
+                  {"tick": 7968, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 53837, "time_dur": 162, "idx": 262},
+                  {"tick": 8112, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 54810, "time_dur": 162, "idx": 268},
+                  {"tick": 8256, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 55783, "time_dur": 162, "idx": 274},
+                  {"tick": 8400, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 56756, "time_dur": 162, "idx": 280},
+                  {"tick": 8448, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 57081, "time_dur": 324, "idx": 281},
+                  {"tick": 8592, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 58054, "time_dur": 0, "idx": 285},
+                  {"tick": 8640, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 58378, "time_dur": 162, "idx": 286},
+                  {"tick": 8664, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 58540, "time_dur": -1, "idx": 287},
+                  {"tick": 8712, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 58864, "time_dur": 325, "idx": 290},
+                  {"tick": 8760, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 59189, "time_dur": -1, "idx": 291},
+                  {"tick": 8832, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 59675, "time_dur": 325, "idx": 295},
+                  {"tick": 8976, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 60648, "time_dur": 0, "idx": 299},
+                  {"tick": 9024, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 60972, "time_dur": 162, "idx": 300},
+                  {"tick": 9048, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 61134, "time_dur": -1, "idx": 301},
+                  {"tick": 9096, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 61459, "time_dur": 324, "idx": 304},
+                  {"tick": 9144, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 61783, "time_dur": -1, "idx": 305},
+                  {"tick": 9984, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 67459, "time_dur": 162, "idx": 335},
+                  {"tick": 10008, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 67621, "time_dur": -1, "idx": 336},
+                  {"tick": 10056, "key": 0, "dur": 96, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 67945, "time_dur": 649, "idx": 341},
+                  {"tick": 10176, "key": 0, "dur": 144, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 68756, "time_dur": 973, "idx": 342},
+                  {"tick": 10320, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 69729, "time_dur": -1, "idx": 343},
+                  {"tick": 10800, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 72972, "time_dur": 162, "idx": 360},
+                  {"tick": 10824, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 4, "volume": 0, "pan": 0, "attr": 4, "time": 73134, "time_dur": -2, "idx": 361},
+                  {"tick": 10944, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 73945, "time_dur": 325, "idx": 365},
+                  {"tick": 11136, "key": 0, "dur": 192, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 75243, "time_dur": 1297, "idx": 371},
+                  {"tick": 11328, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 76540, "time_dur": -1, "idx": 372},
+                  {"tick": 11592, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 78324, "time_dur": 0, "idx": 377},
+                  {"tick": 11616, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 78486, "time_dur": 0, "idx": 378},
+                  {"tick": 11640, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 78648, "time_dur": 0, "idx": 379},
+                  {"tick": 11976, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 80918, "time_dur": 0, "idx": 393},
+                  {"tick": 12000, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 81081, "time_dur": 0, "idx": 394},
+                  {"tick": 12024, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 81243, "time_dur": 0, "idx": 395},
+                  {"tick": 12096, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 81729, "time_dur": 0, "idx": 398},
+                  {"tick": 12120, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 81891, "time_dur": 0, "idx": 399},
+                  {"tick": 12144, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 82054, "time_dur": 0, "idx": 400},
+                  {"tick": 12168, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 82216, "time_dur": 0, "idx": 401},
+                  {"tick": 12192, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 82378, "time_dur": 162, "idx": 402},
+                  {"tick": 12360, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 83513, "time_dur": 0, "idx": 408},
+                  {"tick": 12384, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 83675, "time_dur": 0, "idx": 409},
+                  {"tick": 12408, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 83837, "time_dur": 0, "idx": 410},
+                  {"tick": 12864, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 86918, "time_dur": 0, "idx": 429},
+                  {"tick": 12888, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 87080, "time_dur": 0, "idx": 430},
+                  {"tick": 12912, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 87243, "time_dur": 0, "idx": 431},
+                  {"tick": 12936, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 87405, "time_dur": 0, "idx": 432},
+                  {"tick": 12960, "key": 0, "dur": 24, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 87567, "time_dur": 162, "idx": 433},
+                  {"tick": 13632, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 92108, "time_dur": 0, "idx": 442},
+                  {"tick": 13704, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 92594, "time_dur": 324, "idx": 445},
+                  {"tick": 13752, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 92918, "time_dur": -1, "idx": 446},
+                  {"tick": 13992, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 94540, "time_dur": 0, "idx": 451},
+                  {"tick": 14052, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 94945, "time_dur": 0, "idx": 453},
+                  {"tick": 14208, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 96000, "time_dur": 324, "idx": 458},
+                  {"tick": 14400, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 97297, "time_dur": 0, "idx": 462},
+                  {"tick": 14592, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 98594, "time_dur": 486, "idx": 468},
+                  {"tick": 14664, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 99080, "time_dur": -1, "idx": 469},
+                  {"tick": 14760, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 99729, "time_dur": 0, "idx": 472},
+                  {"tick": 14856, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 100378, "time_dur": 324, "idx": 477},
+                  {"tick": 14904, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 100702, "time_dur": -1, "idx": 478},
+                  {"tick": 15048, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 101675, "time_dur": 324, "idx": 480},
+                  {"tick": 15168, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 102486, "time_dur": 162, "idx": 484},
+                  {"tick": 15192, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 102648, "time_dur": -1, "idx": 485},
+                  {"tick": 15360, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 103783, "time_dur": 325, "idx": 489},
+                  {"tick": 15624, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 105567, "time_dur": 324, "idx": 497},
+                  {"tick": 15672, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 105891, "time_dur": -1, "idx": 498},
+                  {"tick": 15816, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 106864, "time_dur": 325, "idx": 500},
+                  {"tick": 15936, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 107675, "time_dur": 162, "idx": 504},
+                  {"tick": 15960, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 107837, "time_dur": -1, "idx": 505},
+                  {"tick": 16416, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 110918, "time_dur": 0, "idx": 522},
+                  {"tick": 16440, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 111080, "time_dur": 0, "idx": 524},
+                  {"tick": 16464, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 111242, "time_dur": 0, "idx": 526},
+                  {"tick": 16488, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 111404, "time_dur": 0, "idx": 528},
+                  {"tick": 16512, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 111567, "time_dur": 486, "idx": 533},
+                  {"tick": 16584, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 112053, "time_dur": -1, "idx": 534},
+                  {"tick": 16704, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 112864, "time_dur": 0, "idx": 538},
+                  {"tick": 16968, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 114648, "time_dur": 324, "idx": 548},
+                  {"tick": 17088, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 115459, "time_dur": 486, "idx": 556},
+                  {"tick": 17160, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 115945, "time_dur": -1, "idx": 557},
+                  {"tick": 17280, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 116756, "time_dur": 486, "idx": 563},
+                  {"tick": 17352, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 117242, "time_dur": -1, "idx": 564},
+                  {"tick": 17496, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 118215, "time_dur": 0, "idx": 570},
+                  {"tick": 17664, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 119351, "time_dur": 162, "idx": 574},
+                  {"tick": 17688, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 119513, "time_dur": -1, "idx": 575},
+                  {"tick": 17904, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 120972, "time_dur": 0, "idx": 583},
+                  {"tick": 18048, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 121945, "time_dur": 486, "idx": 591},
+                  {"tick": 18120, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 122431, "time_dur": -1, "idx": 592},
+                  {"tick": 18264, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 123404, "time_dur": 0, "idx": 598},
+                  {"tick": 18504, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 125026, "time_dur": 324, "idx": 606},
+                  {"tick": 18624, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 125837, "time_dur": 486, "idx": 614},
+                  {"tick": 18696, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 126323, "time_dur": -1, "idx": 615},
+                  {"tick": 18816, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 127134, "time_dur": 486, "idx": 621},
+                  {"tick": 18888, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 127621, "time_dur": -1, "idx": 622},
+                  {"tick": 19032, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 128594, "time_dur": 0, "idx": 628},
+                  {"tick": 19200, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 129729, "time_dur": 162, "idx": 632},
+                  {"tick": 19224, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 129891, "time_dur": -1, "idx": 633},
+                  {"tick": 19392, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 131026, "time_dur": 0, "idx": 639},
+                  {"tick": 19416, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 131188, "time_dur": 0, "idx": 640},
+                  {"tick": 19440, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 131350, "time_dur": 0, "idx": 641},
+                  {"tick": 19584, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 132323, "time_dur": 0, "idx": 650},
+                  {"tick": 19680, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 132972, "time_dur": 0, "idx": 652},
+                  {"tick": 19896, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 134431, "time_dur": -1, "idx": 656},
+                  {"tick": 19968, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 134918, "time_dur": 0, "idx": 663},
+                  {"tick": 20064, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 135567, "time_dur": 0, "idx": 665},
+                  {"tick": 20280, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 137026, "time_dur": -1, "idx": 669},
+                  {"tick": 20352, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 137513, "time_dur": 486, "idx": 672},
+                  {"tick": 20424, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 137999, "time_dur": -1, "idx": 673},
+                  {"tick": 20496, "key": 0, "dur": 192, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 138486, "time_dur": 1297, "idx": 676},
+                  {"tick": 20808, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 140594, "time_dur": 486, "idx": 687},
+                  {"tick": 20880, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 141080, "time_dur": -1, "idx": 688},
+                  {"tick": 20976, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 141729, "time_dur": 0, "idx": 694},
+                  {"tick": 21024, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 142053, "time_dur": 0, "idx": 696},
+                  {"tick": 21072, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 142378, "time_dur": 0, "idx": 698},
+                  {"tick": 21120, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 142702, "time_dur": 0, "idx": 701},
+                  {"tick": 21216, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 143351, "time_dur": 0, "idx": 704},
+                  {"tick": 21312, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 143999, "time_dur": 0, "idx": 712},
+                  {"tick": 21408, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 144648, "time_dur": 0, "idx": 714},
+                  {"tick": 21504, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 145296, "time_dur": 0, "idx": 717},
+                  {"tick": 21600, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 145945, "time_dur": 0, "idx": 720},
+                  {"tick": 21696, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 0, "time": 146594, "time_dur": 0, "idx": 726},
+                  {"tick": 21792, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 3, "time": 147242, "time_dur": -1, "idx": 728},
+                  {"tick": 21960, "key": 0, "dur": 48, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 148377, "time_dur": 325, "idx": 733},
+                  {"tick": 22080, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 149188, "time_dur": 162, "idx": 738},
+                  {"tick": 22104, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 149350, "time_dur": -1, "idx": 739},
+                  {"tick": 22152, "key": 0, "dur": 72, "isEnd": 1, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 149675, "time_dur": 486, "idx": 742},
+                  {"tick": 22272, "key": 0, "dur": 24, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 3, "time": 150486, "time_dur": 162, "idx": 747},
+                  {"tick": 22296, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 150648, "time_dur": -1, "idx": 748},
+                  {"tick": 22344, "key": 0, "dur": 48, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 150972, "time_dur": 324, "idx": 751},
+                  {"tick": 22392, "key": 0, "dur": 0, "isEnd": 1, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 151296, "time_dur": -1, "idx": 752},
+                  {"tick": 22656, "key": 0, "dur": 72, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 153080, "time_dur": 487, "idx": 775},
+                  {"tick": 22728, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 153567, "time_dur": -1, "idx": 776},
+                  {"tick": 22788, "key": 0, "dur": 60, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 153972, "time_dur": 406, "idx": 779},
+                  {"tick": 22848, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 154378, "time_dur": -1, "idx": 780},
+                  {"tick": 22908, "key": 0, "dur": 60, "isEnd": 0, "toTrack": 6, "volume": 0, "pan": 0, "attr": 4, "time": 154783, "time_dur": 405, "idx": 783},
+                  {"tick": 22968, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 5, "volume": 0, "pan": 0, "attr": 4, "time": 155188, "time_dur": -1, "idx": 784}
+            ]
+        },
+        {
+            "track": 63, 
+            "note": [
+                  {"tick": 24701, "key": 0, "dur": 0, "isEnd": 0, "toTrack": 0, "volume": 0, "pan": 0, "attr": 202, "time": 166896, "time_dur": 0, "idx": 0}
+            ]
+        }
+    ]
+}
