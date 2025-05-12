@@ -11,12 +11,13 @@
 #include "../../MapWorkspaceCanvas.h"
 #include "../MapEditor.h"
 #include "colorful-log.h"
-#include "editor/edit/HitObjectEditor.h"
-#include "editor/edit/eventhandler/mousepress/ivm/IVMCreateComplexHandler.h"
-#include "editor/edit/eventhandler/mousepress/ivm/IVMEditComplexHandler.h"
-#include "editor/edit/eventhandler/mousepress/ivm/IVMPlaceNoteHandler.h"
-#include "editor/edit/eventhandler/mousepress/ivm/IVMSelectHandler.h"
-#include "editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.h"
+#include "eventhandler/mousedrag/ivm/IVMDragAdjustObjectHandler.h"
+#include "eventhandler/mousedrag/ivm/IVMDragMoveObjectHandler.h"
+#include "eventhandler/mousepress/ivm/IVMCreateComplexHandler.h"
+#include "eventhandler/mousepress/ivm/IVMEditComplexHandler.h"
+#include "eventhandler/mousepress/ivm/IVMPlaceNoteHandler.h"
+#include "eventhandler/mousepress/ivm/IVMSelectHandler.h"
+#include "eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.h"
 #include "mmm/hitobject/Note/rm/Slide.h"
 
 // 构造IVMObjectEditor
@@ -40,6 +41,14 @@ IVMObjectEditor::IVMObjectEditor(MapEditor* meditor_ref)
 
     // 初始化默认的鼠标释放处理器
     mrelease_handler = std::make_shared<IVMMouseReleaseHandler>();
+
+    // 责任链式初始化鼠标拖动处理器
+    // 先处理物件的移动
+    mdrag_handler = std::make_shared<IVMDragMoveObjectHandler>();
+
+    // 然后处理面条的编辑
+    auto object_adjusthandler = std::make_shared<IVMDragAdjustObjectHandler>();
+    mdrag_handler->set_next_handler(object_adjusthandler);
 }
 
 // 析构IVMObjectEditor
@@ -70,12 +79,19 @@ void IVMObjectEditor::end_edit() {
 
 // 鼠标按下事件-传递
 void IVMObjectEditor::mouse_pressed(QMouseEvent* e) {
+    // 拍下悬浮位置快照
+    if (editor_ref->ebuffer.hover_object_info) {
+        hover_object_info_shortcut = std::shared_ptr<HoverObjectInfo>(
+            editor_ref->ebuffer.hover_object_info->clone());
+    } else {
+        hover_object_info_shortcut = nullptr;
+    }
     auto handle_res = mpress_handler->handle(
         this, e, nearest_divisor_time(), editor_ref->cstatus.mouse_pos_orbit);
     if (handle_res) {
         XINFO("鼠标按下事件已被处理");
     } else {
-        XWARN("鼠标按下事件已忽略");
+        XWARN("鼠标按下事件处理失败");
     }
 }
 
@@ -85,7 +101,18 @@ void IVMObjectEditor::mouse_released(QMouseEvent* e) {
     if (handle_res) {
         XINFO("鼠标释放事件已被处理");
     } else {
-        XWARN("鼠标释放事件已忽略");
+        XWARN("鼠标释放事件处理失败");
+    }
+}
+
+// 鼠标拖动事件-传递
+void IVMObjectEditor::mouse_dragged(QMouseEvent* e) {
+    auto handle_res = mdrag_handler->handle(
+        this, e, nearest_divisor_time(), editor_ref->cstatus.mouse_pos_orbit);
+    if (handle_res) {
+        XINFO("鼠标拖动事件已被处理");
+    } else {
+        XWARN("鼠标拖动事件处理失败");
     }
 }
 
@@ -97,78 +124,6 @@ void IVMObjectEditor::update_current_comp() {
         auto temp_note = std::dynamic_pointer_cast<Note>(obj);
         if (!temp_note) continue;
         current_edit_complex->child_notes.emplace_back(temp_note);
-    }
-}
-
-// 鼠标拖动事件-传递
-void IVMObjectEditor::mouse_dragged(QMouseEvent* e) {
-    if (long_note_edit_mode) return;
-
-    auto time = nearest_divisor_time();
-    if (!(std::abs(time - (-1.0)) < 1e-16)) {
-        // 根据编辑模式修改所有编辑缓存物件的
-        // note
-        // 当前编辑物件的相对位置和时间变化值
-        // hold
-        // 或持续时间
-        // slide
-        // 或滑动轨道数
-        // 计算相对变化
-        auto note = std::dynamic_pointer_cast<Note>(current_edit_object);
-        // 拖动单键
-        // 相对移动的时间和轨道
-        auto rtime = time - note->timestamp;
-        auto rorbit = editor_ref->cstatus.mouse_pos_orbit - note->orbit;
-
-        // 将编辑缓存中的所有可转化为Note的物件应用此变化
-        // 同时遍历缓存和快照-
-        auto it = editing_temp_objects.begin();
-        auto info_it = info_shortcuts.begin();
-
-        while (it != editing_temp_objects.end() &&
-               info_it != info_shortcuts.end()) {
-            auto tempnote = std::dynamic_pointer_cast<Note>(*it);
-            auto info = std::dynamic_pointer_cast<Note>(*info_it);
-            if (tempnote) {
-                auto srctime = tempnote->timestamp;
-                auto srco = tempnote->orbit;
-                tempnote->timestamp = info->timestamp + rtime;
-                tempnote->orbit = info->orbit + rorbit;
-                // TODO(xiang 2025-05-08):
-                // 面条和滑键需要同时更新面尾和滑尾-组合键的时间戳也需要更新
-                switch (tempnote->note_type) {
-                    case NoteType::HOLD: {
-                        auto hold = std::static_pointer_cast<Hold>(tempnote);
-                        hold->hold_end_reference->timestamp =
-                            tempnote->timestamp + hold->hold_time;
-                        break;
-                    }
-                    case NoteType::SLIDE: {
-                        auto slide = std::static_pointer_cast<Slide>(tempnote);
-                        slide->slide_end_reference->timestamp =
-                            slide->timestamp;
-                        slide->slide_end_reference->endorbit =
-                            slide->orbit + slide->slide_parameter;
-                        break;
-                    }
-                }
-                XINFO(QString("移动物件t[%1]->t[%2]  o[%3]->o[%4]")
-                          .arg(srctime)
-                          .arg(tempnote->timestamp)
-                          .arg(srco)
-                          .arg(tempnote->orbit)
-                          .toStdString());
-            }
-            ++it;
-            ++info_it;
-        }
-        // 已在map编辑器过滤
-        // switch (editor_ref->edit_mode) {
-        //     // 编辑物件的两个模式-拖动事件
-        //   case MouseEditMode::PLACE_LONGNOTE:
-        //   case MouseEditMode::PLACE_NOTE: {
-        //     break;
-        //   }
-        // }
+        temp_note->parent_reference = current_edit_complex.get();
     }
 }

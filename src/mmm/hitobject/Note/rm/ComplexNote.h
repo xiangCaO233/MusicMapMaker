@@ -8,20 +8,23 @@
 
 // 组合键
 class ComplexNote : public Note {
- public:
-  // 构造ComplexNote
-  explicit ComplexNote(uint32_t time, int32_t orbit_pos);
-  // 析构ComplexNote
-  ~ComplexNote() override;
+   public:
+    // 构造ComplexNote
+    explicit ComplexNote(uint32_t time, int32_t orbit_pos);
+    // 析构ComplexNote
+    ~ComplexNote() override;
 
-  // 所有子物件
-  std::vector<std::shared_ptr<Note>> child_notes;
+    // 所有子物件
+    std::vector<std::shared_ptr<Note>> child_notes;
 
-  // 打印用
-  std::string toString() override;
+    // 打印用
+    std::string toString() override;
 
-  // 深拷贝
-  virtual ComplexNote* clone() override;
+    // 深拷贝
+    virtual ComplexNote* clone() override;
+
+    // 判同
+    virtual bool equals(const std::shared_ptr<HitObject>& other) const override;
 };
 
 #endif  // M_COMPLEXNOTE_H

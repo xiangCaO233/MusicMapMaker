@@ -3,11 +3,30 @@
 #include "../../../../MapEditor.h"
 #include "../../../HitObjectEditor.h"
 #include "colorful-log.h"
+#include "mmm/hitobject/Note/Note.h"
+#include "mmm/hitobject/Note/rm/ComplexNote.h"
 
 // 构造IVMSelectHandler
 IVMSelectHandler::IVMSelectHandler() {}
 // 析构IVMSelectHandler
 IVMSelectHandler::~IVMSelectHandler() = default;
+
+// 选中物件
+void IVMSelectHandler::select_note(IVMObjectEditor* ivmobjecteditor,
+                                   std::shared_ptr<HitObject> note) {
+    // 克隆一份用于编辑缓存显示虚影
+    auto cloned_obj = std::shared_ptr<HitObject>(note->clone());
+
+    // 原来的物件放到src源物件表中-即将删除
+    ivmobjecteditor->editing_src_objects.insert(note);
+
+    // 克隆份放入编辑缓存
+    ivmobjecteditor->editing_temp_objects.insert(cloned_obj);
+
+    // 记录物件快照
+    ivmobjecteditor->info_shortcuts.insert(
+        std::shared_ptr<HitObject>(cloned_obj->clone()));
+}
 
 // 抄抄ivm编辑逻辑
 // 处理事件
@@ -53,23 +72,22 @@ bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
             ivmobjecteditor->editor_ref->ebuffer.selected_hitobjects.clear();
             XWARN("开始编辑已选中的物件");
         } else {
-            // 仅选中悬浮位置的物件
-            // 克隆一份用于编辑缓存显示虚影
-            auto cloned_obj = std::shared_ptr<HitObject>(
-                ivmobjecteditor->current_edit_object->clone());
-
-            // 原来的物件放到src源物件表中-即将删除
-            ivmobjecteditor->editing_src_objects.insert(
+            // 判断是否选到组合键中的子键
+            auto note = std::dynamic_pointer_cast<Note>(
                 ivmobjecteditor->current_edit_object);
-
-            // 克隆份放入编辑缓存
-            ivmobjecteditor->editing_temp_objects.insert(cloned_obj);
-
-            // 记录物件快照
-            ivmobjecteditor->info_shortcuts.insert(
-                std::shared_ptr<HitObject>(cloned_obj->clone()));
-
-            XWARN("开始编辑鼠标悬浮物件");
+            if (note && note->compinfo != ComplexInfo::NONE) {
+                // 选中组合键中所有的物件
+                for (const auto& child_note :
+                     note->parent_reference->child_notes) {
+                    select_note(ivmobjecteditor, child_note);
+                }
+                XWARN("开始编辑鼠标悬浮组合物件");
+            } else {
+                // 仅选中悬浮位置的物件
+                select_note(ivmobjecteditor,
+                            ivmobjecteditor->current_edit_object);
+                XWARN("开始编辑鼠标悬浮物件");
+            }
         }
 
         // 左键仅选中-直接返回处理结果

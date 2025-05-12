@@ -1,5 +1,6 @@
 #include "IVMMouseReleaseHandler.h"
 
+#include "../../../../mmm/hitobject/Note/rm/ComplexNote.h"
 #include "../../../IVMObjectEditor.h"
 
 // 构造IVMMouseReleaseHandler
@@ -35,6 +36,7 @@ bool IVMMouseReleaseHandler::handle(HitObjectEditor* oeditor_context,
         case Qt::RightButton: {
             // 释放的是右键
             if (!ivmobjecteditor->long_note_edit_mode) {
+                // TODO(xiang 2025-05-12): 删除组合键内的物件时拆分组合键
                 // 删除选中的全部物件
                 ivmobjecteditor->editing_temp_objects.clear();
                 ivmobjecteditor->end_edit();
@@ -42,6 +44,10 @@ bool IVMMouseReleaseHandler::handle(HitObjectEditor* oeditor_context,
             } else {
                 // 若为面条编辑模式则面条编辑结束
                 // 结束面条编辑
+                // 只添加当前编辑的组合键
+                ivmobjecteditor->editing_temp_objects.clear();
+                ivmobjecteditor->editing_temp_objects.insert(
+                    ivmobjecteditor->current_edit_complex);
                 ivmobjecteditor->end_edit();
                 ivmobjecteditor->long_note_edit_mode = false;
                 XINFO("结束编辑面条");

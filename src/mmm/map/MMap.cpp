@@ -8,10 +8,12 @@
 
 #include "../../util/mutil.h"
 #include "../hitobject/HitObject.h"
+#include "../hitobject/Note/HoldEnd.h"
 #include "../hitobject/Note/Note.h"
 #include "../hitobject/Note/rm/ComplexNote.h"
 #include "../timing/Timing.h"
 #include "colorful-log.h"
+#include "mmm/hitobject/Note/rm/Slide.h"
 
 MMap::MMap() {
     // 初始化播放回调对象
@@ -20,67 +22,222 @@ MMap::MMap() {
 
 MMap::~MMap() = default;
 
+// 插入物件
+void MMap::insert_hitobject(std::shared_ptr<HitObject> hitobject) {
+    // 普通物件
+    auto note = std::dynamic_pointer_cast<Note>(hitobject);
+    if (note) {
+        switch (note->note_type) {
+            case NoteType::NOTE: {
+                hitobjects.insert(note);
+                break;
+            }
+            case NoteType::SLIDE: {
+                // 滑键
+                // 放入主区,并在主区添加面尾物件
+                auto insert_slide = std::static_pointer_cast<Slide>(note);
+                hitobjects.insert(insert_slide);
+                hitobjects.insert(insert_slide->slide_end_reference);
+                break;
+            }
+            case NoteType::HOLD: {
+                // 面条
+                auto insert_hold = std::static_pointer_cast<Hold>(note);
+                // 放入主区,缓冲区,并在主区添加面尾物件
+                hitobjects.insert(insert_hold);
+                temp_hold_list.insert(insert_hold);
+                hitobjects.insert(insert_hold->hold_end_reference);
+                break;
+            }
+            case NoteType::COMPLEX: {
+                // 组合键
+                auto insert_complex =
+                    std::static_pointer_cast<ComplexNote>(note);
+                for (const auto& child_note : insert_complex->child_notes) {
+                    // 递归插入所有子物件
+                    insert_hitobject(child_note);
+                }
+                // 然后添加自身
+                hitobjects.insert(insert_complex);
+
+                break;
+            }
+        }
+    } else {
+        // 非note的其他物件
+        hitobjects.insert(hitobject);
+    }
+}
+
+// 移除物件
+void MMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
+    auto note = std::dynamic_pointer_cast<Note>(hitobject);
+    if (note) {
+        // 添加相同物件的迭代器到数组
+        auto insert_same_objs =
+            [&](std::vector<decltype(hitobjects.begin())>& to_erase,
+                std::shared_ptr<HitObject> obj) {
+                auto it = hitobjects.lower_bound(obj);
+                // 前移到上一时间戳
+                while (it != hitobjects.begin() &&
+                       note->timestamp - it->get()->timestamp < 10) {
+                    --it;
+                }
+
+                // 添加滑头的即将删除迭代器
+                while (it != hitobjects.end() &&
+                       (it->get()->timestamp - note->timestamp) < 5) {
+                    if (it->get()->equals(note)) {
+                        to_erase.push_back(it);
+                    }
+                    ++it;
+                }
+            };
+        // 添加相同物件的迭代器到数组
+        auto insert_same_tempobjs =
+            [&](std::vector<decltype(temp_hold_list.begin())>& to_erase,
+                std::shared_ptr<Hold> obj) {
+                auto it = temp_hold_list.lower_bound(obj);
+                // 前移到上一时间戳
+                while (it != temp_hold_list.begin() &&
+                       note->timestamp - it->get()->timestamp < 10) {
+                    --it;
+                }
+
+                // 添加滑头的即将删除迭代器
+                while (it != temp_hold_list.end() &&
+                       (it->get()->timestamp - note->timestamp) < 5) {
+                    if (it->get()->equals(note)) {
+                        to_erase.push_back(it);
+                    }
+                    ++it;
+                }
+            };
+        // 从主集合移除
+        auto remove_from_main =
+            [&](std::vector<decltype(hitobjects.begin())>& to_erase) {
+                // 从后往前删除，避免迭代器失效
+                for (auto rit = to_erase.rbegin(); rit != to_erase.rend();
+                     ++rit) {
+                    XWARN(QString("移除map源物件:t[%1]")
+                              .arg((*rit)->get()->timestamp)
+                              .toStdString());
+                    hitobjects.erase(*rit);
+                }
+            };
+        // 从缓存面条集合移除
+        auto remove_from_bufferholds =
+            [&](std::vector<decltype(temp_hold_list.begin())>& to_erase) {
+                // 从后往前删除，避免迭代器失效
+                for (auto rit = to_erase.rbegin(); rit != to_erase.rend();
+                     ++rit) {
+                    XWARN(QString("移除map源物件:t[%1]")
+                              .arg((*rit)->get()->timestamp)
+                              .toStdString());
+                    temp_hold_list.erase(*rit);
+                }
+            };
+
+        switch (note->note_type) {
+            case NoteType::NOTE: {
+                // 删除单键-可能的重叠物件一起删
+                auto insert_slide = std::static_pointer_cast<Slide>(note);
+                // 存储要删除的迭代器（可能有多个匹配项）
+                std::vector<decltype(hitobjects.begin())> to_erase;
+                insert_same_objs(to_erase, note);
+                remove_from_main(to_erase);
+
+                break;
+            }
+            case NoteType::SLIDE: {
+                // 滑键
+                // 从主区移除,并在主区移除对应面尾物件
+                auto insert_slide = std::static_pointer_cast<Slide>(note);
+
+                // 存储要删除的迭代器（可能有多个匹配项）
+                std::vector<decltype(hitobjects.begin())> to_erase;
+
+                // 添加滑头和滑尾
+                insert_same_objs(to_erase, insert_slide);
+                // 从主集合移除物件
+                remove_from_main(to_erase);
+
+                to_erase.clear();
+                insert_same_objs(to_erase, insert_slide->slide_end_reference);
+                // 从主集合移除物件
+                remove_from_main(to_erase);
+                break;
+            }
+            case NoteType::HOLD: {
+                // 面条
+                auto remove_hold = std::static_pointer_cast<Hold>(note);
+                // 从主区和缓冲区移除,并在主区移除面尾物件
+                // 存储要删除的迭代器（可能有多个匹配项）
+                std::vector<decltype(hitobjects.begin())> to_erase;
+
+                // 添加面头和面尾
+                insert_same_objs(to_erase, remove_hold);
+                // 从主集合移除物件
+                remove_from_main(to_erase);
+
+                // 防止迭代器失效
+                to_erase.clear();
+                insert_same_objs(to_erase, remove_hold->hold_end_reference);
+                // 从主集合移除物件
+                remove_from_main(to_erase);
+
+                // 面条缓存
+                std::vector<decltype(temp_hold_list.begin())> to_erase_temp;
+                insert_same_tempobjs(to_erase_temp, remove_hold);
+                remove_from_bufferholds(to_erase_temp);
+
+                break;
+            }
+            case NoteType::COMPLEX: {
+                // 组合键
+                auto remove_complex =
+                    std::static_pointer_cast<ComplexNote>(note);
+                for (const auto& child_note : remove_complex->child_notes) {
+                    // 递归移除所有子物件
+                    remove_hitobject(child_note);
+                }
+                // 然后移除自身
+                // 存储要删除的迭代器（可能有多个匹配项）
+                std::vector<decltype(hitobjects.begin())> to_erase;
+                hitobjects.erase(remove_complex);
+                break;
+            }
+        }
+    } else {
+        hitobjects.erase(hitobject);
+    }
+}
+
 // 执行操作
 void MMap::execute_edit_operation(ObjEditOperation& operation) {
     // TODO(xiang 2025-05-08): 实现执行操作
 
     // 移除src的物件
-    if (!operation.src_objects.empty()) {
+    if (!operation.src_objects.empty())
         for (const auto& srcobj : operation.src_objects) {
-            auto it = hitobjects.lower_bound(srcobj);
-            // 前移到上一时间戳
-            while (it != hitobjects.begin() &&
-                   srcobj->timestamp - it->get()->timestamp < 10) {
-                --it;
-            }
-            // 存储要删除的迭代器（可能有多个匹配项）
-            std::vector<decltype(it)> to_erase;
-
-            while (it != hitobjects.end() &&
-                   (it->get()->timestamp - srcobj->timestamp) < 5) {
-                if (it->get()->equals(srcobj)) {
-                    to_erase.push_back(it);
-                }
-                ++it;
-            }
-
-            // 从后往前删除，避免迭代器失效
-            for (auto rit = to_erase.rbegin(); rit != to_erase.rend(); ++rit) {
-                XWARN(QString("移除map源物件:t[%1]")
-                          .arg((*rit)->get()->timestamp)
-                          .toStdString());
-                hitobjects.erase(*rit);
-            }
-            // 面条缓存容器
-            auto hold = std::dynamic_pointer_cast<Hold>(srcobj);
-            if (hold) {
-                auto it_temp = temp_hold_list.lower_bound(hold);
-                std::vector<decltype(it_temp)> to_erase_temp;
-                // 前移到上一时间戳
-                while (it_temp != temp_hold_list.begin() &&
-                       hold->timestamp - it_temp->get()->timestamp < 10) {
-                    --it_temp;
-                }
-
-                while (it_temp != temp_hold_list.end() &&
-                       (it_temp->get()->timestamp - hold->timestamp) < 5) {
-                    if (it_temp->get()->equals(hold)) {
-                        to_erase_temp.push_back(it_temp);
+            auto note = std::dynamic_pointer_cast<Note>(srcobj);
+            std::shared_ptr<ComplexNote> removed_comp{nullptr};
+            if (note) {
+                switch (note->compinfo) {
+                    case ComplexInfo::END: {
+                        remove_hitobject(std::shared_ptr<ComplexNote>(
+                            note->parent_reference, [](ComplexNote*) {}));
+                        break;
                     }
-                    ++it_temp;
+                    default: {
+                        remove_hitobject(srcobj);
+                        break;
+                    }
                 }
-
-                // 从后往前删除，避免迭代器失效
-                for (auto rit_temp = to_erase_temp.rbegin();
-                     rit_temp != to_erase_temp.rend(); ++rit_temp) {
-                    XWARN(QString("移除map缓存源物件:t[%1]")
-                              .arg((*rit_temp)->get()->timestamp)
-                              .toStdString());
-                    temp_hold_list.erase(*rit_temp);
-                }
+            } else {
+                remove_hitobject(srcobj);
             }
         }
-    }
 
     // 插入des的物件
     if (!operation.des_objects.empty()) {
@@ -94,14 +251,14 @@ void MMap::execute_edit_operation(ObjEditOperation& operation) {
                 --it;
             while (it != hitobjects.end() &&
                    (it->get()->timestamp - obj->timestamp) < 5) {
-                if (it->get()->equals(obj)) {
+                if (obj->equals(*it)) {
                     add = false;
                     break;
                 }
                 ++it;
             }
             if (add) {
-                hitobjects.insert(obj);
+                insert_hitobject(obj);
                 XWARN(QString("添加map目标物件:t[%1]")
                           .arg(obj->timestamp)
                           .toStdString());
@@ -115,20 +272,6 @@ void MMap::execute_edit_operation(ObjEditOperation& operation) {
 }
 
 void MMap::execute_edit_operation(TimingEditOperation& operation) {}
-
-// 插入物件
-void MMap::insert_hitobject(std::shared_ptr<HitObject> hitobject) {
-    auto note = std::dynamic_pointer_cast<Note>(hitobject);
-    if (note) {
-        // 处理面条
-
-    } else {
-        hitobjects.insert(hitobject);
-    }
-}
-
-// 移除物件
-void MMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {}
 
 // 生成此拍的分拍策略
 void MMap::generate_divisor_policy(const std::shared_ptr<Beat>& beat) {

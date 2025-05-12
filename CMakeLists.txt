@@ -173,6 +173,11 @@ set(PROJECT_SOURCES
     src/canvas/map/editor/edit/eventhandler/mouserelease/IMouseReleaseEventHandler.h
     src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.h
     src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousedrag/IMouseDragEventHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragMoveObjectHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragMoveObjectHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragAdjustObjectHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragAdjustObjectHandler.cpp
     src/canvas/map/generator/ObjectGenerator.h
     src/canvas/map/generator/ObjectGenerator.cpp
     src/canvas/map/generator/general/NoteGenerator.h

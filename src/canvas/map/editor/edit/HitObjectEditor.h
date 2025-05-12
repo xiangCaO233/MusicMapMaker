@@ -7,6 +7,8 @@
 #include <stack>
 
 #include "../../../../mmm/map/MMap.h"
+#include "../info/HoverInfo.h"
+#include "eventhandler/mousedrag/IMouseDragEventHandler.h"
 #include "eventhandler/mousepress/IMousePressEventHandler.h"
 #include "eventhandler/mouserelease/IMouseReleaseEventHandler.h"
 
@@ -28,11 +30,17 @@ class HitObjectEditor {
     // 图编辑器引用
     MapEditor* editor_ref;
 
+    // 鼠标按下时鼠标悬停位置的物件信息快照
+    std::shared_ptr<HoverObjectInfo> hover_object_info_shortcut{nullptr};
+
     // 鼠标按下事件处理器
     std::shared_ptr<IMousePressEventHandler> mpress_handler;
 
     // 鼠标释放事件处理器
     std::shared_ptr<IMouseReleaseEventHandler> mrelease_handler;
+
+    // 鼠标拖动事件处理器
+    std::shared_ptr<IMouseDragEventHandler> mdrag_handler;
 
     // 正在编辑的原物件
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
