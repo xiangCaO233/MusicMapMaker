@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <memory>
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -630,6 +631,7 @@ void MMap::query_object_in_range(
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>&
         result_objects,
     int32_t start, const int32_t end, bool with_longhold) {
+    std::unique_lock<std::mutex> lock(hitobjects_mutex);
     // 自动去重+排序
     // std::set<std::shared_ptr<HitObject>, SharedPtrCompare> adding_objects;
     /*

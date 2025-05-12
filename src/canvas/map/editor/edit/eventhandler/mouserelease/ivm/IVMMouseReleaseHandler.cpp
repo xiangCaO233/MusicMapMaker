@@ -37,6 +37,13 @@ bool IVMMouseReleaseHandler::handle(HitObjectEditor* oeditor_context,
             // 释放的是右键
             if (!ivmobjecteditor->long_note_edit_mode) {
                 // TODO(xiang 2025-05-12): 删除组合键内的物件时拆分组合键
+                //
+                //
+                //
+                //
+                //
+                //
+                //
                 // 删除选中的全部物件
                 ivmobjecteditor->editing_temp_objects.clear();
                 ivmobjecteditor->end_edit();

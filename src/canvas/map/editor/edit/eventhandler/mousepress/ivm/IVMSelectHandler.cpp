@@ -73,15 +73,28 @@ bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
             XWARN("开始编辑已选中的物件");
         } else {
             // 判断是否选到组合键中的子键
+            // 仅选中悬浮位置的物件
+            // select_note(ivmobjecteditor,
+            // ivmobjecteditor->current_edit_object);
+            // XWARN("开始编辑鼠标悬浮物件");
+
             auto note = std::dynamic_pointer_cast<Note>(
                 ivmobjecteditor->current_edit_object);
             if (note && note->compinfo != ComplexInfo::NONE) {
-                // 选中组合键中所有的物件
-                for (const auto& child_note :
-                     note->parent_reference->child_notes) {
-                    select_note(ivmobjecteditor, child_note);
+                // 如果选到组合键头-把所有的都加入(整体)
+                if (note->compinfo == ComplexInfo::HEAD) {
+                    // 选中组合键中所有的物件
+                    for (const auto& child_note :
+                         note->parent_reference->child_notes) {
+                        select_note(ivmobjecteditor, child_note);
+                    }
+                    XWARN("开始编辑鼠标悬浮完整组合物件");
+                } else {
+                    // 仅选中悬浮位置的物件
+                    select_note(ivmobjecteditor,
+                                ivmobjecteditor->current_edit_object);
+                    XWARN("开始编辑鼠标悬浮组合物件子键");
                 }
-                XWARN("开始编辑鼠标悬浮组合物件");
             } else {
                 // 仅选中悬浮位置的物件
                 select_note(ivmobjecteditor,

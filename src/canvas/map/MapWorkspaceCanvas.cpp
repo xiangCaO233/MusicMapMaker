@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -605,6 +606,9 @@ void MapWorkspaceCanvas::push_shape() {
         // 更新物件列表
         // 清除物件缓存
         editor->ebuffer.buffer_objects.clear();
+        {
+            std::unique_lock<std::mutex> lock(working_map->hitobjects_mutex);
+        }
         working_map->query_object_in_range(
             editor->ebuffer.buffer_objects,
             int32_t(editor->ebuffer.current_time_area_start),
