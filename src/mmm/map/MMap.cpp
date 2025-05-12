@@ -51,7 +51,6 @@ void MMap::execute_edit_operation(ObjEditOperation& operation) {
                           .toStdString());
                 hitobjects.erase(*rit);
             }
-
             // 面条缓存容器
             auto hold = std::dynamic_pointer_cast<Hold>(srcobj);
             if (hold) {
@@ -60,7 +59,7 @@ void MMap::execute_edit_operation(ObjEditOperation& operation) {
                 // 前移到上一时间戳
                 while (it_temp != temp_hold_list.begin() &&
                        hold->timestamp - it_temp->get()->timestamp < 10) {
-                    --it;
+                    --it_temp;
                 }
 
                 while (it_temp != temp_hold_list.end() &&
