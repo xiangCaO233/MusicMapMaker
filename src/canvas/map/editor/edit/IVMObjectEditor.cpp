@@ -123,7 +123,7 @@ void IVMObjectEditor::update_current_comp() {
     for (const auto& obj : editing_temp_objects) {
         auto temp_note = std::dynamic_pointer_cast<Note>(obj);
         if (!temp_note) continue;
-        current_edit_complex->child_notes.emplace_back(temp_note);
+        current_edit_complex->child_notes.insert(temp_note);
         temp_note->parent_reference = current_edit_complex.get();
     }
 }

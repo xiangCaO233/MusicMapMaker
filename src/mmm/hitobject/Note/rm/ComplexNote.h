@@ -2,9 +2,10 @@
 #define M_COMPLEXNOTE_H
 
 #include <memory>
-#include <vector>
+#include <set>
 
 #include "../Note.h"
+#include "mmm/hitobject/HitObject.h"
 
 // 组合键
 class ComplexNote : public Note {
@@ -15,7 +16,7 @@ class ComplexNote : public Note {
     ~ComplexNote() override;
 
     // 所有子物件
-    std::vector<std::shared_ptr<Note>> child_notes;
+    std::multiset<std::shared_ptr<Note>, HitObjectComparator> child_notes;
 
     // 打印用
     std::string toString() override;

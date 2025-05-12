@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <iterator>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -218,16 +219,60 @@ void MMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
 void MMap::execute_edit_operation(ObjEditOperation& operation) {
     // TODO(xiang 2025-05-08): 实现执行操作
 
+    bool remove_parent{false};
     // 移除src的物件
     if (!operation.src_objects.empty())
         for (const auto& srcobj : operation.src_objects) {
             auto note = std::dynamic_pointer_cast<Note>(srcobj);
             std::shared_ptr<ComplexNote> removed_comp{nullptr};
+            std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+                intersections;
+
             if (note) {
                 switch (note->compinfo) {
+                    case ComplexInfo::HEAD:
+                    case ComplexInfo::BODY: {
+                        auto temp_comp = std::shared_ptr<ComplexNote>(
+                            note->parent_reference, [](ComplexNote*) {});
+                        if (temp_comp != removed_comp) {
+                            // 有新的组合键内的物件
+                            removed_comp = temp_comp;
+                            // 取得交集
+                            std::set_intersection(
+                                operation.src_objects.begin(),
+                                operation.src_objects.end(),
+                                removed_comp->child_notes.begin(),
+                                removed_comp->child_notes.end(),
+                                std::inserter(intersections,
+                                              intersections.end()),
+                                operation.src_objects.key_comp());
+
+                            // 判断交集是否完全属于组合键-(全选到了)
+
+                            if (!mutil::full_selected_complex(intersections,
+                                                              removed_comp)) {
+                                std::multiset<std::shared_ptr<HitObject>,
+                                              HitObjectComparator>
+                                    res;
+                                remove_parent = true;
+                                // 不完全-需要拆分组合键
+                                mutil::destruct_complex_note(res, removed_comp,
+                                                             intersections);
+                                remove_hitobject(removed_comp);
+                                for (const auto& obj : res) {
+                                    insert_hitobject(obj);
+                                }
+                            }
+                        }
+                        break;
+                    }
                     case ComplexInfo::END: {
-                        remove_hitobject(std::shared_ptr<ComplexNote>(
-                            note->parent_reference, [](ComplexNote*) {}));
+                        if (!remove_parent) {
+                            removed_comp = std::shared_ptr<ComplexNote>(
+                                note->parent_reference, [](ComplexNote*) {});
+                            remove_hitobject(removed_comp);
+                        }
+                        intersections.clear();
                         break;
                     }
                     default: {
