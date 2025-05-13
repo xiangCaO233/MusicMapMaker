@@ -13,24 +13,24 @@ class MInfo;
 }
 
 class MInfo : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  explicit MInfo(QWidget *parent = nullptr);
-  ~MInfo();
-  MMetas *mmetas;
+   public:
+    explicit MInfo(QWidget *parent = nullptr);
+    ~MInfo();
+    MMetas *mmetas;
 
-  // 当前主题
-  GlobalTheme current_theme;
+    // 当前主题
+    GlobalTheme current_theme;
 
-  // 使用主题
-  void use_theme(GlobalTheme theme);
+    // 使用主题
+    void use_theme(GlobalTheme theme);
 
-  // 输出日志
-  void log(MLogLevel level, const QString &message);
+    // 输出日志
+    void log(MLogLevel level, const QString &message);
 
- private:
-  Ui::MInfo *ui;
+   private:
+    Ui::MInfo *ui;
 };
 
 #endif  // MINFO_H

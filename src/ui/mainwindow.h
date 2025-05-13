@@ -23,26 +23,26 @@ class MainWindow;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  explicit MainWindow(QWidget *parent = nullptr);
-  ~MainWindow() override;
+   public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
 
-  // 全部设置
-  Settings settings;
+    // 全部设置
+    Settings settings;
 
-  // 当前主题
-  GlobalTheme current_theme;
+    // 当前主题
+    GlobalTheme current_theme;
 
-  // 使用主题
-  void use_theme(GlobalTheme theme);
+    // 使用主题
+    void use_theme(GlobalTheme theme);
 
- public slots:
-  // 更新窗口标题
-  void update_window_title(QString &suffix);
+   public slots:
+    // 更新窗口标题
+    void update_window_title(QString &suffix);
 
- private:
-  Ui::MainWindow *ui;
+   private:
+    Ui::MainWindow *ui;
 };
 #endif  // MAINWINDOW_H

@@ -3,14 +3,14 @@
 
 // 默认主题
 enum class GlobalTheme {
-  DARK,
-  LIGHT,
+    DARK,
+    LIGHT,
 };
 
 // 设置
 struct Settings {
-  // 主题
-  GlobalTheme global_theme;
+    // 主题
+    GlobalTheme global_theme;
 };
 
 #endif  // M_GLOBAL_SETTINGS_H

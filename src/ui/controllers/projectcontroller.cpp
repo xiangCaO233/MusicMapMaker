@@ -60,7 +60,7 @@ MProjectController::~MProjectController() { delete ui; }
 // 新项目槽函数
 void MProjectController::new_project(std::shared_ptr<MapWorkProject>& project) {
     // 添加到项目列表
-    project_list.emplace_back(project);
+    project_mapping[project->config.project_name] = project;
 
     // 添加选中项
     ui->project_selector->addItem(
@@ -262,16 +262,15 @@ void MProjectController::on_close_project_button_clicked() {
         // 获取选中的项目指针
         QVariant var = ui->project_selector->currentData();
         auto project = var.value<std::shared_ptr<MapWorkProject>>();
-        auto project_it =
-            std::find(project_list.begin(), project_list.end(), project);
-        if (project_it != project_list.end()) {
+        auto project_it = project_mapping.find(project->config.project_name);
+        if (project_it != project_mapping.end()) {
             // 移除当前选中项
             ui->project_selector->removeItem(
                 ui->project_selector->currentIndex());
             // 从项目列表移除
-            project_list.erase(project_it);
+            project_mapping.erase(project_it);
             // 检查当前是否还有其他项目
-            if (!project_list.empty()) {
+            if (!project_mapping.empty()) {
                 // 选中另一个项目
                 on_project_selector_currentIndexChanged(1);
             } else {

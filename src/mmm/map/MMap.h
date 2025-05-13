@@ -73,7 +73,7 @@ class MMap {
     std::shared_ptr<AudioEnginPlayCallback> audio_pos_callback;
 
     // 项目引用
-    std::shared_ptr<MapWorkProject> project_reference;
+    MapWorkProject* project_reference;
 
     // 图类型
     MapType maptype;

@@ -40,94 +40,94 @@ class GLCanvas : public QOpenGLWindow,
                  public QOpenGLFunctions_4_5_Core
 #endif  //__APPLE__
 {
-  Q_OBJECT
-  friend class AbstractRenderer;
-  friend class StaticRenderer;
-  friend class DynamicRenderer;
+    Q_OBJECT
+    friend class AbstractRenderer;
+    friend class StaticRenderer;
+    friend class DynamicRenderer;
 
- public:
-  // 构造GLCanvas
-  explicit GLCanvas(QWidget *parent = nullptr);
-  // 析构GLCanvas
-  ~GLCanvas() override;
-  // fps计数器
-  FrameRateCounter *fpsCounter;
+   public:
+    // 构造GLCanvas
+    explicit GLCanvas(QWidget *parent = nullptr);
+    // 析构GLCanvas
+    ~GLCanvas() override;
+    // fps计数器
+    FrameRateCounter *fpsCounter;
 
-  // 刷新线程
-  std::thread update_thread;
+    // 刷新线程
+    std::thread update_thread;
 
-  // 目标刷新时间间隔
-  int32_t des_update_time{8};
+    // 目标刷新时间间隔
+    int32_t des_update_time{8};
 
-  // 停止刷新线程标识
-  bool stop_refresh{false};
+    // 停止刷新线程标识
+    bool stop_refresh{false};
 
-  // 上一帧glcall
-  long pre_glcalls{0};
-  long pre_drawcall{0};
+    // 上一帧glcall
+    long pre_glcalls{0};
+    long pre_drawcall{0};
 
-  // 上一次的帧生成时间
-  long pre_frame_time{100};
+    // 上一次的帧生成时间
+    long pre_frame_time{100};
 
-  // 当前鼠标位置
-  QPoint mouse_pos{0, 0};
+    // 当前鼠标位置
+    QPoint mouse_pos{0, 0};
 
-  // 需要更新采样器uniform location
-  static bool need_update_sampler_location;
+    // 需要更新采样器uniform location
+    static bool need_update_sampler_location;
 
-  // 渲染管理器
-  RendererManager *renderer_manager = nullptr;
+    // 渲染管理器
+    RendererManager *renderer_manager = nullptr;
 
-  // 全部纹理映射表(id-纹理对象)
-  std::unordered_map<std::string, std::shared_ptr<TextureInstace>>
-      texture_full_map;
+    // 全部纹理映射表(id-纹理对象)
+    std::unordered_map<std::string, std::shared_ptr<TextureInstace>>
+        texture_full_map;
 
-  // 从指定目录添加纹理
-  void load_texture_from_path(const char *path);
+    // 从指定目录添加纹理
+    void load_texture_from_path(const char *path);
 
-  // 从指定目录添加纹理
-  void load_texture_from_path(std::filesystem::path &path);
+    // 从指定目录添加纹理
+    void load_texture_from_path(std::filesystem::path &path);
 
-  // 添加纹理
-  void add_texture(const char *relative_path, const char *path);
+    // 添加纹理
+    void add_texture(const char *relative_path, const char *path);
 
-  // 添加纹理
-  void add_texture(std::filesystem::path &relative_path,
-                   std::filesystem::path &path);
+    // 添加纹理
+    void add_texture(std::filesystem::path &relative_path,
+                     std::filesystem::path &path);
 
-  // 设置垂直同步
-  void set_Vsync(bool flag);
+    // 设置垂直同步
+    void set_Vsync(bool flag);
 
-  // 渲染实际图形
-  virtual void push_shape();
+    // 渲染实际图形
+    virtual void push_shape();
 
-  void start_render();
+    void start_render();
 
-  void rendergl();
+    void rendergl();
 
- public slots:
-  // 更新fps显示
-  virtual void updateFpsDisplay(int fps);
+   public slots:
+    // 更新fps显示
+    virtual void updateFpsDisplay(int fps);
 
- signals:
-  void update_window_title_suffix(QString &title_suffix);
+   signals:
+    void update_window_title_suffix(QString &title_suffix);
 
- protected:
-  void initializeGL() override;
-  void resizeGL(int w, int h) override;
-  void paintGL() override;
+   protected:
+    void initializeGL() override;
+    void resizeGL(int w, int h) override;
+    void paintGL() override;
 
-  // qt事件
-  void mousePressEvent(QMouseEvent *event) override;
-  void mouseReleaseEvent(QMouseEvent *event) override;
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
-  void mouseMoveEvent(QMouseEvent *event) override;
-  void wheelEvent(QWheelEvent *event) override;
-  void keyPressEvent(QKeyEvent *event) override;
-  void keyReleaseEvent(QKeyEvent *event) override;
-  void focusInEvent(QFocusEvent *event) override;
-  void focusOutEvent(QFocusEvent *event) override;
-  void resizeEvent(QResizeEvent *event) override;
+    // qt事件
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void focusInEvent(QFocusEvent *event) override;
+    void focusOutEvent(QFocusEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 };
 
 #endif  // GLCANVAS_H

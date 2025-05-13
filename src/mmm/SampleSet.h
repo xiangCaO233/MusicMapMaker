@@ -41,10 +41,10 @@
 当填写了文件名，此时游戏会将这个文件替换掉物件默认的附加打击音效。
 */
 enum class SampleSet : uint32_t {
-  NONE = 0,
-  NORMAL = 1,
-  SOFT = 2,
-  DRUM = 3,
+    NONE = 0,
+    NORMAL = 1,
+    SOFT = 2,
+    DRUM = 3,
 };
 
 #endif  // M_SAMPLE_SET_H

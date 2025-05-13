@@ -5,8 +5,8 @@
 #include "ui_minfo.h"
 
 MInfo::MInfo(QWidget *parent) : QWidget(parent), ui(new Ui::MInfo) {
-  ui->setupUi(this);
-  mmetas = ui->mapmeta_edit;
+    ui->setupUi(this);
+    mmetas = ui->mapmeta_edit;
 }
 
 MInfo::~MInfo() { delete ui; }
@@ -26,33 +26,33 @@ const char *message_expr =
 
 // 输出日志
 void MInfo::log(MLogLevel level, const QString &message) {
-  QString timestamp = QTime::currentTime().toString("hh:mm:ss");
-  QString levelname;
-  QString level_color;
-  QString level_weight = "normal";
-  switch (level) {
-    case MLogLevel::INFO: {
-      levelname = "info";
-      level_color = "#00AA00";
-      break;
+    QString timestamp = QTime::currentTime().toString("hh:mm:ss");
+    QString levelname;
+    QString level_color;
+    QString level_weight = "normal";
+    switch (level) {
+        case MLogLevel::INFO: {
+            levelname = "info";
+            level_color = "#00AA00";
+            break;
+        }
+        case MLogLevel::WARN: {
+            levelname = "warn";
+            level_color = "#FFA500";
+            break;
+        }
+        case MLogLevel::ERROR: {
+            levelname = "error";
+            level_color = "#D50000";
+            level_weight = "bold";
+            break;
+        }
     }
-    case MLogLevel::WARN: {
-      levelname = "warn";
-      level_color = "#FFA500";
-      break;
-    }
-    case MLogLevel::ERROR: {
-      levelname = "error";
-      level_color = "#D50000";
-      level_weight = "bold";
-      break;
-    }
-  }
-  QString logline =
-      QString(time_expr).arg(timestamp) +
-      QString(level_expr).arg(level_color).arg(level_weight).arg(levelname) +
-      QString(message_expr).arg(level_color).arg(level_weight).arg(message);
+    QString logline =
+        QString(time_expr).arg(timestamp) +
+        QString(level_expr).arg(level_color).arg(level_weight).arg(levelname) +
+        QString(message_expr).arg(level_color).arg(level_weight).arg(message);
 
-  ui->logTextArea->append(logline);
-  if (level == MLogLevel::ERROR) ui->errorTextArea->append(logline);
+    ui->logTextArea->append(logline);
+    if (level == MLogLevel::ERROR) ui->errorTextArea->append(logline);
 }

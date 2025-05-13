@@ -18,40 +18,40 @@
 
 #define XTRACE(msg) SPDLOG_TRACE(msg)
 #define XDEBUG(msg) SPDLOG_DEBUG(msg)
-#define XINFO(msg)  \
-  SPDLOG_INFO(msg); \
-  emit XLogger::uilogger->info(QString::fromStdString(msg));
-#define XWARN(msg)  \
-  SPDLOG_WARN(msg); \
-  emit XLogger::uilogger->warn(QString::fromStdString(msg));
-#define XERROR(msg)  \
-  SPDLOG_ERROR(msg); \
-  emit XLogger::uilogger->error(QString::fromStdString(msg));
+#define XINFO(msg)    \
+    SPDLOG_INFO(msg); \
+    emit XLogger::uilogger->info(QString::fromStdString(msg));
+#define XWARN(msg)    \
+    SPDLOG_WARN(msg); \
+    emit XLogger::uilogger->warn(QString::fromStdString(msg));
+#define XERROR(msg)    \
+    SPDLOG_ERROR(msg); \
+    emit XLogger::uilogger->error(QString::fromStdString(msg));
 #define XCRITICAL(msg) SPDLOG_CRITICAL(msg)
 
 class ColorfulFormatter : public spdlog::formatter {
- public:
-  void format(const spdlog::details::log_msg& msg,
-              spdlog::memory_buf_t& dest) override;
-  std::unique_ptr<spdlog::formatter> clone() const override;
+   public:
+    void format(const spdlog::details::log_msg& msg,
+                spdlog::memory_buf_t& dest) override;
+    std::unique_ptr<spdlog::formatter> clone() const override;
 
- private:
-  const char* get_color(spdlog::level::level_enum level) const;
+   private:
+    const char* get_color(spdlog::level::level_enum level) const;
 };
 
 class XLogger {
-  // 终端日志实体
-  static std::shared_ptr<spdlog::logger> logger;
+    // 终端日志实体
+    static std::shared_ptr<spdlog::logger> logger;
 
- public:
-  // ui日志实体
-  static MUiLogger* uilogger;
-  static uint32_t glcalls;
-  static uint32_t drawcalls;
-  static void init(const char* name);
-  static void shutdown();
-  static void enable();
-  static void disable();
-  static void setlevel(spdlog::level::level_enum level);
+   public:
+    // ui日志实体
+    static MUiLogger* uilogger;
+    static uint32_t glcalls;
+    static uint32_t drawcalls;
+    static void init(const char* name);
+    static void shutdown();
+    static void enable();
+    static void disable();
+    static void setlevel(spdlog::level::level_enum level);
 };
 #endif  // XIANG_COLORFULLOG_H

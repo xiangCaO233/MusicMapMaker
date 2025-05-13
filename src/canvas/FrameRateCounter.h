@@ -7,19 +7,19 @@
 
 // 帧率计数器
 class FrameRateCounter : public QObject {
-  Q_OBJECT
- public:
-  FrameRateCounter(QWidget *parent = nullptr);
-  void frameRendered();
+    Q_OBJECT
+   public:
+    FrameRateCounter(QWidget *parent = nullptr);
+    void frameRendered();
 
- signals:
-  void fpsUpdated(int fps);
+   signals:
+    void fpsUpdated(int fps);
 
- private:
-  void updateFPS();
+   private:
+    void updateFPS();
 
-  int frameCount = 0;
-  QTimer timer;
+    int frameCount = 0;
+    QTimer timer;
 };
 
 #endif  // M_FRAMERATECOUNTER_H

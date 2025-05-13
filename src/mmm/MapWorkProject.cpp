@@ -1,6 +1,8 @@
 #include "MapWorkProject.h"
 
 #include <AudioManager.h>
+#include <qdir.h>
+#include <qlogging.h>
 
 #include <filesystem>
 #include <fstream>
@@ -18,116 +20,150 @@ using namespace pugi;
 // 构造MapWorkProject
 MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
                                const char* name) {
-  // 初始化项目名
-  if (name) {
-    config.project_name = std::string(name);
-  } else {
-    // 使用项目目录名
-    config.project_name = project_path.filename().string();
-  }
-
-  XINFO("构建项目");
-
-  // 读取项目配置文件/没有则创建
-  auto config_file_name = config.project_name + ".xml";
-  auto config_path = project_path / config_file_name;
-
-  static const std::unordered_set<std::string> map_extention = {".osu", ".imd"};
-  static const std::unordered_set<std::string> audio_extention = {
-      ".mp3", ".ogg", ".wav"};
-  static const std::unordered_set<std::string> image_extention = {
-      ".png", ".jpg", ".jpeg"};
-  static const std::unordered_set<std::string> video_extention = {".mp4",
-                                                                  ".mkv"};
-  // 打开目录中可载入文件(.osu,.imd,.mp3,.ogg,.wav,.png,.jpg,.jpeg,.mp4,.mkv)--到项目管理器
-  // 遍历目录内容
-  for (const auto& entry : std::filesystem::directory_iterator(project_path)) {
-    auto abspath = std::filesystem::weakly_canonical(
-        std::filesystem::absolute(entry.path()));
-    const auto extention = abspath.extension().string();
-    if (map_extention.find(extention) != map_extention.end()) {
-      // 谱面文件--预加载
-      maps.emplace_back();
-      const auto map_file_string = abspath.string();
-      auto& map = maps.back();
-      if (extention == ".osu") {
-        map = std::make_shared<OsuMap>();
-      }
-      if (extention == ".imd") {
-        map = std::make_shared<RMMap>();
-      }
-      maps.back()->load_from_file(map_file_string.c_str());
-      // 初始化画布时间位置
-      map_canvasposes.try_emplace(map, 0.0);
-    } else if (audio_extention.find(extention) != audio_extention.end()) {
-      // 音频文件
-      audio_paths.emplace_back(abspath.string());
-      // 加载音频
-      BackgroundAudio::loadin_audio(abspath.string());
-    } else if (image_extention.find(extention) != image_extention.end()) {
-      // 图片文件
-      image_paths.emplace_back(abspath.string());
-    } else if (video_extention.find(extention) != video_extention.end()) {
-      // 视频文件
-      video_paths.emplace_back(abspath.string());
+    // 初始化项目名
+    if (name) {
+        config.project_name = std::string(name);
+    } else {
+        // 使用项目目录名
+        config.project_name = project_path.filename().string();
     }
-  }
 
-  // 设置谱面的音频引用
-  for (const auto& map : maps) {
-    auto filename = map->audio_file_abs_path.filename().string();
-    // 去除头部空格
-    filename.erase(
-        filename.begin(),
-        std::find_if(filename.begin(), filename.end(),
-                     [](unsigned char ch) { return !std::isspace(ch); }));
-    // 去除尾部空格
-    filename.erase(
-        std::find_if(filename.rbegin(), filename.rend(),
-                     [](unsigned char ch) { return !std::isspace(ch); })
-            .base(),
-        filename.end());
-  }
+    XINFO("构建项目");
 
-  // 检查配置文件
-  bool need_create_config{false};
-  if (std::filesystem::exists(config_path) &&
-      std::filesystem::is_regular_file(config_path)) {
-    // 存在且为正常文件
-    // 载入配置
-    xml_parse_result result =
-        config_xml.load_file(config_path.string().c_str());
-    if (!result) {
-      XWARN("项目配置加载失败,重新创建配置");
-      need_create_config = true;
+    // 读取项目配置文件/没有则创建
+    auto config_file_name = config.project_name + ".xml";
+    config_xml_path = project_path / config_file_name;
+
+    static const std::unordered_set<std::string> map_extention = {".osu",
+                                                                  ".imd"};
+    static const std::unordered_set<std::string> audio_extention = {
+        ".mp3", ".ogg", ".wav"};
+    static const std::unordered_set<std::string> image_extention = {
+        ".png", ".jpg", ".jpeg"};
+    static const std::unordered_set<std::string> video_extention = {".mp4",
+                                                                    ".mkv"};
+    // 打开目录中可载入文件(.osu,.imd,.mp3,.ogg,.wav,.png,.jpg,.jpeg,.mp4,.mkv)--到项目管理器
+    // 遍历目录内容
+    for (const auto& entry :
+         std::filesystem::directory_iterator(project_path)) {
+        auto abspath = std::filesystem::weakly_canonical(
+            std::filesystem::absolute(entry.path()));
+        const auto extention = abspath.extension().string();
+        if (map_extention.find(extention) != map_extention.end()) {
+            // 谱面文件--预加载
+            maps.emplace_back();
+            const auto map_file_string = abspath.string();
+            auto& map = maps.back();
+            if (extention == ".osu") {
+                map = std::make_shared<OsuMap>();
+            }
+            if (extention == ".imd") {
+                map = std::make_shared<RMMap>();
+            }
+            maps.back()->load_from_file(map_file_string.c_str());
+            // 初始化画布时间位置
+            map_canvasposes.try_emplace(map, 0.0);
+        } else if (audio_extention.find(extention) != audio_extention.end()) {
+            // 音频文件
+            audio_paths.emplace_back(abspath.string());
+            // 加载音频
+            BackgroundAudio::loadin_audio(abspath.string());
+        } else if (image_extention.find(extention) != image_extention.end()) {
+            // 图片文件
+            image_paths.emplace_back(abspath.string());
+        } else if (video_extention.find(extention) != video_extention.end()) {
+            // 视频文件
+            video_paths.emplace_back(abspath.string());
+        }
     }
-  } else {
-    need_create_config = true;
-  }
-  // TODO(xiang 2025-04-16): 读取配置,或初始化配置
-  if (need_create_config) {
-    // 创建配置文件
-    std::ofstream(config_path.string()).close();
-    // 现场载入配置
-    config_xml.load_file(config_path.string().c_str());
-    // 初始化配置
-  } else {
-    // 读取
-  }
 
-  // 默认使用unknown设备
-  devicename = "unknown output device";
+    // 设置谱面的音频引用
+    for (const auto& map : maps) {
+        auto filename = map->audio_file_abs_path.filename().string();
+        // 去除头部空格
+        filename.erase(
+            filename.begin(),
+            std::find_if(filename.begin(), filename.end(),
+                         [](unsigned char ch) { return !std::isspace(ch); }));
+        // 去除尾部空格
+        filename.erase(
+            std::find_if(filename.rbegin(), filename.rend(),
+                         [](unsigned char ch) { return !std::isspace(ch); })
+                .base(),
+            filename.end());
+    }
+
+    // 检查配置文件
+    bool need_create_config{false};
+    if (std::filesystem::exists(config_xml_path) &&
+        std::filesystem::is_regular_file(config_xml_path)) {
+        // 存在且为正常文件
+        // 载入配置
+        xml_parse_result result = config_xml.load_file(
+            QDir(config_xml_path).canonicalPath().toStdString().c_str());
+
+        if (!result) {
+            XWARN("项目配置加载失败,重新创建配置");
+            need_create_config = true;
+        }
+    } else {
+        need_create_config = true;
+    }
+    // TODO(xiang 2025-04-16): 读取配置,或初始化配置
+    if (need_create_config) {
+        // 创建配置文件
+        std::ofstream(config_xml_path.string()).close();
+        // 现场载入配置
+        config_xml.load_file(config_xml_path.string().c_str());
+        // 初始化配置
+        // 初始化项目名配置
+        auto project_name_node = config_xml.append_child("Project Name");
+        project_name_node.text().set(config.project_name);
+        // 初始化音频输出设备名配置
+        auto device_name_node = config_xml.append_child("Device Name");
+        device_name_node.text().set(devicename);
+    } else {
+        // 读取
+    }
+
+    // 默认使用unknown设备
+    devicename = "unknown output device";
 }
 
 // 析构MapWorkProject
 MapWorkProject::~MapWorkProject() {
-  // 卸载音频
-  for (const auto& path : audio_paths) {
-    BackgroundAudio::unload_audio(path);
-  }
+    // 卸载音频
+    for (const auto& path : audio_paths) {
+        BackgroundAudio::unload_audio(path);
+    }
+    // 保存配置
+    save_config();
 };
 
 // 设置项目音频输出设备
 void MapWorkProject::set_audio_device(std::string& outdevicename) {
-  devicename = outdevicename;
+    devicename = outdevicename;
+    config.device = devicename;
+    config_xml.child("Device Name").text().set(outdevicename);
+}
+
+// 保存配置
+void MapWorkProject::save_config() {
+    // 参数: 文件名, 缩进字符串, 格式化选项, 编码
+    // PUGIXML_TEXT("  ") 用于跨平台处理缩进字符串字面量
+    // 读取项目配置文件/没有则创建
+    bool save_ok = config_xml.save_file(
+        QDir(config_xml_path).absolutePath().toStdString().c_str(),
+        PUGIXML_TEXT("    "), pugi::format_indent, pugi::encoding_utf8);
+    // pugi::format_default: 默认格式，通常会缩进
+    // pugi::format_indent: 强制缩进 (通常已包含在 default 中)
+    // pugi::format_raw: 不进行任何格式化，所有文本按原样输出
+    // pugi::format_no_declaration: 不输出 <?xml ...?> 声明头
+    // pugi::format_write_bom: 写入UTF-8 BOM (可选)
+
+    if (save_ok) {
+        qDebug() << "项目配置保存成功";
+    } else {
+        qWarning() << "项目配置保存成功";
+    }
 }

@@ -6,19 +6,19 @@
 #include "MapWorkspaceCanvas.h"
 
 class CanvasContainer : public QWidget {
- public:
-  // 构造CanvasContainer
-  CanvasContainer(QWidget* parent = nullptr);
-  // 析构CanvasContainer
-  ~CanvasContainer() override;
+   public:
+    // 构造CanvasContainer
+    CanvasContainer(QWidget* parent = nullptr);
+    // 析构CanvasContainer
+    ~CanvasContainer() override;
 
-  // 画布本体
-  QScopedPointer<MapWorkspaceCanvas> canvas;
+    // 画布本体
+    QScopedPointer<MapWorkspaceCanvas> canvas;
 
-  // 用于嵌入 QOpenGLWindow
-  QWidget* container;
+    // 用于嵌入 QOpenGLWindow
+    QWidget* container;
 
- protected:
+   protected:
 };
 
 #endif  // M_CANVASCONTAINER_H
