@@ -99,8 +99,8 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
         std::filesystem::is_regular_file(config_xml_path)) {
         // 存在且为正常文件
         // 载入配置
-        xml_parse_result result = config_xml.load_file(
-            QDir(config_xml_path).canonicalPath().toStdString().c_str());
+        auto file_str = QDir(config_xml_path).canonicalPath().toStdString();
+        xml_parse_result result = config_xml.load_file(file_str.c_str());
 
         if (!result) {
             XWARN("项目配置加载失败,重新创建配置");
@@ -110,24 +110,63 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
         need_create_config = true;
     }
     // TODO(xiang 2025-04-16): 读取配置,或初始化配置
+    // 现场载入配置
     if (need_create_config) {
+        // 默认使用unknown设备
+        devicename = "unknown output device";
+
         // 创建配置文件
         std::ofstream(config_xml_path.string()).close();
-        // 现场载入配置
-        config_xml.load_file(config_xml_path.string().c_str());
+
+        // 项目属性
+        project_root_node = config_xml.append_child("MMMProject");
+        project_root_node.append_attribute("version");
+        project_root_node.attribute("version").set_value("v0.1");
+
         // 初始化配置
         // 初始化项目名配置
-        auto project_name_node = config_xml.append_child("Project Name");
+        auto project_name_node = project_root_node.append_child("ProjectName");
         project_name_node.text().set(config.project_name);
-        // 初始化音频输出设备名配置
-        auto device_name_node = config_xml.append_child("Device Name");
+        // 初始化音频配置
+        audio_node = project_root_node.append_child("AudioConfig");
+        // 初始化输出设备名配置
+        auto device_name_node = audio_node.append_child("DeviceName");
         device_name_node.text().set(devicename);
+
+        // 初始化输出音量配置
+        config.pglobal_volume = .5f;
+        config.pmusic_volume = 1.f;
+        config.peffect_volume = 1.f;
+        audio_volume_node = audio_node.append_child("VolumeConfig");
+
+        audio_volume_node.append_attribute("global").set_value(
+            config.pglobal_volume);
+        audio_volume_node.append_attribute("music").set_value(
+            config.pmusic_volume);
+        audio_volume_node.append_attribute("effect").set_value(
+            config.peffect_volume);
     } else {
         // 读取
-    }
+        project_root_node = config_xml.child("MMMProject");
 
-    // 默认使用unknown设备
-    devicename = "unknown output device";
+        // 读取项目名
+        config.project_name =
+            project_root_node.child("ProjectName").text().as_string();
+
+        // 读取音频配置
+        audio_node = project_root_node.child("AudioConfig");
+        // 读取设备名
+        devicename = audio_node.child("DeviceName").text().as_string();
+        config.device = devicename;
+        // 读取项目音频配置
+        audio_volume_node = audio_node.child("VolumeConfig");
+        config.pglobal_volume =
+            audio_volume_node.attribute("global").as_float();
+        config.pmusic_volume = audio_volume_node.attribute("music").as_float();
+        config.peffect_volume =
+            audio_volume_node.attribute("effect").as_float();
+        XINFO("已读取项目配置");
+    }
 }
 
 // 析构MapWorkProject
@@ -144,7 +183,7 @@ MapWorkProject::~MapWorkProject() {
 void MapWorkProject::set_audio_device(std::string& outdevicename) {
     devicename = outdevicename;
     config.device = devicename;
-    config_xml.child("Device Name").text().set(outdevicename);
+    audio_node.child("DeviceName").text().set(outdevicename);
 }
 
 // 保存配置
@@ -152,9 +191,10 @@ void MapWorkProject::save_config() {
     // 参数: 文件名, 缩进字符串, 格式化选项, 编码
     // PUGIXML_TEXT("  ") 用于跨平台处理缩进字符串字面量
     // 读取项目配置文件/没有则创建
-    bool save_ok = config_xml.save_file(
-        QDir(config_xml_path).absolutePath().toStdString().c_str(),
-        PUGIXML_TEXT("    "), pugi::format_indent, pugi::encoding_utf8);
+    auto file_str = QDir(config_xml_path).absolutePath().toStdString();
+    bool save_ok =
+        config_xml.save_file(file_str.c_str(), PUGIXML_TEXT("    "),
+                             pugi::format_indent, pugi::encoding_utf8);
     // pugi::format_default: 默认格式，通常会缩进
     // pugi::format_indent: 强制缩进 (通常已包含在 default 中)
     // pugi::format_raw: 不进行任何格式化，所有文本按原样输出

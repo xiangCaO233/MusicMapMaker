@@ -18,6 +18,7 @@
 class MapWorkProject;
 
 enum class MapType {
+    MMMMAP,
     OSUMAP,
     RMMAP,
     MALODYMAP,

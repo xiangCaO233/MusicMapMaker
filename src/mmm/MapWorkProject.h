@@ -23,11 +23,19 @@ struct ProjectConfig {
     // 项目名称
     std::string project_name;
 
+    // 默认的作者署名
+    std::string def_author_name;
+
     // 使用的音频设备名
     std::string device;
 
-    // 默认的作者署名
-    std::string def_author_name;
+    // 音量
+    // 项目全局音量
+    float pglobal_volume;
+    // 项目音乐音量
+    float pmusic_volume;
+    // 项目效果音量
+    float peffect_volume;
 
     // 物件缩放策略
     double object_width_ratio{1.0};
@@ -36,14 +44,14 @@ struct ProjectConfig {
     // 用户调节的时间线缩放-- n * 1px/1ms
     double timeline_zoom{1.0};
 
-    // 项目偏好编辑方式
-    EditMethodPreference edit_method{EditMethodPreference::IVM};
-
     // 预览区时间倍率:实际时间范围为当前时间范围*preview_time_scale
     double preview_time_scale{5.0};
 
     // 默认分拍策略
     int32_t default_divisors{1};
+
+    // 项目偏好编辑方式
+    EditMethodPreference edit_method{EditMethodPreference::IVM};
 };
 
 // 项目
@@ -63,6 +71,11 @@ class MapWorkProject {
 
     // xml配置文档
     pugi::xml_document config_xml;
+    // 根节点
+    pugi::xml_node project_root_node;
+    pugi::xml_node audio_node;
+    pugi::xml_node audio_volume_node;
+    pugi::xml_node canvas_node;
 
     // 项目中谱的列表
     std::vector<std::shared_ptr<MMap>> maps;

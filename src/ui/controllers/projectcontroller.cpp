@@ -19,6 +19,7 @@
 
 #include "../../mmm/MapWorkProject.h"
 #include "audio/BackgroundAudio.h"
+#include "colorful-log.h"
 #include "ui_mprojectcontroller.h"
 
 MProjectController::MProjectController(QWidget* parent)
@@ -236,7 +237,11 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
     });
     menu.addAction(tr("Create New Map"), [&]() {
         // 调用创建谱面函数
-        qDebug() << "创建谱面";
+        if (!selected_project) {
+            XERROR("请先打开项目");
+        } else {
+            qDebug() << "创建谱面";
+        }
     });
 
     // 显示菜单
@@ -294,8 +299,9 @@ void MProjectController::on_audio_device_selector_currentTextChanged(
 
     if (selected_project) {
         // 获取并设置项目设备为当前选中的音频设备
-        selected_project->devicename =
-            ui->audio_device_selector->currentText().toStdString();
+        auto device = ui->audio_device_selector->currentText().toStdString();
+        selected_project->set_audio_device(device);
+
         BackgroundAudio::init_device(selected_project->devicename);
         // 更新音量
         BackgroundAudio::set_global_volume(selected_project->devicename,

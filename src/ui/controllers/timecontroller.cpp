@@ -191,6 +191,7 @@ void TimeController::on_current_timeline_speed_changed(double timeline_speed) {
 void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
     binding_map = map;
     // 读取项目的设置
+    // 画布配置
     auto project_owidth_value =
         int(map ? map->project_reference->config.object_width_ratio * 100 : 0);
     ui->owidth_scale_button->setText(QString::number(project_owidth_value));
@@ -206,6 +207,37 @@ void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
     ui->timeline_zoom_button->setText(
         QString::number(project_timeline_zoom_value));
     ui->timeline_zoom_slider->setValue(project_timeline_zoom_value);
+
+    // 音频配置
+    auto project_global_volume =
+        int(map ? map->project_reference->config.pglobal_volume * 100 : 50);
+    ui->global_volume_slider->setValue(project_global_volume);
+    ui->global_volume_value_label->setText(
+        QString::number(project_global_volume));
+
+    auto project_music_volume =
+        int(map ? map->project_reference->config.pmusic_volume * 100 : 100);
+    ui->music_volume_slider->setValue(project_music_volume);
+    ui->music_volume_value_label->setText(
+        QString::number(project_music_volume));
+
+    auto project_effect_volume =
+        int(map ? map->project_reference->config.peffect_volume * 100 : 100);
+    ui->effect_volume_slider->setValue(project_effect_volume);
+    ui->effect_volume_value_label->setText(
+        QString::number(project_effect_volume));
+
+    if (binding_map) {
+        BackgroundAudio::set_global_volume(
+            binding_map->project_reference->devicename,
+            map->project_reference->config.pmusic_volume);
+        BackgroundAudio::set_music_volume(
+            binding_map->project_reference->devicename,
+            map->project_reference->config.pmusic_volume);
+        BackgroundAudio::set_effects_volume(
+            binding_map->project_reference->devicename,
+            map->project_reference->config.peffect_volume);
+    }
 }
 
 // 画布时间变化事件
@@ -292,6 +324,11 @@ void TimeController::on_global_volume_slider_valueChanged(int value) {
         // 更新标签
         ui->global_volume_value_label->setText(
             QString::number(volume_value * 100));
+        // 更新项目音量配置
+        binding_map->project_reference->config.pglobal_volume = volume_value;
+        binding_map->project_reference->audio_volume_node.attribute("global")
+            .set_value(volume_value);
+
         update_global_volume_button();
     }
 }
@@ -305,6 +342,10 @@ void TimeController::on_music_volume_slider_valueChanged(int value) {
         // 更新标签
         ui->music_volume_value_label->setText(
             QString::number(volume_value * 100));
+        // 更新项目音量配置
+        binding_map->project_reference->config.pmusic_volume = volume_value;
+        binding_map->project_reference->audio_volume_node.attribute("music")
+            .set_value(volume_value);
     }
 }
 
@@ -317,6 +358,10 @@ void TimeController::on_effect_volume_slider_valueChanged(int value) {
         // 更新标签
         ui->effect_volume_value_label->setText(
             QString::number(volume_value * 100));
+        // 更新项目音量配置
+        binding_map->project_reference->config.peffect_volume = volume_value;
+        binding_map->project_reference->audio_volume_node.attribute("effect")
+            .set_value(volume_value);
     }
 }
 
@@ -416,16 +461,20 @@ void TimeController::on_lineEdit_editingFinished() {
 
 // 物件宽度缩放调节
 void TimeController::on_owidth_scale_slider_valueChanged(int value) {
-    binding_map->project_reference->config.object_width_ratio =
-        double(value) / 100.0;
-    ui->owidth_scale_button->setText(QString::number(value));
+    if (binding_map) {
+        binding_map->project_reference->config.object_width_ratio =
+            double(value) / 100.0;
+        ui->owidth_scale_button->setText(QString::number(value));
+    }
 }
 
 // 物件高度缩放调节
 void TimeController::on_oheight_scale_slider_valueChanged(int value) {
-    binding_map->project_reference->config.object_height_ratio =
-        double(value) / 100.0;
-    ui->oheight_scale_button->setText(QString::number(value));
+    if (binding_map) {
+        binding_map->project_reference->config.object_height_ratio =
+            double(value) / 100.0;
+        ui->oheight_scale_button->setText(QString::number(value));
+    }
 }
 
 // 画布调节时间线缩放
@@ -441,9 +490,11 @@ void TimeController::on_timeline_zoom_slider_valueChanged(int value) {
         timeline_zoom_sync_lock = false;
         return;
     }
-    binding_map->project_reference->config.timeline_zoom =
-        double(value) / 100.0;
-    ui->timeline_zoom_button->setText(QString::number(value));
+    if (binding_map) {
+        binding_map->project_reference->config.timeline_zoom =
+            double(value) / 100.0;
+        ui->timeline_zoom_button->setText(QString::number(value));
+    }
 }
 
 // 重置宽度缩放按钮
