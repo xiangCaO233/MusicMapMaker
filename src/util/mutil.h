@@ -109,10 +109,10 @@ inline bool full_selected_complex(
     return true;
 }
 
-// --- 辅助函数：完成片段并添加到结果集 ---
-inline void finalize_and_add_segment(
+// --- 辅助函数：完成片段并将其添加到结果集 (处理独立物件的 parent 和 compinfo)
+inline void finalize_and_add_segment(  // 重命名以示区别
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>& res,
-    std::shared_ptr<ComplexNote>& segment,
+    std::shared_ptr<ComplexNote>& segment,  // 当前构建的片段，包含克隆的 Note
     const std::shared_ptr<ComplexNote>& original_comp_base) {
     if (!segment || segment->child_notes.empty()) {
         segment = nullptr;
@@ -120,15 +120,36 @@ inline void finalize_and_add_segment(
     }
 
     if (segment->child_notes.size() == 1) {
-        res.insert(*segment->child_notes.begin());
+        // 片段只有一个物件，它将成为独立的 Note
+        auto single_hit_object_ptr = *segment->child_notes.begin();
+        auto single_note_ptr =
+            std::dynamic_pointer_cast<Note>(single_hit_object_ptr);
+
+        if (single_note_ptr) {
+            // *** 关键步骤：处理独立 Note ***
+            // 设置父引用为 null
+            single_note_ptr->parent_reference = nullptr;
+            single_note_ptr->compinfo =
+                ComplexInfo::NONE;  // 设置 compinfo 为 NONE
+        }
+        // (如果 single_hit_object_ptr 不是 Note，则不进行这些操作)
+
+        res.insert(
+            single_hit_object_ptr);  // 将这个（可能已修改的）独立物件加入结果集
     } else {
+        // 片段包含多个物件，形成一个新的 ComplexNote
+        // 子 Note 的 parent_ref 和 compinfo 已在加入 segment 时正确设置
         if (original_comp_base && !segment->child_notes.empty()) {
             segment->timestamp = (*segment->child_notes.begin())->timestamp;
             segment->orbit = original_comp_base->orbit;
+            // 新 ComplexNote 自身的 compinfo
             segment->compinfo = ComplexInfo::NONE;
         }
+        // 将新的 ComplexNote 加入结果集
         res.insert(segment);
     }
+
+    // 重置 segment 指针
     segment = nullptr;
 }
 
