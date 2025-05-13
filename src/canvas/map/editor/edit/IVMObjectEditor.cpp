@@ -8,6 +8,7 @@
 #include "../../../../mmm/hitobject/Note/HoldEnd.h"
 #include "../../../../mmm/hitobject/Note/Note.h"
 #include "../../../../mmm/hitobject/Note/rm/ComplexNote.h"
+#include "../../../../util/mutil.h"
 #include "../../MapWorkspaceCanvas.h"
 #include "../MapEditor.h"
 #include "colorful-log.h"
@@ -58,7 +59,73 @@ IVMObjectEditor::~IVMObjectEditor() = default;
 void IVMObjectEditor::end_edit() {
     // 生成操作并执行到map
     // 生成编辑操作
+
     ObjEditOperation operation;
+
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+        editing_src_objects_temp;
+    bool removed_parent{false};
+    for (const auto& srcobj : editing_src_objects) {
+        auto note = std::dynamic_pointer_cast<Note>(srcobj);
+        std::shared_ptr<ComplexNote> removed_comp{nullptr};
+        std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+            intersections;
+        if (note) {
+            switch (note->compinfo) {
+                case ComplexInfo::HEAD:
+                case ComplexInfo::BODY:
+                case ComplexInfo::END: {
+                    auto temp_comp = std::shared_ptr<ComplexNote>(
+                        note->parent_reference, [](ComplexNote*) {});
+                    if (temp_comp != removed_comp) {
+                        // 有新的组合键内的物件
+                        removed_comp = temp_comp;
+                        // 取得交集
+                        std::set_intersection(
+                            editing_src_objects.begin(),
+                            editing_src_objects.end(),
+                            removed_comp->child_notes.begin(),
+                            removed_comp->child_notes.end(),
+                            std::inserter(intersections, intersections.end()),
+                            editing_src_objects.key_comp());
+
+                        // 判断交集是否完全属于组合键-(全选到了)
+                        if (!mutil::full_selected_complex(intersections,
+                                                          removed_comp)) {
+                            XWARN("删除部分组合键");
+                            std::multiset<std::shared_ptr<HitObject>,
+                                          HitObjectComparator>
+                                res;
+                            // 不完全-需要拆分组合键
+                            mutil::destruct_complex_note(res, removed_comp,
+                                                         intersections);
+                            editing_src_objects_temp.insert(removed_comp);
+                            removed_parent = true;
+                            for (const auto& obj : res) {
+                                // 放入缓存
+                                editing_temp_objects.insert(obj);
+                            }
+                        } else {
+                            // 全部包含-只需移除整个组合键
+                            if (!removed_parent) {
+                                XWARN("删除全部组合键");
+                                removed_parent = true;
+                                editing_src_objects_temp.insert(temp_comp);
+                            }
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    editing_src_objects_temp.insert(srcobj);
+                    break;
+                }
+            }
+        } else {
+            editing_src_objects_temp.insert(srcobj);
+        }
+    }
+    editing_src_objects = editing_src_objects_temp;
     operation.src_objects = editing_src_objects;
     editing_src_objects.clear();
 

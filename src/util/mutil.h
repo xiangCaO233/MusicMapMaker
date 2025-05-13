@@ -108,196 +108,148 @@ inline bool full_selected_complex(
     }
     return true;
 }
+
 // --- 辅助函数：完成片段并添加到结果集 ---
-// 参数 segment 通过引用传递，以便在函数内将其重置为 nullptr
 inline void finalize_and_add_segment(
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>& res,
-    std::shared_ptr<ComplexNote>& segment)  // 引用传递，用于重置
-{
-    // 如果片段为空或无效，则直接返回并重置
+    std::shared_ptr<ComplexNote>& segment,
+    const std::shared_ptr<ComplexNote>& original_comp_base) {
     if (!segment || segment->child_notes.empty()) {
-        segment = nullptr;  // 确保重置
+        segment = nullptr;
         return;
     }
 
-    // 可选但推荐：检查片段是否真的有效（以 HEAD 开始，以 END 结束）
-    bool is_valid_structure = false;
-    if (!segment->child_notes.empty()) {
-        auto first_child =
-            std::dynamic_pointer_cast<Note>(*segment->child_notes.begin());
-        auto last_child =
-            std::dynamic_pointer_cast<Note>(*segment->child_notes.rbegin());
-        if (first_child && last_child &&
-            first_child->compinfo == ComplexInfo::HEAD &&
-            last_child->compinfo == ComplexInfo::END) {
-            is_valid_structure = true;
-        }
-    }
-
-    if (is_valid_structure) {
-        // 根据规则：如果拆分出的 comp（即 segment）只有一个物件，则加 Note
-        if (segment->child_notes.size() == 1) {
-            // 一个有效的 HEAD...END 序列至少包含两个元素（HEAD 和 END）
-            // 所以 size == 1 且 is_valid_structure 为 true 的情况理论上不应发生
-            // 除非 HEAD 和 END 是同一个对象？
-            // 或者这里的规则指的是：如果最终构建的有效片段只包含一个 Note
-            // 实例？ 我们遵循字面意思：如果这个完成的、有效的 segment
-            // 里只有一个元素 （这暗示原始的 HEAD 和 END
-            // 可能是同一个对象，且该对象存在）， 则将该 Note 加入 res。
-            res.insert(*segment->child_notes.begin());
-        } else {  // segment->child_objects.size() > 1
-            // 如果包含多个物件，则将 Complex 对象加入 res
-            // 可以考虑将原始 comp 的一些非子对象属性复制到 segment
-            // segment->some_metadata = original_comp->some_metadata;
-            res.insert(segment);
-        }
+    if (segment->child_notes.size() == 1) {
+        res.insert(*segment->child_notes.begin());
     } else {
-        // 如果片段结构无效（例如，没有以 END 结尾就被中断了），则丢弃它
-        // std::cout << "Debug: Discarding invalid segment." << std::endl;
+        if (original_comp_base && !segment->child_notes.empty()) {
+            segment->timestamp = (*segment->child_notes.begin())->timestamp;
+            segment->orbit = original_comp_base->orbit;
+            segment->compinfo = ComplexInfo::NONE;
+        }
+        res.insert(segment);
     }
-
-    // 重置 segment 指针，为下一个可能的片段做准备
     segment = nullptr;
 }
 
-// 拆分组合键
+// --- 核心拆分逻辑 (使用 Note::clone() 来创建副本，不修改原始 comp) ---
 /**
- * @brief 根据可用的子对象拆分一个 Complex 对象。
- * @param res [输出] 用于存放结果 Complex 对象或单个 Note 对象的 multiset。
- * @param comp [输入] 要拆分的原始 Complex 对象。
- * @param remove_objs [输入] 包含 comp 子对象交集的 multiset (只读)。
+ * @brief 根据“被移除”的子对象拆分一个 Complex 对象。原始 comp
+ * 及其子对象保持不变。
+ * @param res [输出] 用于存放结果 Complex 对象或单个 (克隆的) Note 对象的
+ * multiset。
+ * @param comp [输入] 要拆分的原始 Complex 对象 (const，表示不修改其直接成员)。
+ * @param removed_objs [输入] 包含 comp 子对象中“应被移除”的物件的
+ * multiset。这些物件将作为断点。
  */
+// --- 核心拆分逻辑 (使用 Note::clone() 并设置父引用) ---
 inline void destruct_complex_note(
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>& res,
-    std::shared_ptr<ComplexNote> comp,
+    const std::shared_ptr<ComplexNote>& comp,
     const std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>&
-        srcobjs) {
-    // 基本检查
-    if (!comp || comp->child_notes.empty() || srcobjs.empty()) {
-        return;  // 无事可做
+        removed_objs) {
+    if (!comp || comp->child_notes.empty()) {
+        return;
     }
 
-    // --- 特殊情况处理：原始 comp 只有一个子对象 ---
     if (comp->child_notes.size() == 1) {
-        // 获取这唯一的子对象
-        const auto& single_original_child = *comp->child_notes.begin();
-        // 检查这个子对象是否存在于 remove_objs 中
-        auto it_found = srcobjs.find(single_original_child);
-        if (it_found != srcobjs.end()) {
-            // 如果存在，根据规则，直接将这个 Note 加入结果集
-            res.insert(
-                *it_found);  // 注意：这里插入的是 remove_objs 中的指针实例
+        const auto& single_original_child_ho = *comp->child_notes.begin();
+        if (removed_objs.find(single_original_child_ho) == removed_objs.end()) {
+            auto original_note_ptr =
+                std::dynamic_pointer_cast<Note>(single_original_child_ho);
+            if (original_note_ptr &&
+                !std::dynamic_pointer_cast<ComplexNote>(original_note_ptr)) {
+                // 克隆出来的 Note 的
+                // parent_ref_raw 是 nullptr
+                Note* cloned_raw_ptr = original_note_ptr->clone();
+                // 单个 Note 不属于新的 ComplexNote 片段，所以其 parent_ref_raw
+                // 保持 nullptr
+                res.insert(std::shared_ptr<Note>(cloned_raw_ptr));
+            }
         }
-        return;  // 处理完毕
+        return;
     }
 
-    // --- 正常处理流程 ---
-    auto orig_it = comp->child_notes.begin();  // 迭代器指向原始子对象序列
-    auto orig_end = comp->child_notes.end();
-    auto present_it = srcobjs.begin();  // 迭代器指向可用子对象序列
-    auto present_end = srcobjs.end();
+    std::shared_ptr<ComplexNote> current_segment = nullptr;
 
-    std::shared_ptr<ComplexNote> current_segment =
-        nullptr;                                          // 当前正在构建的片段
-    HitObjectComparator comparator = srcobjs.key_comp();  // 获取比较器实例
+    for (const auto& child_ho_original_ptr : comp->child_notes) {
+        bool is_removed = (removed_objs.count(child_ho_original_ptr) > 0);
 
-    while (orig_it != orig_end && present_it != present_end) {
-        // 1. 将 present_it 向前移动，跳过那些在 orig_it 之前的可用对象
-        //    (因为两个序列都已排序)
-        while (present_it != present_end && comparator(*present_it, *orig_it)) {
-            ++present_it;
-        }
+        if (is_removed) {
+            // ... (同之前的 finalize_and_add_segment_WITH_CLONE 调用) ...
+            if (current_segment) {
+                if (!current_segment->child_notes.empty()) {
+                    auto last_note_in_seg_clone =
+                        std::dynamic_pointer_cast<Note>(
+                            *current_segment->child_notes.rbegin());
+                    if (last_note_in_seg_clone)
+                        last_note_in_seg_clone->compinfo = ComplexInfo::END;
+                }
+                finalize_and_add_segment(res, current_segment,
+                                         comp);  // 使用之前的 finalize 函数
+            }
+        } else {
+            auto original_note_ptr =
+                std::dynamic_pointer_cast<Note>(child_ho_original_ptr);
+            // 克隆后的 Note (shared_ptr)
+            std::shared_ptr<Note> note_for_segment = nullptr;
 
-        // 如果 present_it 到达末尾，说明后面不可能有匹配 orig_it
-        // 或更后元素的可用对象了
-        if (present_it == present_end) {
-            break;
-        }
-
-        // 2. 检查当前 orig_it 指向的对象是否存在于 present_it 的位置
-        //    使用比较器判断等价性：!comp(a, b) && !comp(b, a)
-        //    由于 present_it 已经 >= orig_it，我们只需要检查 !comp(orig_it,
-        //    present_it)
-        bool match_found = !comparator(*orig_it, *present_it);
-
-        if (match_found) {
-            // --- 找到匹配 ---
-            // 获取当前匹配到的 Note 对象及其类型信息
-            // 注意：*present_it 是 HitObject 指针，需要转为 Note 指针
-            auto current_note = std::dynamic_pointer_cast<Note>(*present_it);
-            if (!current_note) {
-                // 理论上不应发生，因为 remove_objs 是与 comp->child_objects
-                // (Note集合) 的交集 但为健壮性考虑，可以跳过或报错
-                std::cerr << "Warning: Found object in intersection that is "
-                             "not a Note?"
-                          << std::endl;
-                ++orig_it;
-                ++present_it;  // 消耗掉这个匹配但不合法的对象
+            if (original_note_ptr &&
+                !std::dynamic_pointer_cast<ComplexNote>(original_note_ptr)) {
+                Note* cloned_raw_ptr = original_note_ptr->clone();
+                note_for_segment = std::shared_ptr<Note>(cloned_raw_ptr);
+                // 保留原始 compinfo
+                note_for_segment->compinfo = original_note_ptr->compinfo;
+            } else {
+                // 如果是 ComplexNote 或非 Note
+                // HitObject，则中断当前片段，并跳过
+                if (current_segment) {
+                    if (!current_segment->child_notes.empty()) {
+                        auto last_note_in_seg_clone =
+                            std::dynamic_pointer_cast<Note>(
+                                *current_segment->child_notes.rbegin());
+                        if (last_note_in_seg_clone)
+                            last_note_in_seg_clone->compinfo = ComplexInfo::END;
+                    }
+                    finalize_and_add_segment(res, current_segment, comp);
+                }
+                // 根据需要，决定是否将 child_ho_original_ptr (原始 ComplexNote
+                // 或非 Note 对象) 加入 res if
+                // (removed_objs.find(child_ho_original_ptr) ==
+                // removed_objs.end()) {
+                //     res.insert(child_ho_original_ptr);
+                // }
                 continue;
             }
 
-            ComplexInfo info = current_note->compinfo;
-
-            // --- 根据 Note 类型处理 ---
-            if (info == ComplexInfo::HEAD) {
-                // 如果当前正在构建片段，说明之前的片段未正常结束（缺少
-                // END），需要先 finalize（通常会丢弃）
-                finalize_and_add_segment(res, current_segment);
-
-                // 开始一个新的片段
-                current_segment = std::make_shared<ComplexNote>(
-                    current_note->timestamp, current_note->orbit);
-                // 可选：从原始 comp 复制一些元数据到 new segment
-                current_segment->child_notes.insert(current_note);  // 加入 HEAD
-
-            } else if (info == ComplexInfo::BODY) {
-                if (current_segment) {
-                    // 如果已开始片段，将 BODY 加入
-                    current_segment->child_notes.insert(current_note);
+            if (note_for_segment) {
+                // 如果成功克隆了一个 Note
+                if (!current_segment) {
+                    current_segment = std::make_shared<ComplexNote>(
+                        comp->timestamp, comp->orbit);
+                    note_for_segment->compinfo = ComplexInfo::HEAD;
                 } else {
-                    // 孤立的 BODY，忽略 (因为没有 HEAD 开始)
+                    note_for_segment->compinfo = ComplexInfo::BODY;
                 }
-            } else if (info == ComplexInfo::END) {
-                if (current_segment) {
-                    // 如果已开始片段，加入 END 并完成这个片段
-                    current_segment->child_notes.insert(current_note);
-                    finalize_and_add_segment(
-                        res, current_segment);  // 完成并加入结果集 (如果有效)
-                    // finalize_and_add_segment 会将 current_segment 设为
-                    // nullptr
-                } else {
-                    // 孤立的 END，忽略 (因为没有 HEAD/BODY 开始)
-                }
-            } else {  // ComplexInfo::NONE 或其他未知类型
-                if (current_segment) {
-                    // 在片段中遇到非组合键部分，视为序列中断
-                    finalize_and_add_segment(
-                        res, current_segment);  // finalize (可能丢弃)
-                }
-                // 忽略这个 NONE 类型的音符
+                // 设置父引用
+                // current_segment.get() 获取 ComplexNote* 指针
+                note_for_segment->parent_reference = current_segment.get();
+                current_segment->child_notes.insert(note_for_segment);
             }
-
-            // 成功匹配并处理后，两个迭代器都向前移动
-            ++orig_it;
-            ++present_it;
-
-        } else {
-            // --- 未找到匹配 ---
-            // 当前 orig_it 指向的原始子对象在 remove_objs 中不存在
-            // 这意味着任何正在构建的片段都被中断了
-            if (current_segment) {
-                finalize_and_add_segment(
-                    res, current_segment);  // finalize (可能丢弃)
-                // current_segment 被设为 nullptr
-            }
-            // 只移动 orig_it，继续检查原始序列的下一个期望对象
-            // present_it 不动，因为它指向的对象可能匹配原始序列中更后面的对象
-            ++orig_it;
         }
     }
-    // 循环结束后，如果 current_segment 仍然存在，说明最后一个片段没有以 END
-    // 正常结束 需要 finalize 它 (通常会被丢弃，因为它不完整)
-    finalize_and_add_segment(res, current_segment);
+
+    if (current_segment) {
+        if (!current_segment->child_notes.empty()) {
+            auto last_note_in_segment_clone = std::dynamic_pointer_cast<Note>(
+                *current_segment->child_notes.rbegin());
+            if (last_note_in_segment_clone) {
+                last_note_in_segment_clone->compinfo = ComplexInfo::END;
+                // 父引用已在加入时设置，这里不需要再次设置
+            }
+        }
+        finalize_and_add_segment(res, current_segment, comp);
+    }
 }
 
 // 将毫秒值转换为 "hh:mm:ss.zzz" 格式 QString

@@ -601,7 +601,7 @@ void MapWorkspaceCanvas::push_shape() {
         // 清除hover信息
         // 生成区域信息
         areagenerator->generate();
-        if (editor->cstatus.canvas_pasued) draw_beats();
+        draw_beats();
 
         // 更新物件列表
         // 清除物件缓存

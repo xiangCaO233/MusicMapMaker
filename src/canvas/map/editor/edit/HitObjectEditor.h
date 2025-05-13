@@ -60,6 +60,9 @@ class HitObjectEditor {
     // 鼠标最近的分拍线的时间
     double nearest_divisor_time();
 
+    // 分析需要删除的物件-自动拆分组合键
+    void analyze_src_object();
+
     // void drag_object()
 
     // 撤销
