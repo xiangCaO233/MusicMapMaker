@@ -126,6 +126,9 @@ void MEditorArea::use_theme(GlobalTheme theme) {
     mutil::set_button_svgcolor(ui->show_object_after_judgeline_button,
                                ":/icons/glasses.svg", button_color, 16, 16);
 
+    mutil::set_button_svgcolor(ui->show_timeline_button, ":/icons/lines.svg",
+                               button_color, 16, 16);
+
     // 模式选择菜单内的按钮组
     mutil::set_button_svgcolor(drawnote_mode_button, ":/icons/drawnote.svg",
                                button_color, 16, 16);
@@ -499,4 +502,8 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
 void MEditorArea::on_show_object_after_judgeline_button_toggled(bool checked) {
     canvas_container->canvas.get()
         ->editor->csettings.show_object_after_judgeline = checked;
+}
+
+void MEditorArea::on_show_timeline_button_toggled(bool checked) {
+    canvas_container->canvas.get()->editor->csettings.show_timeline = checked;
 }

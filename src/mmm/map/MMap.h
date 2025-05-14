@@ -13,6 +13,7 @@
 #include "../hitobject/HitObject.h"
 #include "../hitobject/Note/Hold.h"
 #include "../timing/Timing.h"
+#include "MapMetadata.h"
 #include "callback/AudioEnginPlayCallback.h"
 
 class MapWorkProject;
@@ -61,8 +62,19 @@ class MMap {
     // 析构MMap
     virtual ~MMap();
 
+    // 元数据集
+    std::unordered_map<MapMetadataType, std::shared_ptr<MapMetadata>> metadatas;
+
     // 图名称
     std::string map_name;
+
+    // 基本元数据
+    std::string title;
+    std::string title_unicode;
+    std::string artist;
+    std::string artist_unicode;
+    std::string author;
+    std::string version;
 
     // map文件路径
     std::filesystem::path map_file_path;
@@ -86,7 +98,9 @@ class MMap {
     double preference_bpm{0};
 
     // 谱面时长--计算
-    int32_t map_length = 0;
+    int32_t map_length{0};
+
+    int32_t orbits;
 
     // 全部物件
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> hitobjects;
@@ -111,6 +125,9 @@ class MMap {
         }
     };
 
+    // 注册元数据
+    void register_metadata(MapMetadataType type);
+
     // 执行操作
     void execute_edit_operation(ObjEditOperation& operation);
     void execute_edit_operation(TimingEditOperation& operation);
@@ -125,7 +142,7 @@ class MMap {
     void erase_beats(double start, double end);
 
     // 从文件读取谱面
-    virtual void load_from_file(const char* path) = 0;
+    virtual void load_from_file(const char* path);
 
     // 插入物件
     virtual void insert_hitobject(std::shared_ptr<HitObject> hitobject);

@@ -79,6 +79,8 @@ class MEditorArea : public QWidget {
 
     void on_show_object_after_judgeline_button_toggled(bool checked);
 
+    void on_show_timeline_button_toggled(bool checked);
+
    private:
     Ui::MEditorArea *ui;
 

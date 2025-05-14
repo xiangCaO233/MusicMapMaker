@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -24,12 +25,13 @@ class RMMap : public MMap {
     int32_t max_orbits{0};
 
     // 版本--一般为ez,nm,hd,mx之类的
-    std::string version;
+    std::string Version;
 
     // 从文件读取谱面
     void load_from_file(const char* path) override;
 
-   protected:
+    // imd格式默认的元数据
+    static std::shared_ptr<MapMetadata> default_metadata();
 };
 
 // 二进制读取器

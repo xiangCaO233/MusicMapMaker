@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>620</width>
-    <height>145</height>
+    <width>730</width>
+    <height>304</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,11 +30,309 @@
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="spacing">
        <number>2</number>
       </property>
+      <item row="9" column="2">
+       <widget class="QPushButton" name="read_musiclength_button">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Use Music Length</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="use_music_artistunicode_button">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Use Music Artist</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QLineEdit" name="maplength_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string notr="true">60000</string>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string/>
+        </property>
+        <property name="cursorMoveStyle">
+         <enum>Qt::CursorMoveStyle::LogicalMoveStyle</enum>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QLineEdit" name="author_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="music_path_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Audio File Path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QPushButton" name="bg_path_browser_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string> Browse</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/folder-open.svg</normaloff>:/icons/folder-open.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="bg_path_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="title_unicode_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="artist_unicode_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Artist Unicode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="mapversion_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Map Version:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="pbpm_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Map Preference BPM:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="artist_unicode_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2">
+       <widget class="QPushButton" name="test_bpm_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Not supported yet</string>
+        </property>
+        <property name="text">
+         <string>Test</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QLineEdit" name="pbpm_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string notr="true">60</string>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="music_path_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="title_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLineEdit" name="mapversion_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string notr="true">[mmm]</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="music_path_browser_button">
         <property name="sizePolicy">
@@ -52,7 +350,7 @@
          <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
         <property name="text">
-         <string> Browser</string>
+         <string> Browse</string>
         </property>
         <property name="icon">
          <iconset resource="../../../resources/glsrcs.qrc">
@@ -60,47 +358,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="music_path_label">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Audio File Path:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="music_path_edit"/>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="bg_path_browser_button">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
-        </property>
-        <property name="text">
-         <string> Browser</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../resources/glsrcs.qrc">
-          <normaloff>:/icons/folder-open.svg</normaloff>:/icons/folder-open.svg</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="bg_path_label">
         <property name="font">
          <font>
@@ -112,8 +370,140 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="bg_path_edit"/>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="use_music_titleunicode_button">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Use Music Title</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="artist_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Artist:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0">
+       <widget class="QLabel" name="author_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Map Author:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="title_unicode_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Title Unicode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="title_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Title:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="maplength_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Map Length(ms):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="2">
+       <widget class="QPushButton" name="use_project_default_author_button">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Use Project Default</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="artist_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="keys_label">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Keys:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="keys_edit">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string notr="true">4</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

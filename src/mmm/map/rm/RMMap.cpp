@@ -19,9 +19,21 @@ BinaryReader::BinaryReader() {}
 // 析构ImdReader
 BinaryReader::~BinaryReader() = default;
 
-RMMap::RMMap() : MMap() { maptype = MapType::RMMAP; }
+RMMap::RMMap() : MMap() {
+    maptype = MapType::RMMAP;
+    // 注册元数据
+    register_metadata(MapMetadataType::IMD);
+}
 
 RMMap::~RMMap() = default;
+
+// imd格式默认的元数据
+std::shared_ptr<MapMetadata> RMMap::default_metadata() {
+    auto meta = std::make_shared<MapMetadata>();
+    meta->map_properties["version"] = "hd";
+    meta->map_properties["table_rows"] = "0";
+    return meta;
+}
 
 // 从文件读取谱面
 void RMMap::load_from_file(const char* path) {
@@ -72,9 +84,10 @@ void RMMap::load_from_file(const char* path) {
     auto last_pos = fnamestr.rfind(".");
 
     // 截取第二个_到最后一个.之间的字符串作为版本
-    version = second_pos < last_pos
+    Version = second_pos < last_pos
                   ? fnamestr.substr(second_pos + 1, last_pos - second_pos - 1)
                   : "unknown";
+    version = Version;
 
     // 截取0~第一个_之间的字符串作为文件前缀
     auto file_presuffix = fnamestr.substr(0, first_pos);
@@ -316,4 +329,8 @@ void RMMap::load_from_file(const char* path) {
             break;
         }
     }
+    // 填充元数据
+    metadatas[MapMetadataType::IMD]->map_properties["version"] = version;
+    metadatas[MapMetadataType::IMD]->map_properties["table_rows"] =
+        std::to_string(table_rows);
 }

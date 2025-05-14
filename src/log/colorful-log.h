@@ -48,6 +48,8 @@ class XLogger {
     static MUiLogger* uilogger;
     static uint32_t glcalls;
     static uint32_t drawcalls;
+    // 最后一次打开的文件目录
+    static QString last_select_directory;
     static void init(const char* name);
     static void shutdown();
     static void enable();

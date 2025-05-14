@@ -35,9 +35,6 @@ class MProjectController : public QWidget {
     std::unordered_map<std::string, std::shared_ptr<MapWorkProject>>
         project_mapping;
 
-    // 最后一次打开的文件目录
-    QString last_select_directory;
-
     // 选择项目
     void select_project(std::shared_ptr<MapWorkProject> &project);
 

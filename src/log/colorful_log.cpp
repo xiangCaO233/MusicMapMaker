@@ -1,3 +1,4 @@
+#include <QDir>
 #include <memory>
 
 #include "colorful-log.h"
@@ -73,6 +74,10 @@ const char *ColorfulFormatter::get_color(
 
 uint32_t XLogger::glcalls = 0;
 uint32_t XLogger::drawcalls = 0;
+// 最后一次打开的文件目录
+// 初始化最后一次选择的为当前目录
+QString XLogger::last_select_directory = QDir::currentPath();
+
 std::shared_ptr<spdlog::logger> XLogger::logger;
 
 void XLogger::init(const char *name) {

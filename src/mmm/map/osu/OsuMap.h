@@ -349,6 +349,9 @@ class OsuMap : public MMap {
      */
     std::vector<int32_t> SliderBorder;
 
+    // osu格式默认的元数据
+    static std::shared_ptr<MapMetadata> default_metadata();
+
     // 从文件读取谱面
     void load_from_file(const char* path) override;
 };

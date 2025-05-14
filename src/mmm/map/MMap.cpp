@@ -13,9 +13,11 @@
 #include "../hitobject/Note/HoldEnd.h"
 #include "../hitobject/Note/Note.h"
 #include "../hitobject/Note/rm/ComplexNote.h"
+#include "../hitobject/Note/rm/Slide.h"
 #include "../timing/Timing.h"
 #include "colorful-log.h"
-#include "mmm/hitobject/Note/rm/Slide.h"
+#include "osu/OsuMap.h"
+#include "rm/RMMap.h"
 
 MMap::MMap() {
     // 初始化播放回调对象
@@ -23,6 +25,25 @@ MMap::MMap() {
 }
 
 MMap::~MMap() = default;
+
+// 从文件读取谱面
+void MMap::load_from_file(const char* path) {}
+
+// 注册元数据
+void MMap::register_metadata(MapMetadataType type) {
+    switch (type) {
+        case MapMetadataType::IMD: {
+            metadatas[type] = RMMap::default_metadata();
+            break;
+        }
+        case MapMetadataType::OSU: {
+            metadatas[type] = OsuMap::default_metadata();
+            break;
+        }
+        default:
+            break;
+    }
+}
 
 // 插入物件
 void MMap::insert_hitobject(std::shared_ptr<HitObject> hitobject) {

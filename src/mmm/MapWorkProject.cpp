@@ -19,7 +19,8 @@ using namespace pugi;
 
 // 构造MapWorkProject
 MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
-                               const char* name) {
+                               const char* name)
+    : ppath(project_path) {
     // 初始化项目名
     if (name) {
         config.project_name = std::string(name);
@@ -177,7 +178,14 @@ MapWorkProject::~MapWorkProject() {
     }
     // 保存配置
     save_config();
-};
+}
+
+// 添加新谱面
+void MapWorkProject::add_new_map(const std::shared_ptr<MMap>& map) {
+    maps.emplace_back(map);
+    map_canvasposes.try_emplace(map, 0);
+    map->project_reference = this;
+}
 
 // 设置项目音频输出设备
 void MapWorkProject::set_audio_device(std::string& outdevicename) {

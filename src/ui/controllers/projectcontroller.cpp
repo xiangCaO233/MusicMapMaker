@@ -18,16 +18,16 @@
 #include <memory>
 
 #include "../../mmm/MapWorkProject.h"
+#include "../../util/mutil.h"
 #include "audio/BackgroundAudio.h"
 #include "colorful-log.h"
+#include "guide/newmapguide.h"
+#include "mmm/map/MMap.h"
 #include "ui_mprojectcontroller.h"
 
 MProjectController::MProjectController(QWidget* parent)
     : QWidget(parent), ui(new Ui::MProjectController) {
     ui->setupUi(this);
-
-    // 初始化最后一次选择的为家目录
-    last_select_directory = QDir::homePath();
 
     // 初始化listview模型
     QStandardItemModel* map_list_model =
@@ -227,7 +227,7 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
     menu.addAction(tr("Import Map"), [&]() {
         auto options = QFileDialog::DontUseNativeDialog;
         auto fileNames = QFileDialog::getOpenFileNames(
-            this, tr("选择谱面"), last_select_directory,
+            this, tr("选择谱面"), XLogger::last_select_directory,
             tr("谱面文件(*.osu *.imd *.mc)"), nullptr, options);
 
         // TODO(xiang 2025-04-17): 实现项目中导入谱面
@@ -241,6 +241,109 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
             XERROR("请先打开项目");
         } else {
             qDebug() << "创建谱面";
+            // 显示模态对话框
+            NewMapGuide dialog;
+            if (dialog.exec() == QDialog::Accepted) {
+                // 用户点击了OK
+                XINFO("确认创建map");
+                // 检查创建所需参数
+                // 音频路径
+                auto audio_file_path = dialog.music_path;
+                BackgroundAudio::unload_audio(audio_file_path);
+
+                // 构造map
+                auto map = std::make_shared<MMap>();
+                std::filesystem::path music_path(audio_file_path);
+                // 不存在则拷贝过去
+                if (!mutil::fileExistsInPath(music_path,
+                                             selected_project->ppath)) {
+                    // 拷贝并更新音频路径
+                    mutil::copyFileToPath(music_path, selected_project->ppath,
+                                          map->audio_file_abs_path);
+                    selected_project->audio_paths.emplace_back(
+                        QDir(map->audio_file_abs_path)
+                            .absolutePath()
+                            .toStdString());
+                } else {
+                    // 直接使用音频路径
+                    map->audio_file_abs_path = music_path;
+                }
+
+                if (BackgroundAudio::loadin_audio(map->audio_file_abs_path) ==
+                    -1) {
+                    XERROR("无法加载音频");
+                    return;
+                }
+                // 谱面时长
+                // XINFO(QString("map_length:[%1]")
+                //           .arg(dialog.map_length)
+                //           .toStdString());
+                map->map_length = dialog.map_length;
+
+                // pbpm
+                // XINFO(QString("pbpm:[%1]").arg(dialog.pbpm).toStdString());
+                map->preference_bpm = dialog.pbpm;
+
+                // author
+                // XINFO(QString("author:[%1]").arg(dialog.author).toStdString());
+                map->author = dialog.author;
+
+                // bgpath
+                // XINFO(QString("bg:[%1]").arg(dialog.bg_path).toStdString());
+                map->bg_path = dialog.bg_path;
+                std::filesystem::path bg_path(dialog.bg_path);
+                // 不存在则拷贝过去
+                if (!mutil::fileExistsInPath(bg_path,
+                                             selected_project->ppath)) {
+                    // 拷贝并更新图片路径
+                    mutil::copyFileToPath(bg_path, selected_project->ppath,
+                                          map->bg_path);
+                    selected_project->image_paths.emplace_back(
+                        QDir(map->bg_path).absolutePath().toStdString());
+                } else {
+                    // 直接使用图片路径
+                    map->bg_path = dialog.bg_path;
+                }
+
+                // 标题
+                // XINFO(QString("title:[%1]").arg(dialog.title).toStdString());
+                // XINFO(QString("title unicode:[%1]")
+                //           .arg(dialog.title_unicode)
+                //           .toStdString());
+                // 艺术家
+                // XINFO(QString("artist:[%1]").arg(dialog.artist).toStdString());
+                // XINFO(QString("artist unicode:[%1]")
+                //           .arg(dialog.artist_unicode)
+                //           .toStdString());
+                map->title = dialog.title;
+                map->title_unicode = dialog.title_unicode;
+                map->artist = dialog.artist;
+                map->artist_unicode = dialog.artist_unicode;
+
+                // 键数
+                map->orbits = dialog.orbits;
+
+                // 版本
+                map->version = dialog.version;
+
+                // 生成谱面名称
+                map->map_name =
+                    "[" + std::to_string(map->orbits) + "k] " + map->version;
+                // 谱面路径使用相对项目路径
+                map->map_file_path =
+                    selected_project->ppath / (map->map_name + ".mmm");
+
+                // 添加map
+                selected_project->add_new_map(map);
+
+                // 触发更新
+                select_project(selected_project);
+
+                // 资源不存在则拷贝到当前项目
+            } else {
+                // 用户取消或关闭了对话框
+                XWARN("取消创建map");
+            }
         }
     });
 

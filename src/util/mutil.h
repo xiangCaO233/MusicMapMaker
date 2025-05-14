@@ -91,6 +91,65 @@ inline bool isStringAllDigits_Iteration(const QString& str) {
     // 4. 如果循环结束都没有返回 false，说明所有字符都是数字
     return true;
 }
+/**
+ * @brief 将文件拷贝到指定目录并返回目标文件路径
+ * @param f 源文件绝对路径
+ * @param p 目标目录路径
+ * @param[out] result_path 拷贝结果文件的绝对路径
+ * @return 拷贝是否成功
+ */
+inline bool copyFileToPath(const std::filesystem::path& f,
+                           const std::filesystem::path& p,
+                           std::filesystem::path& result_path) {
+    try {
+        // 检查源文件是否存在且是常规文件
+        if (!std::filesystem::exists(f) ||
+            !std::filesystem::is_regular_file(f)) {
+            std::cerr << "Source file does not exist or is not a regular file"
+                      << std::endl;
+            return false;
+        }
+
+        // 检查目标目录是否存在
+        if (!std::filesystem::exists(p)) {
+            std::cerr << "Target directory does not exist" << std::endl;
+            return false;
+        }
+
+        // 获取文件名部分
+        std::filesystem::path filename = f.filename();
+
+        // 构建目标路径
+        result_path = p / filename;
+
+        // 拷贝文件 (使用覆盖选项)
+        std::filesystem::copy_file(
+            f, result_path, std::filesystem::copy_options::overwrite_existing);
+
+        return true;
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Filesystem error: " << e.what() << std::endl;
+        return false;
+    }
+}
+// 检查路径 p 中是否存在文件 f (f 是绝对路径)
+inline bool fileExistsInPath(const std::filesystem::path& f,
+                             const std::filesystem::path& p) {
+    try {
+        // 获取文件名部分
+        std::filesystem::path filename = f.filename();
+
+        // 构建目标路径
+        std::filesystem::path target_path = p / filename;
+
+        // 检查文件是否存在且是常规文件
+        return std::filesystem::exists(target_path) &&
+               std::filesystem::is_regular_file(target_path);
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Filesystem error: " << e.what() << std::endl;
+        return false;
+    }
+}
 
 // 判断是否全选组合键内的子键
 inline bool full_selected_complex(

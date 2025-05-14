@@ -287,6 +287,44 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="show_timeline_button">
+        <property name="minimumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/lines.svg</normaloff>:/icons/lines.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="lock_edit_mode_button">
         <property name="minimumSize">
          <size>

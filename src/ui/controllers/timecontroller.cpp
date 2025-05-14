@@ -429,7 +429,6 @@ void TimeController::on_lineEdit_returnPressed() {
 
 // 时间编辑框编辑完成事件
 void TimeController::on_lineEdit_editingFinished() {
-    // TODO(xiang 2025-04-26): 实现功能
     // 预先记录修改前的数据
     // 检查输入数据是否合法--不合法恢复缓存数据
     if (tformat == TimeFormat::HHMMSSZZZ) {

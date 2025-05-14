@@ -601,7 +601,9 @@ void MapWorkspaceCanvas::push_shape() {
         // 清除hover信息
         // 生成区域信息
         areagenerator->generate();
-        draw_beats();
+        if (editor->csettings.show_timeline) {
+            draw_beats();
+        }
 
         // 更新物件列表
         // 清除物件缓存
@@ -667,31 +669,30 @@ void MapWorkspaceCanvas::push_shape() {
         draw_hitobject(editbuffers, HitObjectEffect::SHADOW);
 
         renderer_manager->texture_effect = TextureEffect::NONE;
-    }
+        // 绘制预览区域
+        draw_preview_content();
 
-    // 绘制特效
-    for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
-        if (!effect_frame_queue.empty()) {
-            renderer_manager->addRect(effect_frame_queue.front().first,
-                                      effect_frame_queue.front().second,
-                                      QColor(255, 182, 193, 240), 0, true);
-            // 弹出队首
-            effect_frame_queue.pop();
+        // 绘制选中区域
+        draw_select_bound();
+
+        // 绘制判定线
+        draw_judgeline();
+        // 绘制信息区域
+        draw_infoarea();
+        // 绘制顶部栏
+        draw_top_bar();
+        // TODO(xiang 2025-05-14): 多线程数据竞争--崩溃/严重
+        // 绘制特效
+        for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
+            if (!effect_frame_queue.empty()) {
+                renderer_manager->addRect(effect_frame_queue.front().first,
+                                          effect_frame_queue.front().second,
+                                          QColor(255, 182, 193, 240), 0, true);
+                // 弹出队首
+                effect_frame_queue.pop();
+            }
         }
     }
-
-    // 绘制预览区域
-    draw_preview_content();
-
-    // 绘制选中区域
-    draw_select_bound();
-
-    // 绘制判定线
-    draw_judgeline();
-    // 绘制信息区域
-    draw_infoarea();
-    // 绘制顶部栏
-    draw_top_bar();
 }
 
 // 切换到指定图
@@ -704,6 +705,10 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
                    &MapWorkspaceCanvas::on_music_pos_sync);
     working_map = map;
     editor->cstatus.canvas_pasued = true;
+
+    // 清理图形缓存
+    editor->ebuffer.current_beats.clear();
+    effect_frame_queue_map.clear();
 
     if (map) {
         editor->cstatus.map_type = map->maptype;

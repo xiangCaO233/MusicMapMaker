@@ -19,6 +19,9 @@ struct CanvasSettings {
 
     // 是否严格选中
     bool strict_select{false};
+
+    // 是否显示时间线
+    bool show_timeline{true};
 };
 
 #endif  // M_CANVASSETTINGS_H

@@ -66,6 +66,8 @@ class MapWorkProject {
     // 析构MapWorkProject
     virtual ~MapWorkProject();
 
+    std::filesystem::path ppath;
+
     // 配置
     ProjectConfig config;
 
@@ -94,6 +96,9 @@ class MapWorkProject {
 
     // 项目中视频的路径列表
     std::vector<std::string> video_paths;
+
+    // 添加新谱面
+    void add_new_map(const std::shared_ptr<MMap>& map);
 
     // 设置项目音频输出设备
     void set_audio_device(std::string& outdevicename);

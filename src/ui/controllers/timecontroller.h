@@ -6,14 +6,10 @@
 #include <QWidget>
 #include <memory>
 
+#include "../GlobalSettings.h"
+
 class MMap;
 enum class GlobalTheme;
-
-// 时间格式
-enum class TimeFormat {
-    MILLISECONDS,
-    HHMMSSZZZ,
-};
 
 namespace Ui {
 class audio_time_controller;
