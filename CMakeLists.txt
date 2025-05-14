@@ -58,6 +58,7 @@ set(MMM_SOURCES
     src/mmm/SampleSet.h
     src/mmm/MapWorkProject.h
     src/mmm/MapWorkProject.cpp
+    src/mmm/map/MapMetadata.h
     src/mmm/map/MMap.h
     src/mmm/map/MMap.cpp
     src/mmm/map/callback/AudioEnginPlayCallback.h
@@ -234,9 +235,14 @@ include_directories(
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                    resources/glsrcs.qrc
-                    src/ui/guide/newmapguide.h src/ui/guide/newmapguide.cpp src/ui/guide/newmapguide.ui)
+  qt_add_executable(
+    MusicMapMaker
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+    resources/glsrcs.qrc
+    src/ui/guide/newmapguide.h
+    src/ui/guide/newmapguide.cpp
+    src/ui/guide/newmapguide.ui)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
