@@ -106,14 +106,14 @@ void MMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
                 auto it = hitobjects.lower_bound(obj);
                 // 前移到上一时间戳
                 while (it != hitobjects.begin() &&
-                       note->timestamp - it->get()->timestamp < 10) {
+                       obj->timestamp - it->get()->timestamp < 10) {
                     --it;
                 }
 
-                // 添加滑头的即将删除迭代器
+                // 添加即将删除迭代器
                 while (it != hitobjects.end() &&
-                       (it->get()->timestamp - note->timestamp) < 5) {
-                    if (it->get()->equals(note)) {
+                       (it->get()->timestamp - obj->timestamp) < 5) {
+                    if (it->get()->equals(obj)) {
                         to_erase.push_back(it);
                     }
                     ++it;
@@ -126,14 +126,14 @@ void MMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
                 auto it = temp_hold_list.lower_bound(obj);
                 // 前移到上一时间戳
                 while (it != temp_hold_list.begin() &&
-                       note->timestamp - it->get()->timestamp < 10) {
+                       obj->timestamp - it->get()->timestamp < 10) {
                     --it;
                 }
 
-                // 添加滑头的即将删除迭代器
+                // 添加即将删除迭代器
                 while (it != temp_hold_list.end() &&
-                       (it->get()->timestamp - note->timestamp) < 5) {
-                    if (it->get()->equals(note)) {
+                       (it->get()->timestamp - obj->timestamp) < 5) {
+                    if (it->get()->equals(obj)) {
                         to_erase.push_back(it);
                     }
                     ++it;
@@ -230,7 +230,8 @@ void MMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
                 // 然后移除自身
                 // 存储要删除的迭代器（可能有多个匹配项）
                 std::vector<decltype(hitobjects.begin())> to_erase;
-                hitobjects.erase(remove_complex);
+                insert_same_objs(to_erase, remove_complex);
+                remove_from_main(to_erase);
                 break;
             }
         }
