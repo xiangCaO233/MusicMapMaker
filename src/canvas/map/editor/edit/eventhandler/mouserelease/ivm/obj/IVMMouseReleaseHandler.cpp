@@ -1,7 +1,7 @@
 #include "IVMMouseReleaseHandler.h"
 
+#include "../../../../IVMObjectEditor.h"
 #include "../../../../mmm/hitobject/Note/rm/ComplexNote.h"
-#include "../../../IVMObjectEditor.h"
 
 // 构造IVMMouseReleaseHandler
 IVMMouseReleaseHandler::IVMMouseReleaseHandler() {}

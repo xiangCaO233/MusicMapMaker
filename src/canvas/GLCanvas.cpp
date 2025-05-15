@@ -276,7 +276,7 @@ void GLCanvas::load_texture_from_path(const char *p) {
 }
 
 // 从指定目录添加纹理
-void GLCanvas::load_texture_from_path(std::filesystem::path &path) {
+void GLCanvas::load_texture_from_path(const std::filesystem::path &path) {
     QString qps = QString::fromStdString(path.string());
     QString apath = QDir::currentPath() + "/" + qps + "/";
     QDir dir(apath);

@@ -19,6 +19,9 @@
 #include "osu/OsuMap.h"
 #include "rm/RMMap.h"
 
+// 线程池
+ThreadPool MMap::map_pool = ThreadPool(4);
+
 MMap::MMap() {
     // 初始化播放回调对象
     audio_pos_callback = std::make_shared<AudioEnginPlayCallback>();

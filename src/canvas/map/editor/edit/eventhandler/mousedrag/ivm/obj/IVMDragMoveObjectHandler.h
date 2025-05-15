@@ -1,7 +1,7 @@
 #ifndef M_IVMDRAGMOVEOBJECTHANDLER_H
 #define M_IVMDRAGMOVEOBJECTHANDLER_H
 
-#include "../IMouseDragEventHandler.h"
+#include "../../IMouseDragEventHandler.h"
 
 class IVMDragMoveObjectHandler : public IMouseDragEventHandler {
    public:

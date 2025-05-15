@@ -1,7 +1,7 @@
 #ifndef M_IVMMOUSEREASEHANDLER_H
 #define M_IVMMOUSEREASEHANDLER_H
 
-#include "../IMouseReleaseEventHandler.h"
+#include "../../IMouseReleaseEventHandler.h"
 
 class IVMMouseReleaseHandler : public IMouseReleaseEventHandler {
    public:

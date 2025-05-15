@@ -145,7 +145,7 @@ class MapWorkspaceSkin {
         divisors_color_theme;
 
     // 载入皮肤
-    void load_skin(std::filesystem::path& skin_path);
+    void load_skin(const std::filesystem::path& skin_path);
 
     // 获取背景的纹理
     std::shared_ptr<TextureInstace>& get_skin_background_texture();

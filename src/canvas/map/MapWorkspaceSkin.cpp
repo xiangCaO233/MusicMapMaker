@@ -28,7 +28,7 @@ int count_files_recursive(const std::filesystem::path& dir_path) {
 }
 
 // 载入皮肤
-void MapWorkspaceSkin::load_skin(std::filesystem::path& skin_path) {
+void MapWorkspaceSkin::load_skin(const std::filesystem::path& skin_path) {
     // 读取配置文件
     auto config_path = skin_path / "skinconfig.json";
     if (!std::filesystem::exists(config_path)) {

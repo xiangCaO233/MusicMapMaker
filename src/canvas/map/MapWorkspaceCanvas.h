@@ -7,6 +7,7 @@
 
 #include <deque>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <string>
 #include <unordered_map>
@@ -26,6 +27,7 @@
 #include "generator/PreviewGenerator.h"
 #include "generator/TimeInfoGenerator.h"
 #include "threads/EffectThread.h"
+#include "threads/ThreadPool.h"
 
 enum class EffectType {
     NORMAL,
@@ -49,6 +51,8 @@ class MapWorkspaceCanvas : public GLCanvas {
     void paintEvent(QPaintEvent *event) override;
 
     void initializeGL() override;
+    // 线程池
+    ThreadPool canvas_tpool;
 
     /*
      *图形相关
@@ -134,6 +138,7 @@ class MapWorkspaceCanvas : public GLCanvas {
     // 正在工作的图
     std::shared_ptr<MMap> working_map;
 
+    std::mutex skin_mtx;
     // 皮肤
     MapWorkspaceSkin skin;
 

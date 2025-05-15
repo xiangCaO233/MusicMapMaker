@@ -1,11 +1,11 @@
 #include "IVMCreateComplexHandler.h"
 
-#include "../../../../MapEditor.h"
+#include "../../../../../MapEditor.h"
+#include "../../../../HitObjectEditor.h"
 #include "../../../../mmm/hitobject/Note/Hold.h"
 #include "../../../../mmm/hitobject/Note/HoldEnd.h"
 #include "../../../../mmm/hitobject/Note/rm/ComplexNote.h"
 #include "../../../../mmm/hitobject/Note/rm/Slide.h"
-#include "../../../HitObjectEditor.h"
 #include "colorful-log.h"
 
 // 构造IVMCreateComplexHandler

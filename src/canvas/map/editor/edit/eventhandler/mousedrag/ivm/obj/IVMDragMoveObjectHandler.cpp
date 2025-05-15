@@ -1,11 +1,11 @@
 #include "IVMDragMoveObjectHandler.h"
 
-#include "../../../../../MapWorkspaceCanvas.h"
-#include "../../../../MapEditor.h"
+#include "../../../../../../MapWorkspaceCanvas.h"
+#include "../../../../../MapEditor.h"
+#include "../../../../IVMObjectEditor.h"
 #include "../../../../mmm/hitobject/Note/Hold.h"
 #include "../../../../mmm/hitobject/Note/HoldEnd.h"
 #include "../../../../mmm/hitobject/Note/rm/Slide.h"
-#include "../../../IVMObjectEditor.h"
 #include "colorful-log.h"
 
 // 构造IVMDragMoveObjectHandler

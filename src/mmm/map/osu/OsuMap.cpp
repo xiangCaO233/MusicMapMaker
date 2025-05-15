@@ -409,7 +409,6 @@ void OsuMap::load_from_file(const char* path) {
             // 加入物件列表
             hitobjects.insert(osu_note);
         }
-
         std::set<std::shared_ptr<Timing>, TimingComparator> basetimings;
         std::set<std::shared_ptr<Timing>, TimingComparator> notbasetimings;
         // 创建timing
@@ -433,49 +432,54 @@ void OsuMap::load_from_file(const char* path) {
                 basetimings.insert(osu_timing);
             }
         }
-        // 先添加全部基准timing--生成分拍
-        for (auto begin = basetimings.begin(); begin != basetimings.end();
-             ++begin) {
-            insert_timing(*begin);
-        }
-        // 再倒序添加全部变速timing
-        for (auto rbegin = notbasetimings.rbegin();
-             rbegin != notbasetimings.rend(); ++rbegin) {
-            insert_timing(*rbegin);
-        }
 
-        bool finded{false};
-        // 读取全图参考bpm
-        for (const auto& [time, timings] : temp_timing_map) {
-            // 使用第一个不带变速的绝对bpm
-            if (timings.size() == 1 && timings[0]->is_base_timing) {
-                preference_bpm = timings[0]->basebpm;
-                finded = true;
-                break;
+        MMap* ref = this;
+        map_pool.enqueue_void([=]() {
+            // 先添加全部基准timing--生成分拍
+            for (auto begin = basetimings.begin(); begin != basetimings.end();
+                 ++begin) {
+                ref->insert_timing(*begin);
             }
-        }
+            // 再倒序添加全部变速timing
+            for (auto rbegin = notbasetimings.rbegin();
+                 rbegin != notbasetimings.rend(); ++rbegin) {
+                ref->insert_timing(*rbegin);
+            }
 
-        // 没找到单独存在的绝对时间点-找同时存在变速值为1.00的时间点
-        if (!finded) {
-            for (const auto& [time, timings] : temp_timing_map) {
+            bool finded{false};
+            // 读取全图参考bpm
+            for (const auto& [time, timings] : ref->temp_timing_map) {
                 // 使用第一个不带变速的绝对bpm
-                if (timings.size() == 2 &&
-                    std::fabs(timings[1]->bpm - 1.00) < 0.0001) {
-                    preference_bpm = timings[0]->basebpm;
+                if (timings.size() == 1 && timings[0]->is_base_timing) {
+                    ref->preference_bpm = timings[0]->basebpm;
                     finded = true;
                     break;
                 }
             }
-        }
 
-        // 再没找到就用第一个timing的绝对bpm-没有用200
-        if (!finded) {
-            if (timings.empty()) {
-                preference_bpm = 200;
-            } else {
-                preference_bpm = timings.begin()->get()->basebpm;
+            // 没找到单独存在的绝对时间点-找同时存在变速值为1.00的时间点
+            if (!finded) {
+                for (const auto& [time, timings] : ref->temp_timing_map) {
+                    // 使用第一个不带变速的绝对bpm
+                    if (timings.size() == 2 &&
+                        std::fabs(timings[1]->bpm - 1.00) < 0.0001) {
+                        ref->preference_bpm = timings[0]->basebpm;
+                        finded = true;
+                        break;
+                    }
+                }
             }
-        }
+
+            // 再没找到就用第一个timing的绝对bpm-没有用200
+            if (!finded) {
+                if (ref->timings.empty()) {
+                    ref->preference_bpm = 200;
+                } else {
+                    ref->preference_bpm = ref->timings.begin()->get()->basebpm;
+                }
+            }
+        });
+
         // 填充元数据
         // general
         metadatas[MapMetadataType::OSU]->map_properties["AudioFilename"] =

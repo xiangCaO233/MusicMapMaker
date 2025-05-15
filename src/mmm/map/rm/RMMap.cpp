@@ -316,19 +316,23 @@ void RMMap::load_from_file(const char* path) {
     map_name = "[rm] " + file_presuffix + " [" + std::to_string(max_orbits) +
                "k] " + version;
 
-    // 添加timing--自动生成拍
-    for (const auto& temp_timing : temp_timings) {
-        insert_timing(temp_timing);
-    }
-
-    // 读取全图参考bpm
-    for (const auto& [time, timings] : temp_timing_map) {
-        // 使用第一个不带变速的绝对bpm
-        if (timings.size() == 1 && timings[0]->is_base_timing) {
-            preference_bpm = timings[0]->basebpm;
-            break;
+    MMap* ref = this;
+    map_pool.enqueue_void([=]() {
+        // 添加timing--自动生成拍
+        for (const auto& temp_timing : temp_timings) {
+            ref->insert_timing(temp_timing);
         }
-    }
+
+        // 读取全图参考bpm
+        for (const auto& [time, timings] : ref->temp_timing_map) {
+            // 使用第一个不带变速的绝对bpm
+            if (timings.size() == 1 && timings[0]->is_base_timing) {
+                ref->preference_bpm = timings[0]->basebpm;
+                break;
+            }
+        }
+    });
+
     // 填充元数据
     metadatas[MapMetadataType::IMD]->map_properties["version"] = version;
     metadatas[MapMetadataType::IMD]->map_properties["table_rows"] =

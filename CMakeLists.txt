@@ -163,22 +163,22 @@ set(PROJECT_SOURCES
     src/canvas/map/editor/edit/TimingEditor.h
     src/canvas/map/editor/edit/TimingEditor.cpp
     src/canvas/map/editor/edit/eventhandler/mousepress/IMousePressEventHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMSelectHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMSelectHandler.cpp
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMPlaceNoteHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMPlaceNoteHandler.cpp
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMCreateComplexHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMCreateComplexHandler.cpp
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMEditComplexHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/IVMEditComplexHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMSelectHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMSelectHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMPlaceNoteHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMPlaceNoteHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMCreateComplexHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMCreateComplexHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMEditComplexHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMEditComplexHandler.cpp
     src/canvas/map/editor/edit/eventhandler/mouserelease/IMouseReleaseEventHandler.h
-    src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.h
-    src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/IVMMouseReleaseHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/obj/IVMMouseReleaseHandler.h
+    src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/obj/IVMMouseReleaseHandler.cpp
     src/canvas/map/editor/edit/eventhandler/mousedrag/IMouseDragEventHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragMoveObjectHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragMoveObjectHandler.cpp
-    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragAdjustObjectHandler.h
-    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/IVMDragAdjustObjectHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/obj/IVMDragMoveObjectHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/obj/IVMDragMoveObjectHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/obj/IVMDragAdjustObjectHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousedrag/ivm/obj/IVMDragAdjustObjectHandler.cpp
     src/canvas/map/generator/ObjectGenerator.h
     src/canvas/map/generator/ObjectGenerator.cpp
     src/canvas/map/generator/general/NoteGenerator.h

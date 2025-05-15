@@ -1,7 +1,7 @@
 #include "IVMSelectHandler.h"
 
-#include "../../../../MapEditor.h"
-#include "../../../HitObjectEditor.h"
+#include "../../../../../MapEditor.h"
+#include "../../../../HitObjectEditor.h"
 #include "colorful-log.h"
 #include "mmm/hitobject/Note/Note.h"
 #include "mmm/hitobject/Note/rm/ComplexNote.h"

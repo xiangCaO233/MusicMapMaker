@@ -15,6 +15,7 @@
 #include "../timing/Timing.h"
 #include "MapMetadata.h"
 #include "callback/AudioEnginPlayCallback.h"
+#include "threads/ThreadPool.h"
 
 class MapWorkProject;
 
@@ -61,6 +62,9 @@ class MMap {
     MMap();
     // 析构MMap
     virtual ~MMap();
+
+    // 线程池
+    static ThreadPool map_pool;
 
     // 元数据集
     std::unordered_map<MapMetadataType, std::shared_ptr<MapMetadata>> metadatas;

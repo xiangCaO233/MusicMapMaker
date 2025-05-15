@@ -86,7 +86,7 @@ class GLCanvas : public QOpenGLWindow,
     void load_texture_from_path(const char *path);
 
     // 从指定目录添加纹理
-    void load_texture_from_path(std::filesystem::path &path);
+    void load_texture_from_path(const std::filesystem::path &path);
 
     // 添加纹理
     void add_texture(const char *relative_path, const char *path);

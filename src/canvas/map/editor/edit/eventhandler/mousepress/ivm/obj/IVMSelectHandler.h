@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "../IMousePressEventHandler.h"
+#include "../../IMousePressEventHandler.h"
 
 class HitObject;
 class IVMObjectEditor;

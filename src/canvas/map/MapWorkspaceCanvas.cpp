@@ -37,7 +37,7 @@
 #include "mainwindow.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
-    : skin(this), GLCanvas(parent) {
+    : GLCanvas(parent), skin(this), canvas_tpool(4) {
     // 初始化编辑器
     editor = std::make_shared<MapEditor>(this);
     // 初始化特效线程
@@ -283,6 +283,7 @@ void MapWorkspaceCanvas::focusOutEvent(QFocusEvent *event) {
 void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
     // 传递事件
     GLCanvas::resizeEvent(event);
+    std::lock_guard<std::mutex> lock(skin_mtx);
     editor->update_size(size());
 }
 
@@ -475,7 +476,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                                    texture_full_map[frame_texname]);
                 std::lock_guard<std::mutex> lock(
                     effect_frame_queue_map[xpos].mtx);
-                effect_frame_queue_map[xpos].queue.push(std::move(frame));
+                effect_frame_queue_map[xpos].queue.push(frame);
             }
             break;
         }
@@ -500,7 +501,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                                    texture_full_map[frame_texname]);
                 std::lock_guard<std::mutex> lock(
                     effect_frame_queue_map[xpos].mtx);
-                effect_frame_queue_map[xpos].queue.push(std::move(frame));
+                effect_frame_queue_map[xpos].queue.push(frame);
             }
             break;
         }
