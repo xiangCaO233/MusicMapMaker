@@ -15,9 +15,11 @@
 #include "mmm/hitobject/HitObject.h"
 #include "mmm/hitobject/Note/Note.h"
 #include "mmm/hitobject/Note/rm/Slide.h"
+#include "threads/ThreadPool.h"
 
 // 构造EffectThread
-EffectThread::EffectThread(std::shared_ptr<MapEditor> e) : editor(e) {}
+EffectThread::EffectThread(std::shared_ptr<MapEditor> e)
+    : editor(e), tpool(4) {}
 
 // 析构EffectThread
 EffectThread::~EffectThread() { stop(); }
@@ -182,8 +184,8 @@ void EffectThread::effect_thread() {
             auto& hitobjects = editor->canvas_ref->working_map->hitobjects;
             // --- 处理 HitObject (只有在播放时才处理) ---
             if (currently_playing) {
-                // --- 临界区：访问 hitobjects (使用外部传入的锁) ---
                 {
+                    // --- 临界区：访问 hitobjects (使用外部传入的锁) ---
                     std::lock_guard<std::mutex> lock(
                         editor->canvas_ref->working_map
                             ->hitobjects_mutex);  // 使用传入的 hitobjects 锁
@@ -234,9 +236,6 @@ void EffectThread::effect_thread() {
                             if (current_object->is_note) {
                                 auto note = std::static_pointer_cast<Note>(
                                     current_object);
-                                // TODO: 实际的音频播放调用
-                                // 启动播放线程
-                                std::thread framethread;
                                 // 物件的横向偏移
                                 auto x =
                                     editor->ebuffer.edit_area_start_pos_x +
@@ -254,9 +253,8 @@ void EffectThread::effect_thread() {
                                                       .first;
 
                                     // TODO(xiang 2025-05-14): 性能优化--严重
-
-                                    // 播放线程
-                                    framethread = std::thread([=]() {
+                                    // 使用线程池添加任务
+                                    tpool.enqueue_void([=]() {
                                         auto play_x = x;
                                         // 特效类型
                                         EffectType t;
@@ -346,7 +344,6 @@ void EffectThread::effect_thread() {
                                                     0);
                                         }
                                     });
-                                    framethread.detach();
                                 }
                             }
 

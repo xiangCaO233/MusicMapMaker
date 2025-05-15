@@ -135,9 +135,6 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
         device_name_node.text().set(devicename);
 
         // 初始化输出音量配置
-        config.pglobal_volume = .5f;
-        config.pmusic_volume = 1.f;
-        config.peffect_volume = 1.f;
         audio_volume_node = audio_node.append_child("VolumeConfig");
 
         audio_volume_node.append_attribute("global").set_value(

@@ -16,10 +16,10 @@ float BackgroundAudio::music_orbits_volume{1.0f};
 float BackgroundAudio::effect_orbits_volume{1.0f};
 
 // 全局音量
-float BackgroundAudio::global_volume{0.5};
+float BackgroundAudio::global_volume{.3f};
 
 // 轨道速度
-float BackgroundAudio::orbit_speed{1.0f};
+float BackgroundAudio::orbit_speed{.75f};
 
 // 全局速度
-float BackgroundAudio::global_speed{1.0f};
+float BackgroundAudio::global_speed{.5f};

@@ -31,11 +31,11 @@ struct ProjectConfig {
 
     // 音量
     // 项目全局音量
-    float pglobal_volume;
+    float pglobal_volume{.3f};
     // 项目音乐音量
-    float pmusic_volume;
+    float pmusic_volume{.75f};
     // 项目效果音量
-    float peffect_volume;
+    float peffect_volume{.5f};
 
     // 物件缩放策略
     double object_width_ratio{1.0};

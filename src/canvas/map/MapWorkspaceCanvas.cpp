@@ -473,7 +473,9 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                 auto frame =
                     std::make_pair(QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
                                    texture_full_map[frame_texname]);
-                effect_frame_queue_map[xpos].push(std::move(frame));
+                std::lock_guard<std::mutex> lock(
+                    effect_frame_queue_map[xpos].mtx);
+                effect_frame_queue_map[xpos].queue.push(std::move(frame));
             }
             break;
         }
@@ -496,7 +498,9 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                 auto frame =
                     std::make_pair(QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
                                    texture_full_map[frame_texname]);
-                effect_frame_queue_map[xpos].push(std::move(frame));
+                std::lock_guard<std::mutex> lock(
+                    effect_frame_queue_map[xpos].mtx);
+                effect_frame_queue_map[xpos].queue.push(std::move(frame));
             }
             break;
         }
@@ -608,9 +612,6 @@ void MapWorkspaceCanvas::push_shape() {
         // 更新物件列表
         // 清除物件缓存
         editor->ebuffer.buffer_objects.clear();
-        {
-            std::unique_lock<std::mutex> lock(working_map->hitobjects_mutex);
-        }
         working_map->query_object_in_range(
             editor->ebuffer.buffer_objects,
             int32_t(editor->ebuffer.current_time_area_start),
@@ -684,12 +685,14 @@ void MapWorkspaceCanvas::push_shape() {
         // TODO(xiang 2025-05-14): 多线程数据竞争--崩溃/严重
         // 绘制特效
         for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
-            if (!effect_frame_queue.empty()) {
-                renderer_manager->addRect(effect_frame_queue.front().first,
-                                          effect_frame_queue.front().second,
-                                          QColor(255, 182, 193, 240), 0, true);
+            std::lock_guard<std::mutex> lock(effect_frame_queue.mtx);
+            if (!effect_frame_queue.queue.empty()) {
+                renderer_manager->addRect(
+                    effect_frame_queue.queue.front().first,
+                    effect_frame_queue.queue.front().second,
+                    QColor(255, 182, 193, 240), 0, true);
                 // 弹出队首
-                effect_frame_queue.pop();
+                effect_frame_queue.queue.pop();
             }
         }
     }

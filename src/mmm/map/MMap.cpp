@@ -639,8 +639,6 @@ void MMap::query_object_in_range(
         result_objects,
     int32_t start, const int32_t end, bool with_longhold) {
     std::unique_lock<std::mutex> lock(hitobjects_mutex);
-    // 自动去重+排序
-    // std::set<std::shared_ptr<HitObject>, SharedPtrCompare> adding_objects;
     /*
      *lower_bound(key)	返回第一个 ≥ key 的元素的迭代器。
      *upper_bound(key)	返回第一个 > key 的元素的迭代器。

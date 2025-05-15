@@ -15,6 +15,7 @@
 
 #include "../../mmm/Beat.h"
 #include "../../mmm/map/MMap.h"
+#include "../../threads/ThreadSafeQueue.h"
 #include "../GLCanvas.h"
 #include "MapWorkspaceSkin.h"
 #include "RenderParam.h"
@@ -73,7 +74,8 @@ class MapWorkspaceCanvas : public GLCanvas {
 
     // x位置-特效帧队列
     std::unordered_map<
-        double, std::queue<std::pair<QRectF, std::shared_ptr<TextureInstace>>>>
+        double,
+        ThreadSafeQueue<std::pair<QRectF, std::shared_ptr<TextureInstace>>>>
         effect_frame_queue_map;
 
     /*

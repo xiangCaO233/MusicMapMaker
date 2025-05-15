@@ -10,8 +10,11 @@
 #include <thread>
 
 #include "editor/MapEditor.h"
+#include "threads/ThreadPool.h"
 class EffectThread : public QObject {
     Q_OBJECT
+
+    ThreadPool tpool;
 
     // 退出线程
     std::atomic<bool> exit{false};
