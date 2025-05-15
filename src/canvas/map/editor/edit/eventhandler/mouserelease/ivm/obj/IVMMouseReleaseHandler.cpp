@@ -53,9 +53,11 @@ bool IVMMouseReleaseHandler::handle(HitObjectEditor* oeditor_context,
                 // 若为面条编辑模式则面条编辑结束
                 // 结束面条编辑
                 // 只添加当前编辑的组合键
-                ivmobjecteditor->editing_temp_objects.clear();
-                ivmobjecteditor->editing_temp_objects.insert(
-                    ivmobjecteditor->current_edit_complex);
+                if (ivmobjecteditor->current_edit_complex) {
+                    ivmobjecteditor->editing_temp_objects.clear();
+                    ivmobjecteditor->editing_temp_objects.insert(
+                        ivmobjecteditor->current_edit_complex);
+                }
                 ivmobjecteditor->end_edit();
                 ivmobjecteditor->long_note_edit_mode = false;
                 XINFO("结束编辑面条");

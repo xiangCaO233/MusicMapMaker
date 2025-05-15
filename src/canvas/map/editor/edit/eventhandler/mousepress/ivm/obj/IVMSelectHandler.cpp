@@ -13,12 +13,13 @@ IVMSelectHandler::~IVMSelectHandler() = default;
 
 // 选中物件
 void IVMSelectHandler::select_note(IVMObjectEditor* ivmobjecteditor,
-                                   std::shared_ptr<HitObject> note) {
+                                   HitObject* note) {
     // 克隆一份用于编辑缓存显示虚影
     auto cloned_obj = std::shared_ptr<HitObject>(note->clone());
 
     // 原来的物件放到src源物件表中-即将删除
-    ivmobjecteditor->editing_src_objects.insert(note);
+    ivmobjecteditor->editing_src_objects.insert(
+        std::shared_ptr<HitObject>(note, [](HitObject*) {}));
 
     // 克隆份放入编辑缓存
     ivmobjecteditor->editing_temp_objects.insert(cloned_obj);
@@ -81,24 +82,23 @@ bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
             auto note = std::dynamic_pointer_cast<Note>(
                 ivmobjecteditor->current_edit_object);
             if (note && note->compinfo != ComplexInfo::NONE) {
-                // 如果选到组合键头-把所有的都加入(整体)
-                if (note->compinfo == ComplexInfo::HEAD) {
+                // 如果选到组合键头的头部-把所有的都加入(整体)
+                if (note->compinfo == ComplexInfo::HEAD &&
+                    oeditor_context->editor_ref->ebuffer.hover_object_info
+                            ->part == HoverPart::HEAD) {
                     // 选中组合键中所有的物件
-                    for (const auto& child_note :
-                         note->parent_reference->child_notes) {
-                        select_note(ivmobjecteditor, child_note);
-                    }
+                    select_note(ivmobjecteditor, note->parent_reference);
                     XWARN("开始编辑鼠标悬浮完整组合物件");
                 } else {
                     // 仅选中悬浮位置的物件
                     select_note(ivmobjecteditor,
-                                ivmobjecteditor->current_edit_object);
+                                ivmobjecteditor->current_edit_object.get());
                     XWARN("开始编辑鼠标悬浮组合物件子键");
                 }
             } else {
                 // 仅选中悬浮位置的物件
                 select_note(ivmobjecteditor,
-                            ivmobjecteditor->current_edit_object);
+                            ivmobjecteditor->current_edit_object.get());
                 XWARN("开始编辑鼠标悬浮物件");
             }
         }

@@ -158,6 +158,8 @@ set(PROJECT_SOURCES
     src/canvas/map/editor/edit/HitObjectEditor.cpp
     src/canvas/map/editor/edit/IVMObjectEditor.h
     src/canvas/map/editor/edit/IVMObjectEditor.cpp
+    src/canvas/map/editor/edit/IVMTimingEditor.h
+    src/canvas/map/editor/edit/IVMTimingEditor.cpp
     src/canvas/map/editor/edit/MMMObjectEditor.h
     src/canvas/map/editor/edit/MMMObjectEditor.cpp
     src/canvas/map/editor/edit/TimingEditor.h
@@ -171,6 +173,8 @@ set(PROJECT_SOURCES
     src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMCreateComplexHandler.cpp
     src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMEditComplexHandler.h
     src/canvas/map/editor/edit/eventhandler/mousepress/ivm/obj/IVMEditComplexHandler.cpp
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/timing/IVMSelectTimingHandler.h
+    src/canvas/map/editor/edit/eventhandler/mousepress/ivm/timing/IVMSelectTimingHandler.cpp
     src/canvas/map/editor/edit/eventhandler/mouserelease/IMouseReleaseEventHandler.h
     src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/obj/IVMMouseReleaseHandler.h
     src/canvas/map/editor/edit/eventhandler/mouserelease/ivm/obj/IVMMouseReleaseHandler.cpp

@@ -69,8 +69,7 @@ struct EditorBuffer {
             if (ptr == nullptr) {
                 return 0;  // 统一处理 nullptr
             }
-
-            std::size_t seed = ptr->size();
+            size_t seed = ptr->size();
             for (const auto& shared_timing : *ptr) {
                 // 使用 combine 技术混合哈希值
                 if (shared_timing) {

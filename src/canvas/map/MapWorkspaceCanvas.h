@@ -158,6 +158,7 @@ class MapWorkspaceCanvas : public GLCanvas {
     // 渲染实际图形
     void push_shape() override;
 
+    void remove_objects(std::shared_ptr<HitObject> o);
     // 更新fps显示
     virtual void updateFpsDisplay(int fps) override;
 

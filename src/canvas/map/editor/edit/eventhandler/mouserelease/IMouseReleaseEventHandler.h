@@ -16,11 +16,13 @@ class IMouseReleaseEventHandler {
     void set_next_handler(
         std::shared_ptr<IMouseReleaseEventHandler> next_handler_) {
         next_handler = next_handler_;
-    };
+    }
 
     // 处理事件
     virtual bool handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
-                        double mouse_time, double mouse_orbit) = 0;
+                        double mouse_time, double mouse_orbit) {
+        return false;
+    }
 
    protected:
     // 下一个事件处理器

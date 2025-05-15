@@ -16,8 +16,7 @@ class IVMSelectHandler : public IMousePressEventHandler {
     ~IVMSelectHandler() override;
 
     // 选中物件
-    void select_note(IVMObjectEditor* ivmobjecteditor,
-                     std::shared_ptr<HitObject> note);
+    void select_note(IVMObjectEditor* ivmobjecteditor, HitObject* note);
 
     // 处理事件
     bool handle(HitObjectEditor* oeditor_context, QMouseEvent* e,

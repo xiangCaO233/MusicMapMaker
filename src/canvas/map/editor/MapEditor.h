@@ -60,7 +60,8 @@ class MapEditor {
     std::unordered_map<EditMethodPreference, std::shared_ptr<HitObjectEditor>>
         obj_editors;
     // timing编辑器
-    TimingEditor timing_editor;
+    std::unordered_map<EditMethodPreference, std::shared_ptr<TimingEditor>>
+        timing_editors;
 
     // 操作类型栈
     std::stack<std::pair<EditOperationType, EditMethodPreference>>

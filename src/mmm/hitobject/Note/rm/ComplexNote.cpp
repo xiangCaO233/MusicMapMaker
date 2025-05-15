@@ -16,7 +16,15 @@ std::string ComplexNote::toString() {
 }
 
 // 深拷贝
-ComplexNote* ComplexNote::clone() { return nullptr; }
+ComplexNote* ComplexNote::clone() {
+    auto comp = new ComplexNote(timestamp, orbit);
+    for (const auto& child_note : child_notes) {
+        auto cloned_child = child_note->clone();
+        cloned_child->parent_reference = comp;
+        comp->child_notes.insert(std::shared_ptr<Note>(cloned_child));
+    }
+    return comp;
+}
 
 // 判同
 bool ComplexNote::equals(const std::shared_ptr<HitObject>& other) const {

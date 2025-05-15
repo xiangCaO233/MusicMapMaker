@@ -28,6 +28,7 @@
 #include "../../mmm/MapWorkProject.h"
 #include "../../mmm/hitobject/HitObject.h"
 #include "../../mmm/hitobject/Note/Note.h"
+#include "../../mmm/hitobject/Note/rm/ComplexNote.h"
 #include "../audio/BackgroundAudio.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
@@ -597,6 +598,32 @@ void MapWorkspaceCanvas::draw_hitobject(
     }
 }
 
+void MapWorkspaceCanvas::remove_objects(std::shared_ptr<HitObject> o) {
+    auto it = editor->ebuffer.buffer_objects.lower_bound(o);
+    // 前移到上一时间戳
+    while (it != editor->ebuffer.buffer_objects.begin() &&
+           o->timestamp - it->get()->timestamp < 10)
+        --it;
+    // 需要收集所有要删除的迭代器，因为删除会影响迭代器
+    std::vector<decltype(it)> to_erase;
+
+    while (it != editor->ebuffer.buffer_objects.end() &&
+           (it->get()->timestamp - o->timestamp) < 5) {
+        if (it->get()->equals(o)) {
+            to_erase.push_back(it);
+        }
+        ++it;
+    }
+
+    // 从后往前删除，避免迭代器失效问题
+    for (auto rit = to_erase.rbegin(); rit != to_erase.rend(); ++rit) {
+        // XWARN(QString("隐藏编辑中的源物件:[%1]")
+        //       .arg((*rit)->get()->timestamp)
+        //       .toStdString());
+        editor->ebuffer.buffer_objects.erase(*rit);
+    }
+}
+
 // 渲染实际图形
 void MapWorkspaceCanvas::push_shape() {
     // 绘制背景
@@ -621,30 +648,13 @@ void MapWorkspaceCanvas::push_shape() {
         for (const auto &[type, obj_editor] : editor->obj_editors) {
             // 不显示编辑中的物件-移除
             for (const auto &o : obj_editor->editing_src_objects) {
-                auto it = editor->ebuffer.buffer_objects.lower_bound(o);
-                // 前移到上一时间戳
-                while (it != editor->ebuffer.buffer_objects.begin() &&
-                       o->timestamp - it->get()->timestamp < 10)
-                    --it;
-                // 需要收集所有要删除的迭代器，因为删除会影响迭代器
-                std::vector<decltype(it)> to_erase;
-
-                while (it != editor->ebuffer.buffer_objects.end() &&
-                       (it->get()->timestamp - o->timestamp) < 5) {
-                    if (it->get()->equals(o)) {
-                        to_erase.push_back(it);
+                auto comp = std::dynamic_pointer_cast<ComplexNote>(o);
+                if (comp) {
+                    for (const auto &child_note : comp->child_notes) {
+                        remove_objects(child_note);
                     }
-                    ++it;
                 }
-
-                // 从后往前删除，避免迭代器失效问题
-                for (auto rit = to_erase.rbegin(); rit != to_erase.rend();
-                     ++rit) {
-                    // XWARN(QString("隐藏编辑中的源物件:[%1]")
-                    //       .arg((*rit)->get()->timestamp)
-                    //       .toStdString());
-                    editor->ebuffer.buffer_objects.erase(*rit);
-                }
+                remove_objects(o);
             }
         }
 
@@ -665,6 +675,13 @@ void MapWorkspaceCanvas::push_shape() {
             if (obj_editor->editing_temp_objects.empty()) continue;
             for (const auto &temp_shadow_obj :
                  obj_editor->editing_temp_objects) {
+                auto comp =
+                    std::dynamic_pointer_cast<ComplexNote>(temp_shadow_obj);
+                if (comp) {
+                    for (const auto &child_note : comp->child_notes) {
+                        editbuffers.insert(child_note);
+                    }
+                }
                 editbuffers.insert(temp_shadow_obj);
             }
         }

@@ -8,15 +8,18 @@
 #include "colorful-log.h"
 #include "edit/HitObjectEditor.h"
 #include "edit/TimingEditor.h"
+#include "editor/edit/IVMTimingEditor.h"
 #include "info/EditorEnumerations.h"
 
-MapEditor::MapEditor(MapWorkspaceCanvas* canvas)
-    : canvas_ref(canvas), timing_editor(this) {
+MapEditor::MapEditor(MapWorkspaceCanvas* canvas) : canvas_ref(canvas) {
     // 注册物件编辑器
     obj_editors[EditMethodPreference::IVM] =
         std::make_shared<IVMObjectEditor>(this);
     obj_editors[EditMethodPreference::MMM] =
         std::make_shared<MMMObjectEditor>(this);
+    // 注册timing编辑器
+    timing_editors[EditMethodPreference::IVM] =
+        std::make_shared<IVMTimingEditor>(this);
 }
 
 MapEditor::~MapEditor() = default;
@@ -34,7 +37,7 @@ void MapEditor::undo() {
             break;
         }
         case TIMING: {
-            timing_editor.undo();
+            timing_editors[operation_type_stack.top().second]->undo();
             break;
         }
     }
@@ -55,7 +58,7 @@ void MapEditor::redo() {
             break;
         }
         case TIMING: {
-            timing_editor.redo();
+            timing_editors[operation_type_stack.top().second]->redo();
             break;
         }
     }
@@ -200,7 +203,12 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
             switch (cstatus.operation_area) {
                 case MouseOperationArea::INFO: {
                     // 使用放置timing模式-在信息区才传递编辑timing事件
-                    timing_editor.mouse_pressed(e);
+                    if (canvas_ref->working_map) {
+                        timing_editors[canvas_ref->working_map
+                                           ->project_reference->config
+                                           .edit_method]
+                            ->mouse_pressed(e);
+                    }
                     break;
                 }
                 default: {
@@ -265,7 +273,12 @@ void MapEditor::mouse_released(QMouseEvent* e) {
             switch (cstatus.operation_area) {
                 case MouseOperationArea::INFO: {
                     // 使用放置timing模式-在信息区才传递编辑timing事件
-                    timing_editor.mouse_pressed(e);
+                    if (canvas_ref->working_map) {
+                        timing_editors[canvas_ref->working_map
+                                           ->project_reference->config
+                                           .edit_method]
+                            ->mouse_released(e);
+                    }
                     break;
                 }
                 default: {
@@ -344,7 +357,11 @@ void MapEditor::mouse_moved(QMouseEvent* e) {
             }
             case MouseEditMode::PLACE_TIMING: {
                 // 编辑timing的拖动事件
-                timing_editor.mouse_dragged(e);
+                if (canvas_ref->working_map) {
+                    timing_editors[canvas_ref->working_map->project_reference
+                                       ->config.edit_method]
+                        ->mouse_dragged(e);
+                }
                 break;
             }
             case MouseEditMode::NONE: {
