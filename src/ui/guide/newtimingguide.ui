@@ -117,10 +117,16 @@
    </item>
    <item row="3" column="0">
     <widget class="QCheckBox" name="enable_speed_changing">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="font">
       <font>
        <pointsize>14</pointsize>
       </font>
+     </property>
+     <property name="toolTip">
+      <string>Not supported yet</string>
      </property>
      <property name="layoutDirection">
       <enum>Qt::LayoutDirection::RightToLeft</enum>
@@ -208,10 +214,16 @@
       </item>
       <item>
        <widget class="QCheckBox" name="inheritable_checkbox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="font">
          <font>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="toolTip">
+         <string>Not supported yet</string>
         </property>
         <property name="layoutDirection">
          <enum>Qt::LayoutDirection::RightToLeft</enum>
