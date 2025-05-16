@@ -1,6 +1,7 @@
 #include "meditorarea.h"
 
 #include <qbuttongroup.h>
+#include <qfiledialog.h>
 #include <qlabel.h>
 #include <qmenu.h>
 #include <qnamespace.h>
@@ -8,9 +9,15 @@
 #include <qtmetamacros.h>
 #include <qwidgetaction.h>
 
+#include <filesystem>
+#include <string>
+
 #include "../../../canvas/map/editor/MapEditor.h"
 #include "../../../mmm/MapWorkProject.h"
+#include "../../../mmm/map/rm/RMMap.h"
 #include "../../../util/mutil.h"
+#include "colorful-log.h"
+#include "mmm/map/osu/OsuMap.h"
 #include "ui_meditorarea.h"
 
 MEditorArea::MEditorArea(QWidget *parent)
@@ -507,4 +514,42 @@ void MEditorArea::on_show_object_after_judgeline_button_toggled(bool checked) {
 
 void MEditorArea::on_show_timeline_button_toggled(bool checked) {
     canvas_container->canvas.get()->editor->csettings.show_timeline = checked;
+}
+
+// 保存action
+void MEditorArea::on_save_map() {}
+
+void MEditorArea::on_save_map_as() {
+    auto &map = canvas_container->canvas.data()->working_map;
+    if (map) {
+        std::string initial_file_name;
+        switch (map->maptype) {
+            case MapType::MMMMAP: {
+                break;
+            }
+            case MapType::RMMAP: {
+                auto rmmap = std::static_pointer_cast<RMMap>(map);
+                initial_file_name = mutil::sanitizeFilename(
+                    rmmap->title_unicode + "_" + std::to_string(rmmap->orbits) +
+                    "k_" + rmmap->version + ".imd");
+                break;
+            }
+            case MapType::MALODYMAP: {
+                break;
+            }
+            case MapType::OSUMAP: {
+                auto omap = std::static_pointer_cast<OsuMap>(map);
+                initial_file_name = mutil::sanitizeFilename(
+                    omap->artist + " - " + omap->title + "(" + omap->author +
+                    ")" + "[" + omap->version + "]" + ".osu");
+                break;
+            }
+        }
+        auto selected_file = mutil::getSaveDirectoryWithFilename(
+            this, tr("save as"), QString::fromStdString(initial_file_name));
+        if (selected_file != "") {
+            XINFO("尝试保存到:" + selected_file.toStdString());
+            map->write_to_file(selected_file.toStdString().c_str());
+        }
+    }
 }

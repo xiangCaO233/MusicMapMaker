@@ -3,10 +3,14 @@
 
 #include <qcolor.h>
 #include <qcontainerfwd.h>
+#include <qfiledialog.h>
+#include <qlineedit.h>
+#include <qlistview.h>
 #include <qmenu.h>
 #include <qpushbutton.h>
 #include <qsize.h>
 #include <qtoolbutton.h>
+#include <qtreeview.h>
 #include <unicode/ucnv.h>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
@@ -19,6 +23,8 @@
 #include <QtSvgWidgets/QSvgWidget>
 #include <memory>
 #include <string>
+
+#include "colorful-log.h"
 
 #ifdef _WIN32
 #define NOMINMAX
@@ -73,6 +79,91 @@ inline std::u32string cu32(const std::string& utf8) {
     return utf32;
 }
 
+inline std::string sanitizeFilename(std::string filename) {
+    // 定义非法字符（Windows + Unix 常见限制）
+    const std::string illegalChars = "\\/:*?\"<>|";
+
+    // 移除非法字符
+    filename.erase(
+        std::remove_if(filename.begin(), filename.end(),
+                       [&illegalChars](char c) {
+                           // 检查是否是控制字符或非法字符
+                           return (c < 32) ||
+                                  (illegalChars.find(c) != std::string::npos);
+                       }),
+        filename.end());
+
+    // 替换空格为下划线（可选）
+    std::replace(filename.begin(), filename.end(), ' ', '_');
+
+    return filename;
+}
+
+// 判断路径是否以指定字符串结尾
+inline bool endsWithExtension(const std::filesystem::path& filepath,
+                              const std::string& suffix) {
+    // 获取文件名（带扩展名）
+    std::string filename = filepath.filename().string();
+
+    // 检查是否以指定后缀结尾
+    if (filename.length() >= suffix.length() &&
+        filename.compare(filename.length() - suffix.length(), suffix.length(),
+                         suffix) == 0) {
+        return true;
+    }
+    return false;
+}
+
+// 调用文件选择对话框选择保存文件
+inline QString getSaveDirectoryWithFilename(QWidget* parent,
+                                            const QString& title,
+                                            const QString& defaultFilename) {
+    QFileDialog dialog(parent, title, XLogger::last_select_directory);
+
+    // 设置为目录选择模式
+    dialog.setFileMode(QFileDialog::AnyFile);
+
+    // 允许用户输入文件名
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+
+    // 设置默认文件名（可选）
+    if (!defaultFilename.isEmpty()) {
+        dialog.selectFile(defaultFilename);
+    }
+
+    // 强制使用Qt的对话框（非原生对话框），以便更好地控制
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+
+    // 获取对话框中的QLineEdit（用于输入文件名）
+    QLineEdit* lineEdit = dialog.findChild<QLineEdit*>();
+    if (lineEdit && !defaultFilename.isEmpty()) {
+        lineEdit->setText(defaultFilename);
+    }
+
+    // 获取列表视图并设置为单选
+    QListView* listView = dialog.findChild<QListView*>("listView");
+    if (listView) {
+        listView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
+    // 获取树视图并设置为单选
+    QTreeView* treeView = dialog.findChild<QTreeView*>();
+    if (treeView) {
+        treeView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
+    if (dialog.exec() == QDialog::Accepted) {
+        QStringList selected = dialog.selectedFiles();
+        if (!selected.isEmpty()) {
+            // 返回完整路径（目录+文件名）
+            return selected.first();
+        }
+    }
+
+    return QString();  // 用户取消选择
+}
+
+// 判断字符串是否完全由数字组成
 inline bool isStringAllDigits_Iteration(const QString& str) {
     // 1. 处理空字符串的情况 (根据需求，空字符串可能算 true 或 false)
     // 通常认为空字符串不全是数字，所以返回 false

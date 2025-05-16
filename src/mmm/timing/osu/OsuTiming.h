@@ -24,6 +24,7 @@
 *倍，并将这一段的音效组切换成 drum 音效组。
 */
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,6 +35,8 @@ class OsuTiming : public Timing {
    public:
     // 构造OsuTiming
     OsuTiming();
+    // 从父类构造-填充属性
+    explicit OsuTiming(std::shared_ptr<Timing>);
     // 析构OsuTiming
     ~OsuTiming() override;
 

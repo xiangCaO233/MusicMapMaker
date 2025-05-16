@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget* parent)
     // 默认使用Dark主题
     use_theme(GlobalTheme::DARK);
 
+    init_actions();
+
     // 连接文件浏览器和项目管理器信号
     connect(ui->file_controller, &FileBrowserController::open_project,
             ui->project_controller, &MProjectController::new_project);
@@ -139,4 +141,12 @@ void MainWindow::use_theme(GlobalTheme theme) {
 
     // 设置info主题
     ui->infomation_widget->use_theme(theme);
+}
+
+// 初始化actions的信号连接
+void MainWindow::init_actions() {
+    connect(ui->actionSave, &QAction::triggered,
+            ui->page_widget->edit_area_widget, &MEditorArea::on_save_map);
+    connect(ui->actionSave_As, &QAction::triggered,
+            ui->page_widget->edit_area_widget, &MEditorArea::on_save_map_as);
 }

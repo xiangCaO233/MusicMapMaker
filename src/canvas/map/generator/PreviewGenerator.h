@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 class MapEditor;
-enum class NoteType;
+enum class NoteType : uint8_t;
 class ObjectGenerator;
 
 class PreviewGenerator {

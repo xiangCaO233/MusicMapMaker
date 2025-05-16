@@ -148,6 +148,12 @@ class MMap {
     // 从文件读取谱面
     virtual void load_from_file(const char* path);
 
+    // 写出到文件
+    virtual void write_to_file(const char* path);
+
+    // 写出文件是否合法
+    virtual bool is_write_file_legal(const char* file, std::string& res);
+
     // 插入物件
     virtual void insert_hitobject(std::shared_ptr<HitObject> hitobject);
 

@@ -33,6 +33,12 @@ OsuHold::OsuHold(uint32_t time, int32_t orbit_pos, uint32_t holdtime)
     note_type = NoteType::HOLD;
     object_type = HitObjectType::OSUHOLD;
 }
+// 从父类构造
+OsuHold::OsuHold(std::shared_ptr<Hold> src)
+    : Hold(src->timestamp, src->orbit, src->hold_time) {
+    //-填充属性
+    object_type = HitObjectType::OSUHOLD;
+}
 
 OsuHold::~OsuHold() {}
 
@@ -61,6 +67,54 @@ std::string OsuHold::toString() {
            std::to_string(static_cast<int>(sample_group.normalSet)) +
            ", additionalSet=" +
            std::to_string(static_cast<int>(sample_group.additionalSet)) + "}";
+}
+
+// 转化为osu描述
+std::string OsuHold::to_osu_description(int32_t orbit_count) {
+    /*
+     * 长键格式:
+     * x,y,开始时间,物件类型,长键音效,结束时间:音效组:附加音效组:音效参数:音量:[自定义音效文件]
+     * 对于长键:
+     *   - 物件类型 = 128 (Hold note)
+     *   - 结束时间 = 开始时间 + hold_time
+     */
+
+    std::ostringstream oss;
+
+    // x 坐标 (根据轨道数计算)
+    // 原公式: orbit = floor(x * orbit_count / 512)
+    // 反推: x = orbit * 512 / orbit_count
+    int x = static_cast<int>((double(orbit) + 0.5) * 512 / orbit_count);
+    oss << x << ",";
+
+    // y 坐标 (固定192)
+    oss << "192,";
+
+    // 开始时间
+    oss << timestamp << ",";
+
+    // 物件类型 (HOLD=128)
+    oss << "128,";
+
+    // 长键音效 (NoteSample枚举值)
+    oss << static_cast<int>(sample) << ",";
+
+    // 结束时间和音效组参数
+    int end_time = timestamp + hold_time;
+    oss << end_time << ":";
+
+    // 音效组参数
+    oss << static_cast<int>(sample_group.normalSet) << ":";
+    oss << static_cast<int>(sample_group.additionalSet) << ":";
+    oss << sample_group.sampleSetParameter << ":";
+    oss << sample_group.volume << ":";
+
+    // 自定义音效文件 (如果有)
+    if (!sample_group.sampleFile.empty()) {
+        oss << sample_group.sampleFile;
+    }
+
+    return oss.str();
 }
 
 // 从osu描述加载

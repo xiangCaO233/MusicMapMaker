@@ -1,16 +1,57 @@
 #include "OsuTiming.h"
 
 #include <cstdlib>
+#include <iomanip>
 #include <string>
 
 #include "src/mmm/timing/Timing.h"
 
 OsuTiming::OsuTiming() : Timing() { type = TimingType::OSUTIMING; }
+// 从父类构造
+OsuTiming::OsuTiming(std::shared_ptr<Timing>) {
+    // -填充属性
+    type = TimingType::OSUTIMING;
+}
 
 OsuTiming::~OsuTiming() = default;
 
 // 转换为osu的字符串
-std::string OsuTiming::to_osu_description() { return ""; }
+std::string OsuTiming::to_osu_description() {
+    /*
+     * 格式: 时间,拍长,节拍,音效组,音效参数,音量,是否为非继承时间点,效果
+     * 对于非继承时间点(红线):
+     *   拍长 = 60000 / BPM
+     * 对于继承时间点(绿线):
+     *   拍长 = -100 / 滑条速度倍数
+     */
+    std::ostringstream oss;
+    // 时间
+    oss << std::fixed << std::setprecision(0) << timestamp << ",";
+    // 拍长
+    if (is_inherit_timing) {
+        // 继承时间点(绿线): 拍长为负值，表示滑条速度倍数
+        double slider_velocity_multiplier = 100.0 / bpm;
+        oss << std::fixed << std::setprecision(2) << -slider_velocity_multiplier
+            << ",";
+    } else {
+        // 非继承时间点(红线): 拍长为正，表示毫秒每拍
+        double ms_per_beat = 60000.0 / bpm;
+        oss << std::fixed << std::setprecision(2) << ms_per_beat << ",";
+    }
+    // 节拍
+    oss << beat << ",";
+    // 音效组
+    oss << static_cast<int>(sample_set) << ",";
+    // 音效参数
+    oss << sample_parameter << ",";
+    // 音量
+    oss << volume << ",";
+    // 是否为非继承时间点 (0=继承/绿线, 1=非继承/红线)
+    oss << (is_inherit_timing ? "0" : "1") << ",";
+    // 效果
+    oss << static_cast<int>(effect);
+    return oss.str();
+}
 
 // 从osu的字符串读取
 void OsuTiming::from_osu_description(std::vector<std::string>& description) {
@@ -66,5 +107,5 @@ void OsuTiming::from_osu_description(std::vector<std::string>& description) {
     // 音量
     volume = std::stoi(description.at(5));
     // 效果
-    effect = (int8_t)std::stoi(description.at(6));
+    effect = (int8_t)std::stoi(description.at(7));
 }

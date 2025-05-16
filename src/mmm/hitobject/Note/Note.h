@@ -7,13 +7,13 @@
 
 class ComplexNote;
 
-enum class NoteType {
+enum class NoteType : uint8_t {
     // 另外的滑键和折线
-    COMPLEX,
-    SLIDE,
+    COMPLEX = 0x03,
+    SLIDE = 0x01,
     // osu!mania的单键和长条
-    HOLD,
-    NOTE,
+    HOLD = 0x02,
+    NOTE = 0x00,
 };
 
 enum class ComplexInfo {

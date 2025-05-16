@@ -300,6 +300,9 @@
           <height>28</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="text">
          <string notr="true"/>
         </property>

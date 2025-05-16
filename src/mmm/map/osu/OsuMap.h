@@ -93,6 +93,12 @@ class OsuMap : public MMap {
     double StackLeniency{0.0};
 
     /*
+    ***Mode	Integer（整型）
+    *游戏模式（0 = osu!、1 = osu!taiko、2 = osu!catch、3 = osu!mania） 默认0
+    */
+    int32_t Mode{0};
+
+    /*
      ***LetterboxInBreaks
      *Boolean（布尔值）是否开启谱面休息段使用黑边填充设置 默认0
      */
@@ -158,7 +164,9 @@ class OsuMap : public MMap {
      *这些设置只在谱面编辑器内有效，不影响谱面的实际游玩。
      *
      *项目	数据类型	描述
-     ***Bookmarks	逗号分隔的 Integer（整型）数组
+     */
+    /*
+     *Bookmarks	逗号分隔的 Integer（整型）数组
      *书签（蓝线）的位置（毫秒）
      */
     std::vector<int32_t> Bookmarks;
@@ -187,8 +195,9 @@ class OsuMap : public MMap {
     /*
      *元数据
      *项目	数据类型	描述
-     *
-     ***Title	String（字符串）	歌曲标题的罗马音
+     */
+    /*
+     *Title	String（字符串）	歌曲标题的罗马音
      */
     std::string Title;
 
@@ -238,8 +247,8 @@ class OsuMap : public MMap {
     int32_t BeatmapSetID;
 
     // Chapter Difficulty
+    // 项目	数据类型	描述
     /*
-     *项目	数据类型	描述
      ***HPDrainRate	Decimal（精准小数）	HP 值（0-10）
      */
     double HPDrainRate{5.0};
@@ -279,6 +288,7 @@ class OsuMap : public MMap {
     /*
      *背景
      *背景语法：0,0,文件名,x 轴位置,y 轴位置
+     *视频语法：Video,开始时间,文件名,x 轴位置,y 轴位置
      *
      *文件名（字符串）：
      *背景图片在谱面文件夹内的文件名或者相对路径。若文件路径周围包含英文双引号，则也可被识别。
@@ -296,6 +306,7 @@ class OsuMap : public MMap {
 
     // 0为背景图片,1为视频--写出时可写Video或1
     int32_t background_type{0};
+    int32_t video_starttime{0};
     // 背景文件目录
     std::string bg_file_name;
     // 背景的位置x偏移
@@ -354,6 +365,12 @@ class OsuMap : public MMap {
 
     // 从文件读取谱面
     void load_from_file(const char* path) override;
+
+    // 写出到文件
+    void write_to_file(const char* path) override;
+
+    // 写出文件是否合法
+    bool is_write_file_legal(const char* file, std::string& res) override;
 };
 
 class OsuFileReader {

@@ -700,7 +700,6 @@ void MapWorkspaceCanvas::push_shape() {
         draw_infoarea();
         // 绘制顶部栏
         draw_top_bar();
-        // TODO(xiang 2025-05-14): 多线程数据竞争--崩溃/严重
         // 绘制特效
         for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
             std::lock_guard<std::mutex> lock(effect_frame_queue.mtx);

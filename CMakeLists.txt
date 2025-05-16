@@ -19,6 +19,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+add_compile_options(-O3)
+
 # 查找 Qt 包
 find_package(
   QT NAMES Qt6 Qt5 REQUIRED

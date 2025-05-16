@@ -32,6 +32,16 @@ MMap::~MMap() = default;
 // 从文件读取谱面
 void MMap::load_from_file(const char* path) {}
 
+// 写出到文件
+void MMap::write_to_file(const char* path) {
+    // 写出为mmm-json
+}
+
+// 写出文件是否合法
+bool MMap::is_write_file_legal(const char* file, std::string& res) {
+    return false;
+}
+
 // 注册元数据
 void MMap::register_metadata(MapMetadataType type) {
     switch (type) {

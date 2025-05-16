@@ -1,5 +1,6 @@
 #include "RMMap.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -12,6 +13,7 @@
 #include "../../hitobject/Note/rm/Slide.h"
 #include "../MMap.h"
 #include "colorful-log.h"
+#include "util/mutil.h"
 
 // 构造ImdReader
 BinaryReader::BinaryReader() {}
@@ -33,6 +35,197 @@ std::shared_ptr<MapMetadata> RMMap::default_metadata() {
     meta->map_properties["version"] = "hd";
     meta->map_properties["table_rows"] = "0";
     return meta;
+}
+
+// 写出到文件
+void RMMap::write_to_file(const char* path) {
+    // 检查指定的文件名是否合法
+    std::string res;
+    auto legal = is_write_file_legal(path, res);
+    if (!legal) {
+        XWARN("文件输出名不符合imd规范,已修正为" + res);
+    }
+
+    // 写出到指定文件
+    std::ofstream os(res, std::ios::binary);
+    /*
+     * 0~4字节:int32 谱面时长
+     * 5~8字节:int32 图时间点数
+     *
+     * 接下来每12字节按4字节int32+8字节float64(double)组合为一个时间点
+     * 共${图时间点数}组timing数据
+     *
+     * 然后一个03 03未知意义的int16
+     *
+     * 接下来一个int32:表格行数
+     *
+     * 后面全是物件的数据
+     * 11字节为一组
+     * 00   00   00 00 00 00  00    00 00 00 00
+     * 类型 没用    时间戳    轨道     参数
+     * ---类型
+     * 高位为0时不处于组合键中
+     * 高位为6时处于组合键的第一个子键
+     * 高位为2时处于组合键的中间部分子键
+     * 高位为A时处于组合键的最后一个子键
+     *
+     * 低位为0时为单键类型
+     * 低位为1时为滑键类型
+     * 低位为2时为长键类型
+     *
+     * ---参数
+     * 类型为长键时代表持续时间
+     * 类型为滑键时为滑动参数
+     *
+     * 滑动参数为-1代表向左滑动1轨道
+     * 滑动参数为-2代表向左滑动2轨道
+     * 滑动参数为3代表向右滑动3轨道
+     */
+    // 0~4字节:int32 谱面时长
+    os.write(reinterpret_cast<const char*>(&map_length), sizeof(map_length));
+    // 5~8字节:int32 图时间点数
+    int32_t timing_count = timings.size();
+    os.write(reinterpret_cast<const char*>(&timing_count),
+             sizeof(timing_count));
+    // 接下来每12字节按4字节int32+8字节float64(double)组合为一个时间点
+    // 共${图时间点数}组timing数据
+    for (const auto& timing : timings) {
+        int32_t timing_time = timing->timestamp;
+        double timing_bpm = timing->basebpm;
+        os.write(reinterpret_cast<const char*>(&timing_time),
+                 sizeof(timing_time));
+        os.write(reinterpret_cast<const char*>(&timing_bpm),
+                 sizeof(timing_bpm));
+    }
+    // 然后一个03 03未知意义的int16
+    int16_t unknown_flag = 0x0303;
+    os.write(reinterpret_cast<const char*>(&unknown_flag),
+             sizeof(unknown_flag));
+    // 接下来一个int32:表格行数
+    os.write(reinterpret_cast<const char*>(&table_rows), sizeof(table_rows));
+    // 后面全是物件的数据
+    // 11字节为一组
+    // 00   00   00 00 00 00  00    00 00 00 00
+    // 类型 没用    时间戳    轨道     参数
+    // ---类型
+    // 高位为0时不处于组合键中
+    // 高位为6时处于组合键的第一个子键
+    // 高位为2时处于组合键的中间部分子键
+    // 高位为A时处于组合键的最后一个子键
+    //
+    // 低位为0时为单键类型
+    // 低位为1时为滑键类型
+    // 低位为2时为长键类型
+    //
+    // ---参数
+    // 类型为长键时代表持续时间
+    // 类型为滑键时为滑动参数
+    //
+    // 滑动参数为-1代表向左滑动1轨道
+    // 滑动参数为-2代表向左滑动2轨道
+    // 滑动参数为3代表向右滑动3轨道
+    //
+    //
+    // 防止重复写出同一物件
+    std::unordered_map<std::shared_ptr<HitObject>, bool> writed_object;
+    for (const auto& hitobject : hitobjects) {
+        // 筛除面尾滑尾和包含组合键引用的物件和重复物件
+        // 优先写出完整组合键
+        if (!hitobject->is_note) continue;
+        auto note = std::static_pointer_cast<Note>(hitobject);
+        // 不写出处于组合键内的物件
+        if (!note || note->parent_reference) continue;
+        if (writed_object.find(note) == writed_object.end())
+            writed_object.insert({note, true});
+        else
+            continue;
+        if (note->note_type == NoteType::COMPLEX) {
+            auto comp = std::static_pointer_cast<ComplexNote>(note);
+            // 直接写出所有子键
+            for (auto& child_note : comp->child_notes) {
+                write_note(os, child_note);
+            }
+
+        } else {
+            write_note(os, note);
+        }
+    }
+    XINFO("已保存为[" + res + "]");
+}
+
+// 写出文件是否合法
+bool RMMap::is_write_file_legal(const char* file, std::string& res) {
+    // 应该的文件名
+    auto legal_file_name = mutil::sanitizeFilename(
+        title_unicode + "_" + std::to_string(orbits) + "k_" + version + ".imd");
+    std::filesystem::path input_file(file);
+    auto s = input_file.generic_string();
+
+    // 若非imd结尾且包含2个下划线-修正为使用默认名
+    if (!mutil::endsWithExtension(input_file, ".imd") ||
+        std::count(s.begin(), s.end(), '_') != 2) {
+        res = (input_file.parent_path() / legal_file_name).generic_string();
+        return false;
+    }
+    res = input_file;
+    return true;
+}
+
+// 写出一个物件
+void RMMap::write_note(std::ofstream& os, const std::shared_ptr<Note>& note) {
+    // 写出物件
+    //
+    //
+    // 类型
+    uint8_t comp_type = 0x00;
+    // 获取组合信息
+    switch (note->compinfo) {
+        case ComplexInfo::HEAD: {
+            comp_type = 0x60;
+            break;
+        }
+        case ComplexInfo::BODY: {
+            comp_type = 0x20;
+            break;
+        }
+        case ComplexInfo::END: {
+            comp_type = 0xa0;
+            break;
+        }
+        default:
+            break;
+    }
+    uint8_t note_type = static_cast<uint8_t>(note->note_type);
+    uint8_t type_value = comp_type | note_type;
+    os.write(reinterpret_cast<const char*>(&type_value), sizeof(type_value));
+
+    // 没卵用的空字节
+    uint8_t void_byte = 0;
+    os.write(reinterpret_cast<const char*>(&void_byte), sizeof(void_byte));
+
+    // 时间戳
+    os.write(reinterpret_cast<const char*>(&note->timestamp),
+             sizeof(note->timestamp));
+
+    // 轨道-转为单字节
+    uint8_t imdorbit = static_cast<uint8_t>(note->orbit);
+    os.write(reinterpret_cast<const char*>(&imdorbit), sizeof(imdorbit));
+
+    // 参数
+    int32_t param = 0;
+    switch (note->note_type) {
+        case NoteType::SLIDE: {
+            param = (std::static_pointer_cast<Slide>(note))->slide_parameter;
+            break;
+        }
+        case NoteType::HOLD: {
+            param = (std::static_pointer_cast<Hold>(note))->hold_time;
+            break;
+        }
+        default:
+            break;
+    }
+    os.write(reinterpret_cast<const char*>(&param), sizeof(param));
 }
 
 // 从文件读取谱面
@@ -89,12 +282,22 @@ void RMMap::load_from_file(const char* path) {
                   : "unknown";
     version = Version;
 
-    // 截取0~第一个_之间的字符串作为文件前缀
+    // 截取0~第一个_之间的字符串作为文件前缀-标题
     auto file_presuffix = fnamestr.substr(0, first_pos);
+    title_unicode = file_presuffix;
 
     // 前缀+.mp3作为音频文件名
     audio_file_abs_path =
         map_file_path.parent_path() / (file_presuffix + ".mp3");
+    // 也可为wav,ogg
+    if (!std::filesystem::exists(audio_file_abs_path)) {
+        audio_file_abs_path =
+            map_file_path.parent_path() / (file_presuffix + ".wav");
+        if (!std::filesystem::exists(audio_file_abs_path)) {
+            audio_file_abs_path =
+                map_file_path.parent_path() / (file_presuffix + ".ogg");
+        }
+    }
 
     // 检查前缀+.png 或.jpg .jpeg有哪个用哪个作为bg
     bool has_bg{true};

@@ -2,15 +2,18 @@
 #define M_OSUHOLD_H
 
 #include <memory>
+#include <vector>
 
 #include "../Hold.h"
 #include "../HoldEnd.h"
-#include "OsuNote.h"
+#include "OsuInfo.h"
 
 class OsuHold : public Hold {
    public:
     // 构造OsuHold
     OsuHold(uint32_t time, int32_t orbit_pos, uint32_t holdtime);
+    // 从父类构造-填充属性
+    explicit OsuHold(std::shared_ptr<Hold> src);
     OsuHold();
     // 析构OsuHold
     ~OsuHold() override;
@@ -27,6 +30,9 @@ class OsuHold : public Hold {
     // 从osu描述加载
     void from_osu_description(std::vector<std::string>& description,
                               int32_t orbit_count);
+
+    // 转化为osu描述
+    std::string to_osu_description(int32_t orbit_count);
 };
 
 // 面尾

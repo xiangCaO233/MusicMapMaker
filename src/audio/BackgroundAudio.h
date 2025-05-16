@@ -83,6 +83,8 @@ class BackgroundAudio {
                 audiomanager->get_outdevices()->at(device_idit->second);
             if (!device->player) {
                 device->creat_player();
+                // 初始化为当前全局音量
+                device->player->global_volume = global_volume;
             }
         }
     }

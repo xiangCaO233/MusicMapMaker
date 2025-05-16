@@ -165,6 +165,9 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
             audio_volume_node.attribute("effect").as_float();
         XINFO("已读取项目配置");
     }
+    // 使用项目目录
+    XLogger::last_select_directory =
+        QString::fromStdString(ppath.generic_string());
 }
 
 // 析构MapWorkProject

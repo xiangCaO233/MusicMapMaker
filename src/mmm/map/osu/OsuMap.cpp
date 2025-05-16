@@ -14,6 +14,7 @@
 #include "../../timing/osu/OsuTiming.h"
 #include "../MMap.h"
 #include "colorful-log.h"
+#include "mmm/hitobject/Note/rm/Slide.h"
 #include "mmm/timing/Timing.h"
 #include "src/mmm/hitobject/HitObject.h"
 #include "src/mmm/hitobject/Note/Note.h"
@@ -148,6 +149,476 @@ std::shared_ptr<MapMetadata> OsuMap::default_metadata() {
     return meta;
 }
 
+// 写出到文件
+void OsuMap::write_to_file(const char* path) {
+    std::string res;
+    std::string slashn;
+#ifdef _WIN32
+    slashn = "\r\n";
+#else
+    slashn = "\n";
+#endif  //_WIN32
+
+    if (!is_write_file_legal(path, res)) {
+        XWARN("写出路径不合法,已修正到项目路径");
+    }
+    auto& meta = metadatas[MapMetadataType::OSU]->map_properties;
+    std::ofstream os(res);
+    // 写出文件
+    os << "osu file format v" << file_format_version << slashn << slashn;
+    // 章节	描述	内容类型
+    // [General]	谱面的总体信息	键: 值 对
+    os << "[General]" << slashn;
+    /*
+     ***AudioFilename	String（字符串）	音频文件的相对路径 默认无
+     */
+    // std::string AudioFilename{""};
+    os << "AudioFilename: " << AudioFilename << slashn;
+
+    /*
+     ***AudioLeadIn	Integer（整型）	音频文件播放之前预留的空白时间	默认0
+     */
+    // int32_t AudioLeadIn{0};
+    os << "AudioLeadIn: " << AudioLeadIn << slashn;
+
+    /*
+     ***AudioHash	String（字符串）	已弃用
+     */
+    // [[deprecated]] std::string AudioHash{""};
+    // os << "AudioHash: " << AudioHash << slashn;
+
+    /*
+     ***PreviewTime	Integer（整型）	在选中谱面时的歌曲预览点位置（毫秒）-1
+     */
+    // int32_t PreviewTime{-1};
+    os << "PreviewTime: " << PreviewTime << slashn;
+
+    /*
+     ***Countdown	Integer（整型）	在第一个物件之前出现的倒计时速度 (0 =
+     *无倒计时, 1 = 正常速度, 2 = 一半速度, 3 = 二倍速度)	默认1
+     */
+    // int32_t Countdown{1};
+    os << "Countdown: " << Countdown << slashn;
+
+    /*
+     ***SampleSet	String（字符串）
+     *当时间点（红线、绿线）未覆盖设置时的默认音效组（Normal、Soft、Drum）
+     *默认Normal
+     */
+    // SampleSet sample_set{SampleSet::NORMAL};
+    std::string sample_name;
+    switch (sample_set) {
+        case SampleSet::DRUM: {
+            sample_name = "Drum";
+            break;
+        }
+        case SampleSet::SOFT: {
+            sample_name = "Soft";
+            break;
+        }
+        case SampleSet::NORMAL: {
+            sample_name = "Normal";
+            break;
+        }
+        case SampleSet::NONE: {
+            sample_name = "None";
+            break;
+        }
+    }
+    os << "SampleSet: " << sample_name << slashn;
+
+    /*
+     ***StackLeniency	Decimal（精准小数）
+     *当物件重叠在同一个位置时，决定物件之间是否出现堆叠效果的阈值（0-1）
+     *0.7 Mode Integer（整型）	游戏模式（0 = osu!、1 = osu!taiko、2 =
+     *osu!catch、3 = osu!mania）	默认0
+     */
+    // double StackLeniency{0.0};
+    os << "StackLeniency: " << StackLeniency << slashn;
+
+    /*
+    ***Mode	Integer（整型）
+    *游戏模式（0 = osu!、1 = osu!taiko、2 = osu!catch、3 = osu!mania） 默认0
+    */
+    // int32_t Mode{0};
+    os << "Mode: " << Mode << slashn;
+
+    /*
+     ***LetterboxInBreaks
+     *Boolean（布尔值）是否开启谱面休息段使用黑边填充设置 默认0
+     */
+    // bool LetterboxInBreaks{false};
+    os << "LetterboxInBreaks: " << LetterboxInBreaks << slashn;
+
+    /*
+     ***StoryFireInFront Boolean（布尔值）	已弃用	默认1
+     */
+    // [[deprecated]] bool StoryFireInFront{true};
+    // os << "StoryFireInFront" << (StoryFireInFront ? 1 : 0) << slashn;
+
+    /*
+     ***UseSkinSprites Boolean（布尔值）是否允许故事板使用玩家皮肤元素	默认0
+     */
+    // bool UseSkinSprites{false};
+    if (UseSkinSprites) {
+        os << "UseSkinSprites: " << 1 << slashn;
+    }
+
+    /*
+     ***AlwaysShowPlayfield Boolean（布尔值） 已弃用	默认0
+     */
+    // [[deprecated]] bool AlwaysShowPlayfield{false};
+    // os << "AlwaysShowPlayfield" << (AlwaysShowPlayfield? 1 : 0) << slashn;
+
+    /*
+     ***OverlayPosition String（字符串）
+     *设置物件皮肤覆盖层与数字层之间的关系（NoChange = 使用玩家皮肤设定， Below
+     *= 覆盖层绘制于数字之下，Above = 覆盖层绘制于数字之上）	默认NoChange
+     */
+    // std::string OverlayPosition{"NoChange"};
+    if (OverlayPosition != "NoChange")
+        os << "OverlayPosition: " << OverlayPosition << slashn;
+
+    /*
+     ***SkinPreference String（字符串） 推荐在游玩时使用的皮肤名称 默认无
+     */
+    // std::string SkinPreference{""};
+    if (SkinPreference != "")
+        os << "SkinPreference: " << SkinPreference << slashn;
+
+    /*
+     ***EpilepsyWarning Boolean（布尔值） 是否开启谱面闪烁（癫痫）警告	默认0
+     */
+    // bool EpilepsyWarning{false};
+    if (EpilepsyWarning) os << "EpilepsyWarning: " << 1 << slashn;
+
+    /*
+     ***CountdownOffset Integer（整型）
+     *谱面第一个物件之前的倒计时的偏移值（拍子）默认0
+     */
+    // int32_t CountdownOffset{0};
+    if (CountdownOffset != 0)
+        os << "CountdownOffset: " << CountdownOffset << slashn;
+
+    /*
+     ***SpecialStyle Boolean（布尔值） 是否在 osu!mania 谱面中启用 BMS 风格（N+1
+     *键）的键位设置 默认0
+     */
+    // bool SpecialStyle{false};
+    os << "SpecialStyle: " << (SpecialStyle ? 1 : 0) << slashn;
+
+    /*
+     ***WidescreenStoryboard	Boolean（布尔值）是否开启故事板的宽屏显示 默认0
+     */
+    // bool WidescreenStoryboard{false};
+    os << "WidescreenStoryboard: " << (WidescreenStoryboard ? 1 : 0) << slashn;
+
+    /*
+     ***SamplesMatchPlaybackRate
+     *Boolean（布尔值）是否允许当变速类型模组开启时，改变音效的播放速率	默认0
+     */
+    // bool SamplesMatchPlaybackRate{false};
+    if (SamplesMatchPlaybackRate)
+        os << "SamplesMatchPlaybackRate: " << 1 << slashn;
+
+    os << slashn;
+
+    // [Editor]	可在谱面编辑器内显示的信息	键: 值 对
+    os << "[Editor]" << slashn;
+    /*
+     *Bookmarks	逗号分隔的 Integer（整型）数组
+     *书签（蓝线）的位置（毫秒）
+     */
+    // std::vector<int32_t> Bookmarks;
+    if (!Bookmarks.empty()) {
+        std::string bookmarkstr = "";
+        for (const auto& bookmark : Bookmarks) {
+            bookmarkstr.append(std::to_string(bookmark));
+            bookmarkstr.push_back(',');
+        }
+        bookmarkstr.pop_back();
+        os << "Bookmarks: " << bookmarkstr << slashn;
+    }
+
+    /*
+     ***DistanceSpacing	Decimal（精准小数）	间距锁定倍率
+     */
+    // double DistanceSpacing;
+    os << "DistanceSpacing: " << DistanceSpacing << slashn;
+
+    /*
+     ***BeatDivisor	Integer（整型）	节拍细分
+     */
+    // int32_t BeatDivisor;
+    os << "BeatDivisor: " << BeatDivisor << slashn;
+
+    /*
+     ***GridSize	Integer（整型）	网格大小
+     */
+    // int32_t GridSize;
+    os << "GridSize: " << GridSize << slashn;
+
+    /*
+     ***TimelineZoom	Decimal（精准小数）	物件时间轴的缩放倍率
+     */
+    // double TimelineZoom;
+    os << "TimelineZoom: " << TimelineZoom << slashn;
+    os << slashn;
+
+    // [Metadata]	用于识别谱面的元数据	键:值 对
+    os << "[Metadata]" << slashn;
+    /*
+     *Title	String（字符串）	歌曲标题的罗马音
+     */
+    // std::string Title;
+    os << "Title:" << Title << slashn;
+
+    /*
+     ***TitleUnicode	String（字符串）	歌曲标题
+     */
+    // std::string TitleUnicode;
+    os << "TitleUnicode:" << TitleUnicode << slashn;
+
+    /*
+     ***Artist	String（字符串）	艺术家的罗马音
+     */
+    // std::string Artist;
+    os << "Artist:" << Artist << slashn;
+
+    /*
+     ***ArtistUnicode	String（字符串）	艺术家
+     */
+    // std::string ArtistUnicode;
+    os << "ArtistUnicode:" << ArtistUnicode << slashn;
+
+    /*
+     ***Creator	String（字符串）	谱师（谱面创建者）
+     */
+    // std::string Creator;
+    os << "Creator:" << Creator << slashn;
+
+    /*
+     ***Version	String（字符串）	难度名
+     */
+    // std::string Version;
+    os << "Version:" << Version << slashn;
+
+    /*
+     ***Source	String（字符串）	歌曲信息与档案的来源
+     */
+    // std::string Source;
+    os << "Source:" << Source << slashn;
+
+    /*
+     ***Tags	空格分隔的 String（字符串）数组	易于搜索的标签
+     */
+    // std::vector<std::string> Tags;
+    std::string tagstr = "";
+    if (!Tags.empty()) {
+        for (const auto& tag : Tags) {
+            tagstr.append(tag);
+            tagstr.push_back(' ');
+        }
+        tagstr.pop_back();
+    }
+    os << "Tags:" << tagstr << slashn;
+
+    /*
+     ***BeatmapID	Integer（整型）	难度 ID（BID）
+     */
+    // int32_t BeatmapID;
+    os << "BeatmapID:" << BeatmapID << slashn;
+
+    /*
+     ***BeatmapSetID	Integer（整型）	谱面 ID（SID）
+     */
+    // int32_t BeatmapSetID;
+    os << "BeatmapSetID:" << BeatmapSetID << slashn;
+    os << slashn;
+
+    // [Difficulty]	即谱面难度设定	键:值 对
+    os << "[Difficulty]" << slashn;
+    /*
+     ***HPDrainRate	Decimal（精准小数）	HP 值（0-10）
+     */
+    // double HPDrainRate{5.0};
+    os << "HPDrainRate:" << HPDrainRate << slashn;
+
+    /*
+     ***CircleSize	Decimal（精准小数）	CS 值（0-10）
+     * osu mania 模式下这个就是key数
+     */
+    // double CircleSize{4.0};
+    os << "CircleSize:" << CircleSize << slashn;
+
+    /*
+     ***OverallDifficulty	Decimal（精准小数）	OD 值（0-10）
+     * od8~malody的c判
+     */
+    // double OverallDifficulty{8.0};
+    os << "OverallDifficulty:" << OverallDifficulty << slashn;
+
+    /*
+     ***ApproachRate	Decimal（精准小数）	AR 值（0-10）
+     * 似乎om模式里没卵用
+     */
+    // double ApproachRate;
+    os << "ApproachRate:" << ApproachRate << slashn;
+
+    /*
+     ***SliderMultiplier	Decimal（精准小数）	基础滑条速度倍率，乘以
+     *100 后可得到该速度下每拍内滑条会经过多少 osu! 像素 似乎om模式里没卵用
+     */
+    // double SliderMultiplier;
+    os << "SliderMultiplier:" << SliderMultiplier << slashn;
+
+    /*
+     ***SliderTickRate Decimal（精准小数）	滑条点倍率，每拍中滑条点的数量
+     * 似乎om模式里没卵用
+     */
+    // double SliderTickRate;
+    os << "SliderTickRate:" << SliderTickRate << slashn;
+    os << slashn;
+
+    // [Events]	谱面显示设定，故事板事件	逗号分隔的列表
+    os << "[Events]" << slashn;
+    /*
+     *背景
+     *背景语法：0,0,文件名,x 轴位置,y 轴位置
+     *
+     *文件名（字符串）：
+     *背景图片在谱面文件夹内的文件名或者相对路径。若文件路径周围包含英文双引号，则也可被识别。
+     *x 轴位置（整型） 和 y 轴位置（整型）：
+     *以屏幕中心为原点的背景图片位置偏移值，单位是 osu! 像素。例如，50,100
+     *表示这张背景图片在游玩时，需要移动至屏幕中心向右移动 50 osu!
+     *像素，向下移动 100 osu! 像素显示。如果偏移值为 0,0，也可以忽略不写。 视频
+     *视频语法：Video,开始时间,文件名,x 轴位置,y 轴位置
+     *
+     *Video 可用 1 代替。
+     *
+     *文件名（字符串）、x 轴位置（整型）、 y 轴位置（整型）
+     *的效果与背景图片一致。
+     */
+
+    // 0为背景图片,1为视频--写出时可写Video或1
+    // int32_t background_type{0};
+    // 背景文件目录
+    // std::string bg_file_name;
+    // 背景的位置x偏移
+    // int32_t bgxoffset;
+    // 背景的位置y偏移
+    // int32_t bgyoffset;
+    std::string bgstr = "";
+    bgstr.push_back(std::to_string(background_type).at(0));
+    bgstr.push_back(',');
+    bgstr.push_back(std::to_string(video_starttime).at(0));
+    bgstr.push_back(',');
+    bgstr.append("\"" + bg_path.filename().generic_string() + "\"");
+    bgstr.push_back(',');
+    bgstr.push_back(std::to_string(bgxoffset).at(0));
+    bgstr.push_back(',');
+    bgstr.push_back(std::to_string(bgyoffset).at(0));
+
+    os << "//Background and Video events" << slashn;
+    os << bgstr << slashn;
+    os << "//Break Periods" << slashn;
+    os << "//Storyboard Layer 0 (Background)" << slashn;
+    os << "//Storyboard Layer 1 (Fail)" << slashn;
+    os << "//Storyboard Layer 2 (Pass)" << slashn;
+    os << "//Storyboard Layer 3 (Foreground)" << slashn;
+    os << "//Storyboard Layer 4 (Overlay)" << slashn;
+    os << "//Storyboard Sound Samples" << slashn << slashn;
+
+    //  [TimingPoints]	时间轴设定	逗号分隔的列表
+    os << "[TimingPoints]" << slashn;
+    for (const auto& timing : timings) {
+        auto otiming = std::dynamic_pointer_cast<OsuTiming>(timing);
+        if (otiming) {
+        } else {
+            // 从基本物件转化
+        }
+        os << otiming->to_osu_description() << slashn;
+    }
+
+    os << slashn;
+    //  [Colours]	连击、皮肤颜色	键 : 值 对
+    //  不写
+    //  [HitObjects]	击打物件	逗号分隔的列表
+    os << "[HitObjects]" << slashn;
+    // 防止重复写出
+    std::unordered_map<std::shared_ptr<HitObject>, bool> writed_objects;
+
+    // 渲染物件
+    // 计算图形
+    for (const auto& obj : hitobjects) {
+        if (!obj->is_note || obj->object_type == HitObjectType::RMCOMPLEX)
+            continue;
+        auto note = std::dynamic_pointer_cast<Note>(obj);
+        if (!note) continue;
+        if (writed_objects.find(note) == writed_objects.end())
+            writed_objects.insert({note, true});
+        else
+            continue;
+        // 写出物件
+        // 尝试转化OSUNOTE
+        auto osu_note = std::dynamic_pointer_cast<OsuNote>(note);
+        if (osu_note) {
+            os << osu_note->to_osu_description(orbits) << slashn;
+        } else {
+            // 尝试转化OSUHOLD
+            auto osu_hold = std::dynamic_pointer_cast<OsuHold>(note);
+            if (osu_hold) {
+                os << osu_hold->to_osu_description(orbits) << slashn;
+            } else {
+                // 都不是-转化
+                switch (note->note_type) {
+                    case NoteType::NOTE: {
+                        osu_note = std::make_shared<OsuNote>(
+                            std::static_pointer_cast<Note>(note));
+                        os << osu_note->to_osu_description(orbits) << slashn;
+                        break;
+                    }
+                    case NoteType::HOLD: {
+                        osu_hold = std::make_shared<OsuHold>(
+                            std::static_pointer_cast<Hold>(note));
+                        os << osu_hold->to_osu_description(orbits) << slashn;
+                        break;
+                    }
+                        // 需要区分滑键-放若干个单键替换
+                    case NoteType::SLIDE: {
+                        auto slide_notes = OsuNote::from_slide(
+                            std::static_pointer_cast<Slide>(note));
+                        for (auto& slide_note : slide_notes) {
+                            os << slide_note.to_osu_description(orbits)
+                               << slashn;
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    XINFO("已保存为[" + res + "]");
+}
+
+// 写出文件是否合法
+bool OsuMap::is_write_file_legal(const char* file, std::string& res) {
+    // 应该的文件名
+    auto legal_file_name =
+        mutil::sanitizeFilename(artist + " - " + title + "(" + author + ")" +
+                                "[" + version + "]" + ".osu");
+    auto opath = std::filesystem::path(file);
+    auto opathstr = opath.generic_string();
+    if (!mutil::endsWithExtension(opath, ".osu")) {
+        res = (opath.parent_path() / legal_file_name).generic_string();
+        return false;
+    }
+    res = opathstr;
+    return true;
+}
+
 // 从文件读取谱面
 void OsuMap::load_from_file(const char* path) {
     map_file_path = std::filesystem::path(path);
@@ -225,9 +696,27 @@ void OsuMap::load_from_file(const char* path) {
             osureader.get_value("General", "AudioHash", std::string(""));
         PreviewTime = osureader.get_value("General", "PreviewTime", -1);
         Countdown = osureader.get_value("General", "Countdown", 1);
-        sample_set = static_cast<SampleSet>(
-            osureader.get_value("General", "SampleSet", 1));
+
+        auto sample_set_str =
+            osureader.get_value("General", "SampleSet", std::string("None"));
+        while (sample_set_str.starts_with(' ')) {
+            sample_set_str.erase(0, 1);
+        }
+
+        if (sample_set_str == "None") {
+            sample_set = SampleSet::NONE;
+        } else if (sample_set_str == "Soft") {
+            sample_set = SampleSet::SOFT;
+        } else if (sample_set_str == "Normal") {
+            sample_set = SampleSet::NORMAL;
+        } else if (sample_set_str == "Drum") {
+            sample_set = SampleSet::DRUM;
+        } else {
+            sample_set = SampleSet::NONE;
+        }
+
         StackLeniency = osureader.get_value("General", "StackLeniency", 0.0);
+        Mode = osureader.get_value("General", "Mode", 0);
         LetterboxInBreaks =
             osureader.get_value("General", "LetterboxInBreaks", false);
         StoryFireInFront =
@@ -274,7 +763,7 @@ void OsuMap::load_from_file(const char* path) {
 
         // metadata
         Title = osureader.get_value("Metadata", "Title", std::string(""));
-        title = title;
+        title = Title;
         TitleUnicode =
             osureader.get_value("Metadata", "TitleUnicode", std::string(""));
         title_unicode = TitleUnicode;
@@ -333,6 +822,7 @@ void OsuMap::load_from_file(const char* path) {
             // 是视频
             background_type = 1;
         }
+        video_starttime = std::stoi(background_paras.at(1));
         bg_file_name = background_paras.at(2);
         // 去引号
         if (bg_file_name.starts_with('\"')) {

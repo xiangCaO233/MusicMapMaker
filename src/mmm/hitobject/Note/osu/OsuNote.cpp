@@ -10,6 +10,16 @@ OsuNote::OsuNote() : Note(0, 0) {
     object_type = HitObjectType::OSUNOTE;
     note_type = NoteType::NOTE;
 }
+// 从父类转化
+OsuNote::OsuNote(std::shared_ptr<Note> src) : Note(src->timestamp, src->orbit) {
+    // -填充属性
+}
+
+// 从滑键转化
+std::vector<OsuNote> OsuNote::from_slide(std::shared_ptr<Slide> slide) {
+    return {};
+}
+
 OsuNote::OsuNote(uint32_t time, int32_t orbit_pos) : Note(time, orbit_pos) {
     object_type = HitObjectType::OSUNOTE;
     note_type = NoteType::NOTE;
@@ -41,6 +51,54 @@ std::string OsuNote::toString() {
            std::to_string(static_cast<int>(sample_group.normalSet)) +
            ", additionalSet=" +
            std::to_string(static_cast<int>(sample_group.additionalSet)) + "}";
+}
+
+// 转化为osu描述
+std::string OsuNote::to_osu_description(int32_t orbit_count) {
+    /*
+     * 格式:
+     * x,y,开始时间,物件类型,长键音效,结束时间:音效组:附加音效组:音效参数:音量[:自定义音效文件]
+     * 对于单键:
+     *   - 结束时间 = 开始时间
+     *   - 音效组参数格式为:
+     * normalSet:additionalSet:sampleSetParameter:volume:[sampleFile]
+     */
+
+    std::ostringstream oss;
+
+    // x 坐标 (根据轨道数计算)
+    // 原公式: orbit = floor(x * orbit_count / 512)
+    // 反推: x = orbit * 512 / orbit_count
+    int x = static_cast<int>((double(orbit) + 0.5) * 512 / orbit_count);
+    oss << x << ",";
+
+    // y 坐标 (固定192)
+    oss << "192,";
+
+    // 开始时间
+    oss << timestamp << ",";
+
+    // 物件类型 (NOTE=1)
+    oss << "1,";
+
+    // 长键音效 (NoteSample枚举值)
+    oss << static_cast<int>(sample) << ",";
+
+    // 结束时间 (单键等于开始时间)
+    oss << timestamp << ":";
+
+    // 音效组参数
+    oss << static_cast<int>(sample_group.normalSet) << ":";
+    oss << static_cast<int>(sample_group.additionalSet) << ":";
+    oss << sample_group.sampleSetParameter << ":";
+    oss << sample_group.volume << ":";
+
+    // 自定义音效文件 (如果有)
+    if (!sample_group.sampleFile.empty()) {
+        oss << sample_group.sampleFile;
+    }
+
+    return oss.str();
 }
 
 // 从osu描述加载

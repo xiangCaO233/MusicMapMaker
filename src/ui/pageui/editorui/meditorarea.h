@@ -54,6 +54,10 @@ class MEditorArea : public QWidget {
     // 画布通过快捷键切换模式
     void on_canvas_switchmode(MouseEditMode mode);
 
+    // 保存action
+    void on_save_map();
+    void on_save_map_as();
+
    signals:
     // 切换map信号
     void switched_map(std::shared_ptr<MMap> &map);

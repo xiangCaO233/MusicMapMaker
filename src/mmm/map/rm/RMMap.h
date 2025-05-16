@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -29,6 +30,15 @@ class RMMap : public MMap {
 
     // 从文件读取谱面
     void load_from_file(const char* path) override;
+
+    // 写出到文件
+    void write_to_file(const char* path) override;
+
+    // 写出一个物件
+    void write_note(std::ofstream& os, const std::shared_ptr<Note>& note);
+
+    // 写出文件是否合法
+    bool is_write_file_legal(const char* file, std::string& res) override;
 
     // imd格式默认的元数据
     static std::shared_ptr<MapMetadata> default_metadata();
