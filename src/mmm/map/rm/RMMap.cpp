@@ -21,10 +21,70 @@ BinaryReader::BinaryReader() {}
 // 析构ImdReader
 BinaryReader::~BinaryReader() = default;
 
-RMMap::RMMap() : MMap() {
+RMMap::RMMap() {
     maptype = MapType::RMMAP;
     // 注册元数据
     register_metadata(MapMetadataType::IMD);
+}
+
+// 通过父类构造
+RMMap::RMMap(std::shared_ptr<MMap> srcmap) {
+    // 复制基础元数据
+    map_name = srcmap->map_name;
+    title = srcmap->title;
+    title_unicode = srcmap->title_unicode;
+    artist = srcmap->artist;
+    artist_unicode = srcmap->artist_unicode;
+    author = srcmap->author;
+    version = srcmap->version;
+
+    // 复制文件路径
+    map_file_path = srcmap->map_file_path;
+    audio_file_abs_path = srcmap->audio_file_abs_path;
+    bg_path = srcmap->bg_path;
+
+    // 复制其他属性
+    project_reference = srcmap->project_reference;
+    maptype = srcmap->maptype;
+    preference_bpm = srcmap->preference_bpm;
+    map_length = srcmap->map_length;
+    orbits = srcmap->orbits;  // 轨道数直接继承
+
+    // 复制元数据集（深拷贝 shared_ptr）
+    metadatas = srcmap->metadatas;
+
+    // 线程安全地复制全部物件（加锁避免竞争）
+    {
+        std::lock_guard<std::mutex> lock(srcmap->hitobjects_mutex);
+        // 复制所有打击物件
+        hitobjects = srcmap->hitobjects;
+        // 复制长条缓存
+        temp_hold_list = srcmap->temp_hold_list;
+    }
+
+    // 复制时间点和变速数据
+    timings = srcmap->timings;
+    temp_timing_map = srcmap->temp_timing_map;
+
+    // 复制拍子分析结果
+    beats = srcmap->beats;
+
+    // 复制音频回调（共享所有权）
+    audio_pos_callback = srcmap->audio_pos_callback;
+
+    // 初始化子类特有成员
+    // 表格行数默认0
+    table_rows = 0;
+    // 最大轨道数继承父类
+    max_orbits = srcmap->orbits;
+    // 版本字符串继承父类
+    Version = srcmap->version;
+
+    // 查找元数据表-不存在则创建
+    auto meta_it = metadatas.find(MapMetadataType::IMD);
+    if (meta_it == metadatas.end()) {
+        metadatas[MapMetadataType::IMD] = default_metadata();
+    }
 }
 
 RMMap::~RMMap() = default;

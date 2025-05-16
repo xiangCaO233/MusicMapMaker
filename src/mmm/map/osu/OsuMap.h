@@ -38,6 +38,8 @@ class OsuMap : public MMap {
    public:
     // 构造OsuMap
     OsuMap();
+    // 通过父类构造
+    OsuMap(std::shared_ptr<MMap> srcmap);
     // 析构OsuMap
     ~OsuMap() override;
 

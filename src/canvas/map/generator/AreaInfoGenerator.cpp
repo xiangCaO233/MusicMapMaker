@@ -30,10 +30,9 @@ void AreaInfoGenerator::generate() {
         switch (timing->type) {
             case TimingType::GENERAL:
             case TimingType::OSUTIMING: {
-                auto otiming = std::static_pointer_cast<OsuTiming>(timing);
-                if (!otiming->is_inherit_timing) {
+                if (timing->is_base_timing) {
                     // 非变速timing--存储的实际bpm
-                    editor_ref->ebuffer.current_abs_timing = otiming;
+                    editor_ref->ebuffer.current_abs_timing = timing;
                     editor_ref->cstatus.speed_zoom =
                         editor_ref->ebuffer.current_abs_timing->basebpm /
                         editor_ref->canvas_ref->working_map->preference_bpm;
@@ -46,7 +45,7 @@ void AreaInfoGenerator::generate() {
                     editor_ref->cstatus.speed_zoom =
                         editor_ref->ebuffer.current_abs_timing->basebpm /
                         editor_ref->canvas_ref->working_map->preference_bpm *
-                        otiming->bpm;
+                        timing->bpm;
                     emit editor_ref->canvas_ref->current_timeline_speed_changed(
                         editor_ref->cstatus.speed_zoom);
                 }

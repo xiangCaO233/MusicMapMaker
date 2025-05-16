@@ -81,10 +81,147 @@ void OsuFileReader::parse_line(const std::string& line) {
     }
 }
 
-OsuMap::OsuMap() : MMap() {
+OsuMap::OsuMap() {
     maptype = MapType::OSUMAP;
     // 注册元数据
     register_metadata(MapMetadataType::OSU);
+}
+// 通过父类构造
+OsuMap::OsuMap(std::shared_ptr<MMap> srcmap) {
+    // 从父类复制所有基础数据
+    map_name = srcmap->map_name;
+    title = srcmap->title;
+    title_unicode = srcmap->title_unicode;
+    artist = srcmap->artist;
+    artist_unicode = srcmap->artist_unicode;
+    author = srcmap->author;
+    version = srcmap->version;
+
+    map_file_path = srcmap->map_file_path;
+    audio_file_abs_path = srcmap->audio_file_abs_path;
+    bg_path = srcmap->bg_path;
+
+    project_reference = srcmap->project_reference;
+    maptype = srcmap->maptype;
+    preference_bpm = srcmap->preference_bpm;
+    map_length = srcmap->map_length;
+    orbits = srcmap->orbits;
+
+    metadatas = srcmap->metadatas;
+
+    {
+        std::lock_guard<std::mutex> lock(srcmap->hitobjects_mutex);
+        hitobjects = srcmap->hitobjects;
+        temp_hold_list = srcmap->temp_hold_list;
+    }
+
+    timings = srcmap->timings;
+    temp_timing_map = srcmap->temp_timing_map;
+    beats = srcmap->beats;
+    audio_pos_callback = srcmap->audio_pos_callback;
+
+    // 查找元数据表-不存在则创建
+    auto meta_it = metadatas.find(MapMetadataType::OSU);
+    if (meta_it == metadatas.end()) {
+        metadatas[MapMetadataType::OSU] = default_metadata();
+    }
+
+    // General 章节
+    AudioFilename =
+        metadatas[MapMetadataType::OSU]->map_properties["AudioFilename"];
+    AudioLeadIn = std::stoi(
+        metadatas[MapMetadataType::OSU]->map_properties["AudioLeadIn"]);
+    PreviewTime = std::stoi(
+        metadatas[MapMetadataType::OSU]->map_properties["PreviewTime"]);
+    Countdown =
+        std::stoi(metadatas[MapMetadataType::OSU]->map_properties["Countdown"]);
+    sample_set = static_cast<SampleSet>(std::stoi(
+        metadatas[MapMetadataType::OSU]->map_properties["SampleSet"]));
+    StackLeniency = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["StackLeniency"]);
+    LetterboxInBreaks =
+        std::stoi(metadatas[MapMetadataType::OSU]
+                      ->map_properties["LetterboxInBreaks"]) != 0;
+    UseSkinSprites = std::stoi(metadatas[MapMetadataType::OSU]
+                                   ->map_properties["UseSkinSprites"]) != 0;
+    OverlayPosition =
+        metadatas[MapMetadataType::OSU]->map_properties["OverlayPosition"];
+    EpilepsyWarning = std::stoi(metadatas[MapMetadataType::OSU]
+                                    ->map_properties["EpilepsyWarning"]) != 0;
+    CountdownOffset = std::stoi(
+        metadatas[MapMetadataType::OSU]->map_properties["CountdownOffset"]);
+    SpecialStyle =
+        std::stoi(
+            metadatas[MapMetadataType::OSU]->map_properties["SpecialStyle"]) !=
+        0;
+    WidescreenStoryboard =
+        std::stoi(metadatas[MapMetadataType::OSU]
+                      ->map_properties["WidescreenStoryboard"]) != 0;
+    SamplesMatchPlaybackRate =
+        std::stoi(metadatas[MapMetadataType::OSU]
+                      ->map_properties["SamplesMatchPlaybackRate"]) != 0;
+
+    // Editor 章节
+    DistanceSpacing = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["DistanceSpacing"]);
+    BeatDivisor = std::stoi(
+        metadatas[MapMetadataType::OSU]->map_properties["BeatDivisor"]);
+    GridSize =
+        std::stoi(metadatas[MapMetadataType::OSU]->map_properties["GridSize"]);
+    TimelineZoom = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["TimelineZoom"]);
+
+    // Metadata 章节
+    Title = metadatas[MapMetadataType::OSU]->map_properties["Title"];
+    TitleUnicode =
+        metadatas[MapMetadataType::OSU]->map_properties["TitleUnicode"];
+    Artist = metadatas[MapMetadataType::OSU]->map_properties["Artist"];
+    ArtistUnicode =
+        metadatas[MapMetadataType::OSU]->map_properties["ArtistUnicode"];
+    Creator = metadatas[MapMetadataType::OSU]->map_properties["Creator"];
+    Version = metadatas[MapMetadataType::OSU]->map_properties["Version"];
+    Source = metadatas[MapMetadataType::OSU]->map_properties["Source"];
+    BeatmapID =
+        std::stoi(metadatas[MapMetadataType::OSU]->map_properties["BeatmapID"]);
+    BeatmapSetID = std::stoi(
+        metadatas[MapMetadataType::OSU]->map_properties["BeatmapSetID"]);
+
+    // Difficulty 章节
+    HPDrainRate = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["HPDrainRate"]);
+    CircleSize = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["CircleSize"]);
+    OverallDifficulty = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["OverallDifficulty"]);
+    ApproachRate = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["ApproachRate"]);
+    SliderMultiplier = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["SliderMultiplier"]);
+    SliderTickRate = std::stod(
+        metadatas[MapMetadataType::OSU]->map_properties["SliderTickRate"]);
+
+    // 如果父类有相关数据，覆盖默认值
+    if (!srcmap->title.empty()) Title = srcmap->title;
+    if (!srcmap->title_unicode.empty()) TitleUnicode = srcmap->title_unicode;
+    if (!srcmap->artist.empty()) Artist = srcmap->artist;
+    if (!srcmap->artist_unicode.empty()) ArtistUnicode = srcmap->artist_unicode;
+    if (!srcmap->author.empty()) Creator = srcmap->author;
+    if (!srcmap->version.empty()) Version = srcmap->version;
+
+    // 处理背景和音频路径
+    if (!srcmap->bg_path.empty()) {
+        bg_file_name = srcmap->bg_path.filename().string();
+        // 默认背景位置 (0,0)
+        bgxoffset = 0;
+        bgyoffset = 0;
+    }
+
+    if (!srcmap->audio_file_abs_path.empty()) {
+        AudioFilename = srcmap->audio_file_abs_path.filename().string();
+    }
+
+    // 设置文件格式版本
+    file_format_version = 14;
 }
 
 OsuMap::~OsuMap() = default;

@@ -16,6 +16,8 @@ class RMMap : public MMap {
    public:
     // 构造RMMap
     RMMap();
+    // 通过父类构造
+    RMMap(std::shared_ptr<MMap> srcmap);
     // 析构RMMap
     ~RMMap() override;
 

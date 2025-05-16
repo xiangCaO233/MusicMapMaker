@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <filesystem>
 #include <iterator>
 #include <memory>
 #include <mutex>
@@ -35,6 +36,21 @@ void MMap::load_from_file(const char* path) {}
 // 写出到文件
 void MMap::write_to_file(const char* path) {
     // 写出为mmm-json
+    // 根据文件后缀决定如何转换
+    auto p = std::filesystem::path(path);
+    if (mutil::endsWithExtension(p, ".imd")) {
+        // 转化为rmmap并写出
+        auto rmmap =
+            std::make_shared<RMMap>(std::shared_ptr<MMap>(this, [](MMap*) {}));
+        rmmap->write_to_file(path);
+    }
+
+    if (mutil::endsWithExtension(p, ".osu")) {
+        // 转化为osumap并写出
+        auto omap =
+            std::make_shared<OsuMap>(std::shared_ptr<MMap>(this, [](MMap*) {}));
+        omap->write_to_file(path);
+    }
 }
 
 // 写出文件是否合法
