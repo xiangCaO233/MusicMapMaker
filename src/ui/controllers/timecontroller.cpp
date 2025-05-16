@@ -14,6 +14,7 @@
 #include "AudioManager.h"
 #include "audio/BackgroundAudio.h"
 #include "colorful-log.h"
+#include "guide/newtimingguide.h"
 #include "mainwindow.h"
 #include "ui_timecontroller.h"
 
@@ -509,4 +510,23 @@ void TimeController::on_oheight_scale_button_clicked() {
 // 重置时间线缩放按钮
 void TimeController::on_timeline_zoom_button_clicked() {
     ui->timeline_zoom_slider->setValue(100);
+}
+
+// 新建timing按钮事件
+void TimeController::on_new_timing_button_clicked() {
+    if (binding_map) {
+        // 在当前时间唤出新建timing向导
+        NewTimingGuide dialog(binding_map);
+        dialog.set_time(
+            binding_map->project_reference->map_canvasposes[binding_map]);
+        if (dialog.exec() == QDialog::Accepted) {
+            // 确认
+            XINFO("创建时间点");
+        } else {
+            // 取消
+            XWARN("取消创建时间点");
+        }
+    } else {
+        XWARN("无绑定谱面");
+    }
 }

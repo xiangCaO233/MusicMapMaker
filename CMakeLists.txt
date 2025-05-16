@@ -139,6 +139,12 @@ set(PROJECT_SOURCES
     src/ui/infoui/metaui/editinfo/timinginfoui.h
     src/ui/infoui/metaui/editinfo/timinginfoui.cpp
     src/ui/infoui/metaui/editinfo/timinginfoui.ui
+    src/ui/guide/newmapguide.h
+    src/ui/guide/newmapguide.cpp
+    src/ui/guide/newmapguide.ui
+    src/ui/guide/newtimingguide.h
+    src/ui/guide/newtimingguide.cpp
+    src/ui/guide/newtimingguide.ui
     src/threads/EffectThread.h
     src/threads/EffectThread.cpp
     src/canvas/GLCanvas.h
@@ -239,14 +245,8 @@ include_directories(
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(
-    MusicMapMaker
-    MANUAL_FINALIZATION
-    ${PROJECT_SOURCES}
-    resources/glsrcs.qrc
-    src/ui/guide/newmapguide.h
-    src/ui/guide/newmapguide.cpp
-    src/ui/guide/newmapguide.ui)
+  qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
+                    resources/glsrcs.qrc)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})

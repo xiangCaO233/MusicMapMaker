@@ -146,6 +146,9 @@ class TimeController : public QWidget {
     // 切换时间格式按钮事件
     void on_time_format_button_clicked();
 
+    // 新建timing按钮事件
+    void on_new_timing_button_clicked();
+
    private:
     Ui::audio_time_controller *ui;
 
