@@ -395,6 +395,10 @@ void MapEditor::mouse_scrolled(QWheelEvent* e) {
             }
             canvas_ref->working_map->project_reference->config
                 .preview_time_scale = res_preview_scale;
+
+            canvas_ref->working_map->project_reference->canvasconfig_node
+                .attribute("preview-time-scale")
+                .set_value(res_preview_scale);
             break;
         }
         case MouseOperationArea::INFO: {
@@ -434,6 +438,10 @@ void MapEditor::scroll_update_timelinezoom(int dy) {
     if (res_timeline_zoom >= 0.2 && res_timeline_zoom <= 3.0) {
         canvas_ref->working_map->project_reference->config.timeline_zoom =
             res_timeline_zoom;
+
+        canvas_ref->working_map->project_reference->canvasconfig_node
+            .attribute("timeline-zoom")
+            .set_value(res_timeline_zoom);
         // 调节成功传递调节信号
         emit canvas_ref->timeline_zoom_adjusted(
             canvas_ref->working_map->project_reference->config.timeline_zoom *

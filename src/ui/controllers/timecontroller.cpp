@@ -462,8 +462,11 @@ void TimeController::on_lineEdit_editingFinished() {
 // 物件宽度缩放调节
 void TimeController::on_owidth_scale_slider_valueChanged(int value) {
     if (binding_map) {
-        binding_map->project_reference->config.object_width_ratio =
-            double(value) / 100.0;
+        auto ratio_value = double(value) / 100.0;
+        binding_map->project_reference->config.object_width_ratio = ratio_value;
+        binding_map->project_reference->sizeconfig_node
+            .attribute("objwidth-scale")
+            .set_value(ratio_value);
         ui->owidth_scale_button->setText(QString::number(value));
     }
 }
@@ -471,8 +474,12 @@ void TimeController::on_owidth_scale_slider_valueChanged(int value) {
 // 物件高度缩放调节
 void TimeController::on_oheight_scale_slider_valueChanged(int value) {
     if (binding_map) {
+        auto ratio_value = double(value) / 100.0;
         binding_map->project_reference->config.object_height_ratio =
-            double(value) / 100.0;
+            ratio_value;
+        binding_map->project_reference->sizeconfig_node
+            .attribute("objheight-scale")
+            .set_value(ratio_value);
         ui->oheight_scale_button->setText(QString::number(value));
     }
 }
@@ -491,8 +498,11 @@ void TimeController::on_timeline_zoom_slider_valueChanged(int value) {
         return;
     }
     if (binding_map) {
-        binding_map->project_reference->config.timeline_zoom =
-            double(value) / 100.0;
+        auto zoom_value = double(value) / 100.0;
+        binding_map->project_reference->config.timeline_zoom = zoom_value;
+        binding_map->project_reference->canvasconfig_node
+            .attribute("timeline-zoom")
+            .set_value(zoom_value);
         ui->timeline_zoom_button->setText(QString::number(value));
     }
 }

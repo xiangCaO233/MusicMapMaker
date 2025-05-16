@@ -280,34 +280,40 @@ void MEditorArea::initialize_toolbuttons() {
     static int div_ratio = 2;
     static int slide_ratio = 1;
 
-    auto ratio_button = new QPushButton("2");
+    ratio_button = new QPushButton("2");
     ratio_button->setFlat(true);
     ratio_button->setMinimumSize(QSize(24, 24));
     ratio_button->setMaximumSize(QSize(24, 24));
     ratio_button->setToolTip(tr("Change beat type"));
 
+    QPushButton *cp_ratio_button = ratio_button;
+
     // 显示的分拍策略
-    auto div_res_label = new QLabel(customdivosorsliderWidget);
+    div_res_label = new QLabel(customdivosorsliderWidget);
     div_res_label->setText("1/2");
+    QLabel *cp_div_res_label = div_res_label;
 
     connect(ratio_button, &QPushButton::clicked, [=]() {
         if (div_ratio == 2) {
             div_ratio = 3;
-            ratio_button->setText("3");
+            cp_ratio_button->setText("3");
         } else {
             div_ratio = 2;
-            ratio_button->setText("2");
+            cp_ratio_button->setText("2");
         }
         auto res_div = div_ratio * slide_ratio;
-        div_res_label->setText(QString("1/%1").arg(res_div));
+        cp_div_res_label->setText(QString("1/%1").arg(res_div));
         if (canvas->working_map) {
             canvas->working_map->project_reference->config.default_divisors =
                 res_div;
+            canvas->working_map->project_reference->canvasconfig_node
+                .attribute("default-divisors")
+                .set_value(res_div);
         }
     });
 
     // 分拍调整滑条
-    auto divisorslider = new QSlider(Qt::Horizontal, customdivosorsliderWidget);
+    divisorslider = new QSlider(Qt::Horizontal, customdivosorsliderWidget);
     divisorslider->setMinimum(1);
     divisorslider->setMaximum(16);
     divisorslider->setPageStep(1);
@@ -316,10 +322,13 @@ void MEditorArea::initialize_toolbuttons() {
     connect(divisorslider, &QSlider::valueChanged, [=](int value) {
         slide_ratio = value;
         auto res_div = div_ratio * slide_ratio;
-        div_res_label->setText(QString("1/%1").arg(res_div));
+        cp_div_res_label->setText(QString("1/%1").arg(res_div));
         if (canvas->working_map) {
             canvas->working_map->project_reference->config.default_divisors =
                 res_div;
+            canvas->working_map->project_reference->canvasconfig_node
+                .attribute("default-divisors")
+                .set_value(res_div);
         }
     });
     // 布局

@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "../../log/colorful-log.h"
+#include "../../mmm/MapWorkProject.h"
 #include "../../mmm/map/MMap.h"
 #include "../../util/mutil.h"
 #include "ui_mpage.h"
@@ -56,6 +57,20 @@ void MPage::project_controller_select_map(std::shared_ptr<MMap>& map) {
 
     // 选择此页
     ui->page_selector->setCurrentText(page_text);
+    if (map) {
+        // 更新编辑区信息
+        edit_area_widget->div_res_label->setText(QString("1/%1").arg(
+            map->project_reference->config.default_divisors));
+        if (map->project_reference->config.default_divisors % 3 == 0) {
+            edit_area_widget->ratio_button->setText(QString::number(3));
+            edit_area_widget->divisorslider->setValue(
+                map->project_reference->config.default_divisors / 3);
+        } else {
+            edit_area_widget->ratio_button->setText(QString::number(2));
+            edit_area_widget->divisorslider->setValue(
+                map->project_reference->config.default_divisors / 2);
+        }
+    }
 }
 
 // 选择页事件

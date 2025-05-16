@@ -1,9 +1,12 @@
 #ifndef MEDITORAREA_H
 #define MEDITORAREA_H
 
+#include <qlabel.h>
+#include <qpushbutton.h>
 #include <qtmetamacros.h>
 
 #include <QPushButton>
+#include <QSlider>
 #include <QWidget>
 #include <memory>
 
@@ -37,6 +40,11 @@ class MEditorArea : public QWidget {
     QPushButton *place_timing_mode_button;
     QPushButton *selection_mode_button;
     QPushButton *none_mode_button;
+
+    // 分拍策略
+    QLabel *div_res_label;
+    QSlider *divisorslider;
+    QPushButton *ratio_button;
 
     // 锁定模式-不自动切换
     bool lock_mode_auto_switch{false};

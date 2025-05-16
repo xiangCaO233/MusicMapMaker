@@ -77,7 +77,8 @@ class MapWorkProject {
     pugi::xml_node project_root_node;
     pugi::xml_node audio_node;
     pugi::xml_node audio_volume_node;
-    pugi::xml_node canvas_node;
+    pugi::xml_node sizeconfig_node;
+    pugi::xml_node canvasconfig_node;
 
     // 项目中谱的列表
     std::vector<std::shared_ptr<MMap>> maps;

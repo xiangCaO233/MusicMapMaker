@@ -143,6 +143,22 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
             config.pmusic_volume);
         audio_volume_node.append_attribute("effect").set_value(
             config.peffect_volume);
+
+        // 初始化尺寸配置
+        sizeconfig_node = project_root_node.append_child("Sizes");
+        sizeconfig_node.append_attribute("objwidth-scale")
+            .set_value(config.object_width_ratio);
+        sizeconfig_node.append_attribute("objheight-scale")
+            .set_value(config.object_height_ratio);
+
+        // 初始化画布配置
+        canvasconfig_node = project_root_node.append_child("Canvas");
+        canvasconfig_node.append_attribute("timeline-zoom")
+            .set_value(config.timeline_zoom);
+        canvasconfig_node.append_attribute("preview-time-scale")
+            .set_value(config.preview_time_scale);
+        canvasconfig_node.append_attribute("default-divisors")
+            .set_value(config.default_divisors);
     } else {
         // 读取
         project_root_node = config_xml.child("MMMProject");
@@ -163,6 +179,23 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
         config.pmusic_volume = audio_volume_node.attribute("music").as_float();
         config.peffect_volume =
             audio_volume_node.attribute("effect").as_float();
+
+        // 读取尺寸配置
+        sizeconfig_node = project_root_node.child("Sizes");
+        config.object_width_ratio =
+            sizeconfig_node.attribute("objwidth-scale").as_double();
+        config.object_height_ratio =
+            sizeconfig_node.attribute("objheight-scale").as_double();
+
+        // 读取画布配置
+        canvasconfig_node = project_root_node.child("Canvas");
+        config.timeline_zoom =
+            canvasconfig_node.attribute("timeline-zoom").as_double();
+        config.preview_time_scale =
+            canvasconfig_node.attribute("preview-time-scale").as_double();
+        config.default_divisors =
+            canvasconfig_node.attribute("default-divisors").as_double();
+
         XINFO("已读取项目配置");
     }
     // 使用项目目录
