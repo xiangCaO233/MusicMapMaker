@@ -26,6 +26,7 @@ MapEditor::~MapEditor() = default;
 
 // 撤销
 void MapEditor::undo() {
+    XINFO("撤回操作");
     if (operation_type_stack.empty()) return;
     // 加入撤回栈
     undo_type_stack.push(operation_type_stack.top());
@@ -47,6 +48,7 @@ void MapEditor::undo() {
 
 // 重做
 void MapEditor::redo() {
+    XINFO("重做");
     if (undo_type_stack.empty()) return;
 
     // 加入操作栈

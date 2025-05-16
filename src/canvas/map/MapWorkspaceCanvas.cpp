@@ -227,6 +227,7 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
 
     // 捕获按键
     auto keycode = event->key();
+    auto modifiers = event->modifiers();
 
     switch (keycode) {
         case Qt::Key_1:
@@ -253,6 +254,20 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
             editor->cstatus.canvas_pasued = !editor->cstatus.canvas_pasued;
             emit pause_signal(editor->cstatus.canvas_pasued);
             // AudioEnginPlayCallback::count = 0;
+            break;
+        }
+        case Qt::Key_Z: {
+            if (modifiers & Qt::ControlModifier) {
+                // 撤回
+                editor->undo();
+            }
+            break;
+        }
+        case Qt::Key_Y: {
+            if (modifiers & Qt::ControlModifier) {
+                // 重做
+                editor->redo();
+            }
             break;
         }
         case Qt::Key_Delete: {

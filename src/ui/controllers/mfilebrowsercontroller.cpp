@@ -108,9 +108,10 @@ void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
         // 文件夹
         // qDebug() << "click folder: " << click_abs_path;
         menu.addAction(tr("Open Folder"), [&]() {
-            // filebrowercontroller->on_menu_open_folder(
-            //     qobject_cast<QFileSystemModel*>(ui->file_browser_treeview->model()),
-            //     index);
+            auto mod = qobject_cast<QFileSystemModel*>(
+                ui->file_browser_treeview->model());
+            ui->file_browser_treeview->setRootIndex(index);
+            ui->address_line->setText(click_abs_path);
         });
         menu.addAction(tr("Open As Project"), [&]() {
             // TODO(xiang 2025-04-16): 实现打开工程

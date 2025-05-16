@@ -13,10 +13,48 @@ HitObjectEditor::HitObjectEditor(MapEditor* meditor_ref)
 HitObjectEditor::~HitObjectEditor() {}
 
 // 撤销
-void HitObjectEditor::undo() {}
+void HitObjectEditor::undo() {
+    if (operation_stack.empty()) return;
+    auto& operation = operation_stack.top();
+    auto reverse = operation.reverse_clone();
+    undo_stack.push(reverse);
+    // 撤回上一操作
+    if (editor_ref->canvas_ref->working_map) {
+        editor_ref->canvas_ref->working_map->execute_edit_operation(reverse);
+        // 出栈
+        operation_stack.pop();
+    } else {
+        // 没了-清空全部栈
+        while (!operation_stack.empty()) {
+            operation_stack.pop();
+        }
+        while (!undo_stack.empty()) {
+            undo_stack.pop();
+        }
+    }
+}
 
 // 重做
-void HitObjectEditor::redo() {}
+void HitObjectEditor::redo() {
+    if (undo_stack.empty()) return;
+    auto& uoperation = undo_stack.top();
+    auto reverse = uoperation.reverse_clone();
+    operation_stack.push(reverse);
+    // 重做撤回栈顶的操作
+    if (editor_ref->canvas_ref->working_map) {
+        editor_ref->canvas_ref->working_map->execute_edit_operation(reverse);
+        // 出栈
+        undo_stack.pop();
+    } else {
+        // 没了-清空全部栈
+        while (!operation_stack.empty()) {
+            operation_stack.pop();
+        }
+        while (!undo_stack.empty()) {
+            undo_stack.pop();
+        }
+    }
+}
 
 // 鼠标最近的分拍线的时间
 double HitObjectEditor::nearest_divisor_time() {

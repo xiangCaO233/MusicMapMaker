@@ -19,6 +19,7 @@
 #include "eventhandler/mousepress/ivm/obj/IVMPlaceNoteHandler.h"
 #include "eventhandler/mousepress/ivm/obj/IVMSelectHandler.h"
 #include "eventhandler/mouserelease/ivm/obj/IVMMouseReleaseHandler.h"
+#include "mmm/MapWorkProject.h"
 #include "mmm/hitobject/Note/rm/Slide.h"
 
 // 构造IVMObjectEditor
@@ -142,6 +143,10 @@ void IVMObjectEditor::end_edit() {
     current_edit_object = nullptr;
     // 清理快照
     info_shortcuts.clear();
+
+    // 添加操作标记
+    editor_ref->operation_type_stack.emplace(std::make_pair(
+        EditOperationType::HITOBJECT, EditMethodPreference::IVM));
 }
 
 // 鼠标按下事件-传递
