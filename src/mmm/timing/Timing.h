@@ -8,6 +8,7 @@
 #include <cstdint>
 
 enum class TimingType {
+    GENERAL,
     OSUTIMING,
     RMTIMING,
     MALODYTIMING,

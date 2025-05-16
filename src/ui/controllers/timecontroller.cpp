@@ -522,6 +522,17 @@ void TimeController::on_new_timing_button_clicked() {
         if (dialog.exec() == QDialog::Accepted) {
             // 确认
             XINFO("创建时间点");
+            auto timing = std::make_shared<Timing>();
+            timing->type = TimingType::GENERAL;
+            timing->is_base_timing = !dialog.inheritance_pretiming;
+            timing->timestamp = dialog.timestamp;
+            timing->basebpm = dialog.bpm;
+            if (timing->is_base_timing) {
+                timing->bpm = timing->basebpm;
+            } else {
+                timing->bpm = dialog.speed;
+            }
+            binding_map->insert_timing(timing);
         } else {
             // 取消
             XWARN("取消创建时间点");

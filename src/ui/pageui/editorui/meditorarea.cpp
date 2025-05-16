@@ -18,6 +18,7 @@ MEditorArea::MEditorArea(QWidget *parent)
     ui->setupUi(this);
     canvas_container = ui->canvas_container;
     ui->splitter->setCollapsible(1, true);
+    ui->splitter->setSizes({ui->splitter->height(), 0});
     // 初始化工具按钮菜单
     initialize_toolbuttons();
     // 默认隐藏音频控制器

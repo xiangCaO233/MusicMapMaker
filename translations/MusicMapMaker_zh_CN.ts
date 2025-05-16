@@ -90,55 +90,55 @@
         <translation>选中以在判定线后保持显示物件</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="307"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="345"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="307"/>
         <source>switch mode auto select</source>
         <translation>禁用模式自动切换</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="350"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="388"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="350"/>
         <source>magnet to divisors</source>
         <translation>吸附到小节线上</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="391"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="429"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="391"/>
         <source>change the mouse wheel direction</source>
         <translation>更改鼠标滚动方向</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="178"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="182"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="178"/>
         <source>Place note mode</source>
         <translation>单键编辑模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="184"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="188"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="184"/>
         <source>Place line and slide mode</source>
         <translation>面条与滑键编辑模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="190"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="194"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="190"/>
         <source>Place timing mode</source>
         <translation>时间点编辑模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="196"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="200"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="196"/>
         <source>Selection mode</source>
         <translation>选择模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="202"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="206"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="202"/>
         <source>Observer mode</source>
         <translation>观察者模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="276"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="280"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="276"/>
         <source>Change beat type</source>
         <translation>修改拍型</translation>
@@ -429,7 +429,7 @@
 <context>
     <name>MapWorkspaceCanvas</name>
     <message>
-        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="123"/>
+        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="124"/>
         <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="123"/>
         <source>qt update substantially delayed:%1ms</source>
         <translation>Qt发生大幅更新延迟:%1ms</translation>
@@ -575,6 +575,34 @@
         <location filename="../src/ui/guide/newmapguide.cpp" line="163"/>
         <source>background image(*.jpg *.png *.jpeg)</source>
         <translation>背景图片(*.jpg *.png *.jpeg)</translation>
+    </message>
+</context>
+<context>
+    <name>NewTimingGuide</name>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="14"/>
+        <source>New Timing</source>
+        <translation>新建时间点</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="50"/>
+        <source>Timestamp:</source>
+        <translation>时间戳:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="111"/>
+        <source>Adapt to preferencebpm</source>
+        <translation>适应参考bpm</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="129"/>
+        <source>Change Play Speed</source>
+        <translation>启用变速</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="220"/>
+        <source>Inheritance Previous Timing</source>
+        <translation>继承之前的时间点(绝对)</translation>
     </message>
 </context>
 <context>
@@ -725,7 +753,7 @@
         <translation>快退(5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="326"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="383"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="326"/>
         <source>pause</source>
         <translation>切换暂停状态</translation>
@@ -737,37 +765,42 @@
         <translation>快进(5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="446"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="321"/>
+        <source>New Timing</source>
+        <translation>添加时间点</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="503"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="446"/>
         <source>Timeline zoom:</source>
         <translation>时间线缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="519"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="576"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="519"/>
         <source>Object height scale:</source>
         <translation>物件高度缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="592"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="649"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="592"/>
         <source>Object width scale:</source>
         <translation>物件宽度缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="673"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="742"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="673"/>
         <source>change the pitch</source>
         <translation>启用变调</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="801"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="870"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="801"/>
         <source>audio speed </source>
         <translation>音频速度 </translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="714"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="783"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="714"/>
         <source>reset speed</source>
         <translation>重置播放速度</translation>

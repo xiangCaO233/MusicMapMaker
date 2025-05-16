@@ -5,6 +5,7 @@
 #include <memory>
 
 class MMap;
+class Timing;
 
 namespace Ui {
 class NewTimingGuide;
@@ -20,10 +21,13 @@ class NewTimingGuide : public QDialog {
 
     std::shared_ptr<MMap> map;
 
+    // 可被继承的timing
+    std::shared_ptr<Timing> inheritable_timing;
+
     double timestamp;
     double bpm;
     double speed;
-    bool inheritance_pretiming;
+    bool inheritance_pretiming{false};
 
     bool inheritable{false};
 

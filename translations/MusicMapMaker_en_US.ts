@@ -90,55 +90,55 @@
         <translation>Check to show object after judgeline</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="307"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="345"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="307"/>
         <source>switch mode auto select</source>
         <translation>Switch Mode Auto Select</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="350"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="388"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="350"/>
         <source>magnet to divisors</source>
         <translation>Magnet To Divisors</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="391"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="429"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="391"/>
         <source>change the mouse wheel direction</source>
         <translation>Change The Mouse Wheel Direction</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="178"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="182"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="178"/>
         <source>Place note mode</source>
         <translation>Place note mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="184"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="188"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="184"/>
         <source>Place line and slide mode</source>
         <translation>Place line and slide mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="190"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="194"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="190"/>
         <source>Place timing mode</source>
         <translation>Place timing mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="196"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="200"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="196"/>
         <source>Selection mode</source>
         <translation>Selection mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="202"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="206"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="202"/>
         <source>Observer mode</source>
         <translation>Observer mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="276"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="280"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="276"/>
         <source>Change beat type</source>
         <translation>Change beat type</translation>
@@ -429,7 +429,7 @@
 <context>
     <name>MapWorkspaceCanvas</name>
     <message>
-        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="123"/>
+        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="124"/>
         <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="123"/>
         <source>qt update substantially delayed:%1ms</source>
         <translation>Qt update substantially delayed:%1ms</translation>
@@ -502,7 +502,7 @@
         <location filename="../src/ui/guide/newmapguide.ui" line="257"/>
         <location filename="../src/ui/guide/newmapguide.ui" line="257"/>
         <source>Not supported yet</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/guide/newmapguide.ui" line="369"/>
@@ -556,25 +556,53 @@
         <location filename="../src/ui/guide/newmapguide.cpp" line="147"/>
         <location filename="../src/ui/guide/newmapguide.cpp" line="147"/>
         <source>Select Music</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/guide/newmapguide.cpp" line="148"/>
         <location filename="../src/ui/guide/newmapguide.cpp" line="148"/>
         <source>audio file(*.mp3 *.ogg *.wav)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/guide/newmapguide.cpp" line="162"/>
         <location filename="../src/ui/guide/newmapguide.cpp" line="162"/>
         <source>Select Image</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/guide/newmapguide.cpp" line="163"/>
         <location filename="../src/ui/guide/newmapguide.cpp" line="163"/>
         <source>background image(*.jpg *.png *.jpeg)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>NewTimingGuide</name>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="14"/>
+        <source>New Timing</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="50"/>
+        <source>Timestamp:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="111"/>
+        <source>Adapt to preferencebpm</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="129"/>
+        <source>Change Play Speed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="220"/>
+        <source>Inheritance Previous Timing</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -725,7 +753,7 @@
         <translation>Fast backward (5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="326"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="383"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="326"/>
         <source>pause</source>
         <translation>Switch pause status</translation>
@@ -737,37 +765,42 @@
         <translation>Fast forward (5s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="446"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="321"/>
+        <source>New Timing</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="503"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="446"/>
         <source>Timeline zoom:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="519"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="576"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="519"/>
         <source>Object height scale:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="592"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="649"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="592"/>
         <source>Object width scale:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="673"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="742"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="673"/>
         <source>change the pitch</source>
         <translation>Enable change the pitch</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="801"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="870"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="801"/>
         <source>audio speed </source>
         <translation>Audio speed </translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="714"/>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="783"/>
         <location filename="../src/ui/controllers/timecontroller.ui" line="714"/>
         <source>reset speed</source>
         <translation>Reset audio play speed</translation>

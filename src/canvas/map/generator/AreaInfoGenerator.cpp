@@ -28,6 +28,7 @@ void AreaInfoGenerator::generate() {
     // 更新绝对timing
     for (const auto &timing : temp_timings) {
         switch (timing->type) {
+            case TimingType::GENERAL:
             case TimingType::OSUTIMING: {
                 auto otiming = std::static_pointer_cast<OsuTiming>(timing);
                 if (!otiming->is_inherit_timing) {
