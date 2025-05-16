@@ -258,6 +258,7 @@ void MMap::execute_edit_operation(ObjEditOperation& operation) {
             bool add{true};
             auto it = hitobjects.lower_bound(obj);
             // 前移到上一时间戳
+            if (it != hitobjects.begin() && it == hitobjects.end()) --it;
             while (it != hitobjects.begin() &&
                    obj->timestamp - it->get()->timestamp < 10)
                 --it;

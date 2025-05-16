@@ -80,6 +80,7 @@ bool IVMEditComplexHandler::handle(HitObjectEditor* oeditor_context,
         // 放入编辑缓存
         ivmobjecteditor->editing_temp_objects.insert(
             ivmobjecteditor->current_edit_object);
+        ivmobjecteditor->update_current_comp();
         XINFO("为组合键新增面条");
         return true;
     }

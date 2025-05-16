@@ -71,7 +71,11 @@ struct RenderCommand {
                instance_shape == other.instance_shape &&
                instace_bound == other.instace_bound &&
                rotation == other.rotation && fill_color == other.fill_color &&
-               texture == other.texture;
+               texture == other.texture &&
+               texture_effect == other.texture_effect &&
+               texture_alignmode == other.texture_alignmode &&
+               texture_fillmode == other.texture_fillmode &&
+               texture_complementmode == other.texture_complementmode;
     }
 };
 

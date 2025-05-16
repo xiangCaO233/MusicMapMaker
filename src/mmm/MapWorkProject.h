@@ -48,7 +48,7 @@ struct ProjectConfig {
     double preview_time_scale{5.0};
 
     // 默认分拍策略
-    int32_t default_divisors{1};
+    int32_t default_divisors{2};
 
     // 项目偏好编辑方式
     EditMethodPreference edit_method{EditMethodPreference::IVM};

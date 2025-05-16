@@ -90,28 +90,7 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
     if (!canvas_ref->working_map) return;
 
     // 更新轨道数
-    switch (canvas_ref->working_map->maptype) {
-        case MapType::OSUMAP: {
-            // osu图
-            auto omap =
-                std::static_pointer_cast<OsuMap>(canvas_ref->working_map);
-            ebuffer.max_orbit = omap->CircleSize;
-            break;
-        }
-        case MapType::RMMAP: {
-            // rm图
-            auto rmmap =
-                std::static_pointer_cast<RMMap>(canvas_ref->working_map);
-            ebuffer.max_orbit = rmmap->max_orbits;
-            break;
-        }
-        case MapType::MALODYMAP: {
-            // ma图
-            break;
-        }
-        default:
-            break;
-    }
+    ebuffer.max_orbit = canvas_ref->working_map->orbits;
 
     // 更新轨道宽度
     ebuffer.orbit_width = ebuffer.edit_area_width / ebuffer.max_orbit;

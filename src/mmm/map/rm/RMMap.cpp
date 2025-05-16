@@ -311,6 +311,7 @@ void RMMap::load_from_file(const char* path) {
         //       std::to_string(note_orbit) + "],参数:[" +
         //       std::to_string(note_parameter) + "]");
     }
+    orbits = max_orbits;
 
     // 生成图名
     map_name = "[rm] " + file_presuffix + " [" + std::to_string(max_orbits) +

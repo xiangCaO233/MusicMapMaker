@@ -26,9 +26,9 @@ class NewMapGuide : public QDialog {
     std::string title;
     std::string title_unicode;
     std::string artist;
-    std::string version;
+    std::string version{"[mmm]"};
     std::string artist_unicode;
-    std::string author;
+    std::string author{"mmm"};
 
     int32_t orbits{4};
     int32_t map_length{60000};

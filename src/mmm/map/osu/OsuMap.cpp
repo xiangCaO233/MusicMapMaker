@@ -303,6 +303,7 @@ void OsuMap::load_from_file(const char* path) {
         // difficulty
         HPDrainRate = osureader.get_value("Difficulty", "HPDrainRate", 5.0);
         CircleSize = osureader.get_value("Difficulty", "CircleSize", 4.0);
+        orbits = CircleSize;
         OverallDifficulty =
             osureader.get_value("Difficulty", "OverallDifficulty", 8.0);
         ApproachRate = osureader.get_value("Difficulty", "ApproachRate", 0.0);
