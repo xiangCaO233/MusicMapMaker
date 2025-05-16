@@ -108,8 +108,6 @@ void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
         // 文件夹
         // qDebug() << "click folder: " << click_abs_path;
         menu.addAction(tr("Open Folder"), [&]() {
-            auto mod = qobject_cast<QFileSystemModel*>(
-                ui->file_browser_treeview->model());
             ui->file_browser_treeview->setRootIndex(index);
             ui->address_line->setText(click_abs_path);
         });
