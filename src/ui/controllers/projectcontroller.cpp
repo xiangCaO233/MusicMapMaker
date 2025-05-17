@@ -7,7 +7,6 @@
 #include <qtmetamacros.h>
 
 #include <QDesktopServices>
-#include <QDir>
 #include <QFileDialog>
 #include <QMenu>
 #include <QModelIndex>
@@ -300,7 +299,7 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
                     mutil::copyFileToPath(bg_path, selected_project->ppath,
                                           map->bg_path);
                     selected_project->image_paths.emplace_back(
-                        QDir(map->bg_path).absolutePath().toStdString());
+                        map->bg_path.generic_string());
                 } else {
                     // 直接使用图片路径
                     map->bg_path = dialog.bg_path;

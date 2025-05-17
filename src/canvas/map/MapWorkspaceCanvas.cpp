@@ -112,7 +112,7 @@ void MapWorkspaceCanvas::on_timeedit_setpos(double time) {
 void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
     GLCanvas::paintEvent(event);
 
-    static long lasttime = 0;
+    static long long lasttime = 0;
     auto time =
         std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::high_resolution_clock::now().time_since_epoch())
@@ -310,9 +310,10 @@ void MapWorkspaceCanvas::draw_background() {
 
     // 绘制背景图
     renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
+    auto bg_str = working_map->bg_path.generic_string();
+    std::replace(bg_str.begin(), bg_str.end(), '\\', '/');
     auto &t =
-        texture_full_map[QString::fromStdString(working_map->bg_path.string())
-                             .toStdString()];
+        texture_full_map[bg_str];
     renderer_manager->addRect(des, t, QColor(0, 0, 0, 255), 0, false);
     // 绘制背景遮罩
     if (editor->cstatus.background_darken_ratio != 0.0) {

@@ -1,6 +1,5 @@
 #include "timecontroller.h"
 
-#include <qdir.h>
 #include <qlogging.h>
 #include <qtmetamacros.h>
 
@@ -85,21 +84,21 @@ void TimeController::update_global_volume_button() {
 // 更新音频状态
 void TimeController::update_audio_status() {
     if (binding_map) {
-        auto file = QDir(binding_map->audio_file_abs_path);
+        auto file = binding_map->audio_file_abs_path.generic_string();
+        std::replace(file.begin(), file.end(), '\\', '/');
         if (pause) {
             BackgroundAudio::pause_audio(
                 binding_map->project_reference->devicename,
-                file.canonicalPath().toStdString());
+                file);
         } else {
             BackgroundAudio::play_audio(
                 binding_map->project_reference->devicename,
-                file.canonicalPath().toStdString());
+                file);
         }
-        QDir s(binding_map->audio_file_abs_path);
         // 添加回调
         BackgroundAudio::add_playpos_callback(
             binding_map->project_reference->devicename,
-            s.canonicalPath().toStdString(), binding_map->audio_pos_callback);
+            file, binding_map->audio_pos_callback);
         // 暂停的话同步一下
         if (pause) {
             // 防止播放器已播放完暂停了死等待
@@ -114,7 +113,7 @@ void TimeController::update_audio_status() {
                 // 同步音频时间为画布时间
                 BackgroundAudio::set_audio_pos(
                     binding_map->project_reference->devicename,
-                    file.canonicalPath().toStdString(), canvas_pos);
+                    file, canvas_pos);
                 emit music_pos_synchronized(
                     canvas_pos - xutil::plannerpcmpos2milliseconds(
                                      x::Config::mix_buffer_size / 3.0,

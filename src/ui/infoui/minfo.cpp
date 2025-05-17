@@ -53,6 +53,8 @@ void MInfo::log(MLogLevel level, const QString &message) {
         QString(level_expr).arg(level_color).arg(level_weight).arg(levelname) +
         QString(message_expr).arg(level_color).arg(level_weight).arg(message);
 
-    ui->logTextArea->append(logline);
-    if (level == MLogLevel::MLOGERROR) ui->errorTextArea->append(logline);
+    if (ui && ui->logTextArea) {
+        ui->logTextArea->append(logline);
+        if (level == MLogLevel::MLOGERROR) ui->errorTextArea->append(logline);
+    }
 }
