@@ -16,6 +16,7 @@
 #include <QDir>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QStyleFactory>
 #include <QTranslator>
 #include <iostream>
 
@@ -30,6 +31,11 @@ int main(int argc, char* argv[]) {
 #endif  //_WIN32
     QApplication a(argc, argv);
     XLogger::init("MMM");
+    // 设置KDE风格（如果可用）
+    if (QStyleFactory::keys().contains("Breeze")) {
+        XINFO("使用kde Breeze主题");
+        a.setStyle(QStyleFactory::create("Breeze"));
+    }
 
     // 获取系统语言环境
     QLocale systemLocale = QLocale::system();

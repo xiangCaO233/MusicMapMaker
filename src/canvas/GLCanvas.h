@@ -56,6 +56,8 @@ class GLCanvas : public QOpenGLWindow,
     // 刷新线程
     std::thread update_thread;
 
+    double refreshRate_ratio{2.0};
+
     // 目标刷新时间间隔
     int32_t des_update_time{8};
 

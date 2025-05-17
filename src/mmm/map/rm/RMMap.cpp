@@ -13,6 +13,7 @@
 #include "../../hitobject/Note/rm/Slide.h"
 #include "../MMap.h"
 #include "colorful-log.h"
+#include "mmm/hitobject/Note/Note.h"
 #include "util/mutil.h"
 
 // 构造ImdReader
@@ -74,7 +75,22 @@ RMMap::RMMap(std::shared_ptr<MMap> srcmap) {
 
     // 初始化子类特有成员
     // 表格行数默认0
-    table_rows = 0;
+    // 统计表格行数
+    // 防止重复写出同一物件
+    std::unordered_map<std::shared_ptr<HitObject>, bool> readed_object;
+    for (const auto& hitobject : hitobjects) {
+        // 筛除面尾滑尾和包含组合键引用的物件和重复物件
+        // 优先写出完整组合键
+        if (!hitobject->is_note) continue;
+        auto note = std::static_pointer_cast<Note>(hitobject);
+        // 不写出处于组合键内的物件
+        if (!note || note->note_type == NoteType::COMPLEX) continue;
+        if (readed_object.find(note) == readed_object.end())
+            readed_object.insert({note, true});
+        else
+            continue;
+        ++table_rows;
+    }
     // 最大轨道数继承父类
     max_orbits = srcmap->orbits;
     // 版本字符串继承父类

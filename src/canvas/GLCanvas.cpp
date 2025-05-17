@@ -19,11 +19,11 @@
 #include <QThread>
 #include <QTimer>
 #include <chrono>
-#include <unordered_set>
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <thread>
+#include <unordered_set>
 
 #include "colorful-log.h"
 #include "renderer/font/FontRenderer.h"
@@ -58,7 +58,7 @@ GLCanvas::GLCanvas(QWidget *parent) {
     XINFO("显示器刷新率:" + std::to_string(refreshRate) + "Hz");
 
     // 垂直同步帧间隔
-    des_update_time = 1000.0 / refreshRate;
+    des_update_time = 1000.0 / refreshRate / refreshRate_ratio;
 }
 
 GLCanvas::~GLCanvas() {
@@ -204,11 +204,10 @@ void GLCanvas::start_render() {
             QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
 
             qint64 elapsed = timer.elapsed() - start;
-            if (elapsed < des_update_time / 1.5) {
+            if (elapsed < des_update_time) {
                 auto start = std::chrono::high_resolution_clock::now();
-                auto end =
-                    start + std::chrono::microseconds(
-                                int((des_update_time / 1.5 - elapsed) * 1000));
+                auto end = start + std::chrono::microseconds(
+                                       int((des_update_time - elapsed) * 1000));
                 std::this_thread::sleep_for(
                     std::chrono::duration_cast<std::chrono::microseconds>(
                         end - start));
