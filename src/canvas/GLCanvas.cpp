@@ -204,11 +204,11 @@ void GLCanvas::start_render() {
             QMetaObject::invokeMethod(this, "update", Qt::QueuedConnection);
 
             qint64 elapsed = timer.elapsed() - start;
-            if (elapsed < des_update_time / 2.0) {
+            if (elapsed < des_update_time / 1.5) {
                 auto start = std::chrono::high_resolution_clock::now();
                 auto end =
                     start + std::chrono::microseconds(
-                                int((des_update_time / 2.0 - elapsed) * 1000));
+                                int((des_update_time / 1.5 - elapsed) * 1000));
                 std::this_thread::sleep_for(
                     std::chrono::duration_cast<std::chrono::microseconds>(
                         end - start));

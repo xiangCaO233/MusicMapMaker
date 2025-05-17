@@ -8,8 +8,9 @@ project(
 if(MSVC)
   add_compile_options(/Zc:__cplusplus)
   add_compile_options(/utf-8 /EHsc) # 强制使用 UTF-8 编码
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi")
-  set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
+
+  # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi")
+  # set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
 
   # set(CMAKE_PREFIX_PATH "E:\\Software\\vcpkg\\installed\\x64-windows\\share")
 

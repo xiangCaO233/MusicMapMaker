@@ -315,7 +315,7 @@ void EffectThread::effect_thread() {
                                                 frames =
                                                     hold->hold_time /
                                                     canvas->des_update_time *
-                                                    2 *
+                                                    1.5 *
                                                     (1 / canvas->editor->cstatus
                                                              .playspeed);
                                             }
@@ -328,13 +328,12 @@ void EffectThread::effect_thread() {
                                                 frames, t);
 #ifdef _WIN32
 #else
+#endif //_WIN32
                                             std::this_thread::sleep_for(
                                                 std::chrono::milliseconds(int(
-                                                    canvas->des_update_time *
-                                                    2 /
+                                                    canvas->des_update_time * 1.5 /
                                                     canvas->editor->cstatus
                                                         .playspeed)));
-#endif //_WIN32
                                             // 播放音效
                                             BackgroundAudio::
                                                 play_audio_with_new_orbit(
