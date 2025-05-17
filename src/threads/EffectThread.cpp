@@ -326,12 +326,15 @@ void EffectThread::effect_thread() {
                                                 canvas->editor->ebuffer
                                                     .judgeline_visual_position,
                                                 frames, t);
+#ifdef _WIN32
+#else
                                             std::this_thread::sleep_for(
                                                 std::chrono::milliseconds(int(
                                                     canvas->des_update_time *
                                                     2 /
                                                     canvas->editor->cstatus
                                                         .playspeed)));
+#endif //_WIN32
                                             // 播放音效
                                             BackgroundAudio::
                                                 play_audio_with_new_orbit(
