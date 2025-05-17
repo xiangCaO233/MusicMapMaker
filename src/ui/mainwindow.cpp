@@ -9,7 +9,7 @@
 #include <string>
 
 #include "./ui_mainwindow.h"
-#include "audio/BackgroundAudio.h"
+#include "../audio/BackgroundAudio.h"
 #include "controllers/timecontroller.h"
 #include "mmetas.h"
 #include "objectinfoui.h"
@@ -26,13 +26,13 @@ MainWindow::MainWindow(QWidget* parent)
     auto infoui = ui->infomation_widget;
 
     connect(XLogger::uilogger, &MUiLogger::info, [=](const QString& message) {
-        infoui->log(MLogLevel::INFO, message);
+        infoui->log(MLogLevel::MLOGINFO, message);
     });
     connect(XLogger::uilogger, &MUiLogger::warn, [=](const QString& message) {
-        infoui->log(MLogLevel::WARN, message);
+        infoui->log(MLogLevel::MLOGWARN, message);
     });
     connect(XLogger::uilogger, &MUiLogger::error, [=](const QString& message) {
-        infoui->log(MLogLevel::ERROR, message);
+        infoui->log(MLogLevel::MLOGERROR, message);
     });
 
     BackgroundAudio::init();

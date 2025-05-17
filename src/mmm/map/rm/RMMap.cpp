@@ -227,7 +227,7 @@ bool RMMap::is_write_file_legal(const char* file, std::string& res) {
         res = (input_file.parent_path() / legal_file_name).generic_string();
         return false;
     }
-    res = input_file;
+    res = input_file.generic_string();
     return true;
 }
 

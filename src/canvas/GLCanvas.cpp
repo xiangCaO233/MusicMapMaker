@@ -1,6 +1,5 @@
 #include "GLCanvas.h"
 
-#include <GL/gl.h>
 #include <qcolor.h>
 #include <qdir.h>
 #include <qdiriterator.h>
@@ -20,6 +19,7 @@
 #include <QThread>
 #include <QTimer>
 #include <chrono>
+#include <unordered_set>
 #include <filesystem>
 #include <memory>
 #include <string>

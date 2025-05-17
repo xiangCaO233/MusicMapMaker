@@ -89,11 +89,8 @@ void TimeInfoGenerator::draw_timing_points() {
                 QString::number(speed_timing_ref->bpm, 'f', 2).toStdString();
         }
 
-#ifdef _WIN32
-#else
         std::u32string u32absbpmstr = mutil::cu32(preference_bpm_str);
         std::u32string u32speedstr = mutil::cu32(speed_str);
-#endif  //_WIN32
 
         // 计算字符串metrics
         double prebpmstr_width{0};

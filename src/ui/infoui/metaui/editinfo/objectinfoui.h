@@ -5,7 +5,7 @@
 
 class Timing;
 class HitObject;
-class Beat;
+struct Beat;
 
 enum class GlobalTheme;
 

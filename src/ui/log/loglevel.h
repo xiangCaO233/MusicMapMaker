@@ -2,9 +2,9 @@
 #define M_LOGLEVEL_H
 
 enum class MLogLevel {
-    INFO,
-    WARN,
-    ERROR,
+    MLOGINFO,
+    MLOGWARN,
+    MLOGERROR,
 };
 
 #endif  // M_LOGLEVEL_H

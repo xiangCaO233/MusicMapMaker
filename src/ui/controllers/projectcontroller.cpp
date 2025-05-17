@@ -269,7 +269,8 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
                     map->audio_file_abs_path = music_path;
                 }
 
-                if (BackgroundAudio::loadin_audio(map->audio_file_abs_path) ==
+                auto audio_path_str = map->audio_file_abs_path.generic_string();
+                if (BackgroundAudio::loadin_audio(audio_path_str) ==
                     -1) {
                     XERROR("无法加载音频");
                     return;

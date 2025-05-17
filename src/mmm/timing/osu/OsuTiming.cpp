@@ -1,6 +1,5 @@
 #include "OsuTiming.h"
 
-#include <cstdlib>
 #include <iomanip>
 #include <string>
 
@@ -24,33 +23,33 @@ std::string OsuTiming::to_osu_description() {
      * 对于继承时间点(绿线):
      *   拍长 = -100 / 滑条速度倍数
      */
-    std::ostringstream oss;
-    // 时间
-    oss << std::fixed << std::setprecision(0) << timestamp << ",";
-    // 拍长
-    if (is_inherit_timing) {
-        // 继承时间点(绿线): 拍长为负值，表示滑条速度倍数
-        double slider_velocity_multiplier = 100.0 / bpm;
-        oss << std::fixed << std::setprecision(2) << -slider_velocity_multiplier
-            << ",";
-    } else {
-        // 非继承时间点(红线): 拍长为正，表示毫秒每拍
-        double ms_per_beat = 60000.0 / bpm;
-        oss << std::fixed << std::setprecision(2) << ms_per_beat << ",";
-    }
-    // 节拍
-    oss << beat << ",";
-    // 音效组
-    oss << static_cast<int>(sample_set) << ",";
-    // 音效参数
-    oss << sample_parameter << ",";
-    // 音量
-    oss << volume << ",";
-    // 是否为非继承时间点 (0=继承/绿线, 1=非继承/红线)
-    oss << (is_inherit_timing ? "0" : "1") << ",";
-    // 效果
-    oss << static_cast<int>(effect);
-    return oss.str();
+    // std::ostringstream oss;
+    // // 时间
+    // oss << std::fixed << std::setprecision(0) << std::to_string(timestamp )<< ",";
+    // // 拍长
+    // if (is_inherit_timing) {
+    //     // 继承时间点(绿线): 拍长为负值，表示滑条速度倍数
+    //     double slider_velocity_multiplier = 100.0 / bpm;
+    //     oss << std::fixed << std::setprecision(2) << std::to_string(-slider_velocity_multiplier)
+    //         << ",";
+    // } else {
+    //     // 非继承时间点(红线): 拍长为正，表示毫秒每拍
+    //     double ms_per_beat = 60000.0 / bpm;
+    //     oss << std::fixed << std::setprecision(2) << std::to_string(ms_per_beat )<< ",";
+    // }
+    // // 节拍
+    // oss << beat << ",";
+    // // 音效组
+    // oss << std::to_string(static_cast<int>(sample_set)) << ",";
+    // // 音效参数
+    // oss << std::to_string(sample_parameter )<< ",";
+    // // 音量
+    // oss << volume << ",";
+    // // 是否为非继承时间点 (0=继承/绿线, 1=非继承/红线)
+    // oss << (is_inherit_timing ? "0" : "1") << ",";
+    // // 效果
+    // oss << std::to_string(static_cast<int>(effect));
+    return "";
 }
 
 // 从osu的字符串读取

@@ -5,6 +5,15 @@ project(
   VERSION 0.1
   LANGUAGES CXX)
 
+if(MSVC)
+  add_compile_options(/Zc:__cplusplus)
+  add_compile_options(/utf-8 /EHsc) # 强制使用 UTF-8 编码
+
+  # set(CMAKE_PREFIX_PATH "E:\\Software\\vcpkg\\installed\\x64-windows\\share")
+
+  # set(spdlog_DIR "E:/Software/vcpkg/installed/x64-windows/share/")
+endif()
+
 add_subdirectory(./libs/xaudiolib)
 include_directories(./ ./libs/xaudiolib/include)
 link_directories(./build)
@@ -19,27 +28,25 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-add_compile_options(-O3)
-
 # 查找 Qt 包
 find_package(
   QT NAMES Qt6 Qt5 REQUIRED
   COMPONENTS Core
-             Widgets
-             OpenGLWidgets
-             OpenGL
-             LinguistTools
-             Svg
-             SvgWidgets)
+  Widgets
+  OpenGLWidgets
+  OpenGL
+  LinguistTools
+  Svg
+  SvgWidgets)
 find_package(
   Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core
-             Widgets
-             OpenGLWidgets
-             OpenGL
-             LinguistTools
-             Svg
-             SvgWidgets)
+  Widgets
+  OpenGLWidgets
+  OpenGL
+  LinguistTools
+  Svg
+  SvgWidgets)
 
 # 查找日志包
 find_package(spdlog REQUIRED)
@@ -92,7 +99,7 @@ set(MMM_SOURCES
 
 # 设置翻译文件
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
-             ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
+  ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
 
 # 设置着色器文件
 set(GLSL_FILES
@@ -149,6 +156,8 @@ set(PROJECT_SOURCES
     src/ui/guide/newtimingguide.ui
     src/threads/EffectThread.h
     src/threads/EffectThread.cpp
+    src/threads/ThreadPool.h
+    src/threads/ThreadSafeQueue.h
     src/canvas/GLCanvas.h
     src/canvas/GLCanvas.cpp
     src/canvas/FrameRateCounter.h
@@ -248,7 +257,7 @@ include_directories(
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                    resources/glsrcs.qrc)
+    resources/glsrcs.qrc)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
@@ -263,19 +272,19 @@ add_dependencies(MusicMapMaker xaudio-dev)
 target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog
-          Qt${QT_VERSION_MAJOR}::Core
-          Qt${QT_VERSION_MAJOR}::Widgets
-          Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-          Qt${QT_VERSION_MAJOR}::OpenGL
-          Qt${QT_VERSION_MAJOR}::Svg
-          Qt${QT_VERSION_MAJOR}::SvgWidgets
-          ICU::uc
-          ICU::i18n
-          ICU::data
-          ${LIBXML2_LIBRARIES}
-          Freetype::Freetype
-          pugixml::pugixml
-          xaudio-dev)
+  Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::Widgets
+  Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+  Qt${QT_VERSION_MAJOR}::OpenGL
+  Qt${QT_VERSION_MAJOR}::Svg
+  Qt${QT_VERSION_MAJOR}::SvgWidgets
+  ICU::uc
+  ICU::i18n
+  ICU::data
+  ${LIBXML2_LIBRARIES}
+  Freetype::Freetype
+  pugixml::pugixml
+  xaudio-dev)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -314,10 +323,10 @@ endif()
 set_target_properties(
   MusicMapMaker
   PROPERTIES ${BUNDLE_ID_OPTION} MACOSX_BUNDLE_BUNDLE_VERSION
-             ${PROJECT_VERSION} MACOSX_BUNDLE_SHORT_VERSION_STRING
-             ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} MACOSX_BUNDLE
-             TRUE WIN32_EXECUTABLE
-             TRUE)
+  ${PROJECT_VERSION} MACOSX_BUNDLE_SHORT_VERSION_STRING
+  ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} MACOSX_BUNDLE
+  TRUE WIN32_EXECUTABLE
+  TRUE)
 
 # 安装配置
 include(GNUInstallDirs)
