@@ -48,6 +48,7 @@ void TextureInstace::load_from_file(std::filesystem::path& relative_path,
     } else {
         name = QString::fromStdString(rp.string()).toStdString();
     }
+    std::replace(name.begin(), name.end(), '\\', '/');
 
     data = stbi_load(file_path.string().c_str(), &width, &height, &channels, 4);
 
