@@ -154,7 +154,7 @@
          </font>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
         </property>
         <property name="text">
          <string notr="true">/home/xiang</string>
