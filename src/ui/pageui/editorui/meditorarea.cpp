@@ -386,6 +386,43 @@ void MEditorArea::initialize_toolbuttons() {
 
     //
     //
+    //
+    // 轨道透明度调节按钮
+    //
+    //
+    // 创建菜单
+    auto orbitopacymenu = new QMenu(ui->orbits_opacy_toolbutton);
+    auto customorbitopacysliderWidget = new QWidget();
+    auto orbitopacyslider =
+        new QSlider(Qt::Vertical, customorbitopacysliderWidget);
+    orbitopacyslider->setRange(0, 100);
+    orbitopacyslider->setValue(50);
+    auto orbitopacyopacylabel = new QLabel("50");
+
+    auto orbitopacymenulayout = new QVBoxLayout(customorbitopacysliderWidget);
+    orbitopacymenulayout->setContentsMargins(2, 2, 2, 2);
+    orbitopacymenulayout->setSpacing(2);
+    orbitopacymenulayout->addWidget(orbitopacyslider);
+    orbitopacymenulayout->addWidget(orbitopacyopacylabel);
+    customorbitopacysliderWidget->setLayout(orbitopacymenulayout);
+
+    connect(orbitopacyslider, &QSlider::valueChanged, [=](int value) {
+        orbitopacyopacylabel->setText(QString::number(value));
+        canvas->editor->cstatus.background_darken_ratio =
+            1.0 - double(value) / 100.0;
+    });
+
+    // 将自定义 Widget 包装成 QWidgetAction
+    auto *orbitopacywidgetAction = new QWidgetAction(orbitopacymenu);
+    orbitopacywidgetAction->setDefaultWidget(customorbitopacysliderWidget);
+
+    // 添加到菜单
+    orbitopacymenu->addAction(orbitopacywidgetAction);
+    // 设置轨道透明度按钮菜单
+    ui->orbits_opacy_toolbutton->setMenu(orbitopacymenu);
+
+    //
+    //
     // 书签按钮
     update_bookmarks();
 }

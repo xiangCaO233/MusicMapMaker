@@ -3,6 +3,7 @@
 #include "../../../mmm/MapWorkProject.h"
 #include "../MapWorkspaceCanvas.h"
 #include "../editor/MapEditor.h"
+#include "texture/Texture.h"
 
 // 构造OrbitGenerate
 OrbitGenerator::OrbitGenerator(std::shared_ptr<MapEditor> &editor)
@@ -26,11 +27,18 @@ void OrbitGenerator::generate() {
         // 轨道的实际绘制纹理宽度-物件缩放*轨道纹理宽度尺寸
         auto orbit_texture_width =
             editor_ref->ebuffer.object_size_scale * orbit_texture->width;
+        // 居中
+        orbit_xpos +=
+            (editor_ref->ebuffer.orbit_width - orbit_texture_width) / 2.0;
 
+        editor_ref->canvas_ref->renderer_manager->texture_fillmode =
+            TextureFillMode::FILL;
         // 绘制轨道背景
         editor_ref->canvas_ref->renderer_manager->addRect(
             QRectF(orbit_xpos, 0, orbit_texture_width,
                    editor_ref->cstatus.canvas_size.height()),
             orbit_texture, QColor(0, 0, 0), 0, false);
+        editor_ref->canvas_ref->renderer_manager->texture_fillmode =
+            TextureFillMode::SCALLING_AND_TILE;
     }
 }

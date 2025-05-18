@@ -189,6 +189,38 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="orbits_opacy_toolbutton">
+        <property name="minimumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/orbits.svg</normaloff>:/icons/orbits.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="bookmark_toolbutton">
         <property name="minimumSize">
          <size>

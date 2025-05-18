@@ -65,6 +65,9 @@ struct CanvasStatus {
     // 背景暗化
     double background_darken_ratio{0.75};
 
+    // 轨道暗化
+    double orbit_darken_ratio{0.50};
+
     // 时间偏移
     double static_time_offset{-15};
 

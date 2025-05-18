@@ -686,7 +686,8 @@ void MapWorkspaceCanvas::push_shape() {
     draw_background();
 
     if (working_map) {
-        // 清除hover信息
+        // 绘制轨道背景
+        draw_orbits();
         // 生成区域信息
         areagenerator->generate();
         if (editor->csettings.show_timeline) {

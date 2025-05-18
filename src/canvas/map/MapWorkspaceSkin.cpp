@@ -164,8 +164,9 @@ std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_orbit_bg_texture() {
             bg_texture_buffer
                 .try_emplace(
                     TexType::ORBIT_BG,
-                    cvs->texture_full_map[bg_texture_config.value<std::string>(
-                        "orbit_background", "none")])
+                    cvs->texture_full_map[bg_texture_config["panel"]
+                                              .value<std::string>(
+                                                  "orbit_background", "none")])
                 .first;
     }
     return obg_texit->second;
@@ -179,8 +180,9 @@ std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_orbit_judge_texture() {
             bg_texture_buffer
                 .try_emplace(
                     TexType::JUDGE_ORBIT,
-                    cvs->texture_full_map[bg_texture_config.value<std::string>(
-                        "judge_orbit", "none")])
+                    cvs->texture_full_map[bg_texture_config["panel"]
+                                              .value<std::string>("judge_orbit",
+                                                                  "none")])
                 .first;
     }
     return ojudge_texit->second;
