@@ -144,6 +144,7 @@ class MapWorkspaceSkin {
 
     // 特效帧数量
     int32_t nomal_hit_effect_frame_count;
+    double normal_hit_effect_duration;
     int32_t slide_hit_effect_frame_count;
 
     // 时间分割线主题-(1/n-(颜色-宽度)列表)

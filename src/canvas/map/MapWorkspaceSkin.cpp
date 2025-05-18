@@ -106,6 +106,8 @@ void MapWorkspaceSkin::load_skin(const std::filesystem::path& skin_path) {
         hit_effect_config.value<std::string>("note-effectdir", "");
     nomal_hit_effect_frame_count =
         count_files_recursive(skin_path / nomal_hit_effect_dir);
+    normal_hit_effect_duration =
+        hit_effect_config.value<double>("note-effect-duration", 0.1);
 
     slide_hit_effect_dir =
         hit_effect_config.value<std::string>("slide-effectdir", "");
