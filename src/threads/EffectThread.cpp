@@ -283,7 +283,7 @@ void EffectThread::effect_thread() {
                                                         canvas->skin
                                                             .normal_hit_effect_duration /
                                                         canvas
-                                                            ->des_update_time *
+                                                            ->actual_update_time *
                                                         (1 /
                                                          canvas->editor->cstatus
                                                              .playspeed);
@@ -306,7 +306,7 @@ void EffectThread::effect_thread() {
                                                         canvas->skin
                                                             .normal_hit_effect_duration /
                                                         canvas
-                                                            ->des_update_time *
+                                                            ->actual_update_time *
                                                         (1 /
                                                          canvas->editor->cstatus
                                                              .playspeed);
