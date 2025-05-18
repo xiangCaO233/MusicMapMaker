@@ -77,6 +77,8 @@ class MapEditor {
 
     // 复制
     void copy();
+    // 剪切
+    void cut();
     // 粘贴
     void paste();
 
