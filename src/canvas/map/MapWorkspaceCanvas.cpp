@@ -134,7 +134,7 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
         actual_update_time - des_update_time > des_update_time) {
         auto log = tr("qt update substantially delayed:%1ms")
                        .arg(QString::number(actual_update_time, 'f', 2));
-        XWARN(log.toStdString());
+        // XWARN(log.toStdString());
     }
     lasttime = time;
 

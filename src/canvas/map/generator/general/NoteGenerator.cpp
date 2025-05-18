@@ -19,16 +19,24 @@ NoteGenerator::~NoteGenerator() = default;
 // 生成物件渲染指令
 void NoteGenerator::generate(Note& note) {
     auto note_ptr = std::shared_ptr<HitObject>(&note, [](Note*) {});
-    auto texture = note.note_type == NoteType::NOTE
-                       ? editor_ref->ebuffer.note_texture
-                       : editor_ref->ebuffer.head_texture;
-    auto note_size =
-        QSizeF(texture->width * editor_ref->ebuffer.object_size_scale *
-                   editor_ref->canvas_ref->working_map->project_reference
-                       ->config.object_width_ratio,
-               texture->height * editor_ref->ebuffer.object_size_scale *
-                   editor_ref->canvas_ref->working_map->project_reference
-                       ->config.object_height_ratio);
+
+    // 区分面条和单键纹理
+    TexType textype;
+    std::shared_ptr<TextureInstace> preference_texture;
+    if (note.note_type == NoteType::NOTE) {
+        textype = TexType::NORMAL_NOTE;
+        preference_texture = editor_ref->ebuffer.note_texture;
+    } else {
+        textype = TexType::HOLD_HEAD;
+        preference_texture = editor_ref->ebuffer.head_texture;
+    }
+    auto note_size = QSizeF(
+        preference_texture->width * editor_ref->ebuffer.object_size_scale *
+            editor_ref->canvas_ref->working_map->project_reference->config
+                .object_width_ratio,
+        preference_texture->height * editor_ref->ebuffer.object_size_scale *
+            editor_ref->canvas_ref->working_map->project_reference->config
+                .object_height_ratio);
     double note_visual_time =
         editor_ref->cstatus.current_visual_time_stamp +
         (note.timestamp - editor_ref->cstatus.current_visual_time_stamp) *
@@ -75,7 +83,7 @@ void NoteGenerator::generate(Note& note) {
     if (head_rect.contains(editor_ref->canvas_ref->mouse_pos)) {
         // 优先使用悬停时的纹理
         head_texture = editor_ref->canvas_ref->skin.get_object_texture(
-            TexType::HOLD_HEAD, ObjectStatus::HOVER);
+            textype, ObjectStatus::HOVER);
         editor_ref->ebuffer.hover_object_info =
             std::make_shared<HoverObjectInfo>(note_ptr, note.beatinfo,
                                               HoverPart::HEAD);
@@ -99,11 +107,11 @@ void NoteGenerator::generate(Note& note) {
             }
             // 选中时的纹理
             head_texture = editor_ref->canvas_ref->skin.get_object_texture(
-                TexType::HOLD_HEAD, ObjectStatus::SELECTED);
+                textype, ObjectStatus::SELECTED);
         } else {
             // 正常纹理
             head_texture = editor_ref->canvas_ref->skin.get_object_texture(
-                TexType::HOLD_HEAD, ObjectStatus::COMMON);
+                textype, ObjectStatus::COMMON);
         }
     }
     objref = note_ptr;
@@ -112,16 +120,25 @@ void NoteGenerator::generate(Note& note) {
 // 生成预览物件
 void NoteGenerator::generate_preview(Note& note) {
     auto note_ptr = std::shared_ptr<HitObject>(&note, [](Note*) {});
-    auto texture = note.note_type == NoteType::NOTE
-                       ? editor_ref->ebuffer.note_texture
-                       : editor_ref->ebuffer.head_texture;
-    auto head_note_size = QSizeF(
-        texture->width * editor_ref->ebuffer.preview_object_size_scale *
-            editor_ref->canvas_ref->working_map->project_reference->config
-                .object_width_ratio,
-        texture->height * editor_ref->ebuffer.preview_object_size_scale * 0.75 *
-            editor_ref->canvas_ref->working_map->project_reference->config
-                .object_height_ratio);
+    // 区分面条和单键纹理
+    TexType textype;
+    std::shared_ptr<TextureInstace> preference_texture;
+    if (note.note_type == NoteType::NOTE) {
+        textype = TexType::NORMAL_NOTE;
+        preference_texture = editor_ref->ebuffer.note_texture;
+    } else {
+        textype = TexType::HOLD_HEAD;
+        preference_texture = editor_ref->ebuffer.head_texture;
+    }
+    auto head_note_size =
+        QSizeF(preference_texture->width *
+                   editor_ref->ebuffer.preview_object_size_scale *
+                   editor_ref->canvas_ref->working_map->project_reference
+                       ->config.object_width_ratio,
+               preference_texture->height *
+                   editor_ref->ebuffer.preview_object_size_scale * 0.75 *
+                   editor_ref->canvas_ref->working_map->project_reference
+                       ->config.object_height_ratio);
     auto preview_height =
         editor_ref->cstatus.canvas_size.height() /
             editor_ref->canvas_ref->working_map->project_reference->config
@@ -175,7 +192,7 @@ void NoteGenerator::generate_preview(Note& note) {
     if (head_rect.contains(editor_ref->canvas_ref->mouse_pos)) {
         // 优先使用悬停时的纹理
         head_texture = editor_ref->canvas_ref->skin.get_object_texture(
-            TexType::HOLD_HEAD, ObjectStatus::HOVER);
+            textype, ObjectStatus::HOVER);
         editor_ref->ebuffer.hover_object_info =
             std::make_shared<HoverObjectInfo>(note_ptr, note.beatinfo,
                                               HoverPart::HEAD);
@@ -199,11 +216,11 @@ void NoteGenerator::generate_preview(Note& note) {
             }
             // 选中时的纹理
             head_texture = editor_ref->canvas_ref->skin.get_object_texture(
-                TexType::HOLD_HEAD, ObjectStatus::SELECTED);
+                textype, ObjectStatus::SELECTED);
         } else {
             // 正常纹理
             head_texture = editor_ref->canvas_ref->skin.get_object_texture(
-                TexType::HOLD_HEAD, ObjectStatus::COMMON);
+                textype, ObjectStatus::COMMON);
         }
     }
     objref = note_ptr;
