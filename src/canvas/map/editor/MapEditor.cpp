@@ -304,7 +304,7 @@ void MapEditor::mouse_moved(QMouseEvent* e) {
         cstatus.operation_area = MouseOperationArea::INFO;
     }
 
-    if (cstatus.mouse_left_pressed) {
+    if (cstatus.mouse_left_pressed && !cstatus.mouse_right_pressed) {
         // 正在拖动
         switch (edit_mode) {
             case MouseEditMode::SELECT: {

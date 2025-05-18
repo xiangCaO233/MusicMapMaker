@@ -93,6 +93,9 @@
           <height>28</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -112,7 +115,11 @@
     </widget>
    </item>
    <item>
-    <widget class="MEditorArea" name="edit_area_widget" native="true"/>
+    <widget class="MEditorArea" name="edit_area_widget" native="true">
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::StrongFocus</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLineEdit" name="command_line">
@@ -121,6 +128,9 @@
        <pointsize>12</pointsize>
        <bold>true</bold>
       </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
      </property>
      <property name="maxLength">
       <number>512</number>

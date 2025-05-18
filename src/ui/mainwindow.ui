@@ -176,6 +176,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::StrongFocus</enum>
+       </property>
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -197,6 +200,9 @@
         </property>
         <item>
          <widget class="QSplitter" name="right_splitter">
+          <property name="focusPolicy">
+           <enum>Qt::FocusPolicy::StrongFocus</enum>
+          </property>
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
@@ -209,6 +215,9 @@
              <width>380</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::StrongFocus</enum>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <property name="spacing">
@@ -227,7 +236,11 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="MPage" name="page_widget" native="true"/>
+             <widget class="MPage" name="page_widget" native="true">
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::StrongFocus</enum>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -264,7 +277,7 @@
      <x>0</x>
      <y>0</y>
      <width>1250</width>
-     <height>17</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

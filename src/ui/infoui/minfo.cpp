@@ -1,6 +1,7 @@
 #include "minfo.h"
 
 #include <qdatetime.h>
+#include <qmainwindow.h>
 
 #include "ui_minfo.h"
 

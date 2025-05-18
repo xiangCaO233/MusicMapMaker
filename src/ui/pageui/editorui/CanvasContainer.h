@@ -17,8 +17,6 @@ class CanvasContainer : public QWidget {
 
     // 用于嵌入 QOpenGLWindow
     QWidget* container;
-
-   protected:
 };
 
 #endif  // M_CANVASCONTAINER_H

@@ -18,6 +18,8 @@ IVMPlaceNoteHandler::~IVMPlaceNoteHandler() = default;
 bool IVMPlaceNoteHandler::handle(HitObjectEditor* oeditor_context,
                                  QMouseEvent* e, double mouse_time,
                                  double mouse_orbit) {
+    if (e->button() != Qt::LeftButton) return false;
+
     XINFO("处理物件放置事件");
     // 鼠标附近无可用拍线-处理失败
     if (std::abs(mouse_time - (-1.0)) <= 1e-7) {

@@ -512,6 +512,9 @@
             </item>
             <item>
              <widget class="QSlider" name="timeline_zoom_slider">
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::ClickFocus</enum>
+              </property>
               <property name="minimum">
                <number>20</number>
               </property>
@@ -585,6 +588,9 @@
             </item>
             <item>
              <widget class="QSlider" name="oheight_scale_slider">
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::ClickFocus</enum>
+              </property>
               <property name="minimum">
                <number>20</number>
               </property>
@@ -658,6 +664,9 @@
             </item>
             <item>
              <widget class="QSlider" name="owidth_scale_slider">
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::ClickFocus</enum>
+              </property>
               <property name="minimum">
                <number>20</number>
               </property>
@@ -861,7 +870,7 @@
                </font>
               </property>
               <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
+               <enum>Qt::FocusPolicy::ClickFocus</enum>
               </property>
               <property name="frame">
                <bool>false</bool>
@@ -1047,7 +1056,7 @@
       <item>
        <widget class="QSlider" name="global_volume_slider">
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
         </property>
         <property name="maximum">
          <number>100</number>
@@ -1134,7 +1143,7 @@
       <item>
        <widget class="QSlider" name="music_volume_slider">
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
         </property>
         <property name="maximum">
          <number>100</number>
@@ -1221,7 +1230,7 @@
       <item>
        <widget class="QSlider" name="effect_volume_slider">
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
         </property>
         <property name="maximum">
          <number>100</number>

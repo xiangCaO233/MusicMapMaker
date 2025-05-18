@@ -1,11 +1,13 @@
 #include "mmetas.h"
 
+#include <qmainwindow.h>
+
 #include <memory>
 
 #include "../../GlobalSettings.h"
 #include "ui_mmetas.h"
 
-MMetas::MMetas(QWidget* parent) : QWidget(parent), ui(new Ui::MMetas) {
+MMetas::MMetas(QWidget *parent) : QWidget(parent), ui(new Ui::MMetas) {
     ui->setupUi(this);
     objinfo_ref = ui->objinfo_widget;
     timinginfo_ref = ui->timinginfo_widget;

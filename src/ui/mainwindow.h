@@ -11,6 +11,7 @@
 
 #include "../log/uilogger.h"
 #include "GlobalSettings.h"
+#include "mpage.h"
 
 class MapWorkspaceCanvas;
 class MMap;
@@ -34,6 +35,9 @@ class MainWindow : public QMainWindow {
 
     // 当前主题
     GlobalTheme current_theme;
+
+    // page
+    MPage *page;
 
     // 使用主题
     void use_theme(GlobalTheme theme);

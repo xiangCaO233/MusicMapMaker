@@ -66,6 +66,9 @@
        <pointsize>26</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
@@ -129,6 +132,9 @@
          </item>
          <item>
           <widget class="QLineEdit" name="bpm_value_lineEdit">
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::ClickFocus</enum>
+           </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
            </property>
@@ -174,6 +180,9 @@
          </item>
          <item>
           <widget class="QLineEdit" name="speed_value_lineEdit">
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::ClickFocus</enum>
+           </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
            </property>
@@ -203,6 +212,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="delete_timing_button">
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="text">
          <string>Delete Timing</string>
         </property>

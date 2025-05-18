@@ -177,6 +177,9 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
             editor->cstatus.mouse_left_pressed = true;
             editor->cstatus.mouse_left_press_pos = event->pos();
         }
+        case Qt::MouseButton::RightButton: {
+            editor->cstatus.mouse_right_pressed = true;
+        }
     }
 
     editor->mouse_pressed(event);
@@ -194,6 +197,9 @@ void MapWorkspaceCanvas::mouseReleaseEvent(QMouseEvent *event) {
     switch (event->button()) {
         case Qt::MouseButton::LeftButton: {
             editor->cstatus.mouse_left_pressed = false;
+        }
+        case Qt::MouseButton::RightButton: {
+            editor->cstatus.mouse_right_pressed = false;
         }
     }
 }
@@ -256,10 +262,23 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
             // AudioEnginPlayCallback::count = 0;
             break;
         }
+        case Qt::Key_C: {
+            if (modifiers & Qt::ControlModifier) {
+                // 复制
+            }
+            break;
+        }
+        case Qt::Key_V: {
+            if (modifiers & Qt::ControlModifier) {
+                // 粘贴
+            }
+            break;
+        }
         case Qt::Key_Z: {
             if (modifiers & Qt::ControlModifier) {
                 // 撤回
                 editor->undo();
+                XWARN("已撤回");
             }
             break;
         }
@@ -267,6 +286,7 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
             if (modifiers & Qt::ControlModifier) {
                 // 重做
                 editor->redo();
+                XWARN("已重做");
             }
             break;
         }
@@ -312,8 +332,7 @@ void MapWorkspaceCanvas::draw_background() {
     renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
     auto bg_str = working_map->bg_path.generic_string();
     std::replace(bg_str.begin(), bg_str.end(), '\\', '/');
-    auto &t =
-        texture_full_map[bg_str];
+    auto &t = texture_full_map[bg_str];
     renderer_manager->addRect(des, t, QColor(0, 0, 0, 255), 0, false);
     // 绘制背景遮罩
     if (editor->cstatus.background_darken_ratio != 0.0) {

@@ -158,9 +158,9 @@ void IVMObjectEditor::mouse_pressed(QMouseEvent* e) {
     } else {
         hover_object_info_shortcut = nullptr;
     }
-    auto handle_res = mpress_handler->handle(
-        this, e, nearest_divisor_time(), editor_ref->cstatus.mouse_pos_orbit);
-    if (handle_res) {
+
+    if (mpress_handler->handle(this, e, nearest_divisor_time(),
+                               editor_ref->cstatus.mouse_pos_orbit)) {
         XINFO("鼠标按下事件已被处理");
     } else {
         XWARN("鼠标按下事件处理失败");
@@ -168,9 +168,8 @@ void IVMObjectEditor::mouse_pressed(QMouseEvent* e) {
 }
 
 void IVMObjectEditor::mouse_released(QMouseEvent* e) {
-    auto handle_res = mrelease_handler->handle(
-        this, e, nearest_divisor_time(), editor_ref->cstatus.mouse_pos_orbit);
-    if (handle_res) {
+    if (mrelease_handler->handle(this, e, nearest_divisor_time(),
+                                 editor_ref->cstatus.mouse_pos_orbit)) {
         XINFO("鼠标释放事件已被处理");
     } else {
         XWARN("鼠标释放事件处理失败");
@@ -179,13 +178,11 @@ void IVMObjectEditor::mouse_released(QMouseEvent* e) {
 
 // 鼠标拖动事件-传递
 void IVMObjectEditor::mouse_dragged(QMouseEvent* e) {
-    auto handle_res = mdrag_handler->handle(
-        this, e, nearest_divisor_time(), editor_ref->cstatus.mouse_pos_orbit);
-    if (handle_res) {
-        XINFO("鼠标拖动事件已被处理");
-    } else {
+    if (!mdrag_handler->handle(this, e, nearest_divisor_time(),
+                               editor_ref->cstatus.mouse_pos_orbit)) {
         XWARN("鼠标拖动事件处理失败");
     }
+    // XINFO("鼠标拖动事件已被处理");
 }
 
 // 更新正编辑的当前组合键

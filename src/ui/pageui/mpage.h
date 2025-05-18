@@ -1,6 +1,7 @@
 #ifndef MPAGE_H
 #define MPAGE_H
 
+#include <qevent.h>
 #include <qtmetamacros.h>
 
 #include <QWidget>

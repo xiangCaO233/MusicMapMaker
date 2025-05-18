@@ -230,6 +230,9 @@
    </item>
    <item>
     <widget class="QTreeView" name="file_browser_treeview">
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
      <property name="contextMenuPolicy">
       <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
      </property>

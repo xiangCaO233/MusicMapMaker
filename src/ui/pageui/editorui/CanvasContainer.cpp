@@ -2,7 +2,11 @@
 
 #include <qwidget.h>
 
+#include <QApplication>
+#include <QOpenGLWindow>
 #include <QVBoxLayout>
+
+#include "colorful-log.h"
 
 // 构造CanvasContainer
 CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
@@ -11,7 +15,6 @@ CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
 
     // 将 QOpenGLWindow 嵌入到 QWidget
     container = QWidget::createWindowContainer(canvas.data(), this);
-
     // 设置布局
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(container);

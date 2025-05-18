@@ -8,8 +8,8 @@
 #include <memory>
 #include <string>
 
-#include "./ui_mainwindow.h"
 #include "../audio/BackgroundAudio.h"
+#include "./ui_mainwindow.h"
 #include "controllers/timecontroller.h"
 #include "mmetas.h"
 #include "objectinfoui.h"
@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget* parent)
     ui->setupUi(this);
 
     auto infoui = ui->infomation_widget;
+
+    page = ui->page_widget;
 
     connect(XLogger::uilogger, &MUiLogger::info, [=](const QString& message) {
         infoui->log(MLogLevel::MLOGINFO, message);

@@ -46,9 +46,14 @@ bool IVMMouseReleaseHandler::handle(HitObjectEditor* oeditor_context,
                 //
                 //
                 // 删除选中的全部物件
-                ivmobjecteditor->editing_temp_objects.clear();
-                ivmobjecteditor->end_edit();
-                XINFO("删除物件");
+                if (!ivmobjecteditor->editing_src_objects.empty()) {
+                    ivmobjecteditor->editing_temp_objects.clear();
+                    ivmobjecteditor->end_edit();
+                    XINFO("删除物件");
+                } else {
+                    // 未选中任何物件-不执行删除
+                    XWARN("未选中任何物件,不执行删除");
+                }
             } else {
                 // 若为面条编辑模式则面条编辑结束
                 // 结束面条编辑

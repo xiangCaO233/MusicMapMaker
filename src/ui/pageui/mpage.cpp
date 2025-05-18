@@ -1,5 +1,6 @@
 #include "mpage.h"
 
+#include <qapplication.h>
 #include <qtmetamacros.h>
 
 #include <memory>

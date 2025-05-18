@@ -269,8 +269,7 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
                 }
 
                 auto audio_path_str = map->audio_file_abs_path.generic_string();
-                if (BackgroundAudio::loadin_audio(audio_path_str) ==
-                    -1) {
+                if (BackgroundAudio::loadin_audio(audio_path_str) == -1) {
                     XERROR("无法加载音频");
                     return;
                 }
@@ -338,6 +337,9 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
 
                 // 触发更新
                 select_project(selected_project);
+
+                // 新建谱面后重置设备同步锁
+                device_sync_lock = false;
 
                 // 资源不存在则拷贝到当前项目
             } else {

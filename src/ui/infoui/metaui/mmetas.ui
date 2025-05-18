@@ -31,8 +31,11 @@
    </property>
    <item>
     <widget class="QTabWidget" name="meta_tabs">
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="objectinfo_tab">
       <attribute name="title">

@@ -1,5 +1,6 @@
 #include "meditorarea.h"
 
+#include <qapplication.h>
 #include <qbuttongroup.h>
 #include <qfiledialog.h>
 #include <qlabel.h>
