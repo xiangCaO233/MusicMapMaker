@@ -24,6 +24,7 @@
 #include "generator/AreaInfoGenerator.h"
 #include "generator/BeatGenerator.h"
 #include "generator/ObjectGenerator.h"
+#include "generator/OrbitGenerator.h"
 #include "generator/PreviewGenerator.h"
 #include "generator/TimeInfoGenerator.h"
 #include "threads/EffectThread.h"
@@ -73,6 +74,9 @@ class MapWorkspaceCanvas : public GLCanvas {
     // 预览生成器
     std::shared_ptr<PreviewGenerator> previewgenerator;
 
+    // 轨道生成器
+    std::shared_ptr<OrbitGenerator> orbitgenerator;
+
     // 帧参数包队列
     std::unordered_map<RenderType, std::queue<RenderParamsBundle>> frame_params;
 
@@ -85,6 +89,8 @@ class MapWorkspaceCanvas : public GLCanvas {
     /*
      *成员函数
      */
+    // 绘制轨道底板
+    void draw_orbits();
 
     // 绘制判定线
     void draw_judgeline();

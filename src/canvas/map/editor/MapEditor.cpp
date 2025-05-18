@@ -70,6 +70,12 @@ void MapEditor::redo() {
     undo_type_stack.pop();
 }
 
+// 复制
+void MapEditor::copy() {}
+
+// 粘贴
+void MapEditor::paste() {}
+
 // 画布更新尺寸
 void MapEditor::update_size(const QSize& current_canvas_size) {
     cstatus.canvas_size = current_canvas_size;

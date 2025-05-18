@@ -70,6 +70,11 @@ class HitObjectEditor {
 
     // 重做
     void redo();
+
+    // 复制
+    void copy();
+    // 粘贴
+    void paste();
 };
 
 #endif  // M_HITOBJECTEDITOR_H
