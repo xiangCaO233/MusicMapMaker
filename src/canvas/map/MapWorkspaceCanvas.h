@@ -139,6 +139,9 @@ class MapWorkspaceCanvas : public GLCanvas {
     // 实际的帧更新时间-qt
     double actual_update_time{0};
 
+    // 平均帧更新时间-qt
+    double average_update_time{0};
+
     // 编辑器
     std::shared_ptr<MapEditor> editor;
 

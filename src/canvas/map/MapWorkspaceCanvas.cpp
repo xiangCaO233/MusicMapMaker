@@ -72,6 +72,8 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
 
     // 初始化判定线生成器
     judgelinegenerator = std::make_shared<JudgelineGenerator>(editor);
+
+    average_update_time = des_update_time;
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
@@ -126,6 +128,8 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
             .count();
     auto atime = time - lasttime;
     actual_update_time = double(atime) / 1000.0;
+    // 更新平均帧时间
+    average_update_time = (average_update_time + actual_update_time) / 2.0;
     if (lasttime > 0 &&
         actual_update_time - des_update_time > des_update_time) {
         auto log = tr("qt update substantially delayed:%1ms")
