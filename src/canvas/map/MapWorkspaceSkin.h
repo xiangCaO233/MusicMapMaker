@@ -46,6 +46,9 @@ enum class TexType {
     NODE = 4,
     SLIDE_END_LEFT = 5,
     SLIDE_END_RIGHT = 6,
+    BACKGROUND = 7,
+    ORBIT_BG = 8,
+    JUDGE_ORBIT = 9,
 };
 
 // 选中框纹理的方向
@@ -98,14 +101,17 @@ class MapWorkspaceSkin {
     json texture_config;
 
     json bg_texture_config;
-
-    json object_texture_config;
-
-    // 物件纹理缓存
+    // 背景纹理缓存
     std::unordered_map<
         TexType,
         std::unordered_map<ObjectStatus, std::shared_ptr<TextureInstace>>>
         object_texture_buffer;
+
+    json object_texture_config;
+
+    // 背景纹理缓存
+    std::unordered_map<TexType, std::shared_ptr<TextureInstace>>
+        bg_texture_buffer;
 
     json head_texture_config;
 
@@ -146,6 +152,12 @@ class MapWorkspaceSkin {
 
     // 载入皮肤
     void load_skin(const std::filesystem::path& skin_path);
+
+    // 获取轨道判定纹理
+    std::shared_ptr<TextureInstace>& get_orbit_judge_texture();
+
+    // 获取轨道底板纹理
+    std::shared_ptr<TextureInstace>& get_orbit_bg_texture();
 
     // 获取背景的纹理
     std::shared_ptr<TextureInstace>& get_skin_background_texture();

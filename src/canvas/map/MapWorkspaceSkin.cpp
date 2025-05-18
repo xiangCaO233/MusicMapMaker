@@ -156,11 +156,50 @@ std::string& MapWorkspaceSkin::get_sound_effect(SoundEffectType type) {
     return sound_effects[type];
 }
 
+// 获取轨道底板纹理
+std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_orbit_bg_texture() {
+    auto obg_texit = bg_texture_buffer.find(TexType::ORBIT_BG);
+    if (obg_texit == bg_texture_buffer.end()) {
+        obg_texit =
+            bg_texture_buffer
+                .try_emplace(
+                    TexType::ORBIT_BG,
+                    cvs->texture_full_map[bg_texture_config.value<std::string>(
+                        "orbit_background", "none")])
+                .first;
+    }
+    return obg_texit->second;
+}
+
+// 获取轨道判定纹理
+std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_orbit_judge_texture() {
+    auto ojudge_texit = bg_texture_buffer.find(TexType::JUDGE_ORBIT);
+    if (ojudge_texit == bg_texture_buffer.end()) {
+        ojudge_texit =
+            bg_texture_buffer
+                .try_emplace(
+                    TexType::JUDGE_ORBIT,
+                    cvs->texture_full_map[bg_texture_config.value<std::string>(
+                        "judge_orbit", "none")])
+                .first;
+    }
+    return ojudge_texit->second;
+}
+
 // 获取背景的纹理
 std::shared_ptr<TextureInstace>&
 MapWorkspaceSkin::get_skin_background_texture() {
-    return cvs->texture_full_map[bg_texture_config.value<std::string>(
-        "background", "none")];
+    auto bg_texit = bg_texture_buffer.find(TexType::BACKGROUND);
+    if (bg_texit == bg_texture_buffer.end()) {
+        bg_texit =
+            bg_texture_buffer
+                .try_emplace(
+                    TexType::BACKGROUND,
+                    cvs->texture_full_map[bg_texture_config.value<std::string>(
+                        "background", "none")])
+                .first;
+    }
+    return bg_texit->second;
 }
 
 // 获取精灵的纹理

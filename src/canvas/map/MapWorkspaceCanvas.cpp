@@ -32,7 +32,7 @@
 #include "../audio/BackgroundAudio.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
-#include "generator/OrbitGenerator.hpp"
+#include "generator/OrbitGenerator.h"
 #include "generator/general/HoldGenerator.h"
 #include "generator/general/NoteGenerator.h"
 #include "generator/general/SlideGenerator.h"
@@ -454,7 +454,7 @@ void MapWorkspaceCanvas::draw_preview_content() {
 }
 
 // 绘制轨道底板
-void MapWorkspaceCanvas::draw_orbits() {}
+void MapWorkspaceCanvas::draw_orbits() { orbitgenerator->generate(); }
 
 // 绘制判定线
 void MapWorkspaceCanvas::draw_judgeline() {
