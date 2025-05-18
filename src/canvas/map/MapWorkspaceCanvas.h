@@ -23,6 +23,7 @@
 #include "editor/MapEditor.h"
 #include "generator/AreaInfoGenerator.h"
 #include "generator/BeatGenerator.h"
+#include "generator/JudgelineGenerator.h"
 #include "generator/ObjectGenerator.h"
 #include "generator/OrbitGenerator.h"
 #include "generator/PreviewGenerator.h"
@@ -76,6 +77,9 @@ class MapWorkspaceCanvas : public GLCanvas {
 
     // 轨道生成器
     std::shared_ptr<OrbitGenerator> orbitgenerator;
+
+    // 判定线生成器
+    std::shared_ptr<JudgelineGenerator> judgelinegenerator;
 
     // 帧参数包队列
     std::unordered_map<RenderType, std::queue<RenderParamsBundle>> frame_params;

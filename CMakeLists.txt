@@ -213,6 +213,8 @@ set(PROJECT_SOURCES
     src/canvas/map/generator/general/SlideGenerator.cpp
     src/canvas/map/generator/OrbitGenerator.h
     src/canvas/map/generator/OrbitGenerator.cpp
+    src/canvas/map/generator/JudgelineGenerator.h
+    src/canvas/map/generator/JudgelineGenerator.cpp
     src/canvas/map/generator/BeatGenerator.h
     src/canvas/map/generator/BeatGenerator.cpp
     src/canvas/map/generator/AreaInfoGenerator.h

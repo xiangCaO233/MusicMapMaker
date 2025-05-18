@@ -69,6 +69,9 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
 
     // 初始化轨道生成器
     orbitgenerator = std::make_shared<OrbitGenerator>(editor);
+
+    // 初始化判定线生成器
+    judgelinegenerator = std::make_shared<JudgelineGenerator>(editor);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
@@ -457,17 +460,7 @@ void MapWorkspaceCanvas::draw_preview_content() {
 void MapWorkspaceCanvas::draw_orbits() { orbitgenerator->generate(); }
 
 // 绘制判定线
-void MapWorkspaceCanvas::draw_judgeline() {
-    auto current_size = size();
-
-    // 主区域判定线
-    renderer_manager->addLine(
-        QPointF(0, editor->ebuffer.judgeline_visual_position),
-        QPointF(
-            current_size.width() * (1 - editor->csettings.preview_width_scale),
-            editor->ebuffer.judgeline_visual_position),
-        8, nullptr, QColor(0, 255, 255, 235), false);
-}
+void MapWorkspaceCanvas::draw_judgeline() { judgelinegenerator->generate(); }
 
 // 绘制信息区
 void MapWorkspaceCanvas::draw_infoarea() { timegenerator->generate(); }
