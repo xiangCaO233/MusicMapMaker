@@ -85,7 +85,7 @@ void BeatGenerator::generate() {
                 if (divisor_time >=
                     editor_ref->ebuffer.current_abs_timing->timestamp) {
                     if (j == 0) {
-                        // 添加小节线头,粗一点6px
+                        // 添加小节线头,粗一点5px
                         // 固定使用白色
                         /*
                          *struct LineRenderData {
@@ -105,7 +105,7 @@ void BeatGenerator::generate() {
                             0, divisor_pos,
                             editor_ref->cstatus.canvas_size.width() *
                                 (1 - editor_ref->csettings.preview_width_scale),
-                            divisor_pos, 255, 255, 255, 255, 8);
+                            divisor_pos, 255, 255, 255, 255, 5);
                     } else {
                         auto divinfos =
                             editor_ref->canvas_ref->skin

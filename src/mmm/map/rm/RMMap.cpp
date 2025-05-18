@@ -117,47 +117,13 @@ std::shared_ptr<MapMetadata> RMMap::default_metadata() {
 
 // 插入物件
 void RMMap::insert_hitobject(std::shared_ptr<HitObject> hitobject) {
-    auto note = std::dynamic_pointer_cast<Note>(hitobject);
-    if (note) {
-        switch (note->note_type) {
-            case NoteType::COMPLEX: {
-                auto comp = std::static_pointer_cast<ComplexNote>(note);
-                for (const auto& child_note : comp->child_notes) {
-                    ++table_rows;
-                }
-                break;
-            }
-            default: {
-                ++table_rows;
-                break;
-            }
-        }
-    } else {
-        ++table_rows;
-    }
+    ++table_rows;
     MMap::insert_hitobject(hitobject);
 }
 
 // 移除物件
 void RMMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
-    auto note = std::dynamic_pointer_cast<Note>(hitobject);
-    if (note) {
-        switch (note->note_type) {
-            case NoteType::COMPLEX: {
-                auto comp = std::static_pointer_cast<ComplexNote>(note);
-                for (const auto& child_note : comp->child_notes) {
-                    --table_rows;
-                }
-                break;
-            }
-            default: {
-                --table_rows;
-                break;
-            }
-        }
-    } else {
-        --table_rows;
-    }
+    --table_rows;
     MMap::remove_hitobject(hitobject);
 }
 
