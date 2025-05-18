@@ -75,6 +75,11 @@ class MapEditor {
     // 重做
     void redo();
 
+    // 复制
+    void copy();
+    // 粘贴
+    void paste();
+
     // 画布鼠标事件接收和分发
     // 鼠标滚动
     void mouse_scrolled(QWheelEvent* e);

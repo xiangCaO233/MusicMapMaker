@@ -32,6 +32,7 @@
 #include "../audio/BackgroundAudio.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
+#include "generator/OrbitGenerator.hpp"
 #include "generator/general/HoldGenerator.h"
 #include "generator/general/NoteGenerator.h"
 #include "generator/general/SlideGenerator.h"
@@ -65,6 +66,9 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
 
     // 初始化预览生成器
     previewgenerator = std::make_shared<PreviewGenerator>(editor);
+
+    // 初始化轨道生成器
+    orbitgenerator = std::make_shared<OrbitGenerator>(editor);
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
@@ -277,12 +281,14 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_C: {
             if (modifiers & Qt::ControlModifier) {
                 // 复制
+                editor->copy();
             }
             break;
         }
         case Qt::Key_V: {
             if (modifiers & Qt::ControlModifier) {
                 // 粘贴
+                editor->paste();
             }
             break;
         }
@@ -446,6 +452,9 @@ void MapWorkspaceCanvas::draw_select_bound() {
 void MapWorkspaceCanvas::draw_preview_content() {
     previewgenerator->generate();
 }
+
+// 绘制轨道底板
+void MapWorkspaceCanvas::draw_orbits() {}
 
 // 绘制判定线
 void MapWorkspaceCanvas::draw_judgeline() {
