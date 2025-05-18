@@ -33,10 +33,15 @@
       "slide-effectdir": "打击特效/特效114514"
     },
     "hitobject": {
-      "head": {
+      "note": {
         "common": "物件/note.png",
         "hover": "物件/note_hover.png",
         "selected": "物件/note_selected.png"
+      },
+      "head": {
+        "common": "物件/head.png",
+        "hover": "物件/head_hover.png",
+        "selected": "物件/head_selected.png"
       },
       "node": {
         "common": "物件/node.png",
