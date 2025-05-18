@@ -74,23 +74,6 @@ RMMap::RMMap(std::shared_ptr<MMap> srcmap) {
     audio_pos_callback = srcmap->audio_pos_callback;
 
     // 初始化子类特有成员
-    // 表格行数默认0
-    // 统计表格行数
-    // 防止重复写出同一物件
-    std::unordered_map<std::shared_ptr<HitObject>, bool> readed_object;
-    for (const auto& hitobject : hitobjects) {
-        // 筛除面尾滑尾和包含组合键引用的物件和重复物件
-        // 优先写出完整组合键
-        if (!hitobject->is_note) continue;
-        auto note = std::static_pointer_cast<Note>(hitobject);
-        // 不写出处于组合键内的物件
-        if (!note || note->note_type == NoteType::COMPLEX) continue;
-        if (readed_object.find(note) == readed_object.end())
-            readed_object.insert({note, true});
-        else
-            continue;
-        ++table_rows;
-    }
     // 最大轨道数继承父类
     max_orbits = srcmap->orbits;
     // 版本字符串继承父类
@@ -101,6 +84,25 @@ RMMap::RMMap(std::shared_ptr<MMap> srcmap) {
     if (meta_it == metadatas.end()) {
         metadatas[MapMetadataType::IMD] = default_metadata();
     }
+
+    version = metadatas[MapMetadataType::IMD]->map_properties["version"];
+    // 统计表格行数
+    std::unordered_map<std::shared_ptr<HitObject>, bool> readed_object;
+    for (const auto& hitobject : hitobjects) {
+        // 筛除面尾滑尾和包含组合键引用的物件和重复物件
+        // 优先写出完整组合键
+        if (!hitobject->is_note) continue;
+        auto note = std::static_pointer_cast<Note>(hitobject);
+        // 不统计组合键
+        if (!note || note->note_type == NoteType::COMPLEX) continue;
+        if (readed_object.find(note) == readed_object.end())
+            readed_object.insert({note, true});
+        else
+            continue;
+        ++table_rows;
+    }
+    metadatas[MapMetadataType::IMD]->map_properties["table_rows"] =
+        std::to_string(table_rows);
 }
 
 RMMap::~RMMap() = default;
@@ -113,6 +115,52 @@ std::shared_ptr<MapMetadata> RMMap::default_metadata() {
     return meta;
 }
 
+// 插入物件
+void RMMap::insert_hitobject(std::shared_ptr<HitObject> hitobject) {
+    auto note = std::dynamic_pointer_cast<Note>(hitobject);
+    if (note) {
+        switch (note->note_type) {
+            case NoteType::COMPLEX: {
+                auto comp = std::static_pointer_cast<ComplexNote>(note);
+                for (const auto& child_note : comp->child_notes) {
+                    ++table_rows;
+                }
+                break;
+            }
+            default: {
+                ++table_rows;
+                break;
+            }
+        }
+    } else {
+        ++table_rows;
+    }
+    MMap::insert_hitobject(hitobject);
+}
+
+// 移除物件
+void RMMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
+    auto note = std::dynamic_pointer_cast<Note>(hitobject);
+    if (note) {
+        switch (note->note_type) {
+            case NoteType::COMPLEX: {
+                auto comp = std::static_pointer_cast<ComplexNote>(note);
+                for (const auto& child_note : comp->child_notes) {
+                    --table_rows;
+                }
+                break;
+            }
+            default: {
+                --table_rows;
+                break;
+            }
+        }
+    } else {
+        --table_rows;
+    }
+    MMap::remove_hitobject(hitobject);
+}
+
 // 写出到文件
 void RMMap::write_to_file(const char* path) {
     // 检查指定的文件名是否合法
@@ -121,6 +169,24 @@ void RMMap::write_to_file(const char* path) {
     if (!legal) {
         XWARN("文件输出名不符合imd规范,已修正为" + res);
     }
+
+    // 统计表格行数
+    auto ttable_rows = 0;
+    std::unordered_map<std::shared_ptr<HitObject>, bool> readed_object;
+    for (const auto& hitobject : hitobjects) {
+        // 筛除面尾滑尾和包含组合键引用的物件和重复物件
+        // 优先写出完整组合键
+        if (!hitobject->is_note) continue;
+        auto note = std::static_pointer_cast<Note>(hitobject);
+        // 不统计组合键
+        if (!note || note->note_type == NoteType::COMPLEX) continue;
+        if (readed_object.find(note) == readed_object.end())
+            readed_object.insert({note, true});
+        else
+            continue;
+        ++ttable_rows;
+    }
+    table_rows = ttable_rows;
 
     // 写出到指定文件
     std::ofstream os(res, std::ios::binary);

@@ -30,6 +30,12 @@ class RMMap : public MMap {
     // 版本--一般为ez,nm,hd,mx之类的
     std::string Version;
 
+    // 插入物件
+    void insert_hitobject(std::shared_ptr<HitObject> hitobject) override;
+
+    // 移除物件
+    void remove_hitobject(std::shared_ptr<HitObject> hitobject) override;
+
     // 从文件读取谱面
     void load_from_file(const char* path) override;
 
