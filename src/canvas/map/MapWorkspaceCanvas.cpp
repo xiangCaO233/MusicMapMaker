@@ -511,10 +511,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
             for (int i = 1; i <= frame_count; ++i) {
                 auto w =
                     effect_frame_texture->width *
-                    (editor->ebuffer.object_size_scale * 0.75 *
+                    (editor->ebuffer.object_size_scale *
                      working_map->project_reference->config.object_width_ratio);
                 auto h = effect_frame_texture->height *
-                         (editor->ebuffer.object_size_scale * 0.75 *
+                         (editor->ebuffer.object_size_scale *
                           working_map->project_reference->config
                               .object_height_ratio);
                 auto frame_texname =
@@ -536,10 +536,10 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
             for (int i = 1; i <= frame_count; ++i) {
                 auto w =
                     effect_frame_texture->width *
-                    (editor->ebuffer.object_size_scale * 0.75 *
+                    (editor->ebuffer.object_size_scale *
                      working_map->project_reference->config.object_width_ratio);
                 auto h = effect_frame_texture->height *
-                         (editor->ebuffer.object_size_scale * 0.75 *
+                         (editor->ebuffer.object_size_scale *
                           working_map->project_reference->config
                               .object_height_ratio);
                 auto frame_texname =
@@ -683,9 +683,12 @@ void MapWorkspaceCanvas::push_shape() {
         draw_orbits();
         // 生成区域信息
         areagenerator->generate();
+        // 绘制时间线
         if (editor->csettings.show_timeline) {
             draw_beats();
         }
+        // 绘制判定线
+        draw_judgeline();
 
         // 更新物件列表
         // 清除物件缓存
@@ -744,8 +747,6 @@ void MapWorkspaceCanvas::push_shape() {
         // 绘制选中区域
         draw_select_bound();
 
-        // 绘制判定线
-        draw_judgeline();
         // 绘制信息区域
         draw_infoarea();
         // 绘制顶部栏
