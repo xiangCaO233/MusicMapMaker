@@ -279,7 +279,8 @@ void EffectThread::effect_thread() {
                                                             ->slide_parameter *
                                                         ow;
                                                     frames =
-                                                        16 *
+                                                        canvas->skin
+                                                            .slide_hit_effect_frame_count *
                                                         (1 /
                                                          canvas->editor->cstatus
                                                              .playspeed);
@@ -298,7 +299,8 @@ void EffectThread::effect_thread() {
                                                 default: {
                                                     t = EffectType::NORMAL;
                                                     frames =
-                                                        30 *
+                                                        canvas->skin
+                                                            .nomal_hit_effect_frame_count *
                                                         (1 /
                                                          canvas->editor->cstatus
                                                              .playspeed);

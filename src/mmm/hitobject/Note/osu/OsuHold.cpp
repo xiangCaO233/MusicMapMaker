@@ -128,37 +128,76 @@ void OsuHold::from_osu_description(std::vector<std::string>& description,
      *x 与长键所在的键位有关。算法为：floor(x * 键位总数 / 512)，并限制在 0 和
      *键位总数 - 1 之间。 *y 不影响长键。默认值为 192，即游戏区域的水平中轴。
      */
-    // 位置
-    orbit = std::floor(std::stoi(description.at(0)) * orbit_count / 512);
-    // 没卵用-om固定192
-    // int y = std::stoi(description.at(1));
-    // 时间戳
-    timestamp = std::stoi(description.at(2));
-    note_type = NoteType::HOLD;
-    // 音效
-    sample = static_cast<NoteSample>(std::stoi(description.at(4)));
+    for (int i = 0; i < description.size(); ++i) {
+        switch (i) {
+            case 0: {
+                // 位置
+                orbit = std::floor(std::stoi(description.at(0)) * orbit_count /
+                                   512);
+                break;
+            }
+            case 1: {
+                // 没卵用-om固定192
+                // int y = std::stoi(description.at(1));
+                break;
+            }
+            case 2: {
+                // 时间戳
+                timestamp = std::stoi(description.at(2));
+                note_type = NoteType::HOLD;
+                break;
+            }
+            case 3: {
+                break;
+            }
+            case 4: {
+                // 音效
+                sample = static_cast<NoteSample>(std::stoi(description.at(4)));
+                break;
+            }
+            case 5: {
+                break;
+            }
+        }
+    }
 
     // 长条结束时间
     // 结束时间和音效组参数粘一起了
     // hold_time = std::stoi(description.at(5)) - timestamp;
     std::string token;
     std::istringstream noteiss(description.at(5));
+
+    // 最后一组的第一个参数就是结束时间
     std::vector<std::string> last_paras;
     while (std::getline(noteiss, token, ':')) {
         last_paras.push_back(token);
     }
-    // 最后一组的第一个参数就是结束时间
-    hold_time = std::stoi(last_paras.at(0)) - timestamp;
-
-    // 剩下四~五个是音效组参数
-    sample_group.normalSet =
-        static_cast<SampleSet>(std::stoi(last_paras.at(1)));
-    sample_group.additionalSet =
-        static_cast<NoteSample>(std::stoi(last_paras.at(2)));
-    sample_group.sampleSetParameter = std::stoi(last_paras.at(3));
-    sample_group.volume = std::stoi(last_paras.at(4));
-    if (last_paras.size() == 6) {
-        // 有指定key音文件
-        sample_group.sampleFile = last_paras.back();
+    for (int i = 0; i < last_paras.size(); ++i) {
+        switch (i) {
+            case 0: {
+                sample_group.normalSet =
+                    static_cast<SampleSet>(std::stoi(last_paras.at(0)));
+                break;
+            }
+            case 1: {
+                sample_group.additionalSet =
+                    static_cast<NoteSample>(std::stoi(last_paras.at(1)));
+                break;
+            }
+            case 2: {
+                sample_group.sampleSetParameter = std::stoi(last_paras.at(2));
+                break;
+            }
+            case 3: {
+                sample_group.volume = std::stoi(last_paras.at(3));
+                break;
+            }
+            case 4: {
+                // 有指定key音文件
+                sample_group.sampleFile = last_paras.at(4);
+                break;
+            }
+        }
     }
+    hold_time = std::stoi(last_paras.at(0)) - timestamp;
 }
