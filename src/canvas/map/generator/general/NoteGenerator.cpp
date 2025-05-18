@@ -19,13 +19,14 @@ NoteGenerator::~NoteGenerator() = default;
 // 生成物件渲染指令
 void NoteGenerator::generate(Note& note) {
     auto note_ptr = std::shared_ptr<HitObject>(&note, [](Note*) {});
+    auto texture = note.note_type == NoteType::NOTE
+                       ? editor_ref->ebuffer.note_texture
+                       : editor_ref->ebuffer.head_texture;
     auto note_size =
-        QSizeF(editor_ref->ebuffer.head_texture->width *
-                   editor_ref->ebuffer.object_size_scale *
+        QSizeF(texture->width * editor_ref->ebuffer.object_size_scale *
                    editor_ref->canvas_ref->working_map->project_reference
                        ->config.object_width_ratio,
-               editor_ref->ebuffer.head_texture->height *
-                   editor_ref->ebuffer.object_size_scale *
+               texture->height * editor_ref->ebuffer.object_size_scale *
                    editor_ref->canvas_ref->working_map->project_reference
                        ->config.object_height_ratio);
     double note_visual_time =
@@ -111,15 +112,16 @@ void NoteGenerator::generate(Note& note) {
 // 生成预览物件
 void NoteGenerator::generate_preview(Note& note) {
     auto note_ptr = std::shared_ptr<HitObject>(&note, [](Note*) {});
-    auto head_note_size =
-        QSizeF(editor_ref->ebuffer.head_texture->width *
-                   editor_ref->ebuffer.preview_object_size_scale *
-                   editor_ref->canvas_ref->working_map->project_reference
-                       ->config.object_width_ratio,
-               editor_ref->ebuffer.head_texture->height *
-                   editor_ref->ebuffer.preview_object_size_scale * 0.75 *
-                   editor_ref->canvas_ref->working_map->project_reference
-                       ->config.object_height_ratio);
+    auto texture = note.note_type == NoteType::NOTE
+                       ? editor_ref->ebuffer.note_texture
+                       : editor_ref->ebuffer.head_texture;
+    auto head_note_size = QSizeF(
+        texture->width * editor_ref->ebuffer.preview_object_size_scale *
+            editor_ref->canvas_ref->working_map->project_reference->config
+                .object_width_ratio,
+        texture->height * editor_ref->ebuffer.preview_object_size_scale * 0.75 *
+            editor_ref->canvas_ref->working_map->project_reference->config
+                .object_height_ratio);
     auto preview_height =
         editor_ref->cstatus.canvas_size.height() /
             editor_ref->canvas_ref->working_map->project_reference->config
