@@ -73,6 +73,9 @@ void MapEditor::redo() {
 // 复制
 void MapEditor::copy() {}
 
+// 剪切
+void MapEditor::cut() {}
+
 // 粘贴
 void MapEditor::paste() {}
 

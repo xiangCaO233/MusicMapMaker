@@ -29,6 +29,7 @@ void OrbitGenerator::generate() {
         orbit_xpos +=
             (editor_ref->ebuffer.orbit_width - orbit_texture_width) / 2.0;
 
+        // 可以直接拉伸-纵向
         editor_ref->canvas_ref->renderer_manager->texture_fillmode =
             TextureFillMode::FILL;
         // 绘制轨道背景

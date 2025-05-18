@@ -57,10 +57,14 @@ void HitObjectEditor::redo() {
 }
 
 // 复制
-void HitObjectEditor::copy() {}
+void HitObjectEditor::copy() {
+    // 获取选中物件
+}
 
 // 粘贴
-void HitObjectEditor::paste() {}
+void HitObjectEditor::paste() {
+    //
+}
 
 // 鼠标最近的分拍线的时间
 double HitObjectEditor::nearest_divisor_time() {

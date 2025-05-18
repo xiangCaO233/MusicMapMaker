@@ -50,6 +50,9 @@ class HitObjectEditor {
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
         editing_temp_objects;
 
+    // 剪切板
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> clipboard;
+
     // 鼠标按下事件-传递
     virtual void mouse_pressed(QMouseEvent* e);
     // 鼠标释放事件-传递
