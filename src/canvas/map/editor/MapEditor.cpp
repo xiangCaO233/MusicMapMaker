@@ -97,7 +97,11 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
         current_canvas_size.width() * csettings.preview_width_scale;
     // 物件头的纹理
     ebuffer.head_texture = canvas_ref->skin.get_object_texture(
-        TexType::NOTE_HEAD, ObjectStatus::COMMON);
+        TexType::HOLD_HEAD, ObjectStatus::COMMON);
+
+    // 普通键的纹理
+    ebuffer.note_texture = canvas_ref->skin.get_object_texture(
+        TexType::NORMAL_NOTE, ObjectStatus::COMMON);
 
     update_areas();
     if (!canvas_ref->working_map) return;

@@ -39,7 +39,7 @@ enum class ObjectStatus : int32_t {
 
 // 物件纹理类型
 enum class TexType {
-    NOTE_HEAD = 0,
+    HOLD_HEAD = 0,
     HOLD_BODY_VERTICAL = 1,
     HOLD_BODY_HORIZONTAL = 2,
     HOLD_END = 3,
@@ -49,6 +49,7 @@ enum class TexType {
     BACKGROUND = 7,
     ORBIT_BG = 8,
     JUDGE_ORBIT = 9,
+    NORMAL_NOTE = 10,
 };
 
 // 选中框纹理的方向
@@ -112,6 +113,8 @@ class MapWorkspaceSkin {
     // 背景纹理缓存
     std::unordered_map<TexType, std::shared_ptr<TextureInstace>>
         bg_texture_buffer;
+
+    json note_texture_config;
 
     json head_texture_config;
 

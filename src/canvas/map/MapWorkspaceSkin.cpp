@@ -55,6 +55,8 @@ void MapWorkspaceSkin::load_skin(const std::filesystem::path& skin_path) {
 
     object_texture_config = texture_config["hitobject"];
 
+    note_texture_config = object_texture_config["note"];
+
     head_texture_config = object_texture_config["head"];
 
     node_texture_config = object_texture_config["node"];
@@ -271,7 +273,11 @@ std::shared_ptr<TextureInstace>& MapWorkspaceSkin::get_object_texture(
         }
     }
     switch (type) {
-        case TexType::NOTE_HEAD: {
+        case TexType::NORMAL_NOTE: {
+            config = &note_texture_config;
+            break;
+        }
+        case TexType::HOLD_HEAD: {
             config = &head_texture_config;
             break;
         }

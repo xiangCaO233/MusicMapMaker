@@ -140,8 +140,11 @@ struct EditorBuffer {
     std::unordered_set<std::shared_ptr<HitObject>, RawPtrHash, RawPtrEqual>
         selected_hitobjects;
 
-    // 物件头的纹理
+    // 面条或滑键头的纹理
     std::shared_ptr<TextureInstace> head_texture;
+
+    // 普通键的纹理
+    std::shared_ptr<TextureInstace> note_texture;
 
     // 轨道宽度
     double orbit_width;
