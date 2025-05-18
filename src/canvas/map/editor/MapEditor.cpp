@@ -1,5 +1,7 @@
 #include "MapEditor.h"
 
+#include <qlogging.h>
+
 #include "../../../mmm/MapWorkProject.h"
 #include "../../mmm/Beat.h"
 #include "../../mmm/map/osu/OsuMap.h"

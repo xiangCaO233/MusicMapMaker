@@ -8,6 +8,7 @@
 #include "../../../../mmm/hitobject/Note/HoldEnd.h"
 #include "../../../../mmm/hitobject/Note/rm/Slide.h"
 #include "colorful-log.h"
+#include "editor/info/HoverInfo.h"
 
 // 构造IVMPlaceNoteHandler
 IVMPlaceNoteHandler::IVMPlaceNoteHandler() {}
@@ -40,14 +41,21 @@ bool IVMPlaceNoteHandler::handle(HitObjectEditor* oeditor_context,
 
             // 生成一个note信息快照记录鼠标按下时的位置信息
             // 记录物件快照
-            ivmobjecteditor->info_shortcuts.insert(std::shared_ptr<HitObject>(
-                ivmobjecteditor->current_edit_object->clone()));
+            auto shortcut = *ivmobjecteditor->info_shortcuts.insert(
+                std::shared_ptr<HitObject>(
+                    ivmobjecteditor->current_edit_object->clone()));
 
             // 放入编辑缓存
             ivmobjecteditor->editing_src_objects.clear();
             ivmobjecteditor->editing_temp_objects.insert(
                 std::shared_ptr<HitObject>(
                     ivmobjecteditor->current_edit_object->clone()));
+
+            // 放置temp物件同时生成缓存信息
+            ivmobjecteditor->hover_object_info_shortcut =
+                std::make_shared<HoverObjectInfo>();
+            ivmobjecteditor->hover_object_info_shortcut->hoverobj = shortcut;
+            ivmobjecteditor->hover_object_info_shortcut->part = HoverPart::HEAD;
 
             XINFO(QString("新增物件->[%1]")
                       .arg(ivmobjecteditor->current_edit_object->timestamp)

@@ -176,13 +176,19 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
         case Qt::MouseButton::LeftButton: {
             editor->cstatus.mouse_left_pressed = true;
             editor->cstatus.mouse_left_press_pos = event->pos();
+            if (!editor->cstatus.mouse_right_pressed) {
+                editor->mouse_pressed(event);
+            }
+            break;
         }
         case Qt::MouseButton::RightButton: {
             editor->cstatus.mouse_right_pressed = true;
+            if (!editor->cstatus.mouse_left_pressed) {
+                editor->mouse_pressed(event);
+            }
+            break;
         }
     }
-
-    editor->mouse_pressed(event);
 
     // qDebug() << event->button();
 }
@@ -192,14 +198,20 @@ void MapWorkspaceCanvas::mouseReleaseEvent(QMouseEvent *event) {
     // 传递事件
     GLCanvas::mouseReleaseEvent(event);
 
-    editor->mouse_released(event);
-
     switch (event->button()) {
         case Qt::MouseButton::LeftButton: {
+            if (!editor->cstatus.mouse_right_pressed) {
+                editor->mouse_released(event);
+            }
             editor->cstatus.mouse_left_pressed = false;
+            break;
         }
         case Qt::MouseButton::RightButton: {
+            if (!editor->cstatus.mouse_left_pressed) {
+                editor->mouse_released(event);
+            }
             editor->cstatus.mouse_right_pressed = false;
+            break;
         }
     }
 }
