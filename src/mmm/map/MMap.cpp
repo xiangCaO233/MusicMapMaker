@@ -2,7 +2,9 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <exception>
 #include <filesystem>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <mutex>
@@ -10,6 +12,7 @@
 #include <vector>
 
 #include "../../util/mutil.h"
+#include "../MapWorkProject.h"
 #include "../hitobject/HitObject.h"
 #include "../hitobject/Note/HoldEnd.h"
 #include "../hitobject/Note/Note.h"
@@ -30,9 +33,6 @@ MMap::MMap() {
 
 MMap::~MMap() = default;
 
-// 从文件读取谱面
-void MMap::load_from_file(const char* path) {}
-
 void write_note_json(json& notes_json, std::shared_ptr<HitObject> o) {
     auto note = std::dynamic_pointer_cast<Note>(o);
 
@@ -41,6 +41,31 @@ void write_note_json(json& notes_json, std::shared_ptr<HitObject> o) {
         note_json["time"] = note->timestamp;
         note_json["orbit"] = note->orbit;
         note_json["complex-info"] = static_cast<int>(note->compinfo);
+        std::string type_name;
+        switch (note->note_type) {
+            case NoteType::NOTE: {
+                type_name = "note";
+                break;
+            }
+            case NoteType::HOLD: {
+                auto hold = std::static_pointer_cast<Hold>(note);
+                note_json["duration"] = hold->hold_time;
+                type_name = "hold";
+                break;
+            }
+            case NoteType::SLIDE: {
+                auto slide = std::static_pointer_cast<Slide>(note);
+                note_json["orbit-alt"] = slide->slide_parameter;
+                type_name = "slide";
+                break;
+            }
+            default: {
+                type_name = "";
+                break;
+            }
+        }
+        note_json["type"] = type_name;
+
         // 元数据
         auto& metas_json = note_json["metas"];
         for (const auto& [type, metadata] : note->metadatas) {
@@ -62,6 +87,77 @@ void write_note_json(json& notes_json, std::shared_ptr<HitObject> o) {
         }
 
         notes_json.push_back(note_json);
+    }
+}
+// 从文件读取谱面
+void MMap::load_from_file(const char* path) {
+    try {
+        map_file_path = std::filesystem::path(path);
+        // 打开文件流
+        std::ifstream input_file(path);
+        // 解析JSON数据
+        json mapdata_json = json::parse(input_file);
+        // 读取json
+        title = mapdata_json["title"];
+        title_unicode = mapdata_json["title-unicode"];
+        artist = mapdata_json["artist"];
+        artist_unicode = mapdata_json["artist-unicode"];
+        version = mapdata_json["version"];
+        author = mapdata_json["author"];
+        preference_bpm = mapdata_json["preference-bpm"];
+        map_length = mapdata_json["maplength"];
+        orbits = mapdata_json["orbits"];
+        audio_file_rpath = std::filesystem::path(mapdata_json["music"]);
+        audio_file_abs_path = map_file_path.parent_path() / audio_file_rpath;
+
+        bg_rpath = std::filesystem::path(mapdata_json["bg"]);
+        bg_path = map_file_path.parent_path() / bg_rpath;
+
+        map_name = "[mmm] " + artist_unicode + " - " + title_unicode + " [" +
+                   std::to_string(orbits) + "k] " + "[" + version + "]";
+
+        // 先读取物件
+        auto notes_json = mapdata_json["notes"];
+        for (const auto& note_json : notes_json) {
+            auto type = note_json.value<std::string>("type", "note");
+            if (type == "note") {
+                auto note = std::make_shared<Note>(
+                    note_json.value<int32_t>("time", 0),
+                    note_json.value<int32_t>("orbit", 0));
+                hitobjects.insert(note);
+            } else if (type == "hold") {
+                auto hold = std::make_shared<Hold>(
+                    note_json.value<int32_t>("time", 0),
+                    note_json.value<int32_t>("orbit", 0),
+                    note_json.value<int32_t>("duration", 0));
+                auto hold_end = std::make_shared<HoldEnd>(hold);
+                hitobjects.insert(hold);
+                temp_hold_list.insert(hold);
+                hitobjects.insert(hold_end);
+            } else if (type == "slide") {
+                auto slide = std::make_shared<Slide>(
+                    note_json.value<int32_t>("time", 0),
+                    note_json.value<int32_t>("orbit", 0),
+                    note_json.value<int32_t>("orbit-alt", 1));
+                auto slide_end = std::make_shared<SlideEnd>(slide);
+                hitobjects.insert(slide);
+                hitobjects.insert(slide_end);
+            }
+        }
+
+        // 读取时间点数据
+        auto& timings_json = mapdata_json["timings"];
+        for (const auto& timing_json : timings_json) {
+            auto timing = std::make_shared<Timing>();
+            timing->timestamp = timing_json["time"];
+            timing->type = TimingType::GENERAL;
+            timing->is_base_timing = timing_json["isbase"];
+            timing->basebpm = timing_json["basebpm"];
+            timing->bpm = timing_json["bpm"];
+            insert_timing(timing);
+        }
+    } catch (std::exception e) {
+        std::cerr << e.what() << "\n";
     }
 }
 
@@ -89,6 +185,8 @@ void MMap::write_to_file(const char* path) {
         mapdata_json["preference-bpm"] = preference_bpm;
         mapdata_json["maplength"] = map_length;
         mapdata_json["orbits"] = orbits;
+        mapdata_json["music"] = audio_file_rpath.generic_string();
+        mapdata_json["bg"] = bg_rpath.generic_string();
 
         // 时间点数据
         auto& timings_json = mapdata_json["timings"];

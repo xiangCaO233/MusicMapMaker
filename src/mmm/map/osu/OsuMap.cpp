@@ -1047,6 +1047,7 @@ void OsuMap::load_from_file(const char* path) {
         }
         std::set<std::shared_ptr<Timing>, TimingComparator> basetimings;
         std::set<std::shared_ptr<Timing>, TimingComparator> notbasetimings;
+
         // 创建timing
         for (int i = 0; i < osureader.current_timing_index; i++) {
             // 按顺序读取timing点

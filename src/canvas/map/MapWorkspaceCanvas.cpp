@@ -29,6 +29,7 @@
 #include "../../mmm/hitobject/HitObject.h"
 #include "../../mmm/hitobject/Note/Note.h"
 #include "../../mmm/hitobject/Note/rm/ComplexNote.h"
+#include "../../util/mutil.h"
 #include "../audio/BackgroundAudio.h"
 #include "MapWorkspaceSkin.h"
 #include "editor/MapEditor.h"
@@ -312,6 +313,36 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
                 // 重做
                 editor->redo();
                 XWARN("已重做");
+            }
+            break;
+        }
+        case Qt::Key_S: {
+            if (modifiers & Qt::ControlModifier) {
+                // 直接保存
+                if (working_map) {
+                    auto dirpath = working_map->map_file_path.parent_path();
+
+                    if (working_map->project_reference->config
+                            .alway_save_asmmm) {
+                        // 保存为mmm
+                        auto def_filename = mutil::sanitizeFilename(
+                            working_map->title_unicode + "-" +
+                            std::to_string(working_map->orbits) + "k-" +
+                            working_map->version + ".mmm");
+                        auto map_path = dirpath / def_filename;
+                        working_map->write_to_file(
+                            map_path.generic_string().c_str());
+
+                    } else {
+                        // 覆盖原有的文件
+                        working_map->write_to_file(
+                            working_map->map_file_path.generic_string()
+                                .c_str());
+                    }
+                    XINFO("已保存");
+                } else {
+                    XWARN("未打开谱面");
+                }
             }
             break;
         }

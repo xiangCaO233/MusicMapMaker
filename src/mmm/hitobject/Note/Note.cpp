@@ -4,7 +4,7 @@
 
 #include "../../canvas/map/generator/ObjectGenerator.h"
 
-Note::Note(uint32_t time, int32_t orbit_pos)
+Note::Note(int32_t time, int32_t orbit_pos)
     : HitObject(time), orbit(orbit_pos) {
     is_note = true;
 

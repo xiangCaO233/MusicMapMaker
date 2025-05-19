@@ -328,9 +328,13 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
                 // 生成谱面名称
                 map->map_name = "[" + std::to_string(map->orbits) + "k] " +
                                 map->title + " " + map->version;
+
+                auto def_filename = mutil::sanitizeFilename(
+                    map->title_unicode + "-" + std::to_string(map->orbits) +
+                    "k-" + map->version + ".mmm");
+
                 // 谱面路径使用相对项目路径
-                map->map_file_path =
-                    selected_project->ppath / (map->map_name + ".mmm");
+                map->map_file_path = selected_project->ppath / def_filename;
 
                 // 添加map
                 selected_project->add_new_map(map);

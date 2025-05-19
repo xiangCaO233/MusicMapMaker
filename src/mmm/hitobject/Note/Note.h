@@ -27,7 +27,7 @@ enum class ComplexInfo : uint8_t {
 class Note : public HitObject {
    public:
     // 构造Note
-    explicit Note(uint32_t time, int32_t orbit_pos);
+    explicit Note(int32_t time, int32_t orbit_pos);
     // 析构Note
     ~Note() override;
 

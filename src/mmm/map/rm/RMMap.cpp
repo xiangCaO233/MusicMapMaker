@@ -399,6 +399,7 @@ void RMMap::load_from_file(const char* path) {
     auto file_presuffix = fnamestr.substr(0, first_pos);
     title_unicode = file_presuffix;
 
+    bool has_audio{true};
     // 前缀+.mp3作为音频文件名
     audio_file_abs_path =
         map_file_path.parent_path() / (file_presuffix + ".mp3");
@@ -409,7 +410,18 @@ void RMMap::load_from_file(const char* path) {
         if (!std::filesystem::exists(audio_file_abs_path)) {
             audio_file_abs_path =
                 map_file_path.parent_path() / (file_presuffix + ".ogg");
+            if (!std::filesystem::exists(audio_file_abs_path)) {
+                has_audio = false;
+            }
         }
+    }
+    if (!has_audio) {
+        audio_file_abs_path.clear();
+        XWARN("未找到音频文件");
+    } else {
+        // 计算相对路径
+        audio_file_rpath = std::filesystem::relative(
+            audio_file_abs_path, map_file_path.parent_path());
     }
 
     // 检查前缀+.png 或.jpg .jpeg有哪个用哪个作为bg

@@ -35,15 +35,15 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
     auto config_file_name = config.project_name + ".xml";
     config_xml_path = project_path / config_file_name;
 
-    static const std::unordered_set<std::string> map_extention = {".osu",
-                                                                  ".imd"};
+    static const std::unordered_set<std::string> map_extention = {
+        ".osu", ".imd", ".mmm"};
     static const std::unordered_set<std::string> audio_extention = {
         ".mp3", ".ogg", ".wav"};
     static const std::unordered_set<std::string> image_extention = {
         ".png", ".jpg", ".jpeg"};
     static const std::unordered_set<std::string> video_extention = {".mp4",
                                                                     ".mkv"};
-    // 打开目录中可载入文件(.osu,.imd,.mp3,.ogg,.wav,.png,.jpg,.jpeg,.mp4,.mkv)--到项目管理器
+    // 打开目录中可载入文件(.osu,.imd,.mmm,.mp3,.ogg,.wav,.png,.jpg,.jpeg,.mp4,.mkv)--到项目管理器
     // 遍历目录内容
     for (const auto& entry :
          std::filesystem::directory_iterator(project_path)) {
@@ -60,6 +60,9 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
             }
             if (extention == ".imd") {
                 map = std::make_shared<RMMap>();
+            }
+            if (extention == ".mmm") {
+                map = std::make_shared<MMap>();
             }
             maps.back()->load_from_file(map_file_string.c_str());
             // 初始化画布时间位置

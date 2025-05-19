@@ -50,6 +50,9 @@ struct ProjectConfig {
     // 默认分拍策略
     int32_t default_divisors{2};
 
+    // 总是保存为mmm文件
+    bool alway_save_asmmm{true};
+
     // 项目偏好编辑方式
     EditMethodPreference edit_method{EditMethodPreference::IVM};
 };

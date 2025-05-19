@@ -25,7 +25,7 @@ enum class HitObjectType {
 class HitObject {
    public:
     // 构造HitObject
-    explicit HitObject(uint32_t time);
+    explicit HitObject(int32_t time);
     // 析构HitObject
     virtual ~HitObject();
 
@@ -42,7 +42,7 @@ class HitObject {
     int32_t timestamp;
 
     // 拍信息
-    std::shared_ptr<Beat> beatinfo;
+    std::shared_ptr<Beat> beatinfo{nullptr};
 
     // 位置
     int32_t divpos{0};
