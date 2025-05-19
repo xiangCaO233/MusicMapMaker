@@ -51,14 +51,14 @@
        <widget class="QPushButton" name="cdup">
         <property name="minimumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="focusPolicy">
@@ -76,8 +76,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>16</width>
-          <height>16</height>
+          <width>14</width>
+          <height>14</height>
          </size>
         </property>
        </widget>
@@ -86,14 +86,14 @@
        <widget class="QPushButton" name="cdnext">
         <property name="minimumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="focusPolicy">
@@ -108,8 +108,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>16</width>
-          <height>16</height>
+          <width>14</width>
+          <height>14</height>
          </size>
         </property>
        </widget>
@@ -118,14 +118,14 @@
        <widget class="QPushButton" name="cdparent">
         <property name="minimumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="focusPolicy">
@@ -140,8 +140,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>16</width>
-          <height>16</height>
+          <width>14</width>
+          <height>14</height>
          </size>
         </property>
        </widget>
@@ -150,7 +150,7 @@
        <widget class="QLineEdit" name="address_line">
         <property name="font">
          <font>
-          <pointsize>16</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="focusPolicy">
@@ -165,14 +165,14 @@
        <widget class="QPushButton" name="address_confirm">
         <property name="minimumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="focusPolicy">
@@ -187,8 +187,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>16</width>
-          <height>16</height>
+          <width>14</width>
+          <height>14</height>
          </size>
         </property>
        </widget>
@@ -197,14 +197,14 @@
        <widget class="QPushButton" name="search">
         <property name="minimumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>28</width>
-          <height>28</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
         <property name="focusPolicy">
@@ -219,8 +219,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>16</width>
-          <height>16</height>
+          <width>14</width>
+          <height>14</height>
          </size>
         </property>
        </widget>

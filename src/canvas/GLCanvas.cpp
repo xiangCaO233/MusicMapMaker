@@ -69,6 +69,26 @@ GLCanvas::~GLCanvas() {
     // update_thread.join();
 };
 
+// 使用主题
+void GLCanvas::use_theme(GlobalTheme theme) {
+    switch (theme) {
+        case GlobalTheme::DARK: {
+            gl_clear_color[0] = .23f;
+            gl_clear_color[1] = .23f;
+            gl_clear_color[2] = .23f;
+            gl_clear_color[3] = 1.0f;
+            break;
+        }
+        case GlobalTheme::LIGHT: {
+            gl_clear_color[0] = .86f;
+            gl_clear_color[1] = .86f;
+            gl_clear_color[2] = .86f;
+            gl_clear_color[3] = 1.0f;
+            break;
+        }
+    }
+}
+
 // 更新fps显示
 void GLCanvas::updateFpsDisplay(int fps) {}
 
@@ -243,7 +263,8 @@ void GLCanvas::rendergl() {
     XLogger::drawcalls = 0;
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
     // 背景色
-    GLCALL(glClearColor(0.23f, 0.23f, 0.23f, 1.0f));
+    GLCALL(glClearColor(gl_clear_color[0], gl_clear_color[1], gl_clear_color[2],
+                        gl_clear_color[3]));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
     // 执行渲染

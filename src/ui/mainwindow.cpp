@@ -94,10 +94,17 @@ void MainWindow::use_theme(GlobalTheme theme) {
     switch (theme) {
         case GlobalTheme::DARK: {
             file_button_color = QColor(255, 255, 255);
+            QFile file(":/QtTheme/theme/Flat/Dark/Pink/Orange.qss");
+            file.open(QFile::ReadOnly);
+            setStyleSheet(file.readAll());
+
             break;
         }
         case GlobalTheme::LIGHT: {
             file_button_color = QColor(0, 0, 0);
+            QFile file(":/QtTheme/theme/Flat/Light/Brown/DeepOrange.qss");
+            file.open(QFile::ReadOnly);
+            setStyleSheet(file.readAll());
             break;
         }
     }

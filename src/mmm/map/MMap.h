@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <list>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -16,6 +17,8 @@
 #include "MapMetadata.h"
 #include "callback/AudioEnginPlayCallback.h"
 #include "threads/ThreadPool.h"
+
+using json = nlohmann::json;
 
 class MapWorkProject;
 
@@ -65,6 +68,9 @@ class MMap {
 
     // 线程池
     static ThreadPool map_pool;
+
+    // 谱面数据json
+    json mapdata_json;
 
     // 元数据集
     std::unordered_map<MapMetadataType, std::shared_ptr<MapMetadata>> metadatas;

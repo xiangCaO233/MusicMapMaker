@@ -264,7 +264,9 @@ include_directories(
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                    resources/glsrcs.qrc)
+                    resources/glsrcs.qrc
+                    themes/QtThemeDark/QtThemeDark.qrc
+                    themes/QtThemeLight/QtThemeLight.qrc)
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})

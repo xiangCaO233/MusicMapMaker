@@ -2,8 +2,11 @@
 #define M_UTIL_H
 
 #include <qcolor.h>
+#include <qcombobox.h>
 #include <qcontainerfwd.h>
 #include <qfiledialog.h>
+#include <qgridlayout.h>
+#include <qlabel.h>
 #include <qlineedit.h>
 #include <qlistview.h>
 #include <qmenu.h>
@@ -11,6 +14,7 @@
 #include <qsize.h>
 #include <qtoolbutton.h>
 #include <qtreeview.h>
+#include <qvariant.h>
 #include <unicode/ucnv.h>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
@@ -114,49 +118,120 @@ inline bool endsWithExtension(const std::filesystem::path& filepath,
     return false;
 }
 
-// 调用文件选择对话框选择保存文件
-inline QString getSaveDirectoryWithFilename(QWidget* parent,
-                                            const QString& title,
-                                            const QString& defaultFilename) {
+inline QString getSaveDirectoryWithFilename(
+    QWidget* parent, const QString& title, const QString& format_label,
+    const QMap<QString, QString>& formatFilters,
+    const QMap<QString, QString>& defaultFilenames,
+    const QString& defaultFormat = QString()) {
     QFileDialog dialog(parent, title, XLogger::last_select_directory);
 
-    // 设置为目录选择模式
+    // 基本设置
     dialog.setFileMode(QFileDialog::AnyFile);
-
-    // 允许用户输入文件名
     dialog.setAcceptMode(QFileDialog::AcceptSave);
-
-    // 设置默认文件名（可选）
-    if (!defaultFilename.isEmpty()) {
-        dialog.selectFile(defaultFilename);
-    }
-
-    // 强制使用Qt的对话框（非原生对话框），以便更好地控制
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
 
-    // 获取对话框中的QLineEdit（用于输入文件名）
-    QLineEdit* lineEdit = dialog.findChild<QLineEdit*>();
-    if (lineEdit && !defaultFilename.isEmpty()) {
-        lineEdit->setText(defaultFilename);
+    // 准备过滤器字符串
+    QStringList filterList;
+    for (auto it = formatFilters.begin(); it != formatFilters.end(); ++it) {
+        filterList.append(QString("%1 (*%2)").arg(it.key()).arg(it.value()));
+    }
+    dialog.setNameFilters(filterList);
+
+    // 创建格式选择组合框
+    QComboBox* formatCombo = new QComboBox(&dialog);
+    int defaultIndex = 0;
+    int currentIndex = 0;
+
+    for (auto it = formatFilters.begin(); it != formatFilters.end(); ++it) {
+        formatCombo->addItem(
+            it.key(), QVariant::fromValue(QPair<QString, QString>(
+                          it.value(), defaultFilenames.value(it.key()))));
+
+        // 检查是否是默认格式
+        if (it.key() == defaultFormat) {
+            defaultIndex = currentIndex;
+        }
+        currentIndex++;
     }
 
-    // 获取列表视图并设置为单选
-    QListView* listView = dialog.findChild<QListView*>("listView");
-    if (listView) {
+    // 将组合框添加到对话框布局
+    QGridLayout* layout = static_cast<QGridLayout*>(dialog.layout());
+    if (layout) {
+        int rowCount = layout->rowCount();
+        layout->addWidget(new QLabel(format_label, &dialog), rowCount, 0);
+        layout->addWidget(formatCombo, rowCount, 1);
+    }
+
+    // 设置默认选择
+    if (!formatFilters.isEmpty()) {
+        formatCombo->setCurrentIndex(defaultIndex);
+        dialog.selectNameFilter(filterList.value(defaultIndex));
+    }
+
+    // 获取文件名编辑框
+    QLineEdit* lineEdit = dialog.findChild<QLineEdit*>();
+
+    // 设置初始文件名
+    if (lineEdit && !formatFilters.isEmpty()) {
+        QString currentKey = formatFilters.keys().value(defaultIndex);
+        QString initialFilename =
+            defaultFilenames.value(currentKey, "untitled");
+        QString initialExtension = formatFilters.value(currentKey);
+        lineEdit->setText(initialFilename + initialExtension);
+    }
+
+    // 当格式改变时的处理
+    QObject::connect(
+        formatCombo, &QComboBox::currentIndexChanged, [&](int index) {
+            if (index < 0 || index >= formatFilters.size()) return;
+
+            // 获取当前选择的数据
+            QPair<QString, QString> data =
+                formatCombo->currentData().value<QPair<QString, QString>>();
+            QString selectedExtension = data.first;
+            QString defaultFilename = data.second;
+
+            // 更新文件名
+            if (lineEdit) {
+                QString newFilename =
+                    defaultFilename.isEmpty()
+                        ? QFileInfo(lineEdit->text()).completeBaseName()
+                        : defaultFilename;
+                newFilename += selectedExtension;
+                lineEdit->setText(newFilename);
+            }
+
+            // 更新文件过滤器
+            dialog.selectNameFilter(filterList.at(index));
+        });
+
+    // 设置单选模式
+    if (QListView* listView = dialog.findChild<QListView*>("listView")) {
         listView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
-
-    // 获取树视图并设置为单选
-    QTreeView* treeView = dialog.findChild<QTreeView*>();
-    if (treeView) {
+    if (QTreeView* treeView = dialog.findChild<QTreeView*>()) {
         treeView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
 
+    // 执行对话框
     if (dialog.exec() == QDialog::Accepted) {
         QStringList selected = dialog.selectedFiles();
         if (!selected.isEmpty()) {
-            // 返回完整路径（目录+文件名）
-            return selected.first();
+            // 确保文件名有正确的扩展名
+            QString selectedFile = selected.first();
+            QPair<QString, QString> data =
+                formatCombo->currentData().value<QPair<QString, QString>>();
+            QString expectedExtension = data.first;
+
+            if (!selectedFile.endsWith(expectedExtension,
+                                       Qt::CaseInsensitive)) {
+                // 如果用户输入的文件名没有正确的扩展名，自动添加
+                if (QFileInfo(selectedFile).suffix().isEmpty()) {
+                    selectedFile += expectedExtension;
+                }
+            }
+
+            return selectedFile;
         }
     }
 

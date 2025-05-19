@@ -156,6 +156,8 @@ void MEditorArea::use_theme(GlobalTheme theme) {
                                16, 16);
     mutil::set_button_svgcolor(ui->lock_edit_mode_button,
                                ":/icons/lock-open.svg", button_color, 16, 16);
+    // 设置画布区主题
+    ui->canvas_container->use_theme(theme);
 
     // 设置时间控制器主题
     ui->audio_time_controller->use_theme(theme);
@@ -532,31 +534,31 @@ void MEditorArea::on_save_map() {}
 void MEditorArea::on_save_map_as() {
     auto &map = canvas_container->canvas.data()->working_map;
     if (map) {
-        std::string initial_file_name;
-        switch (map->maptype) {
-            case MapType::MMMMAP: {
-                break;
-            }
-            case MapType::RMMAP: {
-                auto rmmap = std::static_pointer_cast<RMMap>(map);
-                initial_file_name = mutil::sanitizeFilename(
-                    rmmap->title_unicode + "_" + std::to_string(rmmap->orbits) +
-                    "k_" + rmmap->version + ".imd");
-                break;
-            }
-            case MapType::MALODYMAP: {
-                break;
-            }
-            case MapType::OSUMAP: {
-                auto omap = std::static_pointer_cast<OsuMap>(map);
-                initial_file_name = mutil::sanitizeFilename(
-                    omap->artist + " - " + omap->title + "(" + omap->author +
-                    ")" + "[" + omap->version + "]" + ".osu");
-                break;
-            }
-        }
+        QMap<QString, QString> formats;
+        auto mmmf = tr("mmm mapfile");
+        auto imdf = tr("imd mapfile");
+        auto osuf = tr("osu mapfile");
+        formats[mmmf] = ".mmm";
+        formats[imdf] = ".imd";
+        formats[osuf] = ".osu";
+
+        QMap<QString, QString> defaultNames;
+
+        defaultNames[mmmf] = QString::fromStdString(mutil::sanitizeFilename(
+            map->title_unicode + "-" + std::to_string(map->orbits) + "k-" +
+            map->version));
+        defaultNames[imdf] = QString::fromStdString(mutil::sanitizeFilename(
+            map->title_unicode + "_" + std::to_string(map->orbits) + "k_" +
+            map->version));
+        defaultNames[osuf] = QString::fromStdString(mutil::sanitizeFilename(
+            map->artist + " - " + map->title + "(" + map->author + ")" + "[" +
+            map->version + "]"));
+
+        // 指定PNG Image作为默认格式
         auto selected_file = mutil::getSaveDirectoryWithFilename(
-            this, tr("save as"), QString::fromStdString(initial_file_name));
+            this, tr("Save As"), tr("File Formats:"), formats, defaultNames,
+            mmmf);
+
         if (selected_file != "") {
             XINFO("尝试保存到:" + selected_file.toStdString());
             map->write_to_file(selected_file.toStdString().c_str());

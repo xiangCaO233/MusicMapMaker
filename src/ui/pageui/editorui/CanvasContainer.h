@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "../../GlobalSettings.h"
 #include "MapWorkspaceCanvas.h"
 
 class CanvasContainer : public QWidget {
@@ -12,11 +13,17 @@ class CanvasContainer : public QWidget {
     // 析构CanvasContainer
     ~CanvasContainer() override;
 
+    // 当前主题
+    GlobalTheme current_theme;
+
     // 画布本体
     QScopedPointer<MapWorkspaceCanvas> canvas;
 
     // 用于嵌入 QOpenGLWindow
     QWidget* container;
+
+    // 使用主题
+    void use_theme(GlobalTheme theme);
 };
 
 #endif  // M_CANVASCONTAINER_H

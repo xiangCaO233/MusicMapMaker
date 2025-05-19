@@ -23,3 +23,6 @@ CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
 
 // 析构CanvasContainer
 CanvasContainer::~CanvasContainer() = default;
+
+// 使用主题
+void CanvasContainer::use_theme(GlobalTheme theme) { canvas->use_theme(theme); }
