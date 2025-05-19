@@ -685,6 +685,9 @@ void MapWorkspaceCanvas::push_shape() {
     if (working_map) {
         // 绘制轨道背景
         draw_orbits();
+
+        std::lock_guard<std::mutex> lock(working_map->hitobjects_mutex);
+
         // 生成区域信息
         areagenerator->generate();
         // 绘制时间线

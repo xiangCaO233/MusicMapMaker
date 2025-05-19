@@ -10,6 +10,7 @@ class Beat;
 
 // 基本打击物件---之后可以实现更多音游的物件
 enum class HitObjectType {
+    NONE,
     NOTE,
     HOLD,
     HOLDEND,
@@ -29,7 +30,7 @@ class HitObject {
     virtual ~HitObject();
 
     // 物件具体类型-可直接static转化
-    HitObjectType object_type;
+    HitObjectType object_type{HitObjectType::NONE};
 
     // 是否为note
     bool is_note{false};

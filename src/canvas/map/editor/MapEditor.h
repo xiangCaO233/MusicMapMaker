@@ -55,6 +55,9 @@ class MapEditor {
     // 编辑方式-ivm或mmm
     EditMethodPreference edit_method;
 
+    // 是否是剪切操作
+    bool is_cut{false};
+
     // 编辑
     // 物件编辑器
     std::unordered_map<EditMethodPreference, std::shared_ptr<HitObjectEditor>>

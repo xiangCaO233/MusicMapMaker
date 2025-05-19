@@ -375,6 +375,7 @@ void MapEditor::mouse_scrolled(QWheelEvent* e) {
 
     switch (cstatus.operation_area) {
         case MouseOperationArea::EDIT: {
+            if (!cstatus.canvas_pasued) return;
             // 编辑区
             if (modifiers & Qt::ControlModifier) {
                 // 在编辑区-按下controll滚动

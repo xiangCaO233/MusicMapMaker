@@ -268,7 +268,7 @@ void MMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
 
 // 执行操作
 void MMap::execute_edit_operation(ObjEditOperation& operation) {
-    // TODO(xiang 2025-05-08): 实现执行操作
+    std::lock_guard<std::mutex> lock(hitobjects_mutex);
 
     bool remove_parent{false};
     // 移除src的物件
@@ -669,7 +669,6 @@ void MMap::query_object_in_range(
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>&
         result_objects,
     int32_t start, const int32_t end, bool with_longhold) {
-    std::unique_lock<std::mutex> lock(hitobjects_mutex);
     /*
      *lower_bound(key)	返回第一个 ≥ key 的元素的迭代器。
      *upper_bound(key)	返回第一个 > key 的元素的迭代器。

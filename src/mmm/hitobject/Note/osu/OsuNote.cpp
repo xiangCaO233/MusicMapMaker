@@ -132,38 +132,40 @@ void OsuNote::from_osu_description(std::vector<std::string>& description,
     sample = static_cast<NoteSample>(std::stoi(description.at(4)));
     // XINFO("load note:" + s);
 
-    // 单键:剩下的就是音效组参数
-    std::string token;
-    std::istringstream noteiss(description.at(5));
-    std::vector<std::string> last_paras;
-    while (std::getline(noteiss, token, ':')) {
-        last_paras.push_back(token);
-    }
-
-    for (int i = 0; i < last_paras.size(); ++i) {
-        switch (i) {
-            case 0: {
-                sample_group.normalSet =
-                    static_cast<SampleSet>(std::stoi(last_paras.at(0)));
-                break;
-            }
-            case 1: {
-                sample_group.additionalSet =
-                    static_cast<NoteSample>(std::stoi(last_paras.at(1)));
-                break;
-            }
-            case 2: {
-                sample_group.sampleSetParameter = std::stoi(last_paras.at(2));
-                break;
-            }
-            case 3: {
-                sample_group.volume = std::stoi(last_paras.at(3));
-                break;
-            }
-            case 4: {
-                // 有指定key音文件
-                sample_group.sampleFile = last_paras.at(4);
-                break;
+    if (description.size() >= 6) {
+        // 单键:剩下的就是音效组参数
+        std::string token;
+        std::istringstream noteiss(description.at(5));
+        std::vector<std::string> last_paras;
+        while (std::getline(noteiss, token, ':')) {
+            last_paras.push_back(token);
+        }
+        for (int i = 0; i < last_paras.size(); ++i) {
+            switch (i) {
+                case 0: {
+                    sample_group.normalSet =
+                        static_cast<SampleSet>(std::stoi(last_paras.at(0)));
+                    break;
+                }
+                case 1: {
+                    sample_group.additionalSet =
+                        static_cast<NoteSample>(std::stoi(last_paras.at(1)));
+                    break;
+                }
+                case 2: {
+                    sample_group.sampleSetParameter =
+                        std::stoi(last_paras.at(2));
+                    break;
+                }
+                case 3: {
+                    sample_group.volume = std::stoi(last_paras.at(3));
+                    break;
+                }
+                case 4: {
+                    // 有指定key音文件
+                    sample_group.sampleFile = last_paras.at(4);
+                    break;
+                }
             }
         }
     }

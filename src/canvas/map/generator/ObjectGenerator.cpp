@@ -4,6 +4,8 @@
 
 #include "../MapWorkspaceCanvas.h"
 #include "../editor/MapEditor.h"
+#include "mmm/hitobject/Note/Hold.h"
+#include "mmm/hitobject/Note/HoldEnd.h"
 #include "mmm/hitobject/Note/Note.h"
 
 // 图形渲染数据队列(确定层级)
@@ -46,9 +48,18 @@ void ObjectGenerator::dump_nodes_to_queue(bool is_over_current_time) {
 
             // 选中组合键的节点(节点是相当于那一物件的尾)
             editor_ref->ebuffer.hover_object_info =
-                std::make_shared<HoverObjectInfo>(notereference,
-                                                  notereference->beatinfo,
-                                                  HoverPart::COMPLEX_NODE);
+                std::make_shared<HoverObjectInfo>();
+
+            // TODO(xiang 2025-05-19): 记得实现新建物件的拍信息-暂时防止段错误
+            editor_ref->ebuffer.hover_object_info->hoverobj = notereference;
+            if (!notereference->beatinfo) {
+                editor_ref->ebuffer.hover_object_info->hoverbeat = nullptr;
+            } else {
+                editor_ref->ebuffer.hover_object_info->hoverbeat =
+                    notereference->beatinfo;
+            }
+            editor_ref->ebuffer.hover_object_info->part =
+                HoverPart::COMPLEX_NODE;
 
             editor_ref->cstatus.is_hover_note = true;
         } else if (is_node_in_selected_bound ||
