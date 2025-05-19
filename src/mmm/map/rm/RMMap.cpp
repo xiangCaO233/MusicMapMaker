@@ -25,7 +25,7 @@ BinaryReader::~BinaryReader() = default;
 RMMap::RMMap() {
     maptype = MapType::RMMAP;
     // 注册元数据
-    register_metadata(MapMetadataType::IMD);
+    register_metadata(MapMetadataType::MIMD);
 }
 
 // 通过父类构造
@@ -80,12 +80,12 @@ RMMap::RMMap(std::shared_ptr<MMap> srcmap) {
     Version = srcmap->version;
 
     // 查找元数据表-不存在则创建
-    auto meta_it = metadatas.find(MapMetadataType::IMD);
+    auto meta_it = metadatas.find(MapMetadataType::MIMD);
     if (meta_it == metadatas.end()) {
-        metadatas[MapMetadataType::IMD] = default_metadata();
+        metadatas[MapMetadataType::MIMD] = default_metadata();
     }
 
-    version = metadatas[MapMetadataType::IMD]->map_properties["version"];
+    version = metadatas[MapMetadataType::MIMD]->map_properties["version"];
     // 统计表格行数
     std::unordered_map<std::shared_ptr<HitObject>, bool> readed_object;
     for (const auto& hitobject : hitobjects) {
@@ -101,7 +101,7 @@ RMMap::RMMap(std::shared_ptr<MMap> srcmap) {
             continue;
         ++table_rows;
     }
-    metadatas[MapMetadataType::IMD]->map_properties["table_rows"] =
+    metadatas[MapMetadataType::MIMD]->map_properties["table_rows"] =
         std::to_string(table_rows);
 }
 
@@ -129,6 +129,11 @@ void RMMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
 
 // 写出到文件
 void RMMap::write_to_file(const char* path) {
+    auto p = std::filesystem::path(path);
+    if (mutil::endsWithExtension(p, ".mmm")) {
+        MMap::write_to_file(path);
+        return;
+    }
     // 检查指定的文件名是否合法
     std::string res;
     auto legal = is_write_file_legal(path, res);
@@ -421,6 +426,11 @@ void RMMap::load_from_file(const char* path) {
     }
     if (!has_bg) {
         bg_path.clear();
+        XWARN("未找到背景图片");
+    } else {
+        // 计算相对路径
+        bg_rpath =
+            std::filesystem::relative(bg_path, map_file_path.parent_path());
     }
 
     XINFO("路径:" + map_file_path.string());
@@ -646,7 +656,7 @@ void RMMap::load_from_file(const char* path) {
     });
 
     // 填充元数据
-    metadatas[MapMetadataType::IMD]->map_properties["version"] = version;
-    metadatas[MapMetadataType::IMD]->map_properties["table_rows"] =
+    metadatas[MapMetadataType::MIMD]->map_properties["version"] = version;
+    metadatas[MapMetadataType::MIMD]->map_properties["table_rows"] =
         std::to_string(table_rows);
 }

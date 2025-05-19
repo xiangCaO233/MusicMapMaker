@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "../../Metadata.h"
 #include "../HitObject.h"
 
 class ComplexNote;
@@ -16,11 +17,11 @@ enum class NoteType : uint8_t {
     NOTE = 0x00,
 };
 
-enum class ComplexInfo {
-    NONE,
-    HEAD,
-    BODY,
-    END,
+enum class ComplexInfo : uint8_t {
+    NONE = 0,
+    HEAD = 0x60,
+    BODY = 0x20,
+    END = 0xa0,
 };
 
 class Note : public HitObject {
@@ -32,6 +33,10 @@ class Note : public HitObject {
 
     // 物件类型
     NoteType note_type;
+
+    // 元数据集
+    std::unordered_map<NoteMetadataType, std::shared_ptr<NoteMetadata>>
+        metadatas;
 
     // 物件所处轨道
     int32_t orbit;

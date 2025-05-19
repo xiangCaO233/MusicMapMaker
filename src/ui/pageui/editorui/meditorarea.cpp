@@ -156,6 +156,9 @@ void MEditorArea::use_theme(GlobalTheme theme) {
                                16, 16);
     mutil::set_button_svgcolor(ui->lock_edit_mode_button,
                                ":/icons/lock-open.svg", button_color, 16, 16);
+
+    ratio_button->setStyleSheet("color: " + button_color.name());
+
     // 设置画布区主题
     ui->canvas_container->use_theme(theme);
 
@@ -283,8 +286,7 @@ void MEditorArea::initialize_toolbuttons() {
     static int div_ratio = 2;
     static int slide_ratio = 1;
 
-    ratio_button = new QPushButton("2");
-    ratio_button->setFlat(true);
+    ratio_button = new QPushButton("2", customdivosorsliderWidget);
     ratio_button->setMinimumSize(QSize(24, 24));
     ratio_button->setMaximumSize(QSize(24, 24));
     ratio_button->setToolTip(tr("Change beat type"));

@@ -84,7 +84,7 @@ void OsuFileReader::parse_line(const std::string& line) {
 OsuMap::OsuMap() {
     maptype = MapType::OSUMAP;
     // 注册元数据
-    register_metadata(MapMetadataType::OSU);
+    register_metadata(MapMetadataType::MOSU);
 }
 // 通过父类构造
 OsuMap::OsuMap(std::shared_ptr<MMap> srcmap) {
@@ -121,84 +121,84 @@ OsuMap::OsuMap(std::shared_ptr<MMap> srcmap) {
     audio_pos_callback = srcmap->audio_pos_callback;
 
     // 查找元数据表-不存在则创建
-    auto meta_it = metadatas.find(MapMetadataType::OSU);
+    auto meta_it = metadatas.find(MapMetadataType::MOSU);
     if (meta_it == metadatas.end()) {
-        metadatas[MapMetadataType::OSU] = default_metadata();
+        metadatas[MapMetadataType::MOSU] = default_metadata();
     }
 
     // General 章节
     AudioFilename =
-        metadatas[MapMetadataType::OSU]->map_properties["AudioFilename"];
+        metadatas[MapMetadataType::MOSU]->map_properties["AudioFilename"];
     AudioLeadIn = std::stoi(
-        metadatas[MapMetadataType::OSU]->map_properties["AudioLeadIn"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["AudioLeadIn"]);
     PreviewTime = std::stoi(
-        metadatas[MapMetadataType::OSU]->map_properties["PreviewTime"]);
-    Countdown =
-        std::stoi(metadatas[MapMetadataType::OSU]->map_properties["Countdown"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["PreviewTime"]);
+    Countdown = std::stoi(
+        metadatas[MapMetadataType::MOSU]->map_properties["Countdown"]);
     sample_set = static_cast<SampleSet>(std::stoi(
-        metadatas[MapMetadataType::OSU]->map_properties["SampleSet"]));
+        metadatas[MapMetadataType::MOSU]->map_properties["SampleSet"]));
     StackLeniency = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["StackLeniency"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["StackLeniency"]);
     LetterboxInBreaks =
-        std::stoi(metadatas[MapMetadataType::OSU]
+        std::stoi(metadatas[MapMetadataType::MOSU]
                       ->map_properties["LetterboxInBreaks"]) != 0;
-    UseSkinSprites = std::stoi(metadatas[MapMetadataType::OSU]
+    UseSkinSprites = std::stoi(metadatas[MapMetadataType::MOSU]
                                    ->map_properties["UseSkinSprites"]) != 0;
     OverlayPosition =
-        metadatas[MapMetadataType::OSU]->map_properties["OverlayPosition"];
-    EpilepsyWarning = std::stoi(metadatas[MapMetadataType::OSU]
+        metadatas[MapMetadataType::MOSU]->map_properties["OverlayPosition"];
+    EpilepsyWarning = std::stoi(metadatas[MapMetadataType::MOSU]
                                     ->map_properties["EpilepsyWarning"]) != 0;
     CountdownOffset = std::stoi(
-        metadatas[MapMetadataType::OSU]->map_properties["CountdownOffset"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["CountdownOffset"]);
     SpecialStyle =
         std::stoi(
-            metadatas[MapMetadataType::OSU]->map_properties["SpecialStyle"]) !=
+            metadatas[MapMetadataType::MOSU]->map_properties["SpecialStyle"]) !=
         0;
     WidescreenStoryboard =
-        std::stoi(metadatas[MapMetadataType::OSU]
+        std::stoi(metadatas[MapMetadataType::MOSU]
                       ->map_properties["WidescreenStoryboard"]) != 0;
     SamplesMatchPlaybackRate =
-        std::stoi(metadatas[MapMetadataType::OSU]
+        std::stoi(metadatas[MapMetadataType::MOSU]
                       ->map_properties["SamplesMatchPlaybackRate"]) != 0;
 
     // Editor 章节
     DistanceSpacing = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["DistanceSpacing"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["DistanceSpacing"]);
     BeatDivisor = std::stoi(
-        metadatas[MapMetadataType::OSU]->map_properties["BeatDivisor"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["BeatDivisor"]);
     GridSize =
-        std::stoi(metadatas[MapMetadataType::OSU]->map_properties["GridSize"]);
+        std::stoi(metadatas[MapMetadataType::MOSU]->map_properties["GridSize"]);
     TimelineZoom = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["TimelineZoom"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["TimelineZoom"]);
 
     // Metadata 章节
-    Title = metadatas[MapMetadataType::OSU]->map_properties["Title"];
+    Title = metadatas[MapMetadataType::MOSU]->map_properties["Title"];
     TitleUnicode =
-        metadatas[MapMetadataType::OSU]->map_properties["TitleUnicode"];
-    Artist = metadatas[MapMetadataType::OSU]->map_properties["Artist"];
+        metadatas[MapMetadataType::MOSU]->map_properties["TitleUnicode"];
+    Artist = metadatas[MapMetadataType::MOSU]->map_properties["Artist"];
     ArtistUnicode =
-        metadatas[MapMetadataType::OSU]->map_properties["ArtistUnicode"];
-    Creator = metadatas[MapMetadataType::OSU]->map_properties["Creator"];
-    Version = metadatas[MapMetadataType::OSU]->map_properties["Version"];
-    Source = metadatas[MapMetadataType::OSU]->map_properties["Source"];
-    BeatmapID =
-        std::stoi(metadatas[MapMetadataType::OSU]->map_properties["BeatmapID"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["ArtistUnicode"];
+    Creator = metadatas[MapMetadataType::MOSU]->map_properties["Creator"];
+    Version = metadatas[MapMetadataType::MOSU]->map_properties["Version"];
+    Source = metadatas[MapMetadataType::MOSU]->map_properties["Source"];
+    BeatmapID = std::stoi(
+        metadatas[MapMetadataType::MOSU]->map_properties["BeatmapID"]);
     BeatmapSetID = std::stoi(
-        metadatas[MapMetadataType::OSU]->map_properties["BeatmapSetID"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["BeatmapSetID"]);
 
     // Difficulty 章节
     HPDrainRate = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["HPDrainRate"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["HPDrainRate"]);
     CircleSize = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["CircleSize"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["CircleSize"]);
     OverallDifficulty = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["OverallDifficulty"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["OverallDifficulty"]);
     ApproachRate = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["ApproachRate"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["ApproachRate"]);
     SliderMultiplier = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["SliderMultiplier"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["SliderMultiplier"]);
     SliderTickRate = std::stod(
-        metadatas[MapMetadataType::OSU]->map_properties["SliderTickRate"]);
+        metadatas[MapMetadataType::MOSU]->map_properties["SliderTickRate"]);
 
     // 如果父类有相关数据，覆盖默认值
     if (!srcmap->title.empty()) Title = srcmap->title;
@@ -288,6 +288,12 @@ std::shared_ptr<MapMetadata> OsuMap::default_metadata() {
 
 // 写出到文件
 void OsuMap::write_to_file(const char* path) {
+    auto p = std::filesystem::path(path);
+    if (mutil::endsWithExtension(p, ".mmm")) {
+        MMap::write_to_file(path);
+        return;
+    }
+
     std::string res;
     std::string slashn;
 #ifdef _WIN32
@@ -299,7 +305,7 @@ void OsuMap::write_to_file(const char* path) {
     if (!is_write_file_legal(path, res)) {
         XWARN("写出路径不合法,已修正到项目路径");
     }
-    auto& meta = metadatas[MapMetadataType::OSU]->map_properties;
+    auto& meta = metadatas[MapMetadataType::MOSU]->map_properties;
     std::ofstream os(res);
     // 写出文件
     os << "osu file format v" << file_format_version << slashn << slashn;
@@ -970,6 +976,8 @@ void OsuMap::load_from_file(const char* path) {
         }
         bg_path = std::filesystem::path(map_file_path.parent_path().string() +
                                         "/" + bg_file_name);
+        bg_rpath =
+            std::filesystem::relative(bg_path, map_file_path.parent_path());
         if (background_paras.size() >= 5) {
             bgxoffset = std::stoi(background_paras.at(3));
             bgyoffset = std::stoi(background_paras.at(4));
@@ -1110,41 +1118,43 @@ void OsuMap::load_from_file(const char* path) {
 
         // 填充元数据
         // general
-        metadatas[MapMetadataType::OSU]->map_properties["AudioFilename"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["AudioFilename"] =
             AudioFilename;
-        metadatas[MapMetadataType::OSU]->map_properties["AudioLeadIn"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["AudioLeadIn"] =
             AudioLeadIn;
-        metadatas[MapMetadataType::OSU]->map_properties["AudioLeadHash"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["AudioLeadHash"] =
             AudioHash;
-        metadatas[MapMetadataType::OSU]->map_properties["PreviewTime"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["PreviewTime"] =
             std::to_string(PreviewTime);
-        metadatas[MapMetadataType::OSU]->map_properties["Countdown"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["Countdown"] =
             std::to_string(Countdown);
-        metadatas[MapMetadataType::OSU]->map_properties["SampleSet"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["SampleSet"] =
             std::to_string(static_cast<uint32_t>(sample_set));
-        metadatas[MapMetadataType::OSU]->map_properties["StackLeniency"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["StackLeniency"] =
             std::to_string(StackLeniency);
-        metadatas[MapMetadataType::OSU]->map_properties["LetterboxInBreaks"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["LetterboxInBreaks"] =
             std::to_string(int(LetterboxInBreaks));
-        metadatas[MapMetadataType::OSU]->map_properties["StoryFireInFront"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["StoryFireInFront"] =
             std::to_string(int(StoryFireInFront));
-        metadatas[MapMetadataType::OSU]->map_properties["UseSkinSprites"] = "0";
-        metadatas[MapMetadataType::OSU]->map_properties["AlwaysShowPlayfield"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["UseSkinSprites"] =
+            "0";
+        metadatas[MapMetadataType::MOSU]
+            ->map_properties["AlwaysShowPlayfield"] =
             std::to_string(int(AlwaysShowPlayfield));
-        metadatas[MapMetadataType::OSU]->map_properties["OverlayPosition"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["OverlayPosition"] =
             OverlayPosition;
-        metadatas[MapMetadataType::OSU]->map_properties["SkinPreference"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["SkinPreference"] =
             SkinPreference;
-        metadatas[MapMetadataType::OSU]->map_properties["EpilepsyWarning"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["EpilepsyWarning"] =
             std::to_string(int(EpilepsyWarning));
-        metadatas[MapMetadataType::OSU]->map_properties["CountdownOffset"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["CountdownOffset"] =
             std::to_string(CountdownOffset);
-        metadatas[MapMetadataType::OSU]->map_properties["SpecialStyle"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["SpecialStyle"] =
             std::to_string(int(SpecialStyle));
-        metadatas[MapMetadataType::OSU]
+        metadatas[MapMetadataType::MOSU]
             ->map_properties["WidescreenStoryboard"] =
             std::to_string(WidescreenStoryboard);
-        metadatas[MapMetadataType::OSU]
+        metadatas[MapMetadataType::MOSU]
             ->map_properties["SamplesMatchPlaybackRate"] =
             std::to_string(int(SamplesMatchPlaybackRate));
 
@@ -1158,27 +1168,27 @@ void OsuMap::load_from_file(const char* path) {
             Bookmarks_str.pop_back();
         }
 
-        metadatas[MapMetadataType::OSU]->map_properties["Bookmarks"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["Bookmarks"] =
             Bookmarks_str;
-        metadatas[MapMetadataType::OSU]->map_properties["DistanceSpacing"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["DistanceSpacing"] =
             std::to_string(DistanceSpacing);
-        metadatas[MapMetadataType::OSU]->map_properties["BeatDivisor"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["BeatDivisor"] =
             std::to_string(BeatDivisor);
-        metadatas[MapMetadataType::OSU]->map_properties["GridSize"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["GridSize"] =
             std::to_string(GridSize);
-        metadatas[MapMetadataType::OSU]->map_properties["TimelineZoom"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["TimelineZoom"] =
             std::to_string(TimelineZoom);
 
         // metadata
-        metadatas[MapMetadataType::OSU]->map_properties["Title"] = Title;
-        metadatas[MapMetadataType::OSU]->map_properties["TitleUnicode"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["Title"] = Title;
+        metadatas[MapMetadataType::MOSU]->map_properties["TitleUnicode"] =
             TitleUnicode;
-        metadatas[MapMetadataType::OSU]->map_properties["Artist"] = Artist;
-        metadatas[MapMetadataType::OSU]->map_properties["ArtistUnicode"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["Artist"] = Artist;
+        metadatas[MapMetadataType::MOSU]->map_properties["ArtistUnicode"] =
             ArtistUnicode;
-        metadatas[MapMetadataType::OSU]->map_properties["Creator"] = Creator;
-        metadatas[MapMetadataType::OSU]->map_properties["Version"] = Version;
-        metadatas[MapMetadataType::OSU]->map_properties["Source"] = Source;
+        metadatas[MapMetadataType::MOSU]->map_properties["Creator"] = Creator;
+        metadatas[MapMetadataType::MOSU]->map_properties["Version"] = Version;
+        metadatas[MapMetadataType::MOSU]->map_properties["Source"] = Source;
 
         sstream.clear();
         for (const auto& tag : Tags) {
@@ -1188,24 +1198,24 @@ void OsuMap::load_from_file(const char* path) {
         if (!Tags_str.empty()) {
             Tags_str.pop_back();
         }
-        metadatas[MapMetadataType::OSU]->map_properties["Tags"] = Tags_str;
-        metadatas[MapMetadataType::OSU]->map_properties["BeatmapID"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["Tags"] = Tags_str;
+        metadatas[MapMetadataType::MOSU]->map_properties["BeatmapID"] =
             std::to_string(BeatmapID);
-        metadatas[MapMetadataType::OSU]->map_properties["BeatmapSetID"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["BeatmapSetID"] =
             std::to_string(BeatmapSetID);
 
         // difficulty
-        metadatas[MapMetadataType::OSU]->map_properties["HPDrainRate"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["HPDrainRate"] =
             std::to_string(HPDrainRate);
-        metadatas[MapMetadataType::OSU]->map_properties["CircleSize"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["CircleSize"] =
             std::to_string(CircleSize);
-        metadatas[MapMetadataType::OSU]->map_properties["OverallDifficulty"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["OverallDifficulty"] =
             std::to_string(OverallDifficulty);
-        metadatas[MapMetadataType::OSU]->map_properties["ApproachRate"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["ApproachRate"] =
             std::to_string(ApproachRate);
-        metadatas[MapMetadataType::OSU]->map_properties["SliderMultiplier"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["SliderMultiplier"] =
             std::to_string(SliderMultiplier);
-        metadatas[MapMetadataType::OSU]->map_properties["SliderTickRate"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["SliderTickRate"] =
             std::to_string(SliderTickRate);
 
         // colour--- 不写
@@ -1244,7 +1254,7 @@ void OsuMap::load_from_file(const char* path) {
         } else {
             // 视频
         }
-        metadatas[MapMetadataType::OSU]->map_properties["background"] =
+        metadatas[MapMetadataType::MOSU]->map_properties["background"] =
             std::to_string(background_type) + ",0,\"" + bg_file_name + "\"," +
             std::to_string(bgxoffset) + "," + std::to_string(bgyoffset);
 

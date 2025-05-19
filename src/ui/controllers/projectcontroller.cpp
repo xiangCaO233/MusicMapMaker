@@ -326,8 +326,8 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
                 map->version = dialog.version;
 
                 // 生成谱面名称
-                map->map_name =
-                    "[" + std::to_string(map->orbits) + "k] " + map->version;
+                map->map_name = "[" + std::to_string(map->orbits) + "k] " +
+                                map->title + " " + map->version;
                 // 谱面路径使用相对项目路径
                 map->map_file_path =
                     selected_project->ppath / (map->map_name + ".mmm");

@@ -49,7 +49,7 @@ struct NoteSampleGroup {
     //
     // 对于普通打击音效，音效组由控制该物件的时间点决定。
     // 就是timing
-    SampleSet normalSet{SampleSet::NORMAL};
+    SampleSet normalSet{SampleSet::NONE};
     // 对于附加打击音效， 音效组由普通打击音效组决定。
     // 附加音效组
     NoteSample additionalSet{NoteSample::NORMAL};
@@ -59,7 +59,7 @@ struct NoteSampleGroup {
     uint32_t sampleSetParameter{0};
     // 音量（整型）：音效组的音量。如果是0，
     // 则表示这个打击物件的音量，沿用控制该物件时间点的音量设定。
-    uint32_t volume{100};
+    uint32_t volume{0};
     // 当音效组编号不设为 0 时，加载谱面内的音效
     // 当无法在谱面内找到该音效组编号对应的文件时，加载玩家皮肤内的音效
     // 当无法在玩家皮肤内找到该音效组编号对应的文件时，加载 osu! 默认的音效

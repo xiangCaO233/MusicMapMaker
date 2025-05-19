@@ -70,7 +70,7 @@ set(MMM_SOURCES
     src/mmm/SampleSet.h
     src/mmm/MapWorkProject.h
     src/mmm/MapWorkProject.cpp
-    src/mmm/map/MapMetadata.h
+    src/mmm/Metadata.h
     src/mmm/map/MMap.h
     src/mmm/map/MMap.cpp
     src/mmm/map/callback/AudioEnginPlayCallback.h

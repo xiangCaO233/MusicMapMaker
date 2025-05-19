@@ -23,6 +23,13 @@
 #include "log/colorful-log.h"
 #include "ui/mainwindow.h"
 
+bool isDarkMode() {
+    // 获取应用程序的调色板
+    const QPalette palette = QApplication::palette();
+    // 检查窗口背景颜色的亮度
+    return palette.window().color().lightness() < 128;
+}
+
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
@@ -91,6 +98,12 @@ int main(int argc, char* argv[]) {
     QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
+    // 跟随系统主题
+    if (isDarkMode()) {
+        w.use_theme(GlobalTheme::DARK);
+    } else {
+        w.use_theme(GlobalTheme::LIGHT);
+    }
     w.show();
 
     // auto map = std::make_shared<RMMap>();

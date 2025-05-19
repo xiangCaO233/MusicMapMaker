@@ -48,9 +48,6 @@ MainWindow::MainWindow(QWidget* parent)
     qRegisterMetaType<std::shared_ptr<MapWorkProject>>(
         "std::shared_ptr<MapWorkProject>");
 
-    // 默认使用Dark主题
-    use_theme(GlobalTheme::DARK);
-
     init_actions();
 
     // 连接文件浏览器和项目管理器信号

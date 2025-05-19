@@ -20,6 +20,7 @@ class OsuNote : public Note {
     OsuNote();
     // 析构OsuNote
     ~OsuNote() override;
+
     // note采样
     NoteSample sample;
 
@@ -28,6 +29,9 @@ class OsuNote : public Note {
 
     // 打印用
     std::string toString() override;
+
+    // osu物件默认的元数据
+    static std::shared_ptr<NoteMetadata> default_metadata();
 
     // 从滑键转化
     static std::vector<OsuNote> from_slide(std::shared_ptr<Slide> slide);

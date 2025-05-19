@@ -33,19 +33,113 @@ MMap::~MMap() = default;
 // 从文件读取谱面
 void MMap::load_from_file(const char* path) {}
 
+void write_note_json(json& notes_json, std::shared_ptr<HitObject> o) {
+    auto note = std::dynamic_pointer_cast<Note>(o);
+
+    if (note) {
+        json note_json;
+        note_json["time"] = note->timestamp;
+        note_json["orbit"] = note->orbit;
+        note_json["complex-info"] = static_cast<int>(note->compinfo);
+        // 元数据
+        auto& metas_json = note_json["metas"];
+        for (const auto& [type, metadata] : note->metadatas) {
+            std::string type_name;
+            switch (type) {
+                case NoteMetadataType::NOSU: {
+                    type_name = "osu";
+                    break;
+                }
+                case NoteMetadataType::NMALODY: {
+                    type_name = "malody";
+                    break;
+                }
+            }
+            auto& meta_json = metas_json[type_name];
+            for (const auto& [key, value] : metadata->note_properties) {
+                meta_json[key] = value;
+            }
+        }
+
+        notes_json.push_back(note_json);
+    }
+}
+
 // 写出到文件
 void MMap::write_to_file(const char* path) {
-    // 写出为mmm-json
     // 根据文件后缀决定如何转换
     auto p = std::filesystem::path(path);
-    if (mutil::endsWithExtension(p, ".imd")) {
+    if (mutil::endsWithExtension(p, ".mmm")) {
+        // 写出为mmm-json
+        // 打开文件输出流-覆盖模式
+        std::ofstream out(path);
+        //
+        // 更新json
+        //
+        // 谱面数据json
+        json mapdata_json;
+
+        // 基本共通数据
+        mapdata_json["title"] = title;
+        mapdata_json["title-unicode"] = title_unicode;
+        mapdata_json["artist"] = artist;
+        mapdata_json["artist-unicode"] = artist_unicode;
+        mapdata_json["version"] = version;
+        mapdata_json["author"] = author;
+        mapdata_json["preference-bpm"] = preference_bpm;
+        mapdata_json["maplength"] = map_length;
+        mapdata_json["orbits"] = orbits;
+
+        // 时间点数据
+        auto& timings_json = mapdata_json["timings"];
+
+        int index = 0;
+        for (const auto& timing : timings) {
+            auto& timing_json = timings_json[index];
+            timing_json["time"] = timing->timestamp;
+            timing_json["isbase"] = timing->is_base_timing;
+            timing_json["basebpm"] = timing->basebpm;
+            timing_json["bpm"] = timing->bpm;
+            // TODO(xiang 2025-05-19): timing的元数据实现和保存
+            ++index;
+        }
+
+        // 物件数据
+        auto notes_json = json::array();
+        // 防止重复写出同一物件
+        std::unordered_map<std::shared_ptr<HitObject>, bool> writed_object;
+        for (const auto& hitobject : hitobjects) {
+            // 筛除面尾滑尾和包含组合键引用的物件和重复物件
+            // 优先写出完整组合键
+            if (!hitobject->is_note) continue;
+            auto note = std::static_pointer_cast<Note>(hitobject);
+            // 不写出处于组合键内的物件
+            if (!note || note->parent_reference) continue;
+            if (writed_object.find(note) == writed_object.end())
+                writed_object.insert({note, true});
+            else
+                continue;
+            if (note->note_type == NoteType::COMPLEX) {
+                auto comp = std::static_pointer_cast<ComplexNote>(note);
+                // 直接写出所有子键
+                for (auto& child_note : comp->child_notes) {
+                    write_note_json(notes_json, child_note);
+                }
+            } else {
+                write_note_json(notes_json, note);
+            }
+        }
+        mapdata_json["notes"] = notes_json;
+
+        //
+        // 写出到文件
+        out << mapdata_json.dump(4);
+    } else if (mutil::endsWithExtension(p, ".imd")) {
         // 转化为rmmap并写出
         auto rmmap =
             std::make_shared<RMMap>(std::shared_ptr<MMap>(this, [](MMap*) {}));
         rmmap->write_to_file(path);
-    }
-
-    if (mutil::endsWithExtension(p, ".osu")) {
+    } else if (mutil::endsWithExtension(p, ".osu")) {
         // 转化为osumap并写出
         auto omap =
             std::make_shared<OsuMap>(std::shared_ptr<MMap>(this, [](MMap*) {}));
@@ -55,17 +149,17 @@ void MMap::write_to_file(const char* path) {
 
 // 写出文件是否合法
 bool MMap::is_write_file_legal(const char* file, std::string& res) {
-    return false;
+    return true;
 }
 
 // 注册元数据
 void MMap::register_metadata(MapMetadataType type) {
     switch (type) {
-        case MapMetadataType::IMD: {
+        case MapMetadataType::MIMD: {
             metadatas[type] = RMMap::default_metadata();
             break;
         }
-        case MapMetadataType::OSU: {
+        case MapMetadataType::MOSU: {
             metadatas[type] = OsuMap::default_metadata();
             break;
         }

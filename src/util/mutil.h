@@ -97,9 +97,6 @@ inline std::string sanitizeFilename(std::string filename) {
                        }),
         filename.end());
 
-    // 替换空格为下划线（可选）
-    std::replace(filename.begin(), filename.end(), ' ', '_');
-
     return filename;
 }
 
@@ -184,6 +181,7 @@ inline QString getSaveDirectoryWithFilename(
     QObject::connect(
         formatCombo, &QComboBox::currentIndexChanged, [&](int index) {
             if (index < 0 || index >= formatFilters.size()) return;
+            XINFO("select:" + std::to_string(index));
 
             // 获取当前选择的数据
             QPair<QString, QString> data =

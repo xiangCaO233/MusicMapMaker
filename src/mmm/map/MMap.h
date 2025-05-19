@@ -11,10 +11,10 @@
 #include <vector>
 
 #include "../Beat.h"
+#include "../Metadata.h"
 #include "../hitobject/HitObject.h"
 #include "../hitobject/Note/Hold.h"
 #include "../timing/Timing.h"
-#include "MapMetadata.h"
 #include "callback/AudioEnginPlayCallback.h"
 #include "threads/ThreadPool.h"
 
@@ -69,9 +69,6 @@ class MMap {
     // 线程池
     static ThreadPool map_pool;
 
-    // 谱面数据json
-    json mapdata_json;
-
     // 元数据集
     std::unordered_map<MapMetadataType, std::shared_ptr<MapMetadata>> metadatas;
 
@@ -91,6 +88,13 @@ class MMap {
 
     // 谱面音频绝对路径
     std::filesystem::path audio_file_abs_path;
+    // 谱面音频相对路径
+    std::filesystem::path audio_file_rpath;
+
+    // 背景图-如果有
+    std::filesystem::path bg_path;
+    // 背景图相对路径-如果有
+    std::filesystem::path bg_rpath;
 
     // 混音器音频播放位置回调
     std::shared_ptr<AudioEnginPlayCallback> audio_pos_callback;
@@ -101,15 +105,13 @@ class MMap {
     // 图类型
     MapType maptype;
 
-    // 背景图-如果有
-    std::filesystem::path bg_path;
-
     // 全图参考bpm
     double preference_bpm{0};
 
     // 谱面时长--计算
     int32_t map_length{0};
 
+    // 轨道数
     int32_t orbits;
 
     // 全部物件

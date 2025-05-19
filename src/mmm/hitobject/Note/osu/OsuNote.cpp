@@ -1,22 +1,69 @@
 #include "OsuNote.h"
 
 #include <cmath>
+#include <memory>
 #include <sstream>
 #include <string>
 
 #include "../Note.h"
+#include "mmm/Metadata.h"
 
 OsuNote::OsuNote() : Note(0, 0) {
     object_type = HitObjectType::OSUNOTE;
     note_type = NoteType::NOTE;
+    // 初始化osu元数据
+    metadatas.try_emplace(NoteMetadataType::NOSU).first->second =
+        std::make_shared<NoteMetadata>();
 }
 // 从父类转化
 OsuNote::OsuNote(std::shared_ptr<Note> src) : Note(src->timestamp, src->orbit) {
     // -填充属性
+    auto metait = metadatas.find(NoteMetadataType::NOSU);
+    if (metait == metadatas.end()) {
+        // 注册元数据
+        metait = metadatas.try_emplace(NoteMetadataType::NOSU).first;
+    }
+    auto& meta = metait->second;
+    if (!meta) {
+        meta = default_metadata();
+    }
+
+    // 从元数据读取成员
+    sample = static_cast<NoteSample>(
+        std::stoi(meta->get_value<std::string>("sample", "0")));
+    sample_group.normalSet = static_cast<SampleSet>(
+        std::stoi(meta->get_value<std::string>("samplegroup-normalset", "0")));
+    sample_group.additionalSet = static_cast<NoteSample>(std::stoi(
+        meta->get_value<std::string>("samplegroup-additionalset", "0")));
+    sample_group.sampleSetParameter = std::stoi(
+        meta->get_value<std::string>("samplegroup-samplesetparameter", "0"));
+    sample_group.volume =
+        std::stoi(meta->get_value<std::string>("samplegroup-volume", "0"));
+    sample_group.sampleFile =
+        meta->get_value<std::string>("samplegroup-samplefile", "");
+}
+
+// osu物件默认的元数据
+std::shared_ptr<NoteMetadata> OsuNote::default_metadata() {
+    auto meta = std::make_shared<NoteMetadata>();
+    meta->note_properties["sample"] =
+        std::to_string(static_cast<int>(NoteSample::NORMAL));
+    NoteSampleGroup defgroup;
+    meta->note_properties["samplegroup-normalset"] =
+        std::to_string(static_cast<int>(defgroup.normalSet));
+    meta->note_properties["samplegroup-additionalset"] =
+        std::to_string(static_cast<int>(defgroup.additionalSet));
+    meta->note_properties["samplegroup-samplesetparameter"] =
+        std::to_string(static_cast<int>(defgroup.sampleSetParameter));
+    meta->note_properties["samplegroup-volume"] =
+        std::to_string(static_cast<int>(defgroup.volume));
+    meta->note_properties["samplegroup-samplefile"] = defgroup.sampleFile;
+    return meta;
 }
 
 // 从滑键转化
 std::vector<OsuNote> OsuNote::from_slide(std::shared_ptr<Slide> slide) {
+    // TODO(xiang 2025-05-19): 将滑键转换为多个OsuNote
     return {};
 }
 
@@ -104,6 +151,13 @@ std::string OsuNote::to_osu_description(int32_t orbit_count) {
 // 从osu描述加载
 void OsuNote::from_osu_description(std::vector<std::string>& description,
                                    int32_t orbit_count) {
+    auto metait = metadatas.find(NoteMetadataType::NOSU);
+    if (metait == metadatas.end()) {
+        // 注册元数据
+        metait = metadatas.try_emplace(NoteMetadataType::NOSU).first;
+    }
+    auto& meta = metait->second;
+
     // std::string s("");
     // for (const auto& var : description) {
     //  // s.append(var);
@@ -130,6 +184,7 @@ void OsuNote::from_osu_description(std::vector<std::string>& description,
 
     // 音效
     sample = static_cast<NoteSample>(std::stoi(description.at(4)));
+
     // XINFO("load note:" + s);
 
     if (description.size() >= 6) {
@@ -169,4 +224,14 @@ void OsuNote::from_osu_description(std::vector<std::string>& description,
             }
         }
     }
+    meta->note_properties["sample"] = std::to_string(static_cast<int>(sample));
+    meta->note_properties["samplegroup-normalset"] =
+        std::to_string(static_cast<int>(sample_group.normalSet));
+    meta->note_properties["samplegroup-additionalset"] =
+        std::to_string(static_cast<int>(sample_group.additionalSet));
+    meta->note_properties["samplegroup-samplesetparameter"] =
+        std::to_string(static_cast<int>(sample_group.sampleSetParameter));
+    meta->note_properties["samplegroup-volume"] =
+        std::to_string(static_cast<int>(sample_group.volume));
+    meta->note_properties["samplegroup-samplefile"] = sample_group.sampleFile;
 }
