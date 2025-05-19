@@ -116,32 +116,71 @@ void MMap::load_from_file(const char* path) {
         map_name = "[mmm] " + artist_unicode + " - " + title_unicode + " [" +
                    std::to_string(orbits) + "k] " + "[" + version + "]";
 
+        // 缓存父类指针
+        std::shared_ptr<Note> temp_note;
+        // 缓存组合键指针
+        std::shared_ptr<ComplexNote> temp_complex_note;
+
         // 先读取物件
         auto notes_json = mapdata_json["notes"];
         for (const auto& note_json : notes_json) {
             auto type = note_json.value<std::string>("type", "note");
             if (type == "note") {
-                auto note = std::make_shared<Note>(
+                temp_note = std::make_shared<Note>(
                     note_json.value<int32_t>("time", 0),
                     note_json.value<int32_t>("orbit", 0));
-                hitobjects.insert(note);
-            } else if (type == "hold") {
-                auto hold = std::make_shared<Hold>(
-                    note_json.value<int32_t>("time", 0),
-                    note_json.value<int32_t>("orbit", 0),
-                    note_json.value<int32_t>("duration", 0));
-                auto hold_end = std::make_shared<HoldEnd>(hold);
-                hitobjects.insert(hold);
-                temp_hold_list.insert(hold);
-                hitobjects.insert(hold_end);
-            } else if (type == "slide") {
-                auto slide = std::make_shared<Slide>(
-                    note_json.value<int32_t>("time", 0),
-                    note_json.value<int32_t>("orbit", 0),
-                    note_json.value<int32_t>("orbit-alt", 1));
-                auto slide_end = std::make_shared<SlideEnd>(slide);
-                hitobjects.insert(slide);
-                hitobjects.insert(slide_end);
+            } else {
+                if (type == "hold") {
+                    temp_note = std::make_shared<Hold>(
+                        note_json.value<int32_t>("time", 0),
+                        note_json.value<int32_t>("orbit", 0),
+                        note_json.value<int32_t>("duration", 0));
+                    auto hold = std::static_pointer_cast<Hold>(temp_note);
+                    auto hold_end = std::make_shared<HoldEnd>(hold);
+                    hold->hold_end_reference = hold_end;
+                    temp_hold_list.insert(hold);
+                    hitobjects.insert(hold_end);
+                } else if (type == "slide") {
+                    temp_note = std::make_shared<Slide>(
+                        note_json.value<int32_t>("time", 0),
+                        note_json.value<int32_t>("orbit", 0),
+                        note_json.value<int32_t>("orbit-alt", 1));
+                    auto slide = std::static_pointer_cast<Slide>(temp_note);
+                    auto slide_end = std::make_shared<SlideEnd>(slide);
+                    slide->slide_end_reference = slide_end;
+                    hitobjects.insert(slide_end);
+                }
+            }
+
+            hitobjects.insert(temp_note);
+
+            // 处理组合键
+            temp_note->compinfo = static_cast<ComplexInfo>(
+                note_json.value<uint8_t>("complex-info", 0));
+
+            switch (temp_note->compinfo) {
+                case ComplexInfo::HEAD: {
+                    temp_complex_note = std::make_shared<ComplexNote>(
+                        temp_note->timestamp, temp_note->orbit);
+                    // 设置父物件
+                    temp_note->parent_reference = temp_complex_note.get();
+                    temp_complex_note->child_notes.insert(temp_note);
+                    break;
+                }
+                case ComplexInfo::BODY: {
+                    // 设置父物件
+                    temp_note->parent_reference = temp_complex_note.get();
+                    temp_complex_note->child_notes.insert(temp_note);
+                    break;
+                }
+                case ComplexInfo::END: {
+                    temp_complex_note->child_notes.insert(temp_note);
+                    hitobjects.insert(temp_complex_note);
+                    temp_complex_note.reset();
+                    break;
+                }
+                default:
+                    break;
             }
         }
 
