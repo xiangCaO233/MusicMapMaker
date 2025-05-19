@@ -182,6 +182,26 @@ void MMap::load_from_file(const char* path) {
                 default:
                     break;
             }
+            // 物件元数据
+            auto& metas_json = note_json["metas"];
+            for (const auto& [type, metajson] : metas_json.items()) {
+                // 注册物件的元数据并填入
+                if (type == "osu") {
+                    auto& osumeta =
+                        temp_note->metadatas[NoteMetadataType::NOSU];
+                    for (const auto& [key, value] : metajson.items()) {
+                        osumeta->note_properties[key] =
+                            value.get<std::string>();
+                    }
+                } else if (type == "malody") {
+                    auto& malodymeta =
+                        temp_note->metadatas[NoteMetadataType::NMALODY];
+                    for (const auto& [key, value] : metajson.items()) {
+                        malodymeta->note_properties[key] =
+                            value.get<std::string>();
+                    }
+                }
+            }
         }
 
         // 读取时间点数据
