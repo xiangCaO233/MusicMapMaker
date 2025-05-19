@@ -168,20 +168,19 @@ inline QString getSaveDirectoryWithFilename(
     // 获取文件名编辑框
     QLineEdit* lineEdit = dialog.findChild<QLineEdit*>();
 
-    // 设置初始文件名
-    if (lineEdit && !formatFilters.isEmpty()) {
-        QString currentKey = formatFilters.keys().value(defaultIndex);
-        QString initialFilename =
-            defaultFilenames.value(currentKey, "untitled");
-        QString initialExtension = formatFilters.value(currentKey);
-        lineEdit->setText(initialFilename + initialExtension);
+    // 禁用原生过滤器控件
+    // 找到并隐藏原生过滤器下拉框
+    if (QComboBox* nativeFilterCombo =
+            dialog.findChild<QComboBox*>("fileTypeCombo")) {
+        // 禁止单独选择
+        nativeFilterCombo->setEnabled(false);
     }
 
     // 当格式改变时的处理
     QObject::connect(
         formatCombo, &QComboBox::currentIndexChanged, [&](int index) {
             if (index < 0 || index >= formatFilters.size()) return;
-            XINFO("select:" + std::to_string(index));
+            qDebug() << "select:" << index;
 
             // 获取当前选择的数据
             QPair<QString, QString> data =
@@ -202,6 +201,15 @@ inline QString getSaveDirectoryWithFilename(
             // 更新文件过滤器
             dialog.selectNameFilter(filterList.at(index));
         });
+
+    // 设置初始文件名
+    if (lineEdit && !formatFilters.isEmpty()) {
+        QString currentKey = formatFilters.keys().value(defaultIndex);
+        QString initialFilename =
+            defaultFilenames.value(currentKey, "untitled");
+        QString initialExtension = formatFilters.value(currentKey);
+        lineEdit->setText(initialFilename + initialExtension);
+    }
 
     // 设置单选模式
     if (QListView* listView = dialog.findChild<QListView*>("listView")) {
