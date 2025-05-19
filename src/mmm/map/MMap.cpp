@@ -107,10 +107,10 @@ void MMap::load_from_file(const char* path) {
         preference_bpm = mapdata_json["preference-bpm"];
         map_length = mapdata_json["maplength"];
         orbits = mapdata_json["orbits"];
-        audio_file_rpath = std::filesystem::path(mapdata_json["music"]);
+        audio_file_rpath = std::filesystem::path(mapdata_json["music"].get<std::string>());
         audio_file_abs_path = map_file_path.parent_path() / audio_file_rpath;
 
-        bg_rpath = std::filesystem::path(mapdata_json["bg"]);
+        bg_rpath = std::filesystem::path(mapdata_json["bg"].get<std::string>());
         bg_path = map_file_path.parent_path() / bg_rpath;
 
         map_name = "[mmm] " + artist_unicode + " - " + title_unicode + " [" +
