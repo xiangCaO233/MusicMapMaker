@@ -41,13 +41,13 @@ void MEditorArea::initialize_signals() {
     // 连接快捷键切换模式槽
     connect(canvas_container->canvas.data(),
             &MapWorkspaceCanvas::switch_edit_mode, this,
-            &MEditorArea::on_canvas_switchmode);
+            &MEditorArea::on_canvasSwitchmode);
 
     // 连接调节时间线信号槽
     connect(canvas_container->canvas.data(),
             &MapWorkspaceCanvas::timeline_zoom_adjusted,
             ui->audio_time_controller,
-            &TimeController::on_canvas_adjust_timeline_zoom);
+            &TimeController::on_canvasAdjustTimelineZoom);
     // 连接调节时间信号槽
     connect(ui->audio_time_controller, &TimeController::time_edited,
             canvas_container->canvas.data(),
@@ -60,7 +60,7 @@ void MEditorArea::initialize_signals() {
     // 连接画布信号和时间控制器暂停槽(来回)
     connect(ui->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::pause_signal, ui->audio_time_controller,
-            &TimeController::on_canvas_pause);
+            &TimeController::on_canvasPause);
     connect(ui->audio_time_controller, &TimeController::pause_button_changed,
             ui->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
@@ -71,7 +71,7 @@ void MEditorArea::initialize_signals() {
 
     // 连接画布槽和时间控制器信号
     // 时间控制器暂停->画布暂停响应
-    connect(ui->audio_time_controller, &TimeController::on_canvas_pause,
+    connect(ui->audio_time_controller, &TimeController::on_canvasPause,
             canvas_container->canvas.data(),
             &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
 
@@ -83,24 +83,24 @@ void MEditorArea::initialize_signals() {
     // 连接画布时间更新信号
     connect(ui->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::current_time_stamp_changed, this,
-            &MEditorArea::on_canvas_timestamp_changed);
+            &MEditorArea::on_canvasTimestampChanged);
     connect(ui->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::current_time_stamp_changed,
             ui->audio_time_controller,
-            &TimeController::on_canvas_timestamp_changed);
+            &TimeController::oncanvas_timestampChanged);
 
     // 连接bpm,时间线速度变化槽
     connect(ui->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::current_absbpm_changed,
-            ui->audio_time_controller, &TimeController::on_current_bpm_changed);
+            ui->audio_time_controller, &TimeController::on_currentBpmChanged);
     connect(ui->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::current_timeline_speed_changed,
             ui->audio_time_controller,
-            &TimeController::on_current_timeline_speed_changed);
+            &TimeController::on_currentTimelineSpeedChanged);
 
     // 时间控制器-进度条
     connect(this, &MEditorArea::progress_pos_changed, ui->audio_time_controller,
-            &TimeController::on_canvas_timestamp_changed);
+            &TimeController::oncanvas_timestampChanged);
 }
 
 // 使用主题
@@ -398,7 +398,7 @@ void MEditorArea::initialize_toolbuttons() {
 void MEditorArea::update_bookmarks() {}
 
 // 画布通过快捷键切换模式
-void MEditorArea::on_canvas_switchmode(MouseEditMode mode) {
+void MEditorArea::on_canvasSwitchmode(MouseEditMode mode) {
     // 选中对应按钮
     auto button = modesbuttonGroup->button(static_cast<int32_t>(mode));
     button->setChecked(true);
@@ -408,7 +408,7 @@ void MEditorArea::on_canvas_switchmode(MouseEditMode mode) {
 
 // 画布时间变化事件
 // 更新进度条
-void MEditorArea::on_canvas_timestamp_changed(double time) {
+void MEditorArea::on_canvasTimestampChanged(double time) {
     double t = 0.0;
     if (ui->canvas_container->canvas.data()->working_map) {
         // 更新进度条
@@ -531,9 +531,9 @@ void MEditorArea::on_show_timeline_button_toggled(bool checked) {
 }
 
 // 保存action
-void MEditorArea::on_save_map() {}
+void MEditorArea::on_saveMap() {}
 
-void MEditorArea::on_save_map_as() {
+void MEditorArea::on_saveMapAs() {
     auto &map = canvas_container->canvas.data()->working_map;
     if (map) {
         QMap<QString, QString> formats;

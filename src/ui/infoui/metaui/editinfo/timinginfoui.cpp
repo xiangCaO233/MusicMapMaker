@@ -32,7 +32,7 @@ void TimingInfoui::use_theme(GlobalTheme theme) {
 }
 
 // 画布选中物件事件
-void TimingInfoui::on_canvas_select_timings(
+void TimingInfoui::on_canvasSelectTimings(
     std::vector<std::shared_ptr<Timing>> *timings) {
     current_select_timings = timings;
     update_selected_uiinfo();

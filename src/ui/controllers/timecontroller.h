@@ -57,17 +57,17 @@ class TimeController : public QWidget {
     void on_selectnewmap(std::shared_ptr<MMap> &map);
 
     // 画布时间变化事件
-    void on_canvas_timestamp_changed(double time);
+    void oncanvas_timestampChanged(double time);
 
     // 画布暂停槽
-    void on_canvas_pause(bool paused);
+    void on_canvasPause(bool paused);
 
     // 实时信息变化槽
-    void on_current_bpm_changed(double bpm);
-    void on_current_timeline_speed_changed(double timeline_speed);
+    void on_currentBpmChanged(double bpm);
+    void on_currentTimelineSpeedChanged(double timeline_speed);
 
     // 画布调节时间线缩放
-    void on_canvas_adjust_timeline_zoom(int value);
+    void on_canvasAdjustTimelineZoom(int value);
 
    signals:
     // 时间控制器编辑时间信号

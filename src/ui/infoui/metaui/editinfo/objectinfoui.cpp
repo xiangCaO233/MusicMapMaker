@@ -35,9 +35,9 @@ void ObjectInfoui::use_theme(GlobalTheme theme) {
 }
 
 // 画布选中物件事件
-void ObjectInfoui::on_canvas_select_object(Beat* beatinfo,
-                                           std::shared_ptr<HitObject> obj,
-                                           std::shared_ptr<Timing> ref_timing) {
+void ObjectInfoui::on_canvasSelectObject(Beat* beatinfo,
+                                         std::shared_ptr<HitObject> obj,
+                                         std::shared_ptr<Timing> ref_timing) {
     current_obj = obj;
     current_beatinfo = beatinfo;
     current_ref_timing = ref_timing;

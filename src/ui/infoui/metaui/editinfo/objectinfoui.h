@@ -36,8 +36,8 @@ class ObjectInfoui : public QWidget {
 
    public slots:
     // 画布选中物件事件
-    void on_canvas_select_object(Beat *beatinfo, std::shared_ptr<HitObject> obj,
-                                 std::shared_ptr<Timing> ref_timing);
+    void on_canvasSelectObject(Beat *beatinfo, std::shared_ptr<HitObject> obj,
+                               std::shared_ptr<Timing> ref_timing);
 
    private:
     Ui::ObjectInfoui *ui;

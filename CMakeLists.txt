@@ -244,6 +244,9 @@ set(PROJECT_SOURCES
     src/canvas/texture/pool/MTexturePool.cpp
     src/log/colorful-log.h
     src/log/colorful_log.cpp
+    resources/glsrcs.qrc
+    themes/QtThemeDark/QtThemeDark.qrc
+    themes/QtThemeLight/QtThemeLight.qrc
     ${MMM_SOURCES}
     ${GLSL_FILES}
     ${TS_FILES})
@@ -263,10 +266,7 @@ include_directories(
 
 # 创建可执行文件
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                    resources/glsrcs.qrc
-                    themes/QtThemeDark/QtThemeDark.qrc
-                    themes/QtThemeLight/QtThemeLight.qrc)
+  qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
 else()
   if(ANDROID)
     add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})

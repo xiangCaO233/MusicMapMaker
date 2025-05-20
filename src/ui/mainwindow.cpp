@@ -67,13 +67,13 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::select_object,
             ui->infomation_widget->mmetas->objinfo_ref,
-            &ObjectInfoui::on_canvas_select_object);
+            &ObjectInfoui::on_canvasSelectObject);
 
     // 连接选择timing槽
     connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::select_timing,
             ui->infomation_widget->mmetas->timinginfo_ref,
-            &TimingInfoui::on_canvas_select_timings);
+            &TimingInfoui::on_canvasSelectTimings);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -152,7 +152,7 @@ void MainWindow::use_theme(GlobalTheme theme) {
 // 初始化actions的信号连接
 void MainWindow::init_actions() {
     connect(ui->actionSave, &QAction::triggered,
-            ui->page_widget->edit_area_widget, &MEditorArea::on_save_map);
+            ui->page_widget->edit_area_widget, &MEditorArea::on_saveMap);
     connect(ui->actionSave_As, &QAction::triggered,
-            ui->page_widget->edit_area_widget, &MEditorArea::on_save_map_as);
+            ui->page_widget->edit_area_widget, &MEditorArea::on_saveMapAs);
 }

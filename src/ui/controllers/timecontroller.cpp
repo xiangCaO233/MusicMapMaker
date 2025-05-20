@@ -88,17 +88,15 @@ void TimeController::update_audio_status() {
         std::replace(file.begin(), file.end(), '\\', '/');
         if (pause) {
             BackgroundAudio::pause_audio(
-                binding_map->project_reference->devicename,
-                file);
+                binding_map->project_reference->devicename, file);
         } else {
             BackgroundAudio::play_audio(
-                binding_map->project_reference->devicename,
-                file);
+                binding_map->project_reference->devicename, file);
         }
         // 添加回调
         BackgroundAudio::add_playpos_callback(
-            binding_map->project_reference->devicename,
-            file, binding_map->audio_pos_callback);
+            binding_map->project_reference->devicename, file,
+            binding_map->audio_pos_callback);
         // 暂停的话同步一下
         if (pause) {
             // 防止播放器已播放完暂停了死等待
@@ -112,8 +110,8 @@ void TimeController::update_audio_status() {
                 //       std::to_string(current_audio_time - canvas_pos) + "]");
                 // 同步音频时间为画布时间
                 BackgroundAudio::set_audio_pos(
-                    binding_map->project_reference->devicename,
-                    file, canvas_pos);
+                    binding_map->project_reference->devicename, file,
+                    canvas_pos);
                 emit music_pos_synchronized(
                     canvas_pos - xutil::plannerpcmpos2milliseconds(
                                      x::Config::mix_buffer_size / 3.0,
@@ -162,7 +160,7 @@ void TimeController::on_pausebutton_clicked() {
 }
 
 // 画布暂停槽
-void TimeController::on_canvas_pause(bool paused) {
+void TimeController::on_canvasPause(bool paused) {
     // 更新暂停状态和按钮图标
     pause = paused;
     // 修改timeedit可用状态
@@ -178,12 +176,12 @@ void TimeController::on_canvas_pause(bool paused) {
 
 // 实时信息变化槽
 // bpm
-void TimeController::on_current_bpm_changed(double bpm) {
+void TimeController::on_currentBpmChanged(double bpm) {
     ui->bpmvalue->setText(QString::number(bpm, 'f', 2));
 }
 
 // timeline_speed
-void TimeController::on_current_timeline_speed_changed(double timeline_speed) {
+void TimeController::on_currentTimelineSpeedChanged(double timeline_speed) {
     ui->timelinespeedvalue->setText(QString::number(timeline_speed, 'f', 2));
 }
 
@@ -241,7 +239,7 @@ void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
 }
 
 // 画布时间变化事件
-void TimeController::on_canvas_timestamp_changed(double time) {
+void TimeController::oncanvas_timestampChanged(double time) {
     if (!binding_map) return;
     // 计算进度
     auto progress = time / binding_map->map_length;
@@ -439,7 +437,7 @@ void TimeController::on_lineEdit_editingFinished() {
             ui->lineEdit->setText(latest_time_edit_value);
         } else {
             ui->lineEdit->setText(mutil::millisecondsToQString(milliseconds));
-            on_canvas_timestamp_changed(milliseconds);
+            oncanvas_timestampChanged(milliseconds);
             emit time_edited(milliseconds);
         }
     } else if (tformat == TimeFormat::MILLISECONDS) {
@@ -448,7 +446,7 @@ void TimeController::on_lineEdit_editingFinished() {
         if (isalldigits) {
             auto timem = std::stoi(ui->lineEdit->text().toStdString());
             ui->lineEdit->setText(QString::number(timem));
-            on_canvas_timestamp_changed(timem);
+            oncanvas_timestampChanged(timem);
             emit time_edited(timem);
         } else {
             // 格式错误
@@ -484,7 +482,7 @@ void TimeController::on_oheight_scale_slider_valueChanged(int value) {
 }
 
 // 画布调节时间线缩放
-void TimeController::on_canvas_adjust_timeline_zoom(int value) {
+void TimeController::on_canvasAdjustTimelineZoom(int value) {
     timeline_zoom_sync_lock = true;
     ui->timeline_zoom_slider->setValue(value);
     ui->timeline_zoom_button->setText(QString::number(value));

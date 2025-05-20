@@ -34,8 +34,7 @@ class TimingInfoui : public QWidget {
 
    public slots:
     // 画布选中物件事件
-    void on_canvas_select_timings(
-        std::vector<std::shared_ptr<Timing>> *timings);
+    void on_canvasSelectTimings(std::vector<std::shared_ptr<Timing>> *timings);
 
    private:
     Ui::TimingInfoui *ui;

@@ -60,11 +60,11 @@ class MEditorArea : public QWidget {
     void on_selectnewmap(std::shared_ptr<MMap> &map);
 
     // 画布通过快捷键切换模式
-    void on_canvas_switchmode(MouseEditMode mode);
+    void on_canvasSwitchmode(MouseEditMode mode);
 
     // 保存action
-    void on_save_map();
-    void on_save_map_as();
+    void on_saveMap();
+    void on_saveMapAs();
 
    signals:
     // 切换map信号
@@ -75,7 +75,7 @@ class MEditorArea : public QWidget {
 
    private slots:
     // 画布时间变化事件
-    void on_canvas_timestamp_changed(double time);
+    void on_canvasTimestampChanged(double time);
 
     // 滚动方向切换按钮触发
     void on_wheel_direction_button_toggled(bool checked);
