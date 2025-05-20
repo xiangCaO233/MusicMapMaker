@@ -20,6 +20,7 @@
 #include "../hitobject/Note/rm/Slide.h"
 #include "../timing/Timing.h"
 #include "colorful-log.h"
+#include "mmm/Metadata.h"
 #include "osu/OsuMap.h"
 #include "rm/RMMap.h"
 
@@ -107,7 +108,8 @@ void MMap::load_from_file(const char* path) {
         preference_bpm = mapdata_json["preference-bpm"];
         map_length = mapdata_json["maplength"];
         orbits = mapdata_json["orbits"];
-        audio_file_rpath = std::filesystem::path(mapdata_json["music"].get<std::string>());
+        audio_file_rpath =
+            std::filesystem::path(mapdata_json["music"].get<std::string>());
         audio_file_abs_path = map_file_path.parent_path() / audio_file_rpath;
 
         bg_rpath = std::filesystem::path(mapdata_json["bg"].get<std::string>());
@@ -189,6 +191,7 @@ void MMap::load_from_file(const char* path) {
                 if (type == "osu") {
                     auto& osumeta =
                         temp_note->metadatas[NoteMetadataType::NOSU];
+                    osumeta = std::make_shared<NoteMetadata>();
                     for (const auto& [key, value] : metajson.items()) {
                         osumeta->note_properties[key] =
                             value.get<std::string>();

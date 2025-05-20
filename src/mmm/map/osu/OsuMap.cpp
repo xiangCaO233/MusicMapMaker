@@ -831,6 +831,8 @@ void OsuMap::load_from_file(const char* path) {
         audio_file_abs_path =
             std::filesystem::weakly_canonical(std::filesystem::absolute(
                 map_file_path.parent_path() / AudioFilename));
+        audio_file_rpath = std::filesystem::relative(
+            audio_file_abs_path, map_file_path.parent_path());
 
         // XINFO("audio path:" + audio_file_abs_path.string());
 

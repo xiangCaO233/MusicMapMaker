@@ -7,6 +7,8 @@
 // 时间点
 #include <cstdint>
 
+#include "mmm/Metadata.h"
+
 enum class TimingType {
     GENERAL,
     OSUTIMING,
@@ -21,6 +23,10 @@ class Timing {
     Timing();
     // 析构Timing
     virtual ~Timing();
+
+    // 元数据集
+    std::unordered_map<TimingMetadataType, std::shared_ptr<TimingMetadata>>
+        metadatas;
 
     // 是否为基准timing
     bool is_base_timing{true};
