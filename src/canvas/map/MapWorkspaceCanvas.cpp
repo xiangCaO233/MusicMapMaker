@@ -186,16 +186,16 @@ void MapWorkspaceCanvas::mousePressEvent(QMouseEvent *event) {
 
     switch (event->button()) {
         case Qt::MouseButton::LeftButton: {
-            editor->cstatus.mouse_left_pressed = true;
             editor->cstatus.mouse_left_press_pos = event->pos();
             if (!editor->cstatus.mouse_right_pressed) {
+                editor->cstatus.mouse_left_pressed = true;
                 editor->mouse_pressed(event);
             }
             break;
         }
         case Qt::MouseButton::RightButton: {
-            editor->cstatus.mouse_right_pressed = true;
             if (!editor->cstatus.mouse_left_pressed) {
+                editor->cstatus.mouse_right_pressed = true;
                 editor->mouse_pressed(event);
             }
             break;
