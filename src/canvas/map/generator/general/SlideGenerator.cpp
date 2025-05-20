@@ -155,7 +155,7 @@ void SlideGenerator::generate(Slide& slide) {
                 editor_ref->canvas_ref->skin.get_object_texture(
                     TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::HOVER);
             hoverinfo = std::make_shared<HoverObjectInfo>(
-                slide_ptr, slide.beatinfo, HoverPart::HOLD_BODY);
+                slide_ptr, slide.beatinfo.get(), HoverPart::HOLD_BODY);
             editor_ref->cstatus.is_hover_note = true;
         }
     } else {
@@ -169,7 +169,7 @@ void SlideGenerator::generate(Slide& slide) {
                     TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::SELECTED);
             // 发送更新选中物件信号
             emit editor_ref->canvas_ref->select_object(
-                objref->beatinfo, slide_ptr,
+                objref->beatinfo.get(), slide_ptr,
                 editor_ref->ebuffer.current_abs_timing);
         } else {
             // 使用常规纹理
@@ -208,8 +208,9 @@ void SlideGenerator::generate(Slide& slide) {
                 // 使用hover纹理
                 actual_use_end_texture = slide_end_hovered_texture;
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(
-                        slide_ptr, objref->beatinfo, HoverPart::SLIDE_END);
+                    std::make_shared<HoverObjectInfo>(slide_ptr,
+                                                      objref->beatinfo.get(),
+                                                      HoverPart::SLIDE_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (slide_end_in_select_bound ||
@@ -221,7 +222,7 @@ void SlideGenerator::generate(Slide& slide) {
                     actual_use_end_texture = slide_end_selected_texture;
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        objref->beatinfo, slide_ptr,
+                        objref->beatinfo.get(), slide_ptr,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用常规纹理
@@ -258,8 +259,8 @@ void SlideGenerator::generate(Slide& slide) {
                 // 使用hover纹理
                 actual_use_end_texture = slide_end_hovered_texture;
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(slide_ptr, slide.beatinfo,
-                                                      HoverPart::SLIDE_END);
+                    std::make_shared<HoverObjectInfo>(
+                        slide_ptr, slide.beatinfo.get(), HoverPart::SLIDE_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (slide_end_in_select_bound ||
@@ -271,7 +272,7 @@ void SlideGenerator::generate(Slide& slide) {
                     actual_use_end_texture = slide_end_selected_texture;
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        objref->beatinfo, slide_ptr,
+                        objref->beatinfo.get(), slide_ptr,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用常规纹理
@@ -391,7 +392,7 @@ void SlideGenerator::generate_preview(Slide& slide) {
                 editor_ref->canvas_ref->skin.get_object_texture(
                     TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::HOVER);
             hoverinfo = std::make_shared<HoverObjectInfo>(
-                slide_ptr, slide.beatinfo, HoverPart::HOLD_BODY);
+                slide_ptr, slide.beatinfo.get(), HoverPart::HOLD_BODY);
             editor_ref->cstatus.is_hover_note = true;
         }
     } else {
@@ -405,7 +406,7 @@ void SlideGenerator::generate_preview(Slide& slide) {
                     TexType::HOLD_BODY_HORIZONTAL, ObjectStatus::SELECTED);
             // 发送更新选中物件信号
             emit editor_ref->canvas_ref->select_object(
-                objref->beatinfo, slide_ptr,
+                objref->beatinfo.get(), slide_ptr,
                 editor_ref->ebuffer.current_abs_timing);
         } else {
             // 使用常规纹理
@@ -444,8 +445,9 @@ void SlideGenerator::generate_preview(Slide& slide) {
                 // 使用hover纹理
                 actual_use_end_texture = slide_end_hovered_texture;
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(
-                        slide_ptr, objref->beatinfo, HoverPart::SLIDE_END);
+                    std::make_shared<HoverObjectInfo>(slide_ptr,
+                                                      objref->beatinfo.get(),
+                                                      HoverPart::SLIDE_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (slide_end_in_select_bound ||
@@ -457,7 +459,7 @@ void SlideGenerator::generate_preview(Slide& slide) {
                     actual_use_end_texture = slide_end_selected_texture;
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        objref->beatinfo, slide_ptr,
+                        objref->beatinfo.get(), slide_ptr,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用常规纹理
@@ -494,8 +496,8 @@ void SlideGenerator::generate_preview(Slide& slide) {
                 // 使用hover纹理
                 actual_use_end_texture = slide_end_hovered_texture;
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(slide_ptr, slide.beatinfo,
-                                                      HoverPart::SLIDE_END);
+                    std::make_shared<HoverObjectInfo>(
+                        slide_ptr, slide.beatinfo.get(), HoverPart::SLIDE_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (slide_end_in_select_bound ||
@@ -507,7 +509,7 @@ void SlideGenerator::generate_preview(Slide& slide) {
                     actual_use_end_texture = slide_end_selected_texture;
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        objref->beatinfo, slide_ptr,
+                        objref->beatinfo.get(), slide_ptr,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用常规纹理

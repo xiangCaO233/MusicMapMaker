@@ -21,7 +21,7 @@ enum class HoverPart {
 
 struct HoverObjectInfo {
     std::shared_ptr<HitObject> hoverobj;
-    std::shared_ptr<Beat> hoverbeat;
+    Beat* hoverbeat;
     HoverPart part;
 
     HoverObjectInfo* clone() {

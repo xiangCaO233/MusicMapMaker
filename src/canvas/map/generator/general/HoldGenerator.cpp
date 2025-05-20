@@ -136,7 +136,7 @@ void HoldGenerator::generate(Hold &hold) {
                 editor_ref->canvas_ref->skin.get_object_texture(
                     TexType::HOLD_BODY_VERTICAL, ObjectStatus::HOVER);
             hoverinfo = std::make_shared<HoverObjectInfo>(
-                hold_ptr, hold.beatinfo, HoverPart::HOLD_BODY);
+                hold_ptr, hold.beatinfo.get(), HoverPart::HOLD_BODY);
             editor_ref->cstatus.is_hover_note = true;
         }
     } else {
@@ -149,7 +149,7 @@ void HoldGenerator::generate(Hold &hold) {
                     TexType::HOLD_BODY_VERTICAL, ObjectStatus::SELECTED);
             // 发送更新选中物件信号
             emit editor_ref->canvas_ref->select_object(
-                hold.beatinfo, hold_ptr,
+                hold.beatinfo.get(), hold_ptr,
                 editor_ref->ebuffer.current_abs_timing);
         } else {
             // 使用默认纹理
@@ -192,8 +192,8 @@ void HoldGenerator::generate(Hold &hold) {
                     editor_ref->canvas_ref->skin.get_object_texture(
                         TexType::HOLD_END, ObjectStatus::HOVER);
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(hold_ptr, hold.beatinfo,
-                                                      HoverPart::HOLD_END);
+                    std::make_shared<HoverObjectInfo>(
+                        hold_ptr, hold.beatinfo.get(), HoverPart::HOLD_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (hold_end_in_select_bound ||
@@ -208,7 +208,7 @@ void HoldGenerator::generate(Hold &hold) {
                             TexType::HOLD_END, ObjectStatus::SELECTED);
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        hold.beatinfo, hold_ptr,
+                        hold.beatinfo.get(), hold_ptr,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用普通纹理
@@ -251,8 +251,8 @@ void HoldGenerator::generate(Hold &hold) {
                     editor_ref->canvas_ref->skin.get_object_texture(
                         TexType::HOLD_END, ObjectStatus::HOVER);
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(hold_ptr, hold.beatinfo,
-                                                      HoverPart::HOLD_END);
+                    std::make_shared<HoverObjectInfo>(
+                        hold_ptr, hold.beatinfo.get(), HoverPart::HOLD_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (hold_end_in_select_bound ||
@@ -267,7 +267,7 @@ void HoldGenerator::generate(Hold &hold) {
                             TexType::HOLD_END, ObjectStatus::SELECTED);
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        hold.beatinfo, objref,
+                        hold.beatinfo.get(), objref,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用普通纹理
@@ -376,7 +376,7 @@ void HoldGenerator::generate_preview(Hold &hold) {
                 editor_ref->canvas_ref->skin.get_object_texture(
                     TexType::HOLD_BODY_VERTICAL, ObjectStatus::HOVER);
             hoverinfo = std::make_shared<HoverObjectInfo>(
-                hold_ptr, hold.beatinfo, HoverPart::HOLD_BODY);
+                hold_ptr, hold.beatinfo.get(), HoverPart::HOLD_BODY);
             editor_ref->cstatus.is_hover_note = true;
         }
     } else {
@@ -389,7 +389,7 @@ void HoldGenerator::generate_preview(Hold &hold) {
                     TexType::HOLD_BODY_VERTICAL, ObjectStatus::SELECTED);
             // 发送更新选中物件信号
             emit editor_ref->canvas_ref->select_object(
-                hold.beatinfo, hold_ptr,
+                hold.beatinfo.get(), hold_ptr,
                 editor_ref->ebuffer.current_abs_timing);
         } else {
             // 使用默认纹理
@@ -432,8 +432,8 @@ void HoldGenerator::generate_preview(Hold &hold) {
                     editor_ref->canvas_ref->skin.get_object_texture(
                         TexType::HOLD_END, ObjectStatus::HOVER);
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(hold_ptr, hold.beatinfo,
-                                                      HoverPart::HOLD_END);
+                    std::make_shared<HoverObjectInfo>(
+                        hold_ptr, hold.beatinfo.get(), HoverPart::HOLD_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (hold_end_in_select_bound ||
@@ -448,7 +448,7 @@ void HoldGenerator::generate_preview(Hold &hold) {
                             TexType::HOLD_END, ObjectStatus::SELECTED);
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        hold.beatinfo, hold_ptr,
+                        hold.beatinfo.get(), hold_ptr,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用普通纹理
@@ -491,8 +491,8 @@ void HoldGenerator::generate_preview(Hold &hold) {
                     editor_ref->canvas_ref->skin.get_object_texture(
                         TexType::HOLD_END, ObjectStatus::HOVER);
                 editor_ref->ebuffer.hover_object_info =
-                    std::make_shared<HoverObjectInfo>(hold_ptr, hold.beatinfo,
-                                                      HoverPart::HOLD_END);
+                    std::make_shared<HoverObjectInfo>(
+                        hold_ptr, hold.beatinfo.get(), HoverPart::HOLD_END);
                 editor_ref->cstatus.is_hover_note = true;
             } else {
                 if (hold_end_in_select_bound ||
@@ -507,7 +507,7 @@ void HoldGenerator::generate_preview(Hold &hold) {
                             TexType::HOLD_END, ObjectStatus::SELECTED);
                     // 发送更新选中物件信号
                     emit editor_ref->canvas_ref->select_object(
-                        hold.beatinfo, objref,
+                        hold.beatinfo.get(), objref,
                         editor_ref->ebuffer.current_abs_timing);
                 } else {
                     // 使用普通纹理

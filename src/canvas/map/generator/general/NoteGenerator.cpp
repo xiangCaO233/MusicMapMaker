@@ -85,7 +85,7 @@ void NoteGenerator::generate(Note& note) {
         head_texture = editor_ref->canvas_ref->skin.get_object_texture(
             textype, ObjectStatus::HOVER);
         editor_ref->ebuffer.hover_object_info =
-            std::make_shared<HoverObjectInfo>(note_ptr, note.beatinfo,
+            std::make_shared<HoverObjectInfo>(note_ptr, note.beatinfo.get(),
                                               HoverPart::HEAD);
 
         editor_ref->cstatus.is_hover_note = true;
@@ -102,7 +102,7 @@ void NoteGenerator::generate(Note& note) {
                 editor_ref->ebuffer.selected_hitobjects.emplace(note_ptr);
                 // 发送更新选中物件信号
                 emit editor_ref->canvas_ref->select_object(
-                    note.beatinfo, note_ptr,
+                    note.beatinfo.get(), note_ptr,
                     editor_ref->ebuffer.current_abs_timing);
             }
             // 选中时的纹理
@@ -194,7 +194,7 @@ void NoteGenerator::generate_preview(Note& note) {
         head_texture = editor_ref->canvas_ref->skin.get_object_texture(
             textype, ObjectStatus::HOVER);
         editor_ref->ebuffer.hover_object_info =
-            std::make_shared<HoverObjectInfo>(note_ptr, note.beatinfo,
+            std::make_shared<HoverObjectInfo>(note_ptr, note.beatinfo.get(),
                                               HoverPart::HEAD);
 
         editor_ref->cstatus.is_hover_note = true;
@@ -211,7 +211,7 @@ void NoteGenerator::generate_preview(Note& note) {
                 editor_ref->ebuffer.selected_hitobjects.emplace(note_ptr);
                 // 发送更新选中物件信号
                 emit editor_ref->canvas_ref->select_object(
-                    note.beatinfo, note_ptr,
+                    note.beatinfo.get(), note_ptr,
                     editor_ref->ebuffer.current_abs_timing);
             }
             // 选中时的纹理

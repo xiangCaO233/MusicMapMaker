@@ -21,7 +21,7 @@ class ObjectInfoui : public QWidget {
     ~ObjectInfoui();
 
     // 当前选中的物件信息
-    std::shared_ptr<Beat> current_beatinfo{nullptr};
+    Beat *current_beatinfo{nullptr};
     std::shared_ptr<HitObject> current_obj{nullptr};
     std::shared_ptr<Timing> current_ref_timing{nullptr};
 
@@ -36,8 +36,7 @@ class ObjectInfoui : public QWidget {
 
    public slots:
     // 画布选中物件事件
-    void on_canvas_select_object(std::shared_ptr<Beat> beatinfo,
-                                 std::shared_ptr<HitObject> obj,
+    void on_canvas_select_object(Beat *beatinfo, std::shared_ptr<HitObject> obj,
                                  std::shared_ptr<Timing> ref_timing);
 
    private:

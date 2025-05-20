@@ -202,8 +202,7 @@ class MapWorkspaceCanvas : public GLCanvas {
     void current_timeline_speed_changed(double timeline_speed);
 
     // 选中物件的信号
-    void select_object(std::shared_ptr<Beat> beatinfo,
-                       std::shared_ptr<HitObject> obj,
+    void select_object(Beat *beatinfo, std::shared_ptr<HitObject> obj,
                        std::shared_ptr<Timing> ref_timing);
 
     // 选中timing的信号

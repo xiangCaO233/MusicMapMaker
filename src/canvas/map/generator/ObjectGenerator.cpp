@@ -56,7 +56,7 @@ void ObjectGenerator::dump_nodes_to_queue(bool is_over_current_time) {
                 editor_ref->ebuffer.hover_object_info->hoverbeat = nullptr;
             } else {
                 editor_ref->ebuffer.hover_object_info->hoverbeat =
-                    notereference->beatinfo;
+                    notereference->beatinfo.get();
             }
             editor_ref->ebuffer.hover_object_info->part =
                 HoverPart::COMPLEX_NODE;
@@ -114,7 +114,7 @@ void ObjectGenerator::dump_nodes_to_preview_queue(bool is_over_current_time) {
             // 选中组合键的节点(节点是相当于那一物件的尾)
             editor_ref->ebuffer.hover_object_info =
                 std::make_shared<HoverObjectInfo>(notereference,
-                                                  notereference->beatinfo,
+                                                  notereference->beatinfo.get(),
                                                   HoverPart::COMPLEX_NODE);
 
             editor_ref->cstatus.is_hover_note = true;
