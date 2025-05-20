@@ -31,6 +31,7 @@ bool IVMDragMoveObjectHandler::handle(HitObjectEditor* oeditor_context,
             // 计算相对变化
             auto note = std::dynamic_pointer_cast<Note>(
                 ivmobjecteditor->current_edit_object);
+            if (!note) return false;
             // 拖动单键
             // 相对移动的时间和轨道
             auto rtime = mouse_time - note->timestamp;
