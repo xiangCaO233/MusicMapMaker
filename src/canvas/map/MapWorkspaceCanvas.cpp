@@ -661,6 +661,8 @@ void MapWorkspaceCanvas::draw_effect_frame() {
             texdir.append(std::to_string(effect_frame_queue.current_frame_pos));
             texdir.append(".png");
 
+            ++effect_frame_queue.current_frame_pos;
+
             auto &effect_tex = texture_full_map[texdir];
             auto w =
                 effect_tex->width *
