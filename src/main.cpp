@@ -93,9 +93,9 @@ int main(int argc, char* argv[]) {
     MainWindow w;
     // 跟随系统主题
     if (isDarkMode()) {
-        w.use_theme(GlobalTheme::DARK);
-    } else {
         w.use_theme(GlobalTheme::LIGHT);
+    } else {
+        w.use_theme(GlobalTheme::DARK);
     }
     w.show();
 

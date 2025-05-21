@@ -280,7 +280,8 @@ void EffectThread::effect_thread() {
                                                         ow;
                                                     playtime =
                                                         canvas->skin
-                                                            .normal_hit_effect_duration /
+                                                            .normal_hit_effect_duration *
+                                                        1000 /
                                                         canvas->editor->cstatus
                                                             .playspeed;
                                                     if (note->compinfo ==
@@ -299,7 +300,8 @@ void EffectThread::effect_thread() {
                                                     t = EffectType::NORMAL;
                                                     playtime =
                                                         canvas->skin
-                                                            .normal_hit_effect_duration /
+                                                            .normal_hit_effect_duration *
+                                                        1000 /
                                                         canvas->editor->cstatus
                                                             .playspeed;
                                                     soundt = SoundEffectType::
