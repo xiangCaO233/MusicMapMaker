@@ -93,32 +93,38 @@ void IVMObjectEditor::end_edit() {
                         // 判断交集是否完全属于组合键-(全选到了)
                         if (!mutil::full_selected_complex(intersections,
                                                           removed_comp)) {
-                            XWARN("删除部分组合键");
+                            XWARN("删除组合键部分");
                             std::multiset<std::shared_ptr<HitObject>,
                                           HitObjectComparator>
                                 res;
                             // 不完全-需要拆分组合键
                             mutil::destruct_complex_note(res, removed_comp,
                                                          intersections);
-                            editing_src_objects_temp.insert(removed_comp);
+                            editing_src_objects_temp.insert(
+                                std::shared_ptr<HitObject>(
+                                    removed_comp->clone()));
                             removed_parent = true;
                             for (const auto& obj : res) {
                                 // 放入缓存
-                                editing_temp_objects.insert(obj);
+                                editing_temp_objects.insert(
+                                    std::shared_ptr<HitObject>(obj->clone()));
                             }
                         } else {
                             // 全部包含-只需移除整个组合键
                             if (!removed_parent) {
                                 XWARN("删除全部组合键");
                                 removed_parent = true;
-                                editing_src_objects_temp.insert(temp_comp);
+                                editing_src_objects_temp.insert(
+                                    std::shared_ptr<HitObject>(
+                                        temp_comp->clone()));
                             }
                         }
                     }
                     break;
                 }
                 default: {
-                    editing_src_objects_temp.insert(srcobj);
+                    editing_src_objects_temp.insert(
+                        std::shared_ptr<HitObject>(srcobj->clone()));
                     break;
                 }
             }
@@ -137,6 +143,7 @@ void IVMObjectEditor::end_edit() {
 
     // 入操作栈
     operation_stack.emplace(operation);
+
     // 清理正在编辑的物件
     editing_temp_objects.clear();
     current_edit_complex = nullptr;
