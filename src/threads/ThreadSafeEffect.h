@@ -10,16 +10,13 @@ enum class EffectType {
     SLIDEARROW,
 };
 
-// 可锁队列-线程安全
-template <typename T>
-class ThreadSafeQueue {
+// 可锁特效-线程安全
+class ThreadSafeEffect {
    public:
-    // 构造ThreadSafeQueue
-    ThreadSafeQueue() = default;
-    // 析构ThreadSafeQueue
-    virtual ~ThreadSafeQueue() = default;
-
-    std::queue<T> queue;
+    // 构造ThreadSafeEffect
+    ThreadSafeEffect() = default;
+    // 析构ThreadSafeEffect
+    virtual ~ThreadSafeEffect() = default;
     std::mutex mtx;
 
     // 特效类型
@@ -28,6 +25,9 @@ class ThreadSafeQueue {
     double time_left;
     // 当前播放到的帧位置
     int32_t current_frame_pos;
+    // 播放位置
+    double xpos;
+    double ypos;
 };
 
 #endif  // M_THREADSAFEQUEUE_H

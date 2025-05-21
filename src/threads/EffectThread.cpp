@@ -261,7 +261,7 @@ void EffectThread::effect_thread() {
                                         // 音效类型
                                         SoundEffectType soundt;
                                         // 特效帧数
-                                        int32_t frames;
+                                        double playtime;
                                         if (note) {
                                             switch (note->note_type) {
                                                 case NoteType::SLIDE: {
@@ -278,15 +278,11 @@ void EffectThread::effect_thread() {
                                                                  Slide>(note))
                                                             ->slide_parameter *
                                                         ow;
-                                                    frames =
-                                                        1000 *
+                                                    playtime =
                                                         canvas->skin
                                                             .normal_hit_effect_duration /
-                                                        canvas
-                                                            ->average_update_time *
-                                                        (1 /
-                                                         canvas->editor->cstatus
-                                                             .playspeed);
+                                                        canvas->editor->cstatus
+                                                            .playspeed;
                                                     if (note->compinfo ==
                                                         ComplexInfo::NONE) {
                                                         soundt =
@@ -301,15 +297,11 @@ void EffectThread::effect_thread() {
                                                 }
                                                 default: {
                                                     t = EffectType::NORMAL;
-                                                    frames =
-                                                        1000 *
+                                                    playtime =
                                                         canvas->skin
                                                             .normal_hit_effect_duration /
-                                                        canvas
-                                                            ->average_update_time *
-                                                        (1 /
-                                                         canvas->editor->cstatus
-                                                             .playspeed);
+                                                        canvas->editor->cstatus
+                                                            .playspeed;
                                                     soundt = SoundEffectType::
                                                         COMMON_HIT;
                                                     break;
@@ -320,12 +312,10 @@ void EffectThread::effect_thread() {
                                                 auto hold =
                                                     std::static_pointer_cast<
                                                         Hold>(note);
-                                                frames =
+                                                playtime =
                                                     hold->hold_time /
-                                                    canvas
-                                                        ->average_update_time *
-                                                    (1 / canvas->editor->cstatus
-                                                             .playspeed);
+                                                    canvas->editor->cstatus
+                                                        .playspeed;
                                             }
 
                                             // 播放特效
@@ -333,7 +323,7 @@ void EffectThread::effect_thread() {
                                                 play_x,
                                                 canvas->editor->ebuffer
                                                     .judgeline_visual_position,
-                                                frames, t);
+                                                playtime, t);
 
                                             // 延迟对音
                                             std::this_thread::sleep_for(

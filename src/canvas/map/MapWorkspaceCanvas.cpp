@@ -537,71 +537,14 @@ void MapWorkspaceCanvas::draw_beats() {
 }
 
 // 播放特效
-void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
-                                     int32_t frame_count, EffectType etype) {
-    switch (etype) {
-        case EffectType::NORMAL: {
-            std::shared_ptr<TextureInstace> &effect_frame_texture =
-                texture_full_map[skin.nomal_hit_effect_dir + "/1.png"];
-            for (int i = 1; i <= frame_count; ++i) {
-                auto w =
-                    effect_frame_texture->width *
-                    (editor->ebuffer.object_size_scale *
-                     working_map->project_reference->config.object_width_ratio);
-                auto h = effect_frame_texture->height *
-                         (editor->ebuffer.object_size_scale *
-                          working_map->project_reference->config
-                              .object_height_ratio);
-                auto frame_texname =
-                    skin.nomal_hit_effect_dir + "/" +
-                    std::to_string(i % skin.nomal_hit_effect_frame_count + 1) +
-                    ".png";
-                auto frame =
-                    std::make_pair(QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
-                                   texture_full_map[frame_texname]);
-                std::lock_guard<std::mutex> lock(
-                    effect_frame_queue_map[xpos].mtx);
-                effect_frame_queue_map[xpos].queue.push(frame);
-
-                effect_frame_queue_map[xpos].effect_type = EffectType::NORMAL;
-                effect_frame_queue_map[xpos].time_left =
-                    skin.normal_hit_effect_duration;
-                effect_frame_queue_map[xpos].current_frame_pos = 1;
-            }
-            break;
-        }
-        case EffectType::SLIDEARROW: {
-            std::shared_ptr<TextureInstace> &effect_frame_texture =
-                texture_full_map[skin.slide_hit_effect_dir + "/1.png"];
-            for (int i = 1; i <= frame_count; ++i) {
-                auto w =
-                    effect_frame_texture->width *
-                    (editor->ebuffer.object_size_scale *
-                     working_map->project_reference->config.object_width_ratio);
-                auto h = effect_frame_texture->height *
-                         (editor->ebuffer.object_size_scale *
-                          working_map->project_reference->config
-                              .object_height_ratio);
-                auto frame_texname =
-                    skin.slide_hit_effect_dir + "/" +
-                    std::to_string(i % skin.slide_hit_effect_frame_count + 1) +
-                    ".png";
-                auto frame =
-                    std::make_pair(QRectF(xpos - w / 2.0, ypos - h / 2.0, w, h),
-                                   texture_full_map[frame_texname]);
-                std::lock_guard<std::mutex> lock(
-                    effect_frame_queue_map[xpos].mtx);
-                effect_frame_queue_map[xpos].queue.push(frame);
-
-                effect_frame_queue_map[xpos].effect_type =
-                    EffectType::SLIDEARROW;
-                effect_frame_queue_map[xpos].time_left =
-                    skin.normal_hit_effect_duration;
-                effect_frame_queue_map[xpos].current_frame_pos = 1;
-            }
-            break;
-        }
-    }
+void MapWorkspaceCanvas::play_effect(double xpos, double ypos, double play_time,
+                                     EffectType etype) {
+    std::lock_guard<std::mutex> lock(effect_frame_queue_map[xpos].mtx);
+    effect_frame_queue_map[xpos].effect_type = etype;
+    effect_frame_queue_map[xpos].time_left = play_time;
+    effect_frame_queue_map[xpos].current_frame_pos = 1;
+    effect_frame_queue_map[xpos].xpos = xpos;
+    effect_frame_queue_map[xpos].ypos = ypos;
 }
 
 // 绘制物件
@@ -693,6 +636,53 @@ void MapWorkspaceCanvas::draw_hitobject(
     }
 }
 
+void MapWorkspaceCanvas::draw_effect_frame() {
+    // 绘制特效
+    for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
+        std::lock_guard<std::mutex> lock(effect_frame_queue.mtx);
+        if (effect_frame_queue.time_left > 0) {
+            std::string texdir;
+            switch (effect_frame_queue.effect_type) {
+                case EffectType::NORMAL: {
+                    if (effect_frame_queue.current_frame_pos >
+                        skin.nomal_hit_effect_frame_count) {
+                        effect_frame_queue.current_frame_pos = 1;
+                    }
+                    texdir = skin.nomal_hit_effect_dir;
+                    break;
+                }
+                case EffectType::SLIDEARROW: {
+                    if (effect_frame_queue.current_frame_pos >
+                        skin.slide_hit_effect_frame_count) {
+                        effect_frame_queue.current_frame_pos = 1;
+                    }
+                    texdir = skin.slide_hit_effect_dir;
+                }
+            }
+            texdir.push_back('/');
+            texdir.append(std::to_string(effect_frame_queue.current_frame_pos));
+            texdir.append(".png");
+
+            auto &effect_tex = texture_full_map[texdir];
+            auto w =
+                effect_tex->width *
+                (editor->ebuffer.object_size_scale *
+                 working_map->project_reference->config.object_width_ratio);
+            auto h =
+                effect_tex->height *
+                (editor->ebuffer.object_size_scale *
+                 working_map->project_reference->config.object_height_ratio);
+            auto rect = QRectF(effect_frame_queue.xpos - w / 2.0,
+                               effect_frame_queue.ypos - h / 2.0, w, h);
+
+            renderer_manager->addRect(rect, effect_tex,
+                                      QColor(255, 182, 193, 240), 0, true);
+            // 已播放时间
+            effect_frame_queue.time_left -= actual_update_time;
+        }
+    }
+}
+
 void MapWorkspaceCanvas::remove_objects(std::shared_ptr<HitObject> o) {
     auto it = editor->ebuffer.buffer_objects.lower_bound(o);
     // 前移到上一时间戳
@@ -738,6 +728,9 @@ void MapWorkspaceCanvas::push_shape() {
         }
         // 绘制判定线
         draw_judgeline();
+
+        // 绘制特效帧
+        draw_effect_frame();
 
         // 更新物件列表
         // 清除物件缓存
@@ -800,18 +793,6 @@ void MapWorkspaceCanvas::push_shape() {
         draw_infoarea();
         // 绘制顶部栏
         draw_top_bar();
-        // 绘制特效
-        for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
-            std::lock_guard<std::mutex> lock(effect_frame_queue.mtx);
-            if (!effect_frame_queue.queue.empty()) {
-                renderer_manager->addRect(
-                    effect_frame_queue.queue.front().first,
-                    effect_frame_queue.queue.front().second,
-                    QColor(255, 182, 193, 240), 0, true);
-                // 弹出队首
-                effect_frame_queue.queue.pop();
-            }
-        }
     }
 }
 

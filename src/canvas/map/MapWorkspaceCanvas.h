@@ -16,7 +16,7 @@
 
 #include "../../mmm/Beat.h"
 #include "../../mmm/map/MMap.h"
-#include "../../threads/ThreadSafeQueue.h"
+#include "../../threads/ThreadSafeEffect.h"
 #include "../GLCanvas.h"
 #include "MapWorkspaceSkin.h"
 #include "RenderParam.h"
@@ -80,10 +80,7 @@ class MapWorkspaceCanvas : public GLCanvas {
     std::unordered_map<RenderType, std::queue<RenderParamsBundle>> frame_params;
 
     // x位置-特效帧队列
-    std::unordered_map<
-        double,
-        ThreadSafeQueue<std::pair<QRectF, std::shared_ptr<TextureInstace>>>>
-        effect_frame_queue_map;
+    std::unordered_map<double, ThreadSafeEffect> effect_frame_queue_map;
 
     /*
      *成员函数
@@ -124,6 +121,8 @@ class MapWorkspaceCanvas : public GLCanvas {
     // 绘制预览
     void draw_preview_content();
 
+    void draw_effect_frame();
+
    public:
     // 构造MapWorkspaceCanvas
     explicit MapWorkspaceCanvas(QWidget *parent = nullptr);
@@ -154,7 +153,7 @@ class MapWorkspaceCanvas : public GLCanvas {
     std::unordered_set<std::shared_ptr<HitObject>> played_effects_objects;
 
     // 播放特效
-    void play_effect(double xpos, double ypos, int32_t frame_count,
+    void play_effect(double xpos, double ypos, double play_time,
                      EffectType etype);
 
     // 切换到指定图

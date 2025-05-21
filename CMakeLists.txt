@@ -160,7 +160,7 @@ set(PROJECT_SOURCES
     src/threads/EffectThread.h
     src/threads/EffectThread.cpp
     src/threads/ThreadPool.h
-    src/threads/ThreadSafeQueue.h
+    src/threads/ThreadSafeEffect.h
     src/canvas/GLCanvas.h
     src/canvas/GLCanvas.cpp
     src/canvas/FrameRateCounter.h
