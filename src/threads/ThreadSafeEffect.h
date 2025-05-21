@@ -17,8 +17,8 @@ class ThreadSafeEffect {
     ThreadSafeEffect() = default;
     // 析构ThreadSafeEffect
     virtual ~ThreadSafeEffect() = default;
-    std::mutex mtx;
 
+    std::mutex mtx;
     // 特效类型
     EffectType effect_type;
     // 剩余时间

@@ -539,7 +539,6 @@ void MapWorkspaceCanvas::draw_beats() {
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos, double play_time,
                                      EffectType etype) {
-    std::lock_guard<std::mutex> lock(effect_frame_queue_map[xpos].mtx);
     effect_frame_queue_map[xpos].effect_type = etype;
     effect_frame_queue_map[xpos].time_left = play_time;
     effect_frame_queue_map[xpos].current_frame_pos = 1;
@@ -639,7 +638,6 @@ void MapWorkspaceCanvas::draw_hitobject(
 void MapWorkspaceCanvas::draw_effect_frame() {
     // 绘制特效
     for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
-        std::lock_guard<std::mutex> lock(effect_frame_queue.mtx);
         if (effect_frame_queue.time_left > 0) {
             std::string texdir;
             switch (effect_frame_queue.effect_type) {
