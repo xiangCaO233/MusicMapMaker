@@ -74,6 +74,78 @@ MainWindow::MainWindow(QWidget* parent)
             &MapWorkspaceCanvas::select_timing,
             ui->infomation_widget->mmetas->timinginfo_ref,
             &TimingInfoui::on_canvasSelectTimings);
+
+    // 连接调节时间线信号槽
+    connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::timeline_zoom_adjusted,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::on_canvasAdjustTimelineZoom);
+    // 连接调节时间信号槽
+    connect(ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::time_edited,
+            ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::on_timeedit_setpos);
+
+    // 连接时间控制器选择map槽
+    connect(ui->page_widget->edit_area_widget, &MEditorArea::switched_map,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::on_selectnewmap);
+
+    // 连接画布信号和时间控制器暂停槽(来回)
+    connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::pause_signal,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::on_canvasPause);
+    connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::pause_signal,
+            ui->page_widget->edit_area_widget, &MEditorArea::on_canvasPause);
+    connect(ui->page_widget->edit_area_widget,
+            &MEditorArea::pause_button_changed,
+            ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
+
+    // 连接画布槽和时间控制器信号
+    // 时间控制器暂停->画布暂停响应
+    connect(ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::on_canvasPause,
+            ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
+
+    // 时间控制器变速->画布变速响应
+    connect(ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::playspeed_changed,
+            ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::on_timecontroller_speed_changed);
+    connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::current_time_stamp_changed,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::oncanvas_timestampChanged);
+
+    connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::current_time_stamp_changed,
+            ui->page_widget->edit_area_widget,
+            &MEditorArea::oncanvas_timestampChanged);
+
+    // 连接bpm,时间线速度变化槽
+    connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::current_absbpm_changed,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::on_currentBpmChanged);
+    connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
+            &MapWorkspaceCanvas::current_timeline_speed_changed,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::on_currentTimelineSpeedChanged);
+
+    // 时间控制器-进度条
+    connect(ui->page_widget->edit_area_widget,
+            &MEditorArea::progress_pos_changed,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::oncanvas_timestampChanged);
+
+    connect(ui->page_widget->edit_area_widget,
+            &MEditorArea::pause_button_changed,
+            ui->infomation_widget->mmetas->time_audio_controller_ref,
+            &TimeController::on_canvasPause);
 }
 
 MainWindow::~MainWindow() { delete ui; }

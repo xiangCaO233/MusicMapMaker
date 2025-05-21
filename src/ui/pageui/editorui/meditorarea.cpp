@@ -25,8 +25,6 @@ MEditorArea::MEditorArea(QWidget *parent)
     : QWidget(parent), ui(new Ui::MEditorArea) {
     ui->setupUi(this);
     canvas_container = ui->canvas_container;
-    ui->splitter->setCollapsible(1, true);
-    ui->splitter->setSizes({ui->splitter->height(), 0});
     // 初始化工具按钮菜单
     initialize_toolbuttons();
     // 默认隐藏音频控制器
@@ -43,64 +41,15 @@ void MEditorArea::initialize_signals() {
             &MapWorkspaceCanvas::switch_edit_mode, this,
             &MEditorArea::on_canvasSwitchmode);
 
-    // 连接调节时间线信号槽
-    connect(canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::timeline_zoom_adjusted,
-            ui->audio_time_controller,
-            &TimeController::on_canvasAdjustTimelineZoom);
-    // 连接调节时间信号槽
-    connect(ui->audio_time_controller, &TimeController::time_edited,
-            canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::on_timeedit_setpos);
-
-    // 连接时间控制器选择map槽
-    connect(this, &MEditorArea::switched_map, ui->audio_time_controller,
-            &TimeController::on_selectnewmap);
-
-    // 连接画布信号和时间控制器暂停槽(来回)
-    connect(ui->canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::pause_signal, ui->audio_time_controller,
-            &TimeController::on_canvasPause);
-    connect(ui->audio_time_controller, &TimeController::pause_button_changed,
-            ui->canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
-    // 连接时间控制器暂停信号到效果线程
-    // connect(ui->audio_time_controller, &TimeController::pause_button_changed,
-    //         canvas_container->canvas->effect_thread,
-    //         &EffectThread::on_canvas_pause);
-
-    // 连接画布槽和时间控制器信号
-    // 时间控制器暂停->画布暂停响应
-    connect(ui->audio_time_controller, &TimeController::on_canvasPause,
-            canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::on_timecontroller_pause_button_changed);
-
-    // 时间控制器变速->画布变速响应
-    connect(ui->audio_time_controller, &TimeController::playspeed_changed,
-            canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::on_timecontroller_speed_changed);
-
     // 连接画布时间更新信号
     connect(ui->canvas_container->canvas.data(),
             &MapWorkspaceCanvas::current_time_stamp_changed, this,
             &MEditorArea::on_canvasTimestampChanged);
-    connect(ui->canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::current_time_stamp_changed,
-            ui->audio_time_controller,
-            &TimeController::oncanvas_timestampChanged);
 
-    // 连接bpm,时间线速度变化槽
-    connect(ui->canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::current_absbpm_changed,
-            ui->audio_time_controller, &TimeController::on_currentBpmChanged);
-    connect(ui->canvas_container->canvas.data(),
-            &MapWorkspaceCanvas::current_timeline_speed_changed,
-            ui->audio_time_controller,
-            &TimeController::on_currentTimelineSpeedChanged);
-
-    // 时间控制器-进度条
-    connect(this, &MEditorArea::progress_pos_changed, ui->audio_time_controller,
-            &TimeController::oncanvas_timestampChanged);
+    // 连接时间控制器暂停信号到效果线程
+    // connect(ui->audio_time_controller, &TimeController::pause_button_changed,
+    //         canvas_container->canvas->effect_thread,
+    //         &EffectThread::on_canvas_pause);
 }
 
 // 使用主题
@@ -128,6 +77,9 @@ void MEditorArea::use_theme(GlobalTheme theme) {
     mutil::set_toolbutton_svgcolor(ui->background_opacy_toolbutton,
                                    ":/icons/background.svg", button_color, 12,
                                    12);
+    mutil::set_toolbutton_svgcolor(ui->adjust_judgeline_position_toolbutton,
+                                   ":/icons/judgeline.svg", button_color, 12,
+                                   12);
 
     mutil::set_button_svgcolor(ui->magnet_todivisor_button,
                                ":/icons/magnet.svg", button_color, 16, 16);
@@ -151,6 +103,8 @@ void MEditorArea::use_theme(GlobalTheme theme) {
                                button_color, 16, 16);
 
     // 两个状态
+    mutil::set_button_svgcolor(ui->pausebutton, ":/icons/play.svg",
+                               button_color, 16, 16);
     mutil::set_button_svgcolor(ui->wheel_direction_button,
                                ":/icons/long-arrow-alt-up.svg", button_color,
                                16, 16);
@@ -161,9 +115,6 @@ void MEditorArea::use_theme(GlobalTheme theme) {
 
     // 设置画布区主题
     ui->canvas_container->use_theme(theme);
-
-    // 设置时间控制器主题
-    ui->audio_time_controller->use_theme(theme);
 }
 
 // 初始化工具按钮菜单
@@ -390,12 +341,94 @@ void MEditorArea::initialize_toolbuttons() {
 
     //
     //
+    // 轨道高度调节按钮
+    //
+    //
+    // 创建菜单
+    auto jposmenu = new QMenu(ui->adjust_judgeline_position_toolbutton);
+
+    auto customjgsliderWidget = new QWidget();
+    auto jgslider = new QSlider(Qt::Vertical, customjgsliderWidget);
+    jgslider->setRange(0, 100);
+    jgslider->setValue(16);
+    auto jgposlabel = new QLabel("16");
+
+    auto jgmenulayout = new QVBoxLayout(customjgsliderWidget);
+    jgmenulayout->setContentsMargins(2, 2, 2, 2);
+    jgmenulayout->setSpacing(2);
+    jgmenulayout->addWidget(jgslider);
+    jgmenulayout->addWidget(jgposlabel);
+    customjgsliderWidget->setLayout(jgmenulayout);
+
+    connect(jgslider, &QSlider::valueChanged, [=](int value) {
+        jgposlabel->setText(QString::number(value));
+        canvas->editor->csettings.judgeline_position = double(value) / 100.0;
+        canvas->editor->update_size(canvas->size());
+    });
+
+    // 将自定义 Widget 包装成 QWidgetAction
+    auto *jgwidgetAction = new QWidgetAction(jposmenu);
+    jgwidgetAction->setDefaultWidget(customjgsliderWidget);
+
+    // 添加到菜单
+    jposmenu->addAction(jgwidgetAction);
+    // 设置背景按钮菜单
+    ui->adjust_judgeline_position_toolbutton->setMenu(jposmenu);
+
+    //
+    //
     // 书签按钮
     update_bookmarks();
 }
 
 // 更新书签
 void MEditorArea::update_bookmarks() {}
+
+// 画布时间变化事件
+void MEditorArea::oncanvas_timestampChanged(double time) {
+    if (!canvas_container->canvas->working_map) return;
+    // 计算进度
+    auto progress = time / canvas_container->canvas->working_map->map_length;
+
+    // 设置进度条
+    ui->playprogress->setValue(ui->playprogress->maximum() * progress);
+}
+
+// 画布暂停槽
+void MEditorArea::on_canvasPause([[maybe_unused]] bool paused) {
+    update_pause_button();
+}
+
+// 更新暂停按钮
+void MEditorArea::update_pause_button() {
+    QColor button_color;
+    switch (current_theme) {
+        case GlobalTheme::DARK: {
+            button_color = QColor(255, 255, 255);
+            break;
+        }
+        case GlobalTheme::LIGHT: {
+            button_color = QColor(0, 0, 0);
+            break;
+        }
+    }
+    mutil::set_button_svgcolor(
+        ui->pausebutton,
+        (canvas_container->canvas->editor->cstatus.canvas_pasued
+             ? ":/icons/play.svg"
+             : ":/icons/pause.svg"),
+        button_color, 16, 16);
+}
+
+// 暂停按钮
+void MEditorArea::on_pausebutton_clicked() {
+    canvas_container->canvas->editor->cstatus.canvas_pasued =
+        !canvas_container->canvas->editor->cstatus.canvas_pasued;
+    update_pause_button();
+
+    emit pause_button_changed(
+        canvas_container->canvas->editor->cstatus.canvas_pasued);
+}
 
 // 画布通过快捷键切换模式
 void MEditorArea::on_canvasSwitchmode(MouseEditMode mode) {
@@ -410,15 +443,18 @@ void MEditorArea::on_canvasSwitchmode(MouseEditMode mode) {
 // 更新进度条
 void MEditorArea::on_canvasTimestampChanged(double time) {
     double t = 0.0;
+    double v = 0.0;
     if (ui->canvas_container->canvas.data()->working_map) {
         // 更新进度条
         auto maptime = (double)(ui->canvas_container->canvas.data()
                                     ->working_map->map_length);
         double ratio = time / maptime;
         t = ratio * 10000.0;
+        v = ui->playprogress->maximum() * ratio;
     }
     sync_time_lock = true;
     ui->progress_slider->setValue(int(t));
+    ui->playprogress->setValue(int(v));
 }
 
 // page选择了新map事件

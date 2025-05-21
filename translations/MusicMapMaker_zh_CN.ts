@@ -10,37 +10,37 @@
         <translation>打开文件夹</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="115"/>
+        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="114"/>
         <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="115"/>
         <source>Open As Project</source>
         <translation>打开为项目</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="126"/>
+        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="125"/>
         <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="126"/>
         <source>New File</source>
         <translation>新建文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="131"/>
+        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="130"/>
         <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="131"/>
         <source>Open File</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="134"/>
+        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="133"/>
         <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="134"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="137"/>
+        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="136"/>
         <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="137"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="144"/>
+        <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="143"/>
         <location filename="../src/ui/controllers/mfilebrowsercontroller.cpp" line="144"/>
         <source>Properties</source>
         <translation>属性</translation>
@@ -49,13 +49,13 @@
 <context>
     <name>MEditorArea</name>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="121"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="133"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="121"/>
         <source>change the default divisors policy</source>
         <translation>修改默认分拍策略</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="206"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="233"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="206"/>
         <source>map bookmarks</source>
         <translation>谱面书签</translation>
@@ -72,88 +72,113 @@
         <translation>调整画布以适应轨道数(根据皮肤)</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="80"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="86"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="80"/>
         <source>switch edit mode</source>
         <translation>切换编辑模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="162"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="183"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="162"/>
         <source>adjust the background opacy</source>
         <translation>调整背景亮度</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="263"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="296"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="263"/>
         <source>check to show object after judgeline</source>
         <translation>选中以在判定线后保持显示物件</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="393"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="345"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="307"/>
         <source>switch mode auto select</source>
         <translation>禁用模式自动切换</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="442"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="388"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="350"/>
         <source>magnet to divisors</source>
         <translation>吸附到小节线上</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="489"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="429"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="391"/>
         <source>change the mouse wheel direction</source>
         <translation>更改鼠标滚动方向</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="143"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="182"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="178"/>
         <source>Place note mode</source>
         <translation>单键编辑模式</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="149"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="188"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="184"/>
         <source>Place line and slide mode</source>
         <translation>面条与滑键编辑模式</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="155"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="194"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="190"/>
         <source>Place timing mode</source>
         <translation>时间点编辑模式</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="161"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="200"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="196"/>
         <source>Selection mode</source>
         <translation>选择模式</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="167"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="206"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="202"/>
         <source>Observer mode</source>
         <translation>观察者模式</translation>
     </message>
     <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="240"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="280"/>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="276"/>
         <source>Change beat type</source>
         <translation>修改拍型</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="537"/>
+        <source>mmm mapfile</source>
+        <translation>mmm谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="538"/>
+        <source>imd mapfile</source>
+        <translation>imd谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="539"/>
+        <source>osu mapfile</source>
+        <translation>osu谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="558"/>
+        <source>Save As</source>
+        <translation>另存为</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="558"/>
+        <source>File Formats:</source>
+        <translation>文件格式:</translation>
     </message>
 </context>
 <context>
     <name>MInfo</name>
     <message>
-        <location filename="../src/ui/infoui/minfo.ui" line="57"/>
+        <location filename="../src/ui/infoui/minfo.ui" line="60"/>
         <location filename="../src/ui/infoui/minfo.ui" line="57"/>
         <source>Log</source>
         <translation>日志</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/minfo.ui" line="97"/>
+        <location filename="../src/ui/infoui/minfo.ui" line="100"/>
         <location filename="../src/ui/infoui/minfo.ui" line="97"/>
         <source>Errors</source>
         <translation>错误</translation>
@@ -162,13 +187,18 @@
 <context>
     <name>MMetas</name>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="42"/>
+        <source>time audio controller</source>
+        <translation>控制器</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="52"/>
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="39"/>
         <source>edit info</source>
         <translation>编辑信息</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="114"/>
+        <location filename="../src/ui/infoui/metaui/mmetas.ui" line="127"/>
         <location filename="../src/ui/infoui/metaui/mmetas.ui" line="114"/>
         <source>map metadatas</source>
         <translation>谱面元数据</translation>
@@ -219,37 +249,37 @@
         <translation>音频设备</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/projectcontroller.cpp" line="56"/>
+        <location filename="../src/ui/controllers/projectcontroller.cpp" line="55"/>
         <location filename="../src/ui/controllers/projectcontroller.cpp" line="56"/>
         <source>No Project</source>
         <translation>无项目</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/projectcontroller.cpp" line="212"/>
+        <location filename="../src/ui/controllers/projectcontroller.cpp" line="211"/>
         <location filename="../src/ui/controllers/projectcontroller.cpp" line="212"/>
         <source>Open In FileBrowser</source>
         <translation>在文件管理器中打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/projectcontroller.cpp" line="227"/>
+        <location filename="../src/ui/controllers/projectcontroller.cpp" line="226"/>
         <location filename="../src/ui/controllers/projectcontroller.cpp" line="227"/>
         <source>Import Map</source>
         <translation>导入谱面</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/projectcontroller.cpp" line="230"/>
+        <location filename="../src/ui/controllers/projectcontroller.cpp" line="229"/>
         <location filename="../src/ui/controllers/projectcontroller.cpp" line="230"/>
         <source>选择谱面</source>
         <translation>选择谱面</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/projectcontroller.cpp" line="231"/>
+        <location filename="../src/ui/controllers/projectcontroller.cpp" line="230"/>
         <location filename="../src/ui/controllers/projectcontroller.cpp" line="231"/>
         <source>谱面文件(*.osu *.imd *.mc)</source>
         <translation>谱面文件(*.osu *.imd *.mc)</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/projectcontroller.cpp" line="238"/>
+        <location filename="../src/ui/controllers/projectcontroller.cpp" line="237"/>
         <location filename="../src/ui/controllers/projectcontroller.cpp" line="238"/>
         <source>Create New Map</source>
         <translation>新建谱面</translation>
@@ -270,157 +300,157 @@
         <translation>音频设备</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="272"/>
+        <location filename="../src/ui/mainwindow.ui" line="285"/>
         <location filename="../src/ui/mainwindow.ui" line="272"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="276"/>
+        <location filename="../src/ui/mainwindow.ui" line="289"/>
         <location filename="../src/ui/mainwindow.ui" line="276"/>
         <source>Switch Version</source>
         <translation>切换版本</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="297"/>
+        <location filename="../src/ui/mainwindow.ui" line="310"/>
         <location filename="../src/ui/mainwindow.ui" line="297"/>
         <source>Modify</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="310"/>
+        <location filename="../src/ui/mainwindow.ui" line="323"/>
         <location filename="../src/ui/mainwindow.ui" line="310"/>
         <source>View</source>
         <translation>视图</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="317"/>
+        <location filename="../src/ui/mainwindow.ui" line="330"/>
         <location filename="../src/ui/mainwindow.ui" line="317"/>
         <source>Tool</source>
         <translation>工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="323"/>
+        <location filename="../src/ui/mainwindow.ui" line="336"/>
         <location filename="../src/ui/mainwindow.ui" line="323"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="340"/>
+        <location filename="../src/ui/mainwindow.ui" line="353"/>
         <location filename="../src/ui/mainwindow.ui" line="340"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="349"/>
+        <location filename="../src/ui/mainwindow.ui" line="362"/>
         <location filename="../src/ui/mainwindow.ui" line="349"/>
         <source>Open Directory</source>
         <translation>打开目录</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="358"/>
+        <location filename="../src/ui/mainwindow.ui" line="371"/>
         <location filename="../src/ui/mainwindow.ui" line="358"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="367"/>
+        <location filename="../src/ui/mainwindow.ui" line="380"/>
         <location filename="../src/ui/mainwindow.ui" line="367"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="376"/>
+        <location filename="../src/ui/mainwindow.ui" line="389"/>
         <location filename="../src/ui/mainwindow.ui" line="376"/>
         <source>Yank</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="385"/>
+        <location filename="../src/ui/mainwindow.ui" line="398"/>
         <location filename="../src/ui/mainwindow.ui" line="385"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="394"/>
+        <location filename="../src/ui/mainwindow.ui" line="407"/>
         <location filename="../src/ui/mainwindow.ui" line="394"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="403"/>
+        <location filename="../src/ui/mainwindow.ui" line="416"/>
         <location filename="../src/ui/mainwindow.ui" line="403"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="408"/>
+        <location filename="../src/ui/mainwindow.ui" line="421"/>
         <location filename="../src/ui/mainwindow.ui" line="408"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="419"/>
+        <location filename="../src/ui/mainwindow.ui" line="432"/>
         <location filename="../src/ui/mainwindow.ui" line="419"/>
         <source>Show Logs</source>
         <translation>显示日志</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="428"/>
+        <location filename="../src/ui/mainwindow.ui" line="441"/>
         <location filename="../src/ui/mainwindow.ui" line="428"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="437"/>
+        <location filename="../src/ui/mainwindow.ui" line="450"/>
         <location filename="../src/ui/mainwindow.ui" line="437"/>
         <source>Save As</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="442"/>
+        <location filename="../src/ui/mainwindow.ui" line="455"/>
         <location filename="../src/ui/mainwindow.ui" line="442"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="447"/>
+        <location filename="../src/ui/mainwindow.ui" line="460"/>
         <location filename="../src/ui/mainwindow.ui" line="447"/>
         <source>Check Stack Object</source>
         <translation>检查重叠物件</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="458"/>
+        <location filename="../src/ui/mainwindow.ui" line="471"/>
         <location filename="../src/ui/mainwindow.ui" line="458"/>
         <source>Show Files</source>
         <translation>显示文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="467"/>
+        <location filename="../src/ui/mainwindow.ui" line="480"/>
         <location filename="../src/ui/mainwindow.ui" line="467"/>
         <source>Pack</source>
         <translation>打包</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="476"/>
+        <location filename="../src/ui/mainwindow.ui" line="489"/>
         <location filename="../src/ui/mainwindow.ui" line="476"/>
         <source>Pack As</source>
         <translation>打包为</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="485"/>
+        <location filename="../src/ui/mainwindow.ui" line="498"/>
         <location filename="../src/ui/mainwindow.ui" line="485"/>
         <source>New Version</source>
         <translation>新建版本</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="490"/>
+        <location filename="../src/ui/mainwindow.ui" line="503"/>
         <location filename="../src/ui/mainwindow.ui" line="490"/>
         <source>Insane</source>
         <translation>疯狂</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="82"/>
+        <location filename="../src/ui/mainwindow.cpp" line="155"/>
         <location filename="../src/ui/mainwindow.cpp" line="82"/>
         <source>Music Map Maker -</source>
         <translation>音游谱面制作器 -&gt;</translation>
@@ -429,8 +459,8 @@
 <context>
     <name>MapWorkspaceCanvas</name>
     <message>
+        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="136"/>
         <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="124"/>
-        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="123"/>
         <source>qt update substantially delayed:%1ms</source>
         <translation>Qt发生大幅更新延迟:%1ms</translation>
     </message>
@@ -581,25 +611,36 @@
     <name>NewTimingGuide</name>
     <message>
         <location filename="../src/ui/guide/newtimingguide.ui" line="14"/>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="14"/>
         <source>New Timing</source>
         <translation>新建时间点</translation>
     </message>
     <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="50"/>
         <location filename="../src/ui/guide/newtimingguide.ui" line="50"/>
         <source>Timestamp:</source>
         <translation>时间戳:</translation>
     </message>
     <message>
         <location filename="../src/ui/guide/newtimingguide.ui" line="111"/>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="111"/>
         <source>Adapt to preferencebpm</source>
         <translation>适应参考bpm</translation>
     </message>
     <message>
         <location filename="../src/ui/guide/newtimingguide.ui" line="129"/>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="226"/>
+        <source>Not supported yet</source>
+        <translation>暂不支持</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="135"/>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="129"/>
         <source>Change Play Speed</source>
         <translation>启用变速</translation>
     </message>
     <message>
+        <location filename="../src/ui/guide/newtimingguide.ui" line="232"/>
         <location filename="../src/ui/guide/newtimingguide.ui" line="220"/>
         <source>Inheritance Previous Timing</source>
         <translation>继承之前的时间点(绝对)</translation>
@@ -650,7 +691,7 @@
         <translation>时间:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="517"/>
+        <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="520"/>
         <location filename="../src/ui/infoui/metaui/editinfo/objectinfoui.ui" line="517"/>
         <source>go to this timing position</source>
         <translation>前往此时间点处</translation>
@@ -689,14 +730,9 @@
 <context>
     <name>TimeController</name>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="195"/>
-        <source>timeline speed</source>
-        <translation>时间线速度</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="495"/>
-        <source>audio speed </source>
-        <translation>音频速度 </translation>
+        <location filename="../src/ui/controllers/timecontroller.cpp" line="336"/>
+        <source>/switch</source>
+        <translation>/切换</translation>
     </message>
 </context>
 <context>
@@ -714,19 +750,19 @@
         <translation>时间戳</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="113"/>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="116"/>
         <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="113"/>
         <source>bpm:</source>
         <translation>bpm:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="158"/>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="164"/>
         <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="158"/>
         <source>speed:</source>
         <translation>速度:</translation>
     </message>
     <message>
-        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="207"/>
+        <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="219"/>
         <location filename="../src/ui/infoui/metaui/editinfo/timinginfoui.ui" line="207"/>
         <source>Delete Timing</source>
         <translation>删除时间点</translation>
@@ -735,75 +771,64 @@
 <context>
     <name>audio_time_controller</name>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="82"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="82"/>
-        <source>edit play position</source>
-        <translation>修改播放位置</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="235"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="235"/>
-        <source>timeline speed</source>
-        <translation>时间线速度</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="352"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="352"/>
-        <source>fast backward</source>
-        <translation>快退(5s)</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="383"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="326"/>
-        <source>pause</source>
-        <translation>切换暂停状态</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="428"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="428"/>
-        <source>fast forward</source>
-        <translation>快进(5s)</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="321"/>
-        <source>New Timing</source>
-        <translation>添加时间点</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="503"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="446"/>
-        <source>Timeline zoom:</source>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="206"/>
+        <source>timeline scale:</source>
         <translation>时间线缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="576"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="519"/>
-        <source>Object height scale:</source>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="221"/>
+        <source>object height scale:</source>
         <translation>物件高度缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="649"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="592"/>
-        <source>Object width scale:</source>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="236"/>
+        <source>object width scale:</source>
         <translation>物件宽度缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="742"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="673"/>
-        <source>change the pitch</source>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="286"/>
+        <source>effect volume:</source>
+        <translation>效果音量:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="368"/>
+        <source>backgorund music volume:</source>
+        <translation>音乐音量:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="450"/>
+        <source>global volume:</source>
+        <translation>全局音量:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="546"/>
+        <source>timeline speed:</source>
+        <translation>时间线速度:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="645"/>
+        <source>reset audio speed</source>
+        <translation>重置音频速度</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="683"/>
+        <source>enable pitch alt</source>
         <translation>启用变调</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="870"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="801"/>
-        <source>audio speed </source>
-        <translation>音频速度 </translation>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="717"/>
+        <source>audio speed:</source>
+        <translation>音频速度:</translation>
     </message>
     <message>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="783"/>
-        <location filename="../src/ui/controllers/timecontroller.ui" line="714"/>
-        <source>reset speed</source>
-        <translation>重置播放速度</translation>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="747"/>
+        <source>map time</source>
+        <translation>谱面时间</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/controllers/timecontroller.ui" line="779"/>
+        <source>new timing</source>
+        <translation>新建时间点</translation>
     </message>
 </context>
 </TS>

@@ -62,9 +62,16 @@ class MEditorArea : public QWidget {
     // 画布通过快捷键切换模式
     void on_canvasSwitchmode(MouseEditMode mode);
 
+    // 画布时间变化事件
+    void oncanvas_timestampChanged(double time);
+
+    // 画布暂停槽
+    void on_canvasPause(bool paused);
+
     // 保存action
     void on_saveMap();
     void on_saveMapAs();
+    void update_pause_button();
 
    signals:
     // 切换map信号
@@ -73,7 +80,11 @@ class MEditorArea : public QWidget {
     // 进度条移动信号
     void progress_pos_changed(double ratio);
 
+    // 暂停信号
+    void pause_button_changed(bool paused);
+
    private slots:
+    void on_pausebutton_clicked();
     // 画布时间变化事件
     void on_canvasTimestampChanged(double time);
 

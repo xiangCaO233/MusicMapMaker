@@ -1,6 +1,7 @@
 #ifndef TIMECONTROLLER_H
 #define TIMECONTROLLER_H
 
+#include <qevent.h>
 #include <qtmetamacros.h>
 
 #include <QWidget>
@@ -43,14 +44,8 @@ class TimeController : public QWidget {
     // 使用主题
     void use_theme(GlobalTheme theme);
 
-    // 更新全局音量按钮(主题)
-    void update_global_volume_button();
-
-    // 更新音频状态
-    void update_audio_status();
-
-    // 更新暂停按钮
-    void update_pause_button();
+    // 更新album
+    void update_album();
 
    public slots:
     // page选择了新map事件
@@ -64,17 +59,18 @@ class TimeController : public QWidget {
 
     // 实时信息变化槽
     void on_currentBpmChanged(double bpm);
+
     void on_currentTimelineSpeedChanged(double timeline_speed);
 
     // 画布调节时间线缩放
     void on_canvasAdjustTimelineZoom(int value);
 
+    // 更新音频状态
+    void update_audio_status();
+
    signals:
     // 时间控制器编辑时间信号
     void time_edited(double time);
-
-    // 时间控制器暂停信号
-    void pause_button_changed(bool paused);
 
     // 时间控制器播放速度变化信号
     void playspeed_changed(double speed);
@@ -83,14 +79,12 @@ class TimeController : public QWidget {
     void music_pos_synchronized(double time);
 
    private slots:
-    // 暂停按钮
-    void on_pausebutton_clicked();
 
     // 变速设置
-    void on_doubleSpinBox_valueChanged(double arg1);
+    void on_audiospeed_spinbox_valueChanged(double arg1);
 
     // 变速设置完成
-    void on_doubleSpinBox_editingFinished();
+    void on_audiospeed_spinbox_editingFinished();
 
     // 重置变速按钮事件
     void on_resetspeedbutton_clicked();
@@ -107,23 +101,14 @@ class TimeController : public QWidget {
     // 效果音量slider值变化事件
     void on_effect_volume_slider_valueChanged(int value);
 
-    // 静音全局按钮事件
-    void on_reset_global_volume_button_clicked();
-
-    // 静音音乐按钮事件
-    void on_reset_music_volume_button_clicked();
-
-    // 静音效果按钮事件
-    void on_reset_effect_volume_button_clicked();
-
     // 时间编辑框内容变化事件
-    void on_lineEdit_textChanged(const QString &arg1);
+    void on_time_lineedit_textChanged(const QString &arg1);
 
     // 时间编辑框回车按下事件
-    void on_lineEdit_returnPressed();
+    void on_time_lineedit_returnPressed();
 
     // 时间编辑框编辑完成事件
-    void on_lineEdit_editingFinished();
+    void on_time_lineedit_editingFinished();
 
     // 物件宽度缩放调节事件
     void on_owidth_scale_slider_valueChanged(int value);
@@ -134,20 +119,14 @@ class TimeController : public QWidget {
     // 时间线缩放调节事件
     void on_timeline_zoom_slider_valueChanged(int value);
 
-    // 重置宽度缩放按钮
-    void on_owidth_scale_button_clicked();
-
-    // 重置高度缩放按钮
-    void on_oheight_scale_button_clicked();
-
-    // 重置时间线缩放按钮
-    void on_timeline_zoom_button_clicked();
-
     // 切换时间格式按钮事件
     void on_time_format_button_clicked();
 
     // 新建timing按钮事件
     void on_new_timing_button_clicked();
+
+   protected:
+    void resizeEvent(QResizeEvent *e) override;
 
    private:
     Ui::audio_time_controller *ui;

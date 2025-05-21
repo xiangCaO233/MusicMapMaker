@@ -39,11 +39,11 @@
      </property>
      <widget class="QWidget" name="timecontroller_tab">
       <attribute name="title">
-       <string>time controller</string>
+       <string>time audio controller</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QWidget" name="time_controller" native="true"/>
+        <widget class="TimeController" name="time_controller" native="true"/>
        </item>
       </layout>
      </widget>
@@ -152,6 +152,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>TimeController</class>
+   <extends>QWidget</extends>
+   <header location="global">timecontroller.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>ObjectInfoui</class>
    <extends>QWidget</extends>

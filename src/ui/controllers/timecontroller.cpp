@@ -2,6 +2,7 @@
 
 #include <qlogging.h>
 #include <qtmetamacros.h>
+#include <qwidget.h>
 
 #include <memory>
 #include <string>
@@ -24,6 +25,11 @@ TimeController::TimeController(QWidget *parent)
 
 TimeController::~TimeController() { delete ui; }
 
+void TimeController::resizeEvent(QResizeEvent *e) {
+    QWidget::resizeEvent(e);
+    update_album();
+}
+
 // 使用主题
 void TimeController::use_theme(GlobalTheme theme) {
     current_theme = theme;
@@ -38,47 +44,37 @@ void TimeController::use_theme(GlobalTheme theme) {
             break;
         }
     }
-
-    // 设置按钮图标颜色
-    mutil::set_button_svgcolor(ui->pausebutton, ":/icons/play.svg",
-                               file_button_color, 16, 16);
     mutil::set_button_svgcolor(ui->enablepitchaltbutton,
                                ":/icons/pitch-alt.svg", file_button_color, 16,
                                16);
-    mutil::set_button_svgcolor(ui->resetspeedbutton, ":/icons/bolt.svg",
+    mutil::set_button_svgcolor(ui->resetspeedbutton, ":/icons/undo-alt.svg",
                                file_button_color, 16, 16);
-
-    mutil::set_button_svgcolor(ui->reset_global_volume_button,
-                               ":/icons/volume-high.svg", file_button_color, 16,
-                               16);
-    mutil::set_button_svgcolor(ui->reset_music_volume_button,
-                               ":/icons/music.svg", file_button_color, 16, 16);
-
-    mutil::set_button_svgcolor(ui->reset_effect_volume_button,
-                               ":/icons/effect.svg", file_button_color, 16, 16);
 }
 
-// 更新全局音量按钮(主题)
-void TimeController::update_global_volume_button() {
-    QColor button_color;
-    switch (current_theme) {
-        case GlobalTheme::DARK: {
-            button_color = QColor(255, 255, 255);
-            break;
+// 更新album
+void TimeController::update_album() {
+    // 修改曲绘尺寸-根据宽度自适应尺寸
+    if (binding_map && !binding_map->bg_path.empty()) {
+        // 加载图片
+        QPixmap pixmap(
+            QString::fromStdString(binding_map->bg_path.generic_string()));
+        if (!pixmap.isNull()) {
+            // 获取music_album标签的宽度
+            int labelWidth = ui->music_album->width();
+
+            // 根据宽度按比例缩放，保持宽高比
+            QPixmap scaledPixmap = pixmap.scaledToWidth(
+                labelWidth, Qt::TransformationMode::SmoothTransformation);
+
+            // 显示到QLabel
+            ui->music_album->setPixmap(scaledPixmap);
+
+            // 可选：保持居中显示
+            ui->music_album->setAlignment(Qt::AlignCenter);
         }
-        case GlobalTheme::LIGHT: {
-            button_color = QColor(0, 0, 0);
-            break;
-        }
+    } else {
+        ui->music_album->clear();
     }
-    auto current_global_volume = ui->global_volume_slider->value();
-    mutil::set_button_svgcolor(
-        ui->reset_global_volume_button,
-        (current_global_volume > 50
-             ? ":/icons/volume-high.svg"
-             : (current_global_volume > 0 ? ":/icons/volume-low.svg"
-                                          : ":/icons/volume-off.svg")),
-        button_color, 16, 16);
 }
 
 // 更新音频状态
@@ -131,44 +127,13 @@ void TimeController::update_audio_status() {
     }
 }
 
-// 更新暂停按钮
-void TimeController::update_pause_button() {
-    QColor button_color;
-    switch (current_theme) {
-        case GlobalTheme::DARK: {
-            button_color = QColor(255, 255, 255);
-            break;
-        }
-        case GlobalTheme::LIGHT: {
-            button_color = QColor(0, 0, 0);
-            break;
-        }
-    }
-    mutil::set_button_svgcolor(
-        ui->pausebutton, (pause ? ":/icons/play.svg" : ":/icons/pause.svg"),
-        button_color, 16, 16);
-}
-
-// 暂停按钮
-void TimeController::on_pausebutton_clicked() {
-    pause = !pause;
-
-    update_pause_button();
-    // 切换音频播放状态
-    update_audio_status();
-    emit pause_button_changed(pause);
-}
-
 // 画布暂停槽
 void TimeController::on_canvasPause(bool paused) {
     // 更新暂停状态和按钮图标
     pause = paused;
     // 修改timeedit可用状态
     // 非暂停时不可使用
-    ui->lineEdit->setEnabled(pause);
-
-    // 更新暂停按钮图标
-    update_pause_button();
+    ui->time_lineedit->setEnabled(pause);
 
     // 切换音频播放状态
     update_audio_status();
@@ -192,40 +157,43 @@ void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
     // 画布配置
     auto project_owidth_value =
         int(map ? map->project_reference->config.object_width_ratio * 100 : 0);
-    ui->owidth_scale_button->setText(QString::number(project_owidth_value));
+    ui->owidth_scale_value->setText(QString::number(project_owidth_value) +
+                                    ":");
     ui->owidth_scale_slider->setValue(project_owidth_value);
 
     auto project_oheight_value =
         int(map ? map->project_reference->config.object_height_ratio * 100 : 0);
-    ui->oheight_scale_button->setText(QString::number(project_oheight_value));
+    ui->oheight_scale_value->setText(QString::number(project_oheight_value) +
+                                     ":");
     ui->oheight_scale_slider->setValue(project_oheight_value);
 
     auto project_timeline_zoom_value =
         int(map ? map->project_reference->config.timeline_zoom * 100 : 0);
-    ui->timeline_zoom_button->setText(
-        QString::number(project_timeline_zoom_value));
+    ui->timeline_zoom_value->setText(
+        QString::number(project_timeline_zoom_value) + ":");
     ui->timeline_zoom_slider->setValue(project_timeline_zoom_value);
 
     // 音频配置
     auto project_global_volume =
         int(map ? map->project_reference->config.pglobal_volume * 100 : 50);
     ui->global_volume_slider->setValue(project_global_volume);
-    ui->global_volume_value_label->setText(
-        QString::number(project_global_volume));
+    ui->global_volume_value->setText(QString::number(project_global_volume) +
+                                     ":");
 
     auto project_music_volume =
         int(map ? map->project_reference->config.pmusic_volume * 100 : 100);
     ui->music_volume_slider->setValue(project_music_volume);
-    ui->music_volume_value_label->setText(
-        QString::number(project_music_volume));
+    ui->music_volume_value->setText(QString::number(project_music_volume) +
+                                    ":");
 
     auto project_effect_volume =
         int(map ? map->project_reference->config.peffect_volume * 100 : 100);
     ui->effect_volume_slider->setValue(project_effect_volume);
-    ui->effect_volume_value_label->setText(
-        QString::number(project_effect_volume));
+    ui->effect_volume_value->setText(QString::number(project_effect_volume) +
+                                     ":");
 
     if (binding_map) {
+        // 更新音量
         BackgroundAudio::set_global_volume(
             binding_map->project_reference->devicename,
             map->project_reference->config.pmusic_volume);
@@ -235,6 +203,10 @@ void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
         BackgroundAudio::set_effects_volume(
             binding_map->project_reference->devicename,
             map->project_reference->config.peffect_volume);
+        // 更新maptitle
+        ui->map_title_unicode->setText(
+            QString::fromStdString(binding_map->title_unicode));
+        update_album();
     }
 }
 
@@ -245,12 +217,11 @@ void TimeController::oncanvas_timestampChanged(double time) {
     auto progress = time / binding_map->map_length;
     // 更新lineedit和progress
     if (tformat == TimeFormat::MILLISECONDS) {
-        ui->lineEdit->setText(QString::number(int32_t(time)));
+        ui->time_lineedit->setText(QString::number(int32_t(time)));
     }
     if (tformat == TimeFormat::HHMMSSZZZ) {
-        ui->lineEdit->setText(mutil::millisecondsToQString(int32_t(time)));
+        ui->time_lineedit->setText(mutil::millisecondsToQString(int32_t(time)));
     }
-    ui->playprogress->setValue(ui->playprogress->maximum() * progress);
 
     // 暂停可调
     if (!pause) return;
@@ -265,7 +236,7 @@ void TimeController::oncanvas_timestampChanged(double time) {
 }
 
 // 变速设置
-void TimeController::on_doubleSpinBox_valueChanged(double arg1) {
+void TimeController::on_audiospeed_spinbox_valueChanged(double arg1) {
     // TODO(xiang 2025-04-26): 实现功能
     auto speed_value = arg1 / 100.0;
     if (!ui->enablepitchaltbutton->isChecked()) {
@@ -283,8 +254,8 @@ void TimeController::on_doubleSpinBox_valueChanged(double arg1) {
 }
 
 // 变速设置完成
-void TimeController::on_doubleSpinBox_editingFinished() {
-    auto speed_value = ui->doubleSpinBox->value() / 100.0;
+void TimeController::on_audiospeed_spinbox_editingFinished() {
+    auto speed_value = ui->audiospeed_spinbox->value() / 100.0;
     qDebug() << "finished:" << speed_value;
     if (ui->enablepitchaltbutton->isChecked()) {
         // 变速不可以实时调整
@@ -320,14 +291,12 @@ void TimeController::on_global_volume_slider_valueChanged(int value) {
         BackgroundAudio::set_global_volume(
             binding_map->project_reference->devicename, volume_value);
         // 更新标签
-        ui->global_volume_value_label->setText(
-            QString::number(volume_value * 100));
+        ui->global_volume_value->setText(QString::number(volume_value * 100) +
+                                         ":");
         // 更新项目音量配置
         binding_map->project_reference->config.pglobal_volume = volume_value;
         binding_map->project_reference->audio_volume_node.attribute("global")
             .set_value(volume_value);
-
-        update_global_volume_button();
     }
 }
 
@@ -338,8 +307,8 @@ void TimeController::on_music_volume_slider_valueChanged(int value) {
         BackgroundAudio::set_music_volume(
             binding_map->project_reference->devicename, volume_value);
         // 更新标签
-        ui->music_volume_value_label->setText(
-            QString::number(volume_value * 100));
+        ui->music_volume_value->setText(QString::number(volume_value * 100) +
+                                        ":");
         // 更新项目音量配置
         binding_map->project_reference->config.pmusic_volume = volume_value;
         binding_map->project_reference->audio_volume_node.attribute("music")
@@ -354,8 +323,7 @@ void TimeController::on_effect_volume_slider_valueChanged(int value) {
         BackgroundAudio::set_effects_volume(
             binding_map->project_reference->devicename, volume_value);
         // 更新标签
-        ui->effect_volume_value_label->setText(
-            QString::number(volume_value * 100));
+        ui->effect_volume_value->setText(QString::number(volume_value * 100));
         // 更新项目音量配置
         binding_map->project_reference->config.peffect_volume = volume_value;
         binding_map->project_reference->audio_volume_node.attribute("effect")
@@ -363,95 +331,67 @@ void TimeController::on_effect_volume_slider_valueChanged(int value) {
     }
 }
 
-// 静音全局按钮事件
-void TimeController::on_reset_global_volume_button_clicked() {
-    if (binding_map) {
-        BackgroundAudio::set_global_volume(
-            binding_map->project_reference->devicename, 0);
-        // 更新标签
-        ui->global_volume_value_label->setText(QString::number(0));
-        update_global_volume_button();
-    }
-}
-
-// 静音音乐按钮事件
-void TimeController::on_reset_music_volume_button_clicked() {
-    if (binding_map) {
-        BackgroundAudio::set_music_volume(
-            binding_map->project_reference->devicename, 0);
-        // 更新标签
-        ui->music_volume_value_label->setText(QString::number(0));
-    }
-}
-
-// 静音效果按钮事件
-void TimeController::on_reset_effect_volume_button_clicked() {
-    if (binding_map) {
-        BackgroundAudio::set_effects_volume(
-            binding_map->project_reference->devicename, 0);
-        // 更新标签
-        ui->effect_volume_value_label->setText(QString::number(0));
-    }
-}
-
 // 切换时间格式按钮事件
 void TimeController::on_time_format_button_clicked() {
+    auto switch_suffix = tr("/switch");
     if (tformat == TimeFormat::HHMMSSZZZ) {
         // 当前是HHMMSSZZZ--切换为毫秒
-        ui->time_format_button->setText("ms");
+        ui->time_format_button->setText("ms" + switch_suffix);
         // 更新时间编辑框内容
-        ui->lineEdit->setText(QString::number(
+        ui->time_lineedit->setText(QString::number(
             mutil::qstringToMilliseconds(latest_time_edit_value)));
         tformat = TimeFormat::MILLISECONDS;
         return;
     }
     if (tformat == TimeFormat::MILLISECONDS) {
         // 当前是毫秒--切换为HHMMSSZZZ
-        ui->time_format_button->setText("hh:mm:ss.zzz");
+        ui->time_format_button->setText("hh:mm:ss.zzz" + switch_suffix);
         // 更新时间编辑框内容
-        ui->lineEdit->setText(mutil::millisecondsToQString(
+        ui->time_lineedit->setText(mutil::millisecondsToQString(
             std::stoi(latest_time_edit_value.toStdString())));
         tformat = TimeFormat::HHMMSSZZZ;
     }
 }
 
 // 时间编辑框内容变化事件
-void TimeController::on_lineEdit_textChanged(const QString &arg1) {
+void TimeController::on_time_lineedit_textChanged(const QString &arg1) {
     latest_time_edit_value = arg1;
 }
 
 // 时间编辑框回车按下事件
-void TimeController::on_lineEdit_returnPressed() {
-    on_lineEdit_editingFinished();
+void TimeController::on_time_lineedit_returnPressed() {
+    on_time_lineedit_editingFinished();
 }
 
 // 时间编辑框编辑完成事件
-void TimeController::on_lineEdit_editingFinished() {
+void TimeController::on_time_lineedit_editingFinished() {
     // 预先记录修改前的数据
     // 检查输入数据是否合法--不合法恢复缓存数据
     if (tformat == TimeFormat::HHMMSSZZZ) {
-        auto milliseconds = mutil::qstringToMilliseconds(ui->lineEdit->text());
+        auto milliseconds =
+            mutil::qstringToMilliseconds(ui->time_lineedit->text());
         if (milliseconds == -1) {
             // 格式错误
             XERROR("时间格式错误-->需要[hh:mm:ss.zzz]");
-            ui->lineEdit->setText(latest_time_edit_value);
+            ui->time_lineedit->setText(latest_time_edit_value);
         } else {
-            ui->lineEdit->setText(mutil::millisecondsToQString(milliseconds));
+            ui->time_lineedit->setText(
+                mutil::millisecondsToQString(milliseconds));
             oncanvas_timestampChanged(milliseconds);
             emit time_edited(milliseconds);
         }
     } else if (tformat == TimeFormat::MILLISECONDS) {
         bool isalldigits =
-            mutil::isStringAllDigits_Iteration(ui->lineEdit->text());
+            mutil::isStringAllDigits_Iteration(ui->time_lineedit->text());
         if (isalldigits) {
-            auto timem = std::stoi(ui->lineEdit->text().toStdString());
-            ui->lineEdit->setText(QString::number(timem));
+            auto timem = std::stoi(ui->time_lineedit->text().toStdString());
+            ui->time_lineedit->setText(QString::number(timem));
             oncanvas_timestampChanged(timem);
             emit time_edited(timem);
         } else {
             // 格式错误
             XERROR("时间格式错误-->需要[0-9]");
-            ui->lineEdit->setText(latest_time_edit_value);
+            ui->time_lineedit->setText(latest_time_edit_value);
         }
     }
 }
@@ -464,7 +404,7 @@ void TimeController::on_owidth_scale_slider_valueChanged(int value) {
         binding_map->project_reference->sizeconfig_node
             .attribute("objwidth-scale")
             .set_value(ratio_value);
-        ui->owidth_scale_button->setText(QString::number(value));
+        ui->owidth_scale_value->setText(QString::number(value) + ":");
     }
 }
 
@@ -477,7 +417,7 @@ void TimeController::on_oheight_scale_slider_valueChanged(int value) {
         binding_map->project_reference->sizeconfig_node
             .attribute("objheight-scale")
             .set_value(ratio_value);
-        ui->oheight_scale_button->setText(QString::number(value));
+        ui->oheight_scale_value->setText(QString::number(value) + ":");
     }
 }
 
@@ -485,7 +425,7 @@ void TimeController::on_oheight_scale_slider_valueChanged(int value) {
 void TimeController::on_canvasAdjustTimelineZoom(int value) {
     timeline_zoom_sync_lock = true;
     ui->timeline_zoom_slider->setValue(value);
-    ui->timeline_zoom_button->setText(QString::number(value));
+    ui->timeline_zoom_value->setText(QString::number(value) + ":");
 }
 
 // 时间线缩放调节
@@ -500,23 +440,8 @@ void TimeController::on_timeline_zoom_slider_valueChanged(int value) {
         binding_map->project_reference->canvasconfig_node
             .attribute("timeline-zoom")
             .set_value(zoom_value);
-        ui->timeline_zoom_button->setText(QString::number(value));
+        ui->timeline_zoom_value->setText(QString::number(value) + ":");
     }
-}
-
-// 重置宽度缩放按钮
-void TimeController::on_owidth_scale_button_clicked() {
-    ui->owidth_scale_slider->setValue(100);
-}
-
-// 重置高度缩放按钮
-void TimeController::on_oheight_scale_button_clicked() {
-    ui->oheight_scale_slider->setValue(100);
-}
-
-// 重置时间线缩放按钮
-void TimeController::on_timeline_zoom_button_clicked() {
-    ui->timeline_zoom_slider->setValue(100);
 }
 
 // 新建timing按钮事件

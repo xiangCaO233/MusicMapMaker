@@ -1,11 +1,4 @@
-#include <memory>
 
-#include "mmm/hitobject/HitObject.h"
-#include "mmm/hitobject/Note/Note.h"
-#include "mmm/map/osu/OsuMap.h"
-#include "mmm/map/rm/RMMap.h"
-#include "mmm/timing/Timing.h"
-#include "mmm/timing/osu/OsuTiming.h"
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -18,7 +11,6 @@
 #include <QLocale>
 #include <QStyleFactory>
 #include <QTranslator>
-#include <iostream>
 
 #include "log/colorful-log.h"
 #include "ui/mainwindow.h"
@@ -37,12 +29,13 @@ int main(int argc, char* argv[]) {
     std::setlocale(LC_ALL, ".UTF-8");
 #endif  //_WIN32
     QApplication a(argc, argv);
+    // 设置应用图标
+#ifdef _WIN32
+    a.setWindowIcon(QIcon(":/icons/icon.ico"));
+#else
+    a.setWindowIcon(QIcon(":/icons/icon.png"));
+#endif  //_WIN32
     XLogger::init("MMM");
-    // 设置KDE风格（如果可用）
-    if (QStyleFactory::keys().contains("Breeze")) {
-        XINFO("使用kde Breeze主题");
-        a.setStyle(QStyleFactory::create("Breeze"));
-    }
 
     // 获取系统语言环境
     QLocale systemLocale = QLocale::system();
@@ -105,34 +98,6 @@ int main(int argc, char* argv[]) {
         w.use_theme(GlobalTheme::LIGHT);
     }
     w.show();
-
-    // auto map = std::make_shared<RMMap>();
-    // map->load_from_file(
-    //     "../resources/map/rm/4K-Lv.13-Quattro Elements Dimiourgia/Quattro "
-    //     "Elements Dimiourgia_4k_hd.imd");
-
-    // auto map = std::make_shared<OsuMap>();
-    // map->load_from_file(
-    //     "../resources/map/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku
-    //     - " "shojo rei/Haruka Kiritani  Shizuku Hino Mori  Hatsune Miku -
-    //     shojo rei
-    //     "
-    //     "(xiang_233) [(LN)NM lv.29].osu");
-
-    // std::shared_ptr<Timing> speedtiming = std::make_shared<OsuTiming>();
-    //  speedtiming->timestamp = 90473;
-    //  speedtiming->is_base_timing = false;
-    //  speedtiming->basebpm = 100;
-    //  speedtiming->bpm = 3.0;
-
-    // std::shared_ptr<Timing> speedtiming2 = std::make_shared<OsuTiming>();
-    // speedtiming2->timestamp = 90623;
-    // speedtiming2->is_base_timing = false;
-    // speedtiming2->basebpm = 100;
-    // speedtiming2->bpm = 2.0;
-
-    // map->insert_timing(speedtiming);
-    // map->insert_timing(speedtiming2);
 
     return a.exec();
 }

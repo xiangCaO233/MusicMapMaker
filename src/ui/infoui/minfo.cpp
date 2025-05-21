@@ -8,6 +8,7 @@
 MInfo::MInfo(QWidget *parent) : QWidget(parent), ui(new Ui::MInfo) {
     ui->setupUi(this);
     mmetas = ui->mapmeta_edit;
+    ui->splitter->setSizes({ui->splitter->height(), 0});
 }
 
 MInfo::~MInfo() { delete ui; }

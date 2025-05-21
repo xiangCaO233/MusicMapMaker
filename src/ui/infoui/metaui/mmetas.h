@@ -8,6 +8,7 @@
 
 class ObjectInfoui;
 class TimingInfoui;
+class TimeController;
 
 enum class GlobalTheme;
 
@@ -25,6 +26,7 @@ class MMetas : public QWidget {
     // 标签页内组件引用
     ObjectInfoui* objinfo_ref;
     TimingInfoui* timinginfo_ref;
+    TimeController* time_audio_controller_ref;
 
     // 当前主题
     GlobalTheme current_theme;
