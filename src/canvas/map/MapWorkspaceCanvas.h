@@ -31,11 +31,6 @@
 #include "threads/EffectThread.h"
 #include "threads/ThreadPool.h"
 
-enum class EffectType {
-    NORMAL,
-    SLIDEARROW,
-};
-
 class MapWorkspaceCanvas : public GLCanvas {
     Q_OBJECT
    protected:

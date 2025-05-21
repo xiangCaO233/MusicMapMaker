@@ -37,6 +37,16 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
+     <widget class="QWidget" name="timecontroller_tab">
+      <attribute name="title">
+       <string>time controller</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QWidget" name="time_controller" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="objectinfo_tab">
       <attribute name="title">
        <string>edit info</string>

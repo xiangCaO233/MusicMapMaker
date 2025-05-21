@@ -318,7 +318,7 @@ void MEditorArea::initialize_toolbuttons() {
     });
 
     // 分拍调整滑条
-    divisorslider = new QSlider(Qt::Horizontal, customdivosorsliderWidget);
+    divisorslider = new QSlider(Qt::Vertical, customdivosorsliderWidget);
     divisorslider->setMinimum(1);
     divisorslider->setMaximum(16);
     divisorslider->setPageStep(1);
@@ -337,7 +337,7 @@ void MEditorArea::initialize_toolbuttons() {
         }
     });
     // 布局
-    auto divmenulayout = new QHBoxLayout(customdivosorsliderWidget);
+    auto divmenulayout = new QVBoxLayout(customdivosorsliderWidget);
     divmenulayout->setContentsMargins(2, 2, 2, 2);
     divmenulayout->setSpacing(2);
     divmenulayout->addWidget(ratio_button);

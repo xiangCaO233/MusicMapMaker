@@ -562,6 +562,11 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                 std::lock_guard<std::mutex> lock(
                     effect_frame_queue_map[xpos].mtx);
                 effect_frame_queue_map[xpos].queue.push(frame);
+
+                effect_frame_queue_map[xpos].effect_type = EffectType::NORMAL;
+                effect_frame_queue_map[xpos].time_left =
+                    skin.normal_hit_effect_duration;
+                effect_frame_queue_map[xpos].current_frame_pos = 1;
             }
             break;
         }
@@ -587,6 +592,12 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos,
                 std::lock_guard<std::mutex> lock(
                     effect_frame_queue_map[xpos].mtx);
                 effect_frame_queue_map[xpos].queue.push(frame);
+
+                effect_frame_queue_map[xpos].effect_type =
+                    EffectType::SLIDEARROW;
+                effect_frame_queue_map[xpos].time_left =
+                    skin.normal_hit_effect_duration;
+                effect_frame_queue_map[xpos].current_frame_pos = 1;
             }
             break;
         }

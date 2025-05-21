@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>583</width>
-    <height>158</height>
+    <width>662</width>
+    <height>286</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1052,6 +1052,9 @@
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::ClickFocus</enum>
         </property>
+        <property name="layoutDirection">
+         <enum>Qt::LayoutDirection::LeftToRight</enum>
+        </property>
         <property name="maximum">
          <number>100</number>
         </property>
@@ -1298,4 +1301,5 @@
  <resources>
   <include location="../../../resources/glsrcs.qrc"/>
  </resources>
+ <connections/>
 </ui>
