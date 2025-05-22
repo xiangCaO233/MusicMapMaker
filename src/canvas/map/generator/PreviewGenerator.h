@@ -7,6 +7,7 @@
 class MapEditor;
 enum class NoteType : uint8_t;
 class ObjectGenerator;
+class BufferWrapper;
 
 class PreviewGenerator {
    public:
@@ -23,7 +24,7 @@ class PreviewGenerator {
     std::shared_ptr<MapEditor> editor_ref;
 
     // 生成预览
-    void generate();
+    void generate(BufferWrapper* bufferwrapper);
 };
 
 #endif  // M_PREVIEWGENERATOR_H

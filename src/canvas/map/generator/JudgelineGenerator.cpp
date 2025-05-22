@@ -1,6 +1,7 @@
 #include "JudgelineGenerator.h"
 
 #include "../../../mmm/MapWorkProject.h"
+#include "../../RenderBuffer.hpp"
 #include "../MapWorkspaceCanvas.h"
 #include "../editor/MapEditor.h"
 #include "texture/Texture.h"
@@ -13,13 +14,16 @@ JudgelineGenerator::JudgelineGenerator(std::shared_ptr<MapEditor> &editor)
 JudgelineGenerator::~JudgelineGenerator() = default;
 
 // 生成轨道渲染指令
-void JudgelineGenerator::generate() {
+void JudgelineGenerator::generate(BufferWrapper *bufferwrapper) {
     // 主区域判定线
     auto orbit_judge_texture =
         editor_ref->canvas_ref->skin.get_orbit_judge_texture();
+    auto &orbit_params_list = bufferwrapper->orbits_datas.emplace();
 
     // 计算每个轨道的区域
     for (int i = 0; i < editor_ref->canvas_ref->working_map->orbits; ++i) {
+        auto &orbit_params = orbit_params_list.emplace_back();
+
         // 第i个轨道
         // 轨道的x位置
         auto orbit_xpos = editor_ref->ebuffer.edit_area_start_pos_x +
@@ -35,17 +39,14 @@ void JudgelineGenerator::generate() {
         orbit_xpos +=
             (editor_ref->ebuffer.orbit_width - orbit_texture_width) / 2.0;
 
-        editor_ref->canvas_ref->renderer_manager->texture_fillmode =
-            TextureFillMode::FILL;
-        // 绘制轨道判定区
-        editor_ref->canvas_ref->renderer_manager->addRect(
-            QRectF(orbit_xpos,
-                   editor_ref->ebuffer.judgeline_visual_position -
-                       orbit_texture_height / 2.0,
-                   orbit_texture_width, orbit_texture_height),
-            orbit_judge_texture, QColor(0, 0, 0), 0, false);
-
-        editor_ref->canvas_ref->renderer_manager->texture_fillmode =
-            TextureFillMode::SCALLING_AND_TILE;
+        orbit_params.func_type = FunctionType::MRECT;
+        orbit_params.render_settings.texture_fillmode = TextureFillMode::FILL;
+        orbit_params.xpos = orbit_xpos;
+        orbit_params.ypos = editor_ref->ebuffer.judgeline_visual_position -
+                            orbit_texture_height / 2.0;
+        orbit_params.width = orbit_texture_width;
+        orbit_params.height = orbit_texture_height;
+        orbit_params.texture = orbit_judge_texture;
+        orbit_params.is_volatile = false;
     }
 }

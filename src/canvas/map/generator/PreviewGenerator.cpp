@@ -2,6 +2,7 @@
 
 #include "../../../mmm/MapWorkProject.h"
 #include "../MapWorkspaceCanvas.h"
+#include "../RenderBuffer.hpp"
 #include "../editor/MapEditor.h"
 #include "general/HoldGenerator.h"
 #include "general/NoteGenerator.h"
@@ -23,8 +24,9 @@ PreviewGenerator::PreviewGenerator(std::shared_ptr<MapEditor> &editor)
 PreviewGenerator::~PreviewGenerator() = default;
 
 // 生成预览
-void PreviewGenerator::generate() {
+void PreviewGenerator::generate(BufferWrapper *bufferwrapper) {
     if (!editor_ref->canvas_ref->working_map) return;
+    auto &preview_params_list = bufferwrapper->preview_datas.emplace();
     // TODO(xiang 2025-05-07): 优化性能
     // 确定区域
 
@@ -73,32 +75,45 @@ void PreviewGenerator::generate() {
         }
     }
 
+    RendererManagerSettings settings;
     // 切换纹理绘制方式为填充
-    editor_ref->canvas_ref->renderer_manager->texture_fillmode =
-        TextureFillMode::FILL;
+    settings.texture_fillmode = TextureFillMode::FILL;
     // 切换纹理绘制补齐方式为重采样
-    editor_ref->canvas_ref->renderer_manager->texture_complementmode =
-        TextureComplementMode::REPEAT_TEXTURE;
-    editor_ref->canvas_ref->renderer_manager->texture_effect =
-        TextureEffect::NONE;
+    settings.texture_complementmode = TextureComplementMode::REPEAT_TEXTURE;
+    settings.texture_effect = TextureEffect::NONE;
 
     // 按计算层级渲染预览图形
     while (!ObjectGenerator::preview_shape_queue.empty()) {
         auto &shape = ObjectGenerator::preview_shape_queue.front();
-        editor_ref->canvas_ref->renderer_manager->addRect(
-            QRectF(shape.x, shape.y, shape.w, shape.h), shape.tex,
-            QColor(0, 0, 0, 255), 0, true);
+        auto &preview_params = preview_params_list.emplace_back();
+
+        preview_params.func_type = FunctionType::MRECT;
+        preview_params.render_settings = settings;
+        preview_params.xpos = shape.x;
+        preview_params.ypos = shape.y;
+        preview_params.width = shape.w;
+        preview_params.height = shape.h;
+        preview_params.texture = shape.tex;
+        preview_params.is_volatile = true;
+
         ObjectGenerator::preview_shape_queue.pop();
     }
 
+    auto &preview_params1 = preview_params_list.emplace_back();
     // 预览区区域显示
     auto preview_xpos = editor_ref->ebuffer.preview_area_start_pos_x;
     // 绘制一层滤镜
-    QRectF preview_area_bg_bound(preview_xpos, 0.0,
-                                 editor_ref->ebuffer.preview_area_width,
-                                 editor_ref->cstatus.canvas_size.height());
-    editor_ref->canvas_ref->renderer_manager->addRect(
-        preview_area_bg_bound, nullptr, QColor(6, 6, 6, 75), 0, false);
+    preview_params1.func_type = FunctionType::MRECT;
+    preview_params1.render_settings = settings;
+    preview_params1.xpos = preview_xpos;
+    preview_params1.ypos = 0.0;
+    preview_params1.width = editor_ref->ebuffer.preview_area_width;
+    preview_params1.height = editor_ref->cstatus.canvas_size.height();
+    preview_params1.r = 6;
+    preview_params1.g = 6;
+    preview_params1.b = 6;
+    preview_params1.a = 75;
+    preview_params1.is_volatile = false;
 
     // 预览区当前区域
     auto preview_height =
@@ -116,19 +131,37 @@ void PreviewGenerator::generate() {
         preview_height * (0.5 - editor_ref->csettings.judgeline_position);
 
     // 绘制预览区域判定线
-    editor_ref->canvas_ref->renderer_manager->addLine(
-        QPointF(preview_xpos, preview_judgeline_ypos),
-        QPointF(editor_ref->cstatus.canvas_size.width(),
-                preview_judgeline_ypos),
-        2, nullptr, QColor(0, 255, 255, 255), false);
+    auto &preview_params2 = preview_params_list.emplace_back();
+    preview_params2.func_type = FunctionType::MLINE;
+    preview_params2.render_settings = settings;
+    preview_params2.x1 = preview_xpos;
+    preview_params2.y1 = preview_judgeline_ypos;
+    preview_params2.x2 = editor_ref->cstatus.canvas_size.width();
+    preview_params2.y2 = preview_judgeline_ypos;
+    preview_params2.line_width = 2;
+    preview_params2.r = 0;
+    preview_params2.g = 255;
+    preview_params2.b = 255;
+    preview_params2.a = 220;
+    preview_params2.is_volatile = false;
 
     auto preview_ypos =
         preview_judgeline_ypos -
         preview_height * (1 - editor_ref->csettings.judgeline_position);
 
     // 绘制预览区当前区域
-    editor_ref->canvas_ref->renderer_manager->addRect(
-        QRectF(preview_xpos, preview_ypos,
-               editor_ref->ebuffer.preview_area_width, preview_height),
-        nullptr, QColor(233, 233, 233, 75), 0, false);
+    // 绘制一层滤镜
+    auto &preview_params3 = preview_params_list.emplace_back();
+    preview_params3.func_type = FunctionType::MRECT;
+    preview_params3.render_settings = settings;
+
+    preview_params3.xpos = preview_xpos;
+    preview_params3.ypos = preview_ypos;
+    preview_params3.width = editor_ref->ebuffer.preview_area_width;
+    preview_params3.height = preview_height;
+    preview_params3.r = 233;
+    preview_params3.g = 233;
+    preview_params3.b = 233;
+    preview_params3.a = 75;
+    preview_params3.is_volatile = false;
 }

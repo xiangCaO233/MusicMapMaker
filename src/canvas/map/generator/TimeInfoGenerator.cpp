@@ -7,6 +7,7 @@
 #include "../../../mmm/MapWorkProject.h"
 #include "../../../util/mutil.h"
 #include "../MapWorkspaceCanvas.h"
+#include "../RenderBuffer.hpp"
 #include "../editor/MapEditor.h"
 
 // 构造TimeInfoGenerator
@@ -17,7 +18,7 @@ TimeInfoGenerator::TimeInfoGenerator(std::shared_ptr<MapEditor> &editor)
 TimeInfoGenerator::~TimeInfoGenerator() = default;
 
 // 生成信息
-void TimeInfoGenerator::generate() {
+void TimeInfoGenerator::generate(BufferWrapper *bufferwrapper) {
     // 分隔线
     editor_ref->canvas_ref->renderer_manager->addLine(
         QPointF(editor_ref->cstatus.canvas_size.width() *
@@ -31,12 +32,13 @@ void TimeInfoGenerator::generate() {
         4, nullptr, QColor(255, 182, 193, 235), false);
 
     // 标记timing
-    draw_timing_points();
+    draw_timing_points(bufferwrapper);
 }
 
 // 绘制时间点
-void TimeInfoGenerator::draw_timing_points() {
+void TimeInfoGenerator::draw_timing_points(BufferWrapper *bufferwrapper) {
     if (!editor_ref->canvas_ref->working_map) return;
+    auto &info_params_list = bufferwrapper->info_datas.emplace();
 
     std::string bpm_prefix = "bpm:";
     std::vector<std::vector<std::shared_ptr<Timing>> *> timingss_in_area;
@@ -178,8 +180,18 @@ void TimeInfoGenerator::draw_timing_points() {
                 background_color = QColor(0, 0, 0, 255);
             }
         }
-        editor_ref->canvas_ref->renderer_manager->addRoundRect(
-            inner_bound, nullptr, background_color, 0, 1.2, true);
+        auto &info_params = info_params_list.emplace_back();
+        info_params.func_type = FunctionType::MROUNDRECT;
+        info_params.xpos = inner_bound.x();
+        info_params.ypos = inner_bound.y();
+        info_params.width = inner_bound.width();
+        info_params.height = inner_bound.height();
+        info_params.r = background_color.red();
+        info_params.g = background_color.green();
+        info_params.b = background_color.blue();
+        info_params.a = background_color.alpha();
+        info_params.radius = 1.2;
+        info_params.is_volatile = true;
 
         // 画文本
         auto prebpmstrpos_x =
@@ -202,11 +214,24 @@ void TimeInfoGenerator::draw_timing_points() {
                            editor_ref->canvas_ref->skin.timeinfo_font_size) /
                           2.0;
 
-        editor_ref->canvas_ref->renderer_manager->addText(
-            QPointF(prebpmstrpos_x, prebpmstrpos_y), u32absbpmstr,
-            editor_ref->canvas_ref->skin.timeinfo_font_size,
-            editor_ref->canvas_ref->skin.font_family,
-            editor_ref->canvas_ref->skin.timeinfo_font_color, 0);
+        auto &info_params2 = info_params_list.emplace_back();
+        info_params2.func_type = FunctionType::MTEXT;
+        info_params2.xpos = prebpmstrpos_x;
+        info_params2.ypos = prebpmstrpos_y;
+        info_params2.str = u32absbpmstr;
+        info_params2.font_family =
+            editor_ref->canvas_ref->skin.font_family.c_str();
+        info_params2.line_width =
+            editor_ref->canvas_ref->skin.timeinfo_font_size;
+        info_params2.r = editor_ref->canvas_ref->skin.timeinfo_font_color.red();
+        info_params2.g =
+            editor_ref->canvas_ref->skin.timeinfo_font_color.green();
+        info_params2.b =
+            editor_ref->canvas_ref->skin.timeinfo_font_color.blue();
+        info_params2.a =
+            editor_ref->canvas_ref->skin.timeinfo_font_color.alpha();
+        info_params2.is_volatile = true;
+
         if (show_speed) {
             auto speedstrpos_x =
                 inner_bound_pos.x() +
@@ -220,11 +245,25 @@ void TimeInfoGenerator::draw_timing_points() {
                 (speedstr_height -
                  editor_ref->canvas_ref->skin.timeinfo_font_size) /
                     2.0;
-            editor_ref->canvas_ref->renderer_manager->addText(
-                QPointF(speedstrpos_x, speedstrpos_y), u32speedstr,
-                editor_ref->canvas_ref->skin.timeinfo_font_size,
-                editor_ref->canvas_ref->skin.font_family,
-                editor_ref->canvas_ref->skin.timeinfo_font_color, 0);
+
+            auto &info_params = info_params_list.emplace_back();
+            info_params.func_type = FunctionType::MTEXT;
+            info_params.xpos = speedstrpos_x;
+            info_params.ypos = speedstrpos_y;
+            info_params.str = u32speedstr;
+            info_params.font_family =
+                editor_ref->canvas_ref->skin.font_family.c_str();
+            info_params.line_width =
+                editor_ref->canvas_ref->skin.timeinfo_font_size;
+            info_params.r =
+                editor_ref->canvas_ref->skin.timeinfo_font_color.red();
+            info_params.g =
+                editor_ref->canvas_ref->skin.timeinfo_font_color.green();
+            info_params.b =
+                editor_ref->canvas_ref->skin.timeinfo_font_color.blue();
+            info_params.a =
+                editor_ref->canvas_ref->skin.timeinfo_font_color.alpha();
+            info_params.is_volatile = true;
         }
     }
 

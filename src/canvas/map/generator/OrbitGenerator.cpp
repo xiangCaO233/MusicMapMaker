@@ -1,6 +1,7 @@
 #include "OrbitGenerator.h"
 
 #include "../../../mmm/MapWorkProject.h"
+#include "../../RenderBuffer.hpp"
 #include "../MapWorkspaceCanvas.h"
 #include "../editor/MapEditor.h"
 #include "texture/Texture.h"
@@ -13,11 +14,14 @@ OrbitGenerator::OrbitGenerator(std::shared_ptr<MapEditor> &editor)
 OrbitGenerator::~OrbitGenerator() = default;
 
 // 生成轨道渲染指令
-void OrbitGenerator::generate() {
-    auto orbit_texture = editor_ref->canvas_ref->skin.get_orbit_bg_texture();
+void OrbitGenerator::generate(BufferWrapper *bufferwrapper) {
+    auto &params_list = bufferwrapper->orbits_datas.emplace();
 
+    auto orbit_texture = editor_ref->canvas_ref->skin.get_orbit_bg_texture();
     // 计算每个轨道的区域
     for (int i = 0; i < editor_ref->canvas_ref->working_map->orbits; ++i) {
+        auto &params = params_list.emplace_back();
+
         // 第i个轨道
         // 轨道的x位置
         auto orbit_xpos = editor_ref->ebuffer.edit_area_start_pos_x +
@@ -29,15 +33,14 @@ void OrbitGenerator::generate() {
         orbit_xpos +=
             (editor_ref->ebuffer.orbit_width - orbit_texture_width) / 2.0;
 
+        params.func_type = FunctionType::MRECT;
         // 可以直接拉伸-纵向
-        editor_ref->canvas_ref->renderer_manager->texture_fillmode =
-            TextureFillMode::FILL;
-        // 绘制轨道背景
-        editor_ref->canvas_ref->renderer_manager->addRect(
-            QRectF(orbit_xpos, 0, orbit_texture_width,
-                   editor_ref->cstatus.canvas_size.height()),
-            orbit_texture, QColor(0, 0, 0), 0, false);
-        editor_ref->canvas_ref->renderer_manager->texture_fillmode =
-            TextureFillMode::SCALLING_AND_TILE;
+        params.render_settings.texture_fillmode = TextureFillMode::FILL;
+        params.texture = orbit_texture;
+        params.xpos = orbit_xpos;
+        params.ypos = 0;
+        params.width = orbit_texture_width;
+        params.height = editor_ref->cstatus.canvas_size.height();
+        params.is_volatile = false;
     }
 }

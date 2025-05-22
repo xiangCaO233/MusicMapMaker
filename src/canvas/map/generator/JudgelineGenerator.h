@@ -3,6 +3,7 @@
 
 #include <memory>
 class MapEditor;
+class BufferWrapper;
 
 class JudgelineGenerator {
    public:
@@ -15,7 +16,7 @@ class JudgelineGenerator {
     std::shared_ptr<MapEditor> editor_ref;
 
     // 生成轨道渲染指令
-    void generate();
+    void generate(BufferWrapper *bufferwrapper);
 };
 
 #endif  // M_JUDGELINEGENERATOR_H

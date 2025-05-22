@@ -8,12 +8,13 @@
 #include <qthread.h>
 #include <qtmetamacros.h>
 
-#include <cstddef>
 #include <filesystem>
 #include <memory>
 #include <thread>
 #include <unordered_map>
 #include <vector>
+
+#include "RenderBuffer.hpp"
 
 #ifdef __APPLE__
 #include <QtOpenGL/qopenglfunctions_4_1_core.h>
@@ -56,6 +57,8 @@ class GLCanvas : public QOpenGLWindow,
 
     // 刷新线程
     std::thread update_thread;
+    // 计算线程
+    std::thread calculate_thread;
 
     double refreshRate_ratio{2.0};
 
@@ -63,7 +66,7 @@ class GLCanvas : public QOpenGLWindow,
     int32_t des_update_time{8};
 
     // 停止刷新线程标识
-    bool stop_refresh{false};
+    std::atomic<bool> stop_refresh{false};
 
     // 上一帧glcall
     long pre_glcalls{0};
@@ -80,6 +83,9 @@ class GLCanvas : public QOpenGLWindow,
 
     // 渲染管理器
     RendererManager *renderer_manager = nullptr;
+
+    // 双缓冲管理器
+    DoubleBufferManager frame_data_buffer_manager;
 
     // 全部纹理映射表(id-纹理对象)
     std::unordered_map<std::string, std::shared_ptr<TextureInstace>>
@@ -108,11 +114,14 @@ class GLCanvas : public QOpenGLWindow,
     void set_Vsync(bool flag);
 
     // 渲染实际图形
-    virtual void push_shape();
+    virtual void push_shape(BufferWrapper *current_back_buffer);
 
     void start_render();
+    void start_pushshape();
 
     void rendergl();
+    void process_render_params(const RenderParams &params);
+    void use_render_settings(const RendererManagerSettings &settings);
 
    public slots:
     // 更新fps显示

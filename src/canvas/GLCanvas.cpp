@@ -66,6 +66,7 @@ GLCanvas::~GLCanvas() {
     if (renderer_manager) delete renderer_manager;
     // 确保刷新线程退出
     stop_refresh = true;
+    frame_data_buffer_manager.notify_all_for_exit();
     // update_thread.join();
 };
 
@@ -210,6 +211,28 @@ void GLCanvas::initializeGL() {
 
     // 启动gl渲染器
     start_render();
+
+    // 启动pushshape线程
+    start_pushshape();
+}
+
+void GLCanvas::start_pushshape() {
+    auto calculate_work = [&]() {
+        while (!stop_refresh.load(std::memory_order_acquire)) {
+            // 1. 获取后端缓冲区进行写入
+            BufferWrapper *current_back_buffer =
+                frame_data_buffer_manager.acquire_back_buffer_for_writing(
+                    stop_refresh);
+            // 执行渲染
+            // 计算图形
+            push_shape(current_back_buffer);
+
+            // 通知主线程可以绘制
+            frame_data_buffer_manager.submit_back_buffer_and_notify_render();
+        }
+    };
+    calculate_thread = std::thread(calculate_work);
+    calculate_thread.detach();
 }
 
 void GLCanvas::start_render() {
@@ -267,16 +290,43 @@ void GLCanvas::rendergl() {
                         gl_clear_color[3]));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
-    // 执行渲染
-    push_shape();
+    // 取出上一帧数据渲染
+    // 1. 获取前端缓冲区进行读取 (内部会进行交换)
+    BufferWrapper *current_front_buffer =
+        frame_data_buffer_manager.acquire_front_buffer_for_reading(
+            stop_refresh);
+    // acquire 返回 nullptr 表示应该退出
+    if (!current_front_buffer) return;
+
+    // 处理绘制参数
+#define PROCESS_QUEUE_ENCAPSULATED(queue_member)          \
+    while (!current_front_buffer->queue_member.empty()) { \
+        std::vector<RenderParams> &batch =                \
+            current_front_buffer->queue_member.front();   \
+        for (const auto &params : batch) {                \
+            process_render_params(params);                \
+        }                                                 \
+        current_front_buffer->queue_member.pop();         \
+    }
+    PROCESS_QUEUE_ENCAPSULATED(bg_datas);
+    PROCESS_QUEUE_ENCAPSULATED(orbits_datas);
+    PROCESS_QUEUE_ENCAPSULATED(beats_datas);
+    PROCESS_QUEUE_ENCAPSULATED(effects_datas);
+    PROCESS_QUEUE_ENCAPSULATED(hitobjects_datas);
+    PROCESS_QUEUE_ENCAPSULATED(preview_datas);
+    PROCESS_QUEUE_ENCAPSULATED(selection_datas);
+    PROCESS_QUEUE_ENCAPSULATED(info_datas);
+    PROCESS_QUEUE_ENCAPSULATED(topbar_datas);
+#undef PROCESS_QUEUE_ENCAPSULATED
+
     renderer_manager->renderAll();
+    // 3. 释放前端缓冲区
+    frame_data_buffer_manager.release_front_buffer_and_notify_calc();
 
     auto after = std::chrono::high_resolution_clock::now().time_since_epoch();
     pre_frame_time =
         std::chrono::duration_cast<std::chrono::microseconds>(after - before)
             .count();
-
-    // XINFO("frame_time:" + std::to_string(pre_frame_time));
 
     pre_glcalls = XLogger::glcalls;
     pre_drawcall = XLogger::drawcalls;
@@ -286,8 +336,58 @@ void GLCanvas::rendergl() {
 // 绘制画布
 void GLCanvas::paintGL() { rendergl(); }
 
+void GLCanvas::use_render_settings(const RendererManagerSettings &settings) {
+    renderer_manager->texture_effect = settings.texture_effect;
+    renderer_manager->texture_fillmode = settings.texture_fillmode;
+    renderer_manager->texture_alignmode = settings.texture_alignmode;
+    renderer_manager->texture_complementmode = settings.texture_complementmode;
+}
+
+void GLCanvas::process_render_params(const RenderParams &params) {
+    use_render_settings(params.render_settings);
+    switch (params.func_type) {
+        case FunctionType::MRECT: {
+            renderer_manager->addRect(
+                QRectF(params.xpos, params.ypos, params.width, params.height),
+                params.texture, QColor(params.r, params.g, params.b, params.a),
+                params.rotation, params.is_volatile);
+            break;
+        }
+        case FunctionType::MROUNDRECT: {
+            renderer_manager->addRoundRect(
+                QRectF(params.xpos, params.ypos, params.width, params.height),
+                params.texture, QColor(params.r, params.g, params.b, params.a),
+                params.rotation, params.radius, params.is_volatile);
+            break;
+        }
+        case FunctionType::MLINE: {
+            renderer_manager->addLine(
+                QPointF(params.x1, params.y1), QPointF(params.x2, params.y2),
+                params.line_width, params.texture,
+                QColor(params.r, params.g, params.b, params.a),
+                params.is_volatile);
+            break;
+        }
+        case FunctionType::MELLIPSE: {
+            renderer_manager->addEllipse(
+                QRectF(params.xpos, params.ypos, params.width, params.height),
+                params.texture, QColor(params.r, params.g, params.b, params.a),
+                params.rotation, params.is_volatile);
+            break;
+        }
+        case FunctionType::MTEXT: {
+            renderer_manager->addText(
+                QPointF(params.xpos, params.ypos), params.str,
+                params.line_width, params.font_family,
+                QColor(params.r, params.g, params.b, params.a),
+                params.rotation);
+            break;
+        }
+    }
+}
+
 // 渲染实际图形
-void GLCanvas::push_shape() {}
+void GLCanvas::push_shape(BufferWrapper *current_back_buffer) {}
 
 // 从指定目录添加纹理
 void GLCanvas::load_texture_from_path(const char *p) {

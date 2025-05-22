@@ -7,14 +7,7 @@ project(
 
 if(MSVC)
   add_compile_options(/Zc:__cplusplus)
-  add_compile_options(/utf-8 /EHsc) # 强制使用 UTF-8 编码
-
-  # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi")
-  # set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
-
-  # set(CMAKE_PREFIX_PATH "E:\\Software\\vcpkg\\installed\\x64-windows\\share")
-
-  # set(spdlog_DIR "E:/Software/vcpkg/installed/x64-windows/share/")
+  add_compile_options(/utf-8 /EHsc)
 endif()
 
 add_subdirectory(./libs/xaudiolib)
@@ -60,10 +53,8 @@ find_package(Freetype REQUIRED)
 # 查找pugixml包
 find_package(pugixml REQUIRED)
 
+# 字符编码包
 find_package(ICU REQUIRED COMPONENTS uc i18n data)
-
-# set(ICU_FOUND TRUE) set(ICU_INCLUDE_DIRS "/usr/include/unicode")
-# set(ICU_LIBRARIES "icuuc" "icui18n" "icudata")
 
 # 设置mmm相关文件
 set(MMM_SOURCES
@@ -290,7 +281,6 @@ target_link_libraries(
           ICU::uc
           ICU::i18n
           ICU::data
-          ${LIBXML2_LIBRARIES}
           Freetype::Freetype
           pugixml::pugixml
           xaudio-dev)

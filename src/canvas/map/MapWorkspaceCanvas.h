@@ -13,13 +13,13 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include "../../mmm/Beat.h"
 #include "../../mmm/map/MMap.h"
 #include "../../threads/ThreadSafeEffect.h"
 #include "../GLCanvas.h"
 #include "MapWorkspaceSkin.h"
-#include "RenderParam.h"
 #include "editor/MapEditor.h"
 #include "generator/AreaInfoGenerator.h"
 #include "generator/BeatGenerator.h"
@@ -76,9 +76,6 @@ class MapWorkspaceCanvas : public GLCanvas {
     // 判定线生成器
     std::shared_ptr<JudgelineGenerator> judgelinegenerator;
 
-    // 帧参数包队列
-    std::unordered_map<RenderType, std::queue<RenderParamsBundle>> frame_params;
-
     // x位置-特效帧队列
     std::unordered_map<double, ThreadSafeEffect> effect_frame_queue_map;
 
@@ -86,19 +83,19 @@ class MapWorkspaceCanvas : public GLCanvas {
      *成员函数
      */
     // 绘制轨道底板
-    void draw_orbits();
+    void draw_orbits(BufferWrapper *bufferwrapper);
 
     // 绘制判定线
-    void draw_judgeline();
+    void draw_judgeline(BufferWrapper *bufferwrapper);
 
     // 绘制选中框
-    void draw_select_bound();
+    void draw_select_bound(BufferWrapper *bufferwrapper);
 
     // 绘制信息区
-    void draw_infoarea();
+    void draw_infoarea(BufferWrapper *bufferwrapper);
 
     // 绘制拍
-    void draw_beats();
+    void draw_beats(BufferWrapper *bufferwrapper);
 
     enum class HitObjectEffect {
         // 通常模式
@@ -109,19 +106,20 @@ class MapWorkspaceCanvas : public GLCanvas {
 
     // 绘制物件
     void draw_hitobject(
+        BufferWrapper *bufferwrapper,
         std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> &objects,
         HitObjectEffect e);
 
     // 绘制顶部栏
-    void draw_top_bar();
+    void draw_top_bar(BufferWrapper *bufferwrapper);
 
     // 绘制背景
-    void draw_background();
+    void draw_background(BufferWrapper *bufferwrapper);
 
     // 绘制预览
-    void draw_preview_content();
+    void draw_preview_content(BufferWrapper *bufferwrapper);
 
-    void draw_effect_frame();
+    void draw_effect_frame(BufferWrapper *bufferwrapper);
 
    public:
     // 构造MapWorkspaceCanvas
@@ -163,7 +161,7 @@ class MapWorkspaceCanvas : public GLCanvas {
     inline bool &is_paused() { return editor->cstatus.canvas_pasued; }
 
     // 渲染实际图形
-    void push_shape() override;
+    void push_shape(BufferWrapper *current_back_buffer) override;
 
     void remove_objects(std::shared_ptr<HitObject> o);
     // 更新fps显示

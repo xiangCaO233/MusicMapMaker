@@ -5,6 +5,7 @@
 #include <memory>
 
 class MapEditor;
+class BufferWrapper;
 
 class TimeInfoGenerator {
    public:
@@ -17,10 +18,10 @@ class TimeInfoGenerator {
     std::shared_ptr<MapEditor> editor_ref;
 
     // 绘制时间点
-    void draw_timing_points();
+    void draw_timing_points(BufferWrapper* bufferwrapper);
 
     // 生成信息
-    void generate();
+    void generate(BufferWrapper* bufferwrapper);
 };
 
 #endif  // M_TIMEINFO_GENERATOR_H

@@ -380,29 +380,47 @@ void MapWorkspaceCanvas::resizeEvent(QResizeEvent *event) {
 }
 
 // 绘制背景
-void MapWorkspaceCanvas::draw_background() {
+void MapWorkspaceCanvas::draw_background(BufferWrapper *bufferwrapper) {
     if (!working_map) return;
-    auto des = QRectF(0, 0, width(), height());
-
     // 绘制背景图
-    renderer_manager->texture_fillmode = TextureFillMode::SCALLING_AND_TILE;
+
+    auto &params_list = bufferwrapper->bg_datas.emplace();
+    auto &params = params_list.emplace_back();
+
+    // 绘制矩形
+    params.func_type = FunctionType::MRECT;
+
+    // 矩形位置
+    params.xpos = 0;
+    params.ypos = 0;
+    params.width = width();
+    params.height = height();
+
+    params.render_settings.texture_fillmode =
+        TextureFillMode::SCALLING_AND_TILE;
     auto bg_str = working_map->bg_path.generic_string();
     std::replace(bg_str.begin(), bg_str.end(), '\\', '/');
-    auto &t = texture_full_map[bg_str];
-    renderer_manager->addRect(des, t, QColor(0, 0, 0, 255), 0, false);
+    params.texture = texture_full_map[bg_str];
+    params.is_volatile = false;
+
     // 绘制背景遮罩
     if (editor->cstatus.background_darken_ratio != 0.0) {
-        renderer_manager->addRect(
-            des, nullptr,
-            QColor(0, 0, 0, 255 * editor->cstatus.background_darken_ratio), 0,
-            false);
+        auto &params = params_list.emplace_back();
+        params.xpos = 0;
+        params.ypos = 0;
+        params.width = width();
+        params.height = height();
+        params.texture = nullptr;
+        params.a = 255 * editor->cstatus.background_darken_ratio;
+        params.is_volatile = false;
     }
-    // XINFO("bg_path:" + working_map->bg_path.string());
 }
 
 // 绘制顶部栏
-void MapWorkspaceCanvas::draw_top_bar() {
+void MapWorkspaceCanvas::draw_top_bar(BufferWrapper *bufferwrapper) {
     auto current_size = size();
+    auto &topbar_params_list = bufferwrapper->topbar_datas.emplace();
+
     QRectF top_bar_out(0.0f, current_size.height() / 12.0f * -0.3f,
                        current_size.width(), current_size.height() / 12.0f);
     QRectF top_bar_in(
@@ -410,16 +428,50 @@ void MapWorkspaceCanvas::draw_top_bar() {
         current_size.height() / 12.0f * -0.3f + current_size.height() / 48.0f,
         current_size.width() - (current_size.width() / 48.0f),
         current_size.height() / 12.0f - (current_size.height() / 48.0f));
-    renderer_manager->addRoundRect(top_bar_in, nullptr, QColor(30, 40, 50, 230),
-                                   0, 1.3, false);
-    renderer_manager->addRoundRect(top_bar_out, nullptr,
-                                   QColor(33, 33, 33, 230), 0, 1.3, false);
-    renderer_manager->addLine(QPointF(0, 0), QPointF(current_size.width(), 0),
-                              2.0f, nullptr, QColor(255, 255, 255, 240), false);
+
+    auto &topbar_params1 = topbar_params_list.emplace_back();
+    topbar_params1.func_type = FunctionType::MROUNDRECT;
+    topbar_params1.xpos = top_bar_in.x();
+    topbar_params1.ypos = top_bar_in.x();
+    topbar_params1.width = top_bar_in.width();
+    topbar_params1.height = top_bar_in.height();
+    topbar_params1.radius = 1.3;
+    topbar_params1.r = 30;
+    topbar_params1.g = 40;
+    topbar_params1.b = 50;
+    topbar_params1.a = 230;
+    topbar_params1.is_volatile = false;
+
+    auto &topbar_params2 = topbar_params_list.emplace_back();
+    topbar_params2.func_type = FunctionType::MROUNDRECT;
+    topbar_params2.xpos = top_bar_out.x();
+    topbar_params2.ypos = top_bar_out.x();
+    topbar_params2.width = top_bar_out.width();
+    topbar_params2.height = top_bar_out.height();
+    topbar_params2.radius = 1.3;
+    topbar_params2.r = 33;
+    topbar_params2.g = 33;
+    topbar_params2.b = 33;
+    topbar_params2.a = 230;
+    topbar_params2.is_volatile = false;
+
+    auto &topbar_params3 = topbar_params_list.emplace_back();
+    topbar_params3.func_type = FunctionType::MLINE;
+    topbar_params3.x1 = 0;
+    topbar_params3.y1 = 0;
+    topbar_params3.x2 = current_size.width();
+    topbar_params3.y2 = 0;
+    topbar_params3.line_width = 2.0f;
+    topbar_params3.r = 255;
+    topbar_params3.g = 255;
+    topbar_params3.b = 255;
+    topbar_params3.a = 240;
+    topbar_params3.is_volatile = false;
 }
 
 // 绘制选中框
-void MapWorkspaceCanvas::draw_select_bound() {
+void MapWorkspaceCanvas::draw_select_bound(BufferWrapper *bufferwrapper) {
+    auto &selection_params_list = bufferwrapper->selection_datas.emplace();
     if (editor->ebuffer.select_bound_locate_points) {
         auto &border_left_texture =
             skin.get_selected_border_texture(SelectBorderDirection::LEFT);
@@ -474,35 +526,54 @@ void MapWorkspaceCanvas::draw_select_bound() {
             p2.y() - editor->csettings.select_border_width / 2.0,
             std::abs(p3.x() - p2.x()) + editor->csettings.select_border_width,
             editor->csettings.select_border_width);
+        QRectF rect;
+        std::shared_ptr<TextureInstace> texture;
 
-        renderer_manager->addRect(leftrect, border_left_texture,
-                                  QColor(0, 0, 0, 255), 0, true);
-        renderer_manager->addRect(rightrect, border_right_texture,
-                                  QColor(0, 0, 0, 255), 0, true);
-        renderer_manager->addRect(toprect, border_top_texture,
-                                  QColor(0, 0, 0, 255), 0, true);
-        renderer_manager->addRect(bottomrect, border_bottom_texture,
-                                  QColor(0, 0, 0, 255), 0, true);
+#define NEW_PARAMS(selection_params, rect, texture)                            \
+    selection_params.func_type = FunctionType::MRECT;                          \
+    selection_params.render_settings.texture_fillmode = TextureFillMode::FILL; \
+    selection_params.is_volatile = false;                                      \
+    selection_params.xpos = rect.x();                                          \
+    selection_params.ypos = rect.y();                                          \
+    selection_params.width = rect.width();                                     \
+    selection_params.height = rect.height();
+        auto &selection_params1 = selection_params_list.emplace_back();
+        NEW_PARAMS(selection_params1, leftrect, border_left_texture);
+        auto &selection_params2 = selection_params_list.emplace_back();
+        NEW_PARAMS(selection_params2, rightrect, border_right_texture);
+        auto &selection_params3 = selection_params_list.emplace_back();
+        NEW_PARAMS(selection_params3, toprect, border_top_texture);
+        auto &selection_params4 = selection_params_list.emplace_back();
+        NEW_PARAMS(selection_params4, bottomrect, border_bottom_texture);
+#undef NEW_PARAMS
     }
 }
 
 // 绘制预览
-void MapWorkspaceCanvas::draw_preview_content() {
-    previewgenerator->generate();
+void MapWorkspaceCanvas::draw_preview_content(BufferWrapper *bufferwrapper) {
+    previewgenerator->generate(bufferwrapper);
 }
 
 // 绘制轨道底板
-void MapWorkspaceCanvas::draw_orbits() { orbitgenerator->generate(); }
+void MapWorkspaceCanvas::draw_orbits(BufferWrapper *bufferwrapper) {
+    orbitgenerator->generate(bufferwrapper);
+}
 
 // 绘制判定线
-void MapWorkspaceCanvas::draw_judgeline() { judgelinegenerator->generate(); }
+void MapWorkspaceCanvas::draw_judgeline(BufferWrapper *bufferwrapper) {
+    judgelinegenerator->generate(bufferwrapper);
+}
 
 // 绘制信息区
-void MapWorkspaceCanvas::draw_infoarea() { timegenerator->generate(); }
+void MapWorkspaceCanvas::draw_infoarea(BufferWrapper *bufferwrapper) {
+    timegenerator->generate(bufferwrapper);
+}
 
 // 绘制拍
-void MapWorkspaceCanvas::draw_beats() {
+void MapWorkspaceCanvas::draw_beats(BufferWrapper *bufferwrapper) {
     if (!working_map) return;
+    auto &line_params_list = bufferwrapper->beats_datas.emplace();
+
     // 生成图形数据
     beatgenerator->generate();
     decltype(texture_full_map.begin()) s;
@@ -510,28 +581,59 @@ void MapWorkspaceCanvas::draw_beats() {
     // 先绘制所有节拍线
     while (!BeatGenerator::line_queue.empty()) {
         auto &line = BeatGenerator::line_queue.front();
-        renderer_manager->addLine(QPointF(line.x1, line.y1),
-                                  QPointF(line.x2, line.y2), line.line_width,
-                                  nullptr,
-                                  QColor(line.r, line.g, line.b, line.a), true);
+        auto &line_params = line_params_list.emplace_back();
+        line_params.func_type = FunctionType::MLINE;
+        line_params.x1 = line.x1;
+        line_params.y1 = line.y1;
+        line_params.x2 = line.x2;
+        line_params.y2 = line.y2;
+        line_params.line_width = line.line_width;
+        line_params.texture = nullptr;
+        line_params.r = line.r;
+        line_params.g = line.g;
+        line_params.b = line.b;
+        line_params.a = line.a;
+        line_params.is_volatile = true;
 
         BeatGenerator::line_queue.pop();
     }
 
-    // 绘制分拍背景
+    auto &divbg_params_list = bufferwrapper->beats_datas.emplace();
+    // 绘制分拍信息的背景
     while (!BeatGenerator::divbg_queue.empty()) {
         auto &divbg_bound = BeatGenerator::divbg_queue.front();
-        renderer_manager->addRoundRect(divbg_bound, nullptr,
-                                       QColor(64, 64, 64, 233), 0, 1.1, true);
+        auto &divbg_params = divbg_params_list.emplace_back();
+        divbg_params.func_type = FunctionType::MROUNDRECT;
+        divbg_params.xpos = divbg_bound.x();
+        divbg_params.ypos = divbg_bound.y();
+        divbg_params.width = divbg_bound.width();
+        divbg_params.height = divbg_bound.height();
+        divbg_params.r = 64;
+        divbg_params.g = 64;
+        divbg_params.b = 64;
+        divbg_params.a = 233;
+        divbg_params.radius = 1.1;
+        divbg_params.is_volatile = true;
         BeatGenerator::divbg_queue.pop();
     }
 
+    auto &text_params_list = bufferwrapper->beats_datas.emplace();
     // 绘制所有时间字符串
     while (!BeatGenerator::text_queue.empty()) {
         auto &text = BeatGenerator::text_queue.front();
-        renderer_manager->addText(QPointF(text.x, text.y), text.text,
-                                  skin.timeinfo_font_size, skin.font_family,
-                                  skin.timeinfo_font_color, 0, true);
+        auto &text_params = text_params_list.emplace_back();
+        text_params.func_type = FunctionType::MTEXT;
+        text_params.xpos = text.x;
+        text_params.ypos = text.y;
+        text_params.str = text.text;
+        text_params.line_width = skin.timeinfo_font_size;
+        text_params.font_family = skin.font_family.c_str();
+        text_params.r = skin.timeinfo_font_color.red();
+        text_params.g = skin.timeinfo_font_color.green();
+        text_params.b = skin.timeinfo_font_color.blue();
+        text_params.a = skin.timeinfo_font_color.alpha();
+        text_params.is_volatile = false;
+
         BeatGenerator::text_queue.pop();
     }
 }
@@ -539,6 +641,7 @@ void MapWorkspaceCanvas::draw_beats() {
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos, double play_time,
                                      EffectType etype) {
+    std::lock_guard<std::mutex> lock(effect_frame_queue_map[xpos].mtx);
     effect_frame_queue_map[xpos].effect_type = etype;
     effect_frame_queue_map[xpos].time_left = play_time;
     effect_frame_queue_map[xpos].current_frame_pos = 1;
@@ -548,6 +651,7 @@ void MapWorkspaceCanvas::play_effect(double xpos, double ypos, double play_time,
 
 // 绘制物件
 void MapWorkspaceCanvas::draw_hitobject(
+    BufferWrapper *bufferwrapper,
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> &objects,
     HitObjectEffect e) {
     // 防止重复绘制
@@ -575,12 +679,6 @@ void MapWorkspaceCanvas::draw_hitobject(
         }
     }
 
-    // 切换纹理绘制方式为填充
-    renderer_manager->texture_fillmode = TextureFillMode::FILL;
-    // 切换纹理绘制补齐方式为重采样
-    renderer_manager->texture_complementmode =
-        TextureComplementMode::REPEAT_TEXTURE;
-
     // 切换纹理填充效果
     TextureEffect effect;
     switch (e) {
@@ -593,52 +691,88 @@ void MapWorkspaceCanvas::draw_hitobject(
             break;
         }
     }
-    renderer_manager->texture_effect = effect;
 
+    auto &obj_params_list = bufferwrapper->hitobjects_datas.emplace();
     // 按计算层级渲染图形
     while (!ObjectGenerator::shape_queue.empty()) {
         auto &shape = ObjectGenerator::shape_queue.front();
         if (e == HitObjectEffect::NORMAL) {
             if (editor->csettings.show_object_after_judgeline) {
+                // 确定经过判定线后还显示
+                auto &obj_params = obj_params_list.emplace_back();
+                obj_params.func_type = FunctionType::MRECT;
+                // 切换纹理绘制方式为填充
+                obj_params.render_settings.texture_fillmode =
+                    TextureFillMode::FILL;
+                // 切换纹理绘制补齐方式为重采样
+                obj_params.render_settings.texture_complementmode =
+                    TextureComplementMode::REPEAT_TEXTURE;
                 if (shape.is_over_current_time) {
-                    renderer_manager->texture_effect =
+                    obj_params.render_settings.texture_effect =
                         TextureEffect::HALF_TRANSPARENT;
                 }
                 if (!editor->cstatus.canvas_pasued && shape.objref &&
                     shape.objref->timestamp <=
                         editor->cstatus.current_time_stamp) {
                     // 播放中且过了判定线时间使用半透明效果
-                    renderer_manager->texture_effect =
+                    obj_params.render_settings.texture_effect =
                         TextureEffect::HALF_TRANSPARENT;
                 }
 
-                renderer_manager->addRect(
-                    QRectF(shape.x, shape.y, shape.w, shape.h), shape.tex,
-                    QColor(0, 0, 0, 255), 0, true);
+                obj_params.xpos = shape.x;
+                obj_params.ypos = shape.y;
+                obj_params.width = shape.w;
+                obj_params.height = shape.h;
+                obj_params.texture = shape.tex;
+                obj_params.is_volatile = true;
+
             } else {
                 if (!editor->cstatus.canvas_pasued && shape.objref &&
                     shape.objref->timestamp <=
                         editor->cstatus.current_time_stamp) {
                 } else {
-                    renderer_manager->addRect(
-                        QRectF(shape.x, shape.y, shape.w, shape.h), shape.tex,
-                        QColor(0, 0, 0, 255), 0, true);
+                    auto &obj_params = obj_params_list.emplace_back();
+                    obj_params.func_type = FunctionType::MRECT;
+                    // 切换纹理绘制方式为填充
+                    obj_params.render_settings.texture_fillmode =
+                        TextureFillMode::FILL;
+                    // 切换纹理绘制补齐方式为重采样
+                    obj_params.render_settings.texture_complementmode =
+                        TextureComplementMode::REPEAT_TEXTURE;
+                    obj_params.xpos = shape.x;
+                    obj_params.ypos = shape.y;
+                    obj_params.width = shape.w;
+                    obj_params.height = shape.h;
+                    obj_params.texture = shape.tex;
+                    obj_params.is_volatile = true;
                 }
             }
-            renderer_manager->texture_effect = TextureEffect::NONE;
         } else {
-            renderer_manager->addRect(
-                QRectF(shape.x, shape.y, shape.w, shape.h), shape.tex,
-                QColor(0, 0, 0, 255), 0, true);
+            auto &obj_params = obj_params_list.emplace_back();
+            obj_params.func_type = FunctionType::MRECT;
+            // 切换纹理绘制方式为填充
+            obj_params.render_settings.texture_fillmode = TextureFillMode::FILL;
+            // 切换纹理绘制补齐方式为重采样
+            obj_params.render_settings.texture_complementmode =
+                TextureComplementMode::REPEAT_TEXTURE;
+            obj_params.xpos = shape.x;
+            obj_params.ypos = shape.y;
+            obj_params.width = shape.w;
+            obj_params.height = shape.h;
+            obj_params.texture = shape.tex;
+            obj_params.is_volatile = true;
         }
         ObjectGenerator::shape_queue.pop();
     }
 }
 
-void MapWorkspaceCanvas::draw_effect_frame() {
+void MapWorkspaceCanvas::draw_effect_frame(BufferWrapper *bufferwrapper) {
+    auto &effect_params_list = bufferwrapper->effects_datas.emplace();
     // 绘制特效
     for (auto &[xpos, effect_frame_queue] : effect_frame_queue_map) {
+        std::lock_guard<std::mutex> lock(effect_frame_queue_map[xpos].mtx);
         if (effect_frame_queue.time_left > 0) {
+            auto &effect_params = effect_params_list.emplace_back();
             std::string texdir;
             switch (effect_frame_queue.effect_type) {
                 case EffectType::NORMAL: {
@@ -672,11 +806,18 @@ void MapWorkspaceCanvas::draw_effect_frame() {
                 effect_tex->height *
                 (editor->ebuffer.object_size_scale *
                  working_map->project_reference->config.object_height_ratio);
-            auto rect = QRectF(effect_frame_queue.xpos - w / 2.0,
-                               effect_frame_queue.ypos - h / 2.0, w, h);
+            effect_params.func_type = FunctionType::MRECT;
+            effect_params.xpos = effect_frame_queue.xpos - w / 2.0;
+            effect_params.ypos = effect_frame_queue.ypos - h / 2.0;
+            effect_params.width = w;
+            effect_params.height = h;
+            effect_params.texture = effect_tex;
+            effect_params.r = 255;
+            effect_params.g = 182;
+            effect_params.b = 193;
+            effect_params.a = 240;
+            effect_params.is_volatile = true;
 
-            renderer_manager->addRect(rect, effect_tex,
-                                      QColor(255, 182, 193, 240), 0, true);
             // 已播放时间
             effect_frame_queue.time_left -= actual_update_time;
         }
@@ -710,27 +851,29 @@ void MapWorkspaceCanvas::remove_objects(std::shared_ptr<HitObject> o) {
 }
 
 // 渲染实际图形
-void MapWorkspaceCanvas::push_shape() {
+void MapWorkspaceCanvas::push_shape(BufferWrapper *current_back_buffer) {
     // 绘制背景
-    draw_background();
+    draw_background(current_back_buffer);
 
     if (working_map) {
         // 绘制轨道背景
-        draw_orbits();
+        draw_orbits(current_back_buffer);
 
         std::lock_guard<std::mutex> lock(working_map->hitobjects_mutex);
 
-        // 生成区域信息
+        // 生成区域信息-无图形数据
         areagenerator->generate();
+
         // 绘制时间线
         if (editor->csettings.show_timeline) {
-            draw_beats();
+            draw_beats(current_back_buffer);
         }
+
         // 绘制判定线
-        draw_judgeline();
+        draw_judgeline(current_back_buffer);
 
         // 绘制特效帧
-        draw_effect_frame();
+        draw_effect_frame(current_back_buffer);
 
         // 更新物件列表
         // 清除物件缓存
@@ -754,7 +897,8 @@ void MapWorkspaceCanvas::push_shape() {
         }
 
         // 绘制map原本的物件
-        draw_hitobject(editor->ebuffer.buffer_objects, HitObjectEffect::NORMAL);
+        draw_hitobject(current_back_buffer, editor->ebuffer.buffer_objects,
+                       HitObjectEffect::NORMAL);
         // 更新hover信息
         if (!editor->cstatus.is_hover_note) {
             // 未悬浮在任何一个物件或物件身体上
@@ -780,19 +924,20 @@ void MapWorkspaceCanvas::push_shape() {
                 editbuffers.insert(temp_shadow_obj);
             }
         }
-        draw_hitobject(editbuffers, HitObjectEffect::SHADOW);
+        draw_hitobject(current_back_buffer, editbuffers,
+                       HitObjectEffect::SHADOW);
 
-        renderer_manager->texture_effect = TextureEffect::NONE;
         // 绘制预览区域
-        draw_preview_content();
+        draw_preview_content(current_back_buffer);
 
         // 绘制选中区域
-        draw_select_bound();
+        draw_select_bound(current_back_buffer);
 
         // 绘制信息区域
-        draw_infoarea();
+        draw_infoarea(current_back_buffer);
+
         // 绘制顶部栏
-        draw_top_bar();
+        draw_top_bar(current_back_buffer);
     }
 }
 
