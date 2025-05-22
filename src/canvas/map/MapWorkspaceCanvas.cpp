@@ -529,10 +529,11 @@ void MapWorkspaceCanvas::draw_select_bound(BufferWrapper *bufferwrapper) {
         QRectF rect;
         std::shared_ptr<TextureInstace> texture;
 
-#define NEW_PARAMS(selection_params, rect, texture)                            \
+#define NEW_PARAMS(selection_params, rect, tex)                                \
     selection_params.func_type = FunctionType::MRECT;                          \
     selection_params.render_settings.texture_fillmode = TextureFillMode::FILL; \
     selection_params.is_volatile = false;                                      \
+    selection_params.texture = tex;                                            \
     selection_params.xpos = rect.x();                                          \
     selection_params.ypos = rect.y();                                          \
     selection_params.width = rect.width();                                     \
@@ -641,12 +642,13 @@ void MapWorkspaceCanvas::draw_beats(BufferWrapper *bufferwrapper) {
 // 播放特效
 void MapWorkspaceCanvas::play_effect(double xpos, double ypos, double play_time,
                                      EffectType etype) {
-    std::lock_guard<std::mutex> lock(effect_frame_queue_map[xpos].mtx);
-    effect_frame_queue_map[xpos].effect_type = etype;
-    effect_frame_queue_map[xpos].time_left = play_time;
-    effect_frame_queue_map[xpos].current_frame_pos = 1;
-    effect_frame_queue_map[xpos].xpos = xpos;
-    effect_frame_queue_map[xpos].ypos = ypos;
+    auto &queue = effect_frame_queue_map[xpos];
+    std::lock_guard<std::mutex> lock(queue.mtx);
+    queue.effect_type = etype;
+    queue.time_left = play_time;
+    queue.current_frame_pos = 1;
+    queue.xpos = xpos;
+    queue.ypos = ypos;
 }
 
 // 绘制物件

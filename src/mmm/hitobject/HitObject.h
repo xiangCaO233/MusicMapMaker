@@ -68,6 +68,12 @@ class HitObject {
 struct HitObjectComparator {
     bool operator()(const std::shared_ptr<HitObject>& a,
                     const std::shared_ptr<HitObject>& b) const {
+        // 检查空指针
+        if (!a || !b) {
+            // 定义 nullptr 的排序规则：
+            // 如果 a 是 nullptr，则 a < b（除非 b 也是 nullptr）
+            return !a && b;
+        }
         if (a->timestamp != b->timestamp) {
             return a->timestamp < b->timestamp;
         } else {

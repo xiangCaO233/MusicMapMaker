@@ -56,7 +56,7 @@ bool HoldGenerator::should_body_hover(
 // 生成面条
 void HoldGenerator::generate(Hold &hold) {
     NoteGenerator::generate(hold);
-    auto hold_ptr = std::shared_ptr<Hold>(&hold, [](HitObject *) {});
+    auto hold_ptr = std::shared_ptr<Hold>(hold.clone());
     // 面条使用面尾标识
     objref = hold_ptr->hold_end_reference;
     // 添加long_note_body
@@ -142,7 +142,7 @@ void HoldGenerator::generate(Hold &hold) {
     } else {
         if (body_in_select_bound ||
             body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
-            editor_ref->ebuffer.selected_hitobjects.emplace(hold_ptr);
+            editor_ref->ebuffer.selected_hitobjects.insert(hold_ptr);
             // 使用选中纹理
             hold_vert_body_texture =
                 editor_ref->canvas_ref->skin.get_object_texture(
@@ -200,7 +200,7 @@ void HoldGenerator::generate(Hold &hold) {
                     body_selected_it !=
                         editor_ref->ebuffer.selected_hitobjects.end()) {
                     // 未选中则选中此面尾
-                    editor_ref->ebuffer.selected_hitobjects.emplace(
+                    editor_ref->ebuffer.selected_hitobjects.insert(
                         hold.hold_end_reference);
                     // 使用选中的纹理
                     hold_end_texture =
@@ -259,7 +259,7 @@ void HoldGenerator::generate(Hold &hold) {
                     body_selected_it !=
                         editor_ref->ebuffer.selected_hitobjects.end()) {
                     // 未选中则选中此面尾
-                    editor_ref->ebuffer.selected_hitobjects.emplace(
+                    editor_ref->ebuffer.selected_hitobjects.insert(
                         hold.hold_end_reference);
                     // 使用选中的纹理
                     hold_end_texture =
@@ -285,7 +285,7 @@ void HoldGenerator::generate(Hold &hold) {
 // 生成面条
 void HoldGenerator::generate_preview(Hold &hold) {
     NoteGenerator::generate_preview(hold);
-    auto hold_ptr = std::shared_ptr<Hold>(&hold, [](HitObject *) {});
+    auto hold_ptr = std::shared_ptr<Hold>(hold.clone());
     // 面条使用面尾标识
     objref = hold_ptr->hold_end_reference;
     // 添加long_note_body

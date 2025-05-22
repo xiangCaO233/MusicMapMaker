@@ -124,20 +124,7 @@ struct EditorBuffer {
         selected_timingss{nullptr};
 
     // 选中的物件
-    // 哈希函数和比较函数
-    struct RawPtrHash {
-        size_t operator()(const std::shared_ptr<HitObject>& ptr) const {
-            return std::hash<HitObject*>()(ptr.get());
-        }
-    };
-
-    struct RawPtrEqual {
-        bool operator()(const std::shared_ptr<HitObject>& lhs,
-                        const std::shared_ptr<HitObject>& rhs) const {
-            return lhs.get() == rhs.get();
-        }
-    };
-    std::unordered_set<std::shared_ptr<HitObject>, RawPtrHash, RawPtrEqual>
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
         selected_hitobjects;
 
     // 面条或滑键头的纹理
