@@ -126,6 +126,7 @@ void MMap::load_from_file(const char* path) {
         // 先读取物件
         auto notes_json = mapdata_json["notes"];
         for (const auto& note_json : notes_json) {
+            std::cout << note_json.dump() << "\n";
             auto type = note_json.value<std::string>("type", "note");
             if (type == "note") {
                 temp_note = std::make_shared<Note>(
@@ -171,11 +172,14 @@ void MMap::load_from_file(const char* path) {
                 }
                 case ComplexInfo::BODY: {
                     // 设置父物件
+                    if (!temp_complex_note) continue;
+
                     temp_note->parent_reference = temp_complex_note.get();
                     temp_complex_note->child_notes.insert(temp_note);
                     break;
                 }
                 case ComplexInfo::END: {
+                    if (!temp_complex_note) continue;
                     temp_complex_note->child_notes.insert(temp_note);
                     hitobjects.insert(temp_complex_note);
                     temp_complex_note.reset();

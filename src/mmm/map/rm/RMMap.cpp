@@ -626,6 +626,7 @@ void RMMap::load_from_file(const char* path) {
             case 0x20: {
                 // 组合键中间
                 // 设置父物件
+                if (!temp_complex_note) continue;
                 temp_note->parent_reference = temp_complex_note.get();
                 temp_note->compinfo = ComplexInfo::BODY;
                 // 只是一味添加
@@ -635,6 +636,7 @@ void RMMap::load_from_file(const char* path) {
             case 0xa0: {
                 // 组合键尾(结束键)
                 // 设置父物件
+                if (!temp_complex_note) continue;
                 temp_note->parent_reference = temp_complex_note.get();
                 temp_note->compinfo = ComplexInfo::END;
                 // 先添加,再把组合键添加进去

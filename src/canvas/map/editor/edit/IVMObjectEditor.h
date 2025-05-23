@@ -28,6 +28,9 @@ class IVMObjectEditor : public HitObjectEditor {
     // 更新正编辑的当前组合键
     void update_current_comp();
 
+    // 检查编辑中的组合键
+    void check_editing_comp();
+
     // 结束编辑-生成可撤回操作入栈
     void end_edit();
 

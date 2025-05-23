@@ -62,9 +62,17 @@ void IVMObjectEditor::undo() { HitObjectEditor::undo(); }
 void IVMObjectEditor::redo() { HitObjectEditor::redo(); }
 
 // 复制
-void IVMObjectEditor::copy() { HitObjectEditor::copy(); }
+void IVMObjectEditor::copy() {
+    HitObjectEditor::copy();
+    // 筛去非法复制部分
+    check_editing_comp();
+}
 // 剪切
-void IVMObjectEditor::cut() { HitObjectEditor::cut(); }
+void IVMObjectEditor::cut() {
+    HitObjectEditor::cut();
+    // 筛去非法复制部分
+    check_editing_comp();
+}
 // 粘贴
 void IVMObjectEditor::paste() {
     // 根据第一个物件的时间戳到当前时间的偏移粘贴到editing_temp_objects或移动到editing_temp_objects
@@ -106,33 +114,63 @@ void IVMObjectEditor::paste() {
                          clipboard.begin()->get()->timestamp;
             for (const auto& src : clipboard) {
                 auto note = std::dynamic_pointer_cast<Note>(src);
-                if (note) {
-                    switch (note->note_type) {
-                        case NoteType::HOLD: {
-                            auto hold = std::static_pointer_cast<Hold>(note);
-                            auto des = std::shared_ptr<Hold>(hold->clone());
-                            des->hold_end_reference->timestamp += rtime;
-                            des->timestamp += rtime;
-                            editing_temp_objects.insert(des);
-                            break;
+                if (!note) continue;
+                // 不管子键了
+                if (note->parent_reference) continue;
+
+                switch (note->note_type) {
+                    case NoteType::COMPLEX: {
+                        auto comp = std::static_pointer_cast<ComplexNote>(note);
+                        for (const auto& child_note : comp->child_notes) {
+                            switch (child_note->note_type) {
+                                case NoteType::HOLD: {
+                                    auto hold = std::static_pointer_cast<Hold>(
+                                        child_note);
+                                    hold->hold_end_reference->timestamp +=
+                                        rtime;
+                                    hold->timestamp += rtime;
+                                    break;
+                                }
+                                case NoteType::SLIDE: {
+                                    auto slide =
+                                        std::static_pointer_cast<Slide>(note);
+                                    auto des =
+                                        std::shared_ptr<Slide>(slide->clone());
+                                    des->slide_end_reference->timestamp +=
+                                        rtime;
+                                    des->timestamp += rtime;
+                                    editing_temp_objects.insert(des);
+                                    break;
+                                }
+                            }
                         }
-                        case NoteType::SLIDE: {
-                            auto slide = std::static_pointer_cast<Slide>(note);
-                            auto des = std::shared_ptr<Slide>(slide->clone());
-                            des->slide_end_reference->timestamp += rtime;
-                            des->timestamp += rtime;
-                            editing_temp_objects.insert(des);
-                            break;
-                        }
-                        case NoteType::NOTE: {
-                            auto des = std::shared_ptr<Note>(note->clone());
-                            des->timestamp += rtime;
-                            editing_temp_objects.insert(des);
-                            break;
-                        }
+                        break;
+                    }
+                    case NoteType::HOLD: {
+                        auto hold = std::static_pointer_cast<Hold>(note);
+                        auto des = std::shared_ptr<Hold>(hold->clone());
+                        des->hold_end_reference->timestamp += rtime;
+                        des->timestamp += rtime;
+                        editing_temp_objects.insert(des);
+                        break;
+                    }
+                    case NoteType::SLIDE: {
+                        auto slide = std::static_pointer_cast<Slide>(note);
+                        auto des = std::shared_ptr<Slide>(slide->clone());
+                        des->slide_end_reference->timestamp += rtime;
+                        des->timestamp += rtime;
+                        editing_temp_objects.insert(des);
+                        break;
+                    }
+                    case NoteType::NOTE: {
+                        auto des = std::shared_ptr<Note>(note->clone());
+                        des->timestamp += rtime;
+                        editing_temp_objects.insert(des);
+                        break;
                     }
                 }
             }
+            update_current_comp();
             // 生成操作
             end_edit();
             XINFO("已拷贝");
@@ -287,5 +325,46 @@ void IVMObjectEditor::update_current_comp() {
         if (!temp_note) continue;
         current_edit_complex->child_notes.insert(temp_note);
         temp_note->parent_reference = current_edit_complex.get();
+    }
+}
+
+// 检查编辑中的组合键
+void IVMObjectEditor::check_editing_comp() {
+    std::shared_ptr<ComplexNote> temp_comp = nullptr;
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+        illegal_edit_res;
+    for (const auto& o : editing_src_objects) {
+        std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+            temp_illegal_edit_res;
+        auto comp = std::dynamic_pointer_cast<ComplexNote>(o);
+        bool full_selected{true};
+        if (comp) {
+            // 包含组合键内容-检查是否完整包含
+            for (const auto& child_note : comp->child_notes) {
+                auto child_it = editing_src_objects.find(child_note);
+                if (child_it == editing_src_objects.end()) {
+                    // 此组合键不完全包含-去掉拷贝的此组合键的有关子键
+                    full_selected = false;
+                } else {
+                    temp_illegal_edit_res.insert(child_note);
+                }
+            }
+            if (full_selected) {
+                // 全部选到，无需移除
+            } else {
+                // 未全选到-把组合键也移除
+                temp_illegal_edit_res.insert(comp);
+            }
+        }
+        // 收集非法物件
+        for (const auto& temp_illegal_note : temp_illegal_edit_res) {
+            illegal_edit_res.insert(temp_illegal_note);
+        }
+    }
+
+    // 移除非法物件
+    for (const auto& illegal_edit_note : illegal_edit_res) {
+        auto it = editing_src_objects.find(illegal_edit_note);
+        editing_src_objects.erase(it);
     }
 }

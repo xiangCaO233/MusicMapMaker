@@ -1,5 +1,7 @@
 #include "HitObjectEditor.h"
 
+#include <memory>
+
 #include "../../../mmm/MapWorkProject.h"
 #include "../../../mmm/hitobject/Note/rm/ComplexNote.h"
 #include "../../../util/mutil.h"
@@ -64,6 +66,19 @@ void HitObjectEditor::copy() {
     clipboard.clear();
     for (const auto& o : editor_ref->ebuffer.selected_hitobjects) {
         clipboard.insert(o);
+        auto note = std::dynamic_pointer_cast<Note>(o);
+        if (note) {
+            if (note->compinfo != ComplexInfo::NONE) {
+                // 拷贝到了组合键中的子键-添加组合键引用
+                auto temp_comp = std::shared_ptr<ComplexNote>(
+                    note->parent_reference, [](ComplexNote*) {});
+                auto com_it = clipboard.find(temp_comp);
+                if (com_it == clipboard.end()) {
+                    clipboard.insert(
+                        std::shared_ptr<ComplexNote>(temp_comp->clone()));
+                }
+            }
+        }
     }
     editor_ref->ebuffer.select_bound.setWidth(0);
     editor_ref->ebuffer.select_bound.setHeight(0);
@@ -85,6 +100,19 @@ void HitObjectEditor::cut() {
         editing_src_objects.insert(o);
         editing_temp_objects.insert(std::shared_ptr<HitObject>(o->clone()));
         clipboard.insert(o);
+        auto note = std::dynamic_pointer_cast<Note>(o);
+        if (note) {
+            if (note->compinfo != ComplexInfo::NONE) {
+                // 拷贝到了组合键中的子键-添加组合键引用
+                auto temp_comp = std::shared_ptr<ComplexNote>(
+                    note->parent_reference, [](ComplexNote*) {});
+                auto com_it = clipboard.find(temp_comp);
+                if (com_it == clipboard.end()) {
+                    clipboard.insert(
+                        std::shared_ptr<ComplexNote>(temp_comp->clone()));
+                }
+            }
+        }
     }
     editor_ref->ebuffer.selected_hitobjects.clear();
     XINFO("选中物件已剪切到剪切板");

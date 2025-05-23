@@ -147,6 +147,8 @@ void IVMDragMoveObjectHandler::move_temp_objectsrelatively(
                         ++child_info_it;
                     }
                 }
+                // 更新组合键的时间戳
+                comp->timestamp = comp->child_notes.begin()->get()->timestamp;
             } else {
                 check_object(ivmobjecteditor, tempnote, info, rtime, rorbit,
                              true);
