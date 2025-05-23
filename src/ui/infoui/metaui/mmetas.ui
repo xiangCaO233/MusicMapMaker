@@ -35,7 +35,7 @@
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="timecontroller_tab">
       <attribute name="title">
@@ -168,7 +168,40 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QTableWidget" name="meta_table"/>
+        <widget class="QTableWidget" name="meta_table">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::ClickFocus</enum>
+         </property>
+         <property name="gridStyle">
+          <enum>Qt::PenStyle::SolidLine</enum>
+         </property>
+         <property name="sortingEnabled">
+          <bool>false</bool>
+         </property>
+         <attribute name="horizontalHeaderVisible">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="horizontalHeaderHighlightSections">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderHighlightSections">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+          <bool>false</bool>
+         </attribute>
+        </widget>
        </item>
       </layout>
      </widget>

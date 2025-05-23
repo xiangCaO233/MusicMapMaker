@@ -57,6 +57,8 @@ MainWindow::MainWindow(QWidget* parent)
     // 连接项目选择map信号
     connect(ui->project_controller, &MProjectController::select_map,
             ui->page_widget, &MPage::project_controller_select_map);
+    connect(ui->project_controller, &MProjectController::select_map,
+            ui->infomation_widget->mmetas, &MMetas::switch_map);
 
     // 连接窗口标题更新信号
     connect(ui->page_widget->edit_area_widget->canvas_container->canvas.data(),
