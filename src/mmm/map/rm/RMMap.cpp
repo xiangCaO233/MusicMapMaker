@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -387,6 +388,12 @@ void RMMap::load_from_file(const char* path) {
 
     auto first_pos = fnamestr.find('_');
     auto second_pos = fnamestr.find('_', first_pos + 1);
+
+    try {
+        orbits = std::stoi(fnamestr.substr(first_pos + 1, 1));
+    } catch (std::exception& e) {
+        XWARN("读取文件名key数失败-" + std::string(e.what()));
+    }
     auto last_pos = fnamestr.rfind(".");
 
     // 截取第二个_到最后一个.之间的字符串作为版本
@@ -398,6 +405,7 @@ void RMMap::load_from_file(const char* path) {
     // 截取0~第一个_之间的字符串作为文件前缀-标题
     auto file_presuffix = fnamestr.substr(0, first_pos);
     title_unicode = file_presuffix;
+    title = mutil::sanitizeFilename_ascii(title_unicode);
 
     bool has_audio{true};
     // 前缀+.mp3作为音频文件名

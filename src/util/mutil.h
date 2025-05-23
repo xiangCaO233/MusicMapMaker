@@ -100,6 +100,18 @@ inline std::string sanitizeFilename(std::string filename) {
     return filename;
 }
 
+inline std::string sanitizeFilename_ascii(std::string filename) {
+    for (char& c : filename) {
+        // 检查字符是否为可打印的ASCII字符（0x20-0x7E），
+        // 不包括控制字符（0x00-0x1F）和删除字符（0x7F）
+        if (static_cast<unsigned char>(c) < 0x20 ||
+            static_cast<unsigned char>(c) > 0x7E) {
+            c = '_';  // 替换非ASCII字符为'_'
+        }
+    }
+    return filename;
+}
+
 // 判断路径是否以指定字符串结尾
 inline bool endsWithExtension(const std::filesystem::path& filepath,
                               const std::string& suffix) {
@@ -681,9 +693,6 @@ inline void format_music_time2u32(std::u32string& res, double srcmilliseconds) {
     res = cu32(temp);
 #endif  //_WIN32
 }
-
-inline void format_music_time2milliseconds(const std::string& src,
-                                           double& desmilliseconds) {}
 
 inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgpath,
                                     QColor& color, QSize& size) {

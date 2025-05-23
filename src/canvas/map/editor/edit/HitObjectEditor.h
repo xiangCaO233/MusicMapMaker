@@ -50,6 +50,9 @@ class HitObjectEditor {
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
         editing_temp_objects;
 
+    // 是否是剪切操作
+    bool is_cut{false};
+
     // 剪切板
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> clipboard;
 
@@ -66,8 +69,6 @@ class HitObjectEditor {
     // 分析需要删除的物件-自动拆分组合键
     void analyze_src_object();
 
-    // void drag_object()
-
     // 撤销
     void undo();
 
@@ -76,6 +77,8 @@ class HitObjectEditor {
 
     // 复制
     void copy();
+    // 剪切
+    void cut();
     // 粘贴
     void paste();
 };
