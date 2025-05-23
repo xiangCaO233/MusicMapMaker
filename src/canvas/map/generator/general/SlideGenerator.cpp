@@ -57,7 +57,7 @@ bool SlideGenerator::should_body_hover(
 void SlideGenerator::generate(Slide& slide) {
     NoteGenerator::generate(slide);
     // 滑键
-    auto slide_ptr = std::shared_ptr<Slide>(slide.clone());
+    auto slide_ptr = std::shared_ptr<Slide>(&slide, [](Slide*) {});
     objref = slide_ptr;
     auto endorbit = slide.orbit + slide.slide_parameter;
 
@@ -162,7 +162,7 @@ void SlideGenerator::generate(Slide& slide) {
         if (slide_blody_in_select_bound ||
             body_selected_it != editor_ref->ebuffer.selected_hitobjects.end()) {
             // 选中此物件
-            editor_ref->ebuffer.selected_hitobjects.insert(slide_ptr);
+            editor_ref->ebuffer.selected_hitobjects.emplace(slide_ptr);
             // 使用选中纹理
             slide_hori_body_texture =
                 editor_ref->canvas_ref->skin.get_object_texture(
@@ -217,7 +217,7 @@ void SlideGenerator::generate(Slide& slide) {
                     body_selected_it !=
                         editor_ref->ebuffer.selected_hitobjects.end()) {
                     // 选中此物件
-                    editor_ref->ebuffer.selected_hitobjects.insert(slide_ptr);
+                    editor_ref->ebuffer.selected_hitobjects.emplace(slide_ptr);
                     // 使用选中纹理
                     actual_use_end_texture = slide_end_selected_texture;
                     // 发送更新选中物件信号
@@ -267,7 +267,7 @@ void SlideGenerator::generate(Slide& slide) {
                     body_selected_it !=
                         editor_ref->ebuffer.selected_hitobjects.end()) {
                     // 选中此物件
-                    editor_ref->ebuffer.selected_hitobjects.insert(slide_ptr);
+                    editor_ref->ebuffer.selected_hitobjects.emplace(slide_ptr);
                     // 使用选中纹理
                     actual_use_end_texture = slide_end_selected_texture;
                     // 发送更新选中物件信号
@@ -292,7 +292,7 @@ void SlideGenerator::generate(Slide& slide) {
 void SlideGenerator::generate_preview(Slide& slide) {
     NoteGenerator::generate_preview(slide);
     // 滑键
-    auto slide_ptr = std::shared_ptr<Slide>(slide.clone());
+    auto slide_ptr = std::shared_ptr<Slide>(&slide, [](Slide*) {});
     objref = slide_ptr;
     auto endorbit = slide.orbit + slide.slide_parameter;
 

@@ -2,6 +2,8 @@
 
 #include <qlogging.h>
 
+#include <mutex>
+
 #include "../../../mmm/MapWorkProject.h"
 #include "../../mmm/Beat.h"
 #include "../../mmm/map/osu/OsuMap.h"
@@ -216,10 +218,14 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
         }
         case MouseEditMode::SELECT: {
             // 选择模式-不分操作区都可触发
-            clear_selections = false;
+            // 按住controll左键多选
+            if ((e->modifiers() & Qt::ControlModifier)) {
+                // 未按住controll清空选中列表
+                clear_selections = false;
+            }
             // 未悬浮在任何物件上
             // 更新选中信息
-            update_selections(e->modifiers() & Qt::ControlModifier);
+            update_selections();
             break;
         }
         case MouseEditMode::NONE: {
@@ -229,8 +235,10 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
     }
 
     if (clear_selections) {
+        std::lock_guard<std::mutex> lock1(ebuffer.selected_hitobjects_mtx);
         // 其他模式直接清空选中列表
         ebuffer.selected_hitobjects.clear();
+        std::lock_guard<std::mutex> lock2(ebuffer.selected_timingss_mts);
         ebuffer.selected_timingss.clear();
     }
 }
@@ -613,14 +621,8 @@ void MapEditor::update_timepos(int scrolldy, bool is_shift_down) {
 }
 
 // 更新选中信息
-void MapEditor::update_selections(bool is_ctrl_down) {
-    // 按住controll左键多选
-    if (!is_ctrl_down) {
-        // 未按住controll清空选中列表
-        ebuffer.selected_hitobjects.clear();
-        ebuffer.selected_timingss.clear();
-    }
-
+void MapEditor::update_selections() {
+    std::lock_guard<std::mutex> lock(ebuffer.selected_hitobjects_mtx);
     // 选中
     if (ebuffer.hover_object_info) {
         // 有悬浮在物件上
@@ -667,10 +669,4 @@ void MapEditor::update_selection_area(QPoint&& p, bool ctrl_down) {
     ebuffer.select_bound.setHeight(
         std::abs(ebuffer.select_bound_locate_points->first.y() -
                  ebuffer.select_bound_locate_points->second.y()));
-
-    // 更新选中的物件内容
-    if (!ctrl_down) {
-        // 没按ctrl,先清空当前选中的
-        ebuffer.selected_hitobjects.clear();
-    }
 }

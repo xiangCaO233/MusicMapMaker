@@ -2,6 +2,7 @@
 #define M_EDITORBUFFER_H
 
 #include <memory>
+#include <mutex>
 #include <set>
 #include <unordered_set>
 #include <vector>
@@ -118,13 +119,28 @@ struct EditorBuffer {
         }
     };
 
+    std::mutex selected_timingss_mts;
     // 选中的timings
     std::unordered_set<std::vector<std::shared_ptr<Timing>>*,
                        VectorSharedPtrTimingHash, VectorSharedPtrTimingEqual>
         selected_timingss{nullptr};
 
+    std::mutex selected_hitobjects_mtx;
     // 选中的物件
-    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+    // 哈希函数和比较函数
+    struct RawPtrHash {
+        size_t operator()(const std::shared_ptr<HitObject>& ptr) const {
+            return std::hash<HitObject*>()(ptr.get());
+        }
+    };
+
+    struct RawPtrEqual {
+        bool operator()(const std::shared_ptr<HitObject>& lhs,
+                        const std::shared_ptr<HitObject>& rhs) const {
+            return lhs.get() == rhs.get();
+        }
+    };
+    std::unordered_set<std::shared_ptr<HitObject>, RawPtrHash, RawPtrEqual>
         selected_hitobjects;
 
     // 面条或滑键头的纹理

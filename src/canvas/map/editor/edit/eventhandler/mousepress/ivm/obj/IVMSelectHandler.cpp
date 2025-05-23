@@ -107,12 +107,7 @@ bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
         // 右键释放时物件直接删除-生成操作
         return true;
     } else {
-        // 未悬浮于任何物件-清空选中
-        if (!oeditor_context->editor_ref->ebuffer.selected_hitobjects.empty())
-            oeditor_context->editor_ref->ebuffer.selected_hitobjects.clear();
-
         XINFO("未悬浮于任何物件-传递事件给放置物件处理器");
-
         // 传递事件-下一个应为放置物件的press处理器
         return next_handler->handle(oeditor_context, e, mouse_time,
                                     mouse_orbit);

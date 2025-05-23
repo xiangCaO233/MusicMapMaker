@@ -877,66 +877,74 @@ void MapWorkspaceCanvas::push_shape(BufferWrapper *current_back_buffer) {
         // 绘制特效帧
         draw_effect_frame(current_back_buffer);
 
-        // 更新物件列表
-        // 清除物件缓存
-        editor->ebuffer.buffer_objects.clear();
-        working_map->query_object_in_range(
-            editor->ebuffer.buffer_objects,
-            int32_t(editor->ebuffer.current_time_area_start),
-            int32_t(editor->ebuffer.current_time_area_end), true);
+        {
+            std::lock_guard<std::mutex> lock(
+                editor->ebuffer.selected_hitobjects_mtx);
+            // 更新物件列表
+            // 清除物件缓存
+            editor->ebuffer.buffer_objects.clear();
+            working_map->query_object_in_range(
+                editor->ebuffer.buffer_objects,
+                int32_t(editor->ebuffer.current_time_area_start),
+                int32_t(editor->ebuffer.current_time_area_end), true);
 
-        for (const auto &[type, obj_editor] : editor->obj_editors) {
-            // 不显示编辑中的物件-移除
-            for (const auto &o : obj_editor->editing_src_objects) {
-                auto comp = std::dynamic_pointer_cast<ComplexNote>(o);
-                if (comp) {
-                    for (const auto &child_note : comp->child_notes) {
-                        remove_objects(child_note);
+            for (const auto &[type, obj_editor] : editor->obj_editors) {
+                // 不显示编辑中的物件-移除
+                for (const auto &o : obj_editor->editing_src_objects) {
+                    auto comp = std::dynamic_pointer_cast<ComplexNote>(o);
+                    if (comp) {
+                        for (const auto &child_note : comp->child_notes) {
+                            remove_objects(child_note);
+                        }
                     }
+                    remove_objects(o);
                 }
-                remove_objects(o);
             }
-        }
 
-        // 绘制map原本的物件
-        draw_hitobject(current_back_buffer, editor->ebuffer.buffer_objects,
-                       HitObjectEffect::NORMAL);
-        // 更新hover信息
-        if (!editor->cstatus.is_hover_note) {
-            // 未悬浮在任何一个物件或物件身体上
-            editor->ebuffer.hover_object_info = nullptr;
-        } else {
-            editor->cstatus.is_hover_note = false;
-        }
+            // 绘制map原本的物件
+            draw_hitobject(current_back_buffer, editor->ebuffer.buffer_objects,
+                           HitObjectEffect::NORMAL);
+            // 更新hover信息
+            if (!editor->cstatus.is_hover_note) {
+                // 未悬浮在任何一个物件或物件身体上
+                editor->ebuffer.hover_object_info = nullptr;
+            } else {
+                editor->cstatus.is_hover_note = false;
+            }
 
-        // 绘制虚影物件-编辑缓存
-        std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
-            editbuffers;
-        for (const auto &[type, obj_editor] : editor->obj_editors) {
-            if (obj_editor->editing_temp_objects.empty()) continue;
-            for (const auto &temp_shadow_obj :
-                 obj_editor->editing_temp_objects) {
-                auto comp =
-                    std::dynamic_pointer_cast<ComplexNote>(temp_shadow_obj);
-                if (comp) {
-                    for (const auto &child_note : comp->child_notes) {
-                        editbuffers.insert(child_note);
+            // 绘制虚影物件-编辑缓存
+            std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
+                editbuffers;
+            for (const auto &[type, obj_editor] : editor->obj_editors) {
+                if (obj_editor->editing_temp_objects.empty()) continue;
+                for (const auto &temp_shadow_obj :
+                     obj_editor->editing_temp_objects) {
+                    auto comp =
+                        std::dynamic_pointer_cast<ComplexNote>(temp_shadow_obj);
+                    if (comp) {
+                        for (const auto &child_note : comp->child_notes) {
+                            editbuffers.insert(child_note);
+                        }
                     }
+                    editbuffers.insert(temp_shadow_obj);
                 }
-                editbuffers.insert(temp_shadow_obj);
             }
-        }
-        draw_hitobject(current_back_buffer, editbuffers,
-                       HitObjectEffect::SHADOW);
+            draw_hitobject(current_back_buffer, editbuffers,
+                           HitObjectEffect::SHADOW);
 
-        // 绘制预览区域
-        draw_preview_content(current_back_buffer);
+            // 绘制预览区域
+            draw_preview_content(current_back_buffer);
+        }
 
         // 绘制选中区域
         draw_select_bound(current_back_buffer);
 
-        // 绘制信息区域
-        draw_infoarea(current_back_buffer);
+        {
+            std::lock_guard<std::mutex> lock(
+                editor->ebuffer.selected_timingss_mts);
+            // 绘制信息区域
+            draw_infoarea(current_back_buffer);
+        }
 
         // 绘制顶部栏
         draw_top_bar(current_back_buffer);

@@ -18,7 +18,7 @@ NoteGenerator::~NoteGenerator() = default;
 
 // 生成物件渲染指令
 void NoteGenerator::generate(Note& note) {
-    auto note_ptr = std::shared_ptr<HitObject>(note.clone());
+    auto note_ptr = std::shared_ptr<HitObject>(&note, [](HitObject*) {});
 
     // 区分面条和单键纹理
     TexType textype;
@@ -99,7 +99,7 @@ void NoteGenerator::generate(Note& note) {
             it != editor_ref->ebuffer.selected_hitobjects.end()) {
             if (it == editor_ref->ebuffer.selected_hitobjects.end()) {
                 // 未选中则选中此物件
-                editor_ref->ebuffer.selected_hitobjects.insert(note_ptr);
+                editor_ref->ebuffer.selected_hitobjects.emplace(note_ptr);
                 // 发送更新选中物件信号
                 emit editor_ref->canvas_ref->select_object(
                     note.beatinfo.get(), note_ptr,
@@ -119,7 +119,7 @@ void NoteGenerator::generate(Note& note) {
 
 // 生成预览物件
 void NoteGenerator::generate_preview(Note& note) {
-    auto note_ptr = std::shared_ptr<HitObject>(note.clone());
+    auto note_ptr = std::shared_ptr<HitObject>(&note, [](HitObject*) {});
     // 区分面条和单键纹理
     TexType textype;
     std::shared_ptr<TextureInstace> preference_texture;
@@ -208,7 +208,7 @@ void NoteGenerator::generate_preview(Note& note) {
             it != editor_ref->ebuffer.selected_hitobjects.end()) {
             if (it == editor_ref->ebuffer.selected_hitobjects.end()) {
                 // 未选中则选中此物件
-                editor_ref->ebuffer.selected_hitobjects.insert(note_ptr);
+                editor_ref->ebuffer.selected_hitobjects.emplace(note_ptr);
                 // 发送更新选中物件信号
                 emit editor_ref->canvas_ref->select_object(
                     note.beatinfo.get(), note_ptr,

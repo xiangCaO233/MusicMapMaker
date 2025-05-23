@@ -106,7 +106,7 @@ class MapEditor {
     // 更新谱面位置
     void update_timepos(int scrolldy, bool is_shift_down);
     // 更新选中信息
-    void update_selections(bool is_ctrl_down);
+    void update_selections();
     // 更新选中区域
     void update_selection_area(QPoint&& p, bool ctrl_down);
 };

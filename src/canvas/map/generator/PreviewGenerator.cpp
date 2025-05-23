@@ -27,7 +27,6 @@ PreviewGenerator::~PreviewGenerator() = default;
 void PreviewGenerator::generate(BufferWrapper *bufferwrapper) {
     if (!editor_ref->canvas_ref->working_map) return;
     auto &preview_params_list = bufferwrapper->preview_datas.emplace();
-    // TODO(xiang 2025-05-07): 优化性能
     // 确定区域
 
     auto area_center_time = (editor_ref->ebuffer.current_time_area_end +
