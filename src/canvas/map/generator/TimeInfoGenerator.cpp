@@ -20,16 +20,23 @@ TimeInfoGenerator::~TimeInfoGenerator() = default;
 // 生成信息
 void TimeInfoGenerator::generate(BufferWrapper *bufferwrapper) {
     // 分隔线
-    editor_ref->canvas_ref->renderer_manager->addLine(
-        QPointF(editor_ref->cstatus.canvas_size.width() *
-                        editor_ref->csettings.infoarea_width_scale -
-                    2,
-                0),
-        QPointF(editor_ref->cstatus.canvas_size.width() *
-                        editor_ref->csettings.infoarea_width_scale -
-                    2,
-                editor_ref->cstatus.canvas_size.height()),
-        4, nullptr, QColor(255, 182, 193, 235), false);
+    auto &info_params_list = bufferwrapper->info_datas.emplace();
+    auto &info_params = info_params_list.emplace_back();
+    info_params.func_type = FunctionType::MLINE;
+    info_params.x1 = editor_ref->cstatus.canvas_size.width() *
+                         editor_ref->csettings.infoarea_width_scale -
+                     2;
+    info_params.y1 = 0;
+    info_params.x2 = editor_ref->cstatus.canvas_size.width() *
+                         editor_ref->csettings.infoarea_width_scale -
+                     2;
+    info_params.y2 = editor_ref->cstatus.canvas_size.height();
+    info_params.r = 255;
+    info_params.g = 182;
+    info_params.b = 193;
+    info_params.a = 235;
+    info_params.line_width = 2;
+    info_params.is_volatile = false;
 
     // 标记timing
     draw_timing_points(bufferwrapper);

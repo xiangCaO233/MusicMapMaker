@@ -16,6 +16,13 @@ MMetas::MMetas(QWidget *parent) : QWidget(parent), ui(new Ui::MMetas) {
 
 MMetas::~MMetas() { delete ui; }
 
+void MMetas::switch_map(std::shared_ptr<MMap> map) {
+    binding_map = map;
+    if (binding_map) {
+        // 更新谱面元数据
+    }
+}
+
 // 使用主题
 void MMetas::use_theme(GlobalTheme theme) {
     objinfo_ref->use_theme(theme);

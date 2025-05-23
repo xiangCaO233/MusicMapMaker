@@ -202,7 +202,7 @@ void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
         // 更新音量
         BackgroundAudio::set_global_volume(
             binding_map->project_reference->devicename,
-            map->project_reference->config.pmusic_volume);
+            map->project_reference->config.pglobal_volume);
         BackgroundAudio::set_music_volume(
             binding_map->project_reference->devicename,
             map->project_reference->config.pmusic_volume);
@@ -212,6 +212,9 @@ void TimeController::on_selectnewmap(std::shared_ptr<MMap> &map) {
         // 更新maptitle
         ui->map_title_unicode->setText(
             QString::fromStdString(binding_map->title_unicode));
+        // 更新mapversion
+        ui->map_version->setText(QString::fromStdString(binding_map->version));
+
         update_album();
     }
 }

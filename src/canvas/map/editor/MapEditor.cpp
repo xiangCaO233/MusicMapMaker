@@ -425,22 +425,31 @@ void MapEditor::mouse_scrolled(QWheelEvent* e) {
             break;
         }
         case MouseOperationArea::INFO: {
-            // 信息区滚动-若此位置存在拍则更新此拍分拍策略
-            auto beats = canvas_ref->working_map->query_beat_before_time(
-                cstatus.mouse_pos_time);
+            // 信息区滚动
+            if (e->modifiers() & Qt::ShiftModifier) {
+                // 更新默认分拍策略
+                if (canvas_ref->working_map) {
+                    canvas_ref->working_map->project_reference->config
+                        .default_divisors += (dy > 0 ? 1 : -1);
+                }
+            } else {
+                // 若此位置存在拍则更新此拍分拍策略
+                auto beats = canvas_ref->working_map->query_beat_before_time(
+                    cstatus.mouse_pos_time);
 
-            for (const auto& beat : beats) {
-                // 只修改所处的拍
-                if (beat->start_timestamp < cstatus.mouse_pos_time &&
-                    beat->end_timestamp > cstatus.mouse_pos_time) {
-                    beat->divisors_customed = true;
-                    auto res_divisors =
-                        (dy > 0 ? beat->divisors + 1 : beat->divisors - 1);
-                    if (res_divisors < 1) {
-                        res_divisors = 1;
-                        break;
+                for (const auto& beat : beats) {
+                    // 只修改所处的拍
+                    if (beat->start_timestamp < cstatus.mouse_pos_time &&
+                        beat->end_timestamp > cstatus.mouse_pos_time) {
+                        beat->divisors_customed = true;
+                        auto res_divisors =
+                            (dy > 0 ? beat->divisors + 1 : beat->divisors - 1);
+                        if (res_divisors < 1) {
+                            res_divisors = 1;
+                            break;
+                        }
+                        beat->divisors = res_divisors;
                     }
-                    beat->divisors = res_divisors;
                 }
             }
 

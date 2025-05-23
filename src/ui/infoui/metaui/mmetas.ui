@@ -143,7 +143,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QListView" name="meta_list"/>
+        <widget class="QTableWidget" name="meta_table"/>
        </item>
       </layout>
      </widget>

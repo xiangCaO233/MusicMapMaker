@@ -9,6 +9,7 @@
 class ObjectInfoui;
 class TimingInfoui;
 class TimeController;
+class MMap;
 
 enum class GlobalTheme;
 
@@ -23,6 +24,9 @@ class MMetas : public QWidget {
     explicit MMetas(QWidget* parent = nullptr);
     ~MMetas();
 
+    // 绑定的图
+    std::shared_ptr<MMap> binding_map;
+
     // 标签页内组件引用
     ObjectInfoui* objinfo_ref;
     TimingInfoui* timinginfo_ref;
@@ -33,6 +37,8 @@ class MMetas : public QWidget {
 
     // 使用主题
     void use_theme(GlobalTheme theme);
+   public slots:
+    void switch_map(std::shared_ptr<MMap> map);
 
    private:
     Ui::MMetas* ui;

@@ -3,6 +3,7 @@
 #define NOMINMAX
 #include <windows.h>
 #endif  //_WIN32
+#include <qfontdatabase.h>
 #include <qsurfaceformat.h>
 
 #include <QApplication>
@@ -43,6 +44,26 @@ int main(int argc, char* argv[]) {
     QString languageCode = systemLocale.name();
 
     XINFO("System language:" + languageCode.toStdString());
+
+    // 设置app默认字体
+    // 1. 加载字体文件
+    int fontId = QFontDatabase::addApplicationFont(":/font/ComicMono-Bold.ttf");
+    if (fontId == -1) {
+        qWarning() << "Failed to load font file";
+        return -1;
+    }
+
+    // 2. 获取字体族名
+    QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+    if (fontFamilies.empty()) {
+        qWarning() << "No font families found in the font file";
+        return -1;
+    }
+
+    // 3. 创建字体对象并设置为应用程序默认字体
+    // 使用第一个字体族，大小12
+    QFont defaultFont(fontFamilies.at(0), 12);
+    a.setFont(defaultFont);
 
     // 初始化 Qt 自带的标准对话框翻译
     QTranslator qtTranslator;
