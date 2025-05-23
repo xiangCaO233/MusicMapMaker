@@ -62,15 +62,18 @@ void FileBrowserController::use_theme(GlobalTheme theme) {
     }
     // 设置文件管理器按钮图标颜色
     mutil::set_button_svgcolor(ui->cdup, ":/icons/angle-left.svg",
-                               file_button_color, 28, 28);
+                               file_button_color, 14, 14);
     mutil::set_button_svgcolor(ui->cdnext, ":/icons/angle-right.svg",
-                               file_button_color, 28, 28);
+                               file_button_color, 14, 14);
     mutil::set_button_svgcolor(ui->cdparent, ":/icons/long-arrow-alt-up.svg",
-                               file_button_color, 28, 28);
+                               file_button_color, 14, 14);
     mutil::set_button_svgcolor(ui->address_confirm, ":/icons/arrow-right.svg",
-                               file_button_color, 28, 28);
+                               file_button_color, 14, 14);
+    mutil::set_button_svgcolor(ui->open_folder_button,
+                               ":/icons/folder-open.svg", file_button_color, 14,
+                               14);
     mutil::set_button_svgcolor(ui->search, ":/icons/search.svg",
-                               file_button_color, 28, 28);
+                               file_button_color, 14, 14);
 }
 
 // TODO(xiang 2025-04-16): 实现文件管理器功能
@@ -207,3 +210,12 @@ void FileBrowserController::on_address_confirm_clicked() {
 
 // 搜索按键事件
 void FileBrowserController::on_search_clicked() {}
+
+// 打开文件夹按钮
+void FileBrowserController::on_open_folder_button_clicked() {
+    auto dir = mutil::getDirectory(this, tr("open directory"),
+                                   XLogger::last_select_directory);
+    if (!dir.isEmpty()) {
+        cd(dir);
+    }
+}

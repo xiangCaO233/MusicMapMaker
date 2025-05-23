@@ -127,6 +127,34 @@ inline bool endsWithExtension(const std::filesystem::path& filepath,
     return false;
 }
 
+// 获取选择的文件夹
+inline QString getDirectory(QWidget* parent, const QString& title,
+                            const QString& defaultPath = QString()) {
+    QFileDialog dialog(parent, title, defaultPath);
+
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOption(QFileDialog::ShowDirsOnly, true);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+
+    if (QListView* listView = dialog.findChild<QListView*>("listView")) {
+        listView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+    if (QTreeView* treeView = dialog.findChild<QTreeView*>()) {
+        treeView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+
+    if (dialog.exec() == QDialog::Accepted) {
+        QStringList selected = dialog.selectedFiles();
+        if (!selected.isEmpty()) {
+            return selected.first();
+        }
+    }
+
+    return QString();
+}
+
+// 获取保存的文件
 inline QString getSaveDirectoryWithFilename(
     QWidget* parent, const QString& title, const QString& format_label,
     const QMap<QString, QString>& formatFilters,

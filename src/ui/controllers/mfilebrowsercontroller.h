@@ -58,6 +58,9 @@ class FileBrowserController : public QWidget {
     // 搜索按键事件
     void on_search_clicked();
 
+    // 打开文件夹按钮
+    void on_open_folder_button_clicked();
+
    private:
     Ui::FileBrowserController *ui;
 };
