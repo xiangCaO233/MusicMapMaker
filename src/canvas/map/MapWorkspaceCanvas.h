@@ -5,6 +5,7 @@
 #include <qpoint.h>
 #include <qtmetamacros.h>
 
+#include <condition_variable>
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -166,6 +167,13 @@ class MapWorkspaceCanvas : public GLCanvas {
     void remove_objects(std::shared_ptr<HitObject> o);
     // 更新fps显示
     virtual void updateFpsDisplay(int fps) override;
+
+    decltype(std::chrono::high_resolution_clock::now()
+                 .time_since_epoch()) last_save_time;
+
+    void strart_auto_save();
+
+    void save();
 
    public slots:
     // 时间控制器暂停按钮触发

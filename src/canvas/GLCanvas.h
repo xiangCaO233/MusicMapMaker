@@ -67,6 +67,8 @@ class GLCanvas : public QOpenGLWindow,
 
     // 停止刷新线程标识
     std::atomic<bool> stop_refresh{false};
+    std::mutex autosave_mtx;
+    std::condition_variable autosave_cv;
 
     // 上一帧glcall
     long pre_glcalls{0};

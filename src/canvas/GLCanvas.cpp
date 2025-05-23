@@ -21,6 +21,7 @@
 #include <chrono>
 #include <filesystem>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <unordered_set>
@@ -64,10 +65,12 @@ GLCanvas::GLCanvas(QWidget *parent) {
 GLCanvas::~GLCanvas() {
     // 释放渲染管理器
     if (renderer_manager) delete renderer_manager;
+    std::lock_guard<std::mutex> lock(autosave_mtx);
+    // update_thread.join();
     // 确保刷新线程退出
     stop_refresh = true;
     frame_data_buffer_manager.notify_all_for_exit();
-    // update_thread.join();
+    autosave_cv.notify_all();
 };
 
 // 使用主题

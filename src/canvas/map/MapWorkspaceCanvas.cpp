@@ -15,12 +15,14 @@
 #include <QThread>
 #include <QTimer>
 #include <QWheelEvent>
+#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <utility>
 
@@ -75,9 +77,55 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
     judgelinegenerator = std::make_shared<JudgelineGenerator>(editor);
 
     average_update_time = des_update_time;
+
+    // 启动自动保存
+    last_save_time =
+        std::chrono::high_resolution_clock::now().time_since_epoch();
+    strart_auto_save();
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
+
+void MapWorkspaceCanvas::strart_auto_save() {
+    std::thread t([&]() {
+        while (true) {
+            // 等待1分钟或被唤醒
+            std::unique_lock<std::mutex> lock(autosave_mtx);
+            if (autosave_cv.wait_for(lock, std::chrono::milliseconds(30 * 1000),
+                                     [&] { return stop_refresh.load(); })) {
+                // 收到停止信号
+                break;
+            }
+            save();
+        }
+    });
+    t.detach();
+}
+
+// 保存
+void MapWorkspaceCanvas::save() {
+    if (working_map) {
+        auto dirpath = working_map->map_file_path.parent_path();
+
+        if (working_map->project_reference->config.alway_save_asmmm) {
+            // 保存为mmm
+            auto def_filename =
+                mutil::sanitizeFilename(working_map->title_unicode + "-" +
+                                        std::to_string(working_map->orbits) +
+                                        "k-" + working_map->version + ".mmm");
+            auto map_path = dirpath / def_filename;
+            working_map->write_to_file(map_path.generic_string().c_str());
+
+        } else {
+            // 覆盖原有的文件
+            working_map->write_to_file(
+                working_map->map_file_path.generic_string().c_str());
+        }
+        XINFO("已保存");
+    } else {
+        XWARN("未打开谱面");
+    }
+}
 
 void MapWorkspaceCanvas::initializeGL() {
     GLCanvas::initializeGL();
@@ -326,30 +374,7 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_S: {
             if (modifiers & Qt::ControlModifier) {
                 // 直接保存
-                if (working_map) {
-                    auto dirpath = working_map->map_file_path.parent_path();
-
-                    if (working_map->project_reference->config
-                            .alway_save_asmmm) {
-                        // 保存为mmm
-                        auto def_filename = mutil::sanitizeFilename(
-                            working_map->title_unicode + "-" +
-                            std::to_string(working_map->orbits) + "k-" +
-                            working_map->version + ".mmm");
-                        auto map_path = dirpath / def_filename;
-                        working_map->write_to_file(
-                            map_path.generic_string().c_str());
-
-                    } else {
-                        // 覆盖原有的文件
-                        working_map->write_to_file(
-                            working_map->map_file_path.generic_string()
-                                .c_str());
-                    }
-                    XINFO("已保存");
-                } else {
-                    XWARN("未打开谱面");
-                }
+                save();
             }
             break;
         }
