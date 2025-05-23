@@ -297,7 +297,7 @@ void IVMObjectEditor::update_current_comp() {
     current_edit_complex->child_notes.clear();
     for (const auto& obj : editing_temp_objects) {
         auto temp_note = std::dynamic_pointer_cast<Note>(obj);
-        if (!temp_note) continue;
+        if (!temp_note || temp_note->note_type == NoteType::COMPLEX) continue;
         current_edit_complex->child_notes.insert(temp_note);
         temp_note->parent_reference = current_edit_complex.get();
     }

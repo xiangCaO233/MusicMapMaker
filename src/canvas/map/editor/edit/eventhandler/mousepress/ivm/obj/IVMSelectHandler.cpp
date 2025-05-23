@@ -45,16 +45,53 @@ bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
         // 选到组合键中的子键-取消处理
         auto note = std::dynamic_pointer_cast<Note>(
             ivmobjecteditor->editor_ref->ebuffer.hover_object_info->hoverobj);
-        if (note && (note->compinfo != ComplexInfo::NONE &&
-                     note->compinfo != ComplexInfo::HEAD)) {
+
+        if (!note) return false;
+        if (note->compinfo != ComplexInfo::NONE &&
+            note->compinfo != ComplexInfo::HEAD) {
             XWARN("试图单独编辑组合键中的子物件-取消操作");
             return false;
         }
-        if (note && note->compinfo == ComplexInfo::HEAD &&
+        if (note->compinfo == ComplexInfo::HEAD &&
             ivmobjecteditor->editor_ref->ebuffer.hover_object_info->part !=
                 HoverPart::HEAD) {
             XWARN("试图单独编辑组合键中的子物件-取消操作");
             return false;
+        }
+        if (note->compinfo == ComplexInfo::HEAD &&
+            ivmobjecteditor->editor_ref->ebuffer.hover_object_info->part ==
+                HoverPart::HEAD &&
+            ivmobjecteditor->editor_ref->edit_mode ==
+                MouseEditMode::PLACE_LONGNOTE &&
+            e->button() == Qt::LeftButton) {
+            // 当以放置面条模式在组合键的头物件的头部左键
+            // 优先再次进入组合键编辑
+            auto comp =
+                std::shared_ptr<ComplexNote>(note->parent_reference->clone());
+
+            // 选中组合键中所有的物件
+            // 先执行删除原组合键
+            select_note(ivmobjecteditor, note->parent_reference);
+            ivmobjecteditor->editing_temp_objects.clear();
+            ivmobjecteditor->end_edit();
+            XWARN("删除原组合键");
+
+            ivmobjecteditor->long_note_edit_mode = true;
+            ivmobjecteditor->current_edit_complex = comp;
+
+            // 设置当前正在编辑的物件为组合键尾
+            ivmobjecteditor->current_edit_object =
+                *ivmobjecteditor->current_edit_complex->child_notes.rbegin();
+
+            // 将当前组合键的子键加入编辑缓存
+            for (const auto& child_note :
+                 ivmobjecteditor->current_edit_complex->child_notes) {
+                ivmobjecteditor->editing_temp_objects.insert(child_note);
+            }
+
+            XWARN("开始修改组合键");
+
+            return true;
         }
 
         // 清空当前编辑的源物件表
