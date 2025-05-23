@@ -41,6 +41,20 @@ bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
         if (ivmobjecteditor->long_note_edit_mode)
             return next_handler->handle(oeditor_context, e, mouse_time,
                                         mouse_orbit);
+        // 选到组合键中的子键-取消处理
+        auto note = std::dynamic_pointer_cast<Note>(
+            ivmobjecteditor->editor_ref->ebuffer.hover_object_info->hoverobj);
+        if (note && (note->compinfo != ComplexInfo::NONE &&
+                     note->compinfo != ComplexInfo::HEAD)) {
+            XWARN("试图单独编辑组合键中的子物件-取消操作");
+            return false;
+        }
+        if (note && note->compinfo == ComplexInfo::HEAD &&
+            ivmobjecteditor->editor_ref->ebuffer.hover_object_info->part !=
+                HoverPart::HEAD) {
+            XWARN("试图单独编辑组合键中的子物件-取消操作");
+            return false;
+        }
 
         // 清空当前编辑的源物件表
         ivmobjecteditor->editing_src_objects.clear();

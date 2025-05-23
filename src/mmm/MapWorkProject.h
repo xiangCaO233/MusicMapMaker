@@ -13,6 +13,8 @@
 
 #include "map/MMap.h"
 
+class MapWorkspaceCanvas;
+
 // 偏好的编辑方式
 enum class EditMethodPreference : int32_t {
     MMM = 0,
@@ -68,6 +70,8 @@ class MapWorkProject {
 
     // 析构MapWorkProject
     virtual ~MapWorkProject();
+
+    MapWorkspaceCanvas* canvas_ref;
 
     std::filesystem::path ppath;
 

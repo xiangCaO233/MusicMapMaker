@@ -803,11 +803,13 @@ void MapWorkspaceCanvas::draw_effect_frame(BufferWrapper *bufferwrapper) {
             auto w =
                 effect_tex->width *
                 (editor->ebuffer.object_size_scale *
-                 working_map->project_reference->config.object_width_ratio);
+                 working_map->project_reference->config.object_width_ratio) *
+                0.8;
             auto h =
                 effect_tex->height *
                 (editor->ebuffer.object_size_scale *
-                 working_map->project_reference->config.object_height_ratio);
+                 working_map->project_reference->config.object_height_ratio) *
+                0.8;
             effect_params.func_type = FunctionType::MRECT;
             effect_params.xpos = effect_frame_queue.xpos - w / 2.0;
             effect_params.ypos = effect_frame_queue.ypos - h / 2.0;
@@ -969,6 +971,7 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
     if (map) {
         editor->cstatus.map_type = map->maptype;
         editor->edit_method = map->project_reference->config.edit_method;
+        working_map->project_reference->canvas_ref = this;
         auto s = QDir(map->audio_file_abs_path);
         // 更新谱面长度(如果音乐比谱面长)
         auto map_audio_length =

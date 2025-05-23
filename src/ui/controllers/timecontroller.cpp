@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include "../../canvas/map/MapWorkspaceCanvas.h"
 #include "../../mmm/MapWorkProject.h"
 #include "../../mmm/map/MMap.h"
 #include "../../util/mutil.h"
@@ -54,22 +55,27 @@ void TimeController::use_theme(GlobalTheme theme) {
 // 更新album
 void TimeController::update_album() {
     // 修改曲绘尺寸-根据宽度自适应尺寸
-    if (binding_map && !binding_map->bg_path.empty()) {
+    if (binding_map && binding_map->project_reference &&
+        binding_map->project_reference->canvas_ref &&
+        !binding_map->bg_path.empty()) {
+        auto bg_str = binding_map->bg_path.generic_string();
+        std::replace(bg_str.begin(), bg_str.end(), '\\', '/');
+        auto tex = binding_map->project_reference->canvas_ref
+                       ->texture_full_map[bg_str];
+        QImage bg;
         // 加载图片
-        QPixmap pixmap(
-            QString::fromStdString(binding_map->bg_path.generic_string()));
-        if (!pixmap.isNull()) {
+        bg = QImage(tex->data, tex->width, tex->height, tex->width * 4,
+                    QImage::Format_RGBA8888);
+
+        if (!bg.isNull()) {
             // 获取music_album标签的宽度
             int labelWidth = ui->music_album->width();
-
             // 根据宽度按比例缩放，保持宽高比
-            QPixmap scaledPixmap = pixmap.scaledToWidth(
+            auto scaledbg = bg.scaledToWidth(
                 labelWidth, Qt::TransformationMode::SmoothTransformation);
-
             // 显示到QLabel
-            ui->music_album->setPixmap(scaledPixmap);
-
-            // 可选：保持居中显示
+            ui->music_album->setPixmap(QPixmap::fromImage(scaledbg));
+            // 保持居中显示
             ui->music_album->setAlignment(Qt::AlignCenter);
         }
     } else {
