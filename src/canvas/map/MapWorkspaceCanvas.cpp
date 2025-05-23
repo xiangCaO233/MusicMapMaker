@@ -803,13 +803,11 @@ void MapWorkspaceCanvas::draw_effect_frame(BufferWrapper *bufferwrapper) {
             auto w =
                 effect_tex->width *
                 (editor->ebuffer.object_size_scale *
-                 working_map->project_reference->config.object_width_ratio) *
-                0.8;
+                 working_map->project_reference->config.object_width_ratio);
             auto h =
                 effect_tex->height *
                 (editor->ebuffer.object_size_scale *
-                 working_map->project_reference->config.object_height_ratio) *
-                0.8;
+                 working_map->project_reference->config.object_height_ratio);
             effect_params.func_type = FunctionType::MRECT;
             effect_params.xpos = effect_frame_queue.xpos - w / 2.0;
             effect_params.ypos = effect_frame_queue.ypos - h / 2.0;
