@@ -3552,14 +3552,14 @@ QRadioButton[Color="Danger"]::indicator:disabled {
 
 
 QScrollBar:vertical {
-    width: 8px;
+    width: 12px;
     border: 0px;
     margin: 2px 0 2 0;
     background-color: #424242;
 }
 
 QScrollBar::handle:vertical {
-    width: 8px;
+    width: 12px;
     min-height: 16px;
     border: 0px;
     background-color: #9e9e9e;
@@ -3567,14 +3567,14 @@ QScrollBar::handle:vertical {
 
 QScrollBar::sub-line:vertical {
     background: #424242;
-    height: 8px;
+    height: 12px;
     subcontrol-position: top;
     subcontrol-origin: margin;
 }
 
 QScrollBar::add-line:vertical {
     background: #424242;
-    height: 8px;
+    height: 12px;
     subcontrol-position: bottom;
     subcontrol-origin: margin;
 }
@@ -3610,14 +3610,14 @@ QScrollBar::down-arrow:vertical:pressed {
 }
 
 QScrollBar:horizontal {
-    height: 8px;
+    height: 12px;
     border: 0px;
     margin: 0 2px 0 2px;
     background-color: #424242;
 }
 
 QScrollBar::handle:horizontal {
-    height: 8px;
+    height: 12px;
     min-width: 16px;
     border: 0px;
     background-color: #9e9e9e;
@@ -3625,14 +3625,14 @@ QScrollBar::handle:horizontal {
 
 QScrollBar::sub-line:horizontal {
     background: #424242;
-    width: 8px;
+    width: 12px;
     subcontrol-position: left;
     subcontrol-origin: margin;
 }
 
 QScrollBar::add-line:horizontal {
     background: #424242;
-    width: 8px;
+    width: 12px;
     subcontrol-position: right;
     subcontrol-origin: margin;
 }
@@ -3706,7 +3706,7 @@ QScrollBar::add-page:pressed {
 
 
 QScrollBar[Color="Primary"]::handle:vertical {
-    width: 8px;
+    width: 12px;
     min-height: 16px;
     border: 0px;
     background-color: #e91e63;
@@ -3743,7 +3743,7 @@ QScrollBar[Color="Primary"]::down-arrow:vertical:pressed {
 }
 
 QScrollBar[Color="Primary"]::handle:horizontal {
-    height: 8px;
+    height: 12px;
     min-width: 16px;
     border: 0px;
     background-color: #e91e63;
@@ -3794,7 +3794,7 @@ QScrollBar[Color="Primary"]::handle:pressed {
 
 
 QScrollBar[Color="Secondary"]::handle:vertical {
-    width: 8px;
+    width: 12px;
     min-height: 16px;
     border: 0px;
     background-color: #ff9800;
@@ -3831,7 +3831,7 @@ QScrollBar[Color="Secondary"]::down-arrow:vertical:pressed {
 }
 
 QScrollBar[Color="Secondary"]::handle:horizontal {
-    height: 8px;
+    height: 12px;
     min-width: 16px;
     border: 0px;
     background-color: #ff9800;
@@ -3882,7 +3882,7 @@ QScrollBar[Color="Secondary"]::handle:pressed {
 
 
 QScrollBar[Color="Success"]::handle:vertical {
-    width: 8px;
+    width: 12px;
     min-height: 16px;
     border: 0px;
     background-color: #4caf50;
@@ -3919,7 +3919,7 @@ QScrollBar[Color="Success"]::down-arrow:vertical:pressed {
 }
 
 QScrollBar[Color="Success"]::handle:horizontal {
-    height: 8px;
+    height: 12px;
     min-width: 16px;
     border: 0px;
     background-color: #4caf50;
@@ -3970,7 +3970,7 @@ QScrollBar[Color="Success"]::handle:pressed {
 
 
 QScrollBar[Color="Warning"]::handle:vertical {
-    width: 8px;
+    width: 12px;
     min-height: 16px;
     border: 0px;
     background-color: #ff9800;
@@ -4007,7 +4007,7 @@ QScrollBar[Color="Warning"]::down-arrow:vertical:pressed {
 }
 
 QScrollBar[Color="Warning"]::handle:horizontal {
-    height: 8px;
+    height: 12px;
     min-width: 16px;
     border: 0px;
     background-color: #ff9800;
@@ -4058,7 +4058,7 @@ QScrollBar[Color="Warning"]::handle:pressed {
 
 
 QScrollBar[Color="Danger"]::handle:vertical {
-    width: 8px;
+    width: 12px;
     min-height: 16px;
     border: 0px;
     background-color: #f44336;
@@ -4095,7 +4095,7 @@ QScrollBar[Color="Danger"]::down-arrow:vertical:pressed {
 }
 
 QScrollBar[Color="Danger"]::handle:horizontal {
-    height: 8px;
+    height: 12px;
     min-width: 16px;
     border: 0px;
     background-color: #f44336;

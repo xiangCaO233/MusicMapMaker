@@ -122,6 +122,31 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="timing_list_tab">
+      <attribute name="title">
+       <string>timing list</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTableWidget" name="timing_table"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="map_metas_tab">
       <attribute name="title">
        <string>map metadatas</string>
