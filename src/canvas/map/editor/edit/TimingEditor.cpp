@@ -1,10 +1,5 @@
 #include "TimingEditor.h"
 
-// 编辑操作栈
-std::stack<TimingEditOperation> TimingEditor::operation_stack;
-// 撤回操作栈
-std::stack<TimingEditOperation> TimingEditor::undo_stack;
-
 // 构造TimingEditor
 TimingEditor::TimingEditor(MapEditor* meditor_ref) : editor_ref(meditor_ref) {}
 // 析构TimingEditor
@@ -24,3 +19,10 @@ void TimingEditor::undo() {}
 
 // 重做
 void TimingEditor::redo() {}
+
+// 复制
+void TimingEditor::copy() {}
+// 剪切
+void TimingEditor::cut() {}
+// 粘贴
+void TimingEditor::paste() {}

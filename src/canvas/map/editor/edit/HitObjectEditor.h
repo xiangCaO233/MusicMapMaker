@@ -70,17 +70,17 @@ class HitObjectEditor {
     void analyze_src_object();
 
     // 撤销
-    void undo();
+    virtual void undo();
 
     // 重做
-    void redo();
+    virtual void redo();
 
     // 复制
-    void copy();
+    virtual void copy();
     // 剪切
-    void cut();
+    virtual void cut();
     // 粘贴
-    void paste();
+    virtual void paste();
 };
 
 #endif  // M_HITOBJECTEDITOR_H

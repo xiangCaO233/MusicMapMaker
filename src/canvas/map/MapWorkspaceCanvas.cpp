@@ -293,6 +293,13 @@ void MapWorkspaceCanvas::keyPressEvent(QKeyEvent *event) {
             }
             break;
         }
+        case Qt::Key_X: {
+            if (modifiers & Qt::ControlModifier) {
+                // 剪切
+                editor->cut();
+            }
+            break;
+        }
         case Qt::Key_V: {
             if (modifiers & Qt::ControlModifier) {
                 // 粘贴
@@ -738,6 +745,7 @@ void MapWorkspaceCanvas::draw_hitobject(
                     // 切换纹理绘制方式为填充
                     obj_params.render_settings.texture_fillmode =
                         TextureFillMode::FILL;
+                    obj_params.render_settings.texture_effect = effect;
                     // 切换纹理绘制补齐方式为重采样
                     obj_params.render_settings.texture_complementmode =
                         TextureComplementMode::REPEAT_TEXTURE;
@@ -754,6 +762,7 @@ void MapWorkspaceCanvas::draw_hitobject(
             obj_params.func_type = FunctionType::MRECT;
             // 切换纹理绘制方式为填充
             obj_params.render_settings.texture_fillmode = TextureFillMode::FILL;
+            obj_params.render_settings.texture_effect = effect;
             // 切换纹理绘制补齐方式为重采样
             obj_params.render_settings.texture_complementmode =
                 TextureComplementMode::REPEAT_TEXTURE;
@@ -941,7 +950,7 @@ void MapWorkspaceCanvas::push_shape(BufferWrapper *current_back_buffer) {
 
         {
             std::lock_guard<std::mutex> lock(
-                editor->ebuffer.selected_timingss_mts);
+                editor->ebuffer.selected_timingss_mtx);
             // 绘制信息区域
             draw_infoarea(current_back_buffer);
         }

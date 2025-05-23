@@ -55,6 +55,90 @@ IVMObjectEditor::IVMObjectEditor(MapEditor* meditor_ref)
 
 // 析构IVMObjectEditor
 IVMObjectEditor::~IVMObjectEditor() = default;
+// 撤销
+void IVMObjectEditor::undo() { HitObjectEditor::undo(); }
+
+// 重做
+void IVMObjectEditor::redo() { HitObjectEditor::redo(); }
+
+// 复制
+void IVMObjectEditor::copy() { HitObjectEditor::copy(); }
+// 剪切
+void IVMObjectEditor::cut() { HitObjectEditor::cut(); }
+// 粘贴
+void IVMObjectEditor::paste() {
+    // 根据第一个物件的时间戳到当前时间的偏移粘贴到editing_temp_objects或移动到editing_temp_objects
+    if (is_cut) {
+        // 剪切-依据clipboard直接修改editing_temp_objects
+        if (!clipboard.empty()) {
+            auto rtime = editor_ref->cstatus.current_time_stamp -
+                         clipboard.begin()->get()->timestamp;
+            for (const auto& o : editing_temp_objects) {
+                auto note = std::dynamic_pointer_cast<Note>(o);
+                if (note) {
+                    switch (note->note_type) {
+                        case NoteType::HOLD: {
+                            auto hold = std::static_pointer_cast<Hold>(note);
+                            hold->hold_end_reference->timestamp += rtime;
+                            hold->timestamp += rtime;
+                            break;
+                        }
+                        case NoteType::SLIDE: {
+                            auto slide = std::static_pointer_cast<Slide>(note);
+                            slide->slide_end_reference->timestamp += rtime;
+                            slide->timestamp += rtime;
+                            break;
+                        }
+                        case NoteType::NOTE: {
+                            note->timestamp += rtime;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        end_edit();
+        XINFO("已粘贴");
+    } else {
+        // 拷贝-读取剪切板
+        if (!clipboard.empty()) {
+            auto rtime = editor_ref->cstatus.current_time_stamp -
+                         clipboard.begin()->get()->timestamp;
+            for (const auto& src : clipboard) {
+                auto note = std::dynamic_pointer_cast<Note>(src);
+                if (note) {
+                    switch (note->note_type) {
+                        case NoteType::HOLD: {
+                            auto hold = std::static_pointer_cast<Hold>(note);
+                            auto des = std::shared_ptr<Hold>(hold->clone());
+                            des->hold_end_reference->timestamp += rtime;
+                            des->timestamp += rtime;
+                            editing_temp_objects.insert(des);
+                            break;
+                        }
+                        case NoteType::SLIDE: {
+                            auto slide = std::static_pointer_cast<Slide>(note);
+                            auto des = std::shared_ptr<Slide>(slide->clone());
+                            des->slide_end_reference->timestamp += rtime;
+                            des->timestamp += rtime;
+                            editing_temp_objects.insert(des);
+                            break;
+                        }
+                        case NoteType::NOTE: {
+                            auto des = std::shared_ptr<Note>(note->clone());
+                            des->timestamp += rtime;
+                            editing_temp_objects.insert(des);
+                            break;
+                        }
+                    }
+                }
+            }
+            // 生成操作
+            end_edit();
+            XINFO("已拷贝");
+        }
+    }
+}
 
 // 结束编辑
 void IVMObjectEditor::end_edit() {
@@ -132,6 +216,8 @@ void IVMObjectEditor::end_edit() {
             editing_src_objects_temp.insert(srcobj);
         }
     }
+
+    // 处理编辑结果
     editing_src_objects = editing_src_objects_temp;
     operation.src_objects = editing_src_objects;
     editing_src_objects.clear();
@@ -153,7 +239,7 @@ void IVMObjectEditor::end_edit() {
 
     // 添加操作标记
     editor_ref->operation_type_stack.emplace(std::make_pair(
-        EditOperationType::HITOBJECT, EditMethodPreference::IVM));
+        EditOperationType::EHITOBJECT, EditMethodPreference::IVM));
 }
 
 // 鼠标按下事件-传递

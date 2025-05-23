@@ -37,11 +37,11 @@ void MapEditor::undo() {
 
     // 根据类型调用编辑器撤回
     switch (operation_type_stack.top().first) {
-        case HITOBJECT: {
+        case EHITOBJECT: {
             obj_editors[operation_type_stack.top().second]->undo();
             break;
         }
-        case TIMING: {
+        case ETIMING: {
             timing_editors[operation_type_stack.top().second]->undo();
             break;
         }
@@ -59,11 +59,11 @@ void MapEditor::redo() {
     operation_type_stack.push(undo_type_stack.top());
     // 根据类型调用编辑器撤回
     switch (undo_type_stack.top().first) {
-        case HITOBJECT: {
+        case EHITOBJECT: {
             obj_editors[operation_type_stack.top().second]->redo();
             break;
         }
-        case TIMING: {
+        case ETIMING: {
             timing_editors[operation_type_stack.top().second]->redo();
             break;
         }
@@ -73,13 +73,88 @@ void MapEditor::redo() {
 }
 
 // 复制
-void MapEditor::copy() {}
+void MapEditor::copy() {
+    std::lock_guard<std::mutex> lock(ebuffer.selected_hitobjects_mtx);
+    if (!ebuffer.selected_hitobjects.empty()) {
+        last_clipmode = EditOperationType::EHITOBJECT;
+        obj_editors[canvas_ref->working_map->project_reference->config
+                        .edit_method]
+            ->copy();
+        obj_editors[canvas_ref->working_map->project_reference->config
+                        .edit_method]
+            ->is_cut = false;
+
+    } else {
+        // 其次timing
+        std::lock_guard<std::mutex> tlock(ebuffer.selected_timingss_mtx);
+        if (!ebuffer.selected_timingss.empty()) {
+            last_clipmode = EditOperationType::ETIMING;
+            timing_editors[canvas_ref->working_map->project_reference->config
+                               .edit_method]
+                ->copy();
+            timing_editors[canvas_ref->working_map->project_reference->config
+                               .edit_method]
+                ->is_cut = false;
+        }
+    }
+}
 
 // 剪切
-void MapEditor::cut() {}
+void MapEditor::cut() {
+    // 看剪切了什么-优先物件
+    std::lock_guard<std::mutex> lock(ebuffer.selected_hitobjects_mtx);
+    if (!ebuffer.selected_hitobjects.empty()) {
+        last_clipmode = EditOperationType::EHITOBJECT;
+        obj_editors[canvas_ref->working_map->project_reference->config
+                        .edit_method]
+            ->cut();
+        obj_editors[canvas_ref->working_map->project_reference->config
+                        .edit_method]
+            ->is_cut = true;
+
+    } else {
+        // 其次timing
+        std::lock_guard<std::mutex> tlock(ebuffer.selected_timingss_mtx);
+        if (!ebuffer.selected_timingss.empty()) {
+            last_clipmode = EditOperationType::ETIMING;
+            timing_editors[canvas_ref->working_map->project_reference->config
+                               .edit_method]
+                ->cut();
+            timing_editors[canvas_ref->working_map->project_reference->config
+                               .edit_method]
+                ->is_cut = true;
+        }
+    }
+}
 
 // 粘贴
-void MapEditor::paste() {}
+void MapEditor::paste() {
+    switch (last_clipmode) {
+        case EditOperationType::ENONE: {
+            break;
+        }
+        case EditOperationType::EHITOBJECT: {
+            obj_editors[canvas_ref->working_map->project_reference->config
+                            .edit_method]
+                ->paste();
+            last_clipmode = EditOperationType::ENONE;
+            obj_editors[canvas_ref->working_map->project_reference->config
+                            .edit_method]
+                ->is_cut = false;
+            break;
+        }
+        case EditOperationType::ETIMING: {
+            timing_editors[canvas_ref->working_map->project_reference->config
+                               .edit_method]
+                ->paste();
+            last_clipmode = EditOperationType::ENONE;
+            timing_editors[canvas_ref->working_map->project_reference->config
+                               .edit_method]
+                ->is_cut = false;
+            break;
+        }
+    }
+}
 
 // 画布更新尺寸
 void MapEditor::update_size(const QSize& current_canvas_size) {
@@ -238,7 +313,7 @@ void MapEditor::mouse_pressed(QMouseEvent* e) {
         std::lock_guard<std::mutex> lock1(ebuffer.selected_hitobjects_mtx);
         // 其他模式直接清空选中列表
         ebuffer.selected_hitobjects.clear();
-        std::lock_guard<std::mutex> lock2(ebuffer.selected_timingss_mts);
+        std::lock_guard<std::mutex> lock2(ebuffer.selected_timingss_mtx);
         ebuffer.selected_timingss.clear();
     }
 }

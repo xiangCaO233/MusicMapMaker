@@ -10,9 +10,9 @@ class MapEditor;
 
 class TimingEditor {
     // 编辑操作栈
-    static std::stack<TimingEditOperation> operation_stack;
+    std::stack<TimingEditOperation> operation_stack;
     // 撤回操作栈
-    static std::stack<TimingEditOperation> undo_stack;
+    std::stack<TimingEditOperation> undo_stack;
 
    public:
     // 构造TimingEditor
@@ -23,6 +23,9 @@ class TimingEditor {
     // 图编辑器引用
     MapEditor* editor_ref;
 
+    // 是否是剪切操作
+    bool is_cut{false};
+
     // 鼠标按下事件-传递
     virtual void mouse_pressed(QMouseEvent* e);
     virtual void mouse_released(QMouseEvent* e);
@@ -31,10 +34,17 @@ class TimingEditor {
     virtual void mouse_dragged(QMouseEvent* e);
 
     // 撤销
-    static void undo();
+    void undo();
 
     // 重做
-    static void redo();
+    void redo();
+
+    // 复制
+    void copy();
+    // 剪切
+    void cut();
+    // 粘贴
+    void paste();
 };
 
 #endif  // M_TIMINGEDITOR_H

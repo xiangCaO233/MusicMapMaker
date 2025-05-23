@@ -23,7 +23,8 @@ bool IVMDragMoveObjectHandler::handle(HitObjectEditor* oeditor_context,
                                       double mouse_orbit) {
     auto ivmobjecteditor = static_cast<IVMObjectEditor*>(oeditor_context);
     // 正处于面条编辑模式-放弃拖动事件的处理
-    if (ivmobjecteditor->long_note_edit_mode) return false;
+    if (ivmobjecteditor->long_note_edit_mode || ivmobjecteditor->is_cut)
+        return false;
 
     if (!(std::abs(mouse_time - (-1.0)) < 1e-16)) {
         if (ivmobjecteditor->hover_object_info_shortcut) {

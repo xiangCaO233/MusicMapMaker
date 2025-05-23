@@ -33,6 +33,7 @@ void IVMSelectHandler::select_note(IVMObjectEditor* ivmobjecteditor,
 // 处理事件
 bool IVMSelectHandler::handle(HitObjectEditor* oeditor_context, QMouseEvent* e,
                               double mouse_time, double mouse_orbit) {
+    if (oeditor_context->is_cut) return false;
     XINFO("处理物件选择事件");
     // 检查是否有悬浮于某物件
     if (oeditor_context->editor_ref->ebuffer.hover_object_info) {

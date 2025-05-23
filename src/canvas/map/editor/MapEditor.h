@@ -26,8 +26,9 @@ class TextureInstace;
 enum class EditMethodPreference;
 
 enum EditOperationType {
-    HITOBJECT,
-    TIMING,
+    ENONE,
+    EHITOBJECT,
+    ETIMING,
 };
 
 // 编辑器
@@ -69,6 +70,9 @@ class MapEditor {
     // 撤回类型栈
     std::stack<std::pair<EditOperationType, EditMethodPreference>>
         undo_type_stack;
+
+    // 上一次剪切操作的模式
+    EditOperationType last_clipmode;
 
     // 撤销
     void undo();

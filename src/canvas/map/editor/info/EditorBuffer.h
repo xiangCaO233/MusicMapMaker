@@ -119,7 +119,7 @@ struct EditorBuffer {
         }
     };
 
-    std::mutex selected_timingss_mts;
+    std::mutex selected_timingss_mtx;
     // 选中的timings
     std::unordered_set<std::vector<std::shared_ptr<Timing>>*,
                        VectorSharedPtrTimingHash, VectorSharedPtrTimingEqual>

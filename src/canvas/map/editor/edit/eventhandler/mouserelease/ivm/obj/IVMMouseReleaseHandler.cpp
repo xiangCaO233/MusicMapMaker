@@ -25,7 +25,8 @@ bool IVMMouseReleaseHandler::handle(HitObjectEditor* oeditor_context,
             //
             // 若为单键编辑模式-
             // 直接应用编辑缓存的修改到map
-            if (!ivmobjecteditor->long_note_edit_mode) {
+            if (!ivmobjecteditor->is_cut &&
+                !ivmobjecteditor->long_note_edit_mode) {
                 ivmobjecteditor->end_edit();
                 XINFO(QString("编辑结束生成物件操作").toStdString());
             } else {
@@ -35,7 +36,8 @@ bool IVMMouseReleaseHandler::handle(HitObjectEditor* oeditor_context,
         }
         case Qt::RightButton: {
             // 释放的是右键
-            if (!ivmobjecteditor->long_note_edit_mode) {
+            if (!ivmobjecteditor->is_cut &&
+                !ivmobjecteditor->long_note_edit_mode) {
                 // TODO(xiang 2025-05-12): 删除组合键内的物件时拆分组合键
 
                 //

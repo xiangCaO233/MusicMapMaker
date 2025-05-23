@@ -5,6 +5,7 @@
 #include "../../../util/mutil.h"
 #include "../../MapWorkspaceCanvas.h"
 #include "../MapEditor.h"
+#include "colorful-log.h"
 
 // 构造HitObjectEditor
 HitObjectEditor::HitObjectEditor(MapEditor* meditor_ref)
@@ -58,13 +59,39 @@ void HitObjectEditor::redo() {
 
 // 复制
 void HitObjectEditor::copy() {
-    // 获取选中物件
+    // 获取选中物件-不清除选中物件-只清除选中框
+    editing_src_objects.clear();
+    clipboard.clear();
+    for (const auto& o : editor_ref->ebuffer.selected_hitobjects) {
+        clipboard.insert(o);
+    }
+    editor_ref->ebuffer.select_bound.setWidth(0);
+    editor_ref->ebuffer.select_bound.setHeight(0);
+    editor_ref->ebuffer.select_bound_locate_points = nullptr;
+    XINFO("选中物件已复制到剪切板");
+}
+
+// 剪切
+void HitObjectEditor::cut() {
+    // 获取选中物件-清除选中物件-进入选中状态(加入editing_src_objects和editing_temp_objects)
+    editing_src_objects.clear();
+    editing_temp_objects.clear();
+    clipboard.clear();
+    editor_ref->ebuffer.select_bound.setWidth(0);
+    editor_ref->ebuffer.select_bound.setHeight(0);
+    editor_ref->ebuffer.select_bound_locate_points = nullptr;
+
+    for (const auto& o : editor_ref->ebuffer.selected_hitobjects) {
+        editing_src_objects.insert(o);
+        editing_temp_objects.insert(std::shared_ptr<HitObject>(o->clone()));
+        clipboard.insert(o);
+    }
+    editor_ref->ebuffer.selected_hitobjects.clear();
+    XINFO("选中物件已剪切到剪切板");
 }
 
 // 粘贴
-void HitObjectEditor::paste() {
-    //
-}
+void HitObjectEditor::paste() {}
 
 // 鼠标最近的分拍线的时间
 double HitObjectEditor::nearest_divisor_time() {

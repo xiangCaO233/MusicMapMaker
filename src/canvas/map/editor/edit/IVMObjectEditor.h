@@ -37,6 +37,19 @@ class IVMObjectEditor : public HitObjectEditor {
     void mouse_released(QMouseEvent* e) override;
     // 鼠标拖动事件-传递
     void mouse_dragged(QMouseEvent* e) override;
+
+    // 撤销
+    void undo() override;
+
+    // 重做
+    void redo() override;
+
+    // 复制
+    void copy() override;
+    // 剪切
+    void cut() override;
+    // 粘贴
+    void paste() override;
 };
 
 #endif  // M_IVMOBJECTEDITOR_H
