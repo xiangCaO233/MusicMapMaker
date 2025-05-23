@@ -65,116 +65,91 @@ void IVMObjectEditor::redo() { HitObjectEditor::redo(); }
 void IVMObjectEditor::copy() {
     HitObjectEditor::copy();
     // 筛去非法复制部分
-    check_editing_comp();
+    check_editing_comp(editing_src_objects);
 }
 // 剪切
 void IVMObjectEditor::cut() {
     HitObjectEditor::cut();
     // 筛去非法复制部分
-    check_editing_comp();
+    check_editing_comp(editing_src_objects);
 }
 // 粘贴
 void IVMObjectEditor::paste() {
     // 根据第一个物件的时间戳到当前时间的偏移粘贴到editing_temp_objects或移动到editing_temp_objects
     if (is_cut) {
-        // 剪切-依据clipboard直接修改editing_temp_objects
-        if (!clipboard.empty()) {
-            auto rtime = editor_ref->cstatus.current_time_stamp -
-                         clipboard.begin()->get()->timestamp;
-            for (const auto& o : editing_temp_objects) {
-                auto note = std::dynamic_pointer_cast<Note>(o);
-                if (note) {
-                    switch (note->note_type) {
-                        case NoteType::HOLD: {
-                            auto hold = std::static_pointer_cast<Hold>(note);
-                            hold->hold_end_reference->timestamp += rtime;
-                            hold->timestamp += rtime;
-                            break;
-                        }
-                        case NoteType::SLIDE: {
-                            auto slide = std::static_pointer_cast<Slide>(note);
-                            slide->slide_end_reference->timestamp += rtime;
-                            slide->timestamp += rtime;
-                            break;
-                        }
-                        case NoteType::NOTE: {
-                            note->timestamp += rtime;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        end_edit();
-        XINFO("已粘贴");
+        editing_temp_objects.clear();
+        paste_clipboard();
+        is_cut = false;
     } else {
-        // 拷贝-读取剪切板
-        if (!clipboard.empty()) {
-            auto rtime = editor_ref->cstatus.current_time_stamp -
-                         clipboard.begin()->get()->timestamp;
-            for (const auto& src : clipboard) {
-                auto note = std::dynamic_pointer_cast<Note>(src);
-                if (!note) continue;
-                // 不管子键了
-                if (note->parent_reference) continue;
+        paste_clipboard();
+    }
+}
 
-                switch (note->note_type) {
-                    case NoteType::COMPLEX: {
-                        auto comp = std::static_pointer_cast<ComplexNote>(note);
-                        for (const auto& child_note : comp->child_notes) {
-                            switch (child_note->note_type) {
-                                case NoteType::HOLD: {
-                                    auto hold = std::static_pointer_cast<Hold>(
-                                        child_note);
-                                    hold->hold_end_reference->timestamp +=
-                                        rtime;
-                                    hold->timestamp += rtime;
-                                    break;
-                                }
-                                case NoteType::SLIDE: {
-                                    auto slide =
-                                        std::static_pointer_cast<Slide>(note);
-                                    auto des =
-                                        std::shared_ptr<Slide>(slide->clone());
-                                    des->slide_end_reference->timestamp +=
-                                        rtime;
-                                    des->timestamp += rtime;
-                                    editing_temp_objects.insert(des);
-                                    break;
-                                }
+// 粘贴剪切板内容
+void IVMObjectEditor::paste_clipboard() {
+    // 拷贝-读取剪切板
+    if (!clipboard.empty()) {
+        auto rtime = editor_ref->cstatus.current_time_stamp -
+                     clipboard.begin()->get()->timestamp;
+        for (const auto& src : clipboard) {
+            auto note = std::dynamic_pointer_cast<Note>(src);
+            if (!note) continue;
+            // 不管子键了
+            if (note->parent_reference) continue;
+
+            switch (note->note_type) {
+                case NoteType::COMPLEX: {
+                    auto comp = std::static_pointer_cast<ComplexNote>(note);
+                    for (const auto& child_note : comp->child_notes) {
+                        switch (child_note->note_type) {
+                            case NoteType::HOLD: {
+                                auto hold =
+                                    std::static_pointer_cast<Hold>(child_note);
+                                hold->hold_end_reference->timestamp += rtime;
+                                hold->timestamp += rtime;
+                                break;
+                            }
+                            case NoteType::SLIDE: {
+                                auto slide =
+                                    std::static_pointer_cast<Slide>(child_note);
+                                slide->slide_end_reference->timestamp += rtime;
+                                slide->timestamp += rtime;
+                                break;
                             }
                         }
-                        break;
                     }
-                    case NoteType::HOLD: {
-                        auto hold = std::static_pointer_cast<Hold>(note);
-                        auto des = std::shared_ptr<Hold>(hold->clone());
-                        des->hold_end_reference->timestamp += rtime;
-                        des->timestamp += rtime;
-                        editing_temp_objects.insert(des);
-                        break;
-                    }
-                    case NoteType::SLIDE: {
-                        auto slide = std::static_pointer_cast<Slide>(note);
-                        auto des = std::shared_ptr<Slide>(slide->clone());
-                        des->slide_end_reference->timestamp += rtime;
-                        des->timestamp += rtime;
-                        editing_temp_objects.insert(des);
-                        break;
-                    }
-                    case NoteType::NOTE: {
-                        auto des = std::shared_ptr<Note>(note->clone());
-                        des->timestamp += rtime;
-                        editing_temp_objects.insert(des);
-                        break;
-                    }
+                    editing_temp_objects.insert(
+                        std::shared_ptr<ComplexNote>(comp->clone()));
+                    break;
+                }
+                case NoteType::HOLD: {
+                    auto hold = std::static_pointer_cast<Hold>(note);
+                    auto des = std::shared_ptr<Hold>(hold->clone());
+                    des->hold_end_reference->timestamp += rtime;
+                    des->timestamp += rtime;
+                    editing_temp_objects.insert(des);
+                    break;
+                }
+                case NoteType::SLIDE: {
+                    auto slide = std::static_pointer_cast<Slide>(note);
+                    auto des = std::shared_ptr<Slide>(slide->clone());
+                    des->slide_end_reference->timestamp += rtime;
+                    des->timestamp += rtime;
+                    editing_temp_objects.insert(des);
+                    break;
+                }
+                case NoteType::NOTE: {
+                    auto des = std::shared_ptr<Note>(note->clone());
+                    des->timestamp += rtime;
+                    editing_temp_objects.insert(des);
+                    break;
                 }
             }
-            update_current_comp();
-            // 生成操作
-            end_edit();
-            XINFO("已拷贝");
         }
+        // 生成操作
+        end_edit();
+        clipboard.clear();
+        XINFO("已粘贴");
     }
 }
 
@@ -329,11 +304,13 @@ void IVMObjectEditor::update_current_comp() {
 }
 
 // 检查编辑中的组合键
-void IVMObjectEditor::check_editing_comp() {
+void IVMObjectEditor::check_editing_comp(
+    std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>&
+        checking_set) {
     std::shared_ptr<ComplexNote> temp_comp = nullptr;
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
         illegal_edit_res;
-    for (const auto& o : editing_src_objects) {
+    for (const auto& o : checking_set) {
         std::multiset<std::shared_ptr<HitObject>, HitObjectComparator>
             temp_illegal_edit_res;
         auto comp = std::dynamic_pointer_cast<ComplexNote>(o);
@@ -364,7 +341,7 @@ void IVMObjectEditor::check_editing_comp() {
 
     // 移除非法物件
     for (const auto& illegal_edit_note : illegal_edit_res) {
-        auto it = editing_src_objects.find(illegal_edit_note);
-        editing_src_objects.erase(it);
+        auto it = checking_set.find(illegal_edit_note);
+        checking_set.erase(it);
     }
 }

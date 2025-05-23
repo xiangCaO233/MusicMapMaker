@@ -29,7 +29,8 @@ class IVMObjectEditor : public HitObjectEditor {
     void update_current_comp();
 
     // 检查编辑中的组合键
-    void check_editing_comp();
+    void check_editing_comp(std::multiset<std::shared_ptr<HitObject>,
+                                          HitObjectComparator>& checking_set);
 
     // 结束编辑-生成可撤回操作入栈
     void end_edit();
@@ -53,6 +54,9 @@ class IVMObjectEditor : public HitObjectEditor {
     void cut() override;
     // 粘贴
     void paste() override;
+
+    // 粘贴剪切板内容
+    void paste_clipboard();
 };
 
 #endif  // M_IVMOBJECTEDITOR_H
