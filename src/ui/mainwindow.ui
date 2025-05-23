@@ -322,8 +322,16 @@
     <property name="title">
      <string>View</string>
     </property>
+    <widget class="QMenu" name="menuSelect_Theme">
+     <property name="title">
+      <string>Select Theme</string>
+     </property>
+     <addaction name="actionDark"/>
+     <addaction name="actionLight"/>
+    </widget>
     <addaction name="actionShow_Logs"/>
     <addaction name="actionShow_Files"/>
+    <addaction name="menuSelect_Theme"/>
    </widget>
    <widget class="QMenu" name="menuTool">
     <property name="title">
@@ -501,6 +509,22 @@
   <action name="actionInsane">
    <property name="text">
     <string>Insane</string>
+   </property>
+  </action>
+  <action name="actionDark">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark</string>
+   </property>
+  </action>
+  <action name="actionLight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Light</string>
    </property>
   </action>
  </widget>

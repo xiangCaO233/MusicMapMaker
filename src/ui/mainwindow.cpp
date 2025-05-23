@@ -166,6 +166,7 @@ void MainWindow::use_theme(GlobalTheme theme) {
             QFile file(":/QtThemeDark/theme/Flat/Dark/Pink/Orange.qss");
             file.open(QFile::ReadOnly);
             setStyleSheet(file.readAll());
+            ui->actionDark->setChecked(true);
 
             break;
         }
@@ -174,6 +175,7 @@ void MainWindow::use_theme(GlobalTheme theme) {
             QFile file(":/QtThemeLight/theme/Flat/Light/Brown/DeepOrange.qss");
             file.open(QFile::ReadOnly);
             setStyleSheet(file.readAll());
+            ui->actionLight->setChecked(true);
             break;
         }
     }
@@ -227,4 +229,15 @@ void MainWindow::init_actions() {
             ui->page_widget->edit_area_widget, &MEditorArea::on_saveMap);
     connect(ui->actionSave_As, &QAction::triggered,
             ui->page_widget->edit_area_widget, &MEditorArea::on_saveMapAs);
+    // 选择主题
+    connect(ui->actionDark, &QAction::triggered, [&]() {
+        ui->actionDark->setChecked(true);
+        ui->actionLight->setChecked(false);
+        use_theme(GlobalTheme::DARK);
+    });
+    connect(ui->actionLight, &QAction::triggered, [&]() {
+        ui->actionDark->setChecked(false);
+        ui->actionLight->setChecked(true);
+        use_theme(GlobalTheme::LIGHT);
+    });
 }
