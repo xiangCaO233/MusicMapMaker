@@ -6,8 +6,6 @@
 #include <QOpenGLWindow>
 #include <QVBoxLayout>
 
-#include "colorful-log.h"
-
 // 构造CanvasContainer
 CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
     // 创建 QOpenGLWindow
@@ -22,7 +20,9 @@ CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
 }
 
 // 析构CanvasContainer
-CanvasContainer::~CanvasContainer() { qDebug() << "~CanvasContainer called"; };
+CanvasContainer::~CanvasContainer() {
+    // qDebug() << "~CanvasContainer called";
+}
 
 // 使用主题
 void CanvasContainer::use_theme(GlobalTheme theme) { canvas->use_theme(theme); }

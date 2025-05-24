@@ -126,7 +126,7 @@ void MMap::load_from_file(const char* path) {
         // 先读取物件
         auto notes_json = mapdata_json["notes"];
         for (const auto& note_json : notes_json) {
-            std::cout << note_json.dump() << "\n";
+            // std::cout << note_json.dump() << "\n";
             auto type = note_json.value<std::string>("type", "note");
             if (type == "note") {
                 temp_note = std::make_shared<Note>(
