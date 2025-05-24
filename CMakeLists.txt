@@ -28,21 +28,21 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 find_package(
   QT NAMES Qt6 Qt5 REQUIRED
   COMPONENTS Core
-             Widgets
-             OpenGLWidgets
-             OpenGL
-             LinguistTools
-             Svg
-             SvgWidgets)
+  Widgets
+  OpenGLWidgets
+  OpenGL
+  LinguistTools
+  Svg
+  SvgWidgets)
 find_package(
   Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core
-             Widgets
-             OpenGLWidgets
-             OpenGL
-             LinguistTools
-             Svg
-             SvgWidgets)
+  Widgets
+  OpenGLWidgets
+  OpenGL
+  LinguistTools
+  Svg
+  SvgWidgets)
 
 # 查找日志包
 find_package(spdlog REQUIRED)
@@ -93,7 +93,7 @@ set(MMM_SOURCES
 
 # 设置翻译文件
 set(TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_zh_CN.ts
-             ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
+  ${CMAKE_CURRENT_SOURCE_DIR}/translations/MusicMapMaker_en_US.ts)
 
 # 设置着色器文件
 set(GLSL_FILES
@@ -272,18 +272,18 @@ add_dependencies(MusicMapMaker xaudio-dev)
 target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog
-          Qt${QT_VERSION_MAJOR}::Core
-          Qt${QT_VERSION_MAJOR}::Widgets
-          Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-          Qt${QT_VERSION_MAJOR}::OpenGL
-          Qt${QT_VERSION_MAJOR}::Svg
-          Qt${QT_VERSION_MAJOR}::SvgWidgets
-          ICU::uc
-          ICU::i18n
-          ICU::data
-          Freetype::Freetype
-          pugixml::pugixml
-          xaudio-dev)
+  Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::Widgets
+  Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+  Qt${QT_VERSION_MAJOR}::OpenGL
+  Qt${QT_VERSION_MAJOR}::Svg
+  Qt${QT_VERSION_MAJOR}::SvgWidgets
+  ICU::uc
+  ICU::i18n
+  ICU::data
+  Freetype::Freetype
+  pugixml::pugixml
+  xaudio-dev)
 
 # 设置翻译系统
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -322,10 +322,10 @@ endif()
 set_target_properties(
   MusicMapMaker
   PROPERTIES ${BUNDLE_ID_OPTION} MACOSX_BUNDLE_BUNDLE_VERSION
-             ${PROJECT_VERSION} MACOSX_BUNDLE_SHORT_VERSION_STRING
-             ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} MACOSX_BUNDLE
-             TRUE WIN32_EXECUTABLE
-             TRUE)
+  ${PROJECT_VERSION} MACOSX_BUNDLE_SHORT_VERSION_STRING
+  ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} MACOSX_BUNDLE
+  TRUE WIN32_EXECUTABLE
+  TRUE)
 
 # 安装配置
 include(GNUInstallDirs)

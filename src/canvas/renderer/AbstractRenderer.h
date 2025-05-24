@@ -35,7 +35,7 @@ class AbstractRenderer {
     virtual ~AbstractRenderer();
 
     // 当前正在使用的纹理池
-    std::shared_ptr<MTexturePool> current_use_pool;
+    MTexturePool* current_use_pool;
 
     // 子类公共成员
     // gl实例指针

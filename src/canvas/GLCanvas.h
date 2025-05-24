@@ -92,9 +92,10 @@ class GLCanvas : public QOpenGLWindow,
     // 全部纹理映射表(id-纹理对象)
     std::unordered_map<std::string, std::shared_ptr<TextureInstace>>
         texture_full_map;
-    float gl_clear_color[4];
     // 当前主题
     GlobalTheme current_theme;
+
+    float gl_clear_color[4];
 
     // 使用主题
     void use_theme(GlobalTheme theme);

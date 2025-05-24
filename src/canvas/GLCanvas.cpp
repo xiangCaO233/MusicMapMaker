@@ -65,6 +65,8 @@ GLCanvas::GLCanvas(QWidget *parent) {
 GLCanvas::~GLCanvas() {
     // 释放渲染管理器
     if (renderer_manager) delete renderer_manager;
+    if (fpsCounter) delete fpsCounter;
+
     std::lock_guard<std::mutex> lock(autosave_mtx);
     // update_thread.join();
     // 确保刷新线程退出

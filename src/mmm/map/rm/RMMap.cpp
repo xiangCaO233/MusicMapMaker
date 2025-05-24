@@ -607,9 +607,6 @@ void RMMap::load_from_file(const char* path) {
             }
         }
 
-        // 添加到物件列表
-        hitobjects.insert(temp_note);
-
         // 组合键处理
         switch (note_complex_info) {
             case 0x60: {
@@ -646,6 +643,9 @@ void RMMap::load_from_file(const char* path) {
                 break;
             }
         }
+
+        // 添加到物件列表
+        hitobjects.insert(temp_note);
 
         // XINFO("物件组合类型:[" + std::to_string(note_complex_info) +
         // "]物件类型:[" +

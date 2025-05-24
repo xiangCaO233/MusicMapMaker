@@ -83,8 +83,8 @@ class MTexturePool {
     bool load_texture(std::shared_ptr<TextureInstace> &texture);
 
     // 使用纹理池
-    void use(const std::shared_ptr<MTexturePool> &pool_reference,
-             std::shared_ptr<AbstractRenderer> &renderer_context);
+    void use(MTexturePool *&pool_reference,
+             AbstractRenderer *&renderer_context);
 };
 
 #endif  // M_MTEXTUREPOOL_H

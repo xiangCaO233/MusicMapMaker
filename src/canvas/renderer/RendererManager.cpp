@@ -82,13 +82,13 @@ void RendererManager::finalize() {
                 if (  // 操作队列为空
                     operation_queue.empty() ||
                     // 操作队列尾渲染器不同
-                    operation_queue.back().renderer != renderer ||
+                    operation_queue.back().renderer != renderer.get() ||
                     // 操作队列尾渲染图形类型不同
                     operation_queue.back().shape_type !=
                         command.instance_shape) {
                     // 新建渲染操作
                     operation_queue.emplace(command, command.instance_shape,
-                                            renderer, nullptr, 0,
+                                            renderer.get(), nullptr, 0,
                                             fontr_instance_index, 1);
                 } else {
                     // 与队尾渲染操作可合并
@@ -102,7 +102,7 @@ void RendererManager::finalize() {
                 if (  // 操作队列为空
                     operation_queue.empty() ||
                     // 操作队列尾渲染器不同
-                    operation_queue.back().renderer != renderer ||
+                    operation_queue.back().renderer != renderer.get() ||
                     // 操作队列尾渲染图形类型不同
                     operation_queue.back().shape_type !=
                         command.instance_shape ||
@@ -113,13 +113,13 @@ void RendererManager::finalize() {
                     (texture ?
                              // texture非空,操作队列尾纹理池也非空
                          operation_queue.back().texture_pool !=
-                             texture->poolreference
+                             texture->poolreference.lock().get()
                              // texture空,操作队列尾纹理池也空-可合并了
                              : false)) {
                     // 新建渲染操作
                     operation_queue.emplace(
-                        command, command.instance_shape, renderer,
-                        texture ? texture->poolreference : nullptr,
+                        command, command.instance_shape, renderer.get(),
+                        texture ? texture->poolreference.lock().get() : nullptr,
                         texture ? texture->texture_layer : 0,
                         (command.is_volatile ? dynamic_instance_index
                                              : static_instance_index),
@@ -175,13 +175,13 @@ void RendererManager::finalize() {
                 if (  // 操作队列为空
                     operation_queue.empty() ||
                     // 操作队列尾渲染器不同
-                    operation_queue.back().renderer != renderer ||
+                    operation_queue.back().renderer != renderer.get() ||
                     // 操作队列尾渲染图形类型不同
                     operation_queue.back().shape_type !=
                         command.instance_shape) {
                     // 新建渲染操作
                     operation_queue.emplace(command, command.instance_shape,
-                                            renderer, nullptr, 0,
+                                            renderer.get(), nullptr, 0,
                                             fontr_instance_index, 1);
                 } else {
                     // 与队尾渲染操作可合并
@@ -194,7 +194,7 @@ void RendererManager::finalize() {
                 if (  // 操作队列为空
                     operation_queue.empty() ||
                     // 操作队列尾渲染器不同
-                    operation_queue.back().renderer != renderer ||
+                    operation_queue.back().renderer != renderer.get() ||
                     // 操作队列尾渲染图形类型不同
                     operation_queue.back().shape_type !=
                         command.instance_shape ||
@@ -205,7 +205,7 @@ void RendererManager::finalize() {
                     (texture ?
                              // texture非空,操作队列尾纹理池也非空
                          (operation_queue.back().texture_pool !=
-                              texture->poolreference ||
+                              texture->poolreference.lock().get() ||
                           // 纹理集层级不同
                           operation_queue.back().layer_index !=
                               texture->texture_layer)
@@ -213,8 +213,8 @@ void RendererManager::finalize() {
                              : false)) {
                     // 新建渲染操作
                     operation_queue.emplace(
-                        command, command.instance_shape, renderer,
-                        texture ? texture->poolreference : nullptr,
+                        command, command.instance_shape, renderer.get(),
+                        texture ? texture->poolreference.lock().get() : nullptr,
                         texture ? texture->texture_layer : 0,
                         (command.is_volatile ? dynamic_instance_index
                                              : static_instance_index),

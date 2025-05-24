@@ -155,8 +155,6 @@ void MMap::load_from_file(const char* path) {
                 }
             }
 
-            hitobjects.insert(temp_note);
-
             // 处理组合键
             temp_note->compinfo = static_cast<ComplexInfo>(
                 note_json.value<uint8_t>("complex-info", 0));
@@ -188,6 +186,8 @@ void MMap::load_from_file(const char* path) {
                 default:
                     break;
             }
+
+            hitobjects.insert(temp_note);
             // 物件元数据
             auto& metas_json = note_json["metas"];
             for (const auto& [type, metajson] : metas_json.items()) {

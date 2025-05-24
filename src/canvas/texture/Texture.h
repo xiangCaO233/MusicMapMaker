@@ -92,7 +92,7 @@ class TextureInstace {
     int32_t hoffset{0};
 
     // 纹理池引用
-    std::shared_ptr<MTexturePool> poolreference;
+    std::weak_ptr<MTexturePool> poolreference;
 
     // 从文件加载
     void load_from_file(std::filesystem::path& relative_path,
