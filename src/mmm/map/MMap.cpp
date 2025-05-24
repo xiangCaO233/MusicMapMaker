@@ -222,6 +222,7 @@ void MMap::load_from_file(const char* path) {
             timing->bpm = timing_json["bpm"];
             insert_timing(timing);
         }
+        input_file.close();       
     } catch (std::exception e) {
         std::cerr << e.what() << "\n";
     }
