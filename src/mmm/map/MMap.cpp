@@ -222,7 +222,7 @@ void MMap::load_from_file(const char* path) {
             timing->bpm = timing_json["bpm"];
             insert_timing(timing);
         }
-        input_file.close();       
+        input_file.close();
     } catch (std::exception e) {
         std::cerr << e.what() << "\n";
     }
@@ -271,6 +271,7 @@ void MMap::write_to_file(const char* path) {
 
         // 物件数据
         auto notes_json = json::array();
+
         // 防止重复写出同一物件
         std::unordered_map<std::shared_ptr<HitObject>, bool> writed_object;
         for (const auto& hitobject : hitobjects) {

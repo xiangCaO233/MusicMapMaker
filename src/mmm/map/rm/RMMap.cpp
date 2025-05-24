@@ -257,6 +257,7 @@ void RMMap::write_to_file(const char* path) {
             auto comp = std::static_pointer_cast<ComplexNote>(note);
             // 直接写出所有子键
             for (auto& child_note : comp->child_notes) {
+                writed_object.insert({child_note, true});
                 write_note(os, child_note);
             }
 
