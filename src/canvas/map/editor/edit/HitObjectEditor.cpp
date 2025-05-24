@@ -107,6 +107,7 @@ void HitObjectEditor::cut() {
                 // 拷贝到了组合键中的子键-添加组合键引用
                 auto temp_comp = std::shared_ptr<ComplexNote>(
                     note->parent_reference, [](ComplexNote*) {});
+                if (!temp_comp) continue;
                 auto com_it = clipboard.find(temp_comp);
                 if (com_it == clipboard.end()) {
                     clipboard.insert(
