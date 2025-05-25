@@ -61,7 +61,7 @@
         <translation>Change The Default Divisors Policy</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="268"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="309"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="268"/>
         <source>map bookmarks</source>
         <translation>Map Bookmarks</translation>
@@ -90,91 +90,106 @@
         <translation>Adjust the background opacy</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="331"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="230"/>
+        <source>adjust judgeline position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="268"/>
+        <source>adjust graphic offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="372"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="331"/>
         <source>check to show object after judgeline</source>
         <translation>Check to show object after judgeline</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="428"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="422"/>
+        <source>show timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="472"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="428"/>
         <source>switch mode auto select</source>
         <translation>Switch Mode Auto Select</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="477"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="521"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="477"/>
         <source>magnet to divisors</source>
         <translation>Magnet To Divisors</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="524"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="568"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="524"/>
         <source>change the mouse wheel direction</source>
         <translation>Change The Mouse Wheel Direction</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="146"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="149"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="146"/>
         <source>Place note mode</source>
         <translation>Place note mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="152"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="155"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="152"/>
         <source>Place line and slide mode</source>
         <translation>Place line and slide mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="158"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="161"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="158"/>
         <source>Place timing mode</source>
         <translation>Place timing mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="164"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="167"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="164"/>
         <source>Selection mode</source>
         <translation>Selection mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="170"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="173"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="170"/>
         <source>Observer mode</source>
         <translation>Observer mode</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="243"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="246"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="243"/>
         <source>Change beat type</source>
         <translation>Change beat type</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="576"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="614"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="576"/>
         <source>mmm mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="577"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="615"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="577"/>
         <source>imd mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="578"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="616"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="578"/>
         <source>osu mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="635"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
         <source>Save As</source>
         <translation type="unfinished">Save As</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="635"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
         <source>File Formats:</source>
         <translation type="unfinished"></translation>
@@ -222,56 +237,67 @@
         <translation>Map metadatas</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="11"/>
         <source>title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="11"/>
         <source>title_unicode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="12"/>
         <source>artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="12"/>
         <source>artist_unicode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="16"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="13"/>
         <source>author</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="16"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="13"/>
         <source>version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="17"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <source>audio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="17"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <source>bg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="18"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <source>preference_bpm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="18"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <source>map_length</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="19"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="16"/>
         <source>orbits</source>
         <translation type="unfinished"></translation>
@@ -541,7 +567,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="155"/>
+        <location filename="../src/ui/mainwindow.cpp" line="157"/>
         <location filename="../src/ui/mainwindow.cpp" line="155"/>
         <source>Music Map Maker -</source>
         <translation>Music Map Maker -&gt;</translation>
@@ -550,7 +576,7 @@
 <context>
     <name>MapWorkspaceCanvas</name>
     <message>
-        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="136"/>
+        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="184"/>
         <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="136"/>
         <source>qt update substantially delayed:%1ms</source>
         <translation>Qt update substantially delayed:%1ms</translation>

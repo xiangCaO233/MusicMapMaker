@@ -295,7 +295,7 @@ void HoldGenerator::generate_preview(Hold &hold) {
         editor_ref->cstatus.canvas_size.height() /
             editor_ref->canvas_ref->working_map->project_reference->config
                 .preview_time_scale +
-        editor_ref->cstatus.static_time_offset *
+        editor_ref->cstatus.graphic_offset *
             editor_ref->canvas_ref->working_map->project_reference->config
                 .timeline_zoom;
 

@@ -80,6 +80,9 @@ void MEditorArea::use_theme(GlobalTheme theme) {
     mutil::set_toolbutton_svgcolor(ui->adjust_judgeline_position_toolbutton,
                                    ":/icons/judgeline.svg", button_color, 12,
                                    12);
+    mutil::set_toolbutton_svgcolor(ui->adjust_visual_offset_toolbutton,
+                                   ":/icons/visual-offset.svg", button_color,
+                                   12, 12);
 
     mutil::set_button_svgcolor(ui->magnet_todivisor_button,
                                ":/icons/magnet.svg", button_color, 16, 16);
@@ -377,6 +380,43 @@ void MEditorArea::initialize_toolbuttons() {
 
     //
     //
+    // 视觉偏移调节按钮
+    //
+    //
+    // 创建菜单
+    auto vposmenu = new QMenu(ui->adjust_visual_offset_toolbutton);
+
+    auto customvpossliderWidget = new QWidget();
+    auto vposslider = new QSlider(Qt::Vertical, customjgsliderWidget);
+    vposslider->setRange(-100, 100);
+    vposslider->setValue(0);
+    vposslider->setSingleStep(1);
+    vposslider->setPageStep(5);
+    auto vposlabel = new QLabel("0");
+
+    auto vposmenulayout = new QVBoxLayout(customvpossliderWidget);
+    vposmenulayout->setContentsMargins(2, 2, 2, 2);
+    vposmenulayout->setSpacing(2);
+    vposmenulayout->addWidget(vposslider);
+    vposmenulayout->addWidget(vposlabel);
+    customvpossliderWidget->setLayout(vposmenulayout);
+
+    connect(vposslider, &QSlider::valueChanged, [=](int value) {
+        vposlabel->setText(QString::number(value));
+        canvas->editor->cstatus.graphic_offset = value;
+    });
+
+    // 将自定义 Widget 包装成 QWidgetAction
+    auto *vposwidgetAction = new QWidgetAction(vposmenu);
+    vposwidgetAction->setDefaultWidget(customvpossliderWidget);
+
+    // 添加到菜单
+    vposmenu->addAction(vposwidgetAction);
+    // 设置背景按钮菜单
+    ui->adjust_visual_offset_toolbutton->setMenu(vposmenu);
+
+    //
+    //
     // 书签按钮
     update_bookmarks();
 }
@@ -545,7 +585,7 @@ void MEditorArea::on_progress_slider_valueChanged(int value) {
                 ui->canvas_container->canvas.data()
                     ->editor->cstatus.current_time_stamp +
                 ui->canvas_container->canvas.data()
-                    ->editor->cstatus.static_time_offset;
+                    ->editor->cstatus.graphic_offset;
             ui->canvas_container->canvas.data()->played_effects_objects.clear();
             emit progress_pos_changed(maptime * ratio);
         }

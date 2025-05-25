@@ -156,14 +156,14 @@ void MapWorkspaceCanvas::on_music_pos_sync(double time) {
         time - (1.0 - editor->cstatus.playspeed) *
                    BackgroundAudio::audio_buffer_offset;
     editor->cstatus.current_visual_time_stamp =
-        editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
+        editor->cstatus.current_time_stamp + editor->cstatus.graphic_offset;
 }
 
 // 时间编辑器设置精确时间
 void MapWorkspaceCanvas::on_timeedit_setpos(double time) {
     editor->cstatus.current_time_stamp = time;
     editor->cstatus.current_visual_time_stamp =
-        editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
+        editor->cstatus.current_time_stamp + editor->cstatus.graphic_offset;
 }
 
 // qt事件
@@ -205,8 +205,7 @@ void MapWorkspaceCanvas::paintEvent(QPaintEvent *event) {
             emit pause_signal(editor->cstatus.canvas_pasued);
         }
         editor->cstatus.current_visual_time_stamp =
-            editor->cstatus.current_time_stamp +
-            editor->cstatus.static_time_offset;
+            editor->cstatus.current_time_stamp + editor->cstatus.graphic_offset;
         working_map->project_reference->map_canvasposes.at(working_map) =
             editor->cstatus.current_time_stamp;
         emit current_time_stamp_changed(editor->cstatus.current_time_stamp);
@@ -1025,8 +1024,7 @@ void MapWorkspaceCanvas::switch_map(std::shared_ptr<MMap> map) {
         editor->cstatus.current_time_stamp =
             map->project_reference->map_canvasposes.at(map);
         editor->cstatus.current_visual_time_stamp =
-            editor->cstatus.current_time_stamp +
-            editor->cstatus.static_time_offset;
+            editor->cstatus.current_time_stamp + editor->cstatus.graphic_offset;
         effect_thread->sync_music_time(editor->cstatus.current_time_stamp);
 
         // 同步特效线程的map

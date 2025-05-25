@@ -99,7 +99,7 @@ void EffectThread::sync_music_time(double time) {
     // 同步画布
     editor->cstatus.current_time_stamp = time;
     editor->cstatus.current_visual_time_stamp =
-        editor->cstatus.current_time_stamp + editor->cstatus.static_time_offset;
+        editor->cstatus.current_time_stamp + editor->cstatus.graphic_offset;
 }
 
 // 音乐播放回调槽

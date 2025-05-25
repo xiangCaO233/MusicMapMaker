@@ -207,7 +207,7 @@ void MapEditor::update_size(const QSize& current_canvas_size) {
         (1 - csettings.judgeline_position) * current_canvas_size.height();
     ebuffer.judgeline_visual_position =
         ebuffer.judgeline_position +
-        (cstatus.static_time_offset) * cstatus.speed_zoom;
+        (cstatus.graphic_offset) * cstatus.speed_zoom;
 }
 
 // 更新区域信息
@@ -693,7 +693,7 @@ void MapEditor::update_timepos(int scrolldy, bool is_shift_down) {
         }
     }
     cstatus.current_visual_time_stamp =
-        cstatus.current_time_stamp + cstatus.static_time_offset;
+        cstatus.current_time_stamp + cstatus.graphic_offset;
     canvas_ref->played_effects_objects.clear();
 
     // 更新项目中自己的位置

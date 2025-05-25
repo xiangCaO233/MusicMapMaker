@@ -31,11 +31,7 @@ int main(int argc, char* argv[]) {
 #endif  //_WIN32
     QApplication a(argc, argv);
     // 设置应用图标
-#ifdef _WIN32
-    a.setWindowIcon(QIcon(":/icons/icon.ico"));
-#else
     a.setWindowIcon(QIcon(":/icons/icon.png"));
-#endif  //_WIN32
     XLogger::init("MMM");
 
     // 获取系统语言环境

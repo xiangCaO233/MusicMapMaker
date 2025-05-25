@@ -61,7 +61,7 @@
         <translation>修改默认分拍策略</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="268"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="309"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="268"/>
         <source>map bookmarks</source>
         <translation>谱面书签</translation>
@@ -90,91 +90,106 @@
         <translation>调整背景亮度</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="331"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="230"/>
+        <source>adjust judgeline position</source>
+        <translation>调整判定线位置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="268"/>
+        <source>adjust graphic offset</source>
+        <translation>调整图形偏移</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="372"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="331"/>
         <source>check to show object after judgeline</source>
         <translation>选中以在判定线后保持显示物件</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="428"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="422"/>
+        <source>show timeline</source>
+        <translation>显示时间线</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="472"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="428"/>
         <source>switch mode auto select</source>
         <translation>禁用模式自动切换</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="477"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="521"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="477"/>
         <source>magnet to divisors</source>
         <translation>吸附到小节线上</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="524"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="568"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.ui" line="524"/>
         <source>change the mouse wheel direction</source>
         <translation>更改鼠标滚动方向</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="146"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="149"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="146"/>
         <source>Place note mode</source>
         <translation>单键编辑模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="152"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="155"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="152"/>
         <source>Place line and slide mode</source>
         <translation>面条与滑键编辑模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="158"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="161"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="158"/>
         <source>Place timing mode</source>
         <translation>时间点编辑模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="164"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="167"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="164"/>
         <source>Selection mode</source>
         <translation>选择模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="170"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="173"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="170"/>
         <source>Observer mode</source>
         <translation>观察者模式</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="243"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="246"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="243"/>
         <source>Change beat type</source>
         <translation>修改拍型</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="576"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="614"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="576"/>
         <source>mmm mapfile</source>
         <translation>mmm谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="577"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="615"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="577"/>
         <source>imd mapfile</source>
         <translation>imd谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="578"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="616"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="578"/>
         <source>osu mapfile</source>
         <translation>osu谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="635"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
         <source>Save As</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
+        <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="635"/>
         <location filename="../src/ui/pageui/editorui/meditorarea.cpp" line="597"/>
         <source>File Formats:</source>
         <translation>文件格式:</translation>
@@ -222,56 +237,67 @@
         <translation>谱面元数据</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="11"/>
         <source>title</source>
         <translation>标题(ascii)</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="11"/>
         <source>title_unicode</source>
         <translation>标题(unicode)</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="12"/>
         <source>artist</source>
         <translation>艺术家(ascii)</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="12"/>
         <source>artist_unicode</source>
         <translation>艺术家(unicode)</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="16"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="13"/>
         <source>author</source>
         <translation>谱面作者</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="16"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="13"/>
         <source>version</source>
         <translation>版本</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="17"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <source>audio</source>
         <translation>音频</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="17"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="14"/>
         <source>bg</source>
         <translation>背景</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="18"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <source>preference_bpm</source>
         <translation>参考bpm</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="18"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="15"/>
         <source>map_length</source>
         <translation>谱面长度(ms)</translation>
     </message>
     <message>
+        <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="19"/>
         <location filename="../src/ui/infoui/metaui/mmetas.cpp" line="16"/>
         <source>orbits</source>
         <translation>轨道数</translation>
@@ -541,7 +567,7 @@
         <translation>亮色</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="155"/>
+        <location filename="../src/ui/mainwindow.cpp" line="157"/>
         <location filename="../src/ui/mainwindow.cpp" line="155"/>
         <source>Music Map Maker -</source>
         <translation>音游谱面制作器 -&gt;</translation>
@@ -550,7 +576,7 @@
 <context>
     <name>MapWorkspaceCanvas</name>
     <message>
-        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="136"/>
+        <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="184"/>
         <location filename="../src/canvas/map/MapWorkspaceCanvas.cpp" line="136"/>
         <source>qt update substantially delayed:%1ms</source>
         <translation>Qt发生大幅更新延迟:%1ms</translation>

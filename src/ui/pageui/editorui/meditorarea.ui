@@ -226,12 +226,53 @@
           <height>28</height>
          </size>
         </property>
+        <property name="toolTip">
+         <string>adjust judgeline position</string>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
          <iconset resource="../../../../resources/glsrcs.qrc">
           <normaloff>:/icons/judgeline.svg</normaloff>:/icons/judgeline.svg</iconset>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="adjust_visual_offset_toolbutton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>adjust graphic offset</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/visual-offset.svg</normaloff>:/icons/visual-offset.svg</iconset>
         </property>
         <property name="popupMode">
          <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
@@ -376,6 +417,9 @@
         </property>
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>show timeline</string>
         </property>
         <property name="text">
          <string notr="true"/>
