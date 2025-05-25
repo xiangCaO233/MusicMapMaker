@@ -388,7 +388,7 @@ void MEditorArea::initialize_toolbuttons() {
 
     auto customvpossliderWidget = new QWidget(vposmenu);
     auto vposslider = new QSlider(Qt::Vertical, customjgsliderWidget);
-    vposslider->setRange(-100, 100);
+    vposslider->setRange(-200, 200);
     vposslider->setValue(0);
     vposslider->setSingleStep(1);
     vposslider->setPageStep(5);
