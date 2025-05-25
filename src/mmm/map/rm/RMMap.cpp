@@ -199,49 +199,49 @@ void RMMap::write_to_file(const char* path) {
     os.write(reinterpret_cast<const char*>(&map_length), sizeof(map_length));
 
     // 5~8字节:int32 图时间点数
-    // int32_t timing_count = timings.size();
-    int32_t timing_count = 0;
+    int32_t timing_count = timings.size();
+    // int32_t timing_count = 0;
     //
 
-    double process_time = 0;
-    double bpm = timings.begin()->get()->basebpm;
-    double beat_length = 60 * 1000.0 / bpm;
+    // double process_time = 0;
+    // double bpm = timings.begin()->get()->basebpm;
+    // double beat_length = 60 * 1000.0 / bpm;
 
-    // 兼容模式-塞满垃圾timing
-    while (int32_t(process_time) < map_length) {
-        auto process_time_i = int32_t(process_time);
-        process_time += beat_length;
-        ++timing_count;
-    }
-    ++timing_count;
+    // // 兼容模式-塞满垃圾timing
+    // while (int32_t(process_time) < map_length) {
+    //     auto process_time_i = int32_t(process_time);
+    //     process_time += beat_length;
+    //     ++timing_count;
+    // }
+    // ++timing_count;
     os.write(reinterpret_cast<const char*>(&timing_count),
              sizeof(timing_count));
 
     // 接下来每12字节按4字节int32+8字节float64(double)组合为一个时间点
     // 共${图时间点数}组timing数据
-    // for (const auto& timing : timings) {
-    //     int32_t timing_time = timing->timestamp;
-    //     double timing_bpm = timing->basebpm;
-    //     os.write(reinterpret_cast<const char*>(&timing_time),
-    //              sizeof(timing_time));
-    //     os.write(reinterpret_cast<const char*>(&timing_bpm),
-    //              sizeof(timing_bpm));
-    // }
+    for (const auto& timing : timings) {
+        int32_t timing_time = timing->timestamp;
+        double timing_bpm = timing->basebpm;
+        os.write(reinterpret_cast<const char*>(&timing_time),
+                 sizeof(timing_time));
+        os.write(reinterpret_cast<const char*>(&timing_bpm),
+                 sizeof(timing_bpm));
+    }
 
-    process_time = 0;
+    // process_time = 0;
 
     // 兼容模式-塞满垃圾timing
-    while (int32_t(process_time) < map_length) {
-        auto process_time_i = int32_t(process_time);
-        os.write(reinterpret_cast<const char*>(&process_time_i),
-                 sizeof(process_time_i));
-        os.write(reinterpret_cast<const char*>(&bpm), sizeof(bpm));
-        process_time += beat_length;
-    }
-    auto process_time_i = int32_t(process_time);
-    os.write(reinterpret_cast<const char*>(&process_time_i),
-             sizeof(process_time_i));
-    os.write(reinterpret_cast<const char*>(&bpm), sizeof(bpm));
+    // while (int32_t(process_time) < map_length) {
+    //     auto process_time_i = int32_t(process_time);
+    //     os.write(reinterpret_cast<const char*>(&process_time_i),
+    //              sizeof(process_time_i));
+    //     os.write(reinterpret_cast<const char*>(&bpm), sizeof(bpm));
+    //     process_time += beat_length;
+    // }
+    // auto process_time_i = int32_t(process_time);
+    // os.write(reinterpret_cast<const char*>(&process_time_i),
+    //          sizeof(process_time_i));
+    // os.write(reinterpret_cast<const char*>(&bpm), sizeof(bpm));
 
     // 然后一个03 03未知意义的int16
     int16_t unknown_flag = 0x0303;
@@ -607,6 +607,8 @@ void RMMap::load_from_file(const char* path) {
     // 缓存组合键指针
     std::shared_ptr<ComplexNote> temp_complex_note;
 
+    int obj_count = 0;
+
     // 读取全部物件
     while ((buffer_data.data() + buffer_data.size() - data_pos) > 0) {
         // 类型1字节
@@ -714,6 +716,7 @@ void RMMap::load_from_file(const char* path) {
 
         // 添加到物件列表
         hitobjects.insert(temp_note);
+        ++obj_count;
 
         // XINFO("物件组合类型:[" + std::to_string(note_complex_info) +
         // "]物件类型:[" +
@@ -723,6 +726,8 @@ void RMMap::load_from_file(const char* path) {
         //       std::to_string(note_parameter) + "]");
     }
     orbits = max_orbits;
+    XINFO("read_notes:" + std::to_string(obj_count));
+    XINFO("table_rows:" + std::to_string(table_rows));
 
     // 生成图名
     map_name = "[rm] " + file_presuffix + " [" + std::to_string(max_orbits) +
