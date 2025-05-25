@@ -68,8 +68,17 @@ struct CanvasStatus {
     // 轨道暗化
     double orbit_darken_ratio{0.50};
 
-    // 时间偏移
+    // 图形偏移
+#ifdef _WIN32
+    // windows
+    double graphic_offset{-65};
+#elifdef __unix
+    // unix
     double graphic_offset{0};
+#else
+    // mac
+    double graphic_offset{0};
+#endif
 
     // TODO(xiang 2025-04-25):
     // 在两个变速timing间插值-下一个是基准timing时保持最后一个变速timing的速度作为时间线缩放

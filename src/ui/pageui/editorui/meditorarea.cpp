@@ -123,6 +123,8 @@ void MEditorArea::use_theme(GlobalTheme theme) {
 // 初始化工具按钮菜单
 void MEditorArea::initialize_toolbuttons() {
     auto canvas = canvas_container->canvas.data();
+    QFont font;
+    font.setPointSize(8);
     //
     //
     // 模式选择按钮
@@ -250,6 +252,8 @@ void MEditorArea::initialize_toolbuttons() {
     // 显示的分拍策略
     div_res_label = new QLabel(customdivosorsliderWidget);
     div_res_label->setText("1/2");
+    div_res_label->setFont(font);
+    div_res_label->setAlignment(Qt::AlignmentFlag::AlignCenter);
     QLabel *cp_div_res_label = div_res_label;
 
     connect(ratio_button, &QPushButton::clicked, [=]() {
@@ -319,6 +323,8 @@ void MEditorArea::initialize_toolbuttons() {
     bgslider->setRange(0, 100);
     bgslider->setValue(25);
     auto bgopacylabel = new QLabel("25");
+    bgopacylabel->setFont(font);
+    bgopacylabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
     auto bgmenulayout = new QVBoxLayout(custombgsliderWidget);
     bgmenulayout->setContentsMargins(2, 2, 2, 2);
@@ -355,6 +361,8 @@ void MEditorArea::initialize_toolbuttons() {
     jgslider->setRange(0, 100);
     jgslider->setValue(16);
     auto jgposlabel = new QLabel("16");
+    jgposlabel->setFont(font);
+    jgposlabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
     auto jgmenulayout = new QVBoxLayout(customjgsliderWidget);
     jgmenulayout->setContentsMargins(2, 2, 2, 2);
@@ -393,8 +401,6 @@ void MEditorArea::initialize_toolbuttons() {
     vposslider->setSingleStep(1);
     vposslider->setPageStep(5);
     auto vposlabel = new QLabel("0");
-    QFont font;
-    font.setPointSize(8);
     vposlabel->setFont(font);
     vposlabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
@@ -409,6 +415,7 @@ void MEditorArea::initialize_toolbuttons() {
     connect(vposslider, &QSlider::valueChanged, [=](int value) {
         vposlabel->setText(QString::number(value));
         canvas->editor->cstatus.graphic_offset = value;
+        canvas->editor->update_size(canvas->size());
     });
 
     // 将自定义 Widget 包装成 QWidgetAction
@@ -467,12 +474,16 @@ void MEditorArea::update_pause_button() {
 
 // 暂停按钮
 void MEditorArea::on_pausebutton_clicked() {
-    canvas_container->canvas->editor->cstatus.canvas_pasued =
-        !canvas_container->canvas->editor->cstatus.canvas_pasued;
-    update_pause_button();
+    if (canvas_container->canvas->working_map &&
+        canvas_container->canvas->working_map->project_reference->devicename !=
+            "unknown output device") {
+        canvas_container->canvas->editor->cstatus.canvas_pasued =
+            !canvas_container->canvas->editor->cstatus.canvas_pasued;
+        update_pause_button();
 
-    emit pause_button_changed(
-        canvas_container->canvas->editor->cstatus.canvas_pasued);
+        emit pause_button_changed(
+            canvas_container->canvas->editor->cstatus.canvas_pasued);
+    }
 }
 
 // 画布通过快捷键切换模式
