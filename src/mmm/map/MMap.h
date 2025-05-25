@@ -114,6 +114,8 @@ class MMap {
     // 轨道数
     int32_t orbits;
 
+    int32_t write_note_count{0};
+
     // 全部物件
     std::multiset<std::shared_ptr<HitObject>, HitObjectComparator> hitobjects;
 
@@ -161,6 +163,9 @@ class MMap {
 
     // 写出文件是否合法
     virtual bool is_write_file_legal(const char* file, std::string& res);
+
+    // 是否包含物件
+    virtual bool contains_obj(std::shared_ptr<HitObject> o);
 
     // 插入物件
     virtual void insert_hitobject(std::shared_ptr<HitObject> hitobject);

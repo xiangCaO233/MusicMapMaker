@@ -197,20 +197,52 @@ void RMMap::write_to_file(const char* path) {
      */
     // 0~4字节:int32 谱面时长
     os.write(reinterpret_cast<const char*>(&map_length), sizeof(map_length));
+
     // 5~8字节:int32 图时间点数
-    int32_t timing_count = timings.size();
+    // int32_t timing_count = timings.size();
+    int32_t timing_count = 0;
+    //
+
+    double process_time = 0;
+    double bpm = timings.begin()->get()->basebpm;
+    double beat_length = 60 * 1000.0 / bpm;
+
+    // 兼容模式-塞满垃圾timing
+    while (int32_t(process_time) < map_length) {
+        auto process_time_i = int32_t(process_time);
+        process_time += beat_length;
+        ++timing_count;
+    }
+    ++timing_count;
     os.write(reinterpret_cast<const char*>(&timing_count),
              sizeof(timing_count));
+
     // 接下来每12字节按4字节int32+8字节float64(double)组合为一个时间点
     // 共${图时间点数}组timing数据
-    for (const auto& timing : timings) {
-        int32_t timing_time = timing->timestamp;
-        double timing_bpm = timing->basebpm;
-        os.write(reinterpret_cast<const char*>(&timing_time),
-                 sizeof(timing_time));
-        os.write(reinterpret_cast<const char*>(&timing_bpm),
-                 sizeof(timing_bpm));
+    // for (const auto& timing : timings) {
+    //     int32_t timing_time = timing->timestamp;
+    //     double timing_bpm = timing->basebpm;
+    //     os.write(reinterpret_cast<const char*>(&timing_time),
+    //              sizeof(timing_time));
+    //     os.write(reinterpret_cast<const char*>(&timing_bpm),
+    //              sizeof(timing_bpm));
+    // }
+
+    process_time = 0;
+
+    // 兼容模式-塞满垃圾timing
+    while (int32_t(process_time) < map_length) {
+        auto process_time_i = int32_t(process_time);
+        os.write(reinterpret_cast<const char*>(&process_time_i),
+                 sizeof(process_time_i));
+        os.write(reinterpret_cast<const char*>(&bpm), sizeof(bpm));
+        process_time += beat_length;
     }
+    auto process_time_i = int32_t(process_time);
+    os.write(reinterpret_cast<const char*>(&process_time_i),
+             sizeof(process_time_i));
+    os.write(reinterpret_cast<const char*>(&bpm), sizeof(bpm));
+
     // 然后一个03 03未知意义的int16
     int16_t unknown_flag = 0x0303;
     os.write(reinterpret_cast<const char*>(&unknown_flag),
@@ -240,6 +272,7 @@ void RMMap::write_to_file(const char* path) {
     // 滑动参数为3代表向右滑动3轨道
     //
     //
+    write_note_count = 0;
     // 防止重复写出同一物件
     std::unordered_map<std::shared_ptr<HitObject>, bool> writed_object;
     for (const auto& hitobject : hitobjects) {
@@ -255,16 +288,50 @@ void RMMap::write_to_file(const char* path) {
             continue;
         if (note->note_type == NoteType::COMPLEX) {
             auto comp = std::static_pointer_cast<ComplexNote>(note);
+            std::shared_ptr<Note> prechild = nullptr;
             // 直接写出所有子键
             for (auto& child_note : comp->child_notes) {
                 writed_object.insert({child_note, true});
+                // 修正当前组合物件子键的时间戳
+                if (prechild) {
+                    switch (prechild->note_type) {
+                        case NoteType::HOLD: {
+                            auto hold =
+                                std::dynamic_pointer_cast<Hold>(prechild);
+                            auto current_slide =
+                                std::dynamic_pointer_cast<Slide>(child_note);
+                            current_slide->timestamp =
+                                hold->hold_end_reference->timestamp;
+                            current_slide->slide_end_reference->timestamp =
+                                hold->hold_end_reference->timestamp;
+                            break;
+                        }
+                        case NoteType::SLIDE: {
+                            auto slide =
+                                std::dynamic_pointer_cast<Slide>(prechild);
+                            auto current_hold =
+                                std::dynamic_pointer_cast<Hold>(child_note);
+                            current_hold->timestamp = slide->timestamp;
+                            current_hold->hold_end_reference->timestamp =
+                                current_hold->timestamp +
+                                current_hold->hold_time;
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+                ++write_note_count;
                 write_note(os, child_note);
+                prechild = child_note;
             }
 
         } else {
             write_note(os, note);
+            ++write_note_count;
         }
     }
+    XINFO("imd write_note_count:" + std::to_string(write_note_count));
     XINFO("已保存为[" + res + "]");
 }
 

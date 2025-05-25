@@ -30,8 +30,8 @@ class MTexturePool {
 
    public:
     // 构造MTexturePool
-    MTexturePool(GLCanvas *canvas, uint32_t layer_width = 4096,
-                 uint32_t layer_height = 4096);
+    MTexturePool(GLCanvas *canvas, uint32_t layer_width = 5120,
+                 uint32_t layer_height = 8192);
 
     // 析构MTexturePool
     virtual ~MTexturePool();
@@ -54,7 +54,7 @@ class MTexturePool {
     uint32_t atlasMetaTextureArray;
 
     // 初始纹理最大层数
-    size_t current_max_layer{16};
+    size_t current_max_layer{8};
 
     // gl窗口上下文
     GLCanvas *cvs;

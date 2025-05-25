@@ -8,6 +8,7 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -88,6 +89,8 @@ void write_note_json(json& notes_json, std::shared_ptr<HitObject> o) {
         }
 
         notes_json.push_back(note_json);
+
+        // XINFO("writed_note:" + note_json.dump());
     }
 }
 // 从文件读取谱面
@@ -158,14 +161,23 @@ void MMap::load_from_file(const char* path) {
             // 处理组合键
             temp_note->compinfo = static_cast<ComplexInfo>(
                 note_json.value<uint8_t>("complex-info", 0));
+            std::shared_ptr<Note> prechild = nullptr;
 
             switch (temp_note->compinfo) {
                 case ComplexInfo::HEAD: {
+                    if (prechild) {
+                        // 存在非法组合键开始
+                        // 清空之前的缓存引用
+                        prechild->parent_reference->child_notes.clear();
+                        prechild->parent_reference = nullptr;
+                        hitobjects.erase(prechild);
+                    }
                     temp_complex_note = std::make_shared<ComplexNote>(
                         temp_note->timestamp, temp_note->orbit);
                     // 设置父物件
                     temp_note->parent_reference = temp_complex_note.get();
                     temp_complex_note->child_notes.insert(temp_note);
+                    prechild = temp_note;
                     break;
                 }
                 case ComplexInfo::BODY: {
@@ -174,12 +186,15 @@ void MMap::load_from_file(const char* path) {
 
                     temp_note->parent_reference = temp_complex_note.get();
                     temp_complex_note->child_notes.insert(temp_note);
+                    prechild = temp_note;
                     break;
                 }
                 case ComplexInfo::END: {
                     if (!temp_complex_note) continue;
                     temp_complex_note->child_notes.insert(temp_note);
+                    temp_note->parent_reference = temp_complex_note.get();
                     hitobjects.insert(temp_complex_note);
+                    prechild = nullptr;
                     temp_complex_note.reset();
                     break;
                 }
@@ -188,6 +203,11 @@ void MMap::load_from_file(const char* path) {
             }
 
             hitobjects.insert(temp_note);
+
+            if (hitobjects.find(temp_note) == hitobjects.end()) {
+                // 不重复添加物件
+            }
+
             // 物件元数据
             auto& metas_json = note_json["metas"];
             for (const auto& [type, metajson] : metas_json.items()) {
@@ -269,6 +289,8 @@ void MMap::write_to_file(const char* path) {
             ++index;
         }
 
+        write_note_count = 0;
+
         // 物件数据
         auto notes_json = json::array();
 
@@ -289,13 +311,20 @@ void MMap::write_to_file(const char* path) {
                 auto comp = std::static_pointer_cast<ComplexNote>(note);
                 // 直接写出所有子键
                 for (auto& child_note : comp->child_notes) {
+                    // if (child_note->timestamp == 25571) {
+                    //     std::cout << child_note->timestamp << "\n";
+                    // }
                     write_note_json(notes_json, child_note);
+                    ++write_note_count;
+                    writed_object.insert({child_note, true});
                 }
             } else {
                 write_note_json(notes_json, note);
+                ++write_note_count;
             }
         }
         mapdata_json["notes"] = notes_json;
+        XINFO("mmm write_note_count:" + std::to_string(write_note_count));
 
         //
         // 写出到文件
@@ -317,6 +346,9 @@ void MMap::write_to_file(const char* path) {
 bool MMap::is_write_file_legal(const char* file, std::string& res) {
     return true;
 }
+
+// 是否包含物件
+bool MMap::contains_obj(std::shared_ptr<HitObject> o) { return false; }
 
 // 注册元数据
 void MMap::register_metadata(MapMetadataType type) {
