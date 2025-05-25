@@ -100,7 +100,7 @@ void MMetas::on_meta_table_cellChanged(int row, int column) {
 
     if (column != 1) return;
     auto res = ui->meta_table->item(row, column)->text().toStdString();
-    qDebug() << "edit" << row << "," << column;
+    // qDebug() << "edit" << row << "," << column;
     switch (row) {
         case 0: {
             if (table_sync_lock) {
