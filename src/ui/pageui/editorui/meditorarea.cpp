@@ -350,7 +350,7 @@ void MEditorArea::initialize_toolbuttons() {
     // 创建菜单
     auto jposmenu = new QMenu(ui->adjust_judgeline_position_toolbutton);
 
-    auto customjgsliderWidget = new QWidget();
+    auto customjgsliderWidget = new QWidget(jposmenu);
     auto jgslider = new QSlider(Qt::Vertical, customjgsliderWidget);
     jgslider->setRange(0, 100);
     jgslider->setValue(16);
@@ -386,19 +386,24 @@ void MEditorArea::initialize_toolbuttons() {
     // 创建菜单
     auto vposmenu = new QMenu(ui->adjust_visual_offset_toolbutton);
 
-    auto customvpossliderWidget = new QWidget();
+    auto customvpossliderWidget = new QWidget(vposmenu);
     auto vposslider = new QSlider(Qt::Vertical, customjgsliderWidget);
     vposslider->setRange(-100, 100);
     vposslider->setValue(0);
     vposslider->setSingleStep(1);
     vposslider->setPageStep(5);
     auto vposlabel = new QLabel("0");
+    QFont font;
+    font.setPointSize(8);
+    vposlabel->setFont(font);
+    vposlabel->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
     auto vposmenulayout = new QVBoxLayout(customvpossliderWidget);
-    vposmenulayout->setContentsMargins(2, 2, 2, 2);
+    vposmenulayout->setContentsMargins(0, 0, 0, 0);
     vposmenulayout->setSpacing(2);
     vposmenulayout->addWidget(vposslider);
     vposmenulayout->addWidget(vposlabel);
+
     customvpossliderWidget->setLayout(vposmenulayout);
 
     connect(vposslider, &QSlider::valueChanged, [=](int value) {
