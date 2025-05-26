@@ -257,8 +257,7 @@ void MMap::load_from_file(const char* path) {
 // 初始化备份
 void MMap::init_backups() {
     // 读取备份目录
-    auto subdir = title_unicode + "_" + version;
-    mutil::sanitizeFilename(subdir);
+    auto subdir = mutil::sanitizeFilename(title_unicode + "_" + version);
     auto bkup_file_path = project_reference->ppath /
                           MainWindow::settings.backup_relative_path / subdir;
     if (!std::filesystem::exists(bkup_file_path)) {

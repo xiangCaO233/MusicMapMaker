@@ -140,9 +140,9 @@ void BackupThread::backup_map_thread() {
             std::to_string(canvas_contex->working_map->orbits) + "k-" +
             canvas_contex->working_map->version + ".mmm.bak");
 
-        auto subdir = canvas_contex->working_map->title_unicode + "_" +
-                      canvas_contex->working_map->version;
-        mutil::sanitizeFilename(subdir);
+        auto subdir =
+            mutil::sanitizeFilename(canvas_contex->working_map->title_unicode +
+                                    "_" + canvas_contex->working_map->version);
 
         auto bak_filestr =
             (bkup_file_path / subdir / bak_filename).generic_string();
