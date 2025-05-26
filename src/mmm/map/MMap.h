@@ -152,6 +152,9 @@ class MMap {
     // 全部拍-自动分析分拍和bpm,变速
     std::multiset<std::shared_ptr<Beat>, BeatComparator> beats;
 
+    // 初始化备份
+    void init_backups();
+
     // 生成此拍的分拍策略
     void generate_divisor_policy(const std::shared_ptr<Beat>& beat);
 

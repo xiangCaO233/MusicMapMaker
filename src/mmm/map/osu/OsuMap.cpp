@@ -289,7 +289,8 @@ std::shared_ptr<MapMetadata> OsuMap::default_metadata() {
 // 写出到文件
 void OsuMap::write_to_file(const char* path) {
     auto p = std::filesystem::path(path);
-    if (mutil::endsWithExtension(p, ".mmm")) {
+    if (mutil::endsWithExtension(p, ".mmm") ||
+        mutil::endsWithExtension(p, ".bak")) {
         MMap::write_to_file(path);
         return;
     }
@@ -764,7 +765,6 @@ bool OsuMap::is_write_file_legal(const char* file, std::string& res) {
 
 // 从文件读取谱面
 void OsuMap::load_from_file(const char* path) {
-    MMap::load_from_file(path);
     map_file_path = std::filesystem::path(path);
     if (map_file_path.is_relative()) {
         map_file_path = std::filesystem::absolute(map_file_path);

@@ -20,13 +20,13 @@
 #define XDEBUG(msg) SPDLOG_DEBUG(msg)
 #define XINFO(msg)    \
     SPDLOG_INFO(msg); \
-    emit XLogger::uilogger->info(QString::fromStdString(msg));
+    // emit XLogger::uilogger->info(QString::fromStdString(msg));
 #define XWARN(msg)    \
     SPDLOG_WARN(msg); \
-    emit XLogger::uilogger->warn(QString::fromStdString(msg));
+    //  emit XLogger::uilogger->warn(QString::fromStdString(msg));
 #define XERROR(msg)    \
     SPDLOG_ERROR(msg); \
-    emit XLogger::uilogger->error(QString::fromStdString(msg));
+    // emit XLogger::uilogger->error(QString::fromStdString(msg));
 #define XCRITICAL(msg) SPDLOG_CRITICAL(msg)
 
 class ColorfulFormatter : public spdlog::formatter {

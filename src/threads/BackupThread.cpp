@@ -20,6 +20,7 @@
 BackupThread::BackupThread(MapWorkspaceCanvas* canvas) : canvas_contex(canvas) {
     thread = std::thread(&BackupThread::run, this);
     thread.detach();
+    XINFO("已启动备份线程");
 }
 
 // 析构BackupThread
@@ -87,15 +88,14 @@ void BackupThread::auto_save_thread() {
 
         if (try_write_map2file(temp_file_str)) {
             if (std::filesystem::exists(des_autosave_file_str)) {
-                std::error_code ec;
                 std::filesystem::remove(des_autosave_file_str);
-                std::filesystem::rename(temp_file_str, des_autosave_file_str,
-                                        ec);
-                if (ec) {
-                    XWARN("替换失败:" + std::to_string(ec.value()));
-                } else {
-                    XINFO("已自动保存");
-                }
+            }
+            std::error_code ec;
+            std::filesystem::rename(temp_file_str, des_autosave_file_str, ec);
+            if (ec) {
+                XWARN("替换失败:" + std::to_string(ec.value()));
+            } else {
+                XINFO("已自动保存");
             }
         }
     }
@@ -107,7 +107,7 @@ std::string get_current_time() {
     std::tm local_time = *std::localtime(&now_time);
 
     std::ostringstream oss;
-    oss << std::put_time(&local_time, "%Y-%m-%d %H:%M:%S");
+    oss << std::put_time(&local_time, "%Y-%m-%d %H-%M-%S");
     return oss.str();
 }
 
@@ -124,8 +124,8 @@ void BackupThread::backup_map_thread() {
                 canvas_contex->working_map->map_backup_paths_queue.front();
             try {
                 std::filesystem::remove(autoremove);
-                XERROR("已移除过时备份文件[" + autoremove.generic_string() +
-                       "]");
+                XWARN("已移除过时备份文件[" + autoremove.generic_string() +
+                      "]");
             } catch (std::exception e) {
                 XERROR("移除备份文件[" + autoremove.generic_string() +
                        "]失败:" + e.what());
@@ -140,7 +140,12 @@ void BackupThread::backup_map_thread() {
             std::to_string(canvas_contex->working_map->orbits) + "k-" +
             canvas_contex->working_map->version + ".mmm.bak");
 
-        auto bak_filestr = (bkup_file_path / bak_filename).generic_string();
+        auto subdir = canvas_contex->working_map->title_unicode + "_" +
+                      canvas_contex->working_map->version;
+        mutil::sanitizeFilename(subdir);
+
+        auto bak_filestr =
+            (bkup_file_path / subdir / bak_filename).generic_string();
         if (try_write_map2file(bak_filestr)) {
             canvas_contex->working_map->map_backup_paths_queue.push_back(
                 bak_filestr);

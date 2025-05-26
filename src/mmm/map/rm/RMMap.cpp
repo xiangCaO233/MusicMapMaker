@@ -131,7 +131,8 @@ void RMMap::remove_hitobject(std::shared_ptr<HitObject> hitobject) {
 // 写出到文件
 void RMMap::write_to_file(const char* path) {
     auto p = std::filesystem::path(path);
-    if (mutil::endsWithExtension(p, ".mmm")) {
+    if (mutil::endsWithExtension(p, ".mmm") ||
+        mutil::endsWithExtension(p, ".bak")) {
         MMap::write_to_file(path);
         return;
     }
@@ -412,7 +413,6 @@ void RMMap::write_note(std::ofstream& os, const std::shared_ptr<Note>& note) {
 
 // 从文件读取谱面
 void RMMap::load_from_file(const char* path) {
-    MMap::load_from_file(path);
     /*
      * 0~4字节:int32 谱面时长
      * 5~8字节:int32 图时间点数

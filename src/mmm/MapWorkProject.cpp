@@ -66,7 +66,8 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
                 map = std::make_shared<MMap>();
             }
             map->project_reference = this;
-            maps.back()->load_from_file(map_file_string.c_str());
+            map->load_from_file(map_file_string.c_str());
+            map->init_backups();
             // 初始化画布时间位置
             map_canvasposes.try_emplace(map, 0.0);
         } else if (audio_extention.find(extention) != audio_extention.end()) {
