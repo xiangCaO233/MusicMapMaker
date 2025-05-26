@@ -412,6 +412,7 @@ void RMMap::write_note(std::ofstream& os, const std::shared_ptr<Note>& note) {
 
 // 从文件读取谱面
 void RMMap::load_from_file(const char* path) {
+    MMap::load_from_file(path);
     /*
      * 0~4字节:int32 谱面时长
      * 5~8字节:int32 图时间点数
@@ -709,7 +710,7 @@ void RMMap::load_from_file(const char* path) {
                 // 先添加,再把组合键添加进去
                 temp_complex_note->child_notes.insert(temp_note);
                 hitobjects.insert(temp_complex_note);
-                temp_complex_note.reset();
+                temp_complex_note = nullptr;
                 break;
             }
         }

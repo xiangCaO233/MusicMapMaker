@@ -86,6 +86,9 @@ class MMap {
     // map文件路径
     std::filesystem::path map_file_path;
 
+    // 谱面路径备份队列
+    std::deque<std::filesystem::path> map_backup_paths_queue;
+
     // 谱面音频绝对路径
     std::filesystem::path audio_file_abs_path;
     // 谱面音频相对路径

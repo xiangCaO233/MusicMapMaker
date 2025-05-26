@@ -764,6 +764,7 @@ bool OsuMap::is_write_file_legal(const char* file, std::string& res) {
 
 // 从文件读取谱面
 void OsuMap::load_from_file(const char* path) {
+    MMap::load_from_file(path);
     map_file_path = std::filesystem::path(path);
     if (map_file_path.is_relative()) {
         map_file_path = std::filesystem::absolute(map_file_path);

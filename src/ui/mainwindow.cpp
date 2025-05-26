@@ -19,6 +19,12 @@
 #include "src/util/mutil.h"
 #include "timinginfoui.h"
 
+// 全局样式表
+QString MainWindow::global_style_sheet;
+
+// 全部设置
+Settings MainWindow::settings;
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -161,22 +167,24 @@ void MainWindow::update_window_title(QString& suffix) {
 void MainWindow::use_theme(GlobalTheme theme) {
     // TODO(xiang 2025-04-16): 实现多主题切换
     current_theme = theme;
+    settings.global_theme = theme;
     QColor file_button_color;
     switch (theme) {
         case GlobalTheme::DARK: {
             file_button_color = QColor(255, 255, 255);
             QFile file(":/QtThemeDark/theme/Flat/Dark/Pink/Orange.qss");
             file.open(QFile::ReadOnly);
-            setStyleSheet(file.readAll());
+            global_style_sheet = file.readAll();
+            setStyleSheet(global_style_sheet);
             ui->actionDark->setChecked(true);
-
             break;
         }
         case GlobalTheme::LIGHT: {
             file_button_color = QColor(0, 0, 0);
             QFile file(":/QtThemeLight/theme/Flat/Light/Brown/DeepOrange.qss");
             file.open(QFile::ReadOnly);
-            setStyleSheet(file.readAll());
+            global_style_sheet = file.readAll();
+            setStyleSheet(global_style_sheet);
             ui->actionLight->setChecked(true);
             break;
         }

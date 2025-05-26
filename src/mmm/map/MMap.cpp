@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include "../../ui/mainwindow.h"
 #include "../../util/mutil.h"
 #include "../MapWorkProject.h"
 #include "../hitobject/HitObject.h"
@@ -95,156 +96,187 @@ void write_note_json(json& notes_json, std::shared_ptr<HitObject> o) {
 }
 // 从文件读取谱面
 void MMap::load_from_file(const char* path) {
-    try {
-        map_file_path = std::filesystem::path(path);
-        // 打开文件流
-        std::ifstream input_file(path);
-        // 解析JSON数据
-        json mapdata_json = json::parse(input_file);
-        // 读取json
-        title = mapdata_json["title"];
-        title_unicode = mapdata_json["title-unicode"];
-        artist = mapdata_json["artist"];
-        artist_unicode = mapdata_json["artist-unicode"];
-        version = mapdata_json["version"];
-        author = mapdata_json["author"];
-        preference_bpm = mapdata_json["preference-bpm"];
-        map_length = mapdata_json["maplength"];
-        orbits = mapdata_json["orbits"];
-        audio_file_rpath =
-            std::filesystem::path(mapdata_json["music"].get<std::string>());
-        audio_file_abs_path = map_file_path.parent_path() / audio_file_rpath;
+    auto s = std::string(path);
+    if (s.ends_with(".mmm")) {
+        try {
+            map_file_path = std::filesystem::path(path);
+            // 打开文件流
+            std::ifstream input_file(path);
+            // 解析JSON数据
+            json mapdata_json = json::parse(input_file);
+            // 读取json
+            title = mapdata_json["title"];
+            title_unicode = mapdata_json["title-unicode"];
+            artist = mapdata_json["artist"];
+            artist_unicode = mapdata_json["artist-unicode"];
+            version = mapdata_json["version"];
+            author = mapdata_json["author"];
+            preference_bpm = mapdata_json["preference-bpm"];
+            map_length = mapdata_json["maplength"];
+            orbits = mapdata_json["orbits"];
+            audio_file_rpath =
+                std::filesystem::path(mapdata_json["music"].get<std::string>());
+            audio_file_abs_path =
+                map_file_path.parent_path() / audio_file_rpath;
 
-        bg_rpath = std::filesystem::path(mapdata_json["bg"].get<std::string>());
-        bg_path = map_file_path.parent_path() / bg_rpath;
+            bg_rpath =
+                std::filesystem::path(mapdata_json["bg"].get<std::string>());
+            bg_path = map_file_path.parent_path() / bg_rpath;
 
-        map_name = "[mmm] " + artist_unicode + " - " + title_unicode + " [" +
-                   std::to_string(orbits) + "k] " + "[" + version + "]";
+            map_name = "[mmm] " + artist_unicode + " - " + title_unicode +
+                       " [" + std::to_string(orbits) + "k] " + "[" + version +
+                       "]";
 
-        // 缓存父类指针
-        std::shared_ptr<Note> temp_note;
-        // 缓存组合键指针
-        std::shared_ptr<ComplexNote> temp_complex_note;
+            // 缓存父类指针
+            std::shared_ptr<Note> temp_note;
+            // 缓存组合键指针
+            std::shared_ptr<ComplexNote> temp_complex_note;
 
-        // 先读取物件
-        auto notes_json = mapdata_json["notes"];
-        for (const auto& note_json : notes_json) {
-            // std::cout << note_json.dump() << "\n";
-            auto type = note_json.value<std::string>("type", "note");
-            if (type == "note") {
-                temp_note = std::make_shared<Note>(
-                    note_json.value<int32_t>("time", 0),
-                    note_json.value<int32_t>("orbit", 0));
-            } else {
-                if (type == "hold") {
-                    temp_note = std::make_shared<Hold>(
+            // 先读取物件
+            auto notes_json = mapdata_json["notes"];
+            for (const auto& note_json : notes_json) {
+                // std::cout << note_json.dump() << "\n";
+                auto type = note_json.value<std::string>("type", "note");
+                if (type == "note") {
+                    temp_note = std::make_shared<Note>(
                         note_json.value<int32_t>("time", 0),
-                        note_json.value<int32_t>("orbit", 0),
-                        note_json.value<int32_t>("duration", 0));
-                    auto hold = std::static_pointer_cast<Hold>(temp_note);
-                    auto hold_end = std::make_shared<HoldEnd>(hold);
-                    hold->hold_end_reference = hold_end;
-                    temp_hold_list.insert(hold);
-                    hitobjects.insert(hold_end);
-                } else if (type == "slide") {
-                    temp_note = std::make_shared<Slide>(
-                        note_json.value<int32_t>("time", 0),
-                        note_json.value<int32_t>("orbit", 0),
-                        note_json.value<int32_t>("orbit-alt", 1));
-                    auto slide = std::static_pointer_cast<Slide>(temp_note);
-                    auto slide_end = std::make_shared<SlideEnd>(slide);
-                    slide->slide_end_reference = slide_end;
-                    hitobjects.insert(slide_end);
+                        note_json.value<int32_t>("orbit", 0));
+                } else {
+                    if (type == "hold") {
+                        temp_note = std::make_shared<Hold>(
+                            note_json.value<int32_t>("time", 0),
+                            note_json.value<int32_t>("orbit", 0),
+                            note_json.value<int32_t>("duration", 0));
+                        auto hold = std::static_pointer_cast<Hold>(temp_note);
+                        auto hold_end = std::make_shared<HoldEnd>(hold);
+                        hold->hold_end_reference = hold_end;
+                        temp_hold_list.insert(hold);
+                        hitobjects.insert(hold_end);
+                    } else if (type == "slide") {
+                        temp_note = std::make_shared<Slide>(
+                            note_json.value<int32_t>("time", 0),
+                            note_json.value<int32_t>("orbit", 0),
+                            note_json.value<int32_t>("orbit-alt", 1));
+                        auto slide = std::static_pointer_cast<Slide>(temp_note);
+                        auto slide_end = std::make_shared<SlideEnd>(slide);
+                        slide->slide_end_reference = slide_end;
+                        hitobjects.insert(slide_end);
+                    }
+                }
+
+                // 处理组合键
+                temp_note->compinfo = static_cast<ComplexInfo>(
+                    note_json.value<uint8_t>("complex-info", 0));
+                std::shared_ptr<Note> prechild = nullptr;
+
+                switch (temp_note->compinfo) {
+                    case ComplexInfo::HEAD: {
+                        if (prechild) {
+                            // 存在非法组合键开始
+                            // 清空之前的缓存引用
+                            prechild->parent_reference->child_notes.clear();
+                            prechild->parent_reference = nullptr;
+                            hitobjects.erase(prechild);
+                        }
+                        temp_complex_note = std::make_shared<ComplexNote>(
+                            temp_note->timestamp, temp_note->orbit);
+                        // 设置父物件
+                        temp_note->parent_reference = temp_complex_note.get();
+                        temp_complex_note->child_notes.insert(temp_note);
+                        prechild = temp_note;
+                        break;
+                    }
+                    case ComplexInfo::BODY: {
+                        // 设置父物件
+                        if (!temp_complex_note) continue;
+
+                        temp_note->parent_reference = temp_complex_note.get();
+                        temp_complex_note->child_notes.insert(temp_note);
+                        prechild = temp_note;
+                        break;
+                    }
+                    case ComplexInfo::END: {
+                        if (!temp_complex_note) continue;
+                        temp_complex_note->child_notes.insert(temp_note);
+                        temp_note->parent_reference = temp_complex_note.get();
+                        hitobjects.insert(temp_complex_note);
+                        prechild = nullptr;
+                        temp_complex_note.reset();
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                hitobjects.insert(temp_note);
+
+                if (hitobjects.find(temp_note) == hitobjects.end()) {
+                    // 不重复添加物件
+                }
+
+                // 物件元数据
+                auto& metas_json = note_json["metas"];
+                for (const auto& [type, metajson] : metas_json.items()) {
+                    // 注册物件的元数据并填入
+                    if (type == "osu") {
+                        auto& osumeta =
+                            temp_note->metadatas[NoteMetadataType::NOSU];
+                        osumeta = std::make_shared<NoteMetadata>();
+                        for (const auto& [key, value] : metajson.items()) {
+                            osumeta->note_properties[key] =
+                                value.get<std::string>();
+                        }
+                    } else if (type == "malody") {
+                        auto& malodymeta =
+                            temp_note->metadatas[NoteMetadataType::NMALODY];
+                        for (const auto& [key, value] : metajson.items()) {
+                            malodymeta->note_properties[key] =
+                                value.get<std::string>();
+                        }
+                    }
                 }
             }
 
-            // 处理组合键
-            temp_note->compinfo = static_cast<ComplexInfo>(
-                note_json.value<uint8_t>("complex-info", 0));
-            std::shared_ptr<Note> prechild = nullptr;
-
-            switch (temp_note->compinfo) {
-                case ComplexInfo::HEAD: {
-                    if (prechild) {
-                        // 存在非法组合键开始
-                        // 清空之前的缓存引用
-                        prechild->parent_reference->child_notes.clear();
-                        prechild->parent_reference = nullptr;
-                        hitobjects.erase(prechild);
-                    }
-                    temp_complex_note = std::make_shared<ComplexNote>(
-                        temp_note->timestamp, temp_note->orbit);
-                    // 设置父物件
-                    temp_note->parent_reference = temp_complex_note.get();
-                    temp_complex_note->child_notes.insert(temp_note);
-                    prechild = temp_note;
-                    break;
-                }
-                case ComplexInfo::BODY: {
-                    // 设置父物件
-                    if (!temp_complex_note) continue;
-
-                    temp_note->parent_reference = temp_complex_note.get();
-                    temp_complex_note->child_notes.insert(temp_note);
-                    prechild = temp_note;
-                    break;
-                }
-                case ComplexInfo::END: {
-                    if (!temp_complex_note) continue;
-                    temp_complex_note->child_notes.insert(temp_note);
-                    temp_note->parent_reference = temp_complex_note.get();
-                    hitobjects.insert(temp_complex_note);
-                    prechild = nullptr;
-                    temp_complex_note.reset();
-                    break;
-                }
-                default:
-                    break;
+            // 读取时间点数据
+            auto& timings_json = mapdata_json["timings"];
+            for (const auto& timing_json : timings_json) {
+                auto timing = std::make_shared<Timing>();
+                timing->timestamp = timing_json["time"];
+                timing->type = TimingType::GENERAL;
+                timing->is_base_timing = timing_json["isbase"];
+                timing->basebpm = timing_json["basebpm"];
+                timing->bpm = timing_json["bpm"];
+                insert_timing(timing);
             }
+            input_file.close();
+        } catch (std::exception e) {
+            std::cerr << e.what() << "\n";
+        }
+    }
 
-            hitobjects.insert(temp_note);
-
-            if (hitobjects.find(temp_note) == hitobjects.end()) {
-                // 不重复添加物件
-            }
-
-            // 物件元数据
-            auto& metas_json = note_json["metas"];
-            for (const auto& [type, metajson] : metas_json.items()) {
-                // 注册物件的元数据并填入
-                if (type == "osu") {
-                    auto& osumeta =
-                        temp_note->metadatas[NoteMetadataType::NOSU];
-                    osumeta = std::make_shared<NoteMetadata>();
-                    for (const auto& [key, value] : metajson.items()) {
-                        osumeta->note_properties[key] =
-                            value.get<std::string>();
-                    }
-                } else if (type == "malody") {
-                    auto& malodymeta =
-                        temp_note->metadatas[NoteMetadataType::NMALODY];
-                    for (const auto& [key, value] : metajson.items()) {
-                        malodymeta->note_properties[key] =
-                            value.get<std::string>();
-                    }
-                }
+    // 读取备份目录
+    auto bkup_file_path =
+        project_reference->ppath / MainWindow::settings.backup_relative_path;
+    if (!std::filesystem::exists(bkup_file_path)) {
+        try {
+            std::filesystem::create_directories(bkup_file_path);
+            XINFO("已创建备份谱面目录[" + bkup_file_path.generic_string() +
+                  "]");
+        } catch (std::exception e) {
+            XERROR("无法创建备份谱面目录[" + bkup_file_path.generic_string() +
+                   "]")
+        }
+    } else {
+        // 读取目录内文件名到备份队列
+        for (const auto& entry :
+             std::filesystem::directory_iterator(bkup_file_path)) {
+            auto file_abspath = std::filesystem::weakly_canonical(
+                std::filesystem::absolute(entry.path()));
+            if (std::filesystem::is_regular_file(file_abspath) &&
+                file_abspath.extension() == ".bak") {
+                map_backup_paths_queue.push_back(file_abspath.generic_string());
             }
         }
-
-        // 读取时间点数据
-        auto& timings_json = mapdata_json["timings"];
-        for (const auto& timing_json : timings_json) {
-            auto timing = std::make_shared<Timing>();
-            timing->timestamp = timing_json["time"];
-            timing->type = TimingType::GENERAL;
-            timing->is_base_timing = timing_json["isbase"];
-            timing->basebpm = timing_json["basebpm"];
-            timing->bpm = timing_json["bpm"];
-            insert_timing(timing);
-        }
-        input_file.close();
-    } catch (std::exception e) {
-        std::cerr << e.what() << "\n";
     }
 }
 
@@ -252,10 +284,9 @@ void MMap::load_from_file(const char* path) {
 void MMap::write_to_file(const char* path) {
     // 根据文件后缀决定如何转换
     auto p = std::filesystem::path(path);
-    if (mutil::endsWithExtension(p, ".mmm")) {
+    if (mutil::endsWithExtension(p, ".mmm") ||
+        mutil::endsWithExtension(p, ".bak")) {
         // 写出为mmm-json
-        // 打开文件输出流-覆盖模式
-        std::ofstream out(path);
         //
         // 更新json
         //
@@ -328,7 +359,10 @@ void MMap::write_to_file(const char* path) {
 
         //
         // 写出到文件
+        // 打开文件输出流-覆盖模式
+        std::ofstream out(path);
         out << mapdata_json.dump(4);
+        out.close();
     } else if (mutil::endsWithExtension(p, ".imd")) {
         // 转化为rmmap并写出
         auto rmmap =

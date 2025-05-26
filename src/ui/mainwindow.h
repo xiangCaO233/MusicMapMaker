@@ -30,8 +30,11 @@ class MainWindow : public QMainWindow {
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+    // 全局样式表
+    static QString global_style_sheet;
+
     // 全部设置
-    Settings settings;
+    static Settings settings;
 
     // 当前主题
     GlobalTheme current_theme;

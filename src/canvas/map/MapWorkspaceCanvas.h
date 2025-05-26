@@ -29,6 +29,7 @@
 #include "generator/OrbitGenerator.h"
 #include "generator/PreviewGenerator.h"
 #include "generator/TimeInfoGenerator.h"
+#include "threads/BackupThread.h"
 #include "threads/EffectThread.h"
 #include "threads/ThreadPool.h"
 
@@ -51,6 +52,8 @@ class MapWorkspaceCanvas : public GLCanvas {
     void initializeGL() override;
     // 线程池
     ThreadPool canvas_tpool;
+
+    BackupThread backup_thread;
 
     /*
      *图形相关
@@ -167,11 +170,6 @@ class MapWorkspaceCanvas : public GLCanvas {
     void remove_objects(std::shared_ptr<HitObject> o);
     // 更新fps显示
     virtual void updateFpsDisplay(int fps) override;
-
-    decltype(std::chrono::high_resolution_clock::now()
-                 .time_since_epoch()) last_save_time;
-
-    void strart_auto_save();
 
     void save();
 

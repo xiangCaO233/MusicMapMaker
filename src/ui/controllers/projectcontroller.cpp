@@ -21,6 +21,7 @@
 #include "audio/BackgroundAudio.h"
 #include "colorful-log.h"
 #include "guide/newmapguide.h"
+#include "mainwindow.h"
 #include "mmm/map/MMap.h"
 #include "ui_mprojectcontroller.h"
 
@@ -353,6 +354,8 @@ void MProjectController::on_map_list_view_customContextMenuRequested(
         }
     });
 
+    menu.setStyleSheet(MainWindow::global_style_sheet);
+
     // 显示菜单
     menu.exec(ui->map_list_view->viewport()->mapToGlobal(pos));
 }
@@ -378,6 +381,11 @@ void MProjectController::on_close_project_button_clicked() {
         auto project = var.value<std::shared_ptr<MapWorkProject>>();
         auto project_it = project_mapping.find(project->config.project_name);
         if (project_it != project_mapping.end()) {
+            // 先保存项目配置
+            project->save_config();
+
+            // 检查是否有打开项目的谱面-关闭它们
+
             // 移除当前选中项
             ui->project_selector->removeItem(
                 ui->project_selector->currentIndex());
@@ -411,8 +419,15 @@ void MProjectController::on_audio_device_selector_currentTextChanged(
         auto device = ui->audio_device_selector->currentText().toStdString();
         selected_project->set_audio_device(device);
 
-        BackgroundAudio::init_device(selected_project->devicename);
         // 更新音量
+        BackgroundAudio::init_device(selected_project->devicename);
+        BackgroundAudio::global_volume =
+            selected_project->config.pglobal_volume;
+        BackgroundAudio::music_orbits_volume =
+            selected_project->config.pmusic_volume;
+        BackgroundAudio::effect_orbits_volume =
+            selected_project->config.peffect_volume;
+
         BackgroundAudio::set_global_volume(selected_project->devicename,
                                            BackgroundAudio::global_volume);
         BackgroundAudio::set_music_volume(selected_project->devicename,
@@ -420,6 +435,10 @@ void MProjectController::on_audio_device_selector_currentTextChanged(
         BackgroundAudio::set_effects_volume(
             selected_project->devicename,
             BackgroundAudio::effect_orbits_volume);
+
+        // 更新播放速度
+        BackgroundAudio::set_play_speed(selected_project->devicename,
+                                        BackgroundAudio::orbit_speed);
 
         // if (BackgroundAudio::enable_pitch_alt) {
         //     BackgroundAudio::set_play_speed(selected_project->devicename,

@@ -20,7 +20,8 @@ using namespace pugi;
 // 构造MapWorkProject
 MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
                                const char* name)
-    : ppath(project_path) {
+    : ppath(std::filesystem::weakly_canonical(
+          std::filesystem::absolute(project_path))) {
     // 初始化项目名
     if (name) {
         config.project_name = std::string(name);
@@ -64,6 +65,7 @@ MapWorkProject::MapWorkProject(const std::filesystem::path& project_path,
             if (extention == ".mmm") {
                 map = std::make_shared<MMap>();
             }
+            map->project_reference = this;
             maps.back()->load_from_file(map_file_string.c_str());
             // 初始化画布时间位置
             map_canvasposes.try_emplace(map, 0.0);

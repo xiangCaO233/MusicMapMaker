@@ -147,6 +147,7 @@ void FileBrowserController::on_file_browser_treeview_customContextMenuRequested(
         // filebrowercontroller->on_menu_show_properties(click_abs_path);
     });
 
+    menu.setStyleSheet(MainWindow::global_style_sheet);
     // 显示菜单
     menu.exec(ui->file_browser_treeview->viewport()->mapToGlobal(pos));
 }

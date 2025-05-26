@@ -40,9 +40,10 @@
 #include "generator/general/NoteGenerator.h"
 #include "generator/general/SlideGenerator.h"
 #include "mainwindow.h"
+#include "threads/BackupThread.h"
 
 MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
-    : GLCanvas(parent), skin(this), canvas_tpool(4) {
+    : GLCanvas(parent), backup_thread(this), skin(this), canvas_tpool(4) {
     // 初始化编辑器
     editor = std::make_shared<MapEditor>(this);
     // 初始化特效线程
@@ -77,36 +78,15 @@ MapWorkspaceCanvas::MapWorkspaceCanvas(QWidget *parent)
     judgelinegenerator = std::make_shared<JudgelineGenerator>(editor);
 
     average_update_time = des_update_time;
-
-    // 启动自动保存
-    last_save_time =
-        std::chrono::high_resolution_clock::now().time_since_epoch();
-    strart_auto_save();
 }
 
 MapWorkspaceCanvas::~MapWorkspaceCanvas() {};
-
-void MapWorkspaceCanvas::strart_auto_save() {
-    std::thread t([&]() {
-        while (true) {
-            // 等待1分钟或被唤醒
-            std::unique_lock<std::mutex> lock(autosave_mtx);
-            if (autosave_cv.wait_for(lock, std::chrono::milliseconds(30 * 1000),
-                                     [&] { return stop_refresh.load(); })) {
-                // 收到停止信号
-                break;
-            }
-            save();
-        }
-    });
-    t.detach();
-}
 
 // 保存
 void MapWorkspaceCanvas::save() {
     if (working_map) {
         auto dirpath = working_map->map_file_path.parent_path();
-
+        std::string save_file;
         if (working_map->project_reference->config.alway_save_asmmm) {
             // 保存为mmm
             auto def_filename =
@@ -114,14 +94,18 @@ void MapWorkspaceCanvas::save() {
                                         std::to_string(working_map->orbits) +
                                         "k-" + working_map->version + ".mmm");
             auto map_path = dirpath / def_filename;
-            working_map->write_to_file(map_path.generic_string().c_str());
-
+            save_file = map_path.generic_string();
         } else {
             // 覆盖原有的文件
-            working_map->write_to_file(
-                working_map->map_file_path.generic_string().c_str());
+            save_file = working_map->map_file_path.generic_string();
         }
-        XINFO("已保存");
+
+        try {
+            working_map->write_to_file(save_file.c_str());
+            XINFO("已保存");
+        } catch (std::exception e) {
+            XERROR("保存[" + save_file + "]失败:" + e.what());
+        }
     } else {
         XWARN("未打开谱面");
     }
