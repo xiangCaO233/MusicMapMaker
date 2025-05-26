@@ -71,12 +71,9 @@ struct CanvasStatus {
     // 图形偏移
 #ifdef _WIN32
     // windows
-    double graphic_offset{-65};
-#elifdef __unix
-    // unix
     double graphic_offset{0};
 #else
-    // mac
+    // mac or unix
     double graphic_offset{0};
 #endif
 
