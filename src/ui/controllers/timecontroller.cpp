@@ -62,6 +62,8 @@ void TimeController::update_album() {
         std::replace(bg_str.begin(), bg_str.end(), '\\', '/');
         auto tex = binding_map->project_reference->canvas_ref
                        ->texture_full_map[bg_str];
+        if (!tex) return;
+
         QImage bg;
         // 加载图片
         bg = QImage(tex->data, tex->width, tex->height, tex->width * 4,
