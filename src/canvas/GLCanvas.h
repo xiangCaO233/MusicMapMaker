@@ -52,6 +52,9 @@ class GLCanvas : public QOpenGLWindow,
     explicit GLCanvas(QWidget *parent = nullptr);
     // 析构GLCanvas
     ~GLCanvas() override;
+    // 显示器刷新率
+    const float screenRefreshRate;
+
     // fps计数器
     FrameRateCounter *fpsCounter;
 
@@ -60,7 +63,8 @@ class GLCanvas : public QOpenGLWindow,
     // 计算线程
     std::thread calculate_thread;
 
-    double refreshRate_ratio{2.0};
+    // 刷新率倍率
+    double refreshRate_ratio{4.0};
 
     // 目标刷新时间间隔
     int32_t des_update_time{8};
@@ -125,6 +129,9 @@ class GLCanvas : public QOpenGLWindow,
     void rendergl();
     void process_render_params(const RenderParams &params);
     void use_render_settings(const RendererManagerSettings &settings);
+
+    // 刷新率倍率
+    void set_refresh_rate_ratio(double ratio);
 
    public slots:
     // 更新fps显示

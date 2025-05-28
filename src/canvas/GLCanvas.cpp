@@ -44,7 +44,8 @@
 
 bool GLCanvas::need_update_sampler_location = false;
 
-GLCanvas::GLCanvas(QWidget *parent) {
+GLCanvas::GLCanvas(QWidget *parent)
+    : screenRefreshRate(QGuiApplication::primaryScreen()->refreshRate()) {
     // 初始化帧率计数器
     fpsCounter = new FrameRateCounter();
 
@@ -52,14 +53,11 @@ GLCanvas::GLCanvas(QWidget *parent) {
     connect(fpsCounter, &FrameRateCounter::fpsUpdated, this,
             &GLCanvas::updateFpsDisplay);
 
-    // 获取主屏幕的刷新率
-    QScreen *primaryScreen = QGuiApplication::primaryScreen();
-    float refreshRate = primaryScreen->refreshRate();
-
-    XINFO("显示器刷新率:" + std::to_string(refreshRate) + "Hz");
+    XINFO("显示器刷新率:" + std::to_string(screenRefreshRate) + "Hz");
 
     // 垂直同步帧间隔
-    des_update_time = 1000.0 / refreshRate / refreshRate_ratio;
+    des_update_time = 1000.0 / screenRefreshRate / refreshRate_ratio;
+    XINFO("目标帧间隔:" + std::to_string(des_update_time));
 }
 
 GLCanvas::~GLCanvas() {
@@ -74,6 +72,14 @@ GLCanvas::~GLCanvas() {
     frame_data_buffer_manager.notify_all_for_exit();
     autosave_cv.notify_all();
 };
+
+// 刷新率倍率
+void GLCanvas::set_refresh_rate_ratio(double ratio) {
+    if (ratio >= 1 && ratio <= 8.0) {
+        refreshRate_ratio = ratio;
+        des_update_time = 1000.0 / screenRefreshRate / refreshRate_ratio;
+    }
+}
 
 // 使用主题
 void GLCanvas::use_theme(GlobalTheme theme) {
