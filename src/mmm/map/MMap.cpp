@@ -835,7 +835,8 @@ void MMap::insert_timing(const std::shared_ptr<Timing>& timing) {
         // 每一拍的实际时间
         double beattime = 60.0 / timing->basebpm * 1000.0;
 
-        while ((*current_process_beatit)->end_timestamp < end) {
+        while (current_process_beatit != beats.end() &&
+               (*current_process_beatit)->end_timestamp < end) {
             // 修改时间线缩放
             (*current_process_beatit)->timeline_zoom = timing->bpm;
             ++current_process_beatit;

@@ -1,4 +1,3 @@
-
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -10,18 +9,10 @@
 #include <QDir>
 #include <QLibraryInfo>
 #include <QLocale>
-#include <QStyleFactory>
 #include <QTranslator>
 
 #include "log/colorful-log.h"
 #include "ui/mainwindow.h"
-
-bool isDarkMode() {
-    // 获取应用程序的调色板
-    const QPalette palette = QApplication::palette();
-    // 检查窗口背景颜色的亮度
-    return palette.window().color().lightness() < 128;
-}
 
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
@@ -31,26 +22,28 @@ int main(int argc, char* argv[]) {
 #endif  //_WIN32
     QApplication a(argc, argv);
     // 设置应用图标
-    a.setWindowIcon(QIcon(":/icons/icon.png"));
+    QApplication::setWindowIcon(QIcon(":/icons/icon.png"));
     XLogger::init("MMM");
 
     // 获取系统语言环境
-    QLocale systemLocale = QLocale::system();
+    const QLocale systemLocale = QLocale::system();
     // 格式如 "zh_CN", "en_US"
-    QString languageCode = systemLocale.name();
+    const QString languageCode = systemLocale.name();
 
     XINFO("System language:" + languageCode.toStdString());
 
     // 设置app默认字体
     // 1. 加载字体文件
-    int fontId = QFontDatabase::addApplicationFont(":/font/ComicMono-Bold.ttf");
+    const int fontId =
+        QFontDatabase::addApplicationFont(":/font/ComicMono-Bold.ttf");
     if (fontId == -1) {
         qWarning() << "Failed to load font file";
         return -1;
     }
 
     // 2. 获取字体族名
-    QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
+    const QStringList fontFamilies =
+        QFontDatabase::applicationFontFamilies(fontId);
     if (fontFamilies.empty()) {
         qWarning() << "No font families found in the font file";
         return -1;
@@ -58,14 +51,14 @@ int main(int argc, char* argv[]) {
 
     // 3. 创建字体对象并设置为应用程序默认字体
     // 使用第一个字体族，大小12
-    QFont defaultFont(fontFamilies.at(0), 12);
-    a.setFont(defaultFont);
+    const QFont defaultFont(fontFamilies.at(0), 12);
+    QApplication::setFont(defaultFont);
 
     // 初始化 Qt 自带的标准对话框翻译
     QTranslator qtTranslator;
     if (qtTranslator.load("qt_" + languageCode,
                           QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
-        a.installTranslator(&qtTranslator);
+        QApplication::installTranslator(&qtTranslator);
     }
 
     // 加载应用程序的自定义翻译
@@ -77,14 +70,14 @@ int main(int argc, char* argv[]) {
 
     // 如果资源加载失败，尝试从文件系统加载
     if (!loaded) {
-        QString localPath =
+        const QString localPath =
             QDir(qApp->applicationDirPath())
                 .filePath("translations/MusicMapMaker_" + languageCode + ".qm");
         loaded = appTranslator.load(localPath);
     }
 
     if (loaded) {
-        a.installTranslator(&appTranslator);
+        QApplication::installTranslator(&appTranslator);
         XINFO("Loaded translation for:" + languageCode.toStdString());
     } else {
         XWARN("Using default language (translation not found for" +
@@ -109,12 +102,12 @@ int main(int argc, char* argv[]) {
 
     MainWindow w;
     // 跟随系统主题
-    if (isDarkMode()) {
+    if (QApplication::palette().window().color().lightness() < 128) {
         w.use_theme(GlobalTheme::DARK);
     } else {
         w.use_theme(GlobalTheme::LIGHT);
     }
     w.show();
 
-    return a.exec();
+    return QApplication::exec();
 }
