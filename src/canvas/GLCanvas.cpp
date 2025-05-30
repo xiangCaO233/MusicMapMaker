@@ -403,7 +403,7 @@ void GLCanvas::push_shape(BufferWrapper *current_back_buffer) {}
 // 从指定目录添加纹理
 void GLCanvas::load_texture_from_path(const char *p) {
     auto path = std::filesystem::path(p);
-    load_texture_from_path(p);
+    load_texture_from_path(path);
 }
 
 // 从指定目录添加纹理

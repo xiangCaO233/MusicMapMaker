@@ -420,14 +420,14 @@ void MapWorkspaceCanvas::draw_background(BufferWrapper *bufferwrapper) {
 
     // 绘制背景遮罩
     if (editor->cstatus.background_darken_ratio != 0.0) {
-        auto &params = params_list.emplace_back();
-        params.xpos = 0;
-        params.ypos = 0;
-        params.width = width();
-        params.height = height();
-        params.texture = nullptr;
-        params.a = 255 * editor->cstatus.background_darken_ratio;
-        params.is_volatile = false;
+        auto &bparams = params_list.emplace_back();
+        bparams.xpos = 0;
+        bparams.ypos = 0;
+        bparams.width = width();
+        bparams.height = height();
+        bparams.texture = nullptr;
+        bparams.a = 255 * editor->cstatus.background_darken_ratio;
+        bparams.is_volatile = false;
     }
 }
 
