@@ -26,16 +26,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # 查找 Qt 包
 find_package(
-  QT NAMES Qt6 Qt5 REQUIRED
-  COMPONENTS Core
-             Widgets
-             OpenGLWidgets
-             OpenGL
-             LinguistTools
-             Svg
-             SvgWidgets)
-find_package(
-  Qt${QT_VERSION_MAJOR} REQUIRED
+  Qt6 REQUIRED
   COMPONENTS Core
              Widgets
              OpenGLWidgets
@@ -258,15 +249,7 @@ include_directories(
   ./src/log)
 
 # 创建可执行文件
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
-else()
-  if(ANDROID)
-    add_library(MusicMapMaker SHARED ${PROJECT_SOURCES})
-  else()
-    add_executable(MusicMapMaker ${PROJECT_SOURCES})
-  endif()
-endif()
+qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
 
 add_dependencies(MusicMapMaker xaudio-dev)
 
@@ -288,22 +271,17 @@ target_link_libraries(
           xaudio-dev)
 
 # 设置翻译系统
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  # Qt6 使用现代翻译工具
-  qt_add_lupdate(MusicMapMaker SOURCES ${PROJECT_SOURCES} TS_FILES ${TS_FILES})
+# Qt6 使用现代翻译工具
+qt_add_lupdate(MusicMapMaker SOURCES ${PROJECT_SOURCES} TS_FILES ${TS_FILES})
 
-  qt_add_lrelease(
-    MusicMapMaker
-    TS_FILES
-    ${TS_FILES}
-    QM_FILES_OUTPUT_VARIABLE
-    QM_FILES
-    OUTPUT_DIRECTORY
-    ${CMAKE_CURRENT_BINARY_DIR}/translations)
-else()
-  # Qt5 使用旧版翻译工具
-  qt5_add_translation(QM_FILES ${TS_FILES})
-endif()
+qt_add_lrelease(
+  MusicMapMaker
+  TS_FILES
+  ${TS_FILES}
+  QM_FILES_OUTPUT_VARIABLE
+  QM_FILES
+  OUTPUT_DIRECTORY
+  ${CMAKE_CURRENT_BINARY_DIR}/translations)
 
 # 将翻译文件添加到资源系统
 qt_add_resources(
@@ -317,10 +295,6 @@ qt_add_resources(
   ${QM_FILES})
 
 # 设置 macOS 和 Windows 目标属性
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.github.MusicMapMaker)
-endif()
-
 set_target_properties(
   MusicMapMaker
   PROPERTIES ${BUNDLE_ID_OPTION} MACOSX_BUNDLE_BUNDLE_VERSION
@@ -338,6 +312,4 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Qt6 最终化处理
-if(QT_VERSION_MAJOR EQUAL 6)
-  qt_finalize_executable(MusicMapMaker)
-endif()
+qt_finalize_executable(MusicMapMaker)
