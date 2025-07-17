@@ -900,7 +900,9 @@ void OsuMap::load_from_file(const char* path) {
                                      [](int ch) { return !std::isspace(ch); })
                             .base(),
                         token.end());
-            Bookmarks.push_back(std::stoi(token));
+            if (token != "") {
+                Bookmarks.push_back(std::stoi(token));
+            }
         }
         DistanceSpacing = osureader.get_value("Editor", "DistanceSpacing", 0.0);
         BeatDivisor = osureader.get_value("Editor", "BeatDivisor", 0);

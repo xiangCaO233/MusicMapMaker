@@ -11,7 +11,10 @@ if(MSVC)
 endif()
 
 add_subdirectory(./libs/xaudiolib)
-include_directories(./ ./libs/xaudiolib/include)
+add_subdirectory(./libs/IonCachyEngine)
+
+include_directories(./ ./libs/xaudiolib/include ./libs/IonCachyEngine/include)
+
 link_directories(./build)
 
 # 启用自动处理 Qt 特性
@@ -251,7 +254,7 @@ include_directories(
 # 创建可执行文件
 qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
 
-add_dependencies(MusicMapMaker xaudio-dev)
+add_dependencies(MusicMapMaker xaudio-dev IonCachyEngin-dev)
 
 # 链接库
 target_link_libraries(
@@ -268,10 +271,10 @@ target_link_libraries(
           ICU::data
           Freetype::Freetype
           pugixml::pugixml
+          IonCachyEngin-dev
           xaudio-dev)
 
-# 设置翻译系统
-# Qt6 使用现代翻译工具
+# 设置翻译系统 Qt6 使用现代翻译工具
 qt_add_lupdate(MusicMapMaker SOURCES ${PROJECT_SOURCES} TS_FILES ${TS_FILES})
 
 qt_add_lrelease(
