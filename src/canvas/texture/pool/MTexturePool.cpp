@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "../../GLCanvas.h"
-#include "colorful-log.h"
+#include "../../GLCanvas.hpp"
+// #include "colorful-log.h"
 
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func)                                             \

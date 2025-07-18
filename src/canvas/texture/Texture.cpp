@@ -11,7 +11,6 @@
 #include <filesystem>
 #include <string>
 
-#include "../../log/colorful-log.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "./stb_image.h"
 
@@ -58,7 +57,7 @@ void TextureInstace::load_from_file(std::filesystem::path& relative_path,
     //       "]");
 
     if (!data) {
-        XWARN("加载纹理失败");
+        // XWARN("加载纹理失败");
         return;
     }
 }
