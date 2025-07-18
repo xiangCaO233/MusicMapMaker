@@ -1,7 +1,3 @@
-#include <GL/gl.h>
-#include <qlogging.h>
-
-#include <QDebug>  // 确保包含了 qdebug
 #include <QGuiApplication>
 #include <QScreen>
 #include <canvas/GLCanvas.hpp>
@@ -13,20 +9,18 @@ template <typename Func>
 auto glCallImpl(Func func, const char* funcStr) {
     // 对 lambda 本身的返回类型进行判断
     if constexpr (std::is_void_v<decltype(func())>) {
-        // 1: lambda 返回 void
+        // lambda 返回 void
         // 调用 lambda
         func();
-        GLenum error = glGetError();
-        if (error != GL_NO_ERROR) {
+        if (GLenum error = glGetError() != GL_NO_ERROR) {
             qDebug() << "OpenGL Error in [" << funcStr << "]: " << error;
         }
         // 此分支无返回
     } else {
-        // 2: lambda 有返回值
+        // lambda 有返回值
         // 调用 lambda 并捕获结果
         auto&& result = func();
-        GLenum error = glGetError();
-        if (error != GL_NO_ERROR) {
+        if (GLenum error = glGetError() != GL_NO_ERROR) {
             qDebug() << "OpenGL Error in [" << funcStr << "]: " << error;
         }
         // 返回结果
