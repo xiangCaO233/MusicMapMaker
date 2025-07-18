@@ -20,6 +20,24 @@ int main(int argc, char* argv[]) {
 #endif  //_WIN32
     QApplication a(argc, argv);
 
+    // 获取系统语言环境
+    auto systemLocale = QLocale::system();
+
+    // 格式如 "zh_CN", "en_US"
+    auto languageCode = systemLocale.name();
+
+    // 初始化gl版本
+    QSurfaceFormat format;
+
+    // gl4.1版本
+    format.setVersion(4, 1);
+    // gl核心模式
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    // 禁用用V-Sync
+    format.setSwapInterval(0);
+    // 应用gl设置
+    QSurfaceFormat::setDefaultFormat(format);
+
     MainWindow w;
     w.show();
 

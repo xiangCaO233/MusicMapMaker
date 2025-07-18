@@ -59,13 +59,21 @@ set(TS_FILES)
 set(GLSL_FILES)
 
 # 项目源文件
-set(PROJECT_SOURCES src/main.cpp)
+set(PROJECT_SOURCES
+    src/ui/canvas/CanvasContainer.h
+    src/ui/canvas/CanvasContainer.cpp
+    src/canvas/GLCanvas.cpp
+    src/canvas/GLCanvas.hpp
+    src/canvas/GLCanvasEvents.cpp
+    src/ui/mainwindow.h
+    src/ui/mainwindow.cpp
+    src/ui/mainwindow.ui
+    src/main.cpp)
 
-include_directories(./src ./src/ui)
+include_directories(./src ./src/ui ./src/ui/canvas)
 
 # 创建可执行文件
-qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-  src/ui/mainwindow.h src/ui/mainwindow.cpp src/ui/mainwindow.ui)
+qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
 
 add_dependencies(MusicMapMaker IonCachyEngin-dev)
 
