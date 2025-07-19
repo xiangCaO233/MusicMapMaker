@@ -16,6 +16,9 @@ class MainWindow : public QMainWindow {
 
    private:
     Ui::MainWindow *ui;
+
+    // 更新标题后缀
+    void update_title_suffix(const QString &suffix);
 };
 
 #endif  // MAINWINDOW_H

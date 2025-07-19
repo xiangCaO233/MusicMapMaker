@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QScreen>
 #include <canvas/GLCanvas.hpp>
+#include <chrono>
 #include <type_traits>
 #include <utility>
 
@@ -34,16 +35,14 @@ auto glCallImpl(Func func, const char* funcStr) {
 // 构造GLCanvas
 GLCanvas::GLCanvas() {
     // 初始化帧率计数器
-    // fpsCounter = new FrameRateCounter();
+    fpsCounter = new FrameRateCounter();
 
     // 更新fps显示内容
-    // connect(fpsCounter, &FrameRateCounter::fpsUpdated, this,
-    //         &GLCanvas::updateFpsDisplay);
+    connect(fpsCounter, &FrameRateCounter::fpsUpdated, this,
+            &GLCanvas::updateFpsDisplay);
 
     auto refreshRate = QGuiApplication::primaryScreen()->refreshRate();
     qDebug() << "显示器刷新率 : " << refreshRate;
-
-    // XINFO("显示器刷新率:" + std::to_string(screenRefreshRate) + "Hz");
 
     // 帧间隔
     auto des_update_time = 1000.0 / refreshRate;
@@ -51,7 +50,20 @@ GLCanvas::GLCanvas() {
 }
 
 // 析构GLCanvas
-GLCanvas::~GLCanvas() = default;
+GLCanvas::~GLCanvas() { delete fpsCounter; }
+
+void GLCanvas::updateFpsDisplay(int fps) {
+    QString title_suffix =
+        QString(
+            "%1 FPS(frametime: "
+            "%2 us | updatetime(qt): %3 ms)")
+            .arg(fps)
+            .arg(std::chrono::duration_cast<std::chrono::microseconds>(
+                     pre_frame_time)
+                     .count())
+            .arg(actual_update_time);
+    emit update_window_suffix(title_suffix);
+}
 
 void GLCanvas::initializeGL() {
     initializeOpenGLFunctions();
@@ -106,6 +118,10 @@ void GLCanvas::initializeGL() {
 void GLCanvas::resizeGL(int w, int h) { GLCALL(glViewport(0, 0, w, h)); }
 
 void GLCanvas::paintGL() {
+    auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
     GLCALL(glClearColor(1.f, 1.f, 1.f, 1.f));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+    pre_frame_time =
+        std::chrono::high_resolution_clock::now().time_since_epoch() - before;
+    fpsCounter->frameRendered();
 }

@@ -60,6 +60,8 @@ set(GLSL_FILES)
 
 # 项目源文件
 set(PROJECT_SOURCES
+    src/canvas/FrameRateCounter.hpp
+    src/canvas/FrameRateCounter.cpp
     src/ui/canvas/CanvasContainer.h
     src/ui/canvas/CanvasContainer.cpp
     src/canvas/GLCanvas.cpp
