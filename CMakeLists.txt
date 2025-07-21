@@ -254,7 +254,7 @@ include_directories(
 # 创建可执行文件
 qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
 
-add_dependencies(MusicMapMaker xaudio-dev IonCachyEngin-dev)
+add_dependencies(MusicMapMaker xaudio-dev)
 
 # 链接库
 target_link_libraries(
@@ -271,7 +271,6 @@ target_link_libraries(
           ICU::data
           Freetype::Freetype
           pugixml::pugixml
-          IonCachyEngin-dev
           xaudio-dev)
 
 # 设置翻译系统 Qt6 使用现代翻译工具
