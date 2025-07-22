@@ -1,8 +1,11 @@
+#include "audio/trackmanager.h"
 #include "mainwindow.h"
+#include "project/projectmanager.h"
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
 #endif  //_WIN32
+#include <audio/audiocontroller.h>
 #include <qfontdatabase.h>
 #include <qsurfaceformat.h>
 

@@ -70,6 +70,15 @@ set(PROJECT_SOURCES
     src/canvas/GLCanvas.cpp
     src/canvas/GLCanvas.hpp
     src/canvas/GLCanvasEvents.cpp
+    src/ui/project/projectmanager.h
+    src/ui/project/projectmanager.cpp
+    src/ui/project/projectmanager.ui
+    src/ui/audio/trackmanager.h
+    src/ui/audio/trackmanager.cpp
+    src/ui/audio/trackmanager.ui
+    src/ui/audio/audiocontroller.h
+    src/ui/audio/audiocontroller.cpp
+    src/ui/audio/audiocontroller.ui
     src/ui/mainwindow.h
     src/ui/mainwindow.cpp
     src/ui/mainwindow.ui
@@ -78,7 +87,8 @@ set(PROJECT_SOURCES
 include_directories(./src ./src/ui ./src/ui/canvas)
 
 # 创建可执行文件
-qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES})
+qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
+                  resources/glsrcs.qrc)
 
 add_dependencies(MusicMapMaker IonCachyEngin-dev)
 

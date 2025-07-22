@@ -41,11 +41,35 @@
      <x>0</x>
      <y>0</y>
      <width>981</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuView_V">
+    <property name="title">
+     <string>View(V)</string>
+    </property>
+    <addaction name="actionTrack_Manager"/>
+    <addaction name="actionProject_Manager"/>
+   </widget>
+   <addaction name="menuView_V"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionTrack_Manager">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Track Manager</string>
+   </property>
+  </action>
+  <action name="actionProject_Manager">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Project Manager</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
