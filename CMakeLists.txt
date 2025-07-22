@@ -60,6 +60,9 @@ set(GLSL_FILES)
 
 # 项目源文件
 set(PROJECT_SOURCES
+    src/canvas/geom/QuadInstanceData.hpp
+    src/canvas/render/Renderer2D.hpp
+    src/canvas/render/Renderer2D.cpp
     src/canvas/FrameRateCounter.hpp
     src/canvas/FrameRateCounter.cpp
     src/ui/canvas/CanvasContainer.h
@@ -83,12 +86,12 @@ add_dependencies(MusicMapMaker IonCachyEngin-dev)
 target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog
-          Qt${QT_VERSION_MAJOR}::Core
-          Qt${QT_VERSION_MAJOR}::Widgets
-          Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-          Qt${QT_VERSION_MAJOR}::OpenGL
-          Qt${QT_VERSION_MAJOR}::Svg
-          Qt${QT_VERSION_MAJOR}::SvgWidgets
+          Qt6::Core
+          Qt6::Widgets
+          Qt6::OpenGLWidgets
+          Qt6::OpenGL
+          Qt6::Svg
+          Qt6::SvgWidgets
           ICU::uc
           ICU::i18n
           ICU::data
