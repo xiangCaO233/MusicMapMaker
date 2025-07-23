@@ -5,11 +5,13 @@
 
 #include <QWidget>
 
+#include "template/HideableToolWindow.hpp"
+
 namespace Ui {
 class AudioController;
 }
 
-class AudioController : public QWidget {
+class AudioController : public HideableToolWindow {
     Q_OBJECT
 
    public:

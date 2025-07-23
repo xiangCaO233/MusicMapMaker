@@ -3,22 +3,18 @@
 
 #include <QWidget>
 
+#include "template/HideableToolWindow.hpp"
+
 namespace Ui {
 class ProjectManager;
 }
 
-class ProjectManager : public QWidget {
+class ProjectManager : public HideableToolWindow {
     Q_OBJECT
 
    public:
     explicit ProjectManager(QWidget *parent = nullptr);
     ~ProjectManager();
-
-   signals:
-    void close_signal();
-
-   protected:
-    void closeEvent(QCloseEvent *event) override;
 
    private:
     Ui::ProjectManager *ui;

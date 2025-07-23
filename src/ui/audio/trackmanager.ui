@@ -49,7 +49,7 @@
         <number>2</number>
        </property>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="tracks_label">
          <property name="font">
           <font>
            <pointsize>16</pointsize>
@@ -64,7 +64,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="listView"/>
+        <widget class="QListView" name="track_list"/>
        </item>
        <item>
         <widget class="QWidget" name="device_widget" native="true">
@@ -98,11 +98,11 @@
              </property>
              <property name="font">
               <font>
-               <pointsize>14</pointsize>
+               <pointsize>10</pointsize>
               </font>
              </property>
              <property name="placeholderText">
-              <string>output device</string>
+              <string>select output device</string>
              </property>
             </widget>
            </widget>
@@ -129,7 +129,7 @@
           <widget class="QPushButton" name="add_track_button">
            <property name="font">
             <font>
-             <pointsize>14</pointsize>
+             <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
@@ -141,7 +141,7 @@
           <widget class="QPushButton" name="remove_track_button">
            <property name="font">
             <font>
-             <pointsize>14</pointsize>
+             <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">
@@ -153,7 +153,7 @@
           <widget class="QPushButton" name="open_controller_button">
            <property name="font">
             <font>
-             <pointsize>14</pointsize>
+             <pointsize>10</pointsize>
             </font>
            </property>
            <property name="text">

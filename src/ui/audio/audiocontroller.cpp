@@ -2,8 +2,8 @@
 
 #include "ui_audiocontroller.h"
 
-AudioController::AudioController(QWidget *parent)
-    : QWidget(parent), ui(new Ui::AudioController) {
+AudioController::AudioController(QWidget* parent)
+    : HideableToolWindow(parent), ui(new Ui::AudioController) {
     ui->setupUi(this);
 }
 

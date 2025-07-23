@@ -60,6 +60,7 @@ set(GLSL_FILES)
 
 # 项目源文件
 set(PROJECT_SOURCES
+    src/util/mutil.hpp
     src/canvas/geom/QuadInstanceData.hpp
     src/canvas/render/Renderer2D.hpp
     src/canvas/render/Renderer2D.cpp
@@ -70,6 +71,8 @@ set(PROJECT_SOURCES
     src/canvas/GLCanvas.cpp
     src/canvas/GLCanvas.hpp
     src/canvas/GLCanvasEvents.cpp
+    src/ui/template/HideableToolWindow.hpp
+    src/ui/template/HideableToolWindow.cpp
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp
     src/ui/project/projectmanager.ui
