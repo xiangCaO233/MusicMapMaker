@@ -8,12 +8,12 @@ class HideableToolWindow : public QWidget {
     Q_OBJECT
    public:
     // 构造HideableToolWindow
-    HideableToolWindow(QWidget* parent = nullptr);
+    explicit HideableToolWindow(QWidget* parent = nullptr);
 
     // 析构HideableToolWindow
     ~HideableToolWindow() override;
    signals:
-    void close_signal();
+    void close_signal(HideableToolWindow* wptr);
 
    protected:
     void closeEvent(QCloseEvent* event) override;

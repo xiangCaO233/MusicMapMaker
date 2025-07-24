@@ -8,6 +8,7 @@ class MainWindow;
 }
 
 class ProjectManager;
+class HideableToolWindow;
 class TrackManager;
 
 class MainWindow : public QMainWindow {
@@ -23,9 +24,9 @@ class MainWindow : public QMainWindow {
     void on_actionProject_Manager_toggled(bool arg1);
 
     // 响应管理器关闭事件
-    void trackmanager_close_slot();
+    void trackmanager_close_slot(HideableToolWindow *wptr);
 
-    void projectmanager_close_slot();
+    void projectmanager_close_slot(HideableToolWindow *wptr);
 
    private:
     Ui::MainWindow *ui;

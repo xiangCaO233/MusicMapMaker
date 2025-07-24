@@ -11,7 +11,7 @@ CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
     container = QWidget::createWindowContainer(canvas.data(), this);
 
     // 设置布局
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    auto layout = new QVBoxLayout(this);
     layout->addWidget(container);
     layout->setContentsMargins(0, 0, 0, 0);
 

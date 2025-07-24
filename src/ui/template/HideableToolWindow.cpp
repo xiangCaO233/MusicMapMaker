@@ -8,6 +8,6 @@ HideableToolWindow::~HideableToolWindow() = default;
 // 把关闭事件改为hide
 void HideableToolWindow::closeEvent(QCloseEvent* event) {
     hide();
-    emit close_signal();
+    emit close_signal(this);
     event->ignore();
 }

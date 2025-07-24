@@ -13,6 +13,7 @@ endif()
 add_subdirectory(./libs/IonCachyEngine)
 
 include_directories(./ ./libs/IonCachyEngine/include)
+include_directories(./src/ui/template)
 
 link_directories(./build)
 
@@ -71,16 +72,24 @@ set(PROJECT_SOURCES
     src/canvas/GLCanvas.cpp
     src/canvas/GLCanvas.hpp
     src/canvas/GLCanvasEvents.cpp
+    src/ui/template/AutoResizeTableWidget.h
+    src/ui/template/AutoResizeTableWidget.cpp
     src/ui/template/HideableToolWindow.hpp
     src/ui/template/HideableToolWindow.cpp
+    src/ui/template/ScalableImageLabel.h
+    src/ui/template/ScalableImageLabel.cpp
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp
     src/ui/project/projectmanager.ui
     src/ui/audio/trackmanager.h
     src/ui/audio/trackmanager.cpp
+    src/ui/audio/trackcontrols.cpp
     src/ui/audio/trackmanager.ui
+    src/ui/audio/callback/AudioPlayCallBack.hpp
+    src/ui/audio/callback/AudioPlayCallBack.cpp
     src/ui/audio/audiocontroller.h
     src/ui/audio/audiocontroller.cpp
+    src/ui/audio/audiocontrols.cpp
     src/ui/audio/audiocontroller.ui
     src/ui/mainwindow.h
     src/ui/mainwindow.cpp

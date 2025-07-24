@@ -111,10 +111,13 @@
             <property name="value">
              <number>0</number>
             </property>
+            <property name="textVisible">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="time_controller" native="true">
+           <widget class="QWidget" name="base_controller" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <property name="spacing">
               <number>2</number>
@@ -131,19 +134,6 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
              <item>
               <widget class="QWidget" name="time_edit_widget" native="true">
                <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -162,77 +152,6 @@
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item>
-                 <widget class="QLineEdit" name="time_edit">
-                  <property name="font">
-                   <font>
-                    <pointsize>16</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>00:00.000.000.000</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="unit_selection">
-                  <property name="font">
-                   <font>
-                    <pointsize>12</pointsize>
-                   </font>
-                  </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LayoutDirection::RightToLeft</enum>
-                  </property>
-                  <property name="currentText">
-                   <string>min:s.ms.us.ns</string>
-                  </property>
-                  <property name="currentIndex">
-                   <number>5</number>
-                  </property>
-                  <property name="placeholderText">
-                   <string>unit</string>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>ms</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>us</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>ns</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>frame</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>min:s</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>min:s.ms.us.ns</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>min:s.ms</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
                </layout>
               </widget>
              </item>
@@ -379,6 +298,45 @@
             </layout>
            </widget>
           </item>
+          <item>
+           <widget class="QLineEdit" name="time_edit">
+            <property name="font">
+             <font>
+              <pointsize>16</pointsize>
+             </font>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
+            </property>
+            <property name="text">
+             <string>00:00.000.000.000</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="unit_selection">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::RightToLeft</enum>
+            </property>
+            <property name="currentText">
+             <string/>
+            </property>
+            <property name="currentIndex">
+             <number>-1</number>
+            </property>
+            <property name="placeholderText">
+             <string>unit</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
         <widget class="QTabWidget" name="functions">
@@ -389,7 +347,65 @@
           <attribute name="title">
            <string>Basic</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_4"/>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>6</number>
+           </property>
+           <property name="topMargin">
+            <number>6</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="volume_controller" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLabel" name="volume_label">
+                <property name="text">
+                 <string>volume</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="volume_slider">
+                <property name="focusPolicy">
+                 <enum>Qt::FocusPolicy::WheelFocus</enum>
+                </property>
+                <property name="minimum">
+                 <number>0</number>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="pageStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>40</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="volume_value_label">
+                <property name="text">
+                 <string notr="true">40</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="strecher_tab">
           <attribute name="title">

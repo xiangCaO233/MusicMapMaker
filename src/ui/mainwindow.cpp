@@ -6,7 +6,7 @@
 #include "canvas/GLCanvas.hpp"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     auto canvas = ui->canvas_container->canvas.data();
@@ -15,9 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     projectmanager = new ProjectManager();
     trackmanager = new TrackManager();
-
-    projectmanager->setWindowFlags(Qt::Tool);
-    trackmanager->setWindowFlags(Qt::Tool);
 
     projectmanager->hide();
     trackmanager->hide();
@@ -29,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 // 更新标题后缀
-void MainWindow::update_title_suffix(const QString &suffix) {
+void MainWindow::update_title_suffix(const QString& suffix) {
     setWindowTitle("MusicMapMaker-->" + suffix);
 }
 
@@ -57,9 +54,11 @@ void MainWindow::on_actionProject_Manager_toggled(bool checked) {
 }
 
 // 响应管理器关闭事件
-void MainWindow::trackmanager_close_slot() {
+void MainWindow::trackmanager_close_slot(
+    [[maybe_unused]] HideableToolWindow* wptr) {
     ui->actionTrack_Manager->setChecked(false);
 }
-void MainWindow::projectmanager_close_slot() {
+void MainWindow::projectmanager_close_slot(
+    [[maybe_unused]] HideableToolWindow* wptr) {
     ui->actionProject_Manager->setChecked(false);
 }
