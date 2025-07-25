@@ -43,6 +43,13 @@ find_package(spdlog REQUIRED)
 # 傅里叶变换包
 find_package(FFTW3 REQUIRED)
 
+if(APPLE)
+
+  set(FFTLIB /opt/homebrew/lib/libfftw3.dylib /opt/homebrew/lib/libfftw3.a)
+else()
+  set(FFTLIB ${FFTW3_LIBRARIES})
+endif(APPLE)
+
 # 查找字体包
 find_package(Freetype REQUIRED)
 
@@ -127,7 +134,7 @@ target_link_libraries(
           ICU::i18n
           ICU::data
           Freetype::Freetype
-          ${FFTW3_LIBRARIES}
+          ${FFTLIB}
           pugixml::pugixml
           IonCachyEngin-dev)
 
