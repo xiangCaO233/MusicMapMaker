@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include <audio/trackmanager.h>
+#include <audio/track/trackmanager.h>
 #include <project/projectmanager.h>
 
 #include "canvas/GLCanvas.hpp"
@@ -31,6 +31,9 @@ void MainWindow::update_title_suffix(const QString& suffix) {
 }
 
 MainWindow::~MainWindow() {
+    projectmanager->hide();
+    trackmanager->hide();
+
     delete trackmanager;
     delete projectmanager;
     delete ui;

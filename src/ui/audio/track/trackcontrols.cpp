@@ -1,5 +1,5 @@
-#include <audio/audiocontroller.h>
-#include <audio/trackmanager.h>
+#include <audio/control/audiocontroller.h>
+#include <audio/track/trackmanager.h>
 #include <ui_trackmanager.h>
 
 #include <util/mutil.hpp>

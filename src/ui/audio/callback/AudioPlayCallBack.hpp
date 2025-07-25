@@ -1,7 +1,7 @@
 #ifndef MMM_AUDIOPLAYCALLBACK_HPP
 #define MMM_AUDIOPLAYCALLBACK_HPP
 
-#include <audio/audiocontroller.h>
+#include <audio/control/audiocontroller.h>
 #include <qobject.h>
 
 #include <ice/core/PlayCallBack.hpp>

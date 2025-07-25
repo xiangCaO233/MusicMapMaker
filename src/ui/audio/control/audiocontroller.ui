@@ -71,7 +71,7 @@
          <bool>false</bool>
         </property>
         <widget class="QWidget" name="track_viewer" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0,0,0">
           <property name="spacing">
            <number>2</number>
           </property>
@@ -89,21 +89,21 @@
           </property>
           <item>
            <widget class="QWidget" name="audio_graphic_widget" native="true">
-            <layout class="QVBoxLayout" name="verticalLayout_5">
+            <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1,0">
              <property name="spacing">
               <number>2</number>
              </property>
              <property name="leftMargin">
-              <number>2</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
-              <number>2</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
-              <number>2</number>
+              <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>2</number>
+              <number>0</number>
              </property>
              <item>
               <widget class="QWidget" name="graphtype_selection_widget" native="true">
@@ -124,10 +124,28 @@
                  <number>0</number>
                 </property>
                 <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Graph Type:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QComboBox" name="graphtype_selection">
+                  <property name="minimumSize">
+                   <size>
+                    <width>58</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <item>
                    <property name="text">
                     <string>wave</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>spectro</string>
                    </property>
                   </item>
                  </widget>
@@ -145,15 +163,126 @@
                   </property>
                  </spacer>
                 </item>
+                <item>
+                 <widget class="QWidget" name="graph_control_widget" native="true">
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <property name="spacing">
+                    <number>2</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_2">
+                     <property name="text">
+                      <string>scale:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="area_scale_spinner">
+                     <property name="minimum">
+                      <number>1</number>
+                     </property>
+                     <property name="maximum">
+                      <number>100</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_3">
+                     <property name="text">
+                      <string>lock ptr pos:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="lock_ptr_pos_button">
+                     <property name="minimumSize">
+                      <size>
+                       <width>24</width>
+                       <height>24</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>24</width>
+                       <height>24</height>
+                      </size>
+                     </property>
+                     <property name="focusPolicy">
+                      <enum>Qt::FocusPolicy::NoFocus</enum>
+                     </property>
+                     <property name="toolTip">
+                      <string>lock ptr</string>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="../../../../resources/glsrcs.qrc">
+                       <normaloff>:/icons/lock-open.svg</normaloff>
+                       <normalon>:/icons/lock.svg</normalon>
+                       <activeoff>:/icons/lock-open.svg</activeoff>
+                       <activeon>:/icons/lock.svg</activeon>:/icons/lock-open.svg</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>16</width>
+                       <height>16</height>
+                      </size>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                     <property name="flat">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QDoubleSpinBox" name="ptr_pos_value_spinner">
+                     <property name="minimum">
+                      <double>0.100000000000000</double>
+                     </property>
+                     <property name="maximum">
+                      <double>0.900000000000000</double>
+                     </property>
+                     <property name="singleStep">
+                      <double>0.100000000000000</double>
+                     </property>
+                     <property name="stepType">
+                      <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+                     </property>
+                     <property name="value">
+                      <double>0.500000000000000</double>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
              <item>
-              <widget class="QWidget" name="main_graph" native="true">
+              <widget class="AudioGraphicWidget" name="main_graph" native="true">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>200</height>
+                 <height>0</height>
                 </size>
                </property>
               </widget>
@@ -169,16 +298,51 @@
            </widget>
           </item>
           <item>
-           <widget class="QProgressBar" name="audio_progress">
-            <property name="maximum">
-             <number>10000</number>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-            <property name="textVisible">
-             <bool>false</bool>
-            </property>
+           <widget class="QWidget" name="progress_widge" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="current_label">
+               <property name="text">
+                <string notr="true">00:00</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QProgressBar" name="audio_progress">
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="textVisible">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="total_label">
+               <property name="text">
+                <string>00:00</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
@@ -254,7 +418,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../../../resources/glsrcs.qrc">
+                <iconset resource="../../../../resources/glsrcs.qrc">
                  <normaloff>:/icons/backward.svg</normaloff>:/icons/backward.svg</iconset>
                </property>
                <property name="iconSize">
@@ -289,7 +453,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../../../resources/glsrcs.qrc">
+                <iconset resource="../../../../resources/glsrcs.qrc">
                  <normaloff>:/icons/pause.svg</normaloff>
                  <normalon>:/icons/play.svg</normalon>
                  <activeon>:/icons/play.svg</activeon>
@@ -333,7 +497,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../../../resources/glsrcs.qrc">
+                <iconset resource="../../../../resources/glsrcs.qrc">
                  <normaloff>:/icons/forward.svg</normaloff>:/icons/forward.svg</iconset>
                </property>
                <property name="iconSize">
@@ -389,7 +553,7 @@
              </font>
             </property>
             <property name="layoutDirection">
-             <enum>Qt::LayoutDirection::RightToLeft</enum>
+             <enum>Qt::LayoutDirection::LeftToRight</enum>
             </property>
             <property name="currentText">
              <string/>
@@ -417,13 +581,13 @@
             <number>0</number>
            </property>
            <property name="leftMargin">
-            <number>6</number>
+            <number>2</number>
            </property>
            <property name="topMargin">
-            <number>6</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>2</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -431,6 +595,18 @@
            <item>
             <widget class="QWidget" name="volume_controller" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QLabel" name="volume_label">
                 <property name="text">
@@ -476,6 +652,105 @@
           <attribute name="title">
            <string>Stretcher</string>
           </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QLabel" name="speed_label">
+               <property name="text">
+                <string>expected playback speed:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="stretcher_speed_slider">
+               <property name="minimum">
+                <number>2500</number>
+               </property>
+               <property name="maximum">
+                <number>20000</number>
+               </property>
+               <property name="pageStep">
+                <number>50</number>
+               </property>
+               <property name="value">
+                <number>10000</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="speed_value_spinner">
+               <property name="prefix">
+                <string notr="true"/>
+               </property>
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="minimum">
+                <double>25.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>200.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>5.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>100.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QLabel" name="actual_speed_label">
+               <property name="toolTip">
+                <string>Since the actual sampling is indivisible, the actual playback speed may not be exactly the same as the expected playback speed.</string>
+               </property>
+               <property name="text">
+                <string>actual playback speed: </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="actual_speed_value">
+               <property name="toolTip">
+                <string>Since the actual sampling is indivisible, the actual playback speed may not be exactly the same as the expected playback speed.</string>
+               </property>
+               <property name="text">
+                <string>100%</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="pitchshifter_tab">
           <attribute name="title">
@@ -500,8 +775,16 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>AudioGraphicWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">AudioGraphicWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
-  <include location="../../../resources/glsrcs.qrc"/>
+  <include location="../../../../resources/glsrcs.qrc"/>
  </resources>
  <connections/>
 </ui>

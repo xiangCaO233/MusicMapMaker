@@ -1,4 +1,4 @@
-#include <audio/audiocontroller.h>
+#include <audio/control/audiocontroller.h>
 #include <ui_audiocontroller.h>
 
 void AudioController::on_pause_button_toggled(bool checked) {
@@ -8,9 +8,19 @@ void AudioController::on_pause_button_toggled(bool checked) {
     ui->time_edit->setEnabled(checked);
 }
 
-void AudioController::on_fast_backward_button_clicked() {}
+void AudioController::on_fast_backward_button_clicked() {
+    // 快退5s
+    source_node->set_playpos(
+        uitime_pos - std::chrono::nanoseconds(5LL * 1000 * 1000 * 1000));
+    updateDisplayPosition();
+}
 
-void AudioController::on_fast_forward_button_clicked() {}
+void AudioController::on_fast_forward_button_clicked() {
+    // 快进5s
+    source_node->set_playpos(
+        uitime_pos + std::chrono::nanoseconds(5LL * 1000 * 1000 * 1000));
+    updateDisplayPosition();
+}
 
 void AudioController::on_time_edit_editingFinished() {
     // 设置音频时间
@@ -19,26 +29,36 @@ void AudioController::on_time_edit_editingFinished() {
     auto unit = ui->unit_selection->currentData().value<PositionUnit>();
     QString text = ui->time_edit->text();
     bool ok = true;
+    size_t frame = 0;
 
     switch (unit) {
         case PositionUnit::Frame: {
-            size_t frame = text.toULongLong(&ok);
+            frame = text.toULongLong(&ok);
             if (ok) source_node->set_playpos(frame);
             break;
         }
         case PositionUnit::Nanoseconds: {
             long long ns = text.toLongLong(&ok);
-            if (ok) source_node->set_playpos(std::chrono::nanoseconds(ns));
+            if (ok) {
+                source_node->set_playpos(std::chrono::nanoseconds(ns));
+                frame = source_node->get_playpos();
+            }
             break;
         }
         case PositionUnit::Microseconds: {
             long long us = text.toLongLong(&ok);
-            if (ok) source_node->set_playpos(std::chrono::microseconds(us));
+            if (ok) {
+                source_node->set_playpos(std::chrono::microseconds(us));
+                frame = source_node->get_playpos();
+            }
             break;
         }
         case PositionUnit::Milliseconds: {
             long long ms = text.toLongLong(&ok);
-            if (ok) source_node->set_playpos(std::chrono::milliseconds(ms));
+            if (ok) {
+                source_node->set_playpos(std::chrono::milliseconds(ms));
+                frame = source_node->get_playpos();
+            }
             break;
         }
         case PositionUnit::MinSec: {
@@ -50,6 +70,7 @@ void AudioController::on_time_edit_editingFinished() {
                 if (!ok) break;
                 source_node->set_playpos(std::chrono::minutes(min) +
                                          std::chrono::seconds(sec));
+                frame = source_node->get_playpos();
             }
             break;
         }
@@ -69,6 +90,7 @@ void AudioController::on_time_edit_editingFinished() {
             source_node->set_playpos(std::chrono::minutes(min) +
                                      std::chrono::seconds(sec) +
                                      std::chrono::milliseconds(ms));
+            frame = source_node->get_playpos();
             break;
         }
         case PositionUnit::MinSecMsUsNs: {
@@ -92,14 +114,12 @@ void AudioController::on_time_edit_editingFinished() {
                 std::chrono::minutes(min) + std::chrono::seconds(sec) +
                 std::chrono::milliseconds(ms) + std::chrono::microseconds(us) +
                 std::chrono::nanoseconds(ns));
+            frame = source_node->get_playpos();
             break;
         }
     }
 
-    // 如果解析失败，或者用户输入不合法，最好恢复显示正确的位置
-    if (!ok) {
-        updateDisplayPosition();
-    }
+    updateDisplayPosition();
 }
 
 void AudioController::on_unit_selection_currentIndexChanged(int index) {

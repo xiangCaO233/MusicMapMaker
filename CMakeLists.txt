@@ -13,7 +13,6 @@ endif()
 add_subdirectory(./libs/IonCachyEngine)
 
 include_directories(./ ./libs/IonCachyEngine/include)
-include_directories(./src/ui/template)
 
 link_directories(./build)
 
@@ -40,6 +39,9 @@ find_package(
 
 # 查找日志包
 find_package(spdlog REQUIRED)
+
+# 傅里叶变换包
+find_package(FFTW3 REQUIRED)
 
 # 查找字体包
 find_package(Freetype REQUIRED)
@@ -81,22 +83,29 @@ set(PROJECT_SOURCES
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp
     src/ui/project/projectmanager.ui
-    src/ui/audio/trackmanager.h
-    src/ui/audio/trackmanager.cpp
-    src/ui/audio/trackcontrols.cpp
-    src/ui/audio/trackmanager.ui
+    src/ui/audio/track/trackmanager.h
+    src/ui/audio/track/trackmanager.cpp
+    src/ui/audio/track/trackcontrols.cpp
+    src/ui/audio/track/trackmanager.ui
     src/ui/audio/callback/AudioPlayCallBack.hpp
     src/ui/audio/callback/AudioPlayCallBack.cpp
-    src/ui/audio/audiocontroller.h
-    src/ui/audio/audiocontroller.cpp
-    src/ui/audio/audiocontrols.cpp
-    src/ui/audio/audiocontroller.ui
+    src/ui/audio/graphic/AudioGraphicWidget.h
+    src/ui/audio/graphic/AudioGraphicWidget.cpp
+    src/ui/audio/control/ProcessChain.hpp
+    src/ui/audio/control/audiocontroller.h
+    src/ui/audio/control/audiocontroller.cpp
+    src/ui/audio/control/audiobasecontrols.cpp
+    src/ui/audio/control/audiographcontrols.cpp
+    src/ui/audio/control/audioeffectcontrols.cpp
+    src/ui/audio/control/audiocontroller.ui
     src/ui/mainwindow.h
     src/ui/mainwindow.cpp
     src/ui/mainwindow.ui
     src/main.cpp)
 
-include_directories(./src ./src/ui ./src/ui/canvas)
+# ui需要包含的路径
+include_directories(./src ./src/ui ./src/ui/canvas ./src/ui/template
+                    ./src/ui/audio/graphic)
 
 # 创建可执行文件
 qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
@@ -118,6 +127,7 @@ target_link_libraries(
           ICU::i18n
           ICU::data
           Freetype::Freetype
+          ${FFTW3_LIBRARIES}
           pugixml::pugixml
           IonCachyEngin-dev)
 

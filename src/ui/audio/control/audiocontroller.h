@@ -11,6 +11,8 @@
 #include <ice/manage/AudioTrack.hpp>
 #include <memory>
 
+#include "audio/control/ProcessChain.hpp"
+
 namespace Ui {
 class AudioController;
 }
@@ -85,21 +87,36 @@ class AudioController : public HideableToolWindow {
     // 回调更新显示位置的槽
     void updateDisplayPosition();
 
+    void on_graphtype_selection_currentIndexChanged(int index);
+
+    void on_area_scale_spinner_valueChanged(int arg1);
+
+    void on_lock_ptr_pos_button_toggled(bool checked);
+
+    void on_ptr_pos_value_spinner_valueChanged(double arg1);
+
+    void on_stretcher_speed_slider_valueChanged(int value);
+
+    void on_speed_value_spinner_valueChanged(double arg1);
+
    private:
     // 音频轨道
-    std::shared_ptr<ice::AudioTrack> audio_track;
+    std::shared_ptr<ice::AudioTrack> audio_track{nullptr};
 
     // 实际播放的源节点
-    std::shared_ptr<ice::SourceNode> source_node;
+    std::shared_ptr<ice::SourceNode> source_node{nullptr};
+
+    // 音效处理链
+    std::unique_ptr<ProcessChain> process_chain{nullptr};
 
     // 控制器的输出节点
-    std::shared_ptr<ice::IAudioNode> output_node;
+    std::shared_ptr<ice::IAudioNode> output_node{nullptr};
 
     // 播放回调
-    std::shared_ptr<ice::PlayCallBack> callback;
+    std::shared_ptr<ice::PlayCallBack> callback{nullptr};
 
     // 对应的在列表中的项
-    QStandardItem *refitem;
+    QStandardItem *refitem{nullptr};
 
     // ui需要显示帧位置时需要展示的参考值
     size_t uiframe_pos;

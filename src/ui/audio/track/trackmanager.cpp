@@ -1,7 +1,7 @@
 #include "trackmanager.h"
 
 #include <SDL3/SDL_audio.h>
-#include <audio/audiocontroller.h>
+#include <audio/control/audiocontroller.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <qobject.h>

@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <utility>
 
-// 使用 C++17 的 if constexpr 的模板帮助函数
+// C++17 的 if constexpr 的模板帮助函数
 template <typename Func>
 auto glCallImpl(Func func, const char* funcStr) {
     // 对 lambda 本身的返回类型进行判断

@@ -8,11 +8,20 @@
 #include <chrono>
 #include <memory>
 
+#include "AudioGraphicWidget.h"
+#include "audio/control/ProcessChain.hpp"
 #include "ui_audiocontroller.h"
 
 AudioController::AudioController(QWidget* parent)
     : HideableToolWindow(parent), ui(new Ui::AudioController) {
     ui->setupUi(this);
+
+    // 初始化图形类型选择数据
+    ui->graphtype_selection->setItemData(
+        0, QVariant::fromValue(AudioGraphicWidget::GraphType::WAVE));
+    ui->graphtype_selection->setItemData(
+        1, QVariant::fromValue(AudioGraphicWidget::GraphType::SPECTRO));
+
     // 初始化单位选择器
     // 填充单位选择框
     ui->unit_selection->addItem(
@@ -35,6 +44,7 @@ AudioController::AudioController(QWidget* parent)
 
     // 初始化回调
     callback = std::make_shared<PlayPosCallBack>(this);
+
     // 连接回调更新信号
     connect(std::static_pointer_cast<PlayPosCallBack>(callback).get(),
             &PlayPosCallBack::update_framepos, this,
@@ -120,6 +130,14 @@ void AudioController::updateDisplayPosition() {
         }
     }
 
+    // 更新进度条时间
+    size_t current_seconds =
+        std::chrono::duration_cast<std::chrono::seconds>(uitime_pos).count();
+    ui->current_label->setText(
+        QString("%1:%2")
+            .arg(current_seconds / 60, 2, 10, QChar('0'))
+            .arg(current_seconds % 60, 2, 10, QChar('0')));
+
     std::chrono::duration<double> total_duration_sec =
         source_node->total_time();
 
@@ -132,6 +150,19 @@ void AudioController::updateDisplayPosition() {
 
     // 更新进度条
     ui->audio_progress->setValue(int(progress * ui->audio_progress->maximum()));
+
+    // 更新音频图参考播放位置数据
+    ui->main_graph->set_currentPlaybackFrame(uiframe_pos);
+    // 判断和更新音频图
+    if (ui->main_graph->is_follow_playback()) {
+        // 跟随需要实时重绘
+        ui->main_graph->update();
+    }
+
+    // 更新实际播放速度
+    auto actual_speed = process_chain->stretcher->get_actual_playback_ratio();
+    ui->actual_speed_value->setText(
+        QString::asprintf("%.2f%%", actual_speed * 100.));
 
     // 只有在用户没有编辑时才更新，防止干扰输入
     if (!ui->time_edit->hasFocus()) {
@@ -163,14 +194,30 @@ void AudioController::set_audio_track(
     // 通过track创建基本sourcenode
     source_node = std::make_shared<ice::SourceNode>(track);
 
+    // 设置进度条总时间
+    std::chrono::duration<double> total_duration_sec =
+        source_node->total_time();
+    auto total_seconds =
+        static_cast<int>(std::round(total_duration_sec.count()));
+    ui->total_label->setText(QString("%1:%2")
+                                 .arg(total_seconds / 60, 2, 10, QChar('0'))
+                                 .arg(total_seconds % 60, 2, 10, QChar('0')));
+
     // 设置回调
     source_node->add_playcallback(callback);
 
-    // 使用sourcenode作为基本输出
-    output_node = source_node;
+    // 初始化效果器链
+    process_chain = std::make_unique<ProcessChain>(source_node);
+
+    // 也设置图形组件的音轨
+    ui->main_graph->set_track(track);
+
+    // 使用process_chain的输出作为输出
+    auto oldnode = output_node;
+    output_node = process_chain->output;
 
     // 发送更新输出节点信号
-    emit update_output_node(this, nullptr, output_node);
+    emit update_output_node(this, oldnode, output_node);
 }
 
 void AudioController::set_item(QStandardItem* item) { refitem = item; }
