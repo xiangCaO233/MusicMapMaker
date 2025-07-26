@@ -165,7 +165,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="metadata_label">
@@ -208,7 +208,7 @@
            <item>
             <widget class="QLabel" name="album_cover_label">
              <property name="text">
-              <string>cover</string>
+              <string>album cover</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignmentFlag::AlignCenter</set>
