@@ -1,9 +1,17 @@
+#include <qtmetamacros.h>
+
 #include <audio/callback/AudioPlayCallBack.hpp>
 
 PlayPosCallBack::PlayPosCallBack(AudioController* controller)
     : QObject(controller), refcontroller(controller) {}
 
 // 实现回调
+void PlayPosCallBack::play_done(bool isloop) const {
+    if (!isloop) {
+        emit playDone();
+    }
+}
+
 void PlayPosCallBack::frameplaypos_updated(size_t frame_pos) {
     refcontroller->set_uiframe_pos(frame_pos);
     emit update_framepos();

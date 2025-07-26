@@ -1,6 +1,8 @@
 #include <audio/control/audiocontroller.h>
 #include <ui_audiocontroller.h>
 
+#include <cstddef>
+
 void AudioController::on_pause_button_toggled(bool checked) {
     checked ? source_node->pause() : source_node->play();
 
@@ -10,15 +12,21 @@ void AudioController::on_pause_button_toggled(bool checked) {
 
 void AudioController::on_fast_backward_button_clicked() {
     // 快退5s
-    source_node->set_playpos(
-        uitime_pos - std::chrono::nanoseconds(5LL * 1000 * 1000 * 1000));
+    auto res = uitime_pos - std::chrono::nanoseconds(5LL * 1000 * 1000 * 1000);
+    source_node->set_playpos(res);
+    set_uitime_pos(res);
+    set_uiframe_pos(source_node->get_playpos());
+
     updateDisplayPosition();
 }
 
 void AudioController::on_fast_forward_button_clicked() {
     // 快进5s
-    source_node->set_playpos(
-        uitime_pos + std::chrono::nanoseconds(5LL * 1000 * 1000 * 1000));
+    auto res = uitime_pos + std::chrono::nanoseconds(5LL * 1000 * 1000 * 1000);
+    source_node->set_playpos(res);
+    set_uitime_pos(res);
+    set_uiframe_pos(source_node->get_playpos());
+
     updateDisplayPosition();
 }
 
@@ -29,36 +37,45 @@ void AudioController::on_time_edit_editingFinished() {
     auto unit = ui->unit_selection->currentData().value<PositionUnit>();
     QString text = ui->time_edit->text();
     bool ok = true;
-    size_t frame = 0;
+    size_t frameres{0};
+    std::chrono::nanoseconds timeres;
 
     switch (unit) {
         case PositionUnit::Frame: {
-            frame = text.toULongLong(&ok);
-            if (ok) source_node->set_playpos(frame);
+            frameres = text.toULongLong(&ok);
+            if (ok) source_node->set_playpos(frameres);
             break;
         }
         case PositionUnit::Nanoseconds: {
             long long ns = text.toLongLong(&ok);
+            auto timens = std::chrono::nanoseconds(ns);
             if (ok) {
-                source_node->set_playpos(std::chrono::nanoseconds(ns));
-                frame = source_node->get_playpos();
+                source_node->set_playpos(timens);
             }
+            frameres = source_node->get_playpos();
+            timeres = timens;
             break;
         }
         case PositionUnit::Microseconds: {
             long long us = text.toLongLong(&ok);
+            auto timeus = std::chrono::microseconds(us);
             if (ok) {
-                source_node->set_playpos(std::chrono::microseconds(us));
-                frame = source_node->get_playpos();
+                source_node->set_playpos(timeus);
             }
+            frameres = source_node->get_playpos();
+            timeres =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(timeus);
             break;
         }
         case PositionUnit::Milliseconds: {
             long long ms = text.toLongLong(&ok);
+            auto timems = std::chrono::milliseconds(ms);
             if (ok) {
-                source_node->set_playpos(std::chrono::milliseconds(ms));
-                frame = source_node->get_playpos();
+                source_node->set_playpos(timems);
             }
+            frameres = source_node->get_playpos();
+            timeres =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(timems);
             break;
         }
         case PositionUnit::MinSec: {
@@ -68,9 +85,13 @@ void AudioController::on_time_edit_editingFinished() {
                 if (!ok) break;
                 long long sec = parts[1].toLongLong(&ok);
                 if (!ok) break;
-                source_node->set_playpos(std::chrono::minutes(min) +
-                                         std::chrono::seconds(sec));
-                frame = source_node->get_playpos();
+                auto time =
+                    std::chrono::minutes(min) + std::chrono::seconds(sec);
+                source_node->set_playpos(time);
+
+                frameres = source_node->get_playpos();
+                timeres =
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(time);
             }
             break;
         }
@@ -86,11 +107,12 @@ void AudioController::on_time_edit_editingFinished() {
             if (!ok) break;
             long long ms = sec_ms[1].toLongLong(&ok);
             if (!ok) break;
-
-            source_node->set_playpos(std::chrono::minutes(min) +
-                                     std::chrono::seconds(sec) +
-                                     std::chrono::milliseconds(ms));
-            frame = source_node->get_playpos();
+            auto time = std::chrono::minutes(min) + std::chrono::seconds(sec) +
+                        std::chrono::milliseconds(ms);
+            source_node->set_playpos(time);
+            frameres = source_node->get_playpos();
+            timeres =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(time);
             break;
         }
         case PositionUnit::MinSecMsUsNs: {
@@ -109,15 +131,20 @@ void AudioController::on_time_edit_editingFinished() {
             if (!ok) break;
             long long ns = parts[4].toLongLong(&ok);
             if (!ok) break;
-
-            source_node->set_playpos(
-                std::chrono::minutes(min) + std::chrono::seconds(sec) +
-                std::chrono::milliseconds(ms) + std::chrono::microseconds(us) +
-                std::chrono::nanoseconds(ns));
-            frame = source_node->get_playpos();
+            auto time = std::chrono::minutes(min) + std::chrono::seconds(sec) +
+                        std::chrono::milliseconds(ms) +
+                        std::chrono::microseconds(us) +
+                        std::chrono::nanoseconds(ns);
+            source_node->set_playpos(time);
+            frameres = source_node->get_playpos();
+            timeres =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(time);
             break;
         }
     }
+
+    set_uiframe_pos(frameres);
+    set_uitime_pos(timeres);
 
     updateDisplayPosition();
 }

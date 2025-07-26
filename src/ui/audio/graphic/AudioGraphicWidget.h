@@ -4,22 +4,25 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QOpenGLFunctions_4_1_Core>
+#include <QOpenGLWidget>
 #include <memory>
+#include <vector>
 
 #include "audio/control/ProcessChain.hpp"
 #include "ice/core/SourceNode.hpp"
 #include "ice/manage/AudioTrack.hpp"
-#include "render/SpectrogramRenderer.hpp"
-#include "render/WaveformRenderer.hpp"
 
-class AudioGraphicWidget : public QWidget {
-    // 存储完整的波形缓存
-    struct WaveformCache {
-        // 每个声道的处理后的浮点数据
-        QVector<QVector<float>> channelData;
-        // 声道数
-        int channelCount = 0;
+class AudioGraphicWidget : public QOpenGLWidget,
+                           public QOpenGLFunctions_4_1_Core {
+    // 存储每个像素列的振幅最大最小值
+    struct MinMaxSample {
+        float min = 1.0f;
+        float max = -1.0f;
     };
+
     Q_OBJECT
    public:
     enum class GraphType {
@@ -54,13 +57,13 @@ class AudioGraphicWidget : public QWidget {
         update();
     }
 
-    // 设置跟随位置比例大小
+    // 设置跟随位置比例
     inline void set_followPositionRatio(double ratio) {
         followPositionRatio = ratio;
         update();
     }
 
-    // 设置当前视图显示的帧数跨度
+    // 设置当前视图显示的帧数跨度(一个完整页显示的音频的帧数)
     inline void set_visibleFrameRange(size_t range) {
         visibleFrameRange = range;
         updateVisualization();
@@ -70,8 +73,20 @@ class AudioGraphicWidget : public QWidget {
     inline void set_currentPlaybackFrame(size_t playpos) {
         currentPlaybackFrame = playpos;
         if (followPlayback) {
+            // 计算理论上播放指针应该在的起始帧，以使其保持在
+            // followPositionRatio 的位置
+            qint64 desiredStartFrame =
+                currentPlaybackFrame -
+                (visibleFrameRange * followPositionRatio);
+
+            // 防止计算出的起始帧为负数
+            if (desiredStartFrame < 0) {
+                desiredStartFrame = 0;
+            }
             updateVisualization();
+            update();
         } else {
+            // 视图是固定的，只需要重绘来更新红色播放指针的位置
             update();
         }
     }
@@ -79,19 +94,19 @@ class AudioGraphicWidget : public QWidget {
     // 设置当前图形类型
     inline void set_graph_type(GraphType type) {
         gtype = type;
-        if (type == GraphType::WAVE) {
-            currentRenderer = waveformRenderer.get();
-        } else if (type == GraphType::SPECTRO) {
-            currentRenderer = spectrogramRenderer.get();
-        }
 
         // 切换模式后，立即重新计算可视化
         updateVisualization();
     }
 
+   signals:
+    // 当缓存计算完成时，由后台线程发出，通知主线程
+    void cacheUpdated(const std::vector<MinMaxSample>& newCache);
+
    protected:
-    // 重写repaint
-    void paintEvent(QPaintEvent* e) override;
+    void initializeGL() override;
+    void resizeGL(int w, int h) override;
+    void paintGL() override;
 
    private:
     // 音轨引用
@@ -106,16 +121,6 @@ class AudioGraphicWidget : public QWidget {
     // 默认显示波形图
     GraphType gtype{GraphType::WAVE};
 
-    // 所有渲染器
-    std::unique_ptr<WaveformRenderer> waveformRenderer;
-    std::unique_ptr<SpectrogramRenderer> spectrogramRenderer;
-
-    // 当前活动渲染器的指针
-    IRenderer* currentRenderer;
-
-    // 波形缓存数据
-    WaveformCache waveformCache;
-
     // 指针是否跟随播放位置
     bool followPlayback{true};
 
@@ -123,13 +128,37 @@ class AudioGraphicWidget : public QWidget {
     double followPositionRatio{0.5};
 
     // 当前视图显示的帧数跨度
-    size_t visibleFrameRange{1024};
+    size_t visibleFrameRange{2048};
 
     // 当前的播放帧位置
     size_t currentPlaybackFrame{0};
 
+    // 当前视图的起始帧
+    qint64 viewStartFrame{0};
+
+    // 这个函数现在是后台线程执行的核心逻辑
+    // 它只负责计算，并返回结果
+    std::vector<MinMaxSample> calculateWaveform(qint64 startFrame, size_t range,
+                                                int numSamples);
+
+    // 异步计算的管理
+    QFuture<std::vector<MinMaxSample>> cacheFuture;
+    QFutureWatcher<std::vector<MinMaxSample>> cacheWatcher;
+
+    // 是否正在计算
+    bool isCalculating{false};
+
     // 更新可视化
     void updateVisualization();
+
+    // 绘制波形图 从缓存绘制
+    void drawWaveform(QPainter& painter);
+
+    // 绘制频谱图
+    void drawSpectrogram(QPainter& painter);
+
+    // 波形图数据缓存
+    std::vector<MinMaxSample> waveformCache;
 };
 
 #endif  // MMM_AUDIOGRAPHICWIDGET_H

@@ -30,6 +30,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 find_package(
   Qt6 REQUIRED
   COMPONENTS Core
+             Concurrent
              Widgets
              OpenGLWidgets
              OpenGL
@@ -44,7 +45,6 @@ find_package(spdlog REQUIRED)
 find_package(FFTW3 REQUIRED)
 
 if(APPLE)
-
   set(FFTLIB /opt/homebrew/lib/libfftw3.dylib /opt/homebrew/lib/libfftw3.a)
 else()
   set(FFTLIB ${FFTW3_LIBRARIES})
@@ -125,6 +125,7 @@ target_link_libraries(
   MusicMapMaker
   PRIVATE spdlog::spdlog
           Qt6::Core
+          Qt6::Concurrent
           Qt6::Widgets
           Qt6::OpenGLWidgets
           Qt6::OpenGL

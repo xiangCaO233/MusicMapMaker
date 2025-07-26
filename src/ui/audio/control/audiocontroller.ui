@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>898</width>
-    <height>513</height>
+    <width>893</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -194,7 +194,7 @@
                       <number>1</number>
                      </property>
                      <property name="maximum">
-                      <number>100</number>
+                      <number>114514</number>
                      </property>
                     </widget>
                    </item>
@@ -278,14 +278,7 @@
               </widget>
              </item>
              <item>
-              <widget class="AudioGraphicWidget" name="main_graph" native="true">
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
+              <widget class="AudioGraphicWidget" name="main_graph"/>
              </item>
              <item>
               <widget class="QScrollBar" name="graph_progress_slidebar">
@@ -778,9 +771,8 @@
  <customwidgets>
   <customwidget>
    <class>AudioGraphicWidget</class>
-   <extends>QWidget</extends>
+   <extends>QOpenGLWidget</extends>
    <header location="global">AudioGraphicWidget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

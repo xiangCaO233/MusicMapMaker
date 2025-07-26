@@ -14,6 +14,7 @@ class PlayPosCallBack : public QObject, public ice::PlayCallBack {
     explicit PlayPosCallBack(AudioController* controller);
 
    signals:
+    void playDone() const;
     void update_framepos();
     void update_timepos();
 
@@ -21,6 +22,7 @@ class PlayPosCallBack : public QObject, public ice::PlayCallBack {
     AudioController* refcontroller;
 
     // 实现回调
+    void play_done(bool isloop) const override;
     void frameplaypos_updated(size_t frame_pos) override;
     void timeplaypos_updated(std::chrono::nanoseconds time_pos) override;
 };

@@ -11,7 +11,6 @@
 #include "AudioGraphicWidget.h"
 #include "audio/control/ProcessChain.hpp"
 #include "ui_audiocontroller.h"
-
 AudioController::AudioController(QWidget* parent)
     : HideableToolWindow(parent), ui(new Ui::AudioController) {
     ui->setupUi(this);
@@ -46,13 +45,23 @@ AudioController::AudioController(QWidget* parent)
     callback = std::make_shared<PlayPosCallBack>(this);
 
     // 连接回调更新信号
-    connect(std::static_pointer_cast<PlayPosCallBack>(callback).get(),
-            &PlayPosCallBack::update_framepos, this,
+    auto play_callback =
+        std::static_pointer_cast<PlayPosCallBack>(callback).get();
+
+    connect(play_callback, &PlayPosCallBack::playDone, this,
+            &AudioController::playDone);
+
+    connect(play_callback, &PlayPosCallBack::update_framepos, this,
             &AudioController::updateDisplayPosition);
 
-    connect(std::static_pointer_cast<PlayPosCallBack>(callback).get(),
-            &PlayPosCallBack::update_timepos, this,
+    connect(play_callback, &PlayPosCallBack::update_timepos, this,
             &AudioController::updateDisplayPosition);
+}
+
+// 播放完成
+void AudioController::playDone() {
+    // 设置播放器按钮为checked
+    ui->pause_button->setChecked(true);
 }
 
 // 更新显示位置
@@ -140,7 +149,6 @@ void AudioController::updateDisplayPosition() {
 
     std::chrono::duration<double> total_duration_sec =
         source_node->total_time();
-
     double progress = 0.0;
     if (total_duration_sec.count() > 0) {
         // 将当前时间也转换为 double 秒

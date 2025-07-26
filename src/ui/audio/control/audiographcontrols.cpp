@@ -10,7 +10,7 @@ void AudioController::on_graphtype_selection_currentIndexChanged(
 }
 
 void AudioController::on_area_scale_spinner_valueChanged(int arg1) {
-    ui->main_graph->set_visibleFrameRange(arg1 * 1024);
+    ui->main_graph->set_visibleFrameRange(arg1 * 2048);
 }
 
 void AudioController::on_lock_ptr_pos_button_toggled(bool checked) {

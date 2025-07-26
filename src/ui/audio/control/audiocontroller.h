@@ -84,7 +84,10 @@ class AudioController : public HideableToolWindow {
 
     void on_volume_slider_valueChanged(int value);
 
-    // 回调更新显示位置的槽
+    // 播放完成
+    void playDone();
+
+    // 更新显示位置
     void updateDisplayPosition();
 
     void on_graphtype_selection_currentIndexChanged(int index);

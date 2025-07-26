@@ -18,6 +18,9 @@ int main(int argc, char* argv[]) {
     SetConsoleCP(65001);
     std::setlocale(LC_ALL, ".UTF-8");
 #endif  //_WIN32
+
+    // 自动共享gl上下文
+    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication a(argc, argv);
 
     // 获取系统语言环境
