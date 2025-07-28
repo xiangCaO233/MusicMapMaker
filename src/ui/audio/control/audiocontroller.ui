@@ -182,24 +182,7 @@
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="QLabel" name="label_2">
-                     <property name="text">
-                      <string>scale:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="area_scale_spinner">
-                     <property name="minimum">
-                      <number>1</number>
-                     </property>
-                     <property name="maximum">
-                      <number>114514</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_3">
+                    <widget class="QLabel" name="ptr_pos_label">
                      <property name="text">
                       <string>lock ptr pos:</string>
                      </property>

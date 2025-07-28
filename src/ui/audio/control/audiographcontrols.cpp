@@ -6,11 +6,7 @@
 void AudioController::on_graphtype_selection_currentIndexChanged(
     [[maybe_unused]] int index) {
     ui->main_graph->set_graph_type(ui->graphtype_selection->currentData()
-                                       .value<AudioGraphicWidget::GraphType>());
-}
-
-void AudioController::on_area_scale_spinner_valueChanged(int arg1) {
-    ui->main_graph->set_visibleFrameRange(arg1 * 2048);
+                                       .value<GraphType>());
 }
 
 void AudioController::on_lock_ptr_pos_button_toggled(bool checked) {

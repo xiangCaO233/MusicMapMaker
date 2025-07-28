@@ -96,8 +96,12 @@ set(PROJECT_SOURCES
     src/ui/audio/track/trackmanager.ui
     src/ui/audio/callback/AudioPlayCallBack.hpp
     src/ui/audio/callback/AudioPlayCallBack.cpp
+    src/ui/audio/graphic/formrender/FormRenderer2D.hpp
+    src/ui/audio/graphic/formrender/FormRenderer2D.cpp
     src/ui/audio/graphic/AudioGraphicWidget.h
     src/ui/audio/graphic/AudioGraphicWidget.cpp
+    src/ui/audio/graphic/AudioGraphicWidgetEvents.cpp
+    src/ui/audio/graphic/AudioGraphicWidgetRender.cpp
     src/ui/audio/control/ProcessChain.hpp
     src/ui/audio/control/audiocontroller.h
     src/ui/audio/control/audiocontroller.cpp

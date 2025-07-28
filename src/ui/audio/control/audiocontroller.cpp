@@ -17,9 +17,9 @@ AudioController::AudioController(QWidget* parent)
 
     // 初始化图形类型选择数据
     ui->graphtype_selection->setItemData(
-        0, QVariant::fromValue(AudioGraphicWidget::GraphType::WAVE));
+        0, QVariant::fromValue(GraphType::WAVE));
     ui->graphtype_selection->setItemData(
-        1, QVariant::fromValue(AudioGraphicWidget::GraphType::SPECTRO));
+        1, QVariant::fromValue(GraphType::SPECTRO));
 
     // 初始化单位选择器
     // 填充单位选择框

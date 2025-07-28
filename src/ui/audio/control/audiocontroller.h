@@ -92,8 +92,6 @@ class AudioController : public HideableToolWindow {
 
     void on_graphtype_selection_currentIndexChanged(int index);
 
-    void on_area_scale_spinner_valueChanged(int arg1);
-
     void on_lock_ptr_pos_button_toggled(bool checked);
 
     void on_ptr_pos_value_spinner_valueChanged(double arg1);
