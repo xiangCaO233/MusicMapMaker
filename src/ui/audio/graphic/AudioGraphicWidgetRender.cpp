@@ -14,7 +14,7 @@ auto glCallImpl(Func func, const char* funcStr) {
         // lambda 返回 void
         // 调用 lambda
         func();
-        if (GLenum error = glGetError() != GL_NO_ERROR) {
+        if (const GLenum error = glGetError() != GL_NO_ERROR) {
             qDebug() << "OpenGL Error in [" << funcStr << "]: " << error;
         }
         // 此分支无返回
@@ -22,7 +22,7 @@ auto glCallImpl(Func func, const char* funcStr) {
         // lambda 有返回值
         // 调用 lambda 并捕获结果
         auto&& result = func();
-        if (GLenum error = glGetError() != GL_NO_ERROR) {
+        if (const GLenum error = glGetError() != GL_NO_ERROR) {
             qDebug() << "OpenGL Error in [" << funcStr << "]: " << error;
         }
         // 返回结果
@@ -57,7 +57,7 @@ void AudioGraphicWidget::paintGL() {
     // Y轴从-1.0到1.0代表最大振幅
     projection.ortho(0.0f, static_cast<float>(visibleFrameRange), -1.0f, 1.0f,
                      -1.0f, 1.0f);
-    QMatrix4x4 view;
+    const QMatrix4x4 view;
     // view 矩阵将世界坐标（像素索引）映射到屏幕
     // 在着色器中用 gl_VertexID 作为x坐标，所以不需要平移和缩放
     // 真正的平移缩放体现在我们从哪个源数据点开始计算
@@ -66,6 +66,7 @@ void AudioGraphicWidget::paintGL() {
     renderer->wav().resize(source_node->format(), visibleFrameRange);
 
     process_chain->source->set_playpos(viewStartFrame);
+
     process_chain->source->play();
     process_chain->output->process(renderer->wav());
     process_chain->source->pause();
@@ -79,9 +80,9 @@ void AudioGraphicWidget::paintGL() {
     // 绘制播放指针
     if (currentPlaybackFrame >= viewStartFrame &&
         currentPlaybackFrame < viewStartFrame + visibleFrameRange) {
-        double framesPerPixel =
+        const double framesPerPixel =
             static_cast<double>(visibleFrameRange) / width();
-        double x_pos =
+        const double x_pos =
             (static_cast<double>(currentPlaybackFrame) - viewStartFrame) /
             framesPerPixel;
         painter.setPen(QPen(Qt::red, 1.5));

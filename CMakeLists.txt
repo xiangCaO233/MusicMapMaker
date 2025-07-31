@@ -71,16 +71,16 @@ set(GLSL_FILES)
 # 项目源文件
 set(PROJECT_SOURCES
     src/util/mutil.hpp
-    src/canvas/geom/QuadInstanceData.hpp
-    src/canvas/render/Renderer2D.hpp
-    src/canvas/render/Renderer2D.cpp
-    src/canvas/FrameRateCounter.hpp
-    src/canvas/FrameRateCounter.cpp
+    src/ui/canvas/geom/QuadInstanceData.hpp
+    src/ui/canvas/render/Renderer2D.hpp
+    src/ui/canvas/render/Renderer2D.cpp
+    src/ui/canvas/FrameRateCounter.hpp
+    src/ui/canvas/FrameRateCounter.cpp
+    src/ui/canvas/GLCanvas.cpp
+    src/ui/canvas/GLCanvas.hpp
+    src/ui/canvas/GLCanvasEvents.cpp
     src/ui/canvas/CanvasContainer.h
     src/ui/canvas/CanvasContainer.cpp
-    src/canvas/GLCanvas.cpp
-    src/canvas/GLCanvas.hpp
-    src/canvas/GLCanvasEvents.cpp
     src/ui/template/AutoResizeTableWidget.h
     src/ui/template/AutoResizeTableWidget.cpp
     src/ui/template/HideableToolWindow.hpp

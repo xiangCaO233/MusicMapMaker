@@ -125,7 +125,7 @@ class AudioGraphicWidget : public QOpenGLWidget {
     // 交互
     QPoint lastMousePos;
     // 拖拽
-    bool isPanning;
+    bool isPanning{false};
 };
 
 #endif  // MMM_AUDIOGRAPHICWIDGET_H

@@ -68,4 +68,5 @@ void AudioGraphicWidget::wheelEvent(QWheelEvent *event) {
     viewStartFrame = qMax(0LL, viewStartFrame);
     viewStartFrame = qMin(qint64(audio_track->num_frames() - visibleFrameRange),
                           viewStartFrame);
+    update();
 }
