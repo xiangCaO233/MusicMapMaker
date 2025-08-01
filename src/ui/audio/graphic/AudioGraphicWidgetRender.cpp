@@ -6,6 +6,8 @@
 #include <audio/graphic/formrender/FormRenderer2D.hpp>
 #include <ice/core/SourceNode.hpp>
 
+#include "ice/config/config.hpp"
+
 // C++17 的 if constexpr 的模板帮助函数
 template <typename Func>
 auto glCallImpl(Func func, const char* funcStr) {
@@ -52,18 +54,18 @@ void AudioGraphicWidget::paintGL() {
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
     if (!renderer || !audio_track) return;
 
-    // OpenGL 渲染
+    // GL渲染
     QMatrix4x4 projection;
     // Y轴从-1.0到1.0代表最大振幅
-    projection.ortho(0.0f, static_cast<float>(visibleFrameRange), -1.0f, 1.0f,
-                     -1.0f, 1.0f);
+    projection.ortho(0.0f, static_cast<float>(visibleFrameRange), -1.f, 1.f,
+                     -1.f, 1.f);
     const QMatrix4x4 view;
     // view 矩阵将世界坐标（像素索引）映射到屏幕
     // 在着色器中用 gl_VertexID 作为x坐标，所以不需要平移和缩放
     // 真正的平移缩放体现在我们从哪个源数据点开始计算
 
     // 读取音频数据到缓冲区
-    renderer->wav().resize(source_node->format(), visibleFrameRange);
+    renderer->wav().resize(ice::ICEConfig::internal_format, visibleFrameRange);
 
     process_chain->source->set_playpos(viewStartFrame);
 
@@ -71,6 +73,7 @@ void AudioGraphicWidget::paintGL() {
     process_chain->output->process(renderer->wav());
     process_chain->source->pause();
 
+    // 渲染波形
     renderer->render(gtype, projection, view);
 
     // --- QPainter 叠加绘制 ---
@@ -85,6 +88,7 @@ void AudioGraphicWidget::paintGL() {
         const double x_pos =
             (static_cast<double>(currentPlaybackFrame) - viewStartFrame) /
             framesPerPixel;
+
         painter.setPen(QPen(Qt::red, 1.5));
         painter.drawLine(QPointF(x_pos, 0), QPointF(x_pos, height()));
     }

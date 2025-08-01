@@ -16,8 +16,8 @@ AudioController::AudioController(QWidget* parent)
     ui->setupUi(this);
 
     // 初始化图形类型选择数据
-    ui->graphtype_selection->setItemData(
-        0, QVariant::fromValue(GraphType::WAVE));
+    ui->graphtype_selection->setItemData(0,
+                                         QVariant::fromValue(GraphType::WAVE));
     ui->graphtype_selection->setItemData(
         1, QVariant::fromValue(GraphType::SPECTRO));
 
@@ -171,6 +171,7 @@ void AudioController::updateDisplayPosition() {
     auto actual_speed = process_chain->stretcher->get_actual_playback_ratio();
     ui->actual_speed_value->setText(
         QString::asprintf("%.2f%%", actual_speed * 100.));
+    ui->actual_speed_progress->setValue(int(actual_speed * 10000.));
 
     // 只有在用户没有编辑时才更新，防止干扰输入
     if (!ui->time_edit->hasFocus()) {

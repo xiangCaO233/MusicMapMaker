@@ -21,12 +21,6 @@ enum class GraphType {
     // 频谱图
     SPECTRO,
 };
-// 存储每个像素列的振幅最大最小值
-struct MinMaxSample {
-    float min = 1.0f;
-    float max = -1.0f;
-    float rms = 0.0f;
-};
 
 class AudioGraphicWidget : public QOpenGLWidget {
     Q_OBJECT
@@ -70,7 +64,11 @@ class AudioGraphicWidget : public QOpenGLWidget {
 
     // 更新当前的播放帧位置
     inline void set_currentPlaybackFrame(size_t playpos) {
-        currentPlaybackFrame = playpos;
+        if (playpos < frameOffset) {
+            currentPlaybackFrame = 0;
+        } else {
+            currentPlaybackFrame = playpos - frameOffset;
+        }
         update();
     }
 
@@ -115,6 +113,9 @@ class AudioGraphicWidget : public QOpenGLWidget {
 
     // 当前视图显示的帧数跨度(10s)
     size_t visibleFrameRange{ice::ICEConfig::internal_format.samplerate * 2};
+
+    // 播放位置偏移
+    size_t frameOffset{ice::ICEConfig::internal_format.samplerate * 1 / 16};
 
     // 当前的播放帧位置
     size_t currentPlaybackFrame{0};

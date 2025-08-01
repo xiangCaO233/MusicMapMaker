@@ -108,6 +108,7 @@ set(PROJECT_SOURCES
     src/ui/audio/control/audiobasecontrols.cpp
     src/ui/audio/control/audiographcontrols.cpp
     src/ui/audio/control/audioeffectcontrols.cpp
+    src/ui/audio/control/audioeqcontrols.cpp
     src/ui/audio/control/audiocontroller.ui
     src/ui/mainwindow.h
     src/ui/mainwindow.cpp

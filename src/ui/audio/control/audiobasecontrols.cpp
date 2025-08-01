@@ -153,9 +153,22 @@ void AudioController::on_unit_selection_currentIndexChanged(int index) {
     updateDisplayPosition();
 }
 
+void AudioController::on_apply_volume_to_graph_checkStateChanged(
+    const Qt::CheckState &arg1) {
+    if (arg1 == Qt::CheckState::Checked) {
+        ui->main_graph->chain()->source->setvolume(source_node->getvolume());
+    } else {
+        ui->main_graph->chain()->source->setvolume(1.f);
+    }
+}
+
 void AudioController::on_volume_slider_valueChanged(int value) {
     source_node->setvolume(float(value) / 100.f);
-    ui->main_graph->chain()->source->setvolume(float(value) / 100.f);
+    if (ui->apply_volume_to_graph->isChecked()) {
+        ui->main_graph->chain()->source->setvolume(float(value) / 100.f);
+    } else {
+        ui->main_graph->chain()->source->setvolume(1.f);
+    }
     // 更新标签
     ui->volume_value_label->setText(QString::number(value));
 }

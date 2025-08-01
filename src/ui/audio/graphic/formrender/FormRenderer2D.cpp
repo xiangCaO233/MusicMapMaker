@@ -127,6 +127,7 @@ void FormRenderer2D::render(GraphType type, const QMatrix4x4& projection,
             // 设置声道颜色
             waveformShader->setUniformValue("channel_color",
                                             channel_colors[ch]);
+            waveformShader->setUniformValue("channel", ch);
             GLCALL(glDrawArrays(GL_LINE_STRIP, 0, wav_buffer.num_frames()));
         }
 

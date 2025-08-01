@@ -18,6 +18,9 @@ void AudioGraphicWidget::set_track(
     // 创建一个独立的source
     source_node = std::make_shared<ice::SourceNode>(track);
 
+    // 恢复原始音量
+    source_node->setvolume(1.f);
+
     // 构建一个处理链
     process_chain = std::make_shared<ProcessChain>(source_node);
 

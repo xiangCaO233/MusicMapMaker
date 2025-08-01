@@ -100,6 +100,60 @@ class AudioController : public HideableToolWindow {
 
     void on_speed_value_spinner_valueChanged(double arg1);
 
+    void on_apply_volume_to_graph_checkStateChanged(const Qt::CheckState &arg1);
+
+    void on_semitones_slider_valueChanged(int value);
+
+    void on_scale_slider_valueChanged(int value);
+
+    void on_semitones_spinner_valueChanged(double arg1);
+
+    void on_scale_spinner_valueChanged(double arg1);
+
+    void on_gainslider_31_valueChanged(int value);
+
+    void on_gainslider_63_valueChanged(int value);
+
+    void on_gainslider_125_valueChanged(int value);
+
+    void on_gainslider_250_valueChanged(int value);
+
+    void on_gainslider_500_valueChanged(int value);
+
+    void on_gainslider_1k_valueChanged(int value);
+
+    void on_gainslider_2k_valueChanged(int value);
+
+    void on_gainslider_4k_valueChanged(int value);
+
+    void on_gainslider_8k_valueChanged(int value);
+
+    void on_gainslider_16k_valueChanged(int value);
+
+    void on_q_31_valueChanged(double arg1);
+
+    void on_q_63_valueChanged(double arg1);
+
+    void on_q_125_valueChanged(double arg1);
+
+    void on_q_250_valueChanged(double arg1);
+
+    void on_q_500_valueChanged(double arg1);
+
+    void on_q_1k_valueChanged(double arg1);
+
+    void on_q_2k_valueChanged(double arg1);
+
+    void on_q_4k_valueChanged(double arg1);
+
+    void on_q_8k_valueChanged(double arg1);
+
+    void on_q_16k_valueChanged(double arg1);
+
+    void on_reset_stretcher_button_clicked();
+
+    void on_reset_pitch_shift_button_clicked();
+
    private:
     // 音频轨道
     std::shared_ptr<ice::AudioTrack> audio_track{nullptr};
@@ -124,6 +178,9 @@ class AudioController : public HideableToolWindow {
 
     // ui需要显示时间位置时需要展示的参考值
     std::chrono::nanoseconds uitime_pos;
+
+    // 更新音调变化
+    void update_pitch(double semitones);
 
     Ui::AudioController *ui;
 };
