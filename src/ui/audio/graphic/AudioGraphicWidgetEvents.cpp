@@ -2,71 +2,102 @@
 
 #include <QWheelEvent>
 
-void AudioGraphicWidget::showEvent(QShowEvent *event) {
+void AudioGraphicWidget::showEvent(QShowEvent* event) {
     QOpenGLWidget::showEvent(event);
 }
-void AudioGraphicWidget::mousePressEvent(QMouseEvent *event) {
+
+void AudioGraphicWidget::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::RightButton) {
+        lastMousePos = event->pos();
         isPanning = true;
-        lastMousePos = event->pos();
         setCursor(Qt::ClosedHandCursor);
-    } else if (event->button() == Qt::LeftButton) {
-        // 跳转
+        event->accept();
     }
 }
 
-void AudioGraphicWidget::mouseMoveEvent(QMouseEvent *event) {
-    if (isPanning) {
-        // 拖拽
-        int dx = event->pos().x() - lastMousePos.x();
-        lastMousePos = event->pos();
-
-        auto framesPerPixel = static_cast<double>(visibleFrameRange) / width();
-        auto frameDelta = static_cast<qint64>(dx * framesPerPixel);
-
-        viewStartFrame -= frameDelta;
-
-        // 边界检查
-        viewStartFrame = qMax(0LL, viewStartFrame);
-        if (audio_track) {
-            viewStartFrame =
-                qMin(qint64(audio_track->num_frames() - visibleFrameRange),
-                     viewStartFrame);
-        }
-        update();
-    } else {
-        // 移动-显示当前鼠标位置对应的时间戳
-    }
-}
-
-void AudioGraphicWidget::mouseReleaseEvent(QMouseEvent *event) {
+void AudioGraphicWidget::mouseReleaseEvent(QMouseEvent* event) {
     if (event->button() == Qt::RightButton && isPanning) {
         isPanning = false;
         setCursor(Qt::ArrowCursor);
+        event->accept();
     }
 }
 
-void AudioGraphicWidget::wheelEvent(QWheelEvent *event) {
-    if (!audio_track) return;
+void AudioGraphicWidget::mouseMoveEvent(QMouseEvent* event) {
+    if (isPanning) {
+        const QPoint delta = event->pos() - lastMousePos;
+        lastMousePos = event->pos();
 
-    double zoomFactor = (event->angleDelta().y() > 0) ? 0.8 : 1.25;
-    double framesPerPixel = static_cast<double>(visibleFrameRange) / width();
-    qint64 mouseFrame =
-        viewStartFrame +
-        static_cast<qint64>(event->position().x() * framesPerPixel);
+        // 将像素偏移转换为时间偏移
+        auto time_delta = pixelsToTime(delta.x());
 
-    size_t newRange = visibleFrameRange * zoomFactor;
-    // 限制范围
-    newRange = qMax((size_t)width(), newRange);
-    newRange = qMin(audio_track->num_frames(), newRange);
-    visibleFrameRange = newRange;
+        // 更新视图起始时间 (注意是减去，因为向右拖动(delta.x >
+        // 0)意味着时间变小)
+        auto new_start_time = viewStartTime - time_delta;
 
-    // 以鼠标为中心缩放
-    viewStartFrame =
-        mouseFrame - static_cast<qint64>(event->position().x() *
-                                         visibleFrameRange / width());
-    viewStartFrame = qMax(0LL, viewStartFrame);
-    viewStartFrame = qMin(qint64(audio_track->num_frames() - visibleFrameRange),
-                          viewStartFrame);
+        // 边界检查
+        if (new_start_time < std::chrono::nanoseconds(0)) {
+            new_start_time = std::chrono::nanoseconds(0);
+        }
+
+        // 检查是否超出音轨末尾
+        const auto total_track_time =
+            framesToTime(audio_track->num_frames(),
+                         audio_track->get_media_info().format.samplerate);
+        if (new_start_time + visibleTimeRange > total_track_time) {
+            new_start_time = total_track_time - visibleTimeRange;
+            if (new_start_time < std::chrono::nanoseconds(0)) {
+                new_start_time = std::chrono::nanoseconds(0);
+            }
+        }
+
+        viewStartTime = new_start_time;
+        update();
+        event->accept();
+    }
+}
+
+void AudioGraphicWidget::wheelEvent(QWheelEvent* event) {
+    const float zoom_factor = 1.15f;
+    const QPoint angle_delta = event->angleDelta();
+
+    // 获取鼠标在控件内的位置和时间
+    const double mouse_x = event->position().x();
+    const auto time_at_cursor_before_zoom =
+        viewStartTime + pixelsToTime(mouse_x);
+
+    // 计算新的可见时间范围
+    std::chrono::nanoseconds new_visible_range;
+    if (angle_delta.y() > 0) {  // 向上滚轮，放大
+        new_visible_range =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                visibleTimeRange / zoom_factor);
+    } else {  // 向下滚轮，缩小
+        new_visible_range =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                visibleTimeRange * zoom_factor);
+    }
+
+    // 边界检查
+    const auto min_range = std::chrono::nanoseconds(10000000);
+    const auto max_range =
+        framesToTime(audio_track->num_frames(),
+                     audio_track->get_media_info().format.samplerate);
+    new_visible_range =
+        std::max(min_range, std::min(new_visible_range, max_range));
+
+    // 计算新的视图起始时间，以保持鼠标指向的时间点不变
+    const double mouse_x_ratio = mouse_x / width();
+    viewStartTime = time_at_cursor_before_zoom -
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        new_visible_range * mouse_x_ratio);
+
+    // 更新可见范围并进行边界检查
+    visibleTimeRange = new_visible_range;
+    if (viewStartTime < std::chrono::nanoseconds(0)) {
+        viewStartTime = std::chrono::nanoseconds(0);
+    }
+
     update();
+    event->accept();
 }

@@ -1,5 +1,8 @@
 #include <AudioGraphicWidget.h>
 
+#include <QtConcurrent>
+#include <chrono>
+
 // 构造AudioGraphicWidget
 AudioGraphicWidget::AudioGraphicWidget(QWidget* parent)
     : QOpenGLWidget(parent) {}
@@ -13,7 +16,7 @@ void AudioGraphicWidget::set_track(
     audio_track = track;
 
     // 新轨道从头开始
-    viewStartFrame = 0;
+    viewStartTime = std::chrono::nanoseconds(0);
 
     // 创建一个独立的source
     source_node = std::make_shared<ice::SourceNode>(track);

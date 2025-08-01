@@ -92,6 +92,8 @@ void TrackManager::on_remove_track_button_clicked() {
     ui->metadata_table->item(3, 1)->setText("");
     ui->metadata_table->item(4, 1)->setText("");
     ui->metadata_table->item(5, 1)->setText("");
+    ui->metadata_table->item(6, 1)->setText("");
+    ui->metadata_table->item(7, 1)->setText("");
 
     // 清除专辑封面显示
     ui->album_cover->clear();
@@ -173,6 +175,10 @@ void TrackManager::on_track_list_clicked(const QModelIndex& index) {
     ui->metadata_table->item(2, 1)->setText(
         QString::fromStdString(mediainfo.album));
     ui->metadata_table->item(3, 1)->setText(QString::number(mediainfo.bitrate));
+    ui->metadata_table->item(4, 1)->setText(
+        QString::number(mediainfo.format.samplerate));
+    ui->metadata_table->item(5, 1)->setText(
+        QString::number(mediainfo.format.channels));
 
     // 计算时间
     auto time_seconds =
@@ -180,9 +186,9 @@ void TrackManager::on_track_list_clicked(const QModelIndex& index) {
     auto timestr = QString::number(time_seconds / 60.0) + tr("min") + " | " +
                    QString::number(time_seconds) + tr("s") + " | " +
                    QString::number(time_seconds * 1000) + tr("ms");
-    ui->metadata_table->item(4, 1)->setText(timestr);
+    ui->metadata_table->item(6, 1)->setText(timestr);
 
-    ui->metadata_table->item(5, 1)->setText(
+    ui->metadata_table->item(7, 1)->setText(
         QString::number(mediainfo.frame_count));
 
     if (mediainfo.cover.isValid()) {

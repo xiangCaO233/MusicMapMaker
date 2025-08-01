@@ -1,9 +1,5 @@
 #version 410 core
 
-// uniform int formwidth;
-// uniform int formheight;
-// uniform uint samples;
-
 uniform mat4 projection;
 uniform mat4 view;
 uniform int channel;

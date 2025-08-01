@@ -33,6 +33,8 @@ class FormRenderer2D : public QOpenGLFunctions_4_1_Core {
 
     ice::AudioBuffer &wav() { return wav_buffer; }
 
+    void updateSpectrogramTexture();
+
    private:
     void initShaders();
     void initGeometry();
@@ -49,10 +51,18 @@ class FormRenderer2D : public QOpenGLFunctions_4_1_Core {
     QOpenGLVertexArrayObject waveformVAO;
     // 当前波形图范围的对应数据集
     ice::AudioBuffer wav_buffer;
-    QVector<QVector4D> channel_colors{
-        QVector4D(0.0f, 0.75f, 1.0f, 0.4f),  // 明亮的青蓝色 (Bright Cyan-Blue)
-        QVector4D(0.1f, 1.0f, 0.5f, 0.4f)  // 鲜明的石灰绿 (Vibrant Lime Green)
-    };
+    QVector<QVector4D> channel_colors{QVector4D(0.0f, 0.75f, 1.0f, 0.4f),
+                                      QVector4D(0.1f, 1.0f, 0.5f, 0.4f)};
+
+    // 频谱图资源
+    QOpenGLShaderProgram *spectroShader{nullptr};
+    // 频谱图顶点缓冲区
+    QOpenGLBuffer spectroVBO;
+    // 频谱图顶点数组
+    QOpenGLVertexArrayObject spectroVAO;
+
+    std::unique_ptr<QOpenGLTexture> spectroTexLeft;
+    std::unique_ptr<QOpenGLTexture> spectroTexRight;
 };
 
 #endif  // MMM_FORMRENDERER2D_HPP

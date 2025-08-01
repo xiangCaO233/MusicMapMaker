@@ -7,13 +7,13 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QOpenGLWidget>
+#include <audio/control/ProcessChain.hpp>
+#include <audio/graphic/formrender/FormRenderer2D.hpp>
+#include <chrono>
+#include <ice/config/config.hpp>
+#include <ice/core/SourceNode.hpp>
+#include <ice/manage/AudioTrack.hpp>
 #include <memory>
-
-#include "audio/control/ProcessChain.hpp"
-#include "formrender/FormRenderer2D.hpp"
-#include "ice/config/config.hpp"
-#include "ice/core/SourceNode.hpp"
-#include "ice/manage/AudioTrack.hpp"
 
 enum class GraphType {
     // 波形图
@@ -57,17 +57,34 @@ class AudioGraphicWidget : public QOpenGLWidget {
         update();
     }
 
-    // 设置当前视图显示的帧数跨度(一个完整页显示的音频的帧数)
-    inline void set_visibleFrameRange(size_t range) {
-        visibleFrameRange = range;
-    }
-
     // 更新当前的播放帧位置
-    inline void set_currentPlaybackFrame(size_t playpos) {
-        if (playpos < frameOffset) {
-            currentPlaybackFrame = 0;
-        } else {
-            currentPlaybackFrame = playpos - frameOffset;
+    inline void set_currentPlaybackFrame(double playpos) {
+        // playpos 是源音轨的帧数，我们需要把它转换成时间
+        const auto source_sample_rate = static_cast<double>(
+            audio_track->get_media_info().format.samplerate);
+
+        // 使用您已有的精确计算方法
+        const double duration_in_seconds = playpos / source_sample_rate;
+        using double_seconds = std::chrono::duration<double>;
+        currentPlaybackTime =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                double_seconds(duration_in_seconds));
+
+        // 跟随播放逻辑
+        if (followPlayback) {
+            // 检查播放时间是否超出了当前视图的跟随区域
+            const auto follow_point_time =
+                viewStartTime +
+                std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    visibleTimeRange * followPositionRatio);
+
+            if (currentPlaybackTime > follow_point_time) {
+                // 将视图的起始时间设置为播放指针减去跟随偏移
+                viewStartTime =
+                    currentPlaybackTime -
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        visibleTimeRange * followPositionRatio);
+            }
         }
         update();
     }
@@ -76,6 +93,9 @@ class AudioGraphicWidget : public QOpenGLWidget {
     inline void set_graph_type(GraphType type) {
         gtype = type;
         // 切换模式后，立即重新计算可视化
+        if (gtype == GraphType::SPECTRO) {
+        }
+        update();
     }
 
    protected:
@@ -111,17 +131,51 @@ class AudioGraphicWidget : public QOpenGLWidget {
     // 跟随位置比例
     double followPositionRatio{0.5};
 
-    // 当前视图显示的帧数跨度(10s)
-    size_t visibleFrameRange{ice::ICEConfig::internal_format.samplerate * 2};
+    // 时间与帧数/像素转换的辅助函数
+    inline long long timeToFrames(std::chrono::nanoseconds t,
+                                  double sample_rate) const {
+        if (sample_rate == 0) return 0;
+        // 将纳秒转换为秒 (浮点数), 然后乘以采样率
+        auto seconds = std::chrono::duration<double>(t).count();
+        return static_cast<long long>(seconds * sample_rate);
+    }
+
+    inline std::chrono::nanoseconds framesToTime(long long f,
+                                                 double sample_rate) const {
+        if (sample_rate == 0) return std::chrono::nanoseconds(0);
+        double seconds = static_cast<double>(f) / sample_rate;
+        using double_seconds = std::chrono::duration<double>;
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(
+            double_seconds(seconds));
+    }
+
+    double timeToPixels(std::chrono::nanoseconds t) const {
+        if (visibleTimeRange.count() == 0) return 0;
+        // 时间在视图中的比例 * 窗口宽度
+        double ratio =
+            static_cast<double>(t.count()) / visibleTimeRange.count();
+        return ratio * width();
+    }
+
+    std::chrono::nanoseconds pixelsToTime(double p) const {
+        if (width() == 0) return std::chrono::nanoseconds(0);
+        // 像素在窗口中的比例 * 可见时间范围
+        double ratio = p / width();
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(
+            visibleTimeRange * ratio);
+    }
+
+    // 当前视图显示的纳秒跨度 (默认2s)
+    std::chrono::nanoseconds visibleTimeRange{std::chrono::seconds(2)};
+
+    // 当前的播放时间位置
+    std::chrono::nanoseconds currentPlaybackTime{0};
+
+    // 当前视图的起始时间
+    std::chrono::nanoseconds viewStartTime{0};
 
     // 播放位置偏移
-    size_t frameOffset{ice::ICEConfig::internal_format.samplerate * 1 / 16};
-
-    // 当前的播放帧位置
-    size_t currentPlaybackFrame{0};
-
-    // 当前视图的起始帧
-    qint64 viewStartFrame{0};
+    std::chrono::nanoseconds timeOffset{std::chrono::milliseconds(75)};
 
     // 交互
     QPoint lastMousePos;

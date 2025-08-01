@@ -18,8 +18,8 @@
 #include "ui_trackmanager.h"
 
 QStringList TrackManager::metaNames() {
-    return {tr("title"),   tr("artist"), tr("album"),
-            tr("bitrate"), tr("length"), tr("framecount")};
+    return {tr("title"),      tr("artist"),   tr("album"),  tr("bitrate"),
+            tr("samplerate"), tr("channels"), tr("length"), tr("framecount")};
 }
 
 TrackManager::TrackManager(QWidget* parent)

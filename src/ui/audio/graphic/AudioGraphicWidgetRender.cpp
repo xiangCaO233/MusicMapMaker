@@ -54,40 +54,49 @@ void AudioGraphicWidget::paintGL() {
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
     if (!renderer || !audio_track) return;
 
-    // GL渲染
+    // --- 核心改变在这里: 所有计算都基于时间 ---
+
+    // 计算引擎需要渲染多少帧 (基于引擎采样率)
+    const double engine_sample_rate =
+        ice::ICEConfig::internal_format.samplerate;
+    const auto engine_visible_frames =
+        timeToFrames(visibleTimeRange, engine_sample_rate);
+
+    // 设置正交投影矩阵 (X轴现在代表引擎处理的帧数)
     QMatrix4x4 projection;
-    // Y轴从-1.0到1.0代表最大振幅
-    projection.ortho(0.0f, static_cast<float>(visibleFrameRange), -1.f, 1.f,
+    projection.ortho(0.0f, static_cast<float>(engine_visible_frames), -1.f, 1.f,
                      -1.f, 1.f);
     const QMatrix4x4 view;
-    // view 矩阵将世界坐标（像素索引）映射到屏幕
-    // 在着色器中用 gl_VertexID 作为x坐标，所以不需要平移和缩放
-    // 真正的平移缩放体现在我们从哪个源数据点开始计算
+
+    // 计算SourceNode应该从哪里开始读取 (基于源采样率)
+    const double source_sample_rate =
+        audio_track->get_media_info().format.samplerate;
+    const auto source_start_frame =
+        timeToFrames(viewStartTime, source_sample_rate);
 
     // 读取音频数据到缓冲区
-    renderer->wav().resize(ice::ICEConfig::internal_format, visibleFrameRange);
-
-    process_chain->source->set_playpos(viewStartFrame);
-
+    renderer->wav().resize(ice::ICEConfig::internal_format,
+                           engine_visible_frames);
+    process_chain->source->set_playpos(source_start_frame);
     process_chain->source->play();
     process_chain->output->process(renderer->wav());
     process_chain->source->pause();
 
-    // 渲染波形
+    // 渲染波形 (FormRenderer2D 不需要任何改动)
     renderer->render(gtype, projection, view);
 
-    // --- QPainter 叠加绘制 ---
+    // QPainter 叠加绘制
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
 
-    // 绘制播放指针
-    if (currentPlaybackFrame >= viewStartFrame &&
-        currentPlaybackFrame < viewStartFrame + visibleFrameRange) {
-        const double framesPerPixel =
-            static_cast<double>(visibleFrameRange) / width();
-        const double x_pos =
-            (static_cast<double>(currentPlaybackFrame) - viewStartFrame) /
-            framesPerPixel;
+    // 绘制播放指针 (完全基于时间)
+    if (currentPlaybackTime >= viewStartTime &&
+        currentPlaybackTime < viewStartTime + visibleTimeRange) {
+        // 计算播放指针相对于视图起始点的时间差
+        const auto time_offset =
+            currentPlaybackTime - viewStartTime - timeOffset;
+        // 将时间差转换为像素位置
+        const double x_pos = timeToPixels(time_offset);
 
         painter.setPen(QPen(Qt::red, 1.5));
         painter.drawLine(QPointF(x_pos, 0), QPointF(x_pos, height()));

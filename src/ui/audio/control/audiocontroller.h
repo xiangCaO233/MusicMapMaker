@@ -61,7 +61,7 @@ class AudioController : public HideableToolWindow {
         return output_node;
     }
 
-    inline void set_uiframe_pos(size_t frame_pos) { uiframe_pos = frame_pos; }
+    inline void set_uiframe_pos(double frame_pos) { uiframe_pos = frame_pos; }
     inline void set_uitime_pos(std::chrono::nanoseconds time_pos) {
         uitime_pos = time_pos;
     }
@@ -174,7 +174,7 @@ class AudioController : public HideableToolWindow {
     QStandardItem *refitem{nullptr};
 
     // ui需要显示帧位置时需要展示的参考值
-    size_t uiframe_pos;
+    double uiframe_pos;
 
     // ui需要显示时间位置时需要展示的参考值
     std::chrono::nanoseconds uitime_pos;
