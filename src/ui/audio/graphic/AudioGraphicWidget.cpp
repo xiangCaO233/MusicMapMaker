@@ -1,7 +1,10 @@
 #include <AudioGraphicWidget.h>
+#include <qlogging.h>
 
 #include <QtConcurrent>
 #include <chrono>
+
+#include "ice/config/config.hpp"
 
 // 构造AudioGraphicWidget
 AudioGraphicWidget::AudioGraphicWidget(QWidget* parent)
@@ -30,6 +33,14 @@ void AudioGraphicWidget::set_track(
     // 只使用eq
     process_chain->eq->set_inputnode(process_chain->source);
     process_chain->output = process_chain->eq;
+
+    double offset = 75. * (double(ice::ICEConfig::internal_format.samplerate) /
+                           double(track->get_media_info().format.samplerate));
+
+    // 更新偏移
+    timeOffset = std::chrono::nanoseconds(size_t(offset * 1000000));
+
+    // qDebug() << "offset = " << timeOffset;
 
     if (!isHidden()) {
         update();

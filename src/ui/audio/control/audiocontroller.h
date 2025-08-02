@@ -92,10 +92,6 @@ class AudioController : public HideableToolWindow {
 
     void on_graphtype_selection_currentIndexChanged(int index);
 
-    void on_lock_ptr_pos_button_toggled(bool checked);
-
-    void on_ptr_pos_value_spinner_valueChanged(double arg1);
-
     void on_stretcher_speed_slider_valueChanged(int value);
 
     void on_speed_value_spinner_valueChanged(double arg1);
@@ -153,6 +149,8 @@ class AudioController : public HideableToolWindow {
     void on_reset_stretcher_button_clicked();
 
     void on_reset_pitch_shift_button_clicked();
+
+    void on_live_button_toggled(bool checked);
 
    private:
     // 音频轨道

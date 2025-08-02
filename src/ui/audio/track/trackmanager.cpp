@@ -15,6 +15,7 @@
 #include <ice/out/play/sdl/SDLPlayer.hpp>
 #include <memory>
 
+#include "HideableToolWindow.hpp"
 #include "ui_trackmanager.h"
 
 QStringList TrackManager::metaNames() {
@@ -123,6 +124,12 @@ TrackManager::~TrackManager() {
 
     delete ui;
     qDebug() << "TrackManager deleted";
+}
+void TrackManager::closeEvent(QCloseEvent* event) {
+    for (auto controller : audio_controllers) {
+        controller->close();
+    }
+    HideableToolWindow::closeEvent(event);
 }
 
 // 载入音频

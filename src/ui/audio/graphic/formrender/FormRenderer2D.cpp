@@ -183,29 +183,39 @@ void FormRenderer2D::render(GraphType type, const QMatrix4x4& projection,
         waveformShader->bind();
         waveformShader->setUniformValue("projection", projection);
         waveformShader->setUniformValue("view", view);
-        // waveformShader->setUniformValue("samples",
-        //                                 uint32_t(wav_buffer.num_frames()));
 
         QOpenGLVertexArrayObject::Binder vaoBinder(&waveformVAO);
 
         // 每个声道独立drawcall(完整线段集)
-        for (int ch = 0; ch < wav_buffer.afmt.channels; ++ch) {
-            waveformVBO.bind();
-            waveformVBO.allocate(wav_buffer.raw_ptrs()[ch],
-                                 wav_buffer.num_frames() * sizeof(float));
-            // 设置声道颜色
-            waveformShader->setUniformValue("channel_color",
-                                            channel_colors[ch]);
-            waveformShader->setUniformValue("channel", ch);
-            GLCALL(glDrawArrays(GL_LINE_STRIP, 0, wav_buffer.num_frames()));
-        }
+        if (liveGraph) {
+            for (int ch = 0; ch < wav_buffer.afmt.channels; ++ch) {
+                // 设置声道颜色
+                waveformShader->setUniformValue("channel_color",
+                                                channel_colors[ch]);
+                waveformShader->setUniformValue("channel", ch);
 
+                waveformVBO.bind();
+                waveformVBO.allocate(wav_buffer.raw_ptrs()[ch],
+                                     wav_buffer.num_frames() * sizeof(float));
+                GLCALL(glDrawArrays(GL_LINE_STRIP, 0, wav_buffer.num_frames()));
+            }
+        } else {
+            for (int ch = 0; ch < wav_span.size(); ++ch) {
+                // 设置声道颜色
+                waveformShader->setUniformValue("channel_color",
+                                                channel_colors[ch]);
+                waveformShader->setUniformValue("channel", ch);
+                waveformVBO.bind();
+                waveformVBO.allocate(wav_span[ch].data(),
+                                     wav_span[ch].size() * sizeof(float));
+                GLCALL(glDrawArrays(GL_LINE_STRIP, 0, wav_span[ch].size()));
+            }
+        }
         waveformShader->release();
     } else if (type == GraphType::SPECTRO) {
         // 频谱图渲染逻辑
         if (!spectroTexLeft || !spectroTexRight || !spectroShader->isLinked())
             return;
-
         spectroShader->bind();
         spectroShader->setUniformValue("u_min_db", -90.0f);
         spectroShader->setUniformValue("u_max_db", 0.0f);

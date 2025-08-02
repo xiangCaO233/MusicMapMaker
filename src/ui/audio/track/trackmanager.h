@@ -53,6 +53,9 @@ class TrackManager : public HideableToolWindow {
                                   std::shared_ptr<ice::IAudioNode> oldnode,
                                   std::shared_ptr<ice::IAudioNode> newnode);
 
+   protected:
+    void closeEvent(QCloseEvent *event) override;
+
    private:
     static QStringList metaNames();
     // 各设备对应的播放器

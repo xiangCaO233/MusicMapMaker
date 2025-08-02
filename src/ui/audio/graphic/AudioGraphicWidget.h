@@ -92,10 +92,15 @@ class AudioGraphicWidget : public QOpenGLWidget {
     // 设置当前图形类型
     inline void set_graph_type(GraphType type) {
         gtype = type;
-        // 切换模式后，立即重新计算可视化
         if (gtype == GraphType::SPECTRO) {
         }
+        // 切换模式后，立即重新计算可视化
         update();
+    }
+
+    inline void set_live(bool flag) {
+        renderer->set_live(flag);
+        liveGraph = flag;
     }
 
    protected:
@@ -125,45 +130,14 @@ class AudioGraphicWidget : public QOpenGLWidget {
     // 默认显示波形图
     GraphType gtype{GraphType::WAVE};
 
+    // 实时同步处理
+    bool liveGraph{false};
+
     // 指针是否跟随播放位置
     bool followPlayback{true};
 
     // 跟随位置比例
     double followPositionRatio{0.5};
-
-    // 时间与帧数/像素转换的辅助函数
-    inline long long timeToFrames(std::chrono::nanoseconds t,
-                                  double sample_rate) const {
-        if (sample_rate == 0) return 0;
-        // 将纳秒转换为秒 (浮点数), 然后乘以采样率
-        auto seconds = std::chrono::duration<double>(t).count();
-        return static_cast<long long>(seconds * sample_rate);
-    }
-
-    inline std::chrono::nanoseconds framesToTime(long long f,
-                                                 double sample_rate) const {
-        if (sample_rate == 0) return std::chrono::nanoseconds(0);
-        double seconds = static_cast<double>(f) / sample_rate;
-        using double_seconds = std::chrono::duration<double>;
-        return std::chrono::duration_cast<std::chrono::nanoseconds>(
-            double_seconds(seconds));
-    }
-
-    double timeToPixels(std::chrono::nanoseconds t) const {
-        if (visibleTimeRange.count() == 0) return 0;
-        // 时间在视图中的比例 * 窗口宽度
-        double ratio =
-            static_cast<double>(t.count()) / visibleTimeRange.count();
-        return ratio * width();
-    }
-
-    std::chrono::nanoseconds pixelsToTime(double p) const {
-        if (width() == 0) return std::chrono::nanoseconds(0);
-        // 像素在窗口中的比例 * 可见时间范围
-        double ratio = p / width();
-        return std::chrono::duration_cast<std::chrono::nanoseconds>(
-            visibleTimeRange * ratio);
-    }
 
     // 当前视图显示的纳秒跨度 (默认2s)
     std::chrono::nanoseconds visibleTimeRange{std::chrono::seconds(2)};
@@ -176,6 +150,40 @@ class AudioGraphicWidget : public QOpenGLWidget {
 
     // 播放位置偏移
     std::chrono::nanoseconds timeOffset{std::chrono::milliseconds(75)};
+
+    // 时间与帧数/像素转换的辅助函数
+    inline double timeToFrames(std::chrono::nanoseconds t,
+                               double sample_rate) const {
+        if (sample_rate == 0) return 0;
+        // 将纳秒转换为秒 (浮点数), 然后乘以采样率
+        auto seconds = std::chrono::duration<double>(t).count();
+        return seconds * sample_rate;
+    }
+
+    inline std::chrono::nanoseconds framesToTime(long long f,
+                                                 double sample_rate) const {
+        if (sample_rate == 0) return std::chrono::nanoseconds(0);
+        double seconds = static_cast<double>(f) / sample_rate;
+        using double_seconds = std::chrono::duration<double>;
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(
+            double_seconds(seconds));
+    }
+
+    inline double timeToPixels(std::chrono::nanoseconds t) const {
+        if (visibleTimeRange.count() == 0) return 0;
+        // 时间在视图中的比例 * 窗口宽度
+        double ratio =
+            static_cast<double>(t.count()) / visibleTimeRange.count();
+        return ratio * width();
+    }
+
+    inline std::chrono::nanoseconds pixelsToTime(double p) const {
+        if (width() == 0) return std::chrono::nanoseconds(0);
+        // 像素在窗口中的比例 * 可见时间范围
+        double ratio = p / width();
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(
+            visibleTimeRange * ratio);
+    }
 
     // 交互
     QPoint lastMousePos;

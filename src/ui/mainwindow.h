@@ -28,6 +28,9 @@ class MainWindow : public QMainWindow {
 
     void projectmanager_close_slot(HideableToolWindow *wptr);
 
+   protected:
+    void closeEvent(QCloseEvent *e) override;
+
    private:
     Ui::MainWindow *ui;
 

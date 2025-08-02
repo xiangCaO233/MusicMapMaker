@@ -54,8 +54,6 @@ void AudioGraphicWidget::paintGL() {
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
     if (!renderer || !audio_track) return;
 
-    // --- 核心改变在这里: 所有计算都基于时间 ---
-
     // 计算引擎需要渲染多少帧 (基于引擎采样率)
     const double engine_sample_rate =
         ice::ICEConfig::internal_format.samplerate;
@@ -64,8 +62,6 @@ void AudioGraphicWidget::paintGL() {
 
     // 设置正交投影矩阵 (X轴现在代表引擎处理的帧数)
     QMatrix4x4 projection;
-    projection.ortho(0.0f, static_cast<float>(engine_visible_frames), -1.f, 1.f,
-                     -1.f, 1.f);
     const QMatrix4x4 view;
 
     // 计算SourceNode应该从哪里开始读取 (基于源采样率)
@@ -74,22 +70,34 @@ void AudioGraphicWidget::paintGL() {
     const auto source_start_frame =
         timeToFrames(viewStartTime, source_sample_rate);
 
-    // 读取音频数据到缓冲区
-    renderer->wav().resize(ice::ICEConfig::internal_format,
-                           engine_visible_frames);
-    process_chain->source->set_playpos(source_start_frame);
-    process_chain->source->play();
-    process_chain->output->process(renderer->wav());
-    process_chain->source->pause();
+    if (liveGraph) {
+        projection.ortho(0.0f, static_cast<float>(engine_visible_frames), -1.f,
+                         1.f, -1.f, 1.f);
+        // 读取音频数据到缓冲区
+        renderer->wav().resize(ice::ICEConfig::internal_format,
+                               size_t(std::ceil(engine_visible_frames)));
+        process_chain->source->set_playpos(
+            size_t(std::ceil(source_start_frame)));
+        process_chain->source->play();
+        process_chain->output->process(renderer->wav());
+        process_chain->source->pause();
+    } else {
+        renderer->span().clear();
+        const auto source_visible_frames =
+            timeToFrames(visibleTimeRange, source_sample_rate);
+        projection.ortho(0.0f, static_cast<float>(source_visible_frames), -1.f,
+                         1.f, -1.f, 1.f);
+        audio_track->origin(renderer->span(), source_start_frame,
+                            source_visible_frames);
+    }
 
-    // 渲染波形 (FormRenderer2D 不需要任何改动)
+    // 渲染波形
     renderer->render(gtype, projection, view);
 
+    // 绘制播放指针 (完全基于时间)
     // QPainter 叠加绘制
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
-
-    // 绘制播放指针 (完全基于时间)
     if (currentPlaybackTime >= viewStartTime &&
         currentPlaybackTime < viewStartTime + visibleTimeRange) {
         // 计算播放指针相对于视图起始点的时间差

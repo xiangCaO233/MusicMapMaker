@@ -25,11 +25,6 @@ MainWindow::MainWindow(QWidget* parent)
             &MainWindow::projectmanager_close_slot);
 }
 
-// 更新标题后缀
-void MainWindow::update_title_suffix(const QString& suffix) {
-    setWindowTitle("MusicMapMaker-->" + suffix);
-}
-
 MainWindow::~MainWindow() {
     projectmanager->hide();
     trackmanager->hide();
@@ -37,6 +32,15 @@ MainWindow::~MainWindow() {
     delete trackmanager;
     delete projectmanager;
     delete ui;
+}
+// 更新标题后缀
+void MainWindow::update_title_suffix(const QString& suffix) {
+    setWindowTitle("MusicMapMaker-->" + suffix);
+}
+
+void MainWindow::closeEvent(QCloseEvent* e) {
+    trackmanager->close();
+    projectmanager->close();
 }
 
 // 菜单项槽函数 - 控制显示和隐藏

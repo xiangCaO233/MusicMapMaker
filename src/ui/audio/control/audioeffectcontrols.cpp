@@ -35,7 +35,7 @@ void AudioController::on_speed_value_spinner_valueChanged(double arg1) {
 }
 
 void AudioController::on_reset_stretcher_button_clicked() {
-    ui->stretcher_speed_slider->setValue(100);
+    ui->stretcher_speed_slider->setValue(10000);
 }
 
 // 变调
@@ -66,15 +66,18 @@ void AudioController::update_pitch(double semitones) {
     // 同步图形组件的处理链
     ui->main_graph->chain()->pitchshifter->set_pitch_shift(semitones);
 }
+
 void AudioController::on_reset_pitch_shift_button_clicked() {
     update_pitch(0.);
 }
+
 void AudioController::on_semitones_slider_valueChanged(int value) {
     // 半音调整条: 从整数值计算出 double 类型的半音值
     // (对应 update_pitch 中的 * 10.0)
     double semitones = static_cast<double>(value) / 100.0;
     update_pitch(semitones);
 }
+
 void AudioController::on_semitones_spinner_valueChanged(double arg1) {
     // 半音调整spinner
     // 半音调整spinner: 直接使用其 double 值

@@ -10,8 +10,10 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QOpenGLVertexArrayObject>
-
-#include "ice/manage/AudioBuffer.hpp"
+#include <audio/graphic/formrender/SpectrogramGenerator.hpp>
+#include <ice/manage/AudioBuffer.hpp>
+#include <span>
+#include <vector>
 
 class AudioGraphicWidget;
 enum class GraphType;
@@ -33,7 +35,11 @@ class FormRenderer2D : public QOpenGLFunctions_4_1_Core {
 
     ice::AudioBuffer &wav() { return wav_buffer; }
 
+    std::vector<std::span<const float>> &span() { return wav_span; }
+
     void updateSpectrogramTexture();
+
+    inline void set_live(bool flag) { liveGraph = flag; }
 
    private:
     void initShaders();
@@ -42,17 +48,24 @@ class FormRenderer2D : public QOpenGLFunctions_4_1_Core {
     // 父窗体引用
     AudioGraphicWidget *parent_widget{nullptr};
 
+    // 实时同步处理
+    bool liveGraph{false};
+
+    // 当前范围的数据
+    ice::AudioBuffer wav_buffer;
+    std::vector<std::span<const float>> wav_span;
+
     // 波形图资源
     // 波形图着色器
     QOpenGLShaderProgram *waveformShader{nullptr};
+
     // 波形图顶点缓冲区
     QOpenGLBuffer waveformVBO;
+
     // 波形图顶点数组
     QOpenGLVertexArrayObject waveformVAO;
-    // 当前波形图范围的对应数据集
-    ice::AudioBuffer wav_buffer;
     QVector<QVector4D> channel_colors{QVector4D(0.0f, 0.75f, 1.0f, 0.4f),
-                                      QVector4D(0.1f, 1.0f, 0.5f, 0.4f)};
+                                      QVector4D(0.98f, 0.495f, 0.f, 0.4f)};
 
     // 频谱图资源
     QOpenGLShaderProgram *spectroShader{nullptr};

@@ -45,9 +45,9 @@ find_package(spdlog REQUIRED)
 find_package(FFTW3 REQUIRED)
 
 if(APPLE)
-  set(FFTLIB /opt/homebrew/lib/libfftw3.dylib /opt/homebrew/lib/libfftw3.a)
+  set(FFTLIB /opt/homebrew/lib/libfftw3f.dylib /opt/homebrew/lib/libfftw3f.a)
 else()
-  set(FFTLIB ${FFTW3_LIBRARIES})
+  set(FFTLIB fftw3f)
 endif(APPLE)
 
 # 查找字体包
