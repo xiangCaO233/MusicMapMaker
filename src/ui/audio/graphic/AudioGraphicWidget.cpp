@@ -4,8 +4,6 @@
 #include <QtConcurrent>
 #include <chrono>
 
-#include "ice/config/config.hpp"
-
 // 构造AudioGraphicWidget
 AudioGraphicWidget::AudioGraphicWidget(QWidget* parent)
     : QOpenGLWidget(parent) {}
@@ -39,8 +37,6 @@ void AudioGraphicWidget::set_track(
 
     // 更新偏移
     timeOffset = std::chrono::nanoseconds(size_t(offset * 1000000));
-
-    // qDebug() << "offset = " << timeOffset;
 
     if (!isHidden()) {
         update();

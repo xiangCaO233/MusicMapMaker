@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <edit/mapeditor.h>
+
 #include <QMainWindow>
 
 namespace Ui {
@@ -16,17 +18,14 @@ class MainWindow : public QMainWindow {
 
    public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
    private slots:
     void on_actionTrack_Manager_toggled(bool arg1);
 
     void on_actionProject_Manager_toggled(bool arg1);
 
-    // 响应管理器关闭事件
-    void trackmanager_close_slot(HideableToolWindow *wptr);
-
-    void projectmanager_close_slot(HideableToolWindow *wptr);
+    void on_actionEditor_toggled(bool arg1);
 
    protected:
     void closeEvent(QCloseEvent *e) override;
@@ -34,14 +33,14 @@ class MainWindow : public QMainWindow {
    private:
     Ui::MainWindow *ui;
 
+    // 编辑器
+    MapEditor *editor;
+
     // 音轨管理器
     TrackManager *trackmanager;
 
     // 项目管理器
     ProjectManager *projectmanager;
-
-    // 更新标题后缀
-    void update_title_suffix(const QString &suffix);
 };
 
 #endif  // MAINWINDOW_H

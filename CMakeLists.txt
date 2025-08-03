@@ -87,6 +87,9 @@ set(PROJECT_SOURCES
     src/ui/template/HideableToolWindow.cpp
     src/ui/template/ScalableImageLabel.h
     src/ui/template/ScalableImageLabel.cpp
+    src/ui/edit/mapeditor.h
+    src/ui/edit/mapeditor.cpp
+    src/ui/edit/mapeditor.ui
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp
     src/ui/project/projectmanager.ui
@@ -112,6 +115,7 @@ set(PROJECT_SOURCES
     src/ui/audio/control/audiocontroller.ui
     src/ui/mainwindow.h
     src/ui/mainwindow.cpp
+    src/ui/mainwindowcontrols.cpp
     src/ui/mainwindow.ui
     src/main.cpp)
 

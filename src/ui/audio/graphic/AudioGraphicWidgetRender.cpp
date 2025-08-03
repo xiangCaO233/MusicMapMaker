@@ -4,9 +4,8 @@
 #include <QtConcurrent>
 #include <audio/control/ProcessChain.hpp>
 #include <audio/graphic/formrender/FormRenderer2D.hpp>
+#include <ice/config/config.hpp>
 #include <ice/core/SourceNode.hpp>
-
-#include "ice/config/config.hpp"
 
 // C++17 的 if constexpr 的模板帮助函数
 template <typename Func>
@@ -69,10 +68,10 @@ void AudioGraphicWidget::paintGL() {
         audio_track->get_media_info().format.samplerate;
     const auto source_start_frame =
         timeToFrames(viewStartTime, source_sample_rate);
+    projection.ortho(0.0f, static_cast<float>(engine_visible_frames), -1.f, 1.f,
+                     -1.f, 1.f);
 
     if (liveGraph) {
-        projection.ortho(0.0f, static_cast<float>(engine_visible_frames), -1.f,
-                         1.f, -1.f, 1.f);
         // 读取音频数据到缓冲区
         renderer->wav().resize(ice::ICEConfig::internal_format,
                                size_t(std::ceil(engine_visible_frames)));
@@ -83,15 +82,16 @@ void AudioGraphicWidget::paintGL() {
         process_chain->source->pause();
     } else {
         renderer->span().clear();
-        const auto source_visible_frames =
-            timeToFrames(visibleTimeRange, source_sample_rate);
-        projection.ortho(0.0f, static_cast<float>(source_visible_frames), -1.f,
-                         1.f, -1.f, 1.f);
+        // const auto source_visible_frames =
+        //     timeToFrames(visibleTimeRange, source_sample_rate);
+        // projection.ortho(0.0f, static_cast<float>(source_visible_frames),
+        // -1.f,
+        //                  1.f, -1.f, 1.f);
         audio_track->origin(renderer->span(), source_start_frame,
-                            source_visible_frames);
+                            engine_visible_frames);
     }
 
-    // 渲染波形
+    // 渲染图形
     renderer->render(gtype, projection, view);
 
     // 绘制播放指针 (完全基于时间)

@@ -167,12 +167,19 @@ void FormRenderer2D::initGeometry() {
 
     spectroVBO.create();
     spectroVBO.bind();
-    const GLfloat vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f,
-                                -1.0f, 1.0f,  1.0f, 1.0f};
+    const GLfloat vertices[] = {
+        // positions   // texture Coords
+        -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+        1.0f,  1.0f, 1.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f,
+    };
     spectroVBO.allocate(vertices, sizeof(vertices));
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(0);
+    GLCALL(glEnableVertexAttribArray(0));
+    GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                                 nullptr));
+    GLCALL(glEnableVertexAttribArray(1));
+    GLCALL(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                                 (void*)(2 * sizeof(float))));
 
     spectroVBO.release();
 }
@@ -213,29 +220,5 @@ void FormRenderer2D::render(GraphType type, const QMatrix4x4& projection,
         }
         waveformShader->release();
     } else if (type == GraphType::SPECTRO) {
-        // 频谱图渲染逻辑
-        if (!spectroTexLeft || !spectroTexRight || !spectroShader->isLinked())
-            return;
-        spectroShader->bind();
-        spectroShader->setUniformValue("u_min_db", -90.0f);
-        spectroShader->setUniformValue("u_max_db", 0.0f);
-
-        QOpenGLVertexArrayObject::Binder vaoBinder(&spectroVAO);
-
-        // 渲染左声道 (上半部分)
-        parent_widget->makeCurrent();
-        glViewport(0, parent_widget->height() / 2, parent_widget->width(),
-                   parent_widget->height() / 2);
-        spectroTexLeft->bind(0);
-        spectroShader->setUniformValue("u_texture", 0);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // 渲染右声道 (下半部分)
-        glViewport(0, 0, parent_widget->width(), parent_widget->height() / 2);
-        spectroTexRight->bind(0);
-        spectroShader->setUniformValue("u_texture", 0);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        spectroShader->release();
     }
 }

@@ -41,10 +41,10 @@ void AudioGraphicWidget::mouseMoveEvent(QMouseEvent* event) {
         }
 
         // 检查是否超出音轨末尾
-        const auto total_track_time =
-            framesToTime(audio_track->num_frames(),
-                         audio_track->get_media_info().format.samplerate);
-        if (new_start_time + visibleTimeRange > total_track_time) {
+        if (const auto total_track_time =
+                framesToTime(audio_track->num_frames(),
+                             audio_track->get_media_info().format.samplerate);
+            new_start_time + visibleTimeRange > total_track_time) {
             new_start_time = total_track_time - visibleTimeRange;
             if (new_start_time < std::chrono::nanoseconds(0)) {
                 new_start_time = std::chrono::nanoseconds(0);
@@ -97,7 +97,6 @@ void AudioGraphicWidget::wheelEvent(QWheelEvent* event) {
     if (viewStartTime < std::chrono::nanoseconds(0)) {
         viewStartTime = std::chrono::nanoseconds(0);
     }
-
     update();
     event->accept();
 }

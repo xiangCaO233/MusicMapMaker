@@ -1,5 +1,3 @@
-#include "audiocontroller.h"
-
 #include <qdir.h>
 #include <qlogging.h>
 #include <qtmetamacros.h>
@@ -8,9 +6,8 @@
 #include <chrono>
 #include <memory>
 
-#include "AudioGraphicWidget.h"
-#include "audio/control/ProcessChain.hpp"
 #include "ui_audiocontroller.h"
+
 AudioController::AudioController(QWidget* parent)
     : HideableToolWindow(parent), ui(new Ui::AudioController) {
     ui->setupUi(this);

@@ -8,6 +8,7 @@
 #include <qpixmap.h>
 #include <qtmetamacros.h>
 
+#include <HideableToolWindow.hpp>
 #include <QCloseEvent>
 #include <QDir>
 #include <QStandardItemModel>
@@ -15,7 +16,6 @@
 #include <ice/out/play/sdl/SDLPlayer.hpp>
 #include <memory>
 
-#include "HideableToolWindow.hpp"
 #include "ui_trackmanager.h"
 
 QStringList TrackManager::metaNames() {

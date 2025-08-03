@@ -10,7 +10,6 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QOpenGLVertexArrayObject>
-#include <audio/graphic/formrender/SpectrogramGenerator.hpp>
 #include <ice/manage/AudioBuffer.hpp>
 #include <span>
 #include <vector>
@@ -36,8 +35,6 @@ class FormRenderer2D : public QOpenGLFunctions_4_1_Core {
     ice::AudioBuffer &wav() { return wav_buffer; }
 
     std::vector<std::span<const float>> &span() { return wav_span; }
-
-    void updateSpectrogramTexture();
 
     inline void set_live(bool flag) { liveGraph = flag; }
 
@@ -73,9 +70,6 @@ class FormRenderer2D : public QOpenGLFunctions_4_1_Core {
     QOpenGLBuffer spectroVBO;
     // 频谱图顶点数组
     QOpenGLVertexArrayObject spectroVAO;
-
-    std::unique_ptr<QOpenGLTexture> spectroTexLeft;
-    std::unique_ptr<QOpenGLTexture> spectroTexRight;
 };
 
 #endif  // MMM_FORMRENDERER2D_HPP
