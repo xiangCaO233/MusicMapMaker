@@ -1,6 +1,9 @@
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <map>
+#include <memory>
 #include <mmm/obj/Composite.hpp>
 #include <mmm/obj/Hold.hpp>
 #include <mmm/obj/Note.hpp>
@@ -27,17 +30,14 @@ struct NoteHandle {
 inline std::pair<int64_t, int64_t> get_interval(const Note* note) {
     if (!note) return {0, 0};
     if (auto* hold = dynamic_cast<const Hold*>(note)) {
-        return {hold->timestamp(), hold->timestamp() + hold->durationtime()};
+        return {hold->timestamp(), hold->timestamp() + hold->duration()};
     }
     if (auto* comp = dynamic_cast<const Composite*>(note)) {
-        return {comp->timestamp(),
-                comp->timestamp() + comp->total_durationtime()};
+        return {comp->timestamp(), comp->timestamp() + comp->total_duration()};
     }
     // Note视为一个极小但非零的区间，以避免端点问题
     return {note->timestamp(), note->timestamp() + 1};
 }
-
-#include <memory>
 
 // 插槽数组
 template <typename T, typename HandleType>
@@ -136,8 +136,8 @@ class IntervalTree {
             return m_root;
         }
 
-        Node* current = m_root;
-        Node* new_node = new Node(interval, handle);
+        auto current = m_root;
+        auto new_node = new Node(interval, handle);
 
         while (true) {
             current->max_end = std::max(current->max_end, new_node->max_end);
@@ -297,9 +297,6 @@ class IntervalTree {
 
     Node* m_root = nullptr;
 };
-
-#include <algorithm>
-#include <map>
 
 class NoteCollection {
    public:

@@ -11,10 +11,10 @@ class Composite : public Note {
     // 析构Composite
     ~Composite() override;
 
-    inline uint32_t total_durationtime() const { return total_duration; }
+    inline uint32_t total_duration() const { return total_duration_time; }
 
    private:
-    uint32_t total_duration;
+    uint32_t total_duration_time;
 };
 
 #endif  // MMM_COMPOSITE_HPP

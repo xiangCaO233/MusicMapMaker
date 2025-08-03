@@ -60,7 +60,9 @@ find_package(pugixml REQUIRED)
 find_package(ICU REQUIRED COMPONENTS uc i18n data)
 
 # 设置mmm相关文件
-set(MMM_SOURCES)
+set(MMM_SOURCES
+    src/mmm/obj/Note.hpp src/mmm/obj/Hold.hpp src/mmm/obj/Slide.hpp
+    src/mmm/obj/Composite.hpp src/mmm/NoteCollection.hpp src/mmm/map/MMap.hpp)
 
 # 设置翻译文件
 set(TS_FILES)
@@ -124,8 +126,8 @@ include_directories(./src ./src/ui ./src/ui/canvas ./src/ui/template
                     ./src/ui/audio/graphic)
 
 # 创建可执行文件
-qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${PROJECT_SOURCES}
-                  resources/glsrcs.qrc)
+qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${MMM_SOURCES}
+                  ${PROJECT_SOURCES} resources/glsrcs.qrc)
 
 add_dependencies(MusicMapMaker IonCachyEngin-dev)
 
