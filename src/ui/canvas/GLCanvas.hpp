@@ -8,6 +8,7 @@
 #include <QOpenGLWindow>
 #include <canvas/FrameRateCounter.hpp>
 
+class TexturePool;
 class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
    public:
@@ -29,6 +30,9 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
    private:
     // fps计数器
     FrameRateCounter *fpsCounter;
+
+    // 纹理池
+    std::unique_ptr<TexturePool> texturepool;
 
     std::chrono::high_resolution_clock::duration pre_frame_time;
     long long actual_update_time;

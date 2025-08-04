@@ -1,7 +1,10 @@
 #include <QGuiApplication>
+#include <QOpenGLFunctions>
 #include <QScreen>
 #include <canvas/GLCanvas.hpp>
+#include <canvas/render/Renderer2D.hpp>
 #include <chrono>
+#include <render/texture/TexturePool.hpp>
 #include <type_traits>
 #include <utility>
 
@@ -72,25 +75,6 @@ void GLCanvas::initializeGL() {
     qDebug() << "OpenGL 版本: "
              << std::string(reinterpret_cast<const char*>(version));
 
-    // 查询最大支持多层纹理的最大层数
-    GLint maxLayers;
-    glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxLayers);
-    qDebug() << "多层纹理最大层数: " << std::to_string(maxLayers);
-
-    // 查询纹理采样器最大连续数量
-    GLint max_fragment_samplers;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fragment_samplers);
-    qDebug() << "纹理采样器最大连续数量: "
-             << std::to_string(max_fragment_samplers / 2);
-    if (max_fragment_samplers > 16) {
-        max_fragment_samplers = 16;
-    }
-
-    // 查询纹理采样器最大数量
-    GLint max_combined_samplers;
-    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_combined_samplers);
-    qDebug() << "纹理采样器最大数量: " << std::to_string(max_combined_samplers);
-
     // 查询最大支持抗锯齿MSAA倍率
     GLint maxSamples;
     GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
@@ -103,8 +87,6 @@ void GLCanvas::initializeGL() {
     // 启用 最大 MSAA
     context()->format().setSamples(maxSamples);
 
-    // XINFO("启用垂直同步");
-
     // 检查最大ubo size
     int maxUBOSize;
     GLCALL(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize));
@@ -113,12 +95,21 @@ void GLCanvas::initializeGL() {
     // 标准混合模式
     GLCALL(glEnable(GL_BLEND));
     GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+    texturepool = std::make_unique<TexturePool>(this);
+    Renderer2D::init();
+    texturepool->buildFromManifest(
+        {"/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
+         "default/物件/arrowleft.png",
+         "/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
+         "default/物件/arrowleft_hover.png"});
 }
 
 void GLCanvas::resizeGL(int w, int h) { GLCALL(glViewport(0, 0, w, h)); }
 
 void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
+    texturepool->processUploadQueue();
     GLCALL(glClearColor(1.f, 1.f, 1.f, 1.f));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
     pre_frame_time =

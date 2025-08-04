@@ -15,25 +15,28 @@ decltype(TrackManager::audio_controllers.begin()) TrackManager::makeController(
 
     // 连接控制器的信号到轨道管理器(实际的音频上下文管理在轨道管理器)
     // 关闭控制器(实际为隐藏)
-    connect(controller, &AudioController::close_signal, this,
-            &TrackManager::onControllerHide);
+    connect(controller, &AudioController::close_signal,
+            [](HideableToolWindow* wptr) {
+                auto controller = qobject_cast<AudioController*>(wptr);
+
+                if (controller->item()) {
+                    controller->item()->setCheckState(Qt::Unchecked);
+                }
+            });
     // 更新输出节点
-    connect(controller, &AudioController::update_output_node, this,
-            &TrackManager::onControllerOutputUpdate);
+    connect(
+        controller, &AudioController::update_output_node,
+        [this](const AudioController*, std::shared_ptr<ice::IAudioNode> oldnode,
+               std::shared_ptr<ice::IAudioNode> newnode) {
+            // 移除旧的,设置新的
+            mixbus->remove_source(oldnode);
+            mixbus->add_source(newnode);
+        });
 
     // 更新轨道
     controller->set_audio_track(track);
 
     return controller_it;
-}
-
-void TrackManager::onControllerOutputUpdate(
-    [[maybe_unused]] const AudioController* controller,
-    std::shared_ptr<ice::IAudioNode> oldnode,
-    std::shared_ptr<ice::IAudioNode> newnode) {
-    // 移除旧的,设置新的
-    mixbus->remove_source(oldnode);
-    mixbus->add_source(newnode);
 }
 
 void TrackManager::onItemChanged(QStandardItem* item) {
@@ -52,15 +55,6 @@ void TrackManager::onItemChanged(QStandardItem* item) {
         // 新建一个控制器
         controller_it = makeController(track, item);
         controller_it.value()->setVisible(state == Qt::Checked);
-    }
-}
-
-// 收到控制器被关闭的信号
-void TrackManager::onControllerHide(HideableToolWindow* wptr) const {
-    auto controller = qobject_cast<AudioController*>(wptr);
-
-    if (controller->item()) {
-        controller->item()->setCheckState(Qt::Unchecked);
     }
 }
 

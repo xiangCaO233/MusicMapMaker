@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 #endif  //_WIN32
 
     // 自动共享gl上下文
-    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+    // QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QApplication a(argc, argv);
 
     // 获取系统语言环境

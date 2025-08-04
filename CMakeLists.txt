@@ -12,7 +12,7 @@ endif()
 
 add_subdirectory(./libs/IonCachyEngine)
 
-include_directories(./ ./libs/IonCachyEngine/include)
+include_directories(./ include/ ./libs/IonCachyEngine/include)
 
 link_directories(./build)
 
@@ -44,6 +44,9 @@ find_package(spdlog REQUIRED)
 # 傅里叶变换包
 find_package(FFTW3 REQUIRED)
 
+# gl数学包
+find_package(glm REQUIRED)
+
 if(APPLE)
   set(FFTLIB /opt/homebrew/lib/libfftw3f.dylib /opt/homebrew/lib/libfftw3f.a)
 else()
@@ -68,12 +71,23 @@ set(MMM_SOURCES
 set(TS_FILES)
 
 # 设置着色器文件
-set(GLSL_FILES)
+set(GLSL_FILES
+    resources/glsl/canvas/quad_fshader.glsl.frag
+    resources/glsl/canvas/quad_vshader.glsl.vert
+    resources/glsl/spectro_fshader.glsl.frag
+    resources/glsl/spectro_vshader.glsl.vert
+    resources/glsl/wavgraph_fshader.glsl.frag
+    resources/glsl/wavgraph_vshader.glsl.vert)
 
-# 项目源文件
-set(PROJECT_SOURCES
-    src/util/mutil.hpp
-    src/ui/canvas/geom/QuadInstanceData.hpp
+set(CANVAS_SOURCES
+    src/ui/canvas/render/quad/QuadInstance.hpp
+    src/ui/canvas/render/quad/FontQuad.hpp
+    src/ui/canvas/render/texture/TexMode.hpp
+    src/ui/canvas/render/texture/TextureInfo.hpp
+    src/ui/canvas/render/texture/TextureInstance.hpp
+    src/ui/canvas/render/texture/FontTexture.hpp
+    src/ui/canvas/render/texture/TexturePool.hpp
+    src/ui/canvas/render/texture/TexturePool.cpp
     src/ui/canvas/render/Renderer2D.hpp
     src/ui/canvas/render/Renderer2D.cpp
     src/ui/canvas/FrameRateCounter.hpp
@@ -82,7 +96,11 @@ set(PROJECT_SOURCES
     src/ui/canvas/GLCanvas.hpp
     src/ui/canvas/GLCanvasEvents.cpp
     src/ui/canvas/CanvasContainer.h
-    src/ui/canvas/CanvasContainer.cpp
+    src/ui/canvas/CanvasContainer.cpp)
+
+# 项目源文件
+set(PROJECT_SOURCES
+    src/util/mutil.hpp
     src/ui/template/AutoResizeTableWidget.h
     src/ui/template/AutoResizeTableWidget.cpp
     src/ui/template/HideableToolWindow.hpp
@@ -126,8 +144,14 @@ include_directories(./src ./src/ui ./src/ui/canvas ./src/ui/template
                     ./src/ui/audio/graphic)
 
 # 创建可执行文件
-qt_add_executable(MusicMapMaker MANUAL_FINALIZATION ${MMM_SOURCES}
-                  ${PROJECT_SOURCES} resources/glsrcs.qrc)
+qt_add_executable(
+  MusicMapMaker
+  MANUAL_FINALIZATION
+  ${MMM_SOURCES}
+  ${CANVAS_SOURCES}
+  ${PROJECT_SOURCES}
+  ${GLSL_FILES}
+  resources/glsrcs.qrc)
 
 add_dependencies(MusicMapMaker IonCachyEngin-dev)
 
@@ -145,6 +169,7 @@ target_link_libraries(
           ICU::uc
           ICU::i18n
           ICU::data
+          glm::glm
           Freetype::Freetype
           ${FFTLIB}
           pugixml::pugixml

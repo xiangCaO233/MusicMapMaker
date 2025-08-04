@@ -46,13 +46,6 @@ class TrackManager : public HideableToolWindow {
 
     void onItemChanged(QStandardItem *item);
 
-    // 音频控制信号
-    // 收到控制器被关闭的信号
-    void onControllerHide(HideableToolWindow *wptr) const;
-    void onControllerOutputUpdate(const AudioController *controller,
-                                  std::shared_ptr<ice::IAudioNode> oldnode,
-                                  std::shared_ptr<ice::IAudioNode> newnode);
-
    protected:
     void closeEvent(QCloseEvent *event) override;
 
@@ -68,7 +61,7 @@ class TrackManager : public HideableToolWindow {
     QHash<QString, AudioController *> audio_controllers;
 
     // 线程池
-    ice::ThreadPool threadpool{8};
+    ice::ThreadPool threadpool{2};
 
     // 音频池
     ice::AudioPool audio_pool{ice::CodecBackend::FFMPEG};
