@@ -1,4 +1,5 @@
 #include <canvas/render/texture/TexturePool.hpp>
+#include <filesystem>
 #include <format>
 #include <mutex>
 #define STB_IMAGE_IMPLEMENTATION
@@ -67,16 +68,7 @@ TexturePool::~TexturePool() {
     is_running = false;
     // 唤醒所有可能在等待的线程，让他们退出
     cv.notify_all();
-
-    // 清理所有已创建的GPU纹理资源
-    // 为了防止重复删除同一个gl_id，使用一个set来记录
-    std::unordered_set<uint32_t> deleted_ids;
-    for (const auto& [path, info] : texture_info) {
-        if (deleted_ids.contains(info.gl_texture_array_id)) {
-            GLCALL(glDeleteTextures(1, &info.gl_texture_array_id), glf);
-            deleted_ids.insert(info.gl_texture_array_id);
-        }
-    }
+    clear();
 }
 
 // 定义分箱的尺寸，可以根据项目需求调整
@@ -93,8 +85,62 @@ static uint32_t getBucketSize(uint32_t n) {
     return BUCKET_SIZES.back();
 }
 
+// TexturePool.cpp
+void TexturePool::clear() {
+    // 停止并等待所有正在进行的加载任务（如果有的话）
+    // 这个实现比较简单，更复杂的需要更精细的线程同步
+    // 确保在调用clear之前，所有异步任务已经完成或被取消
+
+    std::lock_guard<std::mutex> lock(info_mutex);
+    std::lock_guard<std::mutex> queue_lock(queue_mutex);
+
+    // 清理GPU资源
+    std::unordered_set<uint32_t> deleted_ids;
+    for (const auto& [path, info] : texture_infos) {
+        if (!deleted_ids.contains(info.gl_texture_array_id)) {
+            GLCALL(glDeleteTextures(1, &info.gl_texture_array_id), glf);
+            deleted_ids.insert(info.gl_texture_array_id);
+        }
+    }
+
+    // 清理所有CPU端的数据结构
+    texture_infos.clear();
+
+    // 清空待上传队列，以防万一
+    std::queue<LoadedImageData> empty_queue;
+    upload_queue.swap(empty_queue);
+
+    qDebug() << "TexturePool: All resources cleared.";
+}
+
+// 从一个路径加载
+void TexturePool::rebuild_with_directory(const std::string& dir) {
+    auto path = std::filesystem::path(dir);
+    if (!std::filesystem::exists(path)) {
+        qDebug() << "[" << dir << "] 不存在";
+        return;
+    } else {
+        std::unordered_set<std::string, StringHash, std::equal_to<>> paths;
+        for (const auto& [loaded_path, _] : texture_infos) {
+            paths.insert(loaded_path);
+        }
+        for (auto it = std::filesystem::recursive_directory_iterator(path);
+             it != std::filesystem::recursive_directory_iterator(); ++it) {
+            auto filename = it->path().generic_string();
+            if (filename.ends_with("png") || filename.ends_with("jpg")) {
+                qDebug() << "查到需要加载的纹理[" << filename << "]";
+                paths.insert(filename);
+            }
+        }
+        buildFromManifest(paths);
+    }
+}
+
 void TexturePool::buildFromManifest(
-    const std::vector<std::string>& texture_paths) {
+    const std::unordered_set<std::string, StringHash, std::equal_to<>>&
+        texture_paths) {
+    clear();
+
     // 扫描所有纹理并进行分箱
     // key: "Bucket_256x256", value: {path1, path2, ...}
     std::unordered_map<std::string, std::vector<std::string>, StringHash,
@@ -183,11 +229,15 @@ void TexturePool::buildFromManifest(
                                           (float)h / group.bucket_height);
                 info.uv_offset = glm::vec2(0.0f, 0.0f);
 
+                info.origin_size = glm::vec2(w, h);
+
                 // 派发加载任务
                 threadpool.enqueue([this, path, info]() {
                     if (!is_running) return;
 
-                    int load_w, load_h, load_c;
+                    int load_w;
+                    int load_h;
+                    int load_c;
                     unsigned char* data =
                         stbi_load(path.c_str(), &load_w, &load_h, &load_c, 4);
 
@@ -202,7 +252,7 @@ void TexturePool::buildFromManifest(
                         // 在此之前，已经有了最终的渲染信息，所以先存起来
                         {
                             std::lock_guard<std::mutex> lock(info_mutex);
-                            texture_info[path] = info;
+                            texture_infos[path] = info;
                         }
                         cv.notify_one();
                     } else {
@@ -212,7 +262,18 @@ void TexturePool::buildFromManifest(
                 });
             }
         }
+
+        for (const auto& [_, group] : atlas_groups) {
+            auto& internal_group =
+                groups.try_emplace(group.gl_id).first->second;
+            internal_group.gl_id = group.gl_id;
+            internal_group.layer_count = group.layer_count;
+            internal_group.bucket_width = group.bucket_width;
+            internal_group.bucket_height = group.bucket_height;
+            internal_group.uploaded_layers.store(group.uploaded_layers);
+        }
     }
+    need_update.store(true);
 }
 
 // 从主线程调用，处理已从磁盘加载完成的纹理，将其上传到GPU
@@ -266,14 +327,17 @@ void TexturePool::uploadToGpu(const LoadedImageData& data) {
                            ),
            glf);
 
-    qDebug() << "Uploaded" << QString::fromStdString(data.path) << "to array"
-             << info.gl_texture_array_id << "layer" << info.layer_index;
+    qDebug() << "Uploaded" << QString::fromStdString(data.path) << "["
+             << data.width << "x" << data.height << "]" << "to array"
+             << info.gl_texture_array_id << "layer" << info.layer_index
+             << ", layersize:[" << groups[info.gl_texture_array_id].bucket_width
+             << "x" << groups[info.gl_texture_array_id].bucket_height << "]";
 }
 
 // 获取纹理信息以供渲染器使用
 std::optional<TextureInfo> TexturePool::get(const std::string& path) const {
     std::lock_guard<std::mutex> lock(info_mutex);
-    if (auto it = texture_info.find(path); it != texture_info.end()) {
+    if (auto it = texture_infos.find(path); it != texture_infos.end()) {
         return it->second;
     }
     return std::nullopt;

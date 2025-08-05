@@ -15,15 +15,19 @@ struct TextureInfo {
     glm::vec2 uv_scale;
     // UV偏移
     glm::vec2 uv_offset;
+    // 原始尺寸
+    glm::vec2 origin_size;
+    // 是否是字符
+    bool is_char{false};
 };
 
 // 描述一个图集数组
 // (一个桶)
 struct AtlasGroup {
-    uint32_t gl_id = 0;
-    uint32_t bucket_width = 0;
-    uint32_t bucket_height = 0;
-    uint32_t layer_count = 0;
+    uint32_t gl_id{0};
+    uint32_t bucket_width{0};
+    uint32_t bucket_height{0};
+    uint32_t layer_count{0};
     std::atomic<uint32_t> uploaded_layers{0};
 };
 

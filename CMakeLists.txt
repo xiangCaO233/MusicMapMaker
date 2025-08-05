@@ -80,12 +80,9 @@ set(GLSL_FILES
     resources/glsl/wavgraph_vshader.glsl.vert)
 
 set(CANVAS_SOURCES
-    src/ui/canvas/render/quad/QuadInstance.hpp
-    src/ui/canvas/render/quad/FontQuad.hpp
+    src/ui/canvas/render/quad/QuadData.hpp
     src/ui/canvas/render/texture/TexMode.hpp
     src/ui/canvas/render/texture/TextureInfo.hpp
-    src/ui/canvas/render/texture/TextureInstance.hpp
-    src/ui/canvas/render/texture/FontTexture.hpp
     src/ui/canvas/render/texture/TexturePool.hpp
     src/ui/canvas/render/texture/TexturePool.cpp
     src/ui/canvas/render/Renderer2D.hpp

@@ -4,31 +4,37 @@
 #include <canvas/GLCanvas.hpp>
 #include <canvas/render/Renderer2D.hpp>
 #include <chrono>
+#include <cmath>
+#include <numbers>
 #include <render/texture/TexturePool.hpp>
 #include <type_traits>
 #include <utility>
 
+#include "render/texture/TexMode.hpp"
+
 // C++17 的 if constexpr 的模板帮助函数
 template <typename Func>
 auto glCallImpl(Func func, const char* funcStr) {
-    // 对 lambda 本身的返回类型进行判断
+    // 1. 先清除所有历史错误，确保我们只捕获当前调用的错误
+    while (glGetError() != GL_NO_ERROR);
+
+    // 2. 对 lambda 本身的返回类型进行判断
     if constexpr (std::is_void_v<decltype(func())>) {
-        // lambda 返回 void
-        // 调用 lambda
-        func();
-        if (GLenum error = glGetError() != GL_NO_ERROR) {
-            qDebug() << "OpenGL Error in [" << funcStr << "]: " << error;
-        }
-        // 此分支无返回
+        func();  // 调用 lambda
     } else {
-        // lambda 有返回值
-        // 调用 lambda 并捕获结果
-        auto&& result = func();
-        if (GLenum error = glGetError() != GL_NO_ERROR) {
-            qDebug() << "OpenGL Error in [" << funcStr << "]: " << error;
+        auto&& result = func();  // 调用并捕获结果
+        // 检查错误在调用之后
+        if (GLenum error = glGetError(); error != GL_NO_ERROR) {
+            qDebug() << "OpenGL Error in [" << funcStr << "]: " << error
+                     << "(Hex: 0x" << Qt::hex << error << Qt::dec << ")";
         }
-        // 返回结果
         return std::forward<decltype(result)>(result);
+    }
+
+    // 针对void返回类型的lambda，在调用后检查错误
+    if (GLenum error = glGetError(); error != GL_NO_ERROR) {
+        qDebug() << "OpenGL Error in [" << funcStr << "]: " << error
+                 << "(Hex: 0x" << Qt::hex << error << Qt::dec << ")";
     }
 }
 
@@ -96,23 +102,47 @@ void GLCanvas::initializeGL() {
     GLCALL(glEnable(GL_BLEND));
     GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    texturepool = std::make_unique<TexturePool>(this);
-    Renderer2D::init();
-    texturepool->buildFromManifest(
-        {"/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
-         "default/物件/arrowleft.png",
-         "/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
-         "default/物件/arrowleft_hover.png"});
+    render = std::make_unique<Renderer2D>(this);
+    render->add_texture_from_path("../resources/textures/default");
+
+    // texturepool->buildFromManifest(
+    //     {"/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
+    //      "default/物件/arrowleft.png",
+    //      "/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
+    //      "default/物件/arrowleft_hover.png"});
 }
 
-void GLCanvas::resizeGL(int w, int h) { GLCALL(glViewport(0, 0, w, h)); }
+void GLCanvas::resizeGL(int w, int h) {
+    GLCALL(glViewport(0, 0, w, h));
+    QMatrix4x4 projection;
+    projection.ortho(0.0f, static_cast<float>(w), static_cast<float>(h), 0.0f,
+                     -1.0f, 1.0f);
+    render->set_projection(projection);
+}
 
 void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
-    texturepool->processUploadQueue();
-    GLCALL(glClearColor(1.f, 1.f, 1.f, 1.f));
+    render->update();
+    GLCALL(glClearColor(.23f, .23f, .23f, .23f));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+    if (auto texture = render->texture_pool()->get(
+            "../resources/textures/default/物件/arrowright_selected.png");
+        texture.has_value()) {
+        auto tex = texture.value();
+        render->commit({{500, 500},
+                        {tex.origin_size.x, tex.origin_size.y},
+                        0.f,
+                        {1.f, 1.f, 1.f, .4f},
+                        tex,
+                        TexAlignMode::CENTER,
+                        TexScaleMode::SCALE_TO_TILING});
+
+        render->finalize();
+
+        render->render();
+    }
+
+    fpsCounter->frameRendered();
     pre_frame_time =
         std::chrono::high_resolution_clock::now().time_since_epoch() - before;
-    fpsCounter->frameRendered();
 }

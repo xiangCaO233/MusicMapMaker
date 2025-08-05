@@ -1,12 +1,11 @@
 #ifndef MMM_GLCANVAS_HPP
 #define MMM_GLCANVAS_HPP
 
-#include <qcontainerfwd.h>
-#include <qtmetamacros.h>
-
 #include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLWindow>
 #include <canvas/FrameRateCounter.hpp>
+#include <memory>
+#include <render/Renderer2D.hpp>
 
 class TexturePool;
 class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
@@ -31,8 +30,8 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // fps计数器
     FrameRateCounter *fpsCounter;
 
-    // 纹理池
-    std::unique_ptr<TexturePool> texturepool;
+    // 主渲染器
+    std::unique_ptr<Renderer2D> render;
 
     std::chrono::high_resolution_clock::duration pre_frame_time;
     long long actual_update_time;
