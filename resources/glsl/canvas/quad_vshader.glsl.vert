@@ -86,6 +86,7 @@ void main() {
     // 将实例的纹理信息传递给片段着色器(非插值)
     f_QuadSize = aScale;
     f_TextureLayerIdx = aTextureLayerIdx;
+    f_NoFilter = aNoFilter;
     f_UVScale = aUVScale;
     f_GroupSize = aGroupSize;
     f_DefColor = aColor;
