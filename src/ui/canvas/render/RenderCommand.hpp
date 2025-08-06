@@ -17,9 +17,16 @@ struct RenderCommand {
     TexScaleMode tscale;
 
     QuadData to_data() const {
-        return {
-            pos + size / 2.f,    size,      rotation, color, texture.uv_scale,
-            texture.layer_index, no_filter, talign,   tscale};
+        return {pos + size / 2.f,
+                size,
+                rotation,
+                color,
+                texture.uv_scale,
+                texture.group_size,
+                texture.layer_index,
+                no_filter,
+                talign,
+                tscale};
     }
 };
 

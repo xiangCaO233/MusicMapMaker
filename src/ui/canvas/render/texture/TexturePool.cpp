@@ -209,10 +209,10 @@ void TexturePool::buildFromManifest(
                                    GL_LINEAR),
                    glf);
             GLCALL(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
-                                   GL_CLAMP_TO_EDGE),
+                                   GL_CLAMP_TO_BORDER),
                    glf);
             GLCALL(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
-                                   GL_CLAMP_TO_EDGE),
+                                   GL_CLAMP_TO_BORDER),
                    glf);
 
             // 预计算TextureInfo并派发异步加载任务
@@ -230,6 +230,7 @@ void TexturePool::buildFromManifest(
                 info.uv_offset = glm::vec2(0.0f, 0.0f);
 
                 info.origin_size = glm::vec2(w, h);
+                info.group_size = {group.bucket_width, group.bucket_height};
 
                 // 派发加载任务
                 threadpool.enqueue([this, path, info]() {

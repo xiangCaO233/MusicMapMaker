@@ -22,13 +22,13 @@ void MPainter::paintImage(std::string_view resPath, glm::vec2 pos) {
         texture.has_value()) {
         const auto tex = texture.value();
         renderer->commit({pos,
-                          {texture->origin_size.x, texture->origin_size.y},
+                          {600, 200},
                           0.f,
                           {1.f, 1.f, 1.f, 1.f},
                           tex,
                           0,
-                          TexAlignMode::CENTER,
-                          TexScaleMode::SCALE_TO_TILING});
+                          TexAlignMode::LEFT,
+                          TexScaleMode::SCALE_BASEHEIGHT_REPEAT_FILL});
     }
 }
 

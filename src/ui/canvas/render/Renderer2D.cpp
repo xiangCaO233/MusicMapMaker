@@ -135,14 +135,20 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
     // 10~11 vec2 uv_scale
     GLCALL(glf->glEnableVertexAttribArray(4), glf);
 
-    // 12 uint layer_idx
+    // 12~13 vec2 group_size
     GLCALL(glf->glEnableVertexAttribArray(5), glf);
 
-    // 13 uint texalignmode
+    // 14 uint no_filter
     GLCALL(glf->glEnableVertexAttribArray(6), glf);
 
-    // 14 uint texscalemode
+    // 15 uint layer_idx
     GLCALL(glf->glEnableVertexAttribArray(7), glf);
+
+    // 16 uint texalignmode
+    GLCALL(glf->glEnableVertexAttribArray(8), glf);
+
+    // 17 uint texscalemode
+    GLCALL(glf->glEnableVertexAttribArray(9), glf);
 
     update_attribptrFromInstance(0);
 
@@ -151,9 +157,11 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
     GLCALL(glf->glVertexAttribDivisor(2, 1), glf);  // rotation
     GLCALL(glf->glVertexAttribDivisor(3, 1), glf);  // color
     GLCALL(glf->glVertexAttribDivisor(4, 1), glf);  // uv_scale
-    GLCALL(glf->glVertexAttribDivisor(5, 1), glf);  // layer_idx
-    GLCALL(glf->glVertexAttribDivisor(6, 1), glf);  // talign
-    GLCALL(glf->glVertexAttribDivisor(7, 1), glf);  // tscale
+    GLCALL(glf->glVertexAttribDivisor(5, 1), glf);  // group_size
+    GLCALL(glf->glVertexAttribDivisor(6, 1), glf);  // layer_idx
+    GLCALL(glf->glVertexAttribDivisor(7, 1), glf);  // no_filter
+    GLCALL(glf->glVertexAttribDivisor(8, 1), glf);  // talign
+    GLCALL(glf->glVertexAttribDivisor(9, 1), glf);  // tscale
 
     // 解绑
     GLCALL(glf->glBindVertexArray(0), glf);
@@ -282,27 +290,33 @@ void Renderer2D::update_attribptrFromInstance(size_t instance_index) {
                (void*)(base_offset + offsetof(QuadData, uv_scale))),
            glf);
 
-    // 10 uint layer_idx
+    // 12~13 vec2 group_size
+    GLCALL(glf->glVertexAttribPointer(
+               5, 2, GL_FLOAT, false, sizeof(QuadData),
+               (void*)(base_offset + offsetof(QuadData, group_size))),
+           glf);
+
+    // 14 uint layer_idx
     GLCALL(glf->glVertexAttribIPointer(
-               5, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               6, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, layer_idx))),
            glf);
 
-    // 11 uint no_filter
+    // 15 uint no_filter
     GLCALL(glf->glVertexAttribIPointer(
-               6, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               7, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, no_filter))),
            glf);
 
-    // 12 uint texalignmode
+    // 16 uint texalignmode
     GLCALL(glf->glVertexAttribIPointer(
-               7, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               8, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, talign))),
            glf);
 
-    // 13 uint texscalemode
+    // 17 uint texscalemode
     GLCALL(glf->glVertexAttribIPointer(
-               8, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               9, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, tscale))),
            glf);
 }

@@ -17,6 +17,8 @@ struct TextureInfo {
     glm::vec2 uv_offset;
     // 原始尺寸
     glm::vec2 origin_size;
+    // 组尺寸
+    glm::vec2 group_size;
     // 是否是字符
     bool is_char{false};
 };
