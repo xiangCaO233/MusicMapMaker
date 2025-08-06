@@ -3,10 +3,14 @@
 
 #include <qopenglshaderprogram.h>
 
+#include <array>
+#include <glm/fwd.hpp>
 #include <mutex>
 #include <render/RenderCommand.hpp>
 #include <render/quad/QuadData.hpp>
 #include <render/texture/TexturePool.hpp>
+
+#include "render/texture/TexMode.hpp"
 
 class GLCanvas;
 class Renderer2D {
@@ -18,13 +22,16 @@ class Renderer2D {
     QOpenGLShaderProgram* shader() const { return shader_program; }
 
     // 设置投影矩阵
-    void set_projection(const QMatrix4x4& projection);
+    void update_viewport(glm::vec2 view);
 
     // 更新需要更新的资源等等
     void update();
 
     // 提交渲染指令
     void commit(const RenderCommand& command);
+
+    // 新建蒙版
+    void newMask(glm::vec4 rect, glm::vec4 effectParams, MaskEffect effect);
 
     // 添加纹理目录
     void add_texture_from_path(const std::string& path);
@@ -44,6 +51,13 @@ class Renderer2D {
     }
 
    private:
+    // 启用调试线框
+    bool draw_wireframe{true};
+
+    // 尺寸
+    glm::vec2 viewport;
+    bool update_view{true};
+
     // 纹理池
     std::unique_ptr<TexturePool> texturepool;
 
@@ -61,6 +75,27 @@ class Renderer2D {
 
     // 最大矩形数量
     uint32_t max_quadcount{8192};
+
+    // 蒙版ubo句柄
+    uint32_t mask_uBO;
+    bool update_ubo{false};
+
+    // gpu对应的蒙版结构体
+    struct MaskLayer_STD140 {
+        // 蒙版位置
+        // {left, top, right, bottom}
+        glm::vec4 rect;
+        // 效果参数
+        glm::vec4 effectParams;
+        // 效果
+        MaskEffect effect;
+        // 满足std140的4N对齐规则，填充
+        std::array<uint32_t, 3> padding;
+    };
+
+    // 最大的蒙版层数
+    const uint32_t MAX_MASK_LAYERS = 16;
+    std::vector<MaskLayer_STD140> mask_stack_cpu;
 
     // gl资源
     uint32_t instance_dataAO{0};

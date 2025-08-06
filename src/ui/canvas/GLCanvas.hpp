@@ -16,6 +16,10 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 析构GLCanvas
     ~GLCanvas() override;
 
+   signals:
+    void update_window_suffix(const QString &suffix);
+
+   protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
@@ -23,8 +27,8 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-   signals:
-    void update_window_suffix(const QString &suffix);
+    // 更新fps显示
+    virtual void updateFpsDisplay(int fps);
 
    private:
     // fps计数器
@@ -34,10 +38,8 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     std::unique_ptr<Renderer2D> render;
 
     std::chrono::high_resolution_clock::duration pre_frame_time;
-    long long actual_update_time;
 
-    // 更新fps显示
-    virtual void updateFpsDisplay(int fps);
+    long long actual_update_time;
 };
 
 #endif  // MMM_GLCANVAS_HPP

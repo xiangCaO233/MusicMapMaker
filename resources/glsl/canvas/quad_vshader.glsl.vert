@@ -12,16 +12,19 @@ layout(location = 4) in vec2 aUVScale;
 
 // 纹理ID
 layout(location = 5) in uint aTextureLayerIdx;
+// 是否禁止蒙版效果
+layout(location = 6) in uint aNoFilter;
 
-layout(location = 6) in uint aTexScaleStratergy;
-layout(location = 7) in uint aTexAlignStratergy;
+// 贴图策略
+layout(location = 7) in uint aTexScaleStratergy;
+layout(location = 8) in uint aTexAlignStratergy;
 
 // Uniform 矩阵
 uniform mat4 projection;
 
 // 基本矩形顶点
 vec2 positions[4] = vec2[](
-        vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(-1.0, 1.0), vec2(1.0, 1.0)
+        vec2(-0.5, -0.5), vec2(0.5, -0.5), vec2(-0.5, 0.5), vec2(0.5, 0.5)
     );
 vec2 uvs[4] = vec2[](
         vec2(0.0, 0.0),
@@ -33,9 +36,12 @@ int indices[6] = int[](0, 1, 2, 1, 3, 2);
 
 // 输出到片段着色器
 out vec2 v_TexCoord;
+out vec2 v_WorldPos;
 
 // flat 表示不进行插值
 flat out uint f_TextureLayerIdx;
+flat out uint f_NoFilter;
+flat out vec2 f_UVScale;
 flat out vec4 f_DefColor;
 flat out uint f_TexScaleStratergy;
 flat out uint f_TexAlignStratergy;
@@ -49,25 +55,27 @@ void main() {
     v_TexCoord = uvs[corner_index] * aUVScale;
 
     // 变换坐标
-    // a. 缩放 (Scale)
+    // 缩放 (Scale)
     vec2 scaledPos = localPos * vec2(aScale.x, -aScale.y);
 
-    // b. 旋转 (Rotate)
+    // 旋转 (Rotate)
     float c = cos(aRotation);
     float s = sin(aRotation);
     vec2 rotatedPos = vec2(
             scaledPos.x * c - scaledPos.y * s,
             scaledPos.x * s + scaledPos.y * c
         );
-    // c. 平移 (Translate)
+    // 平移 (Translate)
     vec2 worldPos = rotatedPos + aPosition;
+    v_WorldPos = worldPos;
 
     // --- 最终位置计算 ---
     // 将我们计算出的2D世界坐标，通过投影矩阵变换到最终的裁剪空间
     gl_Position = projection * vec4(worldPos, 0.0, 1.0);
 
-    // 将实例的纹理信息传递给片段着色器
+    // 将实例的纹理信息传递给片段着色器(非插值)
     f_TextureLayerIdx = aTextureLayerIdx;
+    f_UVScale = aUVScale;
     f_DefColor = aColor;
     f_TexScaleStratergy = aTexScaleStratergy;
     f_TexAlignStratergy = aTexAlignStratergy;

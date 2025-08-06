@@ -1,15 +1,16 @@
+#include <qlogging.h>
+
 #include <QGuiApplication>
 #include <QOpenGLFunctions>
 #include <QScreen>
 #include <canvas/GLCanvas.hpp>
 #include <canvas/render/Renderer2D.hpp>
 #include <chrono>
-#include <cmath>
-#include <numbers>
 #include <render/texture/TexturePool.hpp>
 #include <type_traits>
 #include <utility>
 
+#include "render/MPainter.hpp"
 #include "render/texture/TexMode.hpp"
 
 // C++17 的 if constexpr 的模板帮助函数
@@ -85,10 +86,7 @@ void GLCanvas::initializeGL() {
     GLint maxSamples;
     GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
 
-    // 初始化纹理池驱动信息
-    // MTexturePool::init_driver_info(maxLayers, max_combined_samplers,
-    //                                max_fragment_samplers);
-
+    // 初始化驱动信息
     qDebug() << "启用最大抗锯齿倍率: " << std::to_string(maxSamples);
     // 启用 最大 MSAA
     context()->format().setSamples(maxSamples);
@@ -105,41 +103,32 @@ void GLCanvas::initializeGL() {
     render = std::make_unique<Renderer2D>(this);
     render->add_texture_from_path("../resources/textures/default");
 
-    // texturepool->buildFromManifest(
-    //     {"/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
-    //      "default/物件/arrowleft.png",
-    //      "/home/xiang/Documents/coding/cpp/MusicMapMaker/resources/textures/"
-    //      "default/物件/arrowleft_hover.png"});
+    // 灰色蒙版
+    render->newMask({0, 0, 1000, 1000}, {.8f, .2f, .2f, .75f},
+                    MaskEffect::DARKEN);
+    // 滤镜蒙版
+    render->newMask({0, 0, 1000, 1000}, {1.f, .5f, .2f, .75f},
+                    MaskEffect::FILTER);
 }
 
 void GLCanvas::resizeGL(int w, int h) {
     GLCALL(glViewport(0, 0, w, h));
-    QMatrix4x4 projection;
-    projection.ortho(0.0f, static_cast<float>(w), static_cast<float>(h), 0.0f,
-                     -1.0f, 1.0f);
-    render->set_projection(projection);
+    render->update_viewport({w, h});
 }
 
 void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
     render->update();
+
     GLCALL(glClearColor(.23f, .23f, .23f, .23f));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
-    if (auto texture = render->texture_pool()->get(
-            "../resources/textures/default/物件/arrowright_selected.png");
-        texture.has_value()) {
-        auto tex = texture.value();
-        render->commit({{500, 500},
-                        {tex.origin_size.x, tex.origin_size.y},
-                        0.f,
-                        {1.f, 1.f, 1.f, .4f},
-                        tex,
-                        TexAlignMode::CENTER,
-                        TexScaleMode::SCALE_TO_TILING});
 
-        render->finalize();
-
-        render->render();
+    {
+        // 绘制
+        MPainter panter(render.get());
+        panter.paintImage(
+            "../resources/textures/default/物件/arrowright_selected.png",
+            {50, 50});
     }
 
     fpsCounter->frameRendered();

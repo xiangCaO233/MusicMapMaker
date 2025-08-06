@@ -83,11 +83,36 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
         qCritical() << "Shader link failed:" << shader_program->log();
     }
 
+    // 检查是否找到了（如果拼写错误或被优化掉，可能找不到）
+    if (GLuint mask_ubo_index =
+            GLCALL(glf->glGetUniformBlockIndex(shader_program->programId(),
+                                               "MaskStackUBO"),
+                   glf);
+        mask_ubo_index != GL_INVALID_INDEX) {
+        // 将 uniform block 索引，绑定到绑定点 0
+        GLCALL(glf->glUniformBlockBinding(shader_program->programId(),
+                                          mask_ubo_index, 0),
+               glf);
+    } else {
+        qWarning()
+            << "Could not find uniform block 'MaskStackUBO' in shader program.";
+    }
+
     // 初始化VAO
     GLCALL(glf->glGenVertexArrays(1, &instance_dataAO), glf);
     // 绑定VAO
     GLCALL(glf->glBindVertexArray(instance_dataAO), glf);
 
+    // 初始化ubo
+    GLCALL(glf->glGenBuffers(1, &mask_uBO), glf);
+    // 绑定ubo
+    GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), glf);
+    // 将UBO缓冲对象，也连接到绑定点 0
+    // 这一步确保了绑定点0实际连接的是我们创建的 m_mask_ubo 这个GPU缓冲区
+    GLCALL(glf->glBindBufferBase(GL_UNIFORM_BUFFER, 0, mask_uBO), glf);
+    GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, 0), glf);
+
+    // 初始化实例缓冲区
     GLCALL(glf->glGenBuffers(1, &instance_dataBO), glf);
     // 绑定VBO
     GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), glf);
@@ -144,21 +169,61 @@ void Renderer2D::add_texture_from_path(const std::string& path) {
     texturepool->rebuild_with_directory(path);
 }
 
-void Renderer2D::set_projection(const QMatrix4x4& projection) {
-    shader_program->bind();
-    shader_program->setUniformValue("projection", projection);
-    shader_program->release();
-}
 // 更新需要更新的资源等等
-void Renderer2D::update() { texturepool->processUploadQueue(); }
+void Renderer2D::update() {
+    texturepool->processUploadQueue();
+
+    if (update_view) {
+        QMatrix4x4 projection;
+        projection.ortho(0.0f, viewport.x, viewport.y, 0.0f, -1.0f, 1.0f);
+        shader_program->bind();
+        shader_program->setUniformValue("projection", projection);
+        shader_program->release();
+        update_view = false;
+    }
+
+    if (update_ubo) {
+        // 更新ubo
+        // 将CPU端的蒙版堆栈数据上传到UBO
+        GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), glf);
+        GLCALL(glf->glBufferData(GL_UNIFORM_BUFFER,
+                                 MAX_MASK_LAYERS * sizeof(MaskLayer_STD140),
+                                 mask_stack_cpu.data(), GL_STATIC_DRAW),
+               glf);
+        GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, 0), glf);
+
+        // 需要一个uniform告诉着色器当前有多少个活跃的蒙版层
+        shader_program->bind();
+        shader_program->setUniformValue("u_ActiveMaskLayerCount",
+                                        int(mask_stack_cpu.size()));
+        shader_program->release();
+        update_ubo = false;
+    }
+}
+
+void Renderer2D::update_viewport(glm::vec2 view) {
+    viewport = view;
+    update_ubo = true;
+    update_view = true;
+}
+
+// 新建蒙版
+void Renderer2D::newMask(glm::vec4 rect, glm::vec4 effectParams,
+                         MaskEffect effect) {
+    // 添加一个蒙版
+    mask_stack_cpu.push_back({rect, effectParams, effect, {0, 0, 0}});
+    update_ubo = true;
+}
 
 // 扩充矩形实例缓冲区
 void Renderer2D::expandQuadDataBuffer() {
     bool need_update{false};
+
     while (max_quadcount < command_list.size()) {
         max_quadcount *= 2;
         need_update = true;
     }
+
     if (need_update) {
         // 绑定现有的VBO
         GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), glf);
@@ -223,15 +288,21 @@ void Renderer2D::update_attribptrFromInstance(size_t instance_index) {
                (void*)(base_offset + offsetof(QuadData, layer_idx))),
            glf);
 
-    // 11 uint texalignmode
+    // 11 uint no_filter
     GLCALL(glf->glVertexAttribIPointer(
                6, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               (void*)(base_offset + offsetof(QuadData, no_filter))),
+           glf);
+
+    // 12 uint texalignmode
+    GLCALL(glf->glVertexAttribIPointer(
+               7, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, talign))),
            glf);
 
-    // 12 uint texscalemode
+    // 13 uint texscalemode
     GLCALL(glf->glVertexAttribIPointer(
-               7, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               8, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, tscale))),
            glf);
 }
@@ -292,6 +363,7 @@ void Renderer2D::render() {
                           quad_datas.data(), GL_DYNAMIC_DRAW),
         glf);
 
+    shader_program->setUniformValue("u_IsDrawingWireframe", false);
     // 循环遍历批处理，分批绘制
     for (const auto& batch : command_batch) {
         // 绑定这个批次需要的纹理
@@ -301,6 +373,7 @@ void Renderer2D::render() {
                glf);
         // 着色器采样器 u_samplerarray 使用纹理单元 0
         shader_program->setUniformValue("u_samplerarray", 0);
+        shader_program->setUniformValue("u_IsDrawingWireframe", false);
 
         // 更新顶点属性指针以指向当前批次的开头
         update_attribptrFromInstance(batch.startIndex);
@@ -309,6 +382,29 @@ void Renderer2D::render() {
         GLCALL(
             glf->glDrawArraysInstanced(GL_TRIANGLES, 0, 6, batch.instanceCount),
             glf);
+    }
+
+    // === 绘制调试线框 ===
+    if (draw_wireframe) {
+        shader_program->setUniformValue("u_IsDrawingWireframe", true);
+        for (const auto& batch : command_batch) {
+            // 我们可以用同一个着色器，但最好有一个专门的、更简单的线框着色器
+            // 这里我们先复用，但让片段着色器输出一个固定颜色
+
+            // (可选) 设置线框的粗细
+            // GLCALL(glf->glLineWidth(2.0f), glf);
+
+            // 【关键】使用 GL_LINE_LOOP 来绘制线框
+            // GL_LINE_LOOP
+            // 会将传入的顶点依次连接成线，并最后将末尾顶点与起始顶点相连
+            // 我们只需要传入构成矩形外框的4个顶点即可
+            GLCALL(glf->glDrawArraysInstanced(
+                       GL_LINE_LOOP,
+                       0,  // 从顶点0开始
+                       6,  // 只使用前4个顶点（正好构成一个矩形）
+                       batch.instanceCount),
+                   glf);
+        }
     }
 
     // 清理

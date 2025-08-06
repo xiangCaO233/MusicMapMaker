@@ -12,18 +12,14 @@ struct RenderCommand {
     glm::f32 rotation;
     glm::vec4 color;
     TextureInfo texture;
+    glm::uint32 no_filter;
     TexAlignMode talign;
     TexScaleMode tscale;
 
     QuadData to_data() const {
-        return {pos,
-                size,
-                rotation,
-                color,
-                texture.uv_scale,
-                texture.layer_index,
-                talign,
-                tscale};
+        return {
+            pos + size / 2.f,    size,      rotation, color, texture.uv_scale,
+            texture.layer_index, no_filter, talign,   tscale};
     }
 };
 
