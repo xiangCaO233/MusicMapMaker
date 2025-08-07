@@ -114,7 +114,7 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
                                            &face) ==
                         0) {  // FreeType成功时返回0
                         success = true;
-                        qDebug() << "读取qrc成功";
+                        // qDebug() << "读取qrc成功";
                     }
                 }
             } else {
@@ -132,7 +132,7 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
                            << QString::fromStdString(font_path_str);
                 return;
             } else {
-                qDebug() << "读取字体文件成功";
+                // qDebug() << "读取字体文件成功";
             }
 
             // 1. 设置像素大小
@@ -147,9 +147,10 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
                     continue;
                 } else {
                     // 成功加载了字形
-                    qDebug()
-                        << "加载字形" << c << "[" << face->glyph->bitmap.width
-                        << "x" << face->glyph->bitmap.rows << "]";
+                    // qDebug()
+                    //     << "加载字形" << c << "[" <<
+                    //     face->glyph->bitmap.width
+                    //     << "x" << face->glyph->bitmap.rows << "]";
                 }
 
                 // FreeType渲染出的位图是8位的灰度图 (alpha-only)
@@ -321,9 +322,9 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
     // b. 填充字形度量信息
     glyph.bearing = data.bearing;
     glyph.xadvance = data.xadvance;
-    qDebug() << "字符" << glyph.c << "放在"
-             << "[" << glyph.character_texinfo.uv_offset.x << ","
-             << glyph.character_texinfo.uv_offset.y << "]";
+    // qDebug() << "字符" << glyph.c << "放在"
+    //          << "[" << glyph.character_texinfo.uv_offset.x << ","
+    //          << glyph.character_texinfo.uv_offset.y << "]";
 
     // 将最终的Glyph信息存入缓存map中
     {

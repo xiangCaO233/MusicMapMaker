@@ -8,10 +8,10 @@
 #include <glm/fwd.hpp>
 #include <ice/thread/ThreadPool.hpp>
 #include <queue>
-#include <render/StringHash.hpp>
 #include <render/texture/TextureInfo.hpp>
 #include <string>
 #include <unordered_map>
+#include <util/StringHash.hpp>
 
 // 字符字形
 struct CharacterGlyph {

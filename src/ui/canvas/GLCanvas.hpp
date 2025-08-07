@@ -30,6 +30,9 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 更新fps显示
     virtual void updateFpsDisplay(int fps);
 
+    // 内部可获取渲染器
+    std::unique_ptr<Renderer2D> &renderer() { return render; }
+
    private:
     // fps计数器
     FrameRateCounter *fpsCounter;

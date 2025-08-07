@@ -10,6 +10,7 @@ class MMap {
     MMap();
     virtual ~MMap();
 
+    // 所有物件
     NoteCollection notes;
 };
 

@@ -7,7 +7,7 @@
 #include <canvas/render/texture/TextureInfo.hpp>
 #include <cstdint>
 #include <ice/thread/ThreadPool.hpp>
-#include <render/StringHash.hpp>
+#include <util/StringHash.hpp>
 
 class TexturePool {
    public:
