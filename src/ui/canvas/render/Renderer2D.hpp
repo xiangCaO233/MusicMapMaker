@@ -6,8 +6,8 @@
 #include <array>
 #include <glm/fwd.hpp>
 #include <mutex>
+#include <render/QuadData.hpp>
 #include <render/RenderCommand.hpp>
-#include <render/quad/QuadData.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TexturePool.hpp>
 #include <render/texture/font/FontPool.hpp>

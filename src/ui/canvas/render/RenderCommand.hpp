@@ -1,7 +1,7 @@
 #ifndef MMM_RENDERCOMMAND_HPP
 #define MMM_RENDERCOMMAND_HPP
 
-#include <render/quad/QuadData.hpp>
+#include <render/QuadData.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TextureInfo.hpp>
 
