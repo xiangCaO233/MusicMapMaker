@@ -83,6 +83,8 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/quad/QuadData.hpp
     src/ui/canvas/render/texture/TexMode.hpp
     src/ui/canvas/render/texture/TextureInfo.hpp
+    src/ui/canvas/render/texture/font/FontPool.hpp
+    src/ui/canvas/render/texture/font/FontPool.cpp
     src/ui/canvas/render/texture/TexturePool.hpp
     src/ui/canvas/render/texture/TexturePool.cpp
     src/ui/canvas/render/MPainter.hpp

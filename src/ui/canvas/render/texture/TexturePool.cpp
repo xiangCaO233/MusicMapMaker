@@ -50,7 +50,7 @@ TexturePool::TexturePool(QOpenGLFunctions_4_1_Core* gl_functions)
     GLCALL(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fragment_samplers),
            glf);
     qDebug() << "纹理采样器最大连续数量: "
-             << std::to_string(max_fragment_samplers / 2);
+             << std::to_string(max_fragment_samplers);
     if (max_fragment_samplers > 16) {
         max_fragment_samplers = 16;
     }

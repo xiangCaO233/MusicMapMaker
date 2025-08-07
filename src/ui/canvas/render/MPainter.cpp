@@ -23,8 +23,51 @@ MPainter::~MPainter() {
 void MPainter::MPainter::paintString(const std::string& fontFamily,
                                      uint32_t fontSize,
                                      const std::u32string& str, glm::vec2 pos,
-                                     TextDirection direction, float rotation,
-                                     glm::vec4 color, bool applyMask) {}
+                                     glm::vec4 color, TextDirection direction,
+                                     float rotation, bool applyMask) {
+    uint32_t xoffset{0};
+    uint32_t yoffset{0};
+
+    for (const auto& character : str) {
+        auto fontoption =
+            renderer->font_pool()->get(fontFamily, fontSize, character);
+        if (fontoption.has_value()) {
+            auto& charInfo = fontoption.value();
+            auto& charTexture = charInfo.character_texinfo;
+
+            // 计算当前字符应该处于的位置
+            glm::vec2 charpos = pos;
+            switch (direction) {
+                case TextDirection::Horizontal: {
+                    charpos.x += xoffset;
+                    break;
+                }
+                case TextDirection::Vertical: {
+                    charpos.y += yoffset;
+                    break;
+                }
+            }
+            charpos.y -= (charInfo.bearing.y);
+            // 提交渲染指令
+            renderer->commit(
+                {{charpos, charTexture.origin_size, rotation, color,
+                  !applyMask},
+                 {charTexture.uv_offset},
+                 {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}});
+
+            switch (direction) {
+                case TextDirection::Horizontal: {
+                    xoffset += charInfo.xadvance / 64;
+                    break;
+                }
+                case TextDirection::Vertical: {
+                    yoffset += (charTexture.origin_size.y + charInfo.bearing.y);
+                    break;
+                }
+            }
+        }
+    }
+}
 
 /**
  * @brief 绘制一条线段，支持圆角。

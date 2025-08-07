@@ -22,6 +22,8 @@ enum class TexScaleMode : uint32_t {
     TILE_BASEHEIGHT_REPEAT = 0x00000007,
     // 单独放一个图像(保持比例,根据对齐方式铺过去,不够则不填充颜色(无重采样),图像过大则应只显示一部分,需要配合对齐方式指定对齐位置)
     SINGLE = 0x00000008,
+    // 仅绘制字符-此情况下圆角半径属性存储的是uvOffset
+    CHARACTER = 0x00000009,
 };
 
 // 纹理对齐方式

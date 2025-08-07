@@ -7,22 +7,7 @@
 #include <canvas/render/texture/TextureInfo.hpp>
 #include <cstdint>
 #include <ice/thread/ThreadPool.hpp>
-#include <string>
-#include <unordered_set>
-
-struct StringHash {
-    // 这个标签用于开启透明性
-    using is_transparent = void;
-    [[nodiscard]] size_t operator()(const char* txt) const {
-        return std::hash<std::string_view>{}(txt);
-    }
-    [[nodiscard]] size_t operator()(std::string_view txt) const {
-        return std::hash<std::string_view>{}(txt);
-    }
-    [[nodiscard]] size_t operator()(const std::string& txt) const {
-        return std::hash<std::string>{}(txt);
-    }
-};
+#include <render/StringHash.hpp>
 
 class TexturePool {
    public:

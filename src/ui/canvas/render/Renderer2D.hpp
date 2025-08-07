@@ -11,6 +11,7 @@
 #include <render/texture/TexturePool.hpp>
 
 #include "render/texture/TexMode.hpp"
+#include "render/texture/font/FontPool.hpp"
 
 class GLCanvas;
 class Renderer2D {
@@ -36,6 +37,9 @@ class Renderer2D {
     // 添加纹理目录
     void add_texture_from_path(const std::string& path);
 
+    // 添加字体
+    void add_font_from_path(const std::string& path, bool is_qrc = false);
+
     // 结束
     void finalize();
 
@@ -50,6 +54,9 @@ class Renderer2D {
         return texturepool;
     }
 
+    // 访问字体池
+    const std::unique_ptr<FontPool>& font_pool() const { return fontpool; }
+
    private:
     // 启用调试线框
     bool draw_wireframe{true};
@@ -60,6 +67,9 @@ class Renderer2D {
 
     // 纹理池
     std::unique_ptr<TexturePool> texturepool;
+
+    // 字体池
+    std::unique_ptr<FontPool> fontpool;
 
     // gl函数上下文
     QOpenGLFunctions_4_1_Core* glf;

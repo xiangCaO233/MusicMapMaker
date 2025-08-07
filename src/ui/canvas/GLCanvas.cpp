@@ -103,6 +103,10 @@ void GLCanvas::initializeGL() {
     render = std::make_unique<Renderer2D>(this);
     render->add_texture_from_path("../resources/textures/default");
 
+    render->add_font_from_path(
+        "../resources/font/ComicShannsMonoNerdFont_Bold.otf");
+    render->add_font_from_path("../resources/font/NotoSansCJK-Bold.ttc");
+
     // 暗化蒙版
     // render->newMask({0, 0, 1000, 1000}, {.2f, .2f, .2f, 0.2f},
     //                 MaskEffect::DARKEN);
@@ -128,15 +132,24 @@ void GLCanvas::paintGL() {
 
     {
         // 绘制
-        MPainter panter(render.get());
-        panter.paintImage(
-            "../resources/textures/default/物件/arrowright_selected.png",
-            {50, 50}, {{1.f, 1.f}, 16.f});
-        panter.fillImage(
-            "../resources/textures/default/物件/arrowright_selected.png",
-            {{350, 550}, {100, 100}});
+        MPainter painter(render.get());
 
-        panter.paintLine({100, 50}, {200, 100}, {0.f, 0.f, 0.f, 1.f}, 4.f);
+        // painter.paintImage(
+        //     "../resources/textures/default/物件/arrowright_selected.png",
+        //     {50, 50}, {{1.f, 1.f}, 16.f});
+
+        // painter.fillImage(
+        //     "../resources/textures/default/物件/arrowright_selected.png",
+        //     {{350, 550}, {100, 100}});
+
+        // painter.paintImage(
+        //     "../resources/textures/default/打击特效/划键打击特效/1.png",
+        //     {100, 100}, {{1.f, 1.f}, 0.f});
+
+        // painter.paintLine({100, 50}, {200, 100}, {0.f, 0.f, 0.f, 1.f}, 4.f);
+
+        painter.paintString("ComicShannsMono Nerd Font", 36, U"nmsl",
+                            {100, 100});
     }
 
     fpsCounter->frameRendered();

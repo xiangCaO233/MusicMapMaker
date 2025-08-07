@@ -90,9 +90,9 @@ class MPainter {
      */
     void paintString(const std::string& fontFamily, uint32_t fontSize,
                      const std::u32string& str, glm::vec2 pos,
+                     glm::vec4 color = glm::vec4(1.0f),
                      TextDirection direction = TextDirection::Horizontal,
-                     float rotation = 0.0f, glm::vec4 color = glm::vec4(1.0f),
-                     bool applyMask = true);
+                     float rotation = 0.0f, bool applyMask = true);
 
     /**
      * @brief 绘制一条线段，支持圆角。

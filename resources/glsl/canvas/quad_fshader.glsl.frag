@@ -74,6 +74,8 @@ uniform int u_ActiveMaskLayerCount;
 //     TILE_BASEHEIGHT_REPEAT = 0x00000007,
 //     // 单独放一个图像(保持比例,根据对齐方式铺过去,不够则不填充颜色(无重采样),图像过大则应只显示一部分,需要配合对齐方式指定对齐位置)
 //     SINGLE = 0x00000008,
+//     仅绘制字符(不可使用圆角属性)-此情况下圆角半径属性存储的是uvOffset
+//     CHARACTER = 0x00000009,
 // };
 const uint AUTO_SCALE_AND_CUT = 1u;
 const uint SCALE_FORCE_BASEWIDTH = 2u;
@@ -83,6 +85,7 @@ const uint TILE_REPEAT = 5u;
 const uint TILE_BASEWIDTH_REPEAT = 6u;
 const uint TILE_BASEHEIGHT_REPEAT = 7u;
 const uint SINGLE = 8u;
+const uint CHARACTER = 9u;
 
 // TexAlignMode
 const uint ALIGN_CENTER = 16u; // 0x10
@@ -119,13 +122,19 @@ UVResult calcUV() {
     // 初始化UV
     result.uv = vec2(0.0);
 
-    // 同时检查纹理是否有效，无效则直接标记为不可见
-    if (f_UVScale.x == 0.0 || f_UVScale.y == 0.0 || f_GroupSize.x == 0.0 || f_GroupSize.y == 0.0) {
+    // 为 CHARACTER 模式添加特殊处理, 它不依赖GroupSize
+    if (f_TexScaleStratergy != CHARACTER && (f_UVScale.x == 0.0 || f_UVScale.y == 0.0 || f_GroupSize.x == 0.0 || f_GroupSize.y == 0.0)) {
         result.visible = false;
         return result;
     }
-    vec2 actualTexSize = f_GroupSize * f_UVScale;
-    vec2 fragPosInQuad = v_TexCoord * f_QuadSize;
+
+    vec2 actualTexSize;
+    vec2 fragPosInQuad;
+    // [优化] CHARACTER模式不需要这两个变量，可以跳过计算
+    if (f_TexScaleStratergy != CHARACTER) {
+        actualTexSize = f_GroupSize * f_UVScale;
+        fragPosInQuad = v_TexCoord * f_QuadSize;
+    }
 
     switch (f_TexScaleStratergy) {
         case AUTO_SCALE_AND_CUT:
@@ -324,6 +333,16 @@ UVResult calcUV() {
             }
             break;
         }
+        case CHARACTER:
+        {
+            // 仅绘制字符模式:
+            // 在此模式下, f_Radius 被复用为 uvOffset (字符在图集中的UV偏移量)。
+            // f_UVScale 是字符的UV尺寸。
+            // v_TexCoord 是在字符矩形上的插值坐标(0-1)。
+            // 最终UV = 偏移量 + 插值坐标 * 尺寸
+            result.uv = f_Radius + (v_TexCoord * f_UVScale);
+            break;
+        }
     }
     return result;
 }
@@ -347,6 +366,10 @@ void main() {
         FragColor = vec4(1.0, 1.0, 0.0, 1.0);
         return;
     }
+    // else {
+    //     FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+    //     return;
+    // }
     vec4 finalColor;
     if (f_TextureLayerIdx == -1) {
         finalColor = f_DefColor;
@@ -360,12 +383,27 @@ void main() {
         }
 
         // 采样纹理并混矩形默认颜色
-        finalColor = texture(u_samplerarray, vec3(uvResult.uv, f_TextureLayerIdx)) * f_DefColor;
+        if (f_TexScaleStratergy == CHARACTER) {
+            // 对于单通道位图字体:
+            // 从R通道获取字符的覆盖率/Alpha值
+            float coverage = texture(u_samplerarray, vec3(uvResult.uv, f_TextureLayerIdx)).r;
+
+            // 使用 f_DefColor 作为基础颜色，并用覆盖率调制其Alpha通道
+            finalColor = vec4(f_DefColor.rgb, f_DefColor.a * coverage);
+        } else {
+            // 对于所有其他RGBA纹理模式，使用原有逻辑
+            finalColor = texture(u_samplerarray, vec3(uvResult.uv, f_TextureLayerIdx)) * f_DefColor;
+        }
     }
 
     // 如果采样出的颜色是完全透明的，也可以提前丢弃以优化
     if (finalColor.a == 0.0) {
         discard;
+    }
+
+    if (f_TexScaleStratergy == CHARACTER) {
+        FragColor = finalColor;
+        return;
     }
 
     // --- 圆角和渐变效果处理 ---

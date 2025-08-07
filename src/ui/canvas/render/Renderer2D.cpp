@@ -42,8 +42,13 @@ auto glCallImpl(Func func, const char* funcStr,
 Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
     // 初始化纹理池
     texturepool = std::make_unique<TexturePool>(canvas);
+
+    // 初始化字体池
+    fontpool = std::make_unique<FontPool>(canvas);
+
     // 初始化着色器
     shader_program = new QOpenGLShaderProgram();
+
     // 从资源qrc加载
     QFile vert_source(":/glsl/canvas/quad_vshader.glsl.vert");
     QFile frag_source(":/glsl/canvas/quad_fshader.glsl.frag");
@@ -189,9 +194,15 @@ void Renderer2D::add_texture_from_path(const std::string& path) {
     texturepool->rebuild_with_directory(path);
 }
 
+// 添加字体
+void Renderer2D::add_font_from_path(const std::string& path, bool is_qrc) {
+    fontpool->load_font(path, is_qrc);
+}
+
 // 更新需要更新的资源等等
 void Renderer2D::update() {
     texturepool->processUploadQueue();
+    fontpool->processUploadQueue();
 
     if (update_view) {
         QMatrix4x4 projection;
@@ -436,21 +447,9 @@ void Renderer2D::render() {
         // 绘制线框
         shader_program->setUniformValue("u_IsDrawingWireframe", true);
         for (const auto& batch : command_batch) {
-            // 我们可以用同一个着色器，但最好有一个专门的、更简单的线框着色器
-            // 这里我们先复用，但让片段着色器输出一个固定颜色
-
-            // (可选) 设置线框的粗细
-            // GLCALL(glf->glLineWidth(2.0f), glf);
-
-            // 【关键】使用 GL_LINE_LOOP 来绘制线框
-            // GL_LINE_LOOP
-            // 会将传入的顶点依次连接成线，并最后将末尾顶点与起始顶点相连
-            // 我们只需要传入构成矩形外框的4个顶点即可
-            GLCALL(glf->glDrawArraysInstanced(
-                       GL_LINE_LOOP,
-                       0,  // 从顶点0开始
-                       6,  // 只使用前4个顶点（正好构成一个矩形）
-                       batch.instanceCount),
+            update_attribptrFromInstance(batch.startIndex);
+            GLCALL(glf->glDrawArraysInstanced(GL_LINE_LOOP, 0, 6,
+                                              batch.instanceCount),
                    glf);
         }
     }
