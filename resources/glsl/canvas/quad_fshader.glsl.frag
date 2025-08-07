@@ -3,6 +3,7 @@
 // --- 输出/输入/Uniforms ---
 out vec4 FragColor;
 
+// 是否绘制线框
 uniform bool u_IsDrawingWireframe;
 // 使用的采样数组
 uniform sampler2DArray u_samplerarray;
@@ -17,7 +18,7 @@ in vec2 v_WorldPos;
 // 纹理在层中的尺寸比例
 flat in vec2 f_UVScale;
 // 纹理层数
-flat in uint f_TextureLayerIdx;
+flat in int f_TextureLayerIdx;
 flat in uint f_NoFilter;
 // 默认颜色
 flat in vec4 f_DefColor;
@@ -51,13 +52,32 @@ uniform int u_ActiveMaskLayerCount;
 
 // --- C++端 enum 值的常量定义 ---
 // TexScaleMode
-const uint TILING_AUTO = 1u;
-const uint SCALE_BASEWIDTH_TO_TILING = 2u;
-const uint SCALE_BASEHEIGHT_TO_TILING = 3u;
-const uint SCALE_FILL = 4u;
-const uint SCALE_BASEWIDTH_REPEAT_FILL = 5u;
-const uint SCALE_BASEHEIGHT_REPEAT_FILL = 6u;
-const uint NO_SCALE_TILING = 7u;
+// enum class TexScaleMode : uint32_t {
+//     // 自动缩放并裁切(确保填满矩形,并保持比例的缩放,始终对齐中心)
+//     AUTO_SCALE_AND_CUT = 0x00000001,
+//     // 强行根据宽度缩放(确保填满矩形宽度(不确保填满矩形),基于此宽度的缩放保持图像比例等比缩放高度)
+//     SCALE_FORCE_BASEWIDTH = 0x00000002,
+//     // 强行根据高度缩放(确保填满矩形高度(不确保填满矩形),基于此高度的缩放保持图像比例等比缩放宽度)
+//     SCALE_FORCE_BASEHEIGHT = 0x00000003,
+//     // 强制填充(不保持比例,直接用图像塞满矩形)
+//     FORCE_FILL = 0x00000004,
+//     // 直接平铺(确保填满矩形宽度,保持比例,保持尺寸,不够的高度使用重采样,确保最终填满矩形)
+//     TILE_REPEAT = 0x00000005,
+//     // 根据宽度平铺(确保填满矩形宽度,保持比例,不够的高度使用重采样,确保最终填满矩形)
+//     TILE_BASEWIDTH_REPEAT = 0x00000006,
+//     // 根据高度平铺(确保填满矩形高度,保持比例,不够的宽度使用重采样,确保最终填满矩形)
+//     TILE_BASEHEIGHT_REPEAT = 0x00000007,
+//     // 单独放一个图像(保持比例,根据对齐方式铺过去,不够则不填充颜色(无重采样),图像过大则应只显示一部分,需要配合对齐方式指定对齐位置)
+//     SINGLE = 0x00000008,
+// };
+const uint AUTO_SCALE_AND_CUT = 1u;
+const uint SCALE_FORCE_BASEWIDTH = 2u;
+const uint SCALE_FORCE_BASEHEIGHT = 3u;
+const uint FORCE_FILL = 4u;
+const uint TILE_REPEAT = 5u;
+const uint TILE_BASEWIDTH_REPEAT = 6u;
+const uint TILE_BASEHEIGHT_REPEAT = 7u;
+const uint SINGLE = 8u;
 
 // TexAlignMode
 const uint ALIGN_CENTER = 16u; // 0x10
@@ -72,19 +92,21 @@ const uint MASK_EFFECT_DARKEN = 2;
 const uint MASK_EFFECT_FILTER = 3;
 const uint MASK_EFFECT_ALPHA_SHIFT = 4;
 
-// [优化] 定义一个返回值结构体, 用于封装UV坐标和片段可见性
-// 这样做可以避免在函数内部使用高成本的 `discard` 指令
+// 封装UV坐标和片段可见性
 struct UVResult {
-    bool visible; // 片段是否可见 (是否在纹理的有效区域内)
-    vec2 uv; // 计算出的采样UV坐标
+    // 片段是否可见 (是否在纹理的有效区域内)
+    bool visible;
+    // 计算出的采样UV坐标
+    vec2 uv;
 };
 
 UVResult calcUV() {
     UVResult result;
-    result.visible = true; // 默认片段是可见的
-    result.uv = vec2(0.0); // 初始化UV
+    // 默认片段是可见的
+    result.visible = true;
+    // 初始化UV
+    result.uv = vec2(0.0);
 
-    // [优化] 提取所有 case 分支中重复的计算，只执行一次
     // 同时检查纹理是否有效，无效则直接标记为不可见
     if (f_UVScale.x == 0.0 || f_UVScale.y == 0.0 || f_GroupSize.x == 0.0 || f_GroupSize.y == 0.0) {
         result.visible = false;
@@ -94,31 +116,31 @@ UVResult calcUV() {
     vec2 fragPosInQuad = v_TexCoord * f_QuadSize;
 
     switch (f_TexScaleStratergy) {
-        case TILING_AUTO:
+        case AUTO_SCALE_AND_CUT:
         {
-            // 2. 计算宽高缩放比
+            // 计算宽高缩放比
             vec2 scaleRatios = f_QuadSize / actualTexSize;
-            // 3. 选择较大的缩放比作为最终的统一缩放因子
+            // 选择较大的缩放比作为最终的统一缩放因子
             float finalScale = max(scaleRatios.x, scaleRatios.y);
-            // 4. 计算缩放后纹理的尺寸
+            // 计算缩放后纹理的尺寸
             vec2 scaledTexSize = actualTexSize * finalScale;
-            // 5. 计算居中对齐的偏移量
+            // 计算居中对齐的偏移量
             vec2 offset = (f_QuadSize - scaledTexSize) / 2.0;
-            // 7. 计算在源纹理上的采样像素坐标
+            // 计算在源纹理上的采样像素坐标
             vec2 samplePosInTex = (fragPosInQuad - offset) / finalScale;
-            // 8. 转换为UV坐标并应用平铺
+            // 转换为UV坐标并应用平铺
             vec2 tiledUV = fract(samplePosInTex / actualTexSize);
-            // 9. 将平铺后的 UV (0-1范围) 映射到纹理层内的实际区域
+            // 将平铺后的 UV (0-1范围) 映射到纹理层内的实际区域
             result.uv = tiledUV * f_UVScale;
             break;
         }
-        case SCALE_BASEWIDTH_TO_TILING:
+        case SCALE_FORCE_BASEWIDTH:
         {
-            // 2. 计算宽度基准的缩放因子
+            // 计算宽度基准的缩放因子
             float finalScale = f_QuadSize.x / actualTexSize.x;
-            // 3. 计算缩放后纹理的尺寸
+            // 计算缩放后纹理的尺寸
             vec2 scaledTexSize = actualTexSize * finalScale;
-            // 4. 根据对齐策略，计算垂直方向的偏移量
+            // 根据对齐策略，计算垂直方向的偏移量
             float offsetY = 0.0;
             if (f_TexAlignStratergy == ALIGN_TOP) {
                 offsetY = 0.0;
@@ -128,7 +150,7 @@ UVResult calcUV() {
                 offsetY = (f_QuadSize.y - scaledTexSize.y) / 2.0;
             }
 
-            // 6. 判断片段是否在垂直对齐后的纹理区域内
+            // 判断片段是否在垂直对齐后的纹理区域内
             if (fragPosInQuad.y < offsetY || fragPosInQuad.y > (offsetY + scaledTexSize.y))
             {
                 // 在留白区域, 标记为不可见
@@ -136,33 +158,34 @@ UVResult calcUV() {
             }
             else
             {
-                // 7. 计算在源纹理上的采样像素坐标
+                // 计算在源纹理上的采样像素坐标
                 vec2 posRelativeToTex = fragPosInQuad - vec2(0.0, offsetY);
                 vec2 samplePosInTex = posRelativeToTex / finalScale;
-                // 8. 转换为UV坐标并应用平铺
+                // 转换为UV坐标并应用平铺
                 vec2 tiledUV = fract(samplePosInTex / actualTexSize);
-                // 9. 将平铺后的 UV 映射到纹理层内的实际区域
+                // 将平铺后的 UV 映射到纹理层内的实际区域
                 result.uv = tiledUV * f_UVScale;
             }
             break;
         }
-        case SCALE_BASEHEIGHT_TO_TILING:
+        case SCALE_FORCE_BASEHEIGHT:
         {
-            // 2. 计算高度基准的缩放因子
+            // 计算高度基准的缩放因子
             float finalScale = f_QuadSize.y / actualTexSize.y;
-            // 3. 计算缩放后纹理的尺寸
+            // 计算缩放后纹理的尺寸
             vec2 scaledTexSize = actualTexSize * finalScale;
-            // 4. 根据对齐策略，计算水平方向的偏移量
+            // 根据对齐策略，计算水平方向的偏移量
             float offsetX = 0.0;
             if (f_TexAlignStratergy == ALIGN_LEFT) {
                 offsetX = 0.0;
             } else if (f_TexAlignStratergy == ALIGN_RIGHT) {
                 offsetX = f_QuadSize.x - scaledTexSize.x;
-            } else { // 默认居中对齐
+            } else {
+                // 默认居中对齐
                 offsetX = (f_QuadSize.x - scaledTexSize.x) / 2.0;
             }
 
-            // 6. 判断片段是否在水平对齐后的纹理区域内
+            // 判断片段是否在水平对齐后的纹理区域内
             if (fragPosInQuad.x < offsetX || fragPosInQuad.x > (offsetX + scaledTexSize.x))
             {
                 // 在留白区域, 标记为不可见
@@ -170,83 +193,96 @@ UVResult calcUV() {
             }
             else
             {
-                // 7. 计算在源纹理上的采样像素坐标
+                // 计算在源纹理上的采样像素坐标
                 vec2 posRelativeToTex = fragPosInQuad - vec2(offsetX, 0.0);
                 vec2 samplePosInTex = posRelativeToTex / finalScale;
-                // 8. 转换为UV坐标并应用平铺
+                // 转换为UV坐标并应用平铺
                 vec2 tiledUV = fract(samplePosInTex / actualTexSize);
-                // 9. 将平铺后的 UV 映射到纹理层内的实际区域
+                // 将平铺后的 UV 映射到纹理层内的实际区域
                 result.uv = tiledUV * f_UVScale;
             }
             break;
         }
-        case SCALE_FILL:
+        case FORCE_FILL:
         {
-            // 将此UV坐标乘以f_UVScale，以确保我们只在纹理的有效区域内进行采样。
+            // 将此UV坐标乘以f_UVScale，确保只在纹理的有效区域内进行采样
             result.uv = v_TexCoord * f_UVScale;
             break;
         }
-        case SCALE_BASEWIDTH_REPEAT_FILL:
+        case TILE_REPEAT:
         {
-            // 1. 计算缩放
+            // 直接以纹理的原始尺寸(actualTexSize)为单位进行平铺
+            // 使用 mod 计算片段在原始纹理尺寸单元内的相对像素位置
+            vec2 samplePosInTex = mod(fragPosInQuad, actualTexSize);
+            // 将像素位置转换为归一化的UV坐标 [0,1]
+            vec2 tiledUV = samplePosInTex / actualTexSize;
+            // 映射到层内实际区域
+            result.uv = tiledUV * f_UVScale;
+            break;
+        }
+        case TILE_BASEWIDTH_REPEAT:
+        {
+            // 计算缩放
             float finalScale = f_QuadSize.x / actualTexSize.x;
             vec2 scaledTexSize = actualTexSize * finalScale;
-            // 2. 根据对齐策略，确定主图像的垂直偏移 (平铺基准点)
+            // 根据对齐策略，确定主图像的垂直偏移 (平铺基准点)
             float offsetY = 0.0;
             if (f_TexAlignStratergy == ALIGN_TOP) {
                 offsetY = 0.0;
             } else if (f_TexAlignStratergy == ALIGN_BOTTOM) {
                 offsetY = f_QuadSize.y - scaledTexSize.y;
-            } else { // 默认居中
+            } else {
+                // 默认居中
                 offsetY = (f_QuadSize.y - scaledTexSize.y) / 2.0;
             }
-            // 3. 计算片段相对于平铺基准点的位置
+            // 计算片段相对于平铺基准点的位置
             vec2 posRelativeToPrimaryTile = fragPosInQuad - vec2(0.0, offsetY);
-            // 4. 使用 mod() 实现无限平铺
+            // 使用 mod() 实现无限平铺
             vec2 posWithinAnyTile = mod(posRelativeToPrimaryTile, scaledTexSize);
-            // 5. 将平铺后的坐标转换回原始纹理的UV空间
+            // 将平铺后的坐标转换回原始纹理的UV空间
             vec2 samplePosInTex = posWithinAnyTile / finalScale;
             vec2 finalUV_normalized = samplePosInTex / actualTexSize;
-            // 6. 映射到层内实际区域
+            // 映射到层内实际区域
             result.uv = finalUV_normalized * f_UVScale;
             break;
         }
-        case SCALE_BASEHEIGHT_REPEAT_FILL:
+        case TILE_BASEHEIGHT_REPEAT:
         {
-            // 1. 计算缩放
+            // 计算缩放
             float finalScale = f_QuadSize.y / actualTexSize.y;
             vec2 scaledTexSize = actualTexSize * finalScale;
-            // 2. 根据对齐策略，确定主图像的水平偏移 (平铺基准点)
+            // 根据对齐策略，确定主图像的水平偏移 (平铺基准点)
             float offsetX = 0.0;
             if (f_TexAlignStratergy == ALIGN_LEFT) {
                 offsetX = 0.0;
             } else if (f_TexAlignStratergy == ALIGN_RIGHT) {
                 offsetX = f_QuadSize.x - scaledTexSize.x;
-            } else { // 默认居中
+            } else {
+                // 默认居中
                 offsetX = (f_QuadSize.x - scaledTexSize.x) / 2.0;
             }
-            // 3. 计算片段相对于平铺基准点的位置
+            // 计算片段相对于平铺基准点的位置
             vec2 posRelativeToPrimaryTile = fragPosInQuad - vec2(offsetX, 0.0);
-            // 4. 使用 mod() 实现无限平铺
+            // 使用 mod() 实现无限平铺
             vec2 posWithinAnyTile = mod(posRelativeToPrimaryTile, scaledTexSize);
-            // 5. 将平铺后的坐标转换回原始纹理的UV空间
+            // 将平铺后的坐标转换回原始纹理的UV空间
             vec2 samplePosInTex = posWithinAnyTile / finalScale;
             vec2 finalUV_normalized = samplePosInTex / actualTexSize;
-            // 6. 映射到层内实际区域
+            // 映射到层内实际区域
             result.uv = finalUV_normalized * f_UVScale;
             break;
         }
-        case NO_SCALE_TILING:
+        case SINGLE:
         {
-            // 2. 根据对齐策略，计算纹理图块的偏移量
-            // [优化] 使用位运算(&)来正确处理组合对齐标志, 但为了保持与原逻辑一致, 这里暂不修改
+            // 根据对齐策略，计算纹理图块的偏移量
             // 水平对齐 (检查 LEFT 和 RIGHT)
             float offsetX = 0.0;
             if (f_TexAlignStratergy == ALIGN_LEFT) {
                 offsetX = 0.0;
             } else if (f_TexAlignStratergy == ALIGN_RIGHT) {
                 offsetX = f_QuadSize.x - actualTexSize.x;
-            } else { // 默认水平居中
+            } else {
+                // 默认水平居中
                 offsetX = (f_QuadSize.x - actualTexSize.x) / 2.0;
             }
             // 垂直对齐 (检查 TOP 和 BOTTOM)
@@ -259,11 +295,11 @@ UVResult calcUV() {
                 offsetY = (f_QuadSize.y - actualTexSize.y) / 2.0;
             }
 
-            // 3. 判断片段是否在图块的边界内
+            // 判断片段是否在图块的边界内
             if (fragPosInQuad.x >= offsetX && fragPosInQuad.x < (offsetX + actualTexSize.x) &&
                     fragPosInQuad.y >= offsetY && fragPosInQuad.y < (offsetY + actualTexSize.y))
             {
-                // 4. 如果在边界内, 计算采样UV
+                // 如果在边界内, 计算采样UV
                 vec2 samplePosInTex = fragPosInQuad - vec2(offsetX, offsetY);
                 vec2 uv = samplePosInTex / actualTexSize;
                 // 映射到层内实际区域
@@ -285,20 +321,24 @@ void main() {
         FragColor = vec4(1.0, 1.0, 0.0, 1.0);
         return;
     }
+    vec4 finalColor;
+    if (f_TextureLayerIdx == -1) {
+        finalColor = f_DefColor;
+    } else {
+        // 先计算UV并判断可见性
+        UVResult uvResult = calcUV();
 
-    // [优化] 调整主逻辑流程, 先计算UV并判断可见性
-    UVResult uvResult = calcUV();
+        // 如果片段在纹理的留白区域，提前丢弃，避免昂贵的 texture() 调用和后续所有计算
+        if (!uvResult.visible) {
+            discard;
+        }
 
-    // 如果片段在纹理的留白区域，提前丢弃，可以避免昂贵的 texture() 调用和后续所有计算
-    if (!uvResult.visible) {
-        discard;
+        // 采样纹理并混矩形默认颜色
+        finalColor = texture(u_samplerarray, vec3(uvResult.uv, f_TextureLayerIdx)) * f_DefColor;
     }
 
-    // 采样纹理并混矩形默认颜色
-    vec4 texcolor = texture(u_samplerarray, vec3(uvResult.uv, f_TextureLayerIdx)) * f_DefColor;
-
     // 如果采样出的颜色是完全透明的，也可以提前丢弃以优化
-    if (texcolor.a == 0.0) {
+    if (finalColor.a == 0.0) {
         discard;
     }
 
@@ -319,24 +359,23 @@ void main() {
                     case MASK_EFFECT_DARKEN:
                     {
                         // 暗化蒙版
-                        // [微优化建议] C++端可以预先计算 (1.0 - darken_ratio) 并传入
-                        texcolor.rgb *= (1.0 - mask.effectParams.x);
+                        finalColor.rgb *= mask.effectParams.x;
                         break;
                     }
                     case MASK_EFFECT_FILTER:
                     {
                         // 滤镜蒙版
-                        texcolor *= mask.effectParams;
+                        finalColor *= mask.effectParams;
                         break;
                     }
                     case MASK_EFFECT_ALPHA_SHIFT:
                     {
-                        texcolor.a *= mask.effectParams.x;
+                        finalColor.a *= mask.effectParams.x;
                         break;
                     }
                 }
             }
         }
     }
-    FragColor = texcolor;
+    FragColor = finalColor;
 }

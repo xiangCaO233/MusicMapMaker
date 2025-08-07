@@ -11,7 +11,7 @@ struct QuadData {
     glm::vec4 color;
     glm::vec2 uv_scale;
     glm::vec2 group_size;
-    glm::uint32 layer_idx;
+    glm::int32 layer_idx;
     glm::uint32 no_filter;
     TexAlignMode talign;
     TexScaleMode tscale;

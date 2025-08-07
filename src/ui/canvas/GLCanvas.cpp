@@ -103,12 +103,15 @@ void GLCanvas::initializeGL() {
     render = std::make_unique<Renderer2D>(this);
     render->add_texture_from_path("../resources/textures/default");
 
-    // 灰色蒙版
-    render->newMask({0, 0, 1000, 1000}, {.8f, .2f, .2f, .75f},
-                    MaskEffect::DARKEN);
+    // 暗化蒙版
+    // render->newMask({0, 0, 1000, 1000}, {.2f, .2f, .2f, 0.2f},
+    //                 MaskEffect::DARKEN);
     // 滤镜蒙版
-    render->newMask({0, 0, 1000, 1000}, {1.f, .5f, .2f, .75f},
-                    MaskEffect::FILTER);
+    // render->newMask({0, 0, 1000, 1000}, {1.f, .5f, .2f, .75f},
+    //                 MaskEffect::FILTER);
+    // 透明蒙版
+    render->newMask({144, 200, 388, 600}, {.3f, .5f, .2f, .75f},
+                    MaskEffect::ALPHA_SHIFT);
 }
 
 void GLCanvas::resizeGL(int w, int h) {
@@ -129,6 +132,11 @@ void GLCanvas::paintGL() {
         panter.paintImage(
             "../resources/textures/default/物件/arrowright_selected.png",
             {50, 50});
+        panter.fillImage(
+            "../resources/textures/default/物件/arrowright_selected.png",
+            {350, 550}, {100, 100});
+
+        panter.paintLine({100, 50}, {200, 100}, {0.f, 0.f, 0.f, 1.f}, 4.f);
     }
 
     fpsCounter->frameRendered();

@@ -13,7 +13,7 @@ layout(location = 4) in vec2 aUVScale;
 layout(location = 5) in vec2 aGroupSize;
 
 // 纹理ID
-layout(location = 6) in uint aTextureLayerIdx;
+layout(location = 6) in int aTextureLayerIdx;
 // 是否禁止蒙版效果
 layout(location = 7) in uint aNoFilter;
 
@@ -50,7 +50,7 @@ out vec2 v_WorldPos;
 
 // flat 表示不进行插值
 flat out vec2 f_QuadSize;
-flat out uint f_TextureLayerIdx;
+flat out int f_TextureLayerIdx;
 flat out uint f_NoFilter;
 flat out vec2 f_UVScale;
 flat out vec2 f_GroupSize;

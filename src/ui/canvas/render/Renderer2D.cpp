@@ -298,7 +298,7 @@ void Renderer2D::update_attribptrFromInstance(size_t instance_index) {
 
     // 14 uint layer_idx
     GLCALL(glf->glVertexAttribIPointer(
-               6, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               6, 1, GL_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, layer_idx))),
            glf);
 
@@ -345,14 +345,17 @@ void Renderer2D::finalize() {
     // 从第二个指令开始遍历
     for (size_t i = 1; i < command_list.size();
          ++i) {  // [修正] 遍历 command_list
+        const auto& command = command_list[i];
         // 检查当前指令是否可以合并到最后一个批次中
-        if (command_list[i].texture.gl_texture_array_id ==
-            command_batch.back().texture_array_id) {
+        if (command.texture.gl_texture_array_id ==
+                command_batch.back().texture_array_id ||
+            // 无纹理也可以合并
+            command.texture.layer_index == -1) {
             command_batch.back().instanceCount++;
         } else {
             // 不可合并，创建一个新的批次
-            command_batch.emplace_back(
-                command_list[i].texture.gl_texture_array_id, i, 1);
+            command_batch.emplace_back(command.texture.gl_texture_array_id, i,
+                                       1);
         }
     }
 
