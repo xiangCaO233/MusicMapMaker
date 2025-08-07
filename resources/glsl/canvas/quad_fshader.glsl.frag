@@ -23,6 +23,11 @@ flat in uint f_NoFilter;
 // 默认颜色
 flat in vec4 f_DefColor;
 
+// 圆角效果
+flat in vec2 f_Radius;
+flat in float f_RadiusEffectParam;
+flat in uint f_RadiusEffect;
+
 // 纹理贴图策略
 flat in uint f_TexScaleStratergy;
 flat in uint f_TexAlignStratergy;
@@ -91,6 +96,13 @@ const uint MASK_EFFECT_NONE = 1;
 const uint MASK_EFFECT_DARKEN = 2;
 const uint MASK_EFFECT_FILTER = 3;
 const uint MASK_EFFECT_ALPHA_SHIFT = 4;
+
+// 圆角效果
+// enum class RadiusEffect : uint32_t {
+//     // 淡入淡出
+//     FADE_IN_AND_OUT = 0x00000001,
+// };
+const uint FADE_IN_AND_OUT = 1u;
 
 // 封装UV坐标和片段可见性
 struct UVResult {
@@ -316,6 +328,20 @@ UVResult calcUV() {
     return result;
 }
 
+/**
+ * @brief 计算一个点到圆角矩形的有向距离 (SDF).
+ * @param p 点的坐标, 相对于矩形中心.
+ * @param b 矩形的半尺寸 (half-extents).
+ * @param r 圆角的半径.
+ * @return float 距离值. 负数在内部, 0在边缘, 正数在外部.
+ */
+float sdRoundedBox(vec2 p, vec2 b, vec2 r) {
+    r = (p.x > 0.0) ? r : vec2(r.x, r.y);
+    r = (p.y > 0.0) ? r : vec2(r.x, r.y);
+    vec2 q = abs(p) - b + r;
+    return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r.x;
+}
+
 void main() {
     if (u_IsDrawingWireframe) {
         FragColor = vec4(1.0, 1.0, 0.0, 1.0);
@@ -341,6 +367,41 @@ void main() {
     if (finalColor.a == 0.0) {
         discard;
     }
+
+    // --- 圆角和渐变效果处理 ---
+    if (f_Radius.x > 0.0 || f_Radius.y > 0.0) {
+        // 计算绘制区域的总尺寸 (包含了外部效果区域)
+        vec2 drawingAreaSize = f_QuadSize + 2.0 * f_RadiusEffectParam;
+
+        // 计算当前片元相对于绘制区域中心点的坐标
+        vec2 pos = (v_TexCoord - 0.5) * drawingAreaSize;
+
+        // 计算圆角的像素半径
+        // f_Radius 是一个比例值, 乘以矩形半高/半宽得到实际像素半径
+        vec2 radiusInPixels = f_Radius * (f_QuadSize / 2.0);
+
+        // 计算到圆角矩形的SDF距离
+        float dist = sdRoundedBox(pos, f_QuadSize / 2.0, radiusInPixels);
+
+        // 根据SDF距离和效果类型，计算最终的 alpha 值
+        if (f_RadiusEffect == FADE_IN_AND_OUT) {
+            // 使用 smoothstep 实现从边缘(dist=0)到外部渐变范围(dist=f_RadiusParams)的平滑过渡
+            // 当 dist 从 0 -> f_RadiusParams, alpha 从 1 -> 0
+            float fade_alpha = smoothstep(f_RadiusEffectParam, 0.0, dist);
+            finalColor.a *= fade_alpha;
+        } else {
+            // 没有渐变效果，就是一个硬切的圆角矩形
+            if (dist > 0.0) {
+                discard;
+            }
+        }
+
+        // 如果经过效果处理后，片元完全透明，则丢弃，避免后续蒙版计算
+        if (finalColor.a == 0.0) {
+            discard;
+        }
+    }
+    // --- 圆角处理结束 ---
 
     if (f_NoFilter == 0) {
         // 应用蒙版

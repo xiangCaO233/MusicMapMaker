@@ -34,6 +34,12 @@ enum class TexAlignMode : uint32_t {
     BOTTOM = 0x00000050,
 };
 
+// 圆角效果
+enum class RadiusEffect : uint32_t {
+    // 淡入淡出
+    FADE_IN_AND_OUT = 0x00000001,
+};
+
 // 纹理的蒙版效果
 enum class MaskEffect : uint32_t {
     // 无效果

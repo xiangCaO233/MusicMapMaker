@@ -132,36 +132,48 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
     // 6~9 vec4 color
     GLCALL(glf->glEnableVertexAttribArray(3), glf);
 
-    // 10~11 vec2 uv_scale
+    // 10~11 vec2 radius
     GLCALL(glf->glEnableVertexAttribArray(4), glf);
 
-    // 12~13 vec2 group_size
+    // 12 f32 radius_effect_param
     GLCALL(glf->glEnableVertexAttribArray(5), glf);
 
-    // 14 uint no_filter
+    // 13 uint radius_effect
     GLCALL(glf->glEnableVertexAttribArray(6), glf);
 
-    // 15 uint layer_idx
+    // 14~15 vec2 uv_scale
     GLCALL(glf->glEnableVertexAttribArray(7), glf);
 
-    // 16 uint texalignmode
+    // 16~17 vec2 group_size
     GLCALL(glf->glEnableVertexAttribArray(8), glf);
 
-    // 17 uint texscalemode
+    // 18 uint no_filter
     GLCALL(glf->glEnableVertexAttribArray(9), glf);
+
+    // 19 int layer_idx
+    GLCALL(glf->glEnableVertexAttribArray(10), glf);
+
+    // 20 uint texalignmode
+    GLCALL(glf->glEnableVertexAttribArray(11), glf);
+
+    // 21 uint texscalemode
+    GLCALL(glf->glEnableVertexAttribArray(12), glf);
 
     update_attribptrFromInstance(0);
 
-    GLCALL(glf->glVertexAttribDivisor(0, 1), glf);  // pos
-    GLCALL(glf->glVertexAttribDivisor(1, 1), glf);  // size
-    GLCALL(glf->glVertexAttribDivisor(2, 1), glf);  // rotation
-    GLCALL(glf->glVertexAttribDivisor(3, 1), glf);  // color
-    GLCALL(glf->glVertexAttribDivisor(4, 1), glf);  // uv_scale
-    GLCALL(glf->glVertexAttribDivisor(5, 1), glf);  // group_size
-    GLCALL(glf->glVertexAttribDivisor(6, 1), glf);  // layer_idx
-    GLCALL(glf->glVertexAttribDivisor(7, 1), glf);  // no_filter
-    GLCALL(glf->glVertexAttribDivisor(8, 1), glf);  // talign
-    GLCALL(glf->glVertexAttribDivisor(9, 1), glf);  // tscale
+    GLCALL(glf->glVertexAttribDivisor(0, 1), glf);   // pos
+    GLCALL(glf->glVertexAttribDivisor(1, 1), glf);   // size
+    GLCALL(glf->glVertexAttribDivisor(2, 1), glf);   // rotation
+    GLCALL(glf->glVertexAttribDivisor(3, 1), glf);   // color
+    GLCALL(glf->glVertexAttribDivisor(4, 1), glf);   // radius
+    GLCALL(glf->glVertexAttribDivisor(5, 1), glf);   // radius_effect_param
+    GLCALL(glf->glVertexAttribDivisor(6, 1), glf);   // radius_effect
+    GLCALL(glf->glVertexAttribDivisor(7, 1), glf);   // uv_scale
+    GLCALL(glf->glVertexAttribDivisor(8, 1), glf);   // group_size
+    GLCALL(glf->glVertexAttribDivisor(9, 1), glf);   // layer_idx
+    GLCALL(glf->glVertexAttribDivisor(10, 1), glf);  // no_filter
+    GLCALL(glf->glVertexAttribDivisor(11, 1), glf);  // talign
+    GLCALL(glf->glVertexAttribDivisor(12, 1), glf);  // tscale
 
     // 解绑
     GLCALL(glf->glBindVertexArray(0), glf);
@@ -284,39 +296,57 @@ void Renderer2D::update_attribptrFromInstance(size_t instance_index) {
                (void*)(base_offset + offsetof(QuadData, color))),
            glf);
 
-    // 10~11 vec2 uv_scale
+    // 10~11 vec2 radius
     GLCALL(glf->glVertexAttribPointer(
                4, 2, GL_FLOAT, false, sizeof(QuadData),
+               (void*)(base_offset + offsetof(QuadData, radius))),
+           glf);
+
+    // 12 f32 radius_effect_param
+    GLCALL(glf->glVertexAttribPointer(
+               5, 1, GL_FLOAT, false, sizeof(QuadData),
+               (void*)(base_offset + offsetof(QuadData, radius_effect_param))),
+           glf);
+
+    // 13 uint radius_effect
+    GLCALL(glf->glVertexAttribIPointer(
+               6, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               (void*)(base_offset + offsetof(QuadData, radius_effect))),
+           glf);
+
+    // 14~15 vec2 uv_scale
+    GLCALL(glf->glVertexAttribPointer(
+               7, 2, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, uv_scale))),
            glf);
 
-    // 12~13 vec2 group_size
+    // 16~17 vec2 group_size
     GLCALL(glf->glVertexAttribPointer(
-               5, 2, GL_FLOAT, false, sizeof(QuadData),
+               8, 2, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, group_size))),
            glf);
 
-    // 14 uint layer_idx
+    // 18 int layer_idx
     GLCALL(glf->glVertexAttribIPointer(
-               6, 1, GL_INT, sizeof(QuadData),
+               9, 1, GL_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, layer_idx))),
            glf);
 
-    // 15 uint no_filter
+    // 19 uint no_filter
     GLCALL(glf->glVertexAttribIPointer(
-               7, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               10, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, no_filter))),
            glf);
 
-    // 16 uint texalignmode
+    // 20 uint texalignmode
     GLCALL(glf->glVertexAttribIPointer(
-               8, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               11, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, talign))),
            glf);
 
-    // 17 uint texscalemode
+    // 21 uint texscalemode
     GLCALL(glf->glVertexAttribIPointer(
-               9, 1, GL_UNSIGNED_INT, sizeof(QuadData),
+               12, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, tscale))),
            glf);
 }
@@ -339,23 +369,23 @@ void Renderer2D::finalize() {
     }
 
     // 从第一个指令开始创建第一个批次
-    command_batch.emplace_back(command_list.front().texture.gl_texture_array_id,
-                               0, 1);
+    command_batch.emplace_back(
+        command_list.front().texturesInfo.texture.gl_texture_array_id, 0, 1);
 
     // 从第二个指令开始遍历
     for (size_t i = 1; i < command_list.size();
          ++i) {  // [修正] 遍历 command_list
         const auto& command = command_list[i];
         // 检查当前指令是否可以合并到最后一个批次中
-        if (command.texture.gl_texture_array_id ==
+        if (command.texturesInfo.texture.gl_texture_array_id ==
                 command_batch.back().texture_array_id ||
             // 无纹理也可以合并
-            command.texture.layer_index == -1) {
+            command.texturesInfo.texture.layer_index == -1) {
             command_batch.back().instanceCount++;
         } else {
             // 不可合并，创建一个新的批次
-            command_batch.emplace_back(command.texture.gl_texture_array_id, i,
-                                       1);
+            command_batch.emplace_back(
+                command.texturesInfo.texture.gl_texture_array_id, i, 1);
         }
     }
 
@@ -380,6 +410,7 @@ void Renderer2D::render() {
                           quad_datas.data(), GL_DYNAMIC_DRAW),
         glf);
 
+    // 不绘制线框
     shader_program->setUniformValue("u_IsDrawingWireframe", false);
     // 循环遍历批处理，分批绘制
     for (const auto& batch : command_batch) {
@@ -390,7 +421,6 @@ void Renderer2D::render() {
                glf);
         // 着色器采样器 u_samplerarray 使用纹理单元 0
         shader_program->setUniformValue("u_samplerarray", 0);
-        shader_program->setUniformValue("u_IsDrawingWireframe", false);
 
         // 更新顶点属性指针以指向当前批次的开头
         update_attribptrFromInstance(batch.startIndex);
@@ -403,6 +433,7 @@ void Renderer2D::render() {
 
     // === 绘制调试线框 ===
     if (draw_wireframe) {
+        // 绘制线框
         shader_program->setUniformValue("u_IsDrawingWireframe", true);
         for (const auto& batch : command_batch) {
             // 我们可以用同一个着色器，但最好有一个专门的、更简单的线框着色器

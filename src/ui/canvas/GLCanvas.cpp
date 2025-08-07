@@ -131,10 +131,10 @@ void GLCanvas::paintGL() {
         MPainter panter(render.get());
         panter.paintImage(
             "../resources/textures/default/物件/arrowright_selected.png",
-            {50, 50});
+            {50, 50}, {{1.f, 1.f}, 16.f});
         panter.fillImage(
             "../resources/textures/default/物件/arrowright_selected.png",
-            {350, 550}, {100, 100});
+            {{350, 550}, {100, 100}});
 
         panter.paintLine({100, 50}, {200, 100}, {0.f, 0.f, 0.f, 1.f}, 4.f);
     }

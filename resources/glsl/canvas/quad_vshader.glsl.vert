@@ -6,20 +6,25 @@ layout(location = 1) in vec2 aScale;
 layout(location = 2) in float aRotation;
 layout(location = 3) in vec4 aColor;
 
+// 圆角
+layout(location = 4) in vec2 aRadius;
+layout(location = 5) in float aRadiusEffectParam;
+layout(location = 6) in uint aRadiusEffect;
+
 // 纹理未必占满采样器数组的一个layer
-layout(location = 4) in vec2 aUVScale;
+layout(location = 7) in vec2 aUVScale;
 // 但是一定是在0,0开始填充的,所以UVoffset恒为0,0
 // 贴图所在纹理组的组尺寸
-layout(location = 5) in vec2 aGroupSize;
+layout(location = 8) in vec2 aGroupSize;
 
 // 纹理ID
-layout(location = 6) in int aTextureLayerIdx;
+layout(location = 9) in int aTextureLayerIdx;
 // 是否禁止蒙版效果
-layout(location = 7) in uint aNoFilter;
+layout(location = 10) in uint aNoFilter;
 
 // 贴图策略
-layout(location = 8) in uint aTexAlignStratergy;
-layout(location = 9) in uint aTexScaleStratergy;
+layout(location = 11) in uint aTexAlignStratergy;
+layout(location = 12) in uint aTexScaleStratergy;
 
 // Uniform 矩阵
 uniform mat4 projection;
@@ -55,6 +60,9 @@ flat out uint f_NoFilter;
 flat out vec2 f_UVScale;
 flat out vec2 f_GroupSize;
 flat out vec4 f_DefColor;
+flat out vec2 f_Radius;
+flat out float f_RadiusEffectParam;
+flat out uint f_RadiusEffect;
 flat out uint f_TexScaleStratergy;
 flat out uint f_TexAlignStratergy;
 
@@ -90,6 +98,9 @@ void main() {
     f_UVScale = aUVScale;
     f_GroupSize = aGroupSize;
     f_DefColor = aColor;
+    f_Radius = aRadius;
+    f_RadiusEffectParam = aRadiusEffectParam;
+    f_RadiusEffect = aRadiusEffect;
     f_TexScaleStratergy = aTexScaleStratergy;
     f_TexAlignStratergy = aTexAlignStratergy;
 }

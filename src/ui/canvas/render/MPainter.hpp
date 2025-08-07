@@ -2,6 +2,7 @@
 #define MMM_MPAINTER_HPP
 
 #include <glm/glm.hpp>
+#include <render/RenderCommand.hpp>
 #include <render/texture/TexMode.hpp>
 #include <string>
 #include <string_view>
@@ -54,6 +55,29 @@ class MPainter {
     };
 
     /**
+     * @struct RectOptions
+     * @brief 封装了绘制一个矩形所需的所有几何与样式属性。
+     */
+    struct RectOptions {
+        glm::vec2 pos;                      ///< 矩形左上角的位置。
+        glm::vec2 size;                     ///< 矩形的尺寸。
+        float rotation = 0.0f;              ///< 旋转角度 (弧度)，围绕矩形中心。
+        glm::vec4 color = glm::vec4(1.0f);  ///< 颜色或应用于纹理的色调。
+        bool applyMask = true;              ///< 是否应用蒙版。
+    };
+
+    /**
+     * @struct TextureMapOptions
+     * @brief 封装了纹理贴图相关的策略。
+     */
+    struct TextureMapOptions {
+        ///< 纹理缩放策略。
+        TexScaleMode scaleMode = TexScaleMode::AUTO_SCALE_AND_CUT;
+        ///< 纹理对齐策略。
+        TexAlignMode alignMode = TexAlignMode::CENTER;
+    };
+
+    /**
      * @brief 在指定位置绘制文本字符串。
      * @param fontFamily 字体族名称 (例如 "Arial", "Microsoft YaHei")。
      * @param fontSize 字体的大小
@@ -71,89 +95,64 @@ class MPainter {
                      bool applyMask = true);
 
     /**
-     * @brief 绘制一条线段。
+     * @brief 绘制一条线段，支持圆角。
      * @param pos1 线段的起点坐标。
      * @param pos2 线段的终点坐标。
      * @param color 线段的颜色。
      * @param lineWidth 线段的宽度（像素）。
-     * @param applyMask 是否应用当前激活的蒙版效果。默认为 true。
+     * @param radiusInfo (可选) 描述线段（矩形）的圆角效果。
+     * @param applyMask (可选) 是否应用当前激活的蒙版效果。
      */
     void paintLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec4 color,
-                   float lineWidth, bool applyMask = true);
+                   float lineWidth, const RadiusInfo& radiusInfo = {},
+                   bool applyMask = true);
 
     /**
-     * @brief 在指定位置以原始尺寸绘制图像。
-     *
-     * 此函数将图像的左上角放置在 `pos` 位置，不进行任何缩放。
-     * 对应于着色器中的 `SINGLE` 策略配合左上角对齐。
+     * @brief [核心] 根据指定的策略在矩形区域内绘制图像，支持圆角。
+     * @param resPath 图像的资源路径。
+     * @param rectOpts 描述矩形的位置、尺寸、旋转和颜色。
+     * @param mapOpts (可选) 描述纹理的缩放和对齐方式。
+     * @param radiusInfo (可选) 描述矩形的圆角效果。
+     */
+    void drawImage(std::string_view resPath, const RectOptions& rectOpts,
+                   const TextureMapOptions& mapOpts =
+                       {TexScaleMode::AUTO_SCALE_AND_CUT, TexAlignMode::CENTER},
+                   const RadiusInfo& radiusInfo = {});
+
+    /**
+     * @brief 在指定位置以原始尺寸绘制图像，支持圆角。
      * @param resPath 图像的资源路径。
      * @param pos 图像左上角的绘制位置。
-     * @param rotation 以弧度为单位旋转角度,围绕图像中心进行旋转,默认为 0.0f。
-     * @param tint 应用于图像的色调，默认为白色（无效果）。
-     * @param applyMask 是否应用当前激活的蒙版效果。默认为 true。
+     * @param radiusInfo (可选) 描述矩形的圆角效果。
+     * @param tint (可选) 应用于图像的色调。
+     * @param rotation (可选) 旋转角度。
      */
     void paintImage(std::string_view resPath, glm::vec2 pos,
-                    float rotation = 0.0f, glm::vec4 tint = glm::vec4(1.0f),
+                    const RadiusInfo& radiusInfo = {},
+                    glm::vec4 tint = glm::vec4(1.0f), float rotation = 0.0f,
                     bool applyMask = true);
 
     /**
-     * @brief 拉伸图像以强制填满指定的矩形区域。
-     *
-     * 此函数不保持图像的原始宽高比。
-     * 是 `drawImage` 函数使用 `TexScaleMode::FORCE_FILL` 的一种便捷方式。
+     * @brief 拉伸图像以强制填满指定的矩形区域，支持圆角。
      * @param resPath 图像的资源路径。
-     * @param pos 目标矩形区域的左上角位置。
-     * @param size 目标矩形区域的尺寸（宽度和高度）。
-     * @param rotation 以弧度为单位旋转角度,围绕图像中心进行旋转,默认为 0.0f。
-     * @param tint 应用于图像的色调，默认为白色（无效果）。
-     * @param applyMask 是否应用当前激活的蒙版效果。默认为 true。
+     * @param rectOpts 描述矩形的位置、尺寸、旋转和颜色。
+     * @param radiusInfo (可选) 描述矩形的圆角效果。
      */
-    void fillImage(std::string_view resPath, glm::vec2 pos, glm::vec2 size,
-                   float rotation = 0.0f, glm::vec4 tint = glm::vec4(1.0f),
-                   bool applyMask = true);
+    void fillImage(std::string_view resPath, const RectOptions& rectOpts,
+                   const RadiusInfo& radiusInfo = {});
 
     /**
-     * @brief 在指定区域内平铺绘制图像。
-     *
-     * 此函数通过重复一个图像（作为图块）来填充一个矩形区域。
-     * 它是对核心函数 drawImage() 在平铺场景下的一个便捷封装。
-     *
+     * @brief 在指定区域内平铺绘制图像，支持圆角。
      * @param resPath 图像的资源路径。
-     * @param pos 目标矩形区域的左上角位置。
-     * @param size 目标矩形区域的总尺寸（宽度和高度）。
-     * @param fitSide
-     * 定义单个图块的缩放方式。决定了是使用原始图像平铺，还是使用缩放后的图像平铺。
-     * @param alignMode
-     * @param rotation 以弧度为单位旋转角度,围绕图像中心进行旋转,默认为 0.0f。
-     * 定义第一个图块在目标区域内的对齐方式，后续的图块将基于此对齐点进行重复。默认为居中对齐。
-     * @param tint 应用于图像的色调，默认为白色（无效果）。
-     * @param applyMask 是否应用当前激活的蒙版效果。默认为 true。
+     * @param rectOpts 描述矩形的位置、尺寸、旋转和颜色。
+     * @param fitSide 定义单个图块的缩放方式。
+     * @param alignMode (可选) 定义第一个图块的对齐方式。
+     * @param radiusInfo (可选) 描述矩形的圆角效果。
      */
-    void tileImage(std::string_view resPath, glm::vec2 pos, glm::vec2 size,
-                   TileFitSide fitSide = TileFitSide::NONE,
+    void tileImage(std::string_view resPath, const RectOptions& rectOpts,
+                   TileFitSide fitSide,
                    TexAlignMode alignMode = TexAlignMode::CENTER,
-                   float rotation = 0.0f, glm::vec4 tint = glm::vec4(1.0f),
-                   bool applyMask = true);
-
-    /**
-     * @brief 根据指定的策略在矩形区域内绘制图像。
-     *
-     * 允许完全控制图像的缩放、平铺和对齐方式。
-     *
-     * @param resPath 图像的资源路径。
-     * @param pos 目标矩形区域的左上角位置。
-     * @param size 目标矩形区域的尺寸（宽度和高度）。
-     * @param scaleMode 纹理的缩放/平铺策略，定义了图像如何适应 `size`。
-     * @param alignMode 对齐策略，当 `scaleMode` 导致有留白时生效。
-     * @param rotation 以弧度为单位旋转角度,围绕图像中心进行旋转,默认为 0.0f。
-     * @param tint 应用于图像的色调，默认为白色（无效果）。
-     * @param applyMask 是否应用当前激活的蒙版效果。默认为 true。
-     */
-    void drawImage(std::string_view resPath, glm::vec2 pos, glm::vec2 size,
-                   TexScaleMode scaleMode,
-                   TexAlignMode alignMode = TexAlignMode::CENTER,
-                   float rotation = 0.0f, glm::vec4 tint = glm::vec4(1.0f),
-                   bool applyMask = true);
+                   const RadiusInfo& radiusInfo = {});
 
    private:
     Renderer2D* renderer;
