@@ -72,6 +72,7 @@ set(MMM_SOURCES
     src/mmm/obj/Hold.hpp
     src/mmm/obj/rm/Slide.hpp
     src/mmm/obj/rm/Composite.hpp
+    src/mmm/obj/rm/Composite.cpp
     src/mmm/obj/osu/OsuNote.hpp
     src/mmm/obj/osu/OsuNote.cpp
     src/mmm/obj/osu/OsuHold.hpp
