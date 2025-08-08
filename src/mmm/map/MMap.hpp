@@ -1,9 +1,10 @@
 #ifndef MMM_MMAP_HPP
 #define MMM_MMAP_HPP
 
-#include <filesystem>
+#include <memory>
+#include <mmm/DataStructures.hpp>
 #include <mmm/MetaData.hpp>
-#include <mmm/NoteCollection.hpp>
+#include <mmm/map/BaseMapMeta.hpp>
 
 // map
 class MMap {
@@ -16,6 +17,12 @@ class MMap {
     // 直接访问物件集合
     NoteCollection& note_set() { return notes; }
 
+    // 直接访问时间点集合
+    TimingMap& timing_set() { return timings; }
+
+    // 访问谱面元数据
+    std::weak_ptr<MapMetadata> mapmeta(MapMetadataType type);
+
    private:
     // (实际持有)
     // 谱面元数据集
@@ -24,14 +31,11 @@ class MMap {
     // 所有物件
     NoteCollection notes;
 
-    // 谱面文件路径
-    std::filesystem::path map_path;
+    // 所有时间点
+    TimingMap timings;
 
-    // 主音频文件路径
-    std::filesystem::path main_audio_path;
-
-    // 谱面总时长
-    uint32_t map_length{0};
+    // 基础谱面信息
+    BaseMapMeta basemeta;
 
     // 谱面io操作
     void readOsu();

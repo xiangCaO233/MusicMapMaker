@@ -112,16 +112,16 @@ class OsuFileReader {
 
 void MMap::readOsu() {
     // 切换为绝对路径
-    if (map_path.is_relative()) {
-        map_path = std::filesystem::absolute(map_path);
+    if (basemeta.map_path.is_relative()) {
+        basemeta.map_path = std::filesystem::absolute(basemeta.map_path);
     }
-    auto fname = map_path.filename();
-    qDebug() << "路径:" << map_path.string();
-    if (map_path.extension() == ".osu") {
+    auto fname = basemeta.map_path.filename();
+    qDebug() << "路径:" << basemeta.map_path.string();
+    if (basemeta.map_path.extension() == ".osu") {
         // XINFO("load_osu:" + p.extension().string());
-        std::ifstream ifs(map_path);
+        std::ifstream ifs(basemeta.map_path);
         if (!ifs.is_open()) {
-            qDebug() << "打开文件[" << map_path.string() << "]失败";
+            qDebug() << "打开文件[" << basemeta.map_path.string() << "]失败";
             return;
         }
         // 创建osu元数据
@@ -178,9 +178,9 @@ void MMap::readOsu() {
             general->AudioFilename.erase(0, 1);
         }
 
-        main_audio_path =
+        basemeta.main_audio_path =
             std::filesystem::weakly_canonical(std::filesystem::absolute(
-                map_path.parent_path() / general->AudioFilename));
+                basemeta.map_path.parent_path() / general->AudioFilename));
         // audio_file_rpath = std::filesystem::relative(
         //     audio_file_abs_path, map_file_path.parent_path());
 
@@ -304,7 +304,9 @@ void MMap::readOsu() {
             osureader.get_value("Difficulty", "HPDrainRate", 5.0);
         difficulty->CircleSize =
             osureader.get_value("Difficulty", "CircleSize", 4.0);
-        // difficulty->orbits = CircleSize;
+
+        basemeta.orbit_count = difficulty->CircleSize;
+
         difficulty->OverallDifficulty =
             osureader.get_value("Difficulty", "OverallDifficulty", 8.0);
         difficulty->ApproachRate =
@@ -347,11 +349,8 @@ void MMap::readOsu() {
                                         event->bg_file_name.end(), "");
         }
 
-        // bg_path = std::filesystem::path(map_file_path.parent_path().string()
-        // +
-        //                                 "/" + bg_file_name);
-        // bg_rpath =
-        //     std::filesystem::relative(bg_path, map_file_path.parent_path());
+        basemeta.main_cover_path = std::filesystem::absolute(
+            basemeta.map_path.parent_path() / event->bg_file_name);
         if (background_paras.size() >= 5) {
             event->bgxoffset = std::stoi(background_paras.at(3));
             event->bgyoffset = std::stoi(background_paras.at(4));
@@ -392,8 +391,8 @@ void MMap::readOsu() {
                 // 使用读取出的参数初始化物件
                 hold->from_osu_description(note_paras, difficulty->CircleSize);
                 // 更新谱面时长
-                if (hold->timestamp() + hold->duration() > map_length)
-                    map_length = hold->timestamp() + hold->duration();
+                if (hold->timestamp() + hold->duration() > basemeta.map_length)
+                    basemeta.map_length = hold->timestamp() + hold->duration();
                 // 把长条物件加入缓存
                 note_set().add_note(std::move(hold));
             } else {
@@ -401,8 +400,8 @@ void MMap::readOsu() {
                 // 使用读取出的参数初始化物件
                 note->from_osu_description(note_paras, difficulty->CircleSize);
                 // 更新谱面时长
-                if (note->timestamp() > map_length)
-                    map_length = note->timestamp();
+                if (note->timestamp() > basemeta.map_length)
+                    basemeta.map_length = note->timestamp();
 
                 // 加入物件列表
                 note_set().add_note(std::move(note));
@@ -413,26 +412,27 @@ void MMap::readOsu() {
         // std::set<std::shared_ptr<Timing>, TimingComparator> notbasetimings;
 
         // 创建timing
-        // for (int i = 0; i < osureader.current_timing_index; i++) {
-        //     // 按顺序读取timing点
-        //     auto timing_point_des =
-        //         osureader.get_value("TimingPoints", std::to_string(i),
-        //                             std::string("10000,333.33,4,0,0,100,1,1"));
-        //     std::istringstream timingiss(timing_point_des);
-        //     std::vector<std::string> timing_point_paras;
-        //     while (std::getline(timingiss, token, ',')) {
-        //         timing_point_paras.emplace_back(token);
-        //     }
-        //     // 创建timing
-        //     auto osu_timing = std::make_shared<OsuTiming>();
-        //     // 使用读取出的参数初始化timing
-        //     osu_timing->from_osu_description(timing_point_paras);
-        //     if (osu_timing->is_inherit_timing) {
-        //         notbasetimings.insert(osu_timing);
-        //     } else {
-        //         basetimings.insert(osu_timing);
-        //     }
-        // }
+        for (int i = 0; i < osureader.current_timing_index; i++) {
+            // 按顺序读取timing点
+            auto timing_point_des =
+                osureader.get_value("TimingPoints", std::to_string(i),
+                                    std::string("10000,333.33,4,0,0,100,1,1"));
+            std::istringstream timingiss(timing_point_des);
+            std::vector<std::string> timing_point_paras;
+            while (std::getline(timingiss, token, ',')) {
+                timing_point_paras.emplace_back(token);
+            }
+            // 创建timing
+            auto osu_timing = std::make_unique<Timing>();
+            // 使用读取出的参数初始化timing
+            osu_timing->from_osu_description(timing_point_paras);
+
+            if (osu_timing->is_inherit_timing) {
+                notbasetimings.insert(osu_timing);
+            } else {
+                basetimings.insert(osu_timing);
+            }
+        }
 
         // MMap* ref = this;
         // map_pool.enqueue_void([=]() {
@@ -482,6 +482,7 @@ void MMap::readOsu() {
         //         }
         //     }
         // });
+
         // 填充元数据
         // general
         using enum MapMetadataType;

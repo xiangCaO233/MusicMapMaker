@@ -148,7 +148,7 @@ void GLCanvas::paintGL() {
 
         // painter.paintLine({100, 50}, {200, 100}, {0.f, 0.f, 0.f, 1.f}, 4.f);
 
-        painter.paintString("ComicShannsMono Nerd Font", 36, U"nmsl",
+        painter.paintString("ComicShannsMono Nerd Font", 16, U"nmsl",
                             {100, 100});
     }
 

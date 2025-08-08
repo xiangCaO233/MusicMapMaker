@@ -58,7 +58,7 @@ class Renderer2D {
 
    private:
     // 启用调试线框
-    bool draw_wireframe{true};
+    bool draw_wireframe{false};
 
     // 尺寸
     glm::vec2 viewport;

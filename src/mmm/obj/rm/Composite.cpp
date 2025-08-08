@@ -1,9 +1,7 @@
 #include <mmm/obj/Hold.hpp>
+#include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Composite.hpp>
 #include <mmm/obj/rm/Slide.hpp>
-
-// 析构Composite
-Composite::~Composite() = default;
 
 // 打印用
 std::string Composite::toString() {}
