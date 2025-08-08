@@ -1,22 +1,41 @@
 #ifndef MMM_MPROJECT_HPP
 #define MMM_MPROJECT_HPP
 
+#include <ice/manage/AudioTrack.hpp>
 #include <map>
 #include <memory>
 #include <mmm/map/MMap.hpp>
+#include <set>
 #include <string>
 
 class MProject {
    public:
     // 构造MProject
     MProject();
+
     // 析构MProject
     virtual ~MProject();
 
+    // 打开项目
+    void open(std::string_view project_path);
+
+    // 关闭项目
+    void close();
+
    private:
-    // 项目谱面表(name-map)
+    // 项目谱面表(谱面资源持有)
     std::map<std::string, std::shared_ptr<MMap>, std::less<>>
         project_maps_table;
+
+    // 项目音频列表(非音频资源持有)
+    std::map<std::string, std::weak_ptr<ice::AudioTrack>, std::less<>>
+        project_audios_table;
+
+    // 项目图片列表
+    std::set<std::string, std::less<>> project_image_table;
+
+    // 项目视频列表
+    std::set<std::string, std::less<>> project_video_table;
 };
 
 #endif  // MMM_MPROJECT_HPP

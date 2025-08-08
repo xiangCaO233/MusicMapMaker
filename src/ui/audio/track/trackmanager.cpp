@@ -157,3 +157,13 @@ void TrackManager::loadin_audio(const QString& audio_file) {
 
     model->appendRow(track_item);
 }
+
+// 获取音频轨道
+std::weak_ptr<ice::AudioTrack> TrackManager::get_track(
+    const QString& audio_name) {
+    auto track_it = audio_tracks.find(audio_name);
+    if (track_it == audio_tracks.end()) {
+        return std::weak_ptr<ice::AudioTrack>();
+    }
+    return track_it.value();
+}

@@ -6,6 +6,17 @@
 #include <mmm/MetaData.hpp>
 #include <vector>
 
+enum class NoteType {
+    // 普通物件
+    NORMAL,
+    // 长条
+    HOLD,
+    // 滑键
+    SLIDE,
+    // 组合键
+    COMPOSITE,
+};
+
 class MMap;
 class Slide;
 
@@ -21,6 +32,9 @@ class Note {
     // 打印用
     virtual std::string toString();
 
+    // 访问类型
+    inline NoteType notetype() const { return type; }
+
     // 访问时间戳
     inline uint32_t timestamp() const { return time; }
 
@@ -28,7 +42,20 @@ class Note {
     inline uint32_t trackpos() const { return track; }
 
     // 访问map引用
-    inline std::shared_ptr<MMap> map() const { return map_ref.lock(); }
+    inline const std::weak_ptr<MMap>& map() const { return map_ref; }
+
+    // 访问元数据
+    inline std::unordered_map<NoteMetadataType, std::shared_ptr<NoteMetadata>>&
+    metadata() {
+        return metadatas;
+    }
+
+    // 从滑键转化
+    static std::vector<Note> from_slide(std::shared_ptr<Slide> slide);
+
+   protected:
+    // 设置类型
+    void set_notetype(NoteType t) { type = t; }
 
     // 设置时间戳
     virtual void set_timestamp(uint32_t t) { time = t; }
@@ -36,10 +63,10 @@ class Note {
     // 设置轨道
     virtual void set_trackpos(uint32_t o) { track = o; }
 
-    // 从滑键转化
-    static std::vector<Note> from_slide(std::shared_ptr<Slide> slide);
-
    private:
+    // 物件类型
+    NoteType type;
+
     // 时间
     uint32_t time{0};
 

@@ -1,8 +1,8 @@
 #ifndef MMM_OSUHOLD_HPP
 #define MMM_OSUHOLD_HPP
 
+#include <mmm/info/osu/OsuNoteInfo.hpp>
 #include <mmm/obj/Hold.hpp>
-#include <mmm/obj/osu/OsuInfo.hpp>
 
 class OsuHold : public Hold, public OsuNoteMetadata {
    public:

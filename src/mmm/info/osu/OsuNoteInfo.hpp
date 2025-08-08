@@ -128,10 +128,10 @@ class OsuNoteMetadata : public NoteMetadata {
     }
 
     // 设置osu物件采样
-    inline void notesample(const NoteSample& nsample) { sample = nsample; }
+    inline void set_notesample(const NoteSample& nsample) { sample = nsample; }
 
     // 设置osu物件采样组
-    inline void note_samplegroup(const NoteSampleGroup& nsample_group) {
+    inline void set_note_samplegroup(const NoteSampleGroup& nsample_group) {
         sample_group = nsample_group;
     }
 
@@ -139,11 +139,11 @@ class OsuNoteMetadata : public NoteMetadata {
     static std::shared_ptr<NoteMetadata> default_metadata();
 
     // 从osu描述加载
-    void from_osu_description(const std::vector<std::string>& description,
-                              int32_t orbit_count);
+    virtual void from_osu_description(
+        const std::vector<std::string>& description, int32_t orbit_count) = 0;
 
     // 转化为osu描述
-    std::string to_osu_description(int32_t orbit_count);
+    virtual std::string to_osu_description(int32_t orbit_count) = 0;
 
    private:
     // note采样

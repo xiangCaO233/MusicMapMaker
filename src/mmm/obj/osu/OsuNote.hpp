@@ -16,6 +16,13 @@ class OsuNote : public Note, public OsuNoteMetadata {
 
     // 打印用
     std::string toString() override;
+
+    // 从osu描述加载
+    void from_osu_description(const std::vector<std::string>& description,
+                              int32_t orbit_count) override;
+
+    // 转化为osu描述
+    std::string to_osu_description(int32_t orbit_count) override;
 };
 
 #endif  // MMM_OSUNOTE_HPP

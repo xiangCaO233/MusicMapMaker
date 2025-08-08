@@ -33,6 +33,9 @@ class TrackManager : public HideableToolWindow {
     // 载入音频
     void loadin_audio(const QString &audio_file);
 
+    // 获取音频轨道
+    std::weak_ptr<ice::AudioTrack> get_track(const QString &audio_name);
+
    private slots:
     void on_add_track_button_clicked();
 
@@ -51,6 +54,7 @@ class TrackManager : public HideableToolWindow {
 
    private:
     static QStringList metaNames();
+
     // 各设备对应的播放器
     QHash<QString, ice::SDLPlayer> players;
 

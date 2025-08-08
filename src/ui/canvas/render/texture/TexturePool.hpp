@@ -40,7 +40,9 @@ class TexturePool {
    private:
     QOpenGLFunctions_4_1_Core* glf;
 
+    // 是否需要更新
     std::atomic<bool> need_update{true};
+
     // 载入的纹理原始数据
     struct LoadedImageData {
         std::string path;
@@ -52,6 +54,7 @@ class TexturePool {
     };
 
     void clear();
+
     void uploadToGpu(const LoadedImageData& data);
 
     // 异步载入纹理或分配大显存的线程池
