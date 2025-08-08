@@ -5,7 +5,7 @@
 // 构造CanvasContainer
 CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
     // 创建 QOpenGLWindow
-    canvas.reset(new GLCanvas());
+    canvas.reset(new MapCanvas());
 
     // 将 QOpenGLWindow 嵌入到 QWidget
     container = QWidget::createWindowContainer(canvas.data(), this);

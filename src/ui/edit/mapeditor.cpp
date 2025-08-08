@@ -14,5 +14,5 @@ MapEditor::~MapEditor() { delete ui; }
 
 // 更新标题后缀
 void MapEditor::update_title_suffix(const QString& suffix) {
-    setWindowTitle("Editor-->" + suffix);
+    setWindowTitle(tr("Editor-->") + suffix);
 }

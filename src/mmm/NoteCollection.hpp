@@ -4,9 +4,9 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <mmm/obj/Composite.hpp>
 #include <mmm/obj/Hold.hpp>
 #include <mmm/obj/Note.hpp>
+#include <mmm/obj/rm/Composite.hpp>
 
 // 句柄
 // 结合索引和generation,防止ABA问题

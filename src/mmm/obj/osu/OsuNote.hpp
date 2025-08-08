@@ -1,8 +1,8 @@
 #ifndef MMM_OSUNOTE_HPP
 #define MMM_OSUNOTE_HPP
 
+#include <mmm/info/osu/OsuNoteInfo.hpp>
 #include <mmm/obj/Note.hpp>
-#include <mmm/obj/osu/OsuInfo.hpp>
 
 class Slide;
 

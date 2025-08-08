@@ -64,8 +64,17 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 
 # 设置mmm相关文件
 set(MMM_SOURCES
-    src/mmm/obj/Note.hpp src/mmm/obj/Hold.hpp src/mmm/obj/Slide.hpp
-    src/mmm/obj/Composite.hpp src/mmm/NoteCollection.hpp src/mmm/map/MMap.hpp)
+    src/mmm/info/osu/OsuMapInfo.hpp
+    src/mmm/info/osu/OsuMapInfo.cpp
+    src/mmm/info/osu/OsuNoteInfo.hpp
+    src/mmm/obj/Note.hpp
+    src/mmm/obj/Hold.hpp
+    src/mmm/obj/rm/Slide.hpp
+    src/mmm/obj/rm/Composite.hpp
+    src/mmm/obj/osu/OsuNote.hpp
+    src/mmm/obj/osu/OsuHold.hpp
+    src/mmm/NoteCollection.hpp
+    src/mmm/map/MMap.hpp)
 
 # 设置翻译文件
 set(TS_FILES)
@@ -95,6 +104,8 @@ set(CANVAS_SOURCES
     src/ui/canvas/FrameRateCounter.cpp
     src/ui/canvas/GLCanvas.cpp
     src/ui/canvas/GLCanvas.hpp
+    src/ui/canvas/map/MapCanvas.hpp
+    src/ui/canvas/map/MapCanvas.cpp
     src/ui/canvas/GLCanvasEvents.cpp
     src/ui/canvas/CanvasContainer.h
     src/ui/canvas/CanvasContainer.cpp)

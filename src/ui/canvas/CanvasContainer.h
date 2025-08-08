@@ -1,6 +1,6 @@
 #include <QScopedPointer>
 #include <QWidget>
-#include <canvas/GLCanvas.hpp>
+#include <canvas/map/MapCanvas.hpp>
 
 class CanvasContainer : public QWidget {
    public:
@@ -11,7 +11,7 @@ class CanvasContainer : public QWidget {
     ~CanvasContainer() override;
 
     // 画布本体
-    QScopedPointer<GLCanvas> canvas;
+    QScopedPointer<MapCanvas> canvas;
 
     // 用于嵌入 QOpenGLWindow
     QWidget* container;

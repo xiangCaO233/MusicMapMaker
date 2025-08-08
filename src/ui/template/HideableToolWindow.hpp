@@ -17,8 +17,6 @@ class HideableToolWindow : public QWidget {
 
    protected:
     void closeEvent(QCloseEvent* event) override;
-
-   protected:
 };
 
 #endif  // MMM_HIDEABLETOOLWINDOW_HPP

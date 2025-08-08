@@ -1,7 +1,7 @@
 #ifndef MMM_COMPOSITE_HPP
 #define MMM_COMPOSITE_HPP
 
-#include "mmm/obj/Note.hpp"
+#include <mmm/obj/Note.hpp>
 
 class Composite : public Note {
    public:

@@ -1,5 +1,5 @@
-#ifndef M_OSUINFO_H
-#define M_OSUINFO_H
+#ifndef MMM_OSUNOTEINFO_HPP
+#define MMM_OSUNOTEINFO_HPP
 
 #include <cstdint>
 #include <memory>
@@ -117,7 +117,7 @@ struct NoteSampleGroup {
 };
 
 // osu物件元数据类
-class OsuNoteMetadata {
+class OsuNoteMetadata : public NoteMetadata {
    public:
     // 获取osu物件采样
     inline const NoteSample& notesample() const { return sample; }
@@ -153,4 +153,4 @@ class OsuNoteMetadata {
     NoteSampleGroup sample_group{};
 };
 
-#endif  // M_OSUINFO_H
+#endif  // MMM_OSUNOTEINFO_HPP

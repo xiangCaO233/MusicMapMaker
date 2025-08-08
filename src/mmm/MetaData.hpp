@@ -22,15 +22,20 @@ class MapMetadata {
     // 元数据类型
     MapMetadataType type;
 
-    // 属性表
-    std::unordered_map<std::string, std::string, StringHash, std::equal_to<>>
+    // 统一通用属性表(来源-[属性名-属性值])
+    std::unordered_map<MapMetadataType,
+                       std::unordered_map<std::string, std::string, StringHash,
+                                          std::equal_to<>>>
         map_properties;
 
     // 获取数据
     template <typename T>
-    T get_value(const std::string& key, T default_value = T()) {
-        auto key_it = map_properties.find(key);
-        if (key_it == map_properties.end()) return default_value;
+    T get_value(MapMetadataType source, const std::string& key,
+                T default_value = T()) {
+        auto properties_it = map_properties.find(source);
+        if (properties_it == map_properties.end()) return default_value;
+        auto key_it = properties_it->second.find(key);
+        if (key_it == properties_it->second.end()) return default_value;
         if constexpr (std::is_same_v<T, std::string>) {
             // 类型为字符串时整个返回
             return key_it->second;
@@ -58,15 +63,20 @@ class NoteMetadata {
     // 元数据类型
     NoteMetadataType type;
 
-    // 属性表
-    std::unordered_map<std::string, std::string, StringHash, std::equal_to<>>
+    // 统一通用属性表(来源-[属性名-属性值])
+    std::unordered_map<NoteMetadataType,
+                       std::unordered_map<std::string, std::string, StringHash,
+                                          std::equal_to<>>>
         note_properties;
 
     // 获取数据
     template <typename T>
-    T get_value(const std::string& key, T default_value = T()) {
-        auto key_it = note_properties.find(key);
-        if (key_it == note_properties.end()) return default_value;
+    T get_value(NoteMetadataType source, const std::string& key,
+                T default_value = T()) {
+        auto properties_it = note_properties.find(source);
+        if (properties_it == note_properties.end()) return default_value;
+        auto key_it = properties_it->second.find(key);
+        if (key_it == properties_it->second.end()) return default_value;
         if constexpr (std::is_same_v<T, std::string>) {
             // 类型为字符串时整个返回
             return key_it->second;
