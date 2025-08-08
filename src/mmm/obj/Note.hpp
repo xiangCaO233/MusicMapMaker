@@ -24,7 +24,7 @@ class Slide;
 class Note {
    public:
     // 构造Note
-    explicit Note(const std::shared_ptr<MMap>& map) : map_ref(map) {};
+    explicit Note(MMap* map) : map_ref(map) {};
 
     // 析构Note
     virtual ~Note() = default;
@@ -42,7 +42,7 @@ class Note {
     inline uint32_t trackpos() const { return track; }
 
     // 访问map引用
-    inline const std::weak_ptr<MMap>& map() const { return map_ref; }
+    inline const MMap* map() const { return map_ref; }
 
     // 访问元数据
     inline std::unordered_map<NoteMetadataType, std::shared_ptr<NoteMetadata>>&
@@ -73,8 +73,8 @@ class Note {
     // 轨道
     uint32_t track{0};
 
-    // map弱引用
-    std::weak_ptr<MMap> map_ref;
+    // map引用
+    MMap* map_ref;
 
     // 元数据集
     std::unordered_map<NoteMetadataType, std::shared_ptr<NoteMetadata>>

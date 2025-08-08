@@ -30,6 +30,10 @@ class MMap {
     // 主音频文件路径
     std::filesystem::path main_audio_path;
 
+    // 谱面总时长
+    uint32_t map_length{0};
+
+    // 谱面io操作
     void readOsu();
     void writeOsu();
 
@@ -38,6 +42,9 @@ class MMap {
 
     void readMc();
     void writeMc();
+
+    void readMMM();
+    void writeMMM();
 };
 
 #endif  // MMM_MMAP_HPP

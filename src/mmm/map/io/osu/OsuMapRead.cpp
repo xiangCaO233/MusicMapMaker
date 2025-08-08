@@ -199,16 +199,17 @@ void MMap::readOsu() {
             sample_set_str.erase(0, 1);
         }
 
+        using enum SampleSet;
         if (sample_set_str == "None") {
-            general->sample_set = SampleSet::NONE;
+            general->sample_set = NONE;
         } else if (sample_set_str == "Soft") {
-            general->sample_set = SampleSet::SOFT;
+            general->sample_set = SOFT;
         } else if (sample_set_str == "Normal") {
-            general->sample_set = SampleSet::NORMAL;
+            general->sample_set = NORMAL;
         } else if (sample_set_str == "Drum") {
-            general->sample_set = SampleSet::DRUM;
+            general->sample_set = DRUM;
         } else {
-            general->sample_set = SampleSet::NONE;
+            general->sample_set = NONE;
         }
 
         general->StackLeniency =
@@ -385,153 +386,144 @@ void MMap::readOsu() {
                 note_paras.emplace_back(token);
             }
 
-            std::shared_ptr<Note> osu_note;
-
             // 创建物件
             if (std::stoi(note_paras.at(3)) == 128) {
-                auto hold = std::make_unique<OsuHold>();
+                auto hold = std::make_unique<OsuHold>(this);
                 // 使用读取出的参数初始化物件
-                hold->from_osu_description(note_paras, CircleSize);
-                // 设置面条物件的面尾引用
-                hold->hold_end_reference = holdend;
-
+                hold->from_osu_description(note_paras, difficulty->CircleSize);
                 // 更新谱面时长
-                if (holdend->timestamp > map_length)
-                    map_length = holdend->timestamp;
-
+                if (hold->timestamp() + hold->duration() > map_length)
+                    map_length = hold->timestamp() + hold->duration();
                 // 把长条物件加入缓存
-                note_set().add_note(hold);
+                note_set().add_note(std::move(hold));
             } else {
-                osu_note = std::make_shared<OsuNote>();
-                auto note = std::dynamic_pointer_cast<OsuNote>(osu_note);
+                auto note = std::make_unique<OsuNote>(this);
                 // 使用读取出的参数初始化物件
                 note->from_osu_description(note_paras, difficulty->CircleSize);
+                // 更新谱面时长
+                if (note->timestamp() > map_length)
+                    map_length = note->timestamp();
+
+                // 加入物件列表
+                note_set().add_note(std::move(note));
             }
-
-            // 更新谱面时长
-            if (osu_note->timestamp > map_length)
-                map_length = osu_note->timestamp;
-
-            // 加入物件列表
-            hitobjects.insert(osu_note);
         }
-        std::set<std::shared_ptr<Timing>, TimingComparator> basetimings;
-        std::set<std::shared_ptr<Timing>, TimingComparator> notbasetimings;
+
+        // std::set<std::shared_ptr<Timing>, TimingComparator> basetimings;
+        // std::set<std::shared_ptr<Timing>, TimingComparator> notbasetimings;
 
         // 创建timing
-        for (int i = 0; i < osureader.current_timing_index; i++) {
-            // 按顺序读取timing点
-            auto timing_point_des =
-                osureader.get_value("TimingPoints", std::to_string(i),
-                                    std::string("10000,333.33,4,0,0,100,1,1"));
-            std::istringstream timingiss(timing_point_des);
-            std::vector<std::string> timing_point_paras;
-            while (std::getline(timingiss, token, ',')) {
-                timing_point_paras.emplace_back(token);
-            }
-            // 创建timing
-            auto osu_timing = std::make_shared<OsuTiming>();
-            // 使用读取出的参数初始化timing
-            osu_timing->from_osu_description(timing_point_paras);
-            if (osu_timing->is_inherit_timing) {
-                notbasetimings.insert(osu_timing);
-            } else {
-                basetimings.insert(osu_timing);
-            }
-        }
+        // for (int i = 0; i < osureader.current_timing_index; i++) {
+        //     // 按顺序读取timing点
+        //     auto timing_point_des =
+        //         osureader.get_value("TimingPoints", std::to_string(i),
+        //                             std::string("10000,333.33,4,0,0,100,1,1"));
+        //     std::istringstream timingiss(timing_point_des);
+        //     std::vector<std::string> timing_point_paras;
+        //     while (std::getline(timingiss, token, ',')) {
+        //         timing_point_paras.emplace_back(token);
+        //     }
+        //     // 创建timing
+        //     auto osu_timing = std::make_shared<OsuTiming>();
+        //     // 使用读取出的参数初始化timing
+        //     osu_timing->from_osu_description(timing_point_paras);
+        //     if (osu_timing->is_inherit_timing) {
+        //         notbasetimings.insert(osu_timing);
+        //     } else {
+        //         basetimings.insert(osu_timing);
+        //     }
+        // }
 
-        MMap* ref = this;
-        map_pool.enqueue_void([=]() {
-            // 先添加全部基准timing--生成分拍
-            for (auto begin = basetimings.begin(); begin != basetimings.end();
-                 ++begin) {
-                ref->insert_timing(*begin);
-            }
-            // 再倒序添加全部变速timing
-            for (auto rbegin = notbasetimings.rbegin();
-                 rbegin != notbasetimings.rend(); ++rbegin) {
-                ref->insert_timing(*rbegin);
-            }
+        // MMap* ref = this;
+        // map_pool.enqueue_void([=]() {
+        //     // 先添加全部基准timing--生成分拍
+        //     for (auto begin = basetimings.begin(); begin !=
+        //     basetimings.end();
+        //          ++begin) {
+        //         ref->insert_timing(*begin);
+        //     }
+        //     // 再倒序添加全部变速timing
+        //     for (auto rbegin = notbasetimings.rbegin();
+        //          rbegin != notbasetimings.rend(); ++rbegin) {
+        //         ref->insert_timing(*rbegin);
+        //     }
 
-            bool finded{false};
-            // 读取全图参考bpm
-            for (const auto& [time, timings] : ref->temp_timing_map) {
-                // 使用第一个不带变速的绝对bpm
-                if (timings.size() == 1 && timings[0]->is_base_timing) {
-                    ref->preference_bpm = timings[0]->basebpm;
-                    finded = true;
-                    break;
-                }
-            }
+        //     bool finded{false};
+        //     // 读取全图参考bpm
+        //     for (const auto& [time, timings] : ref->temp_timing_map) {
+        //         // 使用第一个不带变速的绝对bpm
+        //         if (timings.size() == 1 && timings[0]->is_base_timing) {
+        //             ref->preference_bpm = timings[0]->basebpm;
+        //             finded = true;
+        //             break;
+        //         }
+        //     }
 
-            // 没找到单独存在的绝对时间点-找同时存在变速值为1.00的时间点
-            if (!finded) {
-                for (const auto& [time, timings] : ref->temp_timing_map) {
-                    // 使用第一个不带变速的绝对bpm
-                    if (timings.size() == 2 &&
-                        std::fabs(timings[1]->bpm - 1.00) < 0.0001) {
-                        ref->preference_bpm = timings[0]->basebpm;
-                        finded = true;
-                        break;
-                    }
-                }
-            }
+        //     // 没找到单独存在的绝对时间点-找同时存在变速值为1.00的时间点
+        //     if (!finded) {
+        //         for (const auto& [time, timings] : ref->temp_timing_map) {
+        //             // 使用第一个不带变速的绝对bpm
+        //             if (timings.size() == 2 &&
+        //                 std::fabs(timings[1]->bpm - 1.00) < 0.0001) {
+        //                 ref->preference_bpm = timings[0]->basebpm;
+        //                 finded = true;
+        //                 break;
+        //             }
+        //         }
+        //     }
 
-            // 再没找到就用第一个timing的绝对bpm-没有用200
-            if (!finded) {
-                if (ref->timings.empty()) {
-                    ref->preference_bpm = 200;
-                } else {
-                    ref->preference_bpm = ref->timings.begin()->get()->basebpm;
-                }
-            }
-        });
-
+        //     // 再没找到就用第一个timing的绝对bpm-没有用200
+        //     if (!finded) {
+        //         if (ref->timings.empty()) {
+        //             ref->preference_bpm = 200;
+        //         } else {
+        //             ref->preference_bpm =
+        //             ref->timings.begin()->get()->basebpm;
+        //         }
+        //     }
+        // });
         // 填充元数据
         // general
-        metadatas[MapMetadataType::MOSU]->map_properties["AudioFilename"] =
-            AudioFilename;
-        metadatas[MapMetadataType::MOSU]->map_properties["AudioLeadIn"] =
-            AudioLeadIn;
-        metadatas[MapMetadataType::MOSU]->map_properties["AudioLeadHash"] =
-            AudioHash;
-        metadatas[MapMetadataType::MOSU]->map_properties["PreviewTime"] =
-            std::to_string(PreviewTime);
-        metadatas[MapMetadataType::MOSU]->map_properties["Countdown"] =
-            std::to_string(Countdown);
-        metadatas[MapMetadataType::MOSU]->map_properties["SampleSet"] =
-            std::to_string(static_cast<uint32_t>(sample_set));
-        metadatas[MapMetadataType::MOSU]->map_properties["StackLeniency"] =
-            std::to_string(StackLeniency);
-        metadatas[MapMetadataType::MOSU]->map_properties["LetterboxInBreaks"] =
-            std::to_string(int(LetterboxInBreaks));
-        metadatas[MapMetadataType::MOSU]->map_properties["StoryFireInFront"] =
-            std::to_string(int(StoryFireInFront));
-        metadatas[MapMetadataType::MOSU]->map_properties["UseSkinSprites"] =
-            "0";
-        metadatas[MapMetadataType::MOSU]
-            ->map_properties["AlwaysShowPlayfield"] =
-            std::to_string(int(AlwaysShowPlayfield));
-        metadatas[MapMetadataType::MOSU]->map_properties["OverlayPosition"] =
-            OverlayPosition;
-        metadatas[MapMetadataType::MOSU]->map_properties["SkinPreference"] =
-            SkinPreference;
-        metadatas[MapMetadataType::MOSU]->map_properties["EpilepsyWarning"] =
-            std::to_string(int(EpilepsyWarning));
-        metadatas[MapMetadataType::MOSU]->map_properties["CountdownOffset"] =
-            std::to_string(CountdownOffset);
-        metadatas[MapMetadataType::MOSU]->map_properties["SpecialStyle"] =
-            std::to_string(int(SpecialStyle));
-        metadatas[MapMetadataType::MOSU]
-            ->map_properties["WidescreenStoryboard"] =
-            std::to_string(WidescreenStoryboard);
-        metadatas[MapMetadataType::MOSU]
-            ->map_properties["SamplesMatchPlaybackRate"] =
-            std::to_string(int(SamplesMatchPlaybackRate));
+        using enum MapMetadataType;
+        metadatas[OSU]->map_properties[OSU]["AudioFilename"] =
+            general->AudioFilename;
+        metadatas[OSU]->map_properties[OSU]["AudioLeadIn"] =
+            general->AudioLeadIn;
+        metadatas[OSU]->map_properties[OSU]["AudioLeadHash"] =
+            general->AudioHash;
+        metadatas[OSU]->map_properties[OSU]["PreviewTime"] =
+            std::to_string(general->PreviewTime);
+        metadatas[OSU]->map_properties[OSU]["Countdown"] =
+            std::to_string(general->Countdown);
+        metadatas[OSU]->map_properties[OSU]["SampleSet"] =
+            std::to_string(static_cast<uint32_t>(general->sample_set));
+        metadatas[OSU]->map_properties[OSU]["StackLeniency"] =
+            std::to_string(general->StackLeniency);
+        metadatas[OSU]->map_properties[OSU]["LetterboxInBreaks"] =
+            std::to_string(int(general->LetterboxInBreaks));
+        metadatas[OSU]->map_properties[OSU]["StoryFireInFront"] =
+            std::to_string(int(general->StoryFireInFront));
+        metadatas[OSU]->map_properties[OSU]["UseSkinSprites"] = "0";
+        metadatas[OSU]->map_properties[OSU]["AlwaysShowPlayfield"] =
+            std::to_string(int(general->AlwaysShowPlayfield));
+        metadatas[OSU]->map_properties[OSU]["OverlayPosition"] =
+            general->OverlayPosition;
+        metadatas[OSU]->map_properties[OSU]["SkinPreference"] =
+            general->SkinPreference;
+        metadatas[OSU]->map_properties[OSU]["EpilepsyWarning"] =
+            std::to_string(int(general->EpilepsyWarning));
+        metadatas[OSU]->map_properties[OSU]["CountdownOffset"] =
+            std::to_string(general->CountdownOffset);
+        metadatas[OSU]->map_properties[OSU]["SpecialStyle"] =
+            std::to_string(int(general->SpecialStyle));
+        metadatas[OSU]->map_properties[OSU]["WidescreenStoryboard"] =
+            std::to_string(general->WidescreenStoryboard);
+        metadatas[OSU]->map_properties[OSU]["SamplesMatchPlaybackRate"] =
+            std::to_string(int(general->SamplesMatchPlaybackRate));
 
         // editor
         std::stringstream sstream;
-        for (const auto& val : Bookmarks) {
+        for (const auto& val : editor->Bookmarks) {
             sstream << val << ',';
         }
         auto Bookmarks_str = sstream.str();
@@ -539,55 +531,54 @@ void MMap::readOsu() {
             Bookmarks_str.pop_back();
         }
 
-        metadatas[MapMetadataType::MOSU]->map_properties["Bookmarks"] =
-            Bookmarks_str;
-        metadatas[MapMetadataType::MOSU]->map_properties["DistanceSpacing"] =
-            std::to_string(DistanceSpacing);
-        metadatas[MapMetadataType::MOSU]->map_properties["BeatDivisor"] =
-            std::to_string(BeatDivisor);
-        metadatas[MapMetadataType::MOSU]->map_properties["GridSize"] =
-            std::to_string(GridSize);
-        metadatas[MapMetadataType::MOSU]->map_properties["TimelineZoom"] =
-            std::to_string(TimelineZoom);
+        metadatas[OSU]->map_properties[OSU]["Bookmarks"] = Bookmarks_str;
+        metadatas[OSU]->map_properties[OSU]["DistanceSpacing"] =
+            std::to_string(editor->DistanceSpacing);
+        metadatas[OSU]->map_properties[OSU]["BeatDivisor"] =
+            std::to_string(editor->BeatDivisor);
+        metadatas[OSU]->map_properties[OSU]["GridSize"] =
+            std::to_string(editor->GridSize);
+        metadatas[OSU]->map_properties[OSU]["TimelineZoom"] =
+            std::to_string(editor->TimelineZoom);
 
         // metadata
-        metadatas[MapMetadataType::MOSU]->map_properties["Title"] = Title;
-        metadatas[MapMetadataType::MOSU]->map_properties["TitleUnicode"] =
-            TitleUnicode;
-        metadatas[MapMetadataType::MOSU]->map_properties["Artist"] = Artist;
-        metadatas[MapMetadataType::MOSU]->map_properties["ArtistUnicode"] =
-            ArtistUnicode;
-        metadatas[MapMetadataType::MOSU]->map_properties["Creator"] = Creator;
-        metadatas[MapMetadataType::MOSU]->map_properties["Version"] = Version;
-        metadatas[MapMetadataType::MOSU]->map_properties["Source"] = Source;
+        metadatas[OSU]->map_properties[OSU]["Title"] = metadata->Title;
+        metadatas[OSU]->map_properties[OSU]["TitleUnicode"] =
+            metadata->TitleUnicode;
+        metadatas[OSU]->map_properties[OSU]["Artist"] = metadata->Artist;
+        metadatas[OSU]->map_properties[OSU]["ArtistUnicode"] =
+            metadata->ArtistUnicode;
+        metadatas[OSU]->map_properties[OSU]["Creator"] = metadata->Creator;
+        metadatas[OSU]->map_properties[OSU]["Version"] = metadata->Version;
+        metadatas[OSU]->map_properties[OSU]["Source"] = metadata->Source;
 
         sstream.clear();
-        for (const auto& tag : Tags) {
+        for (const auto& tag : metadata->Tags) {
             sstream << tag << ' ';
         }
         auto Tags_str = sstream.str();
         if (!Tags_str.empty()) {
             Tags_str.pop_back();
         }
-        metadatas[MapMetadataType::MOSU]->map_properties["Tags"] = Tags_str;
-        metadatas[MapMetadataType::MOSU]->map_properties["BeatmapID"] =
-            std::to_string(BeatmapID);
-        metadatas[MapMetadataType::MOSU]->map_properties["BeatmapSetID"] =
-            std::to_string(BeatmapSetID);
+        metadatas[OSU]->map_properties[OSU]["Tags"] = Tags_str;
+        metadatas[OSU]->map_properties[OSU]["BeatmapID"] =
+            std::to_string(metadata->BeatmapID);
+        metadatas[OSU]->map_properties[OSU]["BeatmapSetID"] =
+            std::to_string(metadata->BeatmapSetID);
 
         // difficulty
-        metadatas[MapMetadataType::MOSU]->map_properties["HPDrainRate"] =
-            std::to_string(HPDrainRate);
-        metadatas[MapMetadataType::MOSU]->map_properties["CircleSize"] =
-            std::to_string(CircleSize);
-        metadatas[MapMetadataType::MOSU]->map_properties["OverallDifficulty"] =
-            std::to_string(OverallDifficulty);
-        metadatas[MapMetadataType::MOSU]->map_properties["ApproachRate"] =
-            std::to_string(ApproachRate);
-        metadatas[MapMetadataType::MOSU]->map_properties["SliderMultiplier"] =
-            std::to_string(SliderMultiplier);
-        metadatas[MapMetadataType::MOSU]->map_properties["SliderTickRate"] =
-            std::to_string(SliderTickRate);
+        metadatas[OSU]->map_properties[OSU]["HPDrainRate"] =
+            std::to_string(difficulty->HPDrainRate);
+        metadatas[OSU]->map_properties[OSU]["CircleSize"] =
+            std::to_string(difficulty->CircleSize);
+        metadatas[OSU]->map_properties[OSU]["OverallDifficulty"] =
+            std::to_string(difficulty->OverallDifficulty);
+        metadatas[OSU]->map_properties[OSU]["ApproachRate"] =
+            std::to_string(difficulty->ApproachRate);
+        metadatas[OSU]->map_properties[OSU]["SliderMultiplier"] =
+            std::to_string(difficulty->SliderMultiplier);
+        metadatas[OSU]->map_properties[OSU]["SliderTickRate"] =
+            std::to_string(difficulty->SliderTickRate);
 
         // colour--- 不写
 
@@ -620,18 +611,19 @@ void MMap::readOsu() {
         // int32_t bgxoffset;
         // 背景的位置y偏移
         // int32_t bgyoffset;
-        if (background_type == 0) {
+        if (event->background_type == 0) {
             // 图片
         } else {
             // 视频
         }
-        metadatas[MapMetadataType::MOSU]->map_properties["background"] =
-            std::to_string(background_type) + ",0,\"" + bg_file_name + "\"," +
-            std::to_string(bgxoffset) + "," + std::to_string(bgyoffset);
+        metadatas[OSU]->map_properties[OSU]["background"] =
+            std::to_string(event->background_type) + ",0,\"" +
+            event->bg_file_name + "\"," + std::to_string(event->bgxoffset) +
+            "," + std::to_string(event->bgyoffset);
 
         // breaks
 
     } else {
-        XWARN("非.osu格式,读取失败");
+        qDebug() << "非.osu格式,读取失败";
     }
 }

@@ -9,6 +9,8 @@ MMap::MMap(std::string_view file) {
         readOsu();
     } else if (file.ends_with(".imd")) {
         readImd();
+    } else if (file.ends_with(".mmm")) {
+        readMMM();
     }
 }
 

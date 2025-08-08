@@ -14,8 +14,10 @@ class Slide : public Note {
     // 打印用
     std::string toString() override;
 
+    // 获取dtrack
     inline uint32_t delta_track() const { return dtrack; }
 
+    // 设置dtrack
     inline void set_track_orbit(uint32_t delta_track) { dtrack = delta_track; }
 
    private:

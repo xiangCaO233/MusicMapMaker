@@ -68,11 +68,14 @@ set(MMM_SOURCES
     src/mmm/info/osu/OsuMapInfo.cpp
     src/mmm/info/osu/OsuNoteInfo.hpp
     src/mmm/obj/Note.hpp
+    src/mmm/obj/Note.cpp
     src/mmm/obj/Hold.hpp
     src/mmm/obj/rm/Slide.hpp
     src/mmm/obj/rm/Composite.hpp
     src/mmm/obj/osu/OsuNote.hpp
+    src/mmm/obj/osu/OsuNote.cpp
     src/mmm/obj/osu/OsuHold.hpp
+    src/mmm/obj/osu/OsuHold.cpp
     src/mmm/NoteCollection.hpp
     src/mmm/map/MMap.hpp)
 
