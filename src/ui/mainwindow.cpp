@@ -23,10 +23,6 @@ MainWindow::MainWindow(QWidget* parent)
     trackmanager = new TrackManager();
     projectmanager->bind_trackmgr(trackmanager);
 
-    editor->hide();
-    projectmanager->hide();
-    trackmanager->hide();
-
     // 捕获ui指针
     auto capui = ui;
 
@@ -60,3 +56,6 @@ void MainWindow::closeEvent(QCloseEvent* e) {
     trackmanager->close();
     projectmanager->close();
 }
+
+// 展示编辑器
+void MainWindow::showeditor() { editor->show(); }

@@ -87,9 +87,9 @@ set(MMM_SOURCES
     src/mmm/map/MMap.hpp
     src/mmm/map/MMap.cpp
     src/mmm/map/io/osu/OsuMapRead.cpp
-    # src/mmm/map/io/osu/OsuMapWrite.cpp src/mmm/map/io/mmm/MMapRead.cpp
-    # src/mmm/map/io/mmm/MMapWrite.cpp
-)
+    src/mmm/map/io/osu/OsuMapWrite.cpp
+    src/mmm/map/io/mmm/MMapRead.cpp
+    src/mmm/map/io/mmm/MMapWrite.cpp)
 
 # 设置翻译文件
 set(TS_FILES)
@@ -141,6 +141,9 @@ set(PROJECT_SOURCES
     src/ui/project/projectmanager.cpp
     src/ui/project/projectmanagercontrols.cpp
     src/ui/project/projectmanager.ui
+    src/ui/project/projectconfig.h
+    src/ui/project/projectconfig.cpp
+    src/ui/project/projectconfig.ui
     src/ui/audio/track/trackmanager.h
     src/ui/audio/track/trackmanager.cpp
     src/ui/audio/track/trackcontrols.cpp

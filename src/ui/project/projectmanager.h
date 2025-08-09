@@ -46,6 +46,8 @@ class ProjectManager : public HideableToolWindow {
 
     void on_project_list_doubleClicked(const QModelIndex &index);
 
+    void on_preference_button_clicked();
+
    private:
     // 管理所有项目的内存-因为项目释放时需要使用gl上下文释放纹理
     std::unordered_map<std::string, std::unique_ptr<MProject>, StringHash,

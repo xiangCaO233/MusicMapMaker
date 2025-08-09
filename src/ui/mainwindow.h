@@ -20,6 +20,9 @@ class MainWindow : public QMainWindow {
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+    // 展示编辑器
+    void showeditor();
+
    private slots:
     void on_actionTrack_Manager_toggled(bool arg1);
 

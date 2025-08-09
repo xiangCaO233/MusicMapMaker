@@ -171,3 +171,9 @@ void ProjectManager::show_project(std::string_view project_name) {
         }
     }
 }
+
+void ProjectManager::on_preference_button_clicked()
+{
+
+}
+

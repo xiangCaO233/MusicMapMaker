@@ -16,6 +16,10 @@ MProject::~MProject() {
 
 // 打开项目
 void MProject::open(std::string_view project_path_str) {
+    if (is_opened.load()) {
+        qDebug() << "此项目已经打开过";
+        return;
+    }
     // 打开路径
     project_path = std::filesystem::absolute(
         std::filesystem::path(std::string(project_path_str)));
@@ -53,8 +57,6 @@ void MProject::open(std::string_view project_path_str) {
                 project_video_table.insert(filename);
             }
         }
+        is_opened.store(true);
     }
 }
-
-// 关闭项目
-void MProject::close() {}

@@ -1,6 +1,7 @@
 #ifndef MMM_MPROJECT_HPP
 #define MMM_MPROJECT_HPP
 
+#include <atomic>
 #include <ice/manage/AudioTrack.hpp>
 #include <map>
 #include <memory>
@@ -27,6 +28,9 @@ class MProject {
     void close();
 
    private:
+    // 是否已经打开
+    std::atomic<bool> is_opened{false};
+
     // 项目路径
     std::filesystem::path project_path;
 
