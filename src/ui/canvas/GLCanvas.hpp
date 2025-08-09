@@ -5,16 +5,24 @@
 #include <QOpenGLWindow>
 #include <canvas/FrameRateCounter.hpp>
 #include <memory>
+#include <mmm/project/TextureLoadCallback.hpp>
 #include <render/Renderer2D.hpp>
 
 class TexturePool;
-class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
+class GLCanvas : public QOpenGLWindow,
+                 public QOpenGLFunctions_4_1_Core,
+                 public TextureLoadCallback {
     Q_OBJECT
    public:
     // 构造GLCanvas
     GLCanvas();
     // 析构GLCanvas
     ~GLCanvas() override;
+
+    // 需要载入纹理
+    void need_loadtexture_dir(std::string_view texdir) override;
+    // 需要卸载纹理
+    void need_unloadtexture_dir(std::string_view texdir) override;
 
    signals:
     void update_window_suffix(const QString &suffix);

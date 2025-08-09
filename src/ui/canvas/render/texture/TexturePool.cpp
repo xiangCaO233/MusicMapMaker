@@ -113,8 +113,8 @@ void TexturePool::clear() {
     qDebug() << "TexturePool: All resources cleared.";
 }
 
-// 从一个路径加载
-void TexturePool::rebuild_with_directory(const std::string& dir) {
+// 移除一个路径的纹理
+void TexturePool::remove_directory(const std::string& dir) {
     auto path = std::filesystem::path(dir);
     if (!std::filesystem::exists(path)) {
         qDebug() << "[" << dir << "] 不存在";
@@ -127,7 +127,30 @@ void TexturePool::rebuild_with_directory(const std::string& dir) {
         for (auto it = std::filesystem::recursive_directory_iterator(path);
              it != std::filesystem::recursive_directory_iterator(); ++it) {
             auto filename = it->path().generic_string();
-            if (filename.ends_with("png") || filename.ends_with("jpg")) {
+            if (auto path_it = paths.find(filename); path_it != paths.end()) {
+                paths.erase(path_it);
+            }
+        }
+        buildFromManifest(paths);
+    }
+}
+
+// 从一个路径加载
+void TexturePool::add_directory(const std::string& dir) {
+    auto path = std::filesystem::path(dir);
+    if (!std::filesystem::exists(path)) {
+        qDebug() << "[" << dir << "] 不存在";
+        return;
+    } else {
+        std::unordered_set<std::string, StringHash, std::equal_to<>> paths;
+        for (const auto& [loaded_path, _] : texture_infos) {
+            paths.insert(loaded_path);
+        }
+        for (auto it = std::filesystem::recursive_directory_iterator(path);
+             it != std::filesystem::recursive_directory_iterator(); ++it) {
+            auto filename = it->path().generic_string();
+            if (!paths.contains(filename) && filename.ends_with("png") ||
+                filename.ends_with("jpg")) {
                 qDebug() << "查到需要加载的纹理[" << filename << "]";
                 paths.insert(filename);
             }

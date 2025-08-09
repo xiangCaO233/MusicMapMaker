@@ -67,6 +67,9 @@ set(MMM_SOURCES
     src/mmm/info/osu/OsuMapInfo.hpp
     src/mmm/info/osu/OsuMapInfo.cpp
     src/mmm/info/osu/OsuNoteInfo.hpp
+    src/mmm/project/TextureLoadCallback.hpp
+    src/mmm/project/MProject.hpp
+    src/mmm/project/MProject.cpp
     src/mmm/obj/Note.hpp
     src/mmm/obj/Note.cpp
     src/mmm/obj/Hold.hpp
@@ -77,8 +80,16 @@ set(MMM_SOURCES
     src/mmm/obj/osu/OsuNote.cpp
     src/mmm/obj/osu/OsuHold.hpp
     src/mmm/obj/osu/OsuHold.cpp
-    src/mmm/NoteCollection.hpp
-    src/mmm/map/MMap.hpp)
+    src/mmm/timing/Timing.hpp
+    src/mmm/timing/osu/OsuTiming.hpp
+    src/mmm/timing/osu/OsuTiming.cpp
+    src/mmm/DataStructures.hpp
+    src/mmm/map/MMap.hpp
+    src/mmm/map/MMap.cpp
+    src/mmm/map/io/osu/OsuMapRead.cpp
+    # src/mmm/map/io/osu/OsuMapWrite.cpp src/mmm/map/io/mmm/MMapRead.cpp
+    # src/mmm/map/io/mmm/MMapWrite.cpp
+)
 
 # 设置翻译文件
 set(TS_FILES)

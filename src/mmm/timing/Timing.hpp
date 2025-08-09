@@ -14,9 +14,9 @@ enum class TimingType {
 class Timing {
    public:
     // 构造Timing
-    Timing();
+    Timing() = default;
     // 析构Timing
-    virtual ~Timing();
+    virtual ~Timing() = default;
 
     TimingType type{TimingType::GENERAL};
 
@@ -48,14 +48,6 @@ class Timing {
 
     ///< 拍长(ms)或滑条速度倍率(负值)
     double beat_length{-1.0};
-
-    // 我们增加一个只读的BPM属性，方便计算
-    double get_bpm() const {
-        if (is_base_timing && beat_length > 0) {
-            return 60000.0 / beat_length;
-        }
-        return -1.0;  // 非基准点没有独立的BPM
-    }
 
     // 增加一个辅助的 to_string
     std::string to_string() const {

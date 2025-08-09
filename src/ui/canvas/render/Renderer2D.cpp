@@ -191,7 +191,12 @@ Renderer2D::~Renderer2D() {
 }
 
 void Renderer2D::add_texture_from_path(const std::string& path) {
-    texturepool->rebuild_with_directory(path);
+    texturepool->add_directory(path);
+}
+
+// 移除纹理目录
+void Renderer2D::remove_texture_from_path(const std::string& path) {
+    texturepool->remove_directory(path);
 }
 
 // 添加字体

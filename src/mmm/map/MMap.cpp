@@ -18,7 +18,7 @@ MMap::MMap(std::string_view file) {
 MMap::~MMap() = default;
 
 // 访问谱面元数据
-std::weak_ptr<MapMetadata> MMap::mapmeta(MapMetadataType type) {
+std::weak_ptr<MapMetadata> MMap::map_metadata(MapMetadataType type) {
     auto metaptr_it = metadatas.find(type);
     if (metaptr_it == metadatas.end()) {
         return std::weak_ptr<MapMetadata>();

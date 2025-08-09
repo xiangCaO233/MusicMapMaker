@@ -4,11 +4,12 @@
 #include <mmm/map/MMap.hpp>
 #include <mmm/obj/osu/OsuHold.hpp>
 #include <mmm/obj/osu/OsuNote.hpp>
+#include <mmm/timing/osu/OsuTiming.hpp>
 
 class OsuFileReader {
    public:
     // 构造OsuFileReader
-    OsuFileReader();
+    OsuFileReader() = default;
     // 析构OsuFileReader
     ~OsuFileReader() = default;
 
@@ -317,8 +318,9 @@ void MMap::readOsu() {
             osureader.get_value("Difficulty", "SliderTickRate", 0.0);
 
         // 生成图名
-        // map_name = "[o!m] [" + std::to_string(int(CircleSize)) + "k]" +
-        // Version;
+        basemeta.name = "[o!m] [" +
+                        std::to_string(int(difficulty->CircleSize)) + "k] " +
+                        metadata->Version;
 
         // colour--- 不写
 
@@ -408,9 +410,6 @@ void MMap::readOsu() {
             }
         }
 
-        // std::set<std::shared_ptr<Timing>, TimingComparator> basetimings;
-        // std::set<std::shared_ptr<Timing>, TimingComparator> notbasetimings;
-
         // 创建timing
         for (int i = 0; i < osureader.current_timing_index; i++) {
             // 按顺序读取timing点
@@ -423,65 +422,35 @@ void MMap::readOsu() {
                 timing_point_paras.emplace_back(token);
             }
             // 创建timing
-            auto osu_timing = std::make_unique<Timing>();
+            OsuTiming osu_timing;
             // 使用读取出的参数初始化timing
-            osu_timing->from_osu_description(timing_point_paras);
-
-            if (osu_timing->is_inherit_timing) {
-                notbasetimings.insert(osu_timing);
-            } else {
-                basetimings.insert(osu_timing);
+            osu_timing.from_osu_description(timing_point_paras);
+            // 添加到timing表
+            timing_set().set_timing_point(osu_timing);
+        }
+        bool finded{false};
+        // 读取全图参考bpm
+        for (const auto& [time, timing] :
+             timing_set().get_all_timing_points()) {
+            // 使用第一个不带变速的绝对bpm
+            if (timing.is_base_timing) {
+                basemeta.preference_bpm = timing.basebpm;
+                finded = true;
+                break;
             }
         }
 
-        // MMap* ref = this;
-        // map_pool.enqueue_void([=]() {
-        //     // 先添加全部基准timing--生成分拍
-        //     for (auto begin = basetimings.begin(); begin !=
-        //     basetimings.end();
-        //          ++begin) {
-        //         ref->insert_timing(*begin);
-        //     }
-        //     // 再倒序添加全部变速timing
-        //     for (auto rbegin = notbasetimings.rbegin();
-        //          rbegin != notbasetimings.rend(); ++rbegin) {
-        //         ref->insert_timing(*rbegin);
-        //     }
-
-        //     bool finded{false};
-        //     // 读取全图参考bpm
-        //     for (const auto& [time, timings] : ref->temp_timing_map) {
-        //         // 使用第一个不带变速的绝对bpm
-        //         if (timings.size() == 1 && timings[0]->is_base_timing) {
-        //             ref->preference_bpm = timings[0]->basebpm;
-        //             finded = true;
-        //             break;
-        //         }
-        //     }
-
-        //     // 没找到单独存在的绝对时间点-找同时存在变速值为1.00的时间点
-        //     if (!finded) {
-        //         for (const auto& [time, timings] : ref->temp_timing_map) {
-        //             // 使用第一个不带变速的绝对bpm
-        //             if (timings.size() == 2 &&
-        //                 std::fabs(timings[1]->bpm - 1.00) < 0.0001) {
-        //                 ref->preference_bpm = timings[0]->basebpm;
-        //                 finded = true;
-        //                 break;
-        //             }
-        //         }
-        //     }
-
-        //     // 再没找到就用第一个timing的绝对bpm-没有用200
-        //     if (!finded) {
-        //         if (ref->timings.empty()) {
-        //             ref->preference_bpm = 200;
-        //         } else {
-        //             ref->preference_bpm =
-        //             ref->timings.begin()->get()->basebpm;
-        //         }
-        //     }
-        // });
+        // 再没找到就用第一个timing的绝对bpm-没有用200
+        if (!finded) {
+            if (timing_set().get_all_timing_points().empty()) {
+                basemeta.preference_bpm = 200;
+            } else {
+                basemeta.preference_bpm = timing_set()
+                                              .get_all_timing_points()
+                                              .begin()
+                                              ->second.basebpm;
+            }
+        }
 
         // 填充元数据
         // general

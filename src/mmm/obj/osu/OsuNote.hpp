@@ -12,7 +12,7 @@ class OsuNote : public Note, public OsuNoteMetadata {
     using Note::Note;
 
     // 析构OsuNote
-    ~OsuNote() override;
+    ~OsuNote() override = default;
 
     // 打印用
     std::string toString() override;

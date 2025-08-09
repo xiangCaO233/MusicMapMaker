@@ -6,6 +6,8 @@
 
 // 基本谱面信息
 struct BaseMapMeta {
+    // 谱面名称
+    std::string name;
     // 谱面歌曲标题
     std::string title;
     // 谱面歌曲标题(unicode)

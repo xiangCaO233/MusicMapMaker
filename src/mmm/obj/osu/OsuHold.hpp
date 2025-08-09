@@ -10,7 +10,7 @@ class OsuHold : public Hold, public OsuNoteMetadata {
     using Hold::Hold;
 
     // 析构OsuHold
-    ~OsuHold() override;
+    ~OsuHold() override = default;
 
     // 打印用
     std::string toString() override;

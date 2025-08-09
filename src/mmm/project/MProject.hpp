@@ -8,10 +8,11 @@
 #include <set>
 #include <string>
 
+class TextureLoadCallback;
 class MProject {
    public:
     // 构造MProject
-    MProject();
+    explicit MProject(TextureLoadCallback* texloadcbk);
 
     // 析构MProject
     virtual ~MProject();
@@ -23,8 +24,11 @@ class MProject {
     void close();
 
    private:
+    // 项目路径
+    std::filesystem::path project_path;
+
     // 项目谱面表(谱面资源持有)
-    std::map<std::string, std::shared_ptr<MMap>, std::less<>>
+    std::map<std::string, std::unique_ptr<MMap>, std::less<>>
         project_maps_table;
 
     // 项目音频列表(非音频资源持有)
@@ -36,6 +40,9 @@ class MProject {
 
     // 项目视频列表
     std::set<std::string, std::less<>> project_video_table;
+
+    // 回调指针
+    TextureLoadCallback* callback;
 };
 
 #endif  // MMM_MPROJECT_HPP

@@ -1,5 +1,6 @@
 #ifndef MMM_DATASTRUCTURES_HPP
 #define MMM_DATASTRUCTURES_HPP
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>

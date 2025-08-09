@@ -21,7 +21,10 @@ class MMap {
     TimingMap& timing_set() { return timings; }
 
     // 访问谱面元数据
-    std::weak_ptr<MapMetadata> mapmeta(MapMetadataType type);
+    std::weak_ptr<MapMetadata> map_metadata(MapMetadataType type);
+
+    // 访问基本元数据
+    BaseMapMeta& base_metadata() { return basemeta; };
 
    private:
     // (实际持有)
@@ -39,16 +42,16 @@ class MMap {
 
     // 谱面io操作
     void readOsu();
-    void writeOsu();
+    void writeOsu() {};
 
-    void readImd();
-    void writeImd();
+    void readImd() {};
+    void writeImd() {};
 
-    void readMc();
-    void writeMc();
+    void readMc() {};
+    void writeMc() {};
 
-    void readMMM();
-    void writeMMM();
+    void readMMM() {};
+    void writeMMM() {};
 };
 
 #endif  // MMM_MMAP_HPP

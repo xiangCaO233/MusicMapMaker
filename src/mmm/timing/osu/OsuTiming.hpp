@@ -7,9 +7,9 @@
 class OsuTiming : public Timing, public OsuTimingMetadata {
    public:
     // 构造OsuTiming
-    OsuTiming();
+    OsuTiming() = default;
     // 析构OsuTiming
-    ~OsuTiming() override;
+    ~OsuTiming() override = default;
 
     // 转换为osu的字符串
     std::string to_osu_description() override;

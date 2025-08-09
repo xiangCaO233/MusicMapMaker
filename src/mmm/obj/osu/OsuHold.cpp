@@ -3,7 +3,7 @@
 #include <mmm/obj/osu/OsuHold.hpp>
 
 // 打印用
-std::string OsuHold::toString() {}
+std::string OsuHold::toString() { return ""; }
 
 // 从osu描述加载
 void OsuHold::from_osu_description(const std::vector<std::string>& description,

@@ -24,7 +24,10 @@ class TexturePool {
     bool needupdate() const { return need_update.load(); };
 
     // 从一个路径加载
-    void rebuild_with_directory(const std::string& dir);
+    void add_directory(const std::string& dir);
+
+    // 移除一个路径的纹理
+    void remove_directory(const std::string& dir);
 
     // 从一个包含所有纹理路径的清单文件构建池
     void buildFromManifest(

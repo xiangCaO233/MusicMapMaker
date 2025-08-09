@@ -8,10 +8,10 @@ class Hold : public Note {
     // 构造Hold
     using Note::Note;
     // 析构Hold
-    ~Hold() override;
+    ~Hold() override = default;
 
     // 打印用
-    std::string toString() override;
+    std::string toString() override { return ""; };
 
     inline uint32_t duration() const { return duration_time; }
 

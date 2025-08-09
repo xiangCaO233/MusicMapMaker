@@ -11,7 +11,7 @@ class Composite : public Note {
     using Note::Note;
 
     // 析构Composite
-    ~Composite() override;
+    ~Composite() override = default;
 
     // 打印用
     std::string toString() override;
