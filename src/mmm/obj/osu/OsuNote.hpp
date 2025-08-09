@@ -15,7 +15,7 @@ class OsuNote : public Note, public OsuNoteMetadata {
     ~OsuNote() override = default;
 
     // 打印用
-    std::string toString() override;
+    std::string toString() const override;
 
     // 从osu描述加载
     void from_osu_description(const std::vector<std::string>& description,

@@ -30,7 +30,7 @@ class Note {
     virtual ~Note() = default;
 
     // 打印用
-    virtual std::string toString();
+    virtual std::string toString() const;
 
     // 访问类型
     inline NoteType notetype() const { return type; }

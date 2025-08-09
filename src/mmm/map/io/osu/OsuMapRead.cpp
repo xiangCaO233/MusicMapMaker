@@ -127,6 +127,7 @@ void MMap::readOsu() {
         }
         // 创建osu元数据
         auto osumeta = std::make_shared<OsuMapMetadata>();
+        metadatas[MapMetadataType::OSU] = osumeta;
         OsuFileReader osureader;
         std::string read_buffer;
         std::getline(ifs, read_buffer);

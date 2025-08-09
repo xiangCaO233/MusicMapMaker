@@ -2,8 +2,11 @@
 
 #include <audio/track/trackmanager.h>
 #include <project/projectmanager.h>
+#include <ui_mainwindow.h>
 
-#include "ui_mainwindow.h"
+#include <canvas/map/MapCanvas.hpp>
+#include <mmm/obj/Note.hpp>
+#include <mmm/project/MProject.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -26,6 +29,22 @@ MainWindow::MainWindow(QWidget* parent)
             [capui]() { capui->actionTrack_Manager->setChecked(false); });
     connect(projectmanager, &ProjectManager::close_signal,
             [capui]() { capui->actionProject_Manager->setChecked(false); });
+
+    // auto project = std::make_shared<MProject>(
+    //     static_cast<TextureLoadCallback*>(editor->canvas()));
+
+    // std::thread t([=]() {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    //     project->open("/Users/2333xiang/Downloads/Juggernaut. - Antler");
+    // });
+    // t.detach();
+    MMap map(
+        "/Users/2333xiang/Downloads/Juggernaut. - Antler/Juggernaut. - Antler "
+        "(xiang_233) [NOInsane].osu");
+    auto notes = map.note_set().get_all_notes_ordered();
+    for (const auto& handle : notes) {
+        qDebug() << map.note_set().get_note(handle)->toString();
+    }
 }
 
 MainWindow::~MainWindow() {

@@ -14,7 +14,7 @@ class Composite : public Note {
     ~Composite() override = default;
 
     // 打印用
-    std::string toString() override;
+    std::string toString() const override;
 
     // 总时长
     inline uint32_t total_duration() const { return total_duration_time; }

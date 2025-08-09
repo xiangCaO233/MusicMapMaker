@@ -9,12 +9,16 @@ namespace Ui {
 class MapEditor;
 }
 
+class MapCanvas;
+
 class MapEditor : public HideableToolWindow {
     Q_OBJECT
 
    public:
     explicit MapEditor(QWidget *parent = nullptr);
     ~MapEditor() override;
+
+    MapCanvas *canvas() const;
 
    private:
     Ui::MapEditor *ui;

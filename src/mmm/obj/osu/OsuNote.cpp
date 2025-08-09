@@ -1,10 +1,13 @@
 #include <math.h>
 
 #include <format>
+#include <memory>
 #include <mmm/obj/osu/OsuNote.hpp>
 
+#include "mmm/info/osu/OsuNoteInfo.hpp"
+
 // 打印用
-std::string OsuNote::toString() {
+std::string OsuNote::toString() const {
     std::string sampleStr;
     switch (notesample()) {
         using enum NoteSample;
@@ -37,6 +40,7 @@ void OsuNote::from_osu_description(const std::vector<std::string>& description,
     if (metait == metadata().end()) {
         // 注册元数据
         metait = metadata().try_emplace(OSU).first;
+        metait->second = std::make_shared<OsuNoteMetadata>();
     }
     const auto& meta = metait->second;
 

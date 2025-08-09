@@ -13,7 +13,7 @@ class OsuHold : public Hold, public OsuNoteMetadata {
     ~OsuHold() override = default;
 
     // 打印用
-    std::string toString() override;
+    std::string toString() const override;
 
     // 从osu描述加载
     void from_osu_description(const std::vector<std::string>& description,

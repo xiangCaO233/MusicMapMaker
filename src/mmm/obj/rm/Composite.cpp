@@ -4,7 +4,7 @@
 #include <mmm/obj/rm/Slide.hpp>
 
 // 打印用
-std::string Composite::toString() { return ""; }
+std::string Composite::toString() const { return ""; }
 
 // 添加子物件
 bool Composite::add_child(std::unique_ptr<Note> note) {

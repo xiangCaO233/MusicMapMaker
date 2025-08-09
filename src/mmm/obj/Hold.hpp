@@ -11,7 +11,7 @@ class Hold : public Note {
     ~Hold() override = default;
 
     // 打印用
-    std::string toString() override { return ""; };
+    std::string toString() const override { return ""; };
 
     inline uint32_t duration() const { return duration_time; }
 

@@ -119,6 +119,8 @@ struct NoteSampleGroup {
 // osu物件元数据类
 class OsuNoteMetadata : public NoteMetadata {
    public:
+    using NoteMetadata::NoteMetadata;
+    ~OsuNoteMetadata() = default;
     // 获取osu物件采样
     inline const NoteSample& notesample() const { return sample; }
 
@@ -140,10 +142,10 @@ class OsuNoteMetadata : public NoteMetadata {
 
     // 从osu描述加载
     virtual void from_osu_description(
-        const std::vector<std::string>& description, int32_t orbit_count) = 0;
+        const std::vector<std::string>& description, int32_t orbit_count) {};
 
     // 转化为osu描述
-    virtual std::string to_osu_description(int32_t orbit_count) = 0;
+    virtual std::string to_osu_description(int32_t orbit_count) { return ""; };
 
    private:
     // note采样

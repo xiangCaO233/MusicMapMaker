@@ -12,7 +12,7 @@ class Slide : public Note {
     ~Slide() override;
 
     // 打印用
-    std::string toString() override;
+    std::string toString() const override;
 
     // 获取dtrack
     inline uint32_t delta_track() const { return dtrack; }
