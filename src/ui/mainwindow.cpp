@@ -5,6 +5,7 @@
 #include <ui_mainwindow.h>
 
 #include <canvas/map/MapCanvas.hpp>
+#include <mmm/map/MMap.hpp>
 #include <mmm/obj/Note.hpp>
 #include <mmm/project/MProject.hpp>
 
@@ -12,9 +13,15 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    qRegisterMetaType<std::string>("std::string");
+    // 注册 shared_ptr<MMap> 类型
+    qRegisterMetaType<MMap*>("MMap*");
+
     editor = new MapEditor();
     projectmanager = new ProjectManager();
+    projectmanager->bind_canvas(editor->canvas());
     trackmanager = new TrackManager();
+    projectmanager->bind_trackmgr(trackmanager);
 
     editor->hide();
     projectmanager->hide();
@@ -30,31 +37,21 @@ MainWindow::MainWindow(QWidget* parent)
     connect(projectmanager, &ProjectManager::close_signal,
             [capui]() { capui->actionProject_Manager->setChecked(false); });
 
-    // auto project = std::make_shared<MProject>(
-    //     static_cast<TextureLoadCallback*>(editor->canvas()));
-
-    // std::thread t([=]() {
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    //     project->open("/Users/2333xiang/Downloads/Juggernaut. - Antler");
-    // });
-    // t.detach();
-    MMap map(
-        "/Users/2333xiang/Downloads/Juggernaut. - Antler/Juggernaut. - Antler "
-        "(xiang_233) [NOInsane].osu");
-    auto notes = map.note_set().get_all_notes_ordered();
-    for (const auto& handle : notes) {
-        qDebug() << map.note_set().get_note(handle)->toString();
-    }
+    // MMap map(
+    //     "/Users/2333xiang/Downloads/Juggernaut. - Antler/Juggernaut. - Antler
+    //     "
+    //     "(xiang_233) [NOInsane].osu");
+    // auto notes = map.note_set().get_all_notes_ordered();
+    // for (const auto& handle : notes) {
+    //     qDebug() << map.note_set().get_note(handle)->toString();
+    // }
 }
 
 MainWindow::~MainWindow() {
-    // editor->hide();
-    // projectmanager->hide();
-    // trackmanager->hide();
-
+    // 先清理项目(需要使用editor的gl上下文移除纹理)
+    delete projectmanager;
     delete editor;
     delete trackmanager;
-    delete projectmanager;
     delete ui;
 }
 

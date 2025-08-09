@@ -35,9 +35,11 @@ class Renderer2D {
 
     // 添加纹理目录
     void add_texture_from_path(const std::string& path);
+    void request_texture_from_path(const std::string& path);
 
     // 移除纹理目录
     void remove_texture_from_path(const std::string& path);
+    void request_remove_texture_from_path(const std::string& path);
 
     // 添加字体
     void add_font_from_path(const std::string& path, bool is_qrc = false);

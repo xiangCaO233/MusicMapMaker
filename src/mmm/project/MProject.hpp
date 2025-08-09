@@ -8,11 +8,14 @@
 #include <set>
 #include <string>
 
+#include "mmm/project/AudioLoadCallback.hpp"
+
 class TextureLoadCallback;
 class MProject {
    public:
     // 构造MProject
-    explicit MProject(TextureLoadCallback* texloadcbk);
+    explicit MProject(TextureLoadCallback* texloadcbk,
+                      AudioLoadCallback* audioLoadcbk);
 
     // 析构MProject
     virtual ~MProject();
@@ -42,7 +45,11 @@ class MProject {
     std::set<std::string, std::less<>> project_video_table;
 
     // 回调指针
-    TextureLoadCallback* callback;
+    TextureLoadCallback* texcallback;
+    AudioLoadCallback* audiocallback;
+
+    // 项目管理器可直接访问私有成员
+    friend class ProjectManager;
 };
 
 #endif  // MMM_MPROJECT_HPP

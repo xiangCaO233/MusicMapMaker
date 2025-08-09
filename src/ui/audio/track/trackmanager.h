@@ -7,15 +7,15 @@
 #include <qtmetamacros.h>
 
 #include <QWidget>
+#include <ice/core/IAudioNode.hpp>
+#include <ice/core/MixBus.hpp>
 #include <ice/manage/AudioPool.hpp>
+#include <ice/manage/AudioTrack.hpp>
+#include <ice/out/play/sdl/SDLPlayer.hpp>
+#include <ice/thread/ThreadPool.hpp>
 #include <memory>
-
-#include "ice/core/IAudioNode.hpp"
-#include "ice/core/MixBus.hpp"
-#include "ice/manage/AudioTrack.hpp"
-#include "ice/out/play/sdl/SDLPlayer.hpp"
-#include "ice/thread/ThreadPool.hpp"
-#include "template/HideableToolWindow.hpp"
+#include <mmm/project/AudioLoadCallback.hpp>
+#include <template/HideableToolWindow.hpp>
 
 namespace Ui {
 class TrackManager;
@@ -23,7 +23,7 @@ class TrackManager;
 
 class AudioController;
 
-class TrackManager : public HideableToolWindow {
+class TrackManager : public HideableToolWindow, public AudioLoadCallback {
     Q_OBJECT
 
    public:
@@ -31,10 +31,13 @@ class TrackManager : public HideableToolWindow {
     ~TrackManager() override;
 
     // 载入音频
-    void loadin_audio(const QString &audio_file);
+    std::weak_ptr<ice::AudioTrack> loadin_audio(const QString &audio_file);
 
     // 获取音频轨道
     std::weak_ptr<ice::AudioTrack> get_track(const QString &audio_name);
+
+    std::weak_ptr<ice::AudioTrack> loadBack(
+        std::string_view audio_path) override;
 
    private slots:
     void on_add_track_button_clicked();

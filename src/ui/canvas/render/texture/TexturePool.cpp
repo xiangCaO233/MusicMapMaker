@@ -71,9 +71,10 @@ TexturePool::~TexturePool() {
     clear();
 }
 
-// 定义分箱的尺寸，可以根据项目需求调整
-const std::vector<uint32_t> BUCKET_SIZES = {8,   16,  32,   64,  128,
-                                            256, 512, 1024, 2048};
+// 定义分箱尺寸集
+const std::vector<uint32_t> BUCKET_SIZES = {8,    16,   32,   64,    128,
+                                            256,  512,  1024, 2048,  3072,
+                                            4096, 6144, 8192, 12288, 16384};
 
 // 辅助函数：找到能容纳n的最小的2的幂次桶尺寸
 static uint32_t getBucketSize(uint32_t n) {
@@ -111,6 +112,75 @@ void TexturePool::clear() {
     upload_queue.swap(empty_queue);
 
     qDebug() << "TexturePool: All resources cleared.";
+}
+
+// 其他线程调用来请求添加新路径纹理
+void TexturePool::request_new_directory(const std::string& dir) {
+    auto path = std::filesystem::path(dir);
+    if (!std::filesystem::exists(path)) {
+        qDebug() << "[" << dir << "] 不存在";
+        return;
+    } else {
+        std::lock_guard<std::mutex> lock(rebuild_mutex);
+        new_texture_paths.clear();
+        for (const auto& [loaded_path, _] : texture_infos) {
+            new_texture_paths.insert(loaded_path);
+        }
+        for (auto it = std::filesystem::recursive_directory_iterator(path);
+             it != std::filesystem::recursive_directory_iterator(); ++it) {
+            auto filename = it->path().generic_string();
+            if (!new_texture_paths.contains(filename) &&
+                (filename.ends_with("png") || filename.ends_with("jpg"))) {
+                qDebug() << "查到需要加载的纹理[" << filename << "]";
+                new_texture_paths.insert(filename);
+            }
+        }
+        rebuild_requested = true;
+        need_update.store(true);
+    }
+}
+
+// 其他线程调用来请求添加新路径纹理
+void TexturePool::request_remove_directory(const std::string& dir) {
+    auto path = std::filesystem::path(dir);
+    if (!std::filesystem::exists(path)) {
+        qDebug() << "[" << dir << "] 不存在";
+        return;
+    } else {
+        std::lock_guard<std::mutex> lock(rebuild_mutex);
+        new_texture_paths.clear();
+        for (const auto& [loaded_path, _] : texture_infos) {
+            new_texture_paths.insert(loaded_path);
+        }
+        for (auto it = std::filesystem::recursive_directory_iterator(path);
+             it != std::filesystem::recursive_directory_iterator(); ++it) {
+            auto filename = it->path().generic_string();
+            if (auto path_it = new_texture_paths.find(filename);
+                path_it != new_texture_paths.end()) {
+                new_texture_paths.erase(path_it);
+            }
+        }
+        rebuild_requested = true;
+        need_update.store(true);
+    }
+}
+
+// 主渲染循环调用来检查并执行重建
+void TexturePool::processUpdateDirRequest() {
+    // 必须 在拥有激活GL上下文的线程中调用
+    std::unordered_set<std::string, StringHash, std::equal_to<>> paths_to_load;
+
+    {
+        std::lock_guard<std::mutex> lock(rebuild_mutex);
+        if (!rebuild_requested) {
+            return;  // 没有请求，直接返回
+        }
+        paths_to_load = std::move(new_texture_paths);
+        rebuild_requested = false;
+    }
+
+    // 安全地在渲染线程中执行重建
+    buildFromManifest(paths_to_load);
 }
 
 // 移除一个路径的纹理

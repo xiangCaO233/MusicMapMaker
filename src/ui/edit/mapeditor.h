@@ -1,9 +1,8 @@
 #ifndef MAPEDITOR_H
 #define MAPEDITOR_H
 
+#include <HideableToolWindow.hpp>
 #include <QWidget>
-
-#include "HideableToolWindow.hpp"
 
 namespace Ui {
 class MapEditor;

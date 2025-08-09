@@ -77,12 +77,12 @@ void GLCanvas::updateFpsDisplay(int fps) {
 
 // 需要卸载纹理
 void GLCanvas::need_unloadtexture_dir(std::string_view texdir) {
-    render->remove_texture_from_path(std::string(texdir));
+    render->request_remove_texture_from_path(std::string(texdir));
 }
 
 // 需要载入纹理
 void GLCanvas::need_loadtexture_dir(std::string_view texdir) {
-    render->add_texture_from_path(std::string(texdir));
+    render->request_texture_from_path(std::string(texdir));
 }
 
 void GLCanvas::initializeGL() {

@@ -132,8 +132,14 @@ void TrackManager::closeEvent(QCloseEvent* event) {
     HideableToolWindow::closeEvent(event);
 }
 
+std::weak_ptr<ice::AudioTrack> TrackManager::loadBack(
+    std::string_view audio_path) {
+    return loadin_audio(QString::fromStdString(std::string(audio_path)));
+}
+
 // 载入音频
-void TrackManager::loadin_audio(const QString& audio_file) {
+std::weak_ptr<ice::AudioTrack> TrackManager::loadin_audio(
+    const QString& audio_file) {
     auto track_it = audio_tracks.find(audio_file);
     if (track_it == audio_tracks.end()) {
         qDebug() << "lodin audio:" << audio_file;
@@ -152,10 +158,12 @@ void TrackManager::loadin_audio(const QString& audio_file) {
 
     // 设置为可勾选
     track_item->setCheckable(true);
+
     // 默认未选中
     track_item->setCheckState(Qt::Unchecked);
 
     model->appendRow(track_item);
+    return track;
 }
 
 // 获取音频轨道

@@ -23,6 +23,15 @@ class TexturePool {
     // 是否需要更新
     bool needupdate() const { return need_update.load(); };
 
+    // 其他线程调用来请求添加新路径纹理
+    void request_new_directory(const std::string& dir);
+
+    // 其他线程调用来请求添加新路径纹理
+    void request_remove_directory(const std::string& dir);
+
+    // 主渲染循环调用来检查并执行重建
+    void processUpdateDirRequest();
+
     // 从一个路径加载
     void add_directory(const std::string& dir);
 
@@ -45,6 +54,12 @@ class TexturePool {
 
     // 是否需要更新
     std::atomic<bool> need_update{true};
+
+    // 多线程更新纹理需要的
+    std::mutex rebuild_mutex;
+    bool rebuild_requested = false;
+    std::unordered_set<std::string, StringHash, std::equal_to<>>
+        new_texture_paths;
 
     // 载入的纹理原始数据
     struct LoadedImageData {

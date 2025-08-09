@@ -194,9 +194,17 @@ void Renderer2D::add_texture_from_path(const std::string& path) {
     texturepool->add_directory(path);
 }
 
+void Renderer2D::request_texture_from_path(const std::string& path) {
+    texturepool->request_new_directory(path);
+}
+
 // 移除纹理目录
 void Renderer2D::remove_texture_from_path(const std::string& path) {
     texturepool->remove_directory(path);
+}
+
+void Renderer2D::request_remove_texture_from_path(const std::string& path) {
+    texturepool->request_remove_directory(path);
 }
 
 // 添加字体
@@ -206,7 +214,10 @@ void Renderer2D::add_font_from_path(const std::string& path, bool is_qrc) {
 
 // 更新需要更新的资源等等
 void Renderer2D::update() {
-    texturepool->processUploadQueue();
+    if (texturepool->needupdate()) {
+        texturepool->processUpdateDirRequest();
+        texturepool->processUploadQueue();
+    }
     fontpool->processUploadQueue();
 
     if (update_view) {

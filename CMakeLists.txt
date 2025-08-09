@@ -139,6 +139,7 @@ set(PROJECT_SOURCES
     src/ui/edit/mapeditor.ui
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp
+    src/ui/project/projectmanagercontrols.cpp
     src/ui/project/projectmanager.ui
     src/ui/audio/track/trackmanager.h
     src/ui/audio/track/trackmanager.cpp
