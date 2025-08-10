@@ -4,10 +4,17 @@
 #include <project/projectmanager.h>
 #include <ui_mainwindow.h>
 
+#include <QFile>
 #include <canvas/map/MapCanvas.hpp>
 #include <mmm/map/MMap.hpp>
 #include <mmm/obj/Note.hpp>
 #include <mmm/project/MProject.hpp>
+
+// 全局样式表
+QString MainWindow::global_style_sheet;
+
+// 全部设置
+Settings MainWindow::settings{};
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -17,20 +24,20 @@ MainWindow::MainWindow(QWidget* parent)
     // 注册 shared_ptr<MMap> 类型
     qRegisterMetaType<MMap*>("MMap*");
 
-    editor = new MapEditor();
-    projectmanager = new ProjectManager();
-    projectmanager->bind_canvas(editor->canvas());
-    trackmanager = new TrackManager();
-    projectmanager->bind_trackmgr(trackmanager);
+    ui->project_manager->bind_canvas(ui->editor->canvas());
+    ui->project_manager->bind_trackmgr(ui->track_manager);
 
     // 捕获ui指针
     auto capui = ui;
 
-    connect(editor, &MapEditor::close_signal,
-            [capui]() { capui->actionEditor->setChecked(false); });
-    connect(trackmanager, &TrackManager::close_signal,
+    auto canvas = ui->editor->canvas();
+    connect(canvas, &GLCanvas::update_window_suffix, this,
+            &MainWindow::update_title_suffix);
+
+    connect(ui->track_manager, &TrackManager::close,
             [capui]() { capui->actionTrack_Manager->setChecked(false); });
-    connect(projectmanager, &ProjectManager::close_signal,
+
+    connect(ui->project_manager, &ProjectManager::close,
             [capui]() { capui->actionProject_Manager->setChecked(false); });
 
     // MMap map(
@@ -45,17 +52,59 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow() {
     // 先清理项目(需要使用editor的gl上下文移除纹理)
-    delete projectmanager;
-    delete editor;
-    delete trackmanager;
     delete ui;
+}
+// 使用主题
+void MainWindow::use_theme(GlobalTheme theme) {
+    // current_theme = theme;
+    // settings.global_theme = theme;
+    QColor button_icon_color;
+    switch (theme) {
+        case GlobalTheme::OPEN_DARK: {
+            button_icon_color = QColor(255, 255, 255);
+            QFile file(":/QtThemeDark/theme/Flat/Dark/Pink/Orange.qss");
+            file.open(QFile::ReadOnly);
+            global_style_sheet = file.readAll();
+            setStyleSheet(global_style_sheet);
+            // ui->actionDark->setChecked(true);
+            break;
+        }
+        case GlobalTheme::OPEN_LIGHT: {
+            button_icon_color = QColor(0, 0, 0);
+            QFile file(":/QtThemeLight/theme/Flat/Light/Brown/DeepOrange.qss");
+            file.open(QFile::ReadOnly);
+            global_style_sheet = file.readAll();
+            setStyleSheet(global_style_sheet);
+            // ui->actionLight->setChecked(true);
+            break;
+        }
+        case GlobalTheme::COLIN_DARK: {
+            button_icon_color = QColor(255, 255, 255);
+            QFile file(":/qdarkstyle/dark/darkstyle.qss");
+            file.open(QFile::ReadOnly);
+            global_style_sheet = file.readAll();
+            setStyleSheet(global_style_sheet);
+            // ui->actionDark->setChecked(true);
+            break;
+        }
+        case GlobalTheme::COLIN_LIGHT: {
+            button_icon_color = QColor(0, 0, 0);
+            QFile file(":/qdarkstyle/light/lightstyle.qss");
+            file.open(QFile::ReadOnly);
+            global_style_sheet = file.readAll();
+            setStyleSheet(global_style_sheet);
+            // ui->actionLight->setChecked(true);
+            break;
+        }
+    }
+}
+
+// 更新标题后缀
+void MainWindow::update_title_suffix(const QString& suffix) {
+    setWindowTitle(tr("MusicMapMaker-->") + suffix);
 }
 
 void MainWindow::closeEvent(QCloseEvent* e) {
-    editor->close();
-    trackmanager->close();
-    projectmanager->close();
+    ui->track_manager->close();
+    ui->project_manager->close();
 }
-
-// 展示编辑器
-void MainWindow::showeditor() { editor->show(); }

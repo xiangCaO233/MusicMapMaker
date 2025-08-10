@@ -6,22 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>981</width>
-    <height>668</height>
+    <width>1920</width>
+    <height>1080</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout"/>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="MapEditor" name="editor" native="true"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>981</width>
+     <width>1920</width>
      <height>21</height>
     </rect>
    </property>
@@ -31,70 +35,42 @@
     </property>
     <addaction name="actionTrack_Manager"/>
     <addaction name="actionProject_Manager"/>
-    <addaction name="actionEditor"/>
    </widget>
    <addaction name="menuView_V"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="dockWidget_5">
+  <widget class="QDockWidget" name="project_dock">
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Project Manager</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_5">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QSplitter" name="project_content_splitter">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-       <widget class="QTabWidget" name="tabWidget">
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="maps_tab">
-         <attribute name="title">
-          <string>Maps</string>
-         </attribute>
-        </widget>
-        <widget class="QWidget" name="audios_tab">
-         <attribute name="title">
-          <string>Audios</string>
-         </attribute>
-        </widget>
-        <widget class="QWidget" name="images_tab">
-         <attribute name="title">
-          <string>Images</string>
-         </attribute>
-        </widget>
-        <widget class="QWidget" name="videos_tab">
-         <attribute name="title">
-          <string>Videos</string>
-         </attribute>
-        </widget>
-       </widget>
-       <widget class="QTreeView" name="project_browser"/>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+   <widget class="ProjectManager" name="project_manager"/>
+  </widget>
+  <widget class="QDockWidget" name="track_manager_dock">
+   <property name="allowedAreas">
+    <set>Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Track Manager</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="TrackManager" name="track_manager"/>
   </widget>
   <action name="actionTrack_Manager">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
     <bool>true</bool>
    </property>
    <property name="text">
@@ -105,19 +81,34 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Project Manager</string>
    </property>
   </action>
-  <action name="actionEditor">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Editor</string>
-   </property>
-  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MapEditor</class>
+   <extends>QWidget</extends>
+   <header location="global">mapeditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ProjectManager</class>
+   <extends>QWidget</extends>
+   <header location="global">projectmanager.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TrackManager</class>
+   <extends>QWidget</extends>
+   <header location="global">trackmanager.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

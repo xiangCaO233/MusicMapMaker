@@ -8,3 +8,6 @@ ProjectConfig::ProjectConfig(QWidget *parent)
 }
 
 ProjectConfig::~ProjectConfig() { delete ui; }
+
+// 绑定配置
+void ProjectConfig::bind_config(MProjectConfig *cfg) { config = cfg; }

@@ -10,6 +10,7 @@
 #include <string>
 
 #include "mmm/project/AudioLoadCallback.hpp"
+#include "mmm/project/MProjectConfig.hpp"
 
 class TextureLoadCallback;
 class MProject {
@@ -30,9 +31,13 @@ class MProject {
    private:
     // 是否已经打开
     std::atomic<bool> is_opened{false};
+    std::atomic<bool> is_closed{false};
 
     // 项目路径
     std::filesystem::path project_path;
+
+    // 项目配置
+    MProjectConfig project_config;
 
     // 项目谱面表(谱面资源持有)
     std::map<std::string, std::unique_ptr<MMap>, std::less<>>

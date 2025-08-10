@@ -10,12 +10,13 @@
 #include <filesystem>
 #include <mmm/project/MProject.hpp>
 
+#include "projectconfig.h"
+
 ProjectManager::ProjectManager(QWidget* parent)
-    : HideableToolWindow(parent), ui(new Ui::ProjectManager) {
+    : QWidget(parent), ui(new Ui::ProjectManager) {
     ui->setupUi(this);
-    ui->main_splitter->setSizes({220, 800});
-    ui->main_splitter->setSizes({300, 420});
-    ui->project_content_splitter->setSizes({420, 300});
+    ui->main_splitter->setSizes({0, 300});
+    ui->project_content_splitter->setSizes({220, 300});
 
     // 项目列表模型
     auto project_list_model = new QStandardItemModel(ui->project_list);
@@ -36,9 +37,14 @@ ProjectManager::ProjectManager(QWidget* parent)
     // 视频列表模型
     auto video_list_model = new QStandardItemModel(ui->video_listView);
     ui->video_listView->setModel(video_list_model);
+
+    // 初始化项目配置ui
+    config_ui = new ProjectConfig();
+    config_ui->hide();
 }
 
 ProjectManager::~ProjectManager() {
+    delete config_ui;
     delete ui;
     qDebug() << "ProjectManager deleted";
 }
@@ -172,8 +178,8 @@ void ProjectManager::show_project(std::string_view project_name) {
     }
 }
 
-void ProjectManager::on_preference_button_clicked()
-{
-
+void ProjectManager::closeEvent(QCloseEvent* e) {
+    for (auto& [name, project] : projects) {
+        project->close();
+    }
 }
-

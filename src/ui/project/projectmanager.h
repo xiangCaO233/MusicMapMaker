@@ -1,11 +1,12 @@
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
 
+#include <projectconfig.h>
+
 #include <QStandardItem>
 #include <QWidget>
 #include <memory>
 #include <mmm/project/MProject.hpp>
-#include <template/HideableToolWindow.hpp>
 #include <unordered_map>
 
 namespace Ui {
@@ -15,7 +16,7 @@ class ProjectManager;
 class MapCanvas;
 class TrackManager;
 
-class ProjectManager : public HideableToolWindow {
+class ProjectManager : public QWidget {
     Q_OBJECT
 
    public:
@@ -37,6 +38,9 @@ class ProjectManager : public HideableToolWindow {
     // 展示项目
     void show_project(std::string_view project_name);
 
+   protected:
+    void closeEvent(QCloseEvent *e) override;
+
    private slots:
     void on_create_project_button_clicked();
     void on_add_project_button_clicked();
@@ -54,8 +58,12 @@ class ProjectManager : public HideableToolWindow {
                        std::equal_to<>>
         projects;
 
+    // 项目配置界面
+    ProjectConfig *config_ui;
+
     // 绑定的画布上下文
     MapCanvas *map_canvas{nullptr};
+
     // 绑定的音轨管理器上下文
     TrackManager *track_manager{nullptr};
 

@@ -9,10 +9,7 @@ MProject::MProject(TextureLoadCallback* texloadcbk,
     : texcallback(texloadcbk), audiocallback(audioLoadcbk) {}
 
 // 析构MProject
-MProject::~MProject() {
-    // 通知画布卸载纹理
-    texcallback->need_unloadtexture_dir(project_path.generic_string());
-}
+MProject::~MProject() { close(); }
 
 // 打开项目
 void MProject::open(std::string_view project_path_str) {
@@ -59,4 +56,13 @@ void MProject::open(std::string_view project_path_str) {
         }
         is_opened.store(true);
     }
+}
+
+// 关闭项目
+void MProject::close() {
+    if (is_closed) return;
+    // 通知画布卸载纹理
+    texcallback->need_unloadtexture_dir(project_path.generic_string());
+    // 通知音频池卸载音轨
+    is_closed.store(true);
 }

@@ -171,8 +171,15 @@ set(PROJECT_SOURCES
     src/main.cpp)
 
 # ui需要包含的路径
-include_directories(./src ./src/ui ./src/ui/canvas ./src/ui/template
-                    ./src/ui/audio/graphic)
+include_directories(
+  ./src
+  ./src/ui
+  ./src/ui/canvas
+  ./src/ui/template
+  ./src/ui/project
+  ./src/ui/edit
+  ./src/ui/audio/track
+  ./src/ui/audio/graphic)
 
 # 创建可执行文件
 qt_add_executable(
@@ -182,7 +189,11 @@ qt_add_executable(
   ${CANVAS_SOURCES}
   ${PROJECT_SOURCES}
   ${GLSL_FILES}
-  resources/glsrcs.qrc)
+  resources/glsrcs.qrc
+  themes/ColinsTheme/Dark/darkstyle.qrc
+  themes/ColinsTheme/Light/lightstyle.qrc
+  themes/OpenTheme/QtThemeDark/QtThemeDark.qrc
+  themes/OpenTheme/QtThemeLight/QtThemeLight.qrc)
 
 add_dependencies(MusicMapMaker IonCachyEngin-dev)
 

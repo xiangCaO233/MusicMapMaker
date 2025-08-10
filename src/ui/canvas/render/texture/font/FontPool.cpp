@@ -350,10 +350,10 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
 
     // --- 步骤 5: 更新光标位置 ---
     // 光标向右移动
-    m_cursor_x += data.width;
+    m_cursor_x += data.width + 2;
     // 更新当前行的高度（取本行所有字形的最大高度）
     if (data.height > m_current_line_height) {
-        m_current_line_height = data.height;
+        m_current_line_height = data.height + 2;
     }
 }
 

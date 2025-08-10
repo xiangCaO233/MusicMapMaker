@@ -5,6 +5,8 @@
 
 #include <QMainWindow>
 
+#include "GlobalSettings.hpp"
+
 namespace Ui {
 class MainWindow;
 }
@@ -20,30 +22,31 @@ class MainWindow : public QMainWindow {
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    // 展示编辑器
-    void showeditor();
+    // 全局样式表
+    static QString global_style_sheet;
+
+    // 全部设置
+    static Settings settings;
+
+    // 当前主题
+    GlobalTheme current_theme;
+
+    // 使用主题
+    void use_theme(GlobalTheme theme);
 
    private slots:
     void on_actionTrack_Manager_toggled(bool arg1);
 
     void on_actionProject_Manager_toggled(bool arg1);
 
-    void on_actionEditor_toggled(bool arg1);
+    // 更新标题后缀
+    void update_title_suffix(const QString &suffix);
 
    protected:
     void closeEvent(QCloseEvent *e) override;
 
    private:
     Ui::MainWindow *ui;
-
-    // 编辑器
-    MapEditor *editor;
-
-    // 音轨管理器
-    TrackManager *trackmanager;
-
-    // 项目管理器
-    ProjectManager *projectmanager;
 };
 
 #endif  // MAINWINDOW_H

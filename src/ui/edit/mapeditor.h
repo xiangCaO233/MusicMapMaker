@@ -1,7 +1,6 @@
 #ifndef MAPEDITOR_H
 #define MAPEDITOR_H
 
-#include <HideableToolWindow.hpp>
 #include <QWidget>
 
 namespace Ui {
@@ -10,7 +9,7 @@ class MapEditor;
 
 class MapCanvas;
 
-class MapEditor : public HideableToolWindow {
+class MapEditor : public QWidget {
     Q_OBJECT
 
    public:
@@ -21,8 +20,6 @@ class MapEditor : public HideableToolWindow {
 
    private:
     Ui::MapEditor *ui;
-    // 更新标题后缀
-    void update_title_suffix(const QString &suffix);
 };
 
 #endif  // MAPEDITOR_H

@@ -42,8 +42,13 @@ int main(int argc, char* argv[]) {
     QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
+    // 跟随系统主题
+    if (QApplication::palette().window().color().lightness() < 128) {
+        w.use_theme(GlobalTheme::COLIN_LIGHT);
+    } else {
+        w.use_theme(GlobalTheme::COLIN_LIGHT);
+    }
     w.show();
-    w.showeditor();
 
     return QApplication::exec();
 }
