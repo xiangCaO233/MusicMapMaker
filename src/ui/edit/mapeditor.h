@@ -16,7 +16,12 @@ class MapEditor : public QWidget {
     explicit MapEditor(QWidget *parent = nullptr);
     ~MapEditor() override;
 
+    // 获取画布实例
     MapCanvas *canvas() const;
+
+   protected:
+    void keyPressEvent(QKeyEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
 
    private:
     Ui::MapEditor *ui;

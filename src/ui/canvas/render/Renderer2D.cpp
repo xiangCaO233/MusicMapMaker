@@ -378,7 +378,6 @@ void Renderer2D::update_attribptrFromInstance(size_t instance_index) {
            glf);
 }
 
-// 渲染
 // 结束绘制指令提交
 void Renderer2D::finalize() {
     // 这个函数现在只负责分析，不再与OpenGL交互或修改command_queue
@@ -420,7 +419,10 @@ void Renderer2D::finalize() {
     command_list.clear();
 }
 
+// 渲染
 void Renderer2D::render() {
+    update();
+
     if (quad_datas.empty() || command_batch.empty()) {
         quad_datas.clear();
         return;

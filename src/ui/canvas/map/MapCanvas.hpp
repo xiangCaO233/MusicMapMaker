@@ -1,8 +1,13 @@
 #ifndef MMM_MAPCANVAS_HPP
 #define MMM_MAPCANVAS_HPP
 
+#include <qhash.h>
+#include <qobject.h>
+
 #include <canvas/GLCanvas.hpp>
 #include <memory>
+
+#include "tool/BaseTool.hpp"
 
 class MMap;
 
@@ -15,10 +20,22 @@ class MapCanvas : public GLCanvas {
     ~MapCanvas() override;
 
     // 切换到图
-    void switch_map(const std::shared_ptr<MMap>& smap);
+    void switch_map(const std::shared_ptr<MMap> &smap);
+
+   protected:
+    void keyPressEvent(QKeyEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
 
    private:
-    // 谱面
+    // 绑定的谱面
     std::weak_ptr<MMap> map;
+
+    // 工具集合
+    QHash<QString, BaseTool *> tools;
+
+    // 创建工具
+    void creatTools();
+
+    friend class MapEditor;
 };
 #endif  // MMM_MAPCANVAS_HPP

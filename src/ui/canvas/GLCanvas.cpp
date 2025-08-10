@@ -135,10 +135,6 @@ void GLCanvas::resizeGL(int w, int h) {
 
 void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
-    render->update();
-
-    GLCALL(glClearColor(.23f, .23f, .23f, .23f));
-    GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
     {
         // 绘制
@@ -157,6 +153,8 @@ void GLCanvas::paintGL() {
         //     {100, 100}, {{1.f, 1.f}, 0.f});
 
         // painter.paintLine({100, 50}, {200, 100}, {0.f, 0.f, 0.f, 1.f}, 4.f);
+        GLCALL(glClearColor(.23f, .23f, .23f, .23f));
+        GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
         painter.paintString("ComicShannsMono Nerd Font", 16, U"nmsl",
                             {100, 100});

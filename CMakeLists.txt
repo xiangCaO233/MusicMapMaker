@@ -121,6 +121,7 @@ set(CANVAS_SOURCES
     src/ui/canvas/GLCanvas.hpp
     src/ui/canvas/map/MapCanvas.hpp
     src/ui/canvas/map/MapCanvas.cpp
+    src/ui/canvas/map/MapCanvasEvent.cpp
     src/ui/canvas/GLCanvasEvents.cpp
     src/ui/canvas/CanvasContainer.h
     src/ui/canvas/CanvasContainer.cpp)
@@ -136,6 +137,7 @@ set(PROJECT_SOURCES
     src/ui/template/ScalableImageLabel.cpp
     src/ui/edit/mapeditor.h
     src/ui/edit/mapeditor.cpp
+    src/ui/edit/mapeditorevent.cpp
     src/ui/edit/mapeditor.ui
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp

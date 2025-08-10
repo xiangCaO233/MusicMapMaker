@@ -31,12 +31,25 @@
    </property>
    <widget class="QMenu" name="menuView_V">
     <property name="title">
-     <string>View(V)</string>
+     <string>View(&amp;V)</string>
     </property>
     <addaction name="actionTrack_Manager"/>
     <addaction name="actionProject_Manager"/>
    </widget>
+   <widget class="QMenu" name="menuFile_F">
+    <property name="title">
+     <string>File(&amp;F)</string>
+    </property>
+    <addaction name="actionNew_O"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit(&amp;E)</string>
+    </property>
+   </widget>
+   <addaction name="menuFile_F"/>
    <addaction name="menuView_V"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="project_dock">
@@ -86,6 +99,11 @@
    </property>
    <property name="text">
     <string>Project Manager</string>
+   </property>
+  </action>
+  <action name="actionNew_O">
+   <property name="text">
+    <string>New(&amp;O)</string>
    </property>
   </action>
  </widget>
