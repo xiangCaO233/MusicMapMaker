@@ -1,6 +1,5 @@
 #include <QDebug>
 #include <chrono>
-#include <cmath>
 #include <glm/gtc/constants.hpp>
 #include <layer/interact/InteractLayerGenerator.hpp>
 
@@ -10,11 +9,12 @@
 InteractLayerGenerator::~InteractLayerGenerator() {
     qDebug() << "交互图层生成线程释放";
 }
-// --- 1. 动画参数和常量 (方便您随时调整) ---
-const int NUM_PARTICLES = 20;            // 组成星环的粒子数量
-const float ORBIT_RADIUS = 150.0f;       // 星环环绕鼠标的半径
-const float BASE_PARTICLE_SIZE = 30.0f;  // 粒子的基础大小
-const float ROTATION_SPEED = -0.4f;      // 粒子自身的旋转速度
+// --- 1. 效果参数 ---
+const int NUM_RINGS = 6;                                 // 组成光晕的同心圆数量
+const float BASE_RADIUS = 3.0f;                          // 核心光点的半径
+const float WAVE_AMPLITUDE = 15.0f;                      // 呼吸波动的最大半径
+const float WAVE_SPEED = 1.5f;                           // 呼吸的速度
+const glm::vec4 AURA_COLOR = {0.8f, 0.85f, 1.0f, 1.0f};  // 干净、柔和的浅蓝色
 
 // 生成交互层的数据
 void InteractLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
@@ -31,72 +31,37 @@ void InteractLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
         std::chrono::duration_cast<std::chrono::duration<float>>(
             elapsed_duration)
             .count();
-    // --- 3. 循环创建每一个动态粒子 ---
-    for (int i = 0; i < NUM_PARTICLES; ++i) {
+
+    // --- 3. 循环创建每一个呼吸的圆环 ---
+    for (int i = 0; i < NUM_RINGS; ++i) {
         RenderCommand cmd;
 
-        // --- 计算每个粒子独有的时间偏移，让它们在环上错开 ---
-        // 这使得粒子们形成一条连续流动的“蛇”
-        float particle_offset =
-            (float(i) / NUM_PARTICLES) * 2.0f * glm::pi<float>();
-        float particle_time = elapsed_seconds * 0.7f + particle_offset;
+        // --- 每个圆环的时间都有一个微小的偏移，创造出波纹扩散的效果 ---
+        float time_offset = (float(i) / NUM_RINGS) * glm::pi<float>();
+        float current_time = elapsed_seconds * WAVE_SPEED + time_offset;
 
-        // --- BaseInfo: 位置、大小、旋转、颜色 ---
+        // --- BaseInfo: 大小、位置、颜色 ---
 
-        // 位置: 围绕鼠标做圆周运动
-        cmd.baseInfo.pos.x =
-            l->mouse.x() + ORBIT_RADIUS * std::cos(particle_time);
-        cmd.baseInfo.pos.y =
-            l->mouse.y() + ORBIT_RADIUS * std::sin(particle_time);
+        // 大小: 使用 sin 函数创造一个从基础大小向外平滑脉冲的效果
+        // (1 + sin) / 2 的结果是 [0, 1]，非常适合用来做平滑的脉冲
+        float pulse = (1.0f + std::sin(current_time)) / 2.0f;  // [0, 1]
+        float current_radius = BASE_RADIUS + pulse * WAVE_AMPLITUDE;
 
-        // 大小: 使用 sin 函数创造平滑的脉冲缩放效果
-        float size_pulse =
-            0.5f * (1.0f + std::sin(particle_time * 2.0f));  // [0, 1]
-        cmd.baseInfo.size = {
-            BASE_PARTICLE_SIZE * (0.8f + size_pulse * 0.4f),
-            BASE_PARTICLE_SIZE *
-                (0.8f + size_pulse * 0.4f)};  // 在80%-120%大小间变化
+        cmd.baseInfo.size = {current_radius * 2.0f, current_radius * 2.0f};
 
-        // 旋转: 持续、平滑地旋转
-        cmd.baseInfo.rotation = elapsed_seconds * ROTATION_SPEED;
+        // 位置: 始终居中于鼠标，并根据当前大小调整
+        cmd.baseInfo.pos =
+            glm::vec2{l->mouse.x(), l->mouse.y()} - glm::vec2(current_radius);
 
-        // 颜色: 创造一种在“青色-品红-黄色”之间变化的赛博朋克风格颜色
-        cmd.baseInfo.color.r =
-            (1.0f + std::sin(particle_time * 1.1f)) / 2.0f;  // [0, 1]
-        cmd.baseInfo.color.g =
-            (1.0f + std::cos(particle_time * 0.8f)) / 2.0f;  // [0, 1]
-        cmd.baseInfo.color.b =
-            (1.0f + std::sin(particle_time * 0.5f)) / 2.0f;  // [0, 1]
-        cmd.baseInfo.color.a = 0.8f;  // 稍微透明一点更有层次感
+        // 颜色: 颜色固定，但透明度根据脉冲变化，向外扩散时变淡
+        cmd.baseInfo.color = AURA_COLOR;
+        cmd.baseInfo.color.a = (1.0f - pulse) * 0.7f;  // [0, 0.7]，越向外越透明
 
-        // --- RadiusInfo: 圆角和辉光效果 ---
+        // --- RadiusInfo: 纯粹的圆形，无任何特效 ---
+        cmd.radiusInfo.radius = {1.f, 1.f};        // 保证是完美的圆形
+        cmd.radiusInfo.radius_effect_param = 0.f;  // 禁用所有辉光特效
 
-        // 圆角半径: 在方形和圆形之间平滑过渡
-        float shape_morph = (1.0f + std::cos(particle_time)) / 2.0f;  // [0, 1]
-        cmd.radiusInfo.radius = {shape_morph, shape_morph};  // 0=尖角, 1=圆形
-
-        // 辉光/淡出效果: 让粒子产生呼吸灯一样的柔和光晕
-        float glow_pulse =
-            (1.0f + std::sin(particle_time * 1.5f)) / 2.0f;  // [0, 1]
-        cmd.radiusInfo.radius_effect_param =
-            30.0f + glow_pulse * 50.0f;  // 光晕半径在30-80像素间变化
-        cmd.radiusInfo.radius_effect =
-            RadiusEffect::FADE_IN_AND_OUT;  // 使用您指定的淡出特效
-
-        // --- 重要！位置居中校正 ---
-        // 由于 radius_effect_param
-        // 会扩大最终绘制区域，我们需要重新校正位置使其居中
-        float total_width =
-            cmd.baseInfo.size.x + 2.0f * cmd.radiusInfo.radius_effect_param;
-        float total_height =
-            cmd.baseInfo.size.y + 2.0f * cmd.radiusInfo.radius_effect_param;
-        cmd.baseInfo.pos.x -= total_width / 2.0f;
-        cmd.baseInfo.pos.y -= total_height / 2.0f;
-
-        // --- TexturesInfo: 保持默认纯色绘制 ---
-        // (无需设置)
-
-        // --- 将最终完成的渲染指令推入缓冲区 ---
+        // --- 将渲染指令推入缓冲区 ---
         buffer.push_back(cmd);
     }
 }
