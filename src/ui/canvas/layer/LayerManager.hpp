@@ -72,12 +72,12 @@ class LayerManager {
     // 析构LayerManager
     virtual ~LayerManager() {
         // 先发送停止线程信号
-        for (const auto& [type, thread] : threads) {
-            qDebug() << "线程[" << static_cast<uint32_t>(type)
+        for (const auto& [type, generator] : generators) {
+            qDebug() << "生成器[" << static_cast<uint32_t>(type)
                      << "]发送停止信号";
-            QMetaObject::invokeMethod(thread.get(), "terminate",
-                                      Qt::QueuedConnection);
+            generator->stop();
         }
+
         // 等待所有线程退出
         for (const auto& [type, thread] : threads) {
             thread->quit();
@@ -137,7 +137,7 @@ class LayerManager {
         // 这是启动的核心，保证了run()在新线程中被调用。
 
         QObject::connect(thread.get(), &QThread::started, layerGenerator,
-                         &InteractLayerGenerator::run);
+                         &LayerComputerBase::run);
         // 启动线程
         thread->start();
 

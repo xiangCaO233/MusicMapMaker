@@ -61,7 +61,7 @@ void RenderDataLoop::tick() {
     qint64 workTimeNs = timer.nsecsElapsed();
     if (qint64 sleepTimeNs = desiredTicktimeNs - workTimeNs; sleepTimeNs > 0) {
         // 使用精确的休眠
-        qDebug() << "fix time:" << sleepTimeNs;
+        // qDebug() << "fix time:" << sleepTimeNs;
         QThread::msleep(sleepTimeNs / 1000000);
         // QCoreApplication::processEvents(QEventLoop::AllEvents,
         //                                 sleepTimeNs / 1000000);

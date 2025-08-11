@@ -7,4 +7,6 @@ InteractLayerGenerator::~InteractLayerGenerator() {
 }
 
 // 生成交互层的数据
-void InteractLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {};
+void InteractLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
+    // qDebug() << "生成交互图层";
+}

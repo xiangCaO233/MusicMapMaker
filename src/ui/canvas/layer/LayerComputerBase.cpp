@@ -7,12 +7,12 @@ LayerComputerBase::LayerComputerBase(ILayer* layerptr, FrameSynchronizer* sync,
     : QObject(parent), layer(layerptr), synchronizer(sync) {}
 
 void LayerComputerBase::run() {
-    while (isrunning) {
+    while (isrunning.load()) {
         // 在“开始”栅栏处等待，直到主循环发出信号
         synchronizer->workerWaitForFrameStart();
 
         // 检查是否在等待期间被要求停止
-        if (!isrunning) break;
+        if (!isrunning.load()) break;
 
         auto& buffer = layer->backbuffer();
         buffer.clear();
@@ -23,4 +23,7 @@ void LayerComputerBase::run() {
     }
 }
 
-void LayerComputerBase::stop() { isrunning = false; }
+void LayerComputerBase::stop() {
+    isrunning.store(false);
+    synchronizer->startNextFrame();
+}

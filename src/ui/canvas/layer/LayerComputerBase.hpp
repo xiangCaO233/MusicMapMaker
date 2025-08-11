@@ -31,7 +31,7 @@ class LayerComputerBase : public QObject {
     // 帧同步器
     FrameSynchronizer* synchronizer;
 
-    bool isrunning{true};
+    std::atomic<bool> isrunning{true};
 };
 
 #endif  // MMM_LAYERCOMPUTERBASE_HPP
