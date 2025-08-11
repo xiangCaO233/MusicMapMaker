@@ -5,11 +5,21 @@
 #include <canvas/map/MapCanvas.hpp>
 
 void MapCanvas::keyPressEvent(QKeyEvent *e) {
-    QSignalBlocker blocker(this);
+    GLCanvas::keyPressEvent(e);
     qDebug() << "receive key:" << e->key();
 }
 
 void MapCanvas::keyReleaseEvent(QKeyEvent *e) {
-    QSignalBlocker blocker(this);
+    GLCanvas::keyReleaseEvent(e);
     qDebug() << "release key:" << e->key();
+}
+
+void MapCanvas::mouseMoveEvent(QMouseEvent *e) { GLCanvas::mouseMoveEvent(e); }
+
+void MapCanvas::mousePressEvent(QMouseEvent *e) {
+    GLCanvas::mousePressEvent(e);
+}
+
+void MapCanvas::mouseReleaseEvent(QMouseEvent *e) {
+    GLCanvas::mouseReleaseEvent(e);
 }

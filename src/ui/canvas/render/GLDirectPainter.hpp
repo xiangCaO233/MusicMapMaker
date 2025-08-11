@@ -10,15 +10,15 @@
 class Renderer2D;
 
 /**
- * @class MPainter
- * @brief 一个高级绘图接口，作为渲染指令的翻译器。
+ * @class GLDirectPainter
+ * @brief 一个直接绘图接口,作为渲染指令的翻译器,在释放时直接执行渲染
  */
-class MPainter {
+class GLDirectPainter {
    public:
     // 构造MPainter
-    explicit MPainter(Renderer2D* renderer2D);
+    explicit GLDirectPainter(Renderer2D* renderer2D);
     // 析构MPainter
-    virtual ~MPainter();
+    virtual ~GLDirectPainter();
     /**
      * @enum TextDirection
      * @brief 定义了文本的绘制方向。

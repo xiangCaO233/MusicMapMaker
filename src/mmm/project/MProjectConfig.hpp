@@ -4,6 +4,13 @@
 #include <string>
 #include <vector>
 
+enum class EditMode {
+    // mmm
+    MMM,
+    // ivm
+    IVM,
+};
+
 struct AudioConfig {
     // 输出设备名
     std::string output_device_name;
@@ -23,6 +30,9 @@ struct CanvasConfig {
 struct MProjectConfig {
     // 项目名称
     std::string project_name;
+
+    // 偏好的编辑模式
+    EditMode preference_editMode{EditMode::IVM};
 
     // 音频配置
     // 全局音量

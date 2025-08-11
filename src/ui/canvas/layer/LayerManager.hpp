@@ -101,8 +101,15 @@ class LayerManager {
     // 交换所有图层前后缓冲区
     void swapBuffers() {
         // 逐一翻转
-        for (int i = 4; i < static_cast<uint32_t>(LayerType::INTERACT); ++i) {
+        for (int i = 4; i <= static_cast<uint32_t>(LayerType::INTERACT); ++i) {
             data_buffer[static_cast<LayerType>(i)]->swapBuffers();
+        }
+    }
+
+    // 分发信息更新
+    void updateInfoForLayers(SharedCanvasInfo* info) {
+        for (int i = 4; i <= static_cast<uint32_t>(LayerType::INTERACT); ++i) {
+            data_buffer[static_cast<LayerType>(i)]->updateInfo(info);
         }
     }
 

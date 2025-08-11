@@ -111,8 +111,8 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/texture/font/FontPool.cpp
     src/ui/canvas/render/texture/TexturePool.hpp
     src/ui/canvas/render/texture/TexturePool.cpp
-    src/ui/canvas/render/MPainter.hpp
-    src/ui/canvas/render/MPainter.cpp
+    src/ui/canvas/render/GLDirectPainter.hpp
+    src/ui/canvas/render/GLDirectPainter.cpp
     src/ui/canvas/render/Renderer2D.hpp
     src/ui/canvas/render/Renderer2D.cpp
     src/ui/canvas/render/MPrimitiveCollector.hpp
@@ -132,6 +132,7 @@ set(CANVAS_SOURCES
     src/ui/canvas/layer/interact/InteractLayerGenerator.hpp
     src/ui/canvas/layer/interact/InteractLayerGenerator.cpp
     src/ui/canvas/layer/interact/RealTimeInteractLayer.hpp
+    src/ui/canvas/layer/interact/RealTimeInteractLayer.cpp
     src/ui/canvas/map/MapCanvas.hpp
     src/ui/canvas/map/MapCanvas.cpp
     src/ui/canvas/map/MapCanvasEvent.cpp

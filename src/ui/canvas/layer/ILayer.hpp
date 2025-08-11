@@ -18,12 +18,15 @@ enum class LayerType : uint32_t {
     INTERACT = 4,
 };
 
+class SharedCanvasInfo;
+
 // 图层
 class ILayer {
    public:
     using RenderDataBuffer = std::vector<RenderCommand>;
     // 构造ILayer
     ILayer() = default;
+
     // 析构ILayer
     virtual ~ILayer() = default;
 
@@ -50,6 +53,12 @@ class ILayer {
         int frontIndex = frontBufferIndex.load(std::memory_order_relaxed);
         return buffers[frontIndex];
     }
+
+    // 更新信息
+    virtual void updateInfo(SharedCanvasInfo* info) = 0;
+
+   protected:
+    void setType(LayerType t) { layer_type = t; }
 
    private:
     // 图层类型

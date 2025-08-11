@@ -3,16 +3,22 @@
 
 #include <QMouseEvent>
 
+enum class EditToolType {
+    // 无操作的hand工具只有基本操作和拖动进度的功能
+    HAND,
+    // 放置物件工具-同时可以删除物件
+    NOTE,
+    // 选择工具
+    SELECT,
+};
+
 class GLCanvas;
-class MPainter;
+class GLDirectPainter;
 
 class BaseTool {
    public:
+    explicit BaseTool(GLCanvas* cvs) : m_canvas(cvs) {}
     virtual ~BaseTool() = default;
-
-    // 工具被激活或失活时由Canvas调用
-    virtual void activate(GLCanvas* canvas) { m_canvas = canvas; }
-    virtual void deactivate() {}
 
     // 从GLCanvas转发过来的事件
     virtual void mousePressEvent(QMouseEvent* event) = 0;
@@ -20,12 +26,20 @@ class BaseTool {
     virtual void mouseReleaseEvent(QMouseEvent* event) = 0;
 
     // 由GLCanvas的paintGL()调用，绘制交互过程中的临时图形
-    virtual void drawFeedback(MPainter* painter) = 0;
+    virtual void drawFeedback(GLDirectPainter* painter) = 0;
+
+    // 获取类型
+    EditToolType type() const { return editType; }
 
    protected:
+    inline void setType(EditToolType t) { editType = t; }
+
     inline GLCanvas* canvas() { return m_canvas; }
 
    private:
+    // 工具类型
+    EditToolType editType;
+    // 获取画布指针
     GLCanvas* m_canvas{nullptr};
 };
 

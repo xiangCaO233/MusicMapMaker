@@ -4,6 +4,7 @@
 #include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLWindow>
 #include <canvas/FrameRateCounter.hpp>
+#include <info/SharedCanvasInfo.hpp>
 #include <memory>
 #include <mmm/project/TextureLoadCallback.hpp>
 #include <render/Renderer2D.hpp>
@@ -37,9 +38,22 @@ class GLCanvas : public QOpenGLWindow,
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    void keyPressEvent(QKeyEvent *e) override;
+    void keyReleaseEvent(QKeyEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
+
     void closeEvent(QCloseEvent *e) override;
+
     // 更新fps显示
     virtual void updateFpsDisplay(int fps);
+
+    // 初始化共享信息
+    template <typename InfoType>
+    void initSharedInfo() {
+        canvas_info = std::make_unique<InfoType>();
+    }
 
     // 内部可获取渲染器
     std::unique_ptr<Renderer2D> &renderer() { return render; }
@@ -54,6 +68,10 @@ class GLCanvas : public QOpenGLWindow,
     // 持有数据循环
     std::unique_ptr<RenderDataLoop> render_dataloop;
 
+    // 持有共享画布信息(子类自己初始化)
+    std::unique_ptr<SharedCanvasInfo> canvas_info{nullptr};
+
+    // 上一帧的时间
     std::chrono::high_resolution_clock::duration pre_frame_time;
 
     // 目标帧率

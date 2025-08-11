@@ -10,6 +10,7 @@ MPrimitiveCollector::MPrimitiveCollector(Renderer2D* render,
 // 析构MPrimitiveCollector
 MPrimitiveCollector::~MPrimitiveCollector() {
     collect();
+    layer_manager->swapBuffers();
     renderer->finalize();
     renderer->render();
 }

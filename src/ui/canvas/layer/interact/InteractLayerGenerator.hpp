@@ -7,6 +7,9 @@ class InteractLayerGenerator : public LayerComputerBase {
    public:
     // 构造InteractLayerGenerator
     using LayerComputerBase::LayerComputerBase;
+
+    InteractLayerGenerator();
+
     // 析构InteractLayerGenerator
     ~InteractLayerGenerator() override;
 

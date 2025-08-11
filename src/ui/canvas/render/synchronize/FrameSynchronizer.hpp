@@ -1,9 +1,8 @@
 #ifndef MMM_FRAMESYNCHRONIZER_HPP
 #define MMM_FRAMESYNCHRONIZER_HPP
 
-#include <qobject.h>
-
 #include <QMutex>
+#include <QObject>
 #include <QSemaphore>
 #include <QWaitCondition>
 

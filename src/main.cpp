@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     MainWindow w;
     // 跟随系统主题
     if (QApplication::palette().window().color().lightness() < 128) {
-        w.use_theme(GlobalTheme::COLIN_LIGHT);
+        w.use_theme(GlobalTheme::COLIN_DARK);
     } else {
         w.use_theme(GlobalTheme::COLIN_LIGHT);
     }

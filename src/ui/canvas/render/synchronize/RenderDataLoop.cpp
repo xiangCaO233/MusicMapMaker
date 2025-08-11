@@ -1,7 +1,6 @@
-#include <qobject.h>
-
 #include <QCoreApplication>
 #include <QEvent>
+#include <QObject>
 #include <layer/LayerManager.hpp>
 #include <render/synchronize/FrameSynchronizer.hpp>
 #include <render/synchronize/RenderDataLoop.hpp>
@@ -21,7 +20,8 @@ void RenderDataLoop::start() {
     isRunning = true;
     timer.restart();
 
-    // 立即开始第一次tick，后续tick会自我驱动
+    // 立即开始第一次tick
+    // 后续tick自我驱动
     QCoreApplication::postEvent(this, new QEvent(QEvent::User));
 }
 
@@ -44,7 +44,7 @@ void RenderDataLoop::tick() {
     actualTicktimeNs = timer.nsecsElapsed();
     timer.restart();
 
-    // 开始新一帧：打开栅栏A，让所有图层线程开始计算
+    // 开始新一帧:打开栅栏A，让所有图层线程开始计算
     layer_manager->sync().startNextFrame();
 
     // ... 在此期间主tick线程也可以做其他事情
@@ -74,7 +74,6 @@ void RenderDataLoop::tick() {
     QCoreApplication::postEvent(this, new QEvent(QEvent::User));
 }
 
-// 还需要重写 event() 函数来处理我们自己post的事件
 bool RenderDataLoop::event(QEvent *e) {
     if (e->type() == QEvent::User) {
         tick();

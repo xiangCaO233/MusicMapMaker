@@ -1,12 +1,12 @@
 #include <glm/glm.hpp>
-#include <render/MPainter.hpp>
+#include <render/GLDirectPainter.hpp>
 #include <render/Renderer2D.hpp>
-#include <string_view>
 
 // 构造MPainter
-MPainter::MPainter(Renderer2D* renderer2D) : renderer(renderer2D) {}
+GLDirectPainter::GLDirectPainter(Renderer2D* renderer2D)
+    : renderer(renderer2D) {}
 // 析构MPainter
-MPainter::~MPainter() {
+GLDirectPainter::~GLDirectPainter() {
     // 析构时绘制
     renderer->finalize();
     renderer->render();
@@ -20,11 +20,10 @@ MPainter::~MPainter() {
  * @param pos 文本绘制的起始位置（通常是基线的左端点）。
  * @param color 文本的颜色，默认为不透明白色。
  */
-void MPainter::MPainter::paintString(const std::string& fontFamily,
-                                     uint32_t fontSize,
-                                     const std::u32string& str, glm::vec2 pos,
-                                     glm::vec4 color, TextDirection direction,
-                                     float rotation, bool applyMask) {
+void GLDirectPainter::GLDirectPainter::paintString(
+    const std::string& fontFamily, uint32_t fontSize, const std::u32string& str,
+    glm::vec2 pos, glm::vec4 color, TextDirection direction, float rotation,
+    bool applyMask) {
     uint32_t xoffset{0};
     uint32_t yoffset{0};
 
@@ -78,9 +77,9 @@ void MPainter::MPainter::paintString(const std::string& fontFamily,
  * @param radiusInfo (可选) 描述线段（矩形）的圆角效果。
  * @param applyMask (可选) 是否应用当前激活的蒙版效果。
  */
-void MPainter::paintLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec4 color,
-                         float lineWidth, const RadiusInfo& radiusInfo,
-                         bool applyMask) {
+void GLDirectPainter::paintLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec4 color,
+                                float lineWidth, const RadiusInfo& radiusInfo,
+                                bool applyMask) {
     // 步骤 1: 计算线段向量和长度 (矩形的宽度)
     glm::vec2 delta = pos2 - pos1;
     float length = glm::length(delta);
@@ -114,9 +113,10 @@ void MPainter::paintLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec4 color,
  * @param mapOpts (可选) 描述纹理的缩放和对齐方式。
  * @param radiusInfo (可选) 描述矩形的圆角效果。
  */
-void MPainter::drawImage(std::string_view resPath, const RectOptions& rectOpts,
-                         const TextureMapOptions& mapOpts,
-                         const RadiusInfo& radiusInfo) {
+void GLDirectPainter::drawImage(std::string_view resPath,
+                                const RectOptions& rectOpts,
+                                const TextureMapOptions& mapOpts,
+                                const RadiusInfo& radiusInfo) {
     auto texoption = renderer->texture_pool()->get(std::string(resPath));
     if (texoption.has_value()) {
         const auto& texture = texoption.value();
@@ -145,9 +145,9 @@ void MPainter::drawImage(std::string_view resPath, const RectOptions& rectOpts,
  * @param tint (可选) 应用于图像的色调。
  * @param rotation (可选) 旋转角度。
  */
-void MPainter::paintImage(std::string_view resPath, glm::vec2 pos,
-                          const RadiusInfo& radiusInfo, glm::vec4 tint,
-                          float rotation, bool applyMask) {
+void GLDirectPainter::paintImage(std::string_view resPath, glm::vec2 pos,
+                                 const RadiusInfo& radiusInfo, glm::vec4 tint,
+                                 float rotation, bool applyMask) {
     auto texoption = renderer->texture_pool()->get(std::string(resPath));
     if (texoption.has_value()) {
         const auto& texture = texoption.value();
@@ -164,8 +164,9 @@ void MPainter::paintImage(std::string_view resPath, glm::vec2 pos,
  * @param rectOpts 描述矩形的位置、尺寸、旋转和颜色。
  * @param radiusInfo (可选) 描述矩形的圆角效果。
  */
-void MPainter::fillImage(std::string_view resPath, const RectOptions& rectOpts,
-                         const RadiusInfo& radiusInfo) {
+void GLDirectPainter::fillImage(std::string_view resPath,
+                                const RectOptions& rectOpts,
+                                const RadiusInfo& radiusInfo) {
     TextureMapOptions mapOpts{TexScaleMode::FORCE_FILL, TexAlignMode::CENTER};
     drawImage(resPath, rectOpts, mapOpts, radiusInfo);
 }
@@ -178,12 +179,13 @@ void MPainter::fillImage(std::string_view resPath, const RectOptions& rectOpts,
  * @param alignMode (可选) 定义第一个图块的对齐方式。
  * @param radiusInfo (可选) 描述矩形的圆角效果。
  */
-void MPainter::tileImage(std::string_view resPath, const RectOptions& rectOpts,
-                         TileFitSide fitSide, TexAlignMode alignMode,
-                         const RadiusInfo& radiusInfo) {
+void GLDirectPainter::tileImage(std::string_view resPath,
+                                const RectOptions& rectOpts,
+                                TileFitSide fitSide, TexAlignMode alignMode,
+                                const RadiusInfo& radiusInfo) {
     TexScaleMode scalemode;
     switch (fitSide) {
-        using enum MPainter::TileFitSide;
+        using enum GLDirectPainter::TileFitSide;
         using enum TexScaleMode;
         case NONE: {
             scalemode = TILE_REPEAT;

@@ -16,7 +16,6 @@ class SelectTool : public BaseTool {
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
-    // 由GLCanvas的paintGL()调用，绘制交互过程中的临时图形
-    void drawFeedback(MPainter* painter) override;
+    // void drawFeedback(MPainter* painter) override;
 };
 #endif  // MMM_SELECTTOOL_HPP

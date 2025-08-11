@@ -7,7 +7,7 @@
 #include <canvas/render/Renderer2D.hpp>
 #include <chrono>
 #include <layer/LayerManager.hpp>
-#include <render/MPainter.hpp>
+#include <render/GLDirectPainter.hpp>
 #include <render/MPrimitiveCollector.hpp>
 #include <render/synchronize/RenderDataLoop.hpp>
 #include <render/texture/TexMode.hpp>
@@ -135,8 +135,8 @@ void GLCanvas::initializeGL() {
     // render->newMask({0, 0, 1000, 1000}, {1.f, .5f, .2f, .75f},
     //                 MaskEffect::FILTER);
     // 透明蒙版
-    render->newMask({0, 0, 2000, 2000}, {.3f, .5f, .2f, .75f},
-                    MaskEffect::ALPHA_SHIFT);
+    // render->newMask({0, 0, 2000, 2000}, {.3f, .5f, .2f, .75f},
+    //                 MaskEffect::ALPHA_SHIFT);
 
     // 初始化渲染数据循环
     render_dataloop = std::make_unique<RenderDataLoop>();
@@ -158,7 +158,7 @@ void GLCanvas::paintGL() {
         MPrimitiveCollector pc(render.get(), render_dataloop->layermanager());
 
         // 绘制
-        MPainter painter(render.get());
+        GLDirectPainter painter(render.get());
 
         // painter.paintImage(
         //     "../resources/textures/default/物件/arrowright_selected.png",

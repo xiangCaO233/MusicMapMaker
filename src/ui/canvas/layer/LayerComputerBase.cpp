@@ -4,7 +4,7 @@
 // 构造LayerComputerBase
 LayerComputerBase::LayerComputerBase(ILayer* layerptr, FrameSynchronizer* sync,
                                      QObject* parent)
-    : QObject(parent), layer(layerptr), synchronizer(sync) {}
+    : QObject(parent), layer_ptr(layerptr), synchronizer(sync) {}
 
 void LayerComputerBase::run() {
     while (isrunning.load()) {
@@ -14,7 +14,7 @@ void LayerComputerBase::run() {
         // 检查是否在等待期间被要求停止
         if (!isrunning.load()) break;
 
-        auto& buffer = layer->backbuffer();
+        auto& buffer = layer_ptr->backbuffer();
         buffer.clear();
         generateLayer(buffer);
 

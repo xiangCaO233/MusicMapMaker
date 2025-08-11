@@ -1,10 +1,8 @@
 #ifndef MMM_RENDERDATALOOP_HPP
 #define MMM_RENDERDATALOOP_HPP
 
-#include <qobject.h>
-#include <qtmetamacros.h>
-
 #include <QElapsedTimer>
+#include <QObject>
 #include <memory>
 
 class LayerManager;

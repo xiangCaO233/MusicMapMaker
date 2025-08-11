@@ -15,22 +15,29 @@ class LayerComputerBase : public QObject {
     // 析构LayerComputerBase
     ~LayerComputerBase() override = default;
 
+    // 获取对应图层
+    template <typename Layer>
+    Layer* layer() {
+        return static_cast<Layer*>(layer_ptr);
+    }
+
    public slots:
     void run();
 
     void stop();
 
    protected:
-    virtual void generateLayer(ILayer::RenderDataBuffer& buffer) {
-        // 子类需实现 (=0)
-    }
+    // 生成图层
+    virtual void generateLayer(ILayer::RenderDataBuffer& buffer) = 0;
 
    private:
     // 图层指针
-    ILayer* layer;
+    ILayer* layer_ptr;
+
     // 帧同步器
     FrameSynchronizer* synchronizer;
 
+    // 是否运行
     std::atomic<bool> isrunning{true};
 };
 
