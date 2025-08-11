@@ -7,8 +7,10 @@
 #include <memory>
 #include <mmm/project/TextureLoadCallback.hpp>
 #include <render/Renderer2D.hpp>
+#include <render/synchronize/RenderDataLoop.hpp>
 
 class TexturePool;
+class LayerManager;
 class GLCanvas : public QOpenGLWindow,
                  public QOpenGLFunctions_4_1_Core,
                  public TextureLoadCallback {
@@ -35,6 +37,7 @@ class GLCanvas : public QOpenGLWindow,
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    void closeEvent(QCloseEvent *e) override;
     // 更新fps显示
     virtual void updateFpsDisplay(int fps);
 
@@ -45,11 +48,18 @@ class GLCanvas : public QOpenGLWindow,
     // fps计数器
     FrameRateCounter *fpsCounter;
 
-    // 主渲染器
+    // 持有主渲染器
     std::unique_ptr<Renderer2D> render;
+
+    // 持有数据循环
+    std::unique_ptr<RenderDataLoop> render_dataloop;
 
     std::chrono::high_resolution_clock::duration pre_frame_time;
 
+    // 目标帧率
+    qreal desiredFps;
+
+    // 实际update处理时间
     long long actual_update_time;
 };
 

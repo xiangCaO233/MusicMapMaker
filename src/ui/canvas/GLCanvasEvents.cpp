@@ -15,3 +15,4 @@ void GLCanvas::paintEvent(QPaintEvent *event) {
 void GLCanvas::resizeEvent(QResizeEvent *event) {
     QOpenGLWindow::resizeEvent(event);
 }
+void GLCanvas::closeEvent(QCloseEvent *e) { render_dataloop->stop(); }

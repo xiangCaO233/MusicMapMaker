@@ -115,10 +115,23 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/MPainter.cpp
     src/ui/canvas/render/Renderer2D.hpp
     src/ui/canvas/render/Renderer2D.cpp
+    src/ui/canvas/render/MPrimitiveCollector.hpp
+    src/ui/canvas/render/MPrimitiveCollector.cpp
+    src/ui/canvas/render/synchronize/FrameSynchronizer.hpp
+    src/ui/canvas/render/synchronize/FrameSynchronizer.cpp
+    src/ui/canvas/render/synchronize/RenderDataLoop.hpp
+    src/ui/canvas/render/synchronize/RenderDataLoop.cpp
     src/ui/canvas/FrameRateCounter.hpp
     src/ui/canvas/FrameRateCounter.cpp
     src/ui/canvas/GLCanvas.cpp
     src/ui/canvas/GLCanvas.hpp
+    src/ui/canvas/layer/ILayer.hpp
+    src/ui/canvas/layer/LayerComputerBase.hpp
+    src/ui/canvas/layer/LayerComputerBase.cpp
+    src/ui/canvas/layer/LayerManager.hpp
+    src/ui/canvas/layer/interact/InteractLayerGenerator.hpp
+    src/ui/canvas/layer/interact/InteractLayerGenerator.cpp
+    src/ui/canvas/layer/interact/RealTimeInteractLayer.hpp
     src/ui/canvas/map/MapCanvas.hpp
     src/ui/canvas/map/MapCanvas.cpp
     src/ui/canvas/map/MapCanvasEvent.cpp

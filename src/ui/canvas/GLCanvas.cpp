@@ -6,12 +6,14 @@
 #include <canvas/GLCanvas.hpp>
 #include <canvas/render/Renderer2D.hpp>
 #include <chrono>
+#include <layer/LayerManager.hpp>
+#include <render/MPainter.hpp>
+#include <render/MPrimitiveCollector.hpp>
+#include <render/synchronize/RenderDataLoop.hpp>
+#include <render/texture/TexMode.hpp>
 #include <render/texture/TexturePool.hpp>
 #include <type_traits>
 #include <utility>
-
-#include "render/MPainter.hpp"
-#include "render/texture/TexMode.hpp"
 
 // C++17 的 if constexpr 的模板帮助函数
 template <typename Func>
@@ -51,16 +53,19 @@ GLCanvas::GLCanvas() {
     connect(fpsCounter, &FrameRateCounter::fpsUpdated, this,
             &GLCanvas::updateFpsDisplay);
 
-    auto refreshRate = QGuiApplication::primaryScreen()->refreshRate();
-    qDebug() << "显示器刷新率 : " << refreshRate;
+    desiredFps = QGuiApplication::primaryScreen()->refreshRate();
+    qDebug() << "显示器刷新率 : " << desiredFps;
 
     // 帧间隔
-    auto des_update_time = 1000.0 / refreshRate;
+    auto des_update_time = 1000.0 / desiredFps;
     qDebug() << "目标帧间隔 : " << std::to_string(des_update_time);
 }
 
 // 析构GLCanvas
-GLCanvas::~GLCanvas() { delete fpsCounter; }
+GLCanvas::~GLCanvas() {
+    render.reset();
+    delete fpsCounter;
+}
 
 void GLCanvas::updateFpsDisplay(int fps) {
     QString title_suffix =
@@ -110,12 +115,18 @@ void GLCanvas::initializeGL() {
     GLCALL(glEnable(GL_BLEND));
     GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+    // 初始化渲染器
     render = std::make_unique<Renderer2D>(this);
+
+    // 加载纹理
     render->add_texture_from_path("../resources/textures/default");
 
+    // 加载字体
     render->add_font_from_path(
         "../resources/font/ComicShannsMonoNerdFont_Bold.otf");
     render->add_font_from_path("../resources/font/NotoSansCJK-Bold.ttc");
+
+    // 加载蒙版
 
     // 暗化蒙版
     // render->newMask({0, 0, 1000, 1000}, {.2f, .2f, .2f, 0.2f},
@@ -124,8 +135,15 @@ void GLCanvas::initializeGL() {
     // render->newMask({0, 0, 1000, 1000}, {1.f, .5f, .2f, .75f},
     //                 MaskEffect::FILTER);
     // 透明蒙版
-    render->newMask({144, 200, 388, 600}, {.3f, .5f, .2f, .75f},
+    render->newMask({0, 0, 2000, 2000}, {.3f, .5f, .2f, .75f},
                     MaskEffect::ALPHA_SHIFT);
+
+    // 初始化渲染数据循环
+    render_dataloop = std::make_unique<RenderDataLoop>();
+    render_dataloop->set_targetFPS(desiredFps);
+    connect(render_dataloop.get(), &RenderDataLoop::renderUpdate, this,
+            qOverload<>(&QOpenGLWindow::update));
+    render_dataloop->start();
 }
 
 void GLCanvas::resizeGL(int w, int h) {
@@ -137,6 +155,8 @@ void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
 
     {
+        MPrimitiveCollector pc(render.get(), render_dataloop->layermanager());
+
         // 绘制
         MPainter painter(render.get());
 
