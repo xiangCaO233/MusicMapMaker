@@ -4,6 +4,7 @@
 #include <qobject.h>
 
 #include <layer/ILayer.hpp>
+#include <render/RenderCommand.hpp>
 
 class FrameSynchronizer;
 class LayerComputerBase : public QObject {

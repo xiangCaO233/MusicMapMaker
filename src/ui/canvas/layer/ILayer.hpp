@@ -3,6 +3,8 @@
 
 #include <array>
 #include <render/RenderCommand.hpp>
+#include <render/Renderer2D.hpp>
+#include <string_view>
 #include <vector>
 
 enum class LayerType : uint32_t {
@@ -19,13 +21,14 @@ enum class LayerType : uint32_t {
 };
 
 class SharedCanvasInfo;
+class Renderer2D;
 
 // 图层
 class ILayer {
    public:
     using RenderDataBuffer = std::vector<RenderCommand>;
     // 构造ILayer
-    ILayer() = default;
+    explicit ILayer(Renderer2D* renderer) : rendererRef(renderer) {}
 
     // 析构ILayer
     virtual ~ILayer() = default;
@@ -59,9 +62,21 @@ class ILayer {
     virtual void updateInfo(SharedCanvasInfo* info) = 0;
     void setType(LayerType t) { layer_type = t; }
 
+    // 获取纹理信息
+    TextureInfo textureInfo(std::string_view texpath) const {
+        if (auto texinfoOption = rendererRef->texture_pool()->get(texpath);
+            texinfoOption.has_value()) {
+            return texinfoOption.value();
+        }
+        return {};
+    }
+
    private:
     // 图层类型
     LayerType layer_type;
+
+    // 渲染器引用
+    Renderer2D* rendererRef;
 
     // 双缓冲
     // 两个物理缓冲区

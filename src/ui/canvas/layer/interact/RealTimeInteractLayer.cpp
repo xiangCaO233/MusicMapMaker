@@ -2,7 +2,10 @@
 #include <layer/interact/RealTimeInteractLayer.hpp>
 
 // 构造实时交互图层
-RealTimeInteractLayer::RealTimeInteractLayer() { setType(LayerType::INTERACT); }
+RealTimeInteractLayer::RealTimeInteractLayer(Renderer2D* renderer)
+    : ILayer(renderer) {
+    setType(LayerType::INTERACT);
+}
 
 // 析构实时交互图层
 RealTimeInteractLayer::~RealTimeInteractLayer() = default;

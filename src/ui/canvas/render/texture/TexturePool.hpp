@@ -47,7 +47,7 @@ class TexturePool {
     void processUploadQueue();
 
     // 获取纹理信息以供渲染器使用
-    std::optional<TextureInfo> get(const std::string& path) const;
+    std::optional<TextureInfo> get(std::string_view path) const;
 
    private:
     QOpenGLFunctions_4_1_Core* glf;

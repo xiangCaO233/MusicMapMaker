@@ -6,8 +6,7 @@
 
 #include <canvas/GLCanvas.hpp>
 #include <memory>
-
-#include "tool/BaseTool.hpp"
+#include <tool/BaseTool.hpp>
 
 class MMap;
 
@@ -20,7 +19,7 @@ class MapCanvas : public GLCanvas {
     ~MapCanvas() override;
 
     // 切换到图
-    void switch_map(const std::shared_ptr<MMap> &smap);
+    void switch_map(MMap *smap);
 
    protected:
     void keyPressEvent(QKeyEvent *e) override;
@@ -31,7 +30,7 @@ class MapCanvas : public GLCanvas {
 
    private:
     // 绑定的谱面
-    std::weak_ptr<MMap> map;
+    MMap *map{nullptr};
 
     // 工具集合
     QHash<QString, BaseTool *> tools;

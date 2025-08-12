@@ -17,7 +17,7 @@ void GLCanvas::paintEvent(QPaintEvent *event) {
 void GLCanvas::resizeEvent(QResizeEvent *e) {
     QOpenGLWindow::resizeEvent(e);
     canvas_info->baseInfo.canvasSize = e->size();
-    render_dataloop->layermanager()->updateInfoForLayers(canvas_info.get());
+    update_sharedInfo();
 }
 
 void GLCanvas::keyPressEvent(QKeyEvent *e) {}
@@ -26,17 +26,17 @@ void GLCanvas::keyReleaseEvent(QKeyEvent *e) {}
 
 void GLCanvas::mouseMoveEvent(QMouseEvent *e) {
     canvas_info->realTimeInfo.mousePos = e->pos();
-    render_dataloop->layermanager()->updateInfoForLayers(canvas_info.get());
+    update_sharedInfo();
 }
 
 void GLCanvas::mousePressEvent(QMouseEvent *e) {
     canvas_info->realTimeInfo.buttons.insert(e->button());
-    render_dataloop->layermanager()->updateInfoForLayers(canvas_info.get());
+    update_sharedInfo();
 }
 
 void GLCanvas::mouseReleaseEvent(QMouseEvent *e) {
     canvas_info->realTimeInfo.buttons.erase(e->button());
-    render_dataloop->layermanager()->updateInfoForLayers(canvas_info.get());
+    update_sharedInfo();
 }
 
 void GLCanvas::closeEvent(QCloseEvent *e) { render_dataloop->stop(); }

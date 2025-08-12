@@ -9,7 +9,7 @@
 class FrameRateCounter : public QObject {
     Q_OBJECT
    public:
-    FrameRateCounter(QWidget *parent = nullptr);
+    explicit FrameRateCounter(QWidget *parent = nullptr);
     void frameRendered();
 
    signals:

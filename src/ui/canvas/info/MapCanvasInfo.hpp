@@ -2,16 +2,27 @@
 #define MMM_MAPCANVASINFO_HPP
 
 #include <info/SharedCanvasInfo.hpp>
+#include <mmm/map/MMap.hpp>
 #include <mmm/project/MProjectConfig.hpp>
 #include <tool/BaseTool.hpp>
 
+struct MapInfo {
+    // 背景路径
+    std::string cover_path{""};
+};
+
 struct EditorInfo {
+    // 当前的编辑模式
     EditMode currentMode;
-    // 工具选择/默认时间线
+    // 工具选择
     EditToolType currentEditTool;
+    // 当前的map指针
+    MMap *map;
 };
 
 struct MapCanvasInfo : public SharedCanvasInfo {
+    // map信息
+    MapInfo mapInfo;
     // 编辑信息
     EditorInfo editorInfo;
 };

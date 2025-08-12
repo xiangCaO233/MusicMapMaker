@@ -6,7 +6,7 @@
 class NoteLayer : public ILayer {
    public:
     // 构造NoteLayer
-    NoteLayer();
+    explicit NoteLayer(Renderer2D* renderer);
     // 析构NoteLayer
     ~NoteLayer() override;
 

@@ -20,29 +20,35 @@
 #include <render/synchronize/FrameSynchronizer.hpp>
 #include <unordered_map>
 
+class Renderer2D;
 class LayerManager {
    public:
     // 构造LayerManager
-    LayerManager() {
+    explicit LayerManager(Renderer2D* renderer) {
         // 初始化渲染数据缓冲区
         using enum LayerType;
+
         auto background_layer =
             data_buffer
-                .try_emplace(BACKGROUND, std::make_unique<BackgroundLayer>())
+                .try_emplace(BACKGROUND,
+                             std::make_unique<BackgroundLayer>(renderer))
                 .first->second.get();
         auto timeline_layer =
-            data_buffer.try_emplace(TIMELINE, std::make_unique<TimelineLayer>())
+            data_buffer
+                .try_emplace(TIMELINE,
+                             std::make_unique<TimelineLayer>(renderer))
                 .first->second.get();
         auto note_layer =
-            data_buffer.try_emplace(NOTE, std::make_unique<NoteLayer>())
+            data_buffer.try_emplace(NOTE, std::make_unique<NoteLayer>(renderer))
                 .first->second.get();
         auto effect_layer =
-            data_buffer.try_emplace(EFFECT, std::make_unique<EffectLayer>())
+            data_buffer
+                .try_emplace(EFFECT, std::make_unique<EffectLayer>(renderer))
                 .first->second.get();
         auto interact_layer =
             data_buffer
                 .try_emplace(INTERACT,
-                             std::make_unique<RealTimeInteractLayer>())
+                             std::make_unique<RealTimeInteractLayer>(renderer))
                 .first->second.get();
 
         // 初始化图层生成器
@@ -148,7 +154,7 @@ class LayerManager {
     std::unordered_map<LayerType, std::unique_ptr<QThread>> threads;
 
     // 持有帧同步器
-    FrameSynchronizer synchronizer{2};
+    FrameSynchronizer synchronizer{5};
 
     // 启动生成器
     void startGenerator(LayerType type, LayerComputerBase* layerGenerator) {

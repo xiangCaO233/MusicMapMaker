@@ -6,7 +6,7 @@
 class EffectLayer : public ILayer {
    public:
     // 构造EffectLayer
-    EffectLayer();
+    explicit EffectLayer(Renderer2D* renderer);
     // 析构EffectLayer
     ~EffectLayer() override;
 

@@ -429,7 +429,7 @@ void TexturePool::uploadToGpu(const LoadedImageData& data) {
 }
 
 // 获取纹理信息以供渲染器使用
-std::optional<TextureInfo> TexturePool::get(const std::string& path) const {
+std::optional<TextureInfo> TexturePool::get(std::string_view path) const {
     std::lock_guard<std::mutex> lock(info_mutex);
     if (auto it = texture_infos.find(path); it != texture_infos.end()) {
         return it->second;

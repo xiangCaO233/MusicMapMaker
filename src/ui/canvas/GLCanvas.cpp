@@ -90,6 +90,11 @@ void GLCanvas::need_loadtexture_dir(std::string_view texdir) {
     render->request_texture_from_path(std::string(texdir));
 }
 
+// 更新共享信息
+void GLCanvas::update_sharedInfo() {
+    render_dataloop->layermanager()->updateInfoForLayers(canvas_info.get());
+}
+
 void GLCanvas::initializeGL() {
     initializeOpenGLFunctions();
     // 查询opengl版本
@@ -139,10 +144,12 @@ void GLCanvas::initializeGL() {
     //                 MaskEffect::ALPHA_SHIFT);
 
     // 初始化渲染数据循环
-    render_dataloop = std::make_unique<RenderDataLoop>();
-    render_dataloop->set_targetFPS(desiredFps);
+    render_dataloop = std::make_unique<RenderDataLoop>(render.get());
+    render_dataloop->set_targetFPS(desiredFps * 3);
     connect(render_dataloop.get(), &RenderDataLoop::renderUpdate, this,
             qOverload<>(&QOpenGLWindow::update));
+    connect(fpsCounter, &FrameRateCounter::fpsUpdated, render_dataloop.get(),
+            &RenderDataLoop::updateFPS);
     render_dataloop->start();
 }
 

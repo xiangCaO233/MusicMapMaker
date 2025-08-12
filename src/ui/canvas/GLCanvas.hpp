@@ -50,13 +50,22 @@ class GLCanvas : public QOpenGLWindow,
     virtual void updateFpsDisplay(int fps);
 
     // 初始化共享信息
-    template <typename InfoType>
+    template <typename CanvasInfoType>
     void initSharedInfo() {
-        canvas_info = std::make_unique<InfoType>();
+        canvas_info = std::make_unique<CanvasInfoType>();
+    }
+
+    // 共享信息
+    template <typename CanvasInfoType>
+    CanvasInfoType *info() {
+        return static_cast<CanvasInfoType *>(canvas_info.get());
     }
 
     // 内部可获取渲染器
     std::unique_ptr<Renderer2D> &renderer() { return render; }
+
+    // 更新共享信息
+    void update_sharedInfo();
 
    private:
     // fps计数器

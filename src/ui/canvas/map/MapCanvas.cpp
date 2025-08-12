@@ -1,9 +1,9 @@
 #include <qalgorithms.h>
 
+#include <GLCanvas.hpp>
 #include <canvas/map/MapCanvas.hpp>
-
-#include "GLCanvas.hpp"
-#include "info/MapCanvasInfo.hpp"
+#include <info/MapCanvasInfo.hpp>
+#include <mmm/map/MMap.hpp>
 
 // 构造MapCanvas
 MapCanvas::MapCanvas() : GLCanvas() {
@@ -15,7 +15,13 @@ MapCanvas::MapCanvas() : GLCanvas() {
 MapCanvas::~MapCanvas() { qDeleteAll(tools); }
 
 // 切换到图
-void MapCanvas::switch_map(const std::shared_ptr<MMap>& smap) { map = smap; }
+void MapCanvas::switch_map(MMap* smap) {
+    map = smap;
+    auto mapcanvasInfo = info<MapCanvasInfo>();
+    mapcanvasInfo->mapInfo.cover_path =
+        smap->base_metadata().main_cover_path.generic_string();
+    update_sharedInfo();
+}
 
 // 创建工具
 void MapCanvas::creatTools() {}

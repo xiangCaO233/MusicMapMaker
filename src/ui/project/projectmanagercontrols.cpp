@@ -2,8 +2,10 @@
 #include <qlogging.h>
 #include <ui_projectmanager.h>
 
+#include <map/MapCanvas.hpp>
+#include <util/mutil.hpp>
+
 #include "projectmanager.h"
-#include "util/mutil.hpp"
 
 void ProjectManager::on_create_project_button_clicked() {
     // 使用文件夹选择器选择新项目创建的目标目录
@@ -58,4 +60,8 @@ void ProjectManager::on_preference_button_clicked() {
 
 void ProjectManager::on_map_listView_doubleClicked(const QModelIndex &index) {
     // 打开谱面
+    map_canvas->switch_map(
+        qobject_cast<QStandardItemModel *>(ui->map_listView->model())
+            ->data(index, Qt::UserRole + 1)
+            .value<MMap *>());
 }
