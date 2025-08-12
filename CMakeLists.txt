@@ -129,10 +129,26 @@ set(CANVAS_SOURCES
     src/ui/canvas/layer/LayerComputerBase.hpp
     src/ui/canvas/layer/LayerComputerBase.cpp
     src/ui/canvas/layer/LayerManager.hpp
+    src/ui/canvas/layer/background/BackgroundLayer.hpp
+    src/ui/canvas/layer/background/BackgroundLayer.cpp
+    src/ui/canvas/layer/background/BackgroundLayerGenerator.hpp
+    src/ui/canvas/layer/background/BackgroundLayerGenerator.cpp
+    src/ui/canvas/layer/effect/EffectLayer.hpp
+    src/ui/canvas/layer/effect/EffectLayer.cpp
+    src/ui/canvas/layer/effect/EffectLayerGenerator.hpp
+    src/ui/canvas/layer/effect/EffectLayerGenerator.cpp
     src/ui/canvas/layer/interact/InteractLayerGenerator.hpp
     src/ui/canvas/layer/interact/InteractLayerGenerator.cpp
     src/ui/canvas/layer/interact/RealTimeInteractLayer.hpp
     src/ui/canvas/layer/interact/RealTimeInteractLayer.cpp
+    src/ui/canvas/layer/note/NoteLayer.hpp
+    src/ui/canvas/layer/note/NoteLayer.cpp
+    src/ui/canvas/layer/note/NoteLayerGenerator.hpp
+    src/ui/canvas/layer/note/NoteLayerGenerator.cpp
+    src/ui/canvas/layer/timeline/TimelineLayer.hpp
+    src/ui/canvas/layer/timeline/TimelineLayer.cpp
+    src/ui/canvas/layer/timeline/TimelineLayerGenerator.hpp
+    src/ui/canvas/layer/timeline/TimelineLayerGenerator.cpp
     src/ui/canvas/map/MapCanvas.hpp
     src/ui/canvas/map/MapCanvas.cpp
     src/ui/canvas/map/MapCanvasEvent.cpp

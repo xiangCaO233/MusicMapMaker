@@ -54,10 +54,9 @@ class ILayer {
         return buffers[frontIndex];
     }
 
+   protected:
     // 更新信息
     virtual void updateInfo(SharedCanvasInfo* info) = 0;
-
-   protected:
     void setType(LayerType t) { layer_type = t; }
 
    private:
@@ -70,6 +69,8 @@ class ILayer {
 
     // 使用原子整数作为索引
     std::atomic<int> frontBufferIndex;
+
+    friend class LayerManager;
 };
 
 #endif  // MMM_ILAYER_HPP

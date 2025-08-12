@@ -9,6 +9,7 @@
 InteractLayerGenerator::~InteractLayerGenerator() {
     qDebug() << "交互图层生成线程释放";
 }
+
 // --- 1. 效果参数 ---
 const int NUM_RINGS = 6;                                 // 组成光晕的同心圆数量
 const float BASE_RADIUS = 3.0f;                          // 核心光点的半径
