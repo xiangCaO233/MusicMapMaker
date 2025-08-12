@@ -1,6 +1,6 @@
 #include "mapeditor.h"
 
-#include "ui_mapeditor.h"
+#include <ui_mapeditor.h>
 
 MapEditor::MapEditor(QWidget* parent) : QWidget(parent), ui(new Ui::MapEditor) {
     ui->setupUi(this);

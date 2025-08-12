@@ -67,6 +67,10 @@ GLCanvas::~GLCanvas() {
     delete fpsCounter;
 }
 
+void GLCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
+    audioLoadcbk = cbk;
+}
+
 void GLCanvas::updateFpsDisplay(int fps) {
     QString title_suffix =
         QString(
@@ -81,7 +85,7 @@ void GLCanvas::updateFpsDisplay(int fps) {
 }
 
 // 更新共享信息
-void GLCanvas::update_sharedInfo() {
+void GLCanvas::update_sharedInfo() const {
     render_dataloop->layermanager()->updateInfoForLayers(canvas_info.get());
 }
 

@@ -15,6 +15,8 @@ class RealTimeInteractLayer : public ILayer {
     // 鼠标当前位置
     QPointF mouse{0, 0};
 
+    bool pressed{false};
+
     // 更新信息
     void updateInfo(SharedCanvasInfo* info) override;
 

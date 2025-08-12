@@ -11,6 +11,7 @@
 
 class TexturePool;
 class LayerManager;
+class AudioLoadCallback;
 class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
    public:
@@ -19,9 +20,9 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 析构GLCanvas
     ~GLCanvas() override;
 
-    // 外部可获取纹理加载回调
-    TextureLoadCallback *textureCallback() { return render.get(); }
-
+    // 绑定音频载入回调
+   public slots:
+    void onAudioLoadcbkInitialized(AudioLoadCallback *cbk);
    signals:
     void update_window_suffix(const QString &suffix);
 
@@ -57,10 +58,15 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     }
 
     // 更新共享信息
-    void update_sharedInfo();
+    void update_sharedInfo() const;
 
     // 内部可获取渲染器
     std::unique_ptr<Renderer2D> &renderer() { return render; }
+
+    // 外部可获取纹理加载回调
+    TextureLoadCallback *textureCallback() const { return render.get(); }
+
+    AudioLoadCallback *audioLoadCallback() const { return audioLoadcbk; }
 
    private:
     // fps计数器
@@ -75,6 +81,9 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 持有共享画布信息(子类自己初始化)
     std::unique_ptr<SharedCanvasInfo> canvas_info{nullptr};
 
+    // 音频加载回调指针
+    AudioLoadCallback *audioLoadcbk;
+
     // 上一帧的时间
     std::chrono::high_resolution_clock::duration pre_frame_time;
 
@@ -83,6 +92,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
 
     // 实际update处理时间
     long long actual_update_time;
+    friend class ProjectManager;
 };
 
 #endif  // MMM_GLCANVAS_HPP

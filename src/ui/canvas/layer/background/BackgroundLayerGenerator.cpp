@@ -16,9 +16,9 @@ void BackgroundLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
 
         cmd.baseInfo = {{0.f, 0.f}, bglayer->canvas_size, 0.f};
         cmd.texturesInfo.texture = bglayer->texinfo;
-        // cmd.texturesInfo.tscale = TexScaleMode::FORCE_FILL;
-        // cmd.radiusInfo.radius = {.2f, .2f};
-        // cmd.radiusInfo.radius_effect_param = {0.f};
+        cmd.texturesInfo.tscale = TexScaleMode::FORCE_FILL;
+        cmd.radiusInfo.radius = {.2f, .2f};
+        cmd.radiusInfo.radius_effect_param = {0.f};
 
         buffer.push_back(cmd);
     }

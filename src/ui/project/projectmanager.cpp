@@ -1,6 +1,6 @@
-#include "projectmanager.h"
-
 #include <audio/track/trackmanager.h>
+#include <project/projectconfig.h>
+#include <project/projectmanager.h>
 #include <qlogging.h>
 #include <ui_projectmanager.h>
 
@@ -9,8 +9,6 @@
 #include <canvas/map/MapCanvas.hpp>
 #include <filesystem>
 #include <mmm/project/MProject.hpp>
-
-#include "projectconfig.h"
 
 ProjectManager::ProjectManager(QWidget* parent)
     : QWidget(parent), ui(new Ui::ProjectManager) {

@@ -7,6 +7,7 @@
 #include <qobject.h>
 #include <qpixmap.h>
 #include <qtmetamacros.h>
+#include <ui_trackmanager.h>
 
 #include <HideableToolWindow.hpp>
 #include <QCloseEvent>
@@ -15,8 +16,6 @@
 #include <ice/manage/AudioTrack.hpp>
 #include <ice/out/play/sdl/SDLPlayer.hpp>
 #include <memory>
-
-#include "ui_trackmanager.h"
 
 QStringList TrackManager::metaNames() {
     return {tr("title"),      tr("artist"),   tr("album"),  tr("bitrate"),
@@ -83,6 +82,8 @@ TrackManager::TrackManager(QWidget* parent)
     }
 
     ui->album_info_widget->hide();
+
+    emit audioLoadcbk_initialized(this);
 }
 
 TrackManager::~TrackManager() {

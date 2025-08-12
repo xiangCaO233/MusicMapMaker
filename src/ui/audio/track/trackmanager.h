@@ -6,6 +6,7 @@
 #include <qstandarditemmodel.h>
 #include <qtmetamacros.h>
 
+#include <GLCanvas.hpp>
 #include <QWidget>
 #include <ice/core/IAudioNode.hpp>
 #include <ice/core/MixBus.hpp>
@@ -38,6 +39,8 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
 
     std::weak_ptr<ice::AudioTrack> loadBack(
         std::string_view audio_path) override;
+   signals:
+    void audioLoadcbk_initialized(AudioLoadCallback *cbk);
 
    private slots:
     void on_add_track_button_clicked();

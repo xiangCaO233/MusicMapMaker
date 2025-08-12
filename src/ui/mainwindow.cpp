@@ -1,6 +1,5 @@
-#include "mainwindow.h"
-
 #include <audio/track/trackmanager.h>
+#include <mainwindow.h>
 #include <project/projectmanager.h>
 #include <ui_mainwindow.h>
 
@@ -39,6 +38,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(ui->project_manager, &ProjectManager::close,
             [capui]() { capui->actionProject_Manager->setChecked(false); });
+
+    connect(ui->track_manager, &TrackManager::audioLoadcbk_initialized, canvas,
+            &GLCanvas::onAudioLoadcbkInitialized);
 
     // MMap map(
     //     "/Users/2333xiang/Downloads/Juggernaut. - Antler/Juggernaut. - Antler

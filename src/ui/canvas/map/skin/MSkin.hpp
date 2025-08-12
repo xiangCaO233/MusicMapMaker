@@ -54,8 +54,8 @@ enum class SelectBorderDirection {
 class MSkin {
    public:
     // 构造MSkin
-    MSkin(std::string_view skin_path, TextureLoadCallback* textureLoadcbk,
-          AudioLoadCallback* audioLoadcbk);
+    MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
+          TextureLoadCallback* textureLoadcbk);
 
     // 析构MSkin
     virtual ~MSkin();

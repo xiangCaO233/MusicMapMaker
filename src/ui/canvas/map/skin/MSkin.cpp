@@ -4,29 +4,49 @@
 #include <map/skin/MSkin.hpp>
 
 // 构造MSkin
-MSkin::MSkin(std::string_view skin_path, TextureLoadCallback* textureLoadcbk,
-             AudioLoadCallback* audioLoadcbk) {
+MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
+             TextureLoadCallback* textureLoadcbk) {
     // 载入皮肤配置
     skinPath = std::filesystem::path(skin_path);
-    std::ifstream ifs(skinPath / "skinconfig.json");
+    auto cfgPath = skinPath / "skinconfig.json";
+    std::ifstream ifs(cfgPath);
+    qDebug() << "配置路径:" << cfgPath;
     ifs >> skinRootCfg;
 
     // 读取配置
     name = skinRootCfg.value<std::string>("name", "unknown");
     author = skinRootCfg.value<std::string>("author", "unknown author");
+
     auto texture_config = skinRootCfg["textures"];
+    // qDebug() << "纹理配置";
+    // for (auto& [key, val] : texture_config.items()) {
+    //     qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    // }
 
     auto bg_texture_config = texture_config["bg"];
 
     auto object_texture_config = texture_config["hitobject"];
+    // qDebug() << "纹理bg配置";
 
     auto note_texture_config = object_texture_config["note"];
+    for (auto& [key, val] : note_texture_config.items()) {
+        qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    }
 
     auto head_texture_config = object_texture_config["head"];
+    for (auto& [key, val] : head_texture_config.items()) {
+        qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    }
 
     auto node_texture_config = object_texture_config["node"];
+    for (auto& [key, val] : node_texture_config.items()) {
+        qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    }
 
     auto hold_texture_config = object_texture_config["hold"];
+    // for (auto& [key, val] : hold_texture_config.items()) {
+    //     qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    // }
 
     auto vertical_holdbody_texture_config =
         hold_texture_config["body"]["vertical"];
@@ -56,8 +76,9 @@ MSkin::MSkin(std::string_view skin_path, TextureLoadCallback* textureLoadcbk,
             .toStdString();
 
     // 载入皮肤音轨
-    audioLoadcbk->loadBack(sound_effects[SoundEffectType::COMMON_HIT]);
-    audioLoadcbk->loadBack(sound_effects[SoundEffectType::SLIDE]);
+
+    // audioLoadcbk->loadBack(sound_effects[SoundEffectType::COMMON_HIT]);
+    // audioLoadcbk->loadBack(sound_effects[SoundEffectType::SLIDE]);
 
     qDebug() << "载入皮肤:[" << name << "]";
     qDebug() << "皮肤作者:[" << author << "]";

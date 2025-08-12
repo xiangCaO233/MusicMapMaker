@@ -13,4 +13,5 @@ RealTimeInteractLayer::~RealTimeInteractLayer() = default;
 // 更新信息
 void RealTimeInteractLayer::updateInfo(SharedCanvasInfo* info) {
     mouse = info->realTimeInfo.mousePos;
+    pressed = info->realTimeInfo.buttons.contains(Qt::LeftButton);
 }

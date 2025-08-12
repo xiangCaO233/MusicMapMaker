@@ -53,8 +53,6 @@ else()
   set(FFTLIB fftw3f)
 endif(APPLE)
 
-find_package()
-
 # 查找字体包
 find_package(Freetype REQUIRED)
 
@@ -154,6 +152,8 @@ set(CANVAS_SOURCES
     src/ui/canvas/map/MapCanvas.hpp
     src/ui/canvas/map/MapCanvas.cpp
     src/ui/canvas/map/MapCanvasEvent.cpp
+    src/ui/canvas/map/skin/MSkin.hpp
+    src/ui/canvas/map/skin/MSkin.cpp
     src/ui/canvas/GLCanvasEvents.cpp
     src/ui/canvas/CanvasContainer.h
     src/ui/canvas/CanvasContainer.cpp)

@@ -96,7 +96,8 @@ class AudioController : public HideableToolWindow {
 
     void on_speed_value_spinner_valueChanged(double arg1);
 
-    void on_apply_volume_to_graph_checkStateChanged(const Qt::CheckState &arg1);
+    void on_apply_volume_to_graph_checkStateChanged(
+        const Qt::CheckState &arg1) const;
 
     void on_semitones_slider_valueChanged(int value);
 

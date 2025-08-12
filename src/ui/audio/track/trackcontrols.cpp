@@ -17,10 +17,9 @@ decltype(TrackManager::audio_controllers.begin()) TrackManager::makeController(
     // 关闭控制器(实际为隐藏)
     connect(controller, &AudioController::close_signal,
             [](HideableToolWindow* wptr) {
-                auto controller = qobject_cast<AudioController*>(wptr);
-
-                if (controller->item()) {
-                    controller->item()->setCheckState(Qt::Unchecked);
+                if (auto controller_data = qobject_cast<AudioController*>(wptr);
+                    controller_data->item()) {
+                    controller_data->item()->setCheckState(Qt::Unchecked);
                 }
             });
     // 更新输出节点
@@ -79,7 +78,6 @@ void TrackManager::on_remove_track_button_clicked() {
         return;
     }
     // 先清除表格内容
-    auto model = qobject_cast<QStandardItemModel*>(ui->track_list->model());
     ui->metadata_table->item(0, 1)->setText("");
     ui->metadata_table->item(1, 1)->setText("");
     ui->metadata_table->item(2, 1)->setText("");
@@ -140,11 +138,10 @@ void TrackManager::on_open_controller_button_clicked() {
     // 选中的音频对应的路径
 
     auto audio_path = QString::fromStdString(track->path());
-    auto state = item->checkState();
 
     // 检查是否有控制器
-    auto controller_it = audio_controllers.find(audio_path);
-    if (controller_it != audio_controllers.end()) {
+    if (auto controller_it = audio_controllers.find(audio_path);
+        controller_it != audio_controllers.end()) {
         // 如果有控制器
         controller_it.value()->setVisible(true);
     } else {
@@ -193,7 +190,8 @@ void TrackManager::on_track_list_clicked(const QModelIndex& index) {
     }
 }
 
-void TrackManager::on_track_list_doubleClicked(const QModelIndex& index) {
+void TrackManager::on_track_list_doubleClicked(
+    [[maybe_unused]] const QModelIndex& index) {
     // 双击直接调用打开按钮函数
     on_open_controller_button_clicked();
 }

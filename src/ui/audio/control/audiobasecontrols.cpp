@@ -5,7 +5,6 @@
 
 void AudioController::on_pause_button_toggled(bool checked) {
     checked ? source_node->pause() : source_node->play();
-
     // 设置时间编辑框可编辑性(暂停时可编辑)
     ui->time_edit->setEnabled(checked);
 }
@@ -149,12 +148,13 @@ void AudioController::on_time_edit_editingFinished() {
     updateDisplayPosition();
 }
 
-void AudioController::on_unit_selection_currentIndexChanged(int index) {
+void AudioController::on_unit_selection_currentIndexChanged(
+    [[maybe_unused]] int index) {
     updateDisplayPosition();
 }
 
 void AudioController::on_apply_volume_to_graph_checkStateChanged(
-    const Qt::CheckState &arg1) {
+    const Qt::CheckState &arg1) const {
     if (arg1 == Qt::CheckState::Checked) {
         ui->main_graph->chain()->source->setvolume(source_node->getvolume());
     } else {
