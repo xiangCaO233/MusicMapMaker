@@ -14,6 +14,15 @@ MapCanvas::MapCanvas() : GLCanvas() {
 // 析构MapCanvas
 MapCanvas::~MapCanvas() { qDeleteAll(tools); }
 
+void MapCanvas::initializeGL() {
+    GLCanvas::initializeGL();
+    // 初始化默认皮肤
+    skin = editor_skins
+               .try_emplace("Default",
+                            std::make_unique<MSkin>("", textureCallback()))
+               .first->second.get();
+}
+
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {
     map = smap;

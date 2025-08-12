@@ -6,15 +6,12 @@
 #include <canvas/FrameRateCounter.hpp>
 #include <info/SharedCanvasInfo.hpp>
 #include <memory>
-#include <mmm/project/TextureLoadCallback.hpp>
 #include <render/Renderer2D.hpp>
 #include <render/synchronize/RenderDataLoop.hpp>
 
 class TexturePool;
 class LayerManager;
-class GLCanvas : public QOpenGLWindow,
-                 public QOpenGLFunctions_4_1_Core,
-                 public TextureLoadCallback {
+class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
    public:
     // 构造GLCanvas
@@ -22,10 +19,8 @@ class GLCanvas : public QOpenGLWindow,
     // 析构GLCanvas
     ~GLCanvas() override;
 
-    // 需要载入纹理
-    void need_loadtexture_dir(std::string_view texdir) override;
-    // 需要卸载纹理
-    void need_unloadtexture_dir(std::string_view texdir) override;
+    // 外部可获取纹理加载回调
+    TextureLoadCallback *textureCallback() { return render.get(); }
 
    signals:
     void update_window_suffix(const QString &suffix);
@@ -61,11 +56,11 @@ class GLCanvas : public QOpenGLWindow,
         return static_cast<CanvasInfoType *>(canvas_info.get());
     }
 
-    // 内部可获取渲染器
-    std::unique_ptr<Renderer2D> &renderer() { return render; }
-
     // 更新共享信息
     void update_sharedInfo();
+
+    // 内部可获取渲染器
+    std::unique_ptr<Renderer2D> &renderer() { return render; }
 
    private:
     // fps计数器

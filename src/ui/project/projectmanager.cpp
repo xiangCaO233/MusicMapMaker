@@ -90,8 +90,9 @@ void ProjectManager::open_project(std::string_view project_path) {
         // 创建项目加入集合
         auto project =
             projects
-                .try_emplace(project_name, std::make_unique<MProject>(
-                                               map_canvas, track_manager))
+                .try_emplace(project_name,
+                             std::make_unique<MProject>(
+                                 map_canvas->textureCallback(), track_manager))
                 .first->second.get();
 
         // 打开项目
@@ -126,7 +127,7 @@ void ProjectManager::close_project(std::string_view project_name) {
 void ProjectManager::show_project(std::string_view project_name) {
     auto it = projects.find(project_name);
     if (it != projects.end()) {
-        auto& project = it->second;
+        const auto& project = it->second;
 
         // 更新谱面表
         auto map_model =
@@ -179,7 +180,7 @@ void ProjectManager::show_project(std::string_view project_name) {
 }
 
 void ProjectManager::closeEvent(QCloseEvent* e) {
-    for (auto& [name, project] : projects) {
+    for (const auto& [name, project] : projects) {
         project->close();
     }
 }

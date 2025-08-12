@@ -7,6 +7,10 @@
 #include <canvas/GLCanvas.hpp>
 #include <memory>
 #include <tool/BaseTool.hpp>
+#include <unordered_map>
+
+#include "map/skin/MSkin.hpp"
+#include "util/StringHash.hpp"
 
 class MMap;
 
@@ -22,6 +26,7 @@ class MapCanvas : public GLCanvas {
     void switch_map(MMap *smap);
 
    protected:
+    void initializeGL() override;
     void keyPressEvent(QKeyEvent *e) override;
     void keyReleaseEvent(QKeyEvent *e) override;
     void mouseMoveEvent(QMouseEvent *e) override;
@@ -31,6 +36,14 @@ class MapCanvas : public GLCanvas {
    private:
     // 绑定的谱面
     MMap *map{nullptr};
+
+    // 持有全部的编辑器皮肤
+    std::unordered_map<std::string, std::unique_ptr<MSkin>, StringHash,
+                       std::equal_to<>>
+        editor_skins;
+
+    // 当前使用的皮肤
+    MSkin *skin;
 
     // 工具集合
     QHash<QString, BaseTool *> tools;

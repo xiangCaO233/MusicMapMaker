@@ -5,6 +5,7 @@
 
 #include <array>
 #include <glm/fwd.hpp>
+#include <mmm/project/TextureLoadCallback.hpp>
 #include <mutex>
 #include <render/QuadData.hpp>
 #include <render/RenderCommand.hpp>
@@ -13,10 +14,15 @@
 #include <render/texture/font/FontPool.hpp>
 
 class GLCanvas;
-class Renderer2D {
+class Renderer2D : public TextureLoadCallback {
    public:
     explicit Renderer2D(GLCanvas* canvas);
     ~Renderer2D();
+
+    // 需要载入纹理
+    void need_loadtexture_dir(std::string_view texdir) override;
+    // 需要卸载纹理
+    void need_unloadtexture_dir(std::string_view texdir) override;
 
     // 直接访问着色器
     QOpenGLShaderProgram* shader() const { return shader_program; }

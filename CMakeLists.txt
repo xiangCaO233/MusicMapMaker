@@ -53,6 +53,8 @@ else()
   set(FFTLIB fftw3f)
 endif(APPLE)
 
+find_package()
+
 # 查找字体包
 find_package(Freetype REQUIRED)
 

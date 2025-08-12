@@ -39,6 +39,16 @@ auto glCallImpl(Func func, const char* funcStr,
 // 用于包装 OpenGL 调用并检查错误
 #define GLCALL(func, f) glCallImpl([&]() { return func; }, #func, f)
 
+// 需要卸载纹理
+void Renderer2D::need_unloadtexture_dir(std::string_view texdir) {
+    request_remove_texture_from_path(std::string(texdir));
+}
+
+// 需要载入纹理
+void Renderer2D::need_loadtexture_dir(std::string_view texdir) {
+    request_texture_from_path(std::string(texdir));
+}
+
 Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
     // 初始化纹理池
     texturepool = std::make_unique<TexturePool>(canvas);

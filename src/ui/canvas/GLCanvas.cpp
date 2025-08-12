@@ -57,8 +57,8 @@ GLCanvas::GLCanvas() {
     qDebug() << "显示器刷新率 : " << desiredFps;
 
     // 帧间隔
-    auto des_update_time = 1000.0 / desiredFps;
-    qDebug() << "目标帧间隔 : " << std::to_string(des_update_time);
+    // auto des_update_time = 1000.0 / desiredFps;
+    // qDebug() << "目标帧间隔 : " << std::to_string(des_update_time);
 }
 
 // 析构GLCanvas
@@ -78,16 +78,6 @@ void GLCanvas::updateFpsDisplay(int fps) {
                      .count())
             .arg(actual_update_time);
     emit update_window_suffix(title_suffix);
-}
-
-// 需要卸载纹理
-void GLCanvas::need_unloadtexture_dir(std::string_view texdir) {
-    render->request_remove_texture_from_path(std::string(texdir));
-}
-
-// 需要载入纹理
-void GLCanvas::need_loadtexture_dir(std::string_view texdir) {
-    render->request_texture_from_path(std::string(texdir));
 }
 
 // 更新共享信息
@@ -145,7 +135,7 @@ void GLCanvas::initializeGL() {
 
     // 初始化渲染数据循环
     render_dataloop = std::make_unique<RenderDataLoop>(render.get());
-    render_dataloop->set_targetFPS(desiredFps * 3);
+    render_dataloop->set_targetFPS(desiredFps);
     connect(render_dataloop.get(), &RenderDataLoop::renderUpdate, this,
             qOverload<>(&QOpenGLWindow::update));
     connect(fpsCounter, &FrameRateCounter::fpsUpdated, render_dataloop.get(),
