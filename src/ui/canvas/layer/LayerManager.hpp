@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QMetaObject>
 #include <QThread>
+#include <ecs/ECSCore.hpp>
 #include <layer/ILayer.hpp>
 #include <layer/LayerComputerBase.hpp>
 #include <layer/background/BackgroundLayer.hpp>
@@ -21,6 +22,7 @@
 #include <unordered_map>
 
 class Renderer2D;
+
 class LayerManager {
    public:
     // 构造LayerManager
@@ -31,24 +33,26 @@ class LayerManager {
         auto background_layer =
             data_buffer
                 .try_emplace(BACKGROUND,
-                             std::make_unique<BackgroundLayer>(renderer))
+                             std::make_unique<BackgroundLayer>(renderer, &core))
                 .first->second.get();
         auto timeline_layer =
             data_buffer
                 .try_emplace(TIMELINE,
-                             std::make_unique<TimelineLayer>(renderer))
+                             std::make_unique<TimelineLayer>(renderer, &core))
                 .first->second.get();
         auto note_layer =
-            data_buffer.try_emplace(NOTE, std::make_unique<NoteLayer>(renderer))
+            data_buffer
+                .try_emplace(NOTE, std::make_unique<NoteLayer>(renderer, &core))
                 .first->second.get();
         auto effect_layer =
             data_buffer
-                .try_emplace(EFFECT, std::make_unique<EffectLayer>(renderer))
+                .try_emplace(EFFECT,
+                             std::make_unique<EffectLayer>(renderer, &core))
                 .first->second.get();
         auto interact_layer =
             data_buffer
-                .try_emplace(INTERACT,
-                             std::make_unique<RealTimeInteractLayer>(renderer))
+                .try_emplace(INTERACT, std::make_unique<RealTimeInteractLayer>(
+                                           renderer, &core))
                 .first->second.get();
 
         // 初始化图层生成器
@@ -149,6 +153,9 @@ class LayerManager {
 
     // 持有全部图层生成器
     LayerGenerators generators;
+
+    // 核心ecs
+    ECSCore core;
 
     // 持有所有生成器线程的指针
     std::unordered_map<LayerType, std::unique_ptr<QThread>> threads;

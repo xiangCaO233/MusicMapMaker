@@ -125,6 +125,13 @@ set(CANVAS_SOURCES
     src/ui/canvas/FrameRateCounter.cpp
     src/ui/canvas/GLCanvas.cpp
     src/ui/canvas/GLCanvas.hpp
+    src/ui/canvas/ecs/CoreComponents.hpp
+    src/ui/canvas/ecs/ECSCore.hpp
+    src/ui/canvas/ecs/ECSCore.cpp
+    src/ui/canvas/ecs/Entity.hpp
+    src/ui/canvas/ecs/NoteComponents.hpp
+    src/ui/canvas/ecs/RelationComponents.hpp
+    src/ui/canvas/ecs/StateComponents.hpp
     src/ui/canvas/layer/ILayer.hpp
     src/ui/canvas/layer/LayerComputerBase.hpp
     src/ui/canvas/layer/LayerComputerBase.cpp

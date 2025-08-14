@@ -9,7 +9,7 @@
 
 class RealTimeInteractLayer : public ILayer {
    public:
-    explicit RealTimeInteractLayer(Renderer2D* renderer);
+    RealTimeInteractLayer(Renderer2D* renderer, ECSCore* ecore);
     ~RealTimeInteractLayer() override;
 
     // 鼠标当前位置

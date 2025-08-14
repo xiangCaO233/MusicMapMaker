@@ -33,14 +33,17 @@ MainWindow::MainWindow(QWidget* parent)
     connect(canvas, &GLCanvas::update_window_suffix, this,
             &MainWindow::update_title_suffix);
 
-    connect(ui->track_manager, &TrackManager::close,
-            [capui]() { capui->actionTrack_Manager->setChecked(false); });
+    // connect(ui->track_manager, &TrackManager::close,
+    //         [capui]() { capui->actionTrack_Manager->setChecked(false); });
 
-    connect(ui->project_manager, &ProjectManager::close,
-            [capui]() { capui->actionProject_Manager->setChecked(false); });
+    // connect(ui->project_manager, &ProjectManager::close,
+    //         [capui]() { capui->actionProject_Manager->setChecked(false); });
+
+    connect(canvas, &MapCanvas::skinInitialized, this,
+            &MainWindow::onDefSkinInitialized);
 
     connect(ui->track_manager, &TrackManager::audioLoadcbk_initialized, canvas,
-            &GLCanvas::onAudioLoadcbkInitialized);
+            &MapCanvas::onAudioLoadcbkInitialized);
 
     // MMap map(
     //     "/Users/2333xiang/Downloads/Juggernaut. - Antler/Juggernaut. - Antler
@@ -104,6 +107,12 @@ void MainWindow::use_theme(GlobalTheme theme) {
 // 更新标题后缀
 void MainWindow::update_title_suffix(const QString& suffix) {
     setWindowTitle(tr("MusicMapMaker-->") + suffix);
+}
+
+// 默认皮肤初始化完成
+void MainWindow::onDefSkinInitialized() {
+    // 触发音效加载回调
+    emit ui->track_manager->audioLoadcbk_initialized(ui->track_manager);
 }
 
 void MainWindow::closeEvent(QCloseEvent* e) {

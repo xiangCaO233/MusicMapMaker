@@ -6,7 +6,7 @@
 class TimelineLayer : public ILayer {
    public:
     // 构造TimelineLayer
-    explicit TimelineLayer(Renderer2D* renderer);
+    TimelineLayer(Renderer2D* renderer, ECSCore* ecore);
     // 析构TimelineLayer
     ~TimelineLayer() override;
 

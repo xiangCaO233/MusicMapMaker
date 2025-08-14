@@ -29,19 +29,19 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
     // qDebug() << "纹理bg配置";
 
     auto note_texture_config = object_texture_config["note"];
-    for (auto& [key, val] : note_texture_config.items()) {
-        qDebug() << "key:" << key << ",val:" << val.get<std::string>();
-    }
+    // for (auto& [key, val] : note_texture_config.items()) {
+    //     qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    // }
 
     auto head_texture_config = object_texture_config["head"];
-    for (auto& [key, val] : head_texture_config.items()) {
-        qDebug() << "key:" << key << ",val:" << val.get<std::string>();
-    }
+    // for (auto& [key, val] : head_texture_config.items()) {
+    //     qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    // }
 
     auto node_texture_config = object_texture_config["node"];
-    for (auto& [key, val] : node_texture_config.items()) {
-        qDebug() << "key:" << key << ",val:" << val.get<std::string>();
-    }
+    // for (auto& [key, val] : node_texture_config.items()) {
+    //     qDebug() << "key:" << key << ",val:" << val.get<std::string>();
+    // }
 
     auto hold_texture_config = object_texture_config["hold"];
     // for (auto& [key, val] : hold_texture_config.items()) {
@@ -64,6 +64,7 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
 
     // 音效配置
     auto sound_effects_config = skinRootCfg["sounds"];
+
     sound_effects[SoundEffectType::COMMON_HIT] =
         QDir((skinPath /
               sound_effects_config.value<std::string>("commonhit", "none")))
@@ -75,10 +76,8 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
             .canonicalPath()
             .toStdString();
 
-    // 载入皮肤音轨
-
-    // audioLoadcbk->loadBack(sound_effects[SoundEffectType::COMMON_HIT]);
-    // audioLoadcbk->loadBack(sound_effects[SoundEffectType::SLIDE]);
+    // 载入默认皮肤的全部纹理
+    textureLoadcbk->need_loadtexture_dir(skin_path);
 
     qDebug() << "载入皮肤:[" << name << "]";
     qDebug() << "皮肤作者:[" << author << "]";

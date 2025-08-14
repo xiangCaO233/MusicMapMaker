@@ -15,6 +15,7 @@
 class MMap;
 
 class MapCanvas : public GLCanvas {
+    Q_OBJECT
    public:
     // 构造MapCanvas
     MapCanvas();
@@ -24,6 +25,12 @@ class MapCanvas : public GLCanvas {
 
     // 切换到图
     void switch_map(MMap *smap);
+
+    // 绑定音频载入回调
+   public slots:
+    void onAudioLoadcbkInitialized(AudioLoadCallback *cbk) override;
+   signals:
+    void skinInitialized();
 
    protected:
     void initializeGL() override;

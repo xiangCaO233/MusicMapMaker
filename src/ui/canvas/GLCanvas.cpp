@@ -118,7 +118,7 @@ void GLCanvas::initializeGL() {
     render = std::make_unique<Renderer2D>(this);
 
     // 加载纹理
-    render->add_texture_from_path("../resources/textures/default");
+    // render->add_texture_from_path("../resources/textures/default");
 
     // 加载字体
     render->add_font_from_path(

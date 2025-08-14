@@ -2,7 +2,8 @@
 #include <layer/background/BackgroundLayer.hpp>
 
 // 构造BackgroundLayer
-BackgroundLayer::BackgroundLayer(Renderer2D* renderer) : ILayer(renderer) {
+BackgroundLayer::BackgroundLayer(Renderer2D* renderer, ECSCore* ecore)
+    : ILayer(renderer, ecore) {
     setType(LayerType::BACKGROUND);
 }
 

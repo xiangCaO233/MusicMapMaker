@@ -82,8 +82,6 @@ TrackManager::TrackManager(QWidget* parent)
     }
 
     ui->album_info_widget->hide();
-
-    emit audioLoadcbk_initialized(this);
 }
 
 TrackManager::~TrackManager() {

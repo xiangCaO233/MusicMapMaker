@@ -23,6 +23,17 @@ void MapCanvas::initializeGL() {
                                         "../resources/textures/default",
                                         audioLoadCallback(), textureCallback()))
             .first->second.get();
+    emit skinInitialized();
+}
+
+// 绑定音频载入回调
+void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
+    GLCanvas::onAudioLoadcbkInitialized(cbk);
+    // 载入全部默认皮肤的音效
+    for (const auto& [type, soundRpath] : skin->sound_effects) {
+        auto soundApath = skin->skinPath / soundRpath;
+        cbk->loadBack(soundApath.generic_string());
+    }
 }
 
 // 切换到图

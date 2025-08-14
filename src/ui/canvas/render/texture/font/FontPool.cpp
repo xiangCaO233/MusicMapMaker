@@ -68,11 +68,11 @@ void FontPool::clear() {
     groups.clear();
 
     // 重置打包状态
-    m_current_atlas_id = 0;
-    m_current_layer_index = 0;
-    m_cursor_x = 0;
-    m_cursor_y = 0;
-    m_current_line_height = 0;
+    current_atlas_id = 0;
+    current_layer_index = 0;
+    cursor_x = 0;
+    cursor_y = 0;
+    current_line_height = 0;
 
     qDebug() << "FontPool: All resources cleared.";
 }
@@ -184,7 +184,6 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
                                           glm::ivec2(face->glyph->bitmap_left,
                                                      face->glyph->bitmap_top),
                                           (uint32_t)face->glyph->advance.x};
-
                 {
                     std::lock_guard<std::mutex> lock(queue_mutex);
                     upload_queue.push(imageData);
@@ -233,7 +232,7 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
     }
 
     // --- 步骤 1: 检查是否需要创建新的图集数组 ---
-    if (m_current_atlas_id == 0) {
+    if (current_atlas_id == 0) {
         // 这是上传的第一个字形，需要创建第一个图集数组
         uint32_t new_atlas_id;
         GLCALL(glf->glGenTextures(1, &new_atlas_id), glf);
@@ -259,7 +258,7 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
                                     GL_CLAMP_TO_EDGE),
                glf);
 
-        m_current_atlas_id = new_atlas_id;
+        current_atlas_id = new_atlas_id;
 
         // 记录这个新的图集组信息
         groups[new_atlas_id].gl_id = new_atlas_id;
@@ -268,58 +267,58 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
     }
 
     // --- 步骤 2: 检查当前位置是否能放下新字形 (书架算法) ---
-    if (m_cursor_x + data.width > LAYER_SIZE.x) {
+    if (cursor_x + data.width > LAYER_SIZE.x) {
         // 当前行放不下了，换行
-        m_cursor_x = 0;
-        m_cursor_y += m_current_line_height;
-        m_current_line_height = 0;
+        cursor_x = 0;
+        cursor_y += current_line_height;
+        current_line_height = 0;
     }
 
-    if (m_cursor_y + data.height > LAYER_SIZE.y) {
+    if (cursor_y + data.height > LAYER_SIZE.y) {
         // 当前层也放不下了，切换到下一层
-        m_current_layer_index++;
-        m_cursor_x = 0;
-        m_cursor_y = 0;
-        m_current_line_height = 0;
+        current_layer_index++;
+        cursor_x = 0;
+        cursor_y = 0;
+        current_line_height = 0;
     }
 
-    if (m_current_layer_index >= max_texture_array_layers) {
+    if (current_layer_index >= max_texture_array_layers) {
         // 当前图集数组也满了！需要创建一个新的图集数组
         qWarning()
             << "FontPool: Texture array is full! Need to create a new one.";
-        m_current_atlas_id = 0;  // 强制在下一轮重新创建
+        current_atlas_id = 0;  // 强制在下一轮重新创建
         // 重新尝试上传这个字形
         uploadToGpu(data);
         return;
     }
 
-    // --- 步骤 3: 上传字形位图到GPU ---
-    GLCALL(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, m_current_atlas_id), glf);
-    // 上传数据时，源格式是 GL_RED
+    // 上传字形位图到GPU
+    GLCALL(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, current_atlas_id), glf);
+    // 上传数据时，源格式为 GL_RED
     // 因为数据源 (single_channel_data) 只有一个通道
-    GLCALL(glf->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, m_cursor_x, m_cursor_y,
-                                m_current_layer_index, data.width, data.height,
-                                1, GL_RED, GL_UNSIGNED_BYTE, data.data),
+    GLCALL(glf->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, cursor_x, cursor_y,
+                                current_layer_index, data.width, data.height, 1,
+                                GL_RED, GL_UNSIGNED_BYTE, data.data),
            glf);
 
-    // --- 步骤 4: 计算并存储该字形的完整信息 ---
+    // 计算并存储该字形的完整信息
     CharacterGlyph glyph;
 
-    // a. 填充纹理信息
+    // 填充纹理信息
     glyph.c = data.c;
     glyph.character_texinfo.is_char = true;
-    glyph.character_texinfo.gl_texture_array_id = m_current_atlas_id;
-    glyph.character_texinfo.layer_index = m_current_layer_index;
+    glyph.character_texinfo.gl_texture_array_id = current_atlas_id;
+    glyph.character_texinfo.layer_index = current_layer_index;
 
     // 计算UV偏移和缩放
     glyph.character_texinfo.uv_offset =
-        glm::vec2(m_cursor_x / LAYER_SIZE.x, m_cursor_y / LAYER_SIZE.y);
+        glm::vec2(cursor_x / LAYER_SIZE.x, cursor_y / LAYER_SIZE.y);
     glyph.character_texinfo.uv_scale =
         glm::vec2(data.width / LAYER_SIZE.x, data.height / LAYER_SIZE.y);
     glyph.character_texinfo.origin_size.x = data.width;
     glyph.character_texinfo.origin_size.y = data.height;
 
-    // b. 填充字形度量信息
+    // 填充字形度量信息
     glyph.bearing = data.bearing;
     glyph.xadvance = data.xadvance;
     // qDebug() << "字符" << glyph.c << "放在"
@@ -330,30 +329,29 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
     {
         std::lock_guard<std::mutex> lock(info_mutex);
 
-        // --- 【关键修正】---
-        // 1. 获取或创建字体家族的map
+        // 获取或创建字体家族的map
         auto& size_map = character_infos[data.family];
 
-        // 2. 检查特定字号的CharacterPack是否存在
+        // 检查特定字号的CharacterPack是否存在
         auto it = size_map.find(data.size);
         if (it == size_map.end()) {
             // 如果不存在，创建一个新的CharacterPack并初始化它
             CharacterPack new_pack;
             new_pack.font_size = data.size;
             // 将新的pack插入map
-            it = size_map.emplace(data.size, new_pack).first;
+            it = size_map.try_emplace(data.size, new_pack).first;
         }
 
-        // 3. 现在可以安全地向已存在的CharacterPack中添加字形了
+        // 添加字形
         it->second.character_set[data.c] = glyph;
     }
 
-    // --- 步骤 5: 更新光标位置 ---
+    // 更新光标位置
     // 光标向右移动
-    m_cursor_x += data.width + 2;
+    cursor_x += data.width + 2;
     // 更新当前行的高度（取本行所有字形的最大高度）
-    if (data.height > m_current_line_height) {
-        m_current_line_height = data.height + 2;
+    if (data.height > current_line_height) {
+        current_line_height = data.height + 2;
     }
 }
 

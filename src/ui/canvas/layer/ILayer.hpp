@@ -22,13 +22,15 @@ enum class LayerType : uint32_t {
 
 class SharedCanvasInfo;
 class Renderer2D;
+class ECSCore;
 
 // 图层
 class ILayer {
    public:
     using RenderDataBuffer = std::vector<RenderCommand>;
     // 构造ILayer
-    explicit ILayer(Renderer2D* renderer) : rendererRef(renderer) {}
+    ILayer(Renderer2D* renderer, ECSCore* ecore)
+        : rendererRef(renderer), core(ecore) {}
 
     // 析构ILayer
     virtual ~ILayer() = default;
@@ -77,6 +79,9 @@ class ILayer {
 
     // 渲染器引用
     Renderer2D* rendererRef;
+
+    // ecs核心引用
+    ECSCore* core;
 
     // 双缓冲
     // 两个物理缓冲区

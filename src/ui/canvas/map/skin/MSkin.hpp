@@ -3,9 +3,8 @@
 
 #include <filesystem>
 #include <mmm/project/AudioLoadCallback.hpp>
+#include <mmm/project/TextureLoadCallback.hpp>
 #include <nlohmann/json.hpp>
-
-#include "mmm/project/TextureLoadCallback.hpp"
 
 using json = nlohmann::json;
 
@@ -99,6 +98,8 @@ class MSkin {
 
     // 皮肤的根配置
     json skinRootCfg;
+
+    friend class MapCanvas;
 };
 
 #endif  // MMM_MSKIN_HPP

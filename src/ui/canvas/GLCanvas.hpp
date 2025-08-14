@@ -22,7 +22,8 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
 
     // 绑定音频载入回调
    public slots:
-    void onAudioLoadcbkInitialized(AudioLoadCallback *cbk);
+    virtual void onAudioLoadcbkInitialized(AudioLoadCallback *cbk);
+
    signals:
     void update_window_suffix(const QString &suffix);
 
@@ -63,9 +64,10 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 内部可获取渲染器
     std::unique_ptr<Renderer2D> &renderer() { return render; }
 
-    // 外部可获取纹理加载回调
+    // 内部可获取纹理加载回调
     TextureLoadCallback *textureCallback() const { return render.get(); }
 
+    // 内部可获取音频加载回调
     AudioLoadCallback *audioLoadCallback() const { return audioLoadcbk; }
 
    private:

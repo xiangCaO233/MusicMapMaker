@@ -316,10 +316,10 @@ class FontPool {
     int32_t max_texture_array_layers{0};
 
     // 追踪当前字形打包位置的状态
-    std::atomic<uint32_t> m_current_atlas_id = 0;
-    std::atomic<uint32_t> m_current_layer_index = 0;
-    std::atomic<float> m_cursor_x = 0.0f;
-    std::atomic<float> m_cursor_y = 0.0f;
-    std::atomic<float> m_current_line_height = 0.0f;
+    std::atomic<uint32_t> current_atlas_id = 0;
+    std::atomic<uint32_t> current_layer_index = 0;
+    std::atomic<float> cursor_x = 0.0f;
+    std::atomic<float> cursor_y = 0.0f;
+    std::atomic<float> current_line_height = 0.0f;
 };
 #endif  // MMM_FONTPOOL_HPP

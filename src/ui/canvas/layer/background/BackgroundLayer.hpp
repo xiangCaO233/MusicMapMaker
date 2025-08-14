@@ -8,7 +8,7 @@
 class BackgroundLayer : public ILayer {
    public:
     // 构造BackgroundLayer
-    explicit BackgroundLayer(Renderer2D* renderer);
+    BackgroundLayer(Renderer2D* renderer, ECSCore* ecore);
     // 析构BackgroundLayer
     ~BackgroundLayer() override;
 

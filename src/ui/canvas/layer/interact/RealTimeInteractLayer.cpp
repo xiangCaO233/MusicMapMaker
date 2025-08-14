@@ -2,8 +2,9 @@
 #include <layer/interact/RealTimeInteractLayer.hpp>
 
 // 构造实时交互图层
-RealTimeInteractLayer::RealTimeInteractLayer(Renderer2D* renderer)
-    : ILayer(renderer) {
+RealTimeInteractLayer::RealTimeInteractLayer(Renderer2D* renderer,
+                                             ECSCore* ecore)
+    : ILayer(renderer, ecore) {
     setType(LayerType::INTERACT);
 }
 
