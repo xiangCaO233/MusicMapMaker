@@ -9,7 +9,7 @@
 class FrameSynchronizer : public QObject {
     Q_OBJECT
    public:
-    explicit FrameSynchronizer(int workerCount, QObject* parent = nullptr);
+    FrameSynchronizer(int workerCount, QObject* parent = nullptr);
     ~FrameSynchronizer() override = default;
 
     // --- 由主循环调用 ---

@@ -9,14 +9,19 @@ class ECSCore {
    public:
     // 构造ECSCore
     ECSCore();
+
     // 析构ECSCore
     virtual ~ECSCore();
 
     // 获取ecs reg
     entt::registry& ecs_registry();
 
+    // 更新map
+    void updateMap(MMap* mmap);
+
    private:
-    MMap* map;
+    // map引用
+    MMap* map{nullptr};
     // 持有所有实体(entities)和组件(components)
     entt::registry registry;
 };

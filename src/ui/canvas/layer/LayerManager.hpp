@@ -139,6 +139,8 @@ class LayerManager {
         }
     }
 
+    void updateMap(MMap* map) { core.updateMap(map); }
+
     // 获取同步器
     FrameSynchronizer& sync() { return synchronizer; }
 
