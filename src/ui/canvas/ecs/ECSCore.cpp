@@ -20,18 +20,18 @@ void ECSCore::updateMap(MMap* mmap) {
     map = mmap;
     registry.clear();
     // 更新registry
-    for (const auto& note : mmap->note_set().get_all_notes_unordered()) {
-        auto noteptr = &note;
-        createEntity(noteptr);
+    for (const auto& handle : mmap->note_set().get_all_notes_ordered()) {
+        auto note = mmap->note_set().get_note(handle);
+        createEntity(note, handle);
     }
 }
 
 // 创建实体
-entt::entity ECSCore::createEntity(const Note* note) {
+entt::entity ECSCore::createEntity(const Note* note, NoteHandle handle) {
     auto note_entity = registry.create();
     // 附加note组件(time,track,source)
     registry.emplace<NoteComponent>(note_entity, note->timestamp(),
-                                    note->trackpos(), note);
+                                    note->trackpos(), handle);
     switch (note->notetype()) {
         case NoteType::NORMAL: {
             break;
@@ -50,7 +50,7 @@ entt::entity ECSCore::createEntity(const Note* note) {
             auto composed_note = static_cast<const Composite*>(note);
             std::vector<entt::entity> children;
             for (const auto& child_note : composed_note->children()) {
-                auto child_note_entity = createEntity(child_note.get());
+                auto child_note_entity = createEntity(child_note.get(), {0, 0});
 
                 // 附加父实体组件
                 registry.emplace<ChildOfComponent>(child_note_entity,

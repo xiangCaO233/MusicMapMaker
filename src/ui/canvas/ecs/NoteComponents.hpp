@@ -2,25 +2,25 @@
 #define MMM_NOTECOMPONENTS_HPP
 
 #include <cstdint>
-class Note;
+#include <mmm/NoteHandle.hpp>
 
 // 标记这是一个Note，并存储其轨道信息
 struct NoteComponent {
     uint32_t timestamp;
-    int32_t track_index;
-    Note* source;
+    uint32_t track_index;
+    NoteHandle sourceHandle;
 };
 
 // Hold Note的特有属性
 struct HoldComponent {
     // ms
-    int32_t duration;
+    uint32_t duration;
 };
 
 // Flick Note的特有属性
 struct FlickComponent {
     // 轨道偏移量, e.g., +1 or -1
-    int32_t delta_track;
+    uint32_t delta_track;
 };
 
 #endif  // MMM_NOTECOMPONENTS_HPP

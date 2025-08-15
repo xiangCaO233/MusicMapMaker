@@ -2,6 +2,7 @@
 #define MMM_ECSCORE_HPP
 
 #include <entt.hpp>
+#include <mmm/NoteHandle.hpp>
 
 class MMap;
 class Note;
@@ -28,6 +29,6 @@ class ECSCore {
     entt::registry registry;
 
     // 创建实体
-    entt::entity createEntity(const Note* note);
+    entt::entity createEntity(const Note* note, NoteHandle handle);
 };
 #endif  // MMM_ECSCORE_HPP
