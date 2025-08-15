@@ -17,6 +17,8 @@ class ECSCore {
 
     // 获取ecs reg
     entt::registry& ecs_registry();
+    std::unordered_map<NoteHandle, entt::entity, NoteHandle::Hash>&
+    handle_to_entity_map();
 
     // 更新map
     void updateMap(MMap* mmap);
@@ -28,7 +30,8 @@ class ECSCore {
     // 持有所有实体(entities)和组件(components)
     entt::registry registry;
 
-    // 创建实体
-    entt::entity createEntity(const Note* note, NoteHandle handle);
+    // NoteHandle -> entt::entity 的映射
+    std::unordered_map<NoteHandle, entt::entity, NoteHandle::Hash>
+        handle_to_entity;
 };
 #endif  // MMM_ECSCORE_HPP

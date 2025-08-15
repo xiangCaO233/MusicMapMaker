@@ -3,11 +3,11 @@
 #include <GLCanvas.hpp>
 #include <canvas/map/MapCanvas.hpp>
 #include <info/MapCanvasInfo.hpp>
+#include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
+#include <tool/note/NoteTool.hpp>
 #include <tool/select/SelectTool.hpp>
-
-#include "tool/note/NoteTool.hpp"
 
 // 构造MapCanvas
 MapCanvas::MapCanvas() : GLCanvas() {
@@ -55,6 +55,7 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {
     map = smap;
+    static_cast<MapLayerManager*>(dataloop()->layermanager())->updateMap(smap);
     auto mapcanvasInfo = info<MapCanvasInfo>();
     mapcanvasInfo->mapInfo.cover_path =
         smap->base_metadata().main_cover_path.generic_string();

@@ -15,6 +15,8 @@ RenderDataLoop::~RenderDataLoop() = default;
 
 // 可重写的tick事件(执行其他任务)
 void RenderDataLoop::tickEvent() {}
+void RenderDataLoop::pre_tickEvent() {}
+void RenderDataLoop::after_tickEvent() {}
 
 // 初始化层管理器
 void RenderDataLoop::initializeLayerManager() {
@@ -24,6 +26,12 @@ void RenderDataLoop::initializeLayerManager() {
 }
 
 void RenderDataLoop::updateMap(MMap *map) { layer_manager->updateMap(map); }
+
+// 更新信息
+void RenderDataLoop::update_info(SharedCanvasInfo *newinfo) {
+    info = newinfo;
+    layermanager()->updateInfoForLayers(newinfo);
+}
 
 // 启动循环
 void RenderDataLoop::start() {
@@ -124,6 +132,7 @@ void RenderDataLoop::tick() {
     actualTicktimeNs = timer.nsecsElapsed();
     timer.restart();
 
+    pre_tickEvent();
     // 开始新一帧:打开栅栏A，让所有图层线程开始计算
     layer_manager->sync().startNextFrame();
 
@@ -132,6 +141,7 @@ void RenderDataLoop::tick() {
 
     // 等待所有计算完成：在栅栏B处阻塞等待
     layer_manager->sync().waitForAllWorkers();
+    after_tickEvent();
 
     // 交换缓冲区
     layer_manager->swapBuffers();

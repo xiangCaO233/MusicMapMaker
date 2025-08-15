@@ -1,6 +1,7 @@
 #ifndef MMM_NOTELAYERGENERATOR_HPP
 #define MMM_NOTELAYERGENERATOR_HPP
 
+#include <ecs/system/TimeSystem.hpp>
 #include <layer/LayerComputerBase.hpp>
 
 class NoteLayerGenerator : public LayerComputerBase {
@@ -12,5 +13,8 @@ class NoteLayerGenerator : public LayerComputerBase {
    protected:
     // 生成交互层的数据
     void generateLayer(ILayer::RenderDataBuffer& buffer) override;
+
+   private:
+    TimeSystem time_system;
 };
 #endif  // MMM_NOTELAYERGENERATOR_HPP

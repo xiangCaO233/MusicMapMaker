@@ -4,7 +4,10 @@
 MapLayerManager::~MapLayerManager() = default;
 
 // 更新map
-void MapLayerManager::updateMap(MMap* map) { map_ecs_core.updateMap(map); }
+void MapLayerManager::updateMap(MMap* map) {
+    mapref = map;
+    map_ecs_core.updateMap(map);
+}
 
 // 初始化图层
 void MapLayerManager::initializeLayers() {

@@ -86,7 +86,7 @@ void GLCanvas::updateFpsDisplay(int fps) {
 
 // 更新共享信息
 void GLCanvas::update_sharedInfo() const {
-    render_dataloop->layermanager()->updateInfoForLayers(canvas_info.get());
+    render_dataloop->update_info(canvas_info.get());
 }
 
 void GLCanvas::initializeGL() {
