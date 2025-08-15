@@ -25,6 +25,12 @@ class Composite : public Note {
     // 移除组合键最后的子物件
     std::unique_ptr<Note> pop_back();
 
+    // 访问子物件
+    auto& children() const { return child_notes; }
+
+    // 访问子物件
+    auto& children() { return child_notes; }
+
    private:
     // 子物件
     std::vector<std::unique_ptr<Note>> child_notes;

@@ -2,10 +2,13 @@
 #define MMM_NOTECOMPONENTS_HPP
 
 #include <cstdint>
+class Note;
 
 // 标记这是一个Note，并存储其轨道信息
 struct NoteComponent {
+    uint32_t timestamp;
     int32_t track_index;
+    Note* source;
 };
 
 // Hold Note的特有属性

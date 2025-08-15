@@ -4,6 +4,7 @@
 #include <entt.hpp>
 
 class MMap;
+class Note;
 
 class ECSCore {
    public:
@@ -25,5 +26,8 @@ class ECSCore {
 
     // 持有所有实体(entities)和组件(components)
     entt::registry registry;
+
+    // 创建实体
+    entt::entity createEntity(const Note* note);
 };
 #endif  // MMM_ECSCORE_HPP
