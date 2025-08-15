@@ -1,5 +1,3 @@
-#include "trackmanager.h"
-
 #include <SDL3/SDL_audio.h>
 #include <audio/control/audiocontroller.h>
 #include <qlogging.h>
@@ -7,6 +5,7 @@
 #include <qobject.h>
 #include <qpixmap.h>
 #include <qtmetamacros.h>
+#include <trackmanager.h>
 #include <ui_trackmanager.h>
 
 #include <HideableToolWindow.hpp>

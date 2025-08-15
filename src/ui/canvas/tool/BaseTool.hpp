@@ -12,21 +12,20 @@ enum class EditToolType {
     SELECT,
 };
 
-class GLCanvas;
+class MapCanvas;
 class GLDirectPainter;
 
 class BaseTool {
    public:
-    explicit BaseTool(GLCanvas* cvs) : m_canvas(cvs) {}
+    explicit BaseTool(MapCanvas* cvs) : m_canvas(cvs) {}
     virtual ~BaseTool() = default;
 
-    // 从GLCanvas转发过来的事件
+    // 从Canvas转发过来的事件
     virtual void mousePressEvent(QMouseEvent* event) = 0;
     virtual void mouseMoveEvent(QMouseEvent* event) = 0;
     virtual void mouseReleaseEvent(QMouseEvent* event) = 0;
-
-    // 由GLCanvas的paintGL()调用，绘制交互过程中的临时图形
-    virtual void drawFeedback(GLDirectPainter* painter) = 0;
+    virtual void keyPressEvent(QKeyEvent* e) = 0;
+    virtual void keyReleaseEvent(QKeyEvent* e) = 0;
 
     // 获取类型
     EditToolType type() const { return editType; }
@@ -34,13 +33,13 @@ class BaseTool {
    protected:
     inline void setType(EditToolType t) { editType = t; }
 
-    inline GLCanvas* canvas() { return m_canvas; }
+    inline MapCanvas* canvas() { return m_canvas; }
 
    private:
     // 工具类型
     EditToolType editType;
     // 获取画布指针
-    GLCanvas* m_canvas{nullptr};
+    MapCanvas* m_canvas{nullptr};
 };
 
 #endif  // MMM_BASETOOL_HPP

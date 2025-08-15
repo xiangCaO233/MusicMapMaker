@@ -16,5 +16,7 @@ void BackgroundLayer::updateInfo(SharedCanvasInfo* info) {
     canvas_size = {info->baseInfo.canvasSize.width(),
                    info->baseInfo.canvasSize.height()};
     background_image_path = mapinfo->mapInfo.cover_path;
+    darken = mapinfo->mapInfo.darken;
+    alpha = mapinfo->mapInfo.alpha;
     texinfo = textureInfo(background_image_path);
 }

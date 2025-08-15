@@ -7,11 +7,10 @@
 
 #include <HideableToolWindow.hpp>
 #include <QWidget>
+#include <audio/control/ProcessChain.hpp>
 #include <ice/core/SourceNode.hpp>
 #include <ice/manage/AudioTrack.hpp>
 #include <memory>
-
-#include "audio/control/ProcessChain.hpp"
 
 namespace Ui {
 class AudioController;
@@ -45,6 +44,7 @@ class AudioController : public HideableToolWindow {
 
     // 传递引用
     void set_audio_track(const std::shared_ptr<ice::AudioTrack> &track);
+
     void set_item(QStandardItem *item);
 
     inline const std::shared_ptr<ice::AudioTrack> &track() const {
@@ -61,7 +61,8 @@ class AudioController : public HideableToolWindow {
         return output_node;
     }
 
-    inline void set_uiframe_pos(double frame_pos) { uiframe_pos = frame_pos; }
+    inline void set_uiframe_pos(size_t frame_pos) { uiframe_pos = frame_pos; }
+
     inline void set_uitime_pos(std::chrono::nanoseconds time_pos) {
         uitime_pos = time_pos;
     }
@@ -180,6 +181,9 @@ class AudioController : public HideableToolWindow {
 
     // 更新音调变化
     void update_pitch(double semitones);
+
+    void update_uitime(bool &ok, size_t &frameres,
+                       std::chrono::nanoseconds &timeres) const;
 
     Ui::AudioController *ui;
 };

@@ -4,17 +4,26 @@
 #include <algorithm>
 #include <layer/LayerManager.hpp>
 #include <render/synchronize/FrameSynchronizer.hpp>
-#include <render/synchronize/RenderDataLoop.hpp>
+#include <render/synchronize/tick/RenderDataLoop.hpp>
 
 // 构造RenderTick
 RenderDataLoop::RenderDataLoop(Renderer2D *renderer, QObject *parent)
-    : QObject(parent) {
-    // 初始化图层管理器
-    layer_manager = std::make_unique<LayerManager>(renderer);
-}
+    : QObject(parent), render(renderer) {}
 
 // 析构RenderTick
 RenderDataLoop::~RenderDataLoop() = default;
+
+// 可重写的tick事件(执行其他任务)
+void RenderDataLoop::tickEvent() {}
+
+// 初始化层管理器
+void RenderDataLoop::initializeLayerManager() {
+    // 初始化图层管理器
+    layer_manager = std::make_unique<LayerManager>(render);
+    layer_manager->initializeLayers();
+}
+
+void RenderDataLoop::updateMap(MMap *map) { layer_manager->updateMap(map); }
 
 // 启动循环
 void RenderDataLoop::start() {
@@ -90,21 +99,6 @@ void RenderDataLoop::updateFPS(int fps) {
                                            integral_error_ns + derivative_term);
 
     sleepAdjustmentNs.store(adjustment);
-
-    // qDebug() << "PID Control: desired=" << QString::number(desiredFps, 'f',
-    // 1)
-    //          << ", avg=" << QString::number(avg_fps, 'f', 1)
-    //          << ", error=" << QString::number(errorNs / 1000.0, 'f', 1) <<
-    //          "us"
-    //          << ", P=" << QString::number(proportional_term / 1000.0, 'f', 1)
-    //          << "us"
-    //          << ", I=" << QString::number(integral_error_ns / 1000.0, 'f', 1)
-    //          << "us"
-    //          << ", D=" << QString::number(derivative_term / 1000.0, 'f', 1)
-    //          << "us"
-    //          << ", total_adj=" << QString::number(adjustment / 1000.0, 'f',
-    //          1)
-    //          << "us";
 }
 
 // 设置目标fps
@@ -134,6 +128,7 @@ void RenderDataLoop::tick() {
     layer_manager->sync().startNextFrame();
 
     // ... 在此期间主tick线程也可以做其他事情
+    tickEvent();
 
     // 等待所有计算完成：在栅栏B处阻塞等待
     layer_manager->sync().waitForAllWorkers();

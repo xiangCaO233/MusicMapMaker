@@ -25,6 +25,10 @@ class MapEditor : public QWidget {
 
    private:
     Ui::MapEditor *ui;
+
+    void initializeMenus() const;
+    void initializeToolsMenu() const;
+    void initializeBgMenu() const;
 };
 
 #endif  // MAPEDITOR_H

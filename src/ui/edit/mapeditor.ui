@@ -34,7 +34,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="tools_widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">
        <number>2</number>
@@ -52,7 +52,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QToolButton" name="toolButton">
+       <widget class="QToolButton" name="edit_toolsbutton">
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
@@ -69,24 +69,34 @@
           <height>16</height>
          </size>
         </property>
+        <property name="popupMode">
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+        </property>
         <property name="autoRaise">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="toolButton_2">
+       <widget class="QToolButton" name="bg_adjust_toolbutton">
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/background.svg</normaloff>:/icons/background.svg</iconset>
+        </property>
         <property name="iconSize">
          <size>
           <width>16</width>
           <height>16</height>
          </size>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
         </property>
         <property name="autoRaise">
          <bool>true</bool>

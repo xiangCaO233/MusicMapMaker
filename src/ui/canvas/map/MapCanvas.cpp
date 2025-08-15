@@ -4,11 +4,17 @@
 #include <canvas/map/MapCanvas.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <mmm/map/MMap.hpp>
+#include <render/synchronize/tick/map/MapDataLoop.hpp>
+#include <tool/select/SelectTool.hpp>
+
+#include "tool/note/NoteTool.hpp"
 
 // 构造MapCanvas
 MapCanvas::MapCanvas() : GLCanvas() {
     // 初始化共享信息
     initSharedInfo<MapCanvasInfo>();
+    // 初始化工具
+    creatTools();
 }
 
 // 析构MapCanvas
@@ -16,13 +22,23 @@ MapCanvas::~MapCanvas() { qDeleteAll(tools); }
 
 void MapCanvas::initializeGL() {
     GLCanvas::initializeGL();
+    // 初始化渲染数据循环
+    dataloop() = std::make_unique<MapDataLoop>(renderer().get());
+    dataloop()->initializeLayerManager();
+    dataloop()->set_targetFPS(desired_fps());
+    connect(dataloop().get(), &RenderDataLoop::renderUpdate, this,
+            qOverload<>(&QOpenGLWindow::update));
+    connect(fps_counter(), &FrameRateCounter::fpsUpdated, dataloop().get(),
+            &RenderDataLoop::updateFPS);
+    dataloop()->start();
+
     // 初始化默认皮肤
-    skin =
-        editor_skins
-            .try_emplace("Default", std::make_unique<MSkin>(
-                                        "../resources/textures/default",
-                                        audioLoadCallback(), textureCallback()))
-            .first->second.get();
+    skin = editor_skins
+               .try_emplace("Default-Nagisssa",
+                            std::make_unique<MSkin>(
+                                "../resources/textures/default",
+                                audioLoadCallback(), textureCallback()))
+               .first->second.get();
     emit skinInitialized();
 }
 
@@ -45,5 +61,19 @@ void MapCanvas::switch_map(MMap* smap) {
     update_sharedInfo();
 }
 
+// 使用工具
+void MapCanvas::use_tool(const QString& tool_name) {
+    auto toolit = tools.find(tool_name);
+    if (toolit != tools.end()) {
+        current_tool = toolit.value();
+    }
+}
+
 // 创建工具
-void MapCanvas::creatTools() {}
+void MapCanvas::creatTools() {
+    // 默认使用选择工具
+    current_tool =
+        tools.try_emplace("Select", new SelectTool(this)).first->second;
+    // 创建物件工具
+    tools.try_emplace("Note", new NoteTool(this));
+}

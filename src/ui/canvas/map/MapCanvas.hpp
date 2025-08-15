@@ -5,12 +5,11 @@
 #include <qobject.h>
 
 #include <canvas/GLCanvas.hpp>
+#include <map/skin/MSkin.hpp>
 #include <memory>
 #include <tool/BaseTool.hpp>
 #include <unordered_map>
-
-#include "map/skin/MSkin.hpp"
-#include "util/StringHash.hpp"
+#include <util/StringHash.hpp>
 
 class MMap;
 
@@ -26,9 +25,13 @@ class MapCanvas : public GLCanvas {
     // 切换到图
     void switch_map(MMap *smap);
 
+    // 使用工具
+    void use_tool(const QString &tool_name);
+
     // 绑定音频载入回调
    public slots:
     void onAudioLoadcbkInitialized(AudioLoadCallback *cbk) override;
+
    signals:
     void skinInitialized();
 
@@ -54,6 +57,9 @@ class MapCanvas : public GLCanvas {
 
     // 工具集合
     QHash<QString, BaseTool *> tools;
+
+    // 当前工具
+    BaseTool *current_tool{nullptr};
 
     // 创建工具
     void creatTools();

@@ -9,7 +9,7 @@
 #include <layer/LayerManager.hpp>
 #include <render/GLDirectPainter.hpp>
 #include <render/MPrimitiveCollector.hpp>
-#include <render/synchronize/RenderDataLoop.hpp>
+#include <render/synchronize/tick/RenderDataLoop.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TexturePool.hpp>
 #include <type_traits>
@@ -136,15 +136,6 @@ void GLCanvas::initializeGL() {
     // 透明蒙版
     // render->newMask({0, 0, 2000, 2000}, {.3f, .5f, .2f, .75f},
     //                 MaskEffect::ALPHA_SHIFT);
-
-    // 初始化渲染数据循环
-    render_dataloop = std::make_unique<RenderDataLoop>(render.get());
-    render_dataloop->set_targetFPS(desiredFps);
-    connect(render_dataloop.get(), &RenderDataLoop::renderUpdate, this,
-            qOverload<>(&QOpenGLWindow::update));
-    connect(fpsCounter, &FrameRateCounter::fpsUpdated, render_dataloop.get(),
-            &RenderDataLoop::updateFPS);
-    render_dataloop->start();
 }
 
 void GLCanvas::resizeGL(int w, int h) {

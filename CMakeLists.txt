@@ -119,12 +119,19 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/MPrimitiveCollector.cpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.hpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.cpp
-    src/ui/canvas/render/synchronize/RenderDataLoop.hpp
-    src/ui/canvas/render/synchronize/RenderDataLoop.cpp
+    src/ui/canvas/render/synchronize/tick/RenderDataLoop.hpp
+    src/ui/canvas/render/synchronize/tick/RenderDataLoop.cpp
+    src/ui/canvas/render/synchronize/tick/map/MapDataLoop.hpp
+    src/ui/canvas/render/synchronize/tick/map/MapDataLoop.cpp
     src/ui/canvas/FrameRateCounter.hpp
     src/ui/canvas/FrameRateCounter.cpp
     src/ui/canvas/GLCanvas.cpp
     src/ui/canvas/GLCanvas.hpp
+    src/ui/canvas/tool/BaseTool.hpp
+    src/ui/canvas/tool/select/SelectTool.hpp
+    src/ui/canvas/tool/select/SelectTool.cpp
+    src/ui/canvas/tool/note/NoteTool.hpp
+    src/ui/canvas/tool/note/NoteTool.cpp
     src/ui/canvas/ecs/CoreComponents.hpp
     src/ui/canvas/ecs/ECSCore.hpp
     src/ui/canvas/ecs/ECSCore.cpp
@@ -136,6 +143,8 @@ set(CANVAS_SOURCES
     src/ui/canvas/layer/LayerComputerBase.hpp
     src/ui/canvas/layer/LayerComputerBase.cpp
     src/ui/canvas/layer/LayerManager.hpp
+    src/ui/canvas/layer/MapLayerManager.hpp
+    src/ui/canvas/layer/MapLayerManager.cpp
     src/ui/canvas/layer/background/BackgroundLayer.hpp
     src/ui/canvas/layer/background/BackgroundLayer.cpp
     src/ui/canvas/layer/background/BackgroundLayerGenerator.hpp
@@ -176,6 +185,7 @@ set(PROJECT_SOURCES
     src/ui/template/ScalableImageLabel.cpp
     src/ui/edit/mapeditor.h
     src/ui/edit/mapeditor.cpp
+    src/ui/edit/mapeditormenus.cpp
     src/ui/edit/mapeditorevent.cpp
     src/ui/edit/mapeditor.ui
     src/ui/project/projectmanager.h

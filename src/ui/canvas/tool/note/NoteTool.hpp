@@ -1,15 +1,14 @@
-#ifndef MMM_SELECTTOOL_HPP
-#define MMM_SELECTTOOL_HPP
+#ifndef MMM_NOTETOOL_HPP
+#define MMM_NOTETOOL_HPP
 
 #include <tool/BaseTool.hpp>
 
-class SelectTool : public BaseTool {
+class NoteTool : public BaseTool {
    public:
-    // 构造SelectTool
-    explicit SelectTool(MapCanvas* cvs);
-    using BaseTool::BaseTool;
-    // 析构SelectTool
-    ~SelectTool() override;
+    // 构造NoteTool
+    explicit NoteTool(MapCanvas* cvs);
+    // 析构NoteTool
+    ~NoteTool() override;
 
    protected:
     // 从Canvas转发过来的事件
@@ -19,4 +18,5 @@ class SelectTool : public BaseTool {
     void keyPressEvent(QKeyEvent* e) override;
     void keyReleaseEvent(QKeyEvent* e) override;
 };
-#endif  // MMM_SELECTTOOL_HPP
+
+#endif  // MMM_NOTETOOL_HPP

@@ -22,6 +22,7 @@ class ECSCore {
    private:
     // map引用
     MMap* map{nullptr};
+
     // 持有所有实体(entities)和组件(components)
     entt::registry registry;
 };

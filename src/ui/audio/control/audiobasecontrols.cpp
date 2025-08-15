@@ -33,12 +33,23 @@ void AudioController::on_time_edit_editingFinished() {
     // 设置音频时间
     if (!source_node) return;
 
-    auto unit = ui->unit_selection->currentData().value<PositionUnit>();
-    QString text = ui->time_edit->text();
     bool ok = true;
     size_t frameres{0};
     std::chrono::nanoseconds timeres;
 
+    update_uitime(ok, frameres, timeres);
+
+    set_uiframe_pos(frameres);
+
+    set_uitime_pos(timeres);
+
+    updateDisplayPosition();
+}
+
+void AudioController::update_uitime(bool &ok, size_t &frameres,
+                                    std::chrono::nanoseconds &timeres) const {
+    auto unit = ui->unit_selection->currentData().value<PositionUnit>();
+    QString text = ui->time_edit->text();
     switch (unit) {
         case PositionUnit::Frame: {
             frameres = text.toULongLong(&ok);
@@ -78,8 +89,7 @@ void AudioController::on_time_edit_editingFinished() {
             break;
         }
         case PositionUnit::MinSec: {
-            QStringList parts = text.split(':');
-            if (parts.size() == 2) {
+            if (QStringList parts = text.split(':'); parts.size() == 2) {
                 long long min = parts[0].toLongLong(&ok);
                 if (!ok) break;
                 long long sec = parts[1].toLongLong(&ok);
@@ -141,11 +151,6 @@ void AudioController::on_time_edit_editingFinished() {
             break;
         }
     }
-
-    set_uiframe_pos(frameres);
-    set_uitime_pos(timeres);
-
-    updateDisplayPosition();
 }
 
 void AudioController::on_unit_selection_currentIndexChanged(

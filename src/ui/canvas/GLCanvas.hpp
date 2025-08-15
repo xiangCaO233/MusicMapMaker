@@ -1,13 +1,15 @@
 #ifndef MMM_GLCANVAS_HPP
 #define MMM_GLCANVAS_HPP
 
+#include <qtypes.h>
+
 #include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLWindow>
 #include <canvas/FrameRateCounter.hpp>
 #include <info/SharedCanvasInfo.hpp>
 #include <memory>
 #include <render/Renderer2D.hpp>
-#include <render/synchronize/RenderDataLoop.hpp>
+#include <render/synchronize/tick/RenderDataLoop.hpp>
 
 class TexturePool;
 class LayerManager;
@@ -69,6 +71,15 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
 
     // 内部可获取音频加载回调
     AudioLoadCallback *audioLoadCallback() const { return audioLoadcbk; }
+
+    // 内部可获取数据循环
+    std::unique_ptr<RenderDataLoop> &dataloop() { return render_dataloop; }
+
+    // 内部可获取目标fps
+    qreal desired_fps() const { return desiredFps; }
+
+    // 内部可获取fps计数器
+    FrameRateCounter *fps_counter() { return fpsCounter; }
 
    private:
     // fps计数器

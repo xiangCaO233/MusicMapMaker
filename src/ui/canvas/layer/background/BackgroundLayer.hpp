@@ -21,6 +21,12 @@ class BackgroundLayer : public ILayer {
     // 画布大小
     glm::vec2 canvas_size;
 
+    // 背景暗化倍率
+    float darken;
+
+    // 背景透明度
+    float alpha;
+
    protected:
     // 更新信息
     void updateInfo(SharedCanvasInfo* info) override;
