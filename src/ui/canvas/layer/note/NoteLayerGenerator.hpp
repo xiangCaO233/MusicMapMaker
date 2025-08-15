@@ -15,6 +15,6 @@ class NoteLayerGenerator : public LayerComputerBase {
     void generateLayer(ILayer::RenderDataBuffer& buffer) override;
 
    private:
-    TimeSystem time_system;
+    [[no_unique_address]] TimeSystem time_system;
 };
 #endif  // MMM_NOTELAYERGENERATOR_HPP

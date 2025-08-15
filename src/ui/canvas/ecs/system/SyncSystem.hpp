@@ -17,7 +17,7 @@ class SyncSystem {
    public:
     void update(ECSCore& core, const NoteCollection& notes,
                 const MapCanvasInfo* info,
-                const TimePixelConverter& converter) {
+                const TimePixelConverter& converter) const {
         // 获取计算所需的上下文信息
         const auto& base_info = info->baseInfo;
         const auto& realtime_info = info->realTimeInfo;
@@ -85,7 +85,7 @@ class SyncSystem {
 
     // 创建实体
     entt::entity createEntity(entt::registry& registry, const Note* note,
-                              NoteHandle handle) {
+                              NoteHandle handle) const {
         auto note_entity = registry.create();
         // 附加note组件(time,track,source)
         registry.emplace<NoteComponent>(note_entity, note->timestamp(),
