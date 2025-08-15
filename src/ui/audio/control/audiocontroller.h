@@ -53,9 +53,7 @@ class AudioController : public HideableToolWindow {
 
     inline QStandardItem *item() const { return refitem; }
 
-    inline const std::shared_ptr<ice::SourceNode> &node() const {
-        return source_node;
-    }
+    inline std::weak_ptr<ice::SourceNode> node() const { return source_node; }
 
     inline const std::shared_ptr<ice::IAudioNode> &output() const {
         return output_node;

@@ -7,4 +7,6 @@ NoteLayerGenerator::~NoteLayerGenerator() {
 }
 
 // 生成交互层的数据
-void NoteLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {}
+void NoteLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
+    //
+}
