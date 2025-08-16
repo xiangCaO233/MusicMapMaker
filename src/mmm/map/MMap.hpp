@@ -6,6 +6,8 @@
 #include <mmm/MetaData.hpp>
 #include <mmm/map/BaseMapMeta.hpp>
 
+class MProject;
+
 // map
 class MMap {
    public:
@@ -13,6 +15,12 @@ class MMap {
     explicit MMap(std::string_view file);
 
     virtual ~MMap();
+
+    // 绑定项目
+    void bind_project(MProject* prj) { project_ref = prj; }
+
+    // 获取项目引用
+    MProject* project() { return project_ref; }
 
     // 直接访问物件集合
     NoteCollection& note_set() { return notes; }
@@ -39,6 +47,9 @@ class MMap {
 
     // 基础谱面信息
     BaseMapMeta basemeta;
+
+    // 项目引用
+    MProject* project_ref;
 
     // 谱面io操作
     void readOsu();

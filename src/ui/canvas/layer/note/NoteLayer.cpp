@@ -8,6 +8,3 @@ NoteLayer::NoteLayer(Renderer2D* renderer, ECSCore* ecore)
 
 // 析构NoteLayer
 NoteLayer::~NoteLayer() {}
-
-// 更新信息
-void NoteLayer::updateInfo(SharedCanvasInfo* info) {}

@@ -9,10 +9,6 @@ class EffectLayer : public ILayer {
     EffectLayer(Renderer2D* renderer, ECSCore* ecore);
     // 析构EffectLayer
     ~EffectLayer() override;
-
-   protected:
-    // 更新信息
-    void updateInfo(SharedCanvasInfo* info) override;
 };
 
 #endif  // MMM_EFFECTLAYER_HPP

@@ -1,9 +1,9 @@
 #include <QDebug>
 #include <chrono>
 #include <glm/gtc/constants.hpp>
+#include <info/SharedCanvasInfo.hpp>
 #include <layer/interact/InteractLayerGenerator.hpp>
-
-#include "layer/interact/RealTimeInteractLayer.hpp"
+#include <layer/interact/RealTimeInteractLayer.hpp>
 
 // 析构InteractLayerGenerator
 InteractLayerGenerator::~InteractLayerGenerator() {
@@ -18,9 +18,12 @@ const float WAVE_SPEED = 2.f;        // 呼吸的速度
 const glm::vec4 AURA_COLOR = {0.65f, 0.75f, 1.0f, 1.0f};  // 干净、柔和的浅蓝色
 
 // 生成交互层的数据
-void InteractLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
+void InteractLayerGenerator::generateLayer(LayerManager* manager,
+                                           ILayer::RenderDataBuffer& buffer) {
     // qDebug() << "生成交互图层";
     auto l = layer<RealTimeInteractLayer>();
+    auto mouse = l->info()->realTimeInfo.mousePos;
+    auto pressed = l->info()->realTimeInfo.buttons.contains(Qt::LeftButton);
     // --- 1. 获取并处理时间 ---
     static auto start = std::chrono::high_resolution_clock::now();
     // 获取当前时间点
@@ -33,7 +36,7 @@ void InteractLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
             elapsed_duration)
             .count();
 
-    if (l->pressed) {
+    if (pressed) {
         // --- 3. 循环创建每一个呼吸的圆环 ---
         for (int i = 0; i < NUM_RINGS; ++i) {
             RenderCommand cmd;
@@ -52,8 +55,8 @@ void InteractLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {
             cmd.baseInfo.size = {current_radius * 2.0f, current_radius * 2.0f};
 
             // 位置: 始终居中于鼠标，并根据当前大小调整
-            cmd.baseInfo.pos = glm::vec2{l->mouse.x(), l->mouse.y()} -
-                               glm::vec2(current_radius);
+            cmd.baseInfo.pos =
+                glm::vec2{mouse.x(), mouse.y()} - glm::vec2(current_radius);
 
             // 颜色: 颜色固定，但透明度根据脉冲变化，向外扩散时变淡
             cmd.baseInfo.color = AURA_COLOR;

@@ -8,6 +8,3 @@ TimelineLayer::TimelineLayer(Renderer2D* renderer, ECSCore* ecore)
 
 // 析构TimelineLayer
 TimelineLayer::~TimelineLayer() {}
-
-// 更新信息
-void TimelineLayer::updateInfo(SharedCanvasInfo* info) {}

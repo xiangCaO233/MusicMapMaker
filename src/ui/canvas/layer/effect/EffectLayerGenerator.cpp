@@ -7,4 +7,5 @@ EffectLayerGenerator::~EffectLayerGenerator() {
 }
 
 // 生成图层
-void EffectLayerGenerator::generateLayer(ILayer::RenderDataBuffer& buffer) {}
+void EffectLayerGenerator::generateLayer(LayerManager* manager,
+                                         ILayer::RenderDataBuffer& buffer) {}

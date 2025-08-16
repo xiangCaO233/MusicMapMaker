@@ -59,6 +59,7 @@ void MapCanvas::switch_map(MMap* smap) {
     auto mapcanvasInfo = info<MapCanvasInfo>();
     mapcanvasInfo->mapInfo.cover_path =
         smap->base_metadata().main_cover_path.generic_string();
+    mapcanvasInfo->editorInfo.map = smap;
     update_sharedInfo();
 }
 

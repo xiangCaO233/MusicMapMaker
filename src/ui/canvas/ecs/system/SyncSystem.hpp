@@ -21,7 +21,7 @@ class SyncSystem {
         // 获取计算所需的上下文信息
         const auto& base_info = info->baseInfo;
         const auto& realtime_info = info->realTimeInfo;
-        const int64_t current_time = realtime_info.current_canvas_time;
+        const uint32_t current_time = realtime_info.current_canvas_time;
         const auto canvas_height = base_info.canvasSize.height();
 
         // 定义屏幕边界
@@ -39,15 +39,15 @@ class SyncSystem {
         const auto pixel_y_bottom = 0.0f - judgeline_absolute_y;
 
         // 使用转换器计算时间边界
-        const int64_t time_at_top =
+        const uint32_t time_at_top =
             converter.pixelToTime(pixel_y_top, current_time);
-        const int64_t time_at_bottom =
+        const uint32_t time_at_bottom =
             converter.pixelToTime(pixel_y_bottom, current_time);
 
         // 应用预加载缓冲
-        const int64_t query_start_time =
+        const uint32_t query_start_time =
             time_at_bottom - base_info.view_timeMargin;
-        const int64_t query_end_time = time_at_top + base_info.view_timeMargin;
+        const uint32_t query_end_time = time_at_top + base_info.view_timeMargin;
 
         // 使用计算出的时间范围查询 NoteCollection
         const std::vector<NoteHandle> visible_handles =

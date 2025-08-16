@@ -11,6 +11,7 @@ class BackgroundLayerGenerator : public LayerComputerBase {
 
    protected:
     // 生成图层
-    void generateLayer(ILayer::RenderDataBuffer& buffer) override;
+    void generateLayer(LayerManager* manager,
+                       ILayer::RenderDataBuffer& buffer) override;
 };
 #endif  // MMM_BACKGROUNDLAYERGENERATOR_HPP

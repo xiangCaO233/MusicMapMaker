@@ -3,9 +3,12 @@
 #include <render/synchronize/FrameSynchronizer.hpp>
 
 // 构造LayerComputerBase
-LayerComputerBase::LayerComputerBase(ILayer* layerptr, FrameSynchronizer* sync,
-                                     QObject* parent)
-    : QObject(parent), layer_ptr(layerptr), synchronizer(sync) {}
+LayerComputerBase::LayerComputerBase(LayerManager* manager, ILayer* layerptr,
+                                     FrameSynchronizer* sync, QObject* parent)
+    : QObject(parent),
+      manager_ref(manager),
+      layer_ptr(layerptr),
+      synchronizer(sync) {}
 
 void LayerComputerBase::run() {
     while (isrunning.load()) {
@@ -20,7 +23,7 @@ void LayerComputerBase::run() {
 
         auto& buffer = layer_ptr->backbuffer();
         buffer.clear();
-        generateLayer(buffer);
+        generateLayer(manager_ref, buffer);
 
         // qDebug() << "图层[" << static_cast<uint32_t>(layer_ptr->type()) <<
         // "]"

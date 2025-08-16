@@ -1,6 +1,7 @@
 #ifndef MMM_MAPCANVASINFO_HPP
 #define MMM_MAPCANVASINFO_HPP
 
+#include <glm/glm.hpp>
 #include <info/SharedCanvasInfo.hpp>
 #include <mmm/map/MMap.hpp>
 #include <mmm/project/MProjectConfig.hpp>
@@ -26,6 +27,9 @@ struct EditorInfo {
 
     // 当前的map指针
     MMap *map;
+
+    // 轨道布局
+    glm::vec4 track_layout;
 };
 
 struct MapCanvasInfo : public SharedCanvasInfo {

@@ -9,10 +9,6 @@ class NoteLayer : public ILayer {
     NoteLayer(Renderer2D* renderer, ECSCore* ecore);
     // 析构NoteLayer
     ~NoteLayer() override;
-
-   protected:
-    // 更新信息
-    void updateInfo(SharedCanvasInfo* info) override;
 };
 
 #endif  // MMM_NOTELAYER_HPP

@@ -28,6 +28,9 @@ class MProject {
     // 关闭项目
     void close();
 
+    // 只读配置
+    const MProjectConfig* cfg() const { return &project_config; }
+
    private:
     // 是否已经打开
     std::atomic<bool> is_opened{false};

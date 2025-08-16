@@ -7,12 +7,14 @@
 #include <render/RenderCommand.hpp>
 
 class FrameSynchronizer;
+class LayerManager;
+
 class LayerComputerBase : public QObject {
     Q_OBJECT
    public:
     // 构造LayerComputerBase
-    LayerComputerBase(ILayer* layer, FrameSynchronizer* sync,
-                      QObject* parent = nullptr);
+    LayerComputerBase(LayerManager* manager, ILayer* layer,
+                      FrameSynchronizer* sync, QObject* parent = nullptr);
     // 析构LayerComputerBase
     ~LayerComputerBase() override = default;
 
@@ -29,11 +31,15 @@ class LayerComputerBase : public QObject {
 
    protected:
     // 生成图层
-    virtual void generateLayer(ILayer::RenderDataBuffer& buffer) = 0;
+    virtual void generateLayer(LayerManager* manager,
+                               ILayer::RenderDataBuffer& buffer) = 0;
 
    private:
     // 图层指针
     ILayer* layer_ptr;
+
+    // 图层管理器引用
+    LayerManager* manager_ref;
 
     // 帧同步器
     FrameSynchronizer* synchronizer;

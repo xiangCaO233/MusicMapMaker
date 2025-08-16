@@ -42,31 +42,31 @@ void MapLayerManager::initializeLayers() {
     auto background_generator =
         layer_generators()
             .try_emplace(BACKGROUND, std::make_unique<BackgroundLayerGenerator>(
-                                         background_layer, &sync()))
+                                         this, background_layer, &sync()))
             .first->second.get();
 
     auto timeline_generator =
         layer_generators()
             .try_emplace(TIMELINE, std::make_unique<TimelineLayerGenerator>(
-                                       timeline_layer, &sync()))
+                                       this, timeline_layer, &sync()))
             .first->second.get();
 
     auto note_generator =
         layer_generators()
-            .try_emplace(
-                NOTE, std::make_unique<NoteLayerGenerator>(note_layer, &sync()))
+            .try_emplace(NOTE, std::make_unique<NoteLayerGenerator>(
+                                   this, note_layer, &sync()))
             .first->second.get();
 
     auto effect_generator =
         layer_generators()
             .try_emplace(EFFECT, std::make_unique<EffectLayerGenerator>(
-                                     effect_layer, &sync()))
+                                     this, effect_layer, &sync()))
             .first->second.get();
 
     auto interact_generator =
         layer_generators()
             .try_emplace(INTERACT, std::make_unique<InteractLayerGenerator>(
-                                       interact_layer, &sync()))
+                                       this, interact_layer, &sync()))
             .first->second.get();
 
     // 启动图层生成器

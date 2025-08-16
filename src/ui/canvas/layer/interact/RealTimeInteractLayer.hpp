@@ -11,17 +11,6 @@ class RealTimeInteractLayer : public ILayer {
    public:
     RealTimeInteractLayer(Renderer2D* renderer, ECSCore* ecore);
     ~RealTimeInteractLayer() override;
-
-    // 鼠标当前位置
-    QPointF mouse{0, 0};
-
-    bool pressed{false};
-
-    // 更新信息
-    void updateInfo(SharedCanvasInfo* info) override;
-
-    // 活跃工具
-    BaseTool* activateTool;
 };
 
 #endif  // MMM_REALTIMEINTERACTLAYER_HPP

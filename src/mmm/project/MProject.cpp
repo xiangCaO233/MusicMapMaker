@@ -38,6 +38,7 @@ void MProject::open(std::string_view project_path_str) {
                 // 载入谱面
                 qDebug() << "需要载入谱面[" << filename << "]";
                 auto map = std::make_unique<MMap>(filename);
+                map->bind_project(this);
                 // 添加谱面到表中
                 project_maps_table.try_emplace(map->base_metadata().name,
                                                std::move(map));

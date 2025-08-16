@@ -8,6 +8,3 @@ EffectLayer::EffectLayer(Renderer2D* renderer, ECSCore* ecore)
 
 // 析构EffectLayer
 EffectLayer::~EffectLayer() {}
-
-// 更新信息
-void EffectLayer::updateInfo(SharedCanvasInfo* info) {}

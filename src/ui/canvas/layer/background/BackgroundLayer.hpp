@@ -3,7 +3,6 @@
 
 #include <glm/fwd.hpp>
 #include <layer/ILayer.hpp>
-#include <string>
 
 class BackgroundLayer : public ILayer {
    public:
@@ -12,24 +11,6 @@ class BackgroundLayer : public ILayer {
     // 析构BackgroundLayer
     ~BackgroundLayer() override;
 
-    // 背景图片路径
-    std::string background_image_path;
-
-    // 背景图片信息
-    TextureInfo texinfo;
-
-    // 画布大小
-    glm::vec2 canvas_size;
-
-    // 背景暗化倍率
-    float darken;
-
-    // 背景透明度
-    float alpha;
-
-   protected:
-    // 更新信息
-    void updateInfo(SharedCanvasInfo* info) override;
     friend class BackgroundLayerGenerator;
 };
 #endif  // MMM_BACKGROUNDLAYER_HPP

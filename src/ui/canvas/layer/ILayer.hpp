@@ -38,6 +38,9 @@ class ILayer {
     // 获取图层类型
     LayerType type() const { return layer_type; }
 
+    // 获取信息
+    SharedCanvasInfo* info() { return info_ref; }
+
     // 交换前后缓冲区
     void swapBuffers() {
         // 原子翻转索引 (0 -> 1 , 1 -> 0)
@@ -61,21 +64,21 @@ class ILayer {
 
    protected:
     // 更新信息
-    virtual void updateInfo(SharedCanvasInfo* info) = 0;
+    void updateInfo(SharedCanvasInfo* info) { info_ref = info; }
     void setType(LayerType t) { layer_type = t; }
 
     // 获取纹理信息
     TextureInfo textureInfo(std::string_view texpath) const {
-        if (auto texinfoOption = rendererRef->texture_pool()->get(texpath);
-            texinfoOption.has_value()) {
-            return texinfoOption.value();
-        }
-        return {};
+        auto texinfoOption = rendererRef->texture_pool()->get(texpath);
+        return texinfoOption.value_or({});
     }
 
    private:
     // 图层类型
     LayerType layer_type;
+
+    // 画布信息引用
+    SharedCanvasInfo* info_ref;
 
     // 渲染器引用
     Renderer2D* rendererRef;

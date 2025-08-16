@@ -307,7 +307,7 @@ void MMap::readOsu() {
         difficulty->CircleSize =
             osureader.get_value("Difficulty", "CircleSize", 4.0);
 
-        basemeta.orbit_count = difficulty->CircleSize;
+        basemeta.track_count = difficulty->CircleSize;
 
         difficulty->OverallDifficulty =
             osureader.get_value("Difficulty", "OverallDifficulty", 8.0);

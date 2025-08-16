@@ -26,7 +26,7 @@ struct BaseMapMeta {
     // 谱面参考bpm
     double preference_bpm{100.};
     // 谱面轨道数
-    uint32_t orbit_count{4};
+    uint32_t track_count{4};
     // 谱面总时长
     uint32_t map_length{0};
 };

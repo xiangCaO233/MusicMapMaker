@@ -1,6 +1,7 @@
 #ifndef MMM_MPROJECTCONFIG_HPP
 #define MMM_MPROJECTCONFIG_HPP
 
+#include <glm/glm.hpp>
 #include <string>
 #include <vector>
 
@@ -22,7 +23,11 @@ struct AudioConfig {
     float stretch{1.f};
 };
 
+// 画布配置
 struct CanvasConfig {
+    // top,right,bottom,left
+    glm::vec4 canvas_layout{.1f, .75f, .95f, .23f};
+    // 物件缩放
     float object_width_scale{1.f};
     float object_height_scale{1.f};
 };

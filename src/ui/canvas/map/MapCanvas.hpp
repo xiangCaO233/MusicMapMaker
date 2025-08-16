@@ -43,6 +43,8 @@ class MapCanvas : public GLCanvas {
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
 
+    void resizeEvent(QResizeEvent *event) override;
+
    private:
     // 绑定的谱面
     MMap *map{nullptr};
