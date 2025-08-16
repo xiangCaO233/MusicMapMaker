@@ -1,8 +1,6 @@
 #ifndef MMM_GLCANVAS_HPP
 #define MMM_GLCANVAS_HPP
 
-#include <qtypes.h>
-
 #include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLWindow>
 #include <canvas/FrameRateCounter.hpp>
@@ -14,6 +12,7 @@
 class TexturePool;
 class LayerManager;
 class AudioLoadCallback;
+
 class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
    public:

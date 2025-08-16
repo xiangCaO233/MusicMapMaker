@@ -1,6 +1,7 @@
 #ifndef MMM_BASETOOL_HPP
 #define MMM_BASETOOL_HPP
 
+#include <QKeyEvent>
 #include <QMouseEvent>
 
 enum class EditToolType {
