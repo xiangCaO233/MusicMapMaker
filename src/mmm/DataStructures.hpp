@@ -627,6 +627,7 @@ class TimingMap {
         }
         // 直接使用 map 的下标运算符，如果不存在则创建，存在则覆盖。
         m_timeline[timing.timestamp] = timing;
+        m_version++;
         return true;
     }
 
@@ -637,7 +638,11 @@ class TimingMap {
      */
     bool remove_timing_point(int32_t timestamp) {
         // map::erase(key) 返回被删除的元素数量（0或1）。
-        return m_timeline.erase(timestamp) > 0;
+        if (m_timeline.erase(timestamp) > 0) {
+            m_version++;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -691,10 +696,14 @@ class TimingMap {
      */
     void clear() { m_timeline.clear(); }
 
+    // 获取版本号的接口
+    uint64_t getVersion() const { return m_version; }
+
    private:
     // 使用 std::map 作为核心存储。Key 是时间戳，Value 是 Timing 对象。
     // std::map 自动按 Key 排序，并提供高效的对数时间复杂度查找。
     std::map<int32_t, Timing> m_timeline;
+    uint64_t m_version{0};
 };
 
 #endif  // MMM_DATASTRUCTURES_HPP

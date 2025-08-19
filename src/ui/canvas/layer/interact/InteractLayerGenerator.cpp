@@ -71,4 +71,5 @@ void InteractLayerGenerator::generateLayer(LayerManager* manager,
             buffer.push_back(cmd);
         }
     }
+    // qDebug() << "interact layer done";
 }

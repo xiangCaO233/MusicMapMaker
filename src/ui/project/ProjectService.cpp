@@ -14,7 +14,11 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
 }
 
 // 析构ProjectService
-ProjectService::~ProjectService() = default;
+ProjectService::~ProjectService() {
+    for (const auto& [name, project] : projects) {
+        project->close();
+    }
+}
 
 void ProjectService::selectProject(std::string_view project_name) {
     auto it = projects.find(project_name);

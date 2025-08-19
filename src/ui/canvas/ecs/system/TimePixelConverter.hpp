@@ -7,185 +7,197 @@
 
 class TimePixelConverter {
    public:
+    // 基准：在没有任何速度修饰时，1ms对应1px
     static constexpr double BASE_PIXELS_PER_MS = 1.0;
 
+    /**
+     * @brief 构造函数。所有昂贵的计算都在这里一次性完成。
+     * @param timings 谱面的TimingMap。
+     * @param status 当前的画布状态。
+     * @param prebpm 谱面的基准BPM，用于处理第一个Timing点之前的区域。
+     */
     TimePixelConverter(const TimingMap& timings, const BaseCanvasStatus& status,
                        double prebpm)
-        : m_timings(timings), m_status(status) {
-        if (prebpm > 0) {
-            Timing initial_timing;
-            initial_timing.is_base_timing = true;
-            initial_timing.timestamp = 0;  // 逻辑上的时间原点
-            initial_timing.beat_length = 60000.0 / prebpm;
-            initial_timing.bpm = prebpm;
-            m_initial_timing = initial_timing;
-        }
+        : m_status(status) {
+        buildLookupTable(timings, prebpm);
     }
 
-    float timeToPixel(uint32_t timestamp, uint32_t current_canvas_time) const {
-        // ... 这部分的主体逻辑可以保持和你写的基本一致 ...
-        // 关键是它内部调用的 get_pixels_per_ms 现在是健壮的
-        // 为确保完整性，我们使用健壮的重写版本：
-        if (timestamp == current_canvas_time) return 0.0f;
+    /**
+     * @brief [O(logN)查询] 将时间戳转换为相对于判定线的屏幕像素位置。
+     */
+    float timeToPixel(int64_t timestamp, int64_t current_canvas_time) const {
+        // 使用查找表分别获取两个时间点的“绝对像素位置”（从t=0开始算）
+        double pixel_at_timestamp = getAbsolutePixelAt(timestamp);
+        double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
 
-        bool is_forward = timestamp > current_canvas_time;
-        uint32_t start_time = is_forward ? current_canvas_time : timestamp;
-        uint32_t end_time = is_forward ? timestamp : current_canvas_time;
-
-        double total_pixel_distance = 0.0;
-        uint32_t current_time = start_time;
-
-        const auto& all_points = m_timings.get_all_timing_points();
-        if (auto it = all_points.upper_bound(start_time);
-            it != all_points.begin())
-            --it;
-
-        while (current_time < end_time) {
-            const Timing* active_timing =
-                get_effective_timing_point(current_time);
-            if (!active_timing) break;  // 理论上不会发生，除非初始BPM无效
-
-            double pixels_per_ms = get_pixels_per_ms(*active_timing);
-
-            auto next_it = all_points.upper_bound(current_time);
-            uint32_t segment_end_time =
-                (next_it != all_points.end()) ? next_it->first : end_time;
-
-            uint32_t actual_end = std::min(segment_end_time, end_time);
-
-            total_pixel_distance += (actual_end - current_time) * pixels_per_ms;
-            current_time = actual_end;
-
-            if (current_time >= end_time) break;
-        }
-
-        total_pixel_distance *= m_status.timeline_zoom;
-        return is_forward ? static_cast<float>(total_pixel_distance)
-                          : -static_cast<float>(total_pixel_distance);
+        // 两者的差值就是它们的相对像素距离，最后应用全局缩放
+        return static_cast<float>((pixel_at_timestamp - pixel_at_current_time) *
+                                  m_status.timeline_zoom);
     }
 
-    uint32_t pixelToTime(float pixel_y, uint32_t current_canvas_time) const {
-        if (std::abs(pixel_y) < 1e-6) return current_canvas_time;
-        if (std::abs(m_status.timeline_zoom) < 1e-6) return current_canvas_time;
+    /**
+     * @brief [O(logN)查询] 将相对于判定线的屏幕像素位置转换为时间戳。
+     */
+    int64_t pixelToTime(float pixel_y, int64_t current_canvas_time) const {
+        if (std::abs(m_status.timeline_zoom) < 1e-9) return current_canvas_time;
 
-        double target_pixel_distance = pixel_y / m_status.timeline_zoom;
-        bool is_forward = target_pixel_distance > 0;
-        target_pixel_distance = std::abs(target_pixel_distance);
+        // 1. 计算当前时间点在时间轴上的绝对像素位置
+        double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
 
-        uint32_t current_time = current_canvas_time;
-        const auto& all_points = m_timings.get_all_timing_points();
+        // 2. 根据相对偏移计算目标点的绝对像素位置
+        double target_absolute_pixel =
+            pixel_at_current_time + (pixel_y / m_status.timeline_zoom);
 
-        if (is_forward) {
-            auto it = all_points.upper_bound(current_time);
-            while (target_pixel_distance > 1e-6) {
-                const Timing* active_timing =
-                    get_effective_timing_point(current_time);
-                if (!active_timing) return current_time;
-
-                double pixels_per_ms = get_pixels_per_ms(*active_timing);
-                if (std::abs(pixels_per_ms) < 1e-6) return current_time;
-
-                uint32_t next_timing_ts =
-                    (it != all_points.end()) ? it->first : -1;
-                double pixels_to_next_point =
-                    (std::cmp_not_equal(next_timing_ts, -1))
-                        ? (next_timing_ts - current_time) * pixels_per_ms
-                        : 1e18;
-
-                if (target_pixel_distance <= pixels_to_next_point) {
-                    return current_time +
-                           static_cast<uint32_t>(target_pixel_distance /
-                                                 pixels_per_ms);
-                }
-                target_pixel_distance -= pixels_to_next_point;
-                current_time = next_timing_ts;
-                if (it != all_points.end()) ++it;
-            }
-            return current_time;
-        } else {
-            while (target_pixel_distance > 1e-6) {
-                const Timing* active_timing =
-                    get_effective_timing_point(current_time);
-                if (!active_timing) return current_time;
-
-                double pixels_per_ms = get_pixels_per_ms(*active_timing);
-                if (std::abs(pixels_per_ms) < 1e-6) return current_time;
-
-                auto it = all_points.upper_bound(current_time);
-                uint32_t prev_timing_ts = -1;
-                if (it != all_points.begin()) {
-                    --it;  // it 是 <= current_time 的最后一个点
-                    prev_timing_ts = it->first;
-                }
-
-                double pixels_to_prev_point =
-                    (std::cmp_not_equal(prev_timing_ts, -1))
-                        ? (current_time - prev_timing_ts) * pixels_per_ms
-                        : 1e18;
-
-                if (target_pixel_distance <= pixels_to_prev_point) {
-                    return current_time -
-                           static_cast<uint32_t>(target_pixel_distance /
-                                                 pixels_per_ms);
-                }
-                target_pixel_distance -= pixels_to_prev_point;
-                current_time = prev_timing_ts;
-            }
-            return current_time;
-        }
+        // 3. 在查找表中通过二分查找反算出时间戳
+        return getTimeAtAbsolutePixel(target_absolute_pixel);
     }
 
    private:
-    const TimingMap& m_timings;
+    // --- 内部数据结构：快速查找表 ---
+    struct LookupNode {
+        int64_t timestamp;
+        double accumulated_pixels;  // 从 t=0 到此时间点的总像素距离 (无zoom)
+        double pixels_per_ms;       // 从此时间点开始的区段的速度
+    };
+    std::vector<LookupNode> m_lookup_table;
+
+    // 实时状态仍然需要引用，因为它每帧都可能变化
     const BaseCanvasStatus& m_status;
-    std::optional<Timing> m_initial_timing;
 
     /**
-     * @brief [核心辅助函数]
-     * 获取在指定时间戳下生效的Timing点，永远不会失败（除非没给初始BPM）。
+     * @brief 构造函数的核心：构建累积像素距离的查找表。
      */
-    const Timing* get_effective_timing_point(uint32_t timestamp) const {
-        if (const Timing* point = m_timings.get_active_timing_point(timestamp);
-            point)
-            return point;
-        if (m_initial_timing.has_value()) return &m_initial_timing.value();
-        return nullptr;
+    void buildLookupTable(const TimingMap& timings, double prebpm) {
+        m_lookup_table.clear();
+
+        // 1. 创建一个虚拟的 t=0 时间点作为计算的起点
+        std::optional<Timing> initial_timing_opt;
+        if (prebpm > 0) {
+            Timing initial_timing;
+            initial_timing.is_base_timing = true;
+            initial_timing.timestamp = 0;
+            initial_timing.beat_length = 60000.0 / prebpm;
+            initial_timing.bpm = prebpm;
+            initial_timing_opt = initial_timing;
+        }
+
+        double current_accumulated_pixels = 0.0;
+        int64_t last_timestamp = 0;
+
+        // 添加 t=0 节点到查找表
+        double initial_pixels_per_ms =
+            get_initial_pixels_per_ms(timings, initial_timing_opt);
+        m_lookup_table.emplace_back(0, 0.0, initial_pixels_per_ms);
+
+        // 2. 遍历所有真实的Timing点来构建表的其余部分
+        for (const auto& [timestamp, timing] :
+             timings.get_all_timing_points()) {
+            if (timestamp > last_timestamp) {
+                // 计算上一个区段的长度，并累加到总像素距离中
+                double last_segment_speed = m_lookup_table.back().pixels_per_ms;
+                current_accumulated_pixels +=
+                    (timestamp - last_timestamp) * last_segment_speed;
+            } else {
+                // 处理同一时间戳有多个timing点的情况（虽然map不会，但逻辑上要健壮）
+                // 此时累积距离不变，只更新速度
+                current_accumulated_pixels =
+                    m_lookup_table.back().accumulated_pixels;
+                m_lookup_table.pop_back();  // 移除旧的，用新的覆盖
+            }
+
+            // 计算当前时间点开始的新速度
+            double new_pixels_per_ms =
+                get_pixels_per_ms(timing, timings, initial_timing_opt);
+
+            // 添加新节点到查找表
+            m_lookup_table.emplace_back(timestamp, current_accumulated_pixels,
+                                        new_pixels_per_ms);
+            last_timestamp = timestamp;
+        }
     }
 
     /**
-     * @brief [核心辅助函数] 查找基准红线，会回退到初始Timing点。
+     * @brief [O(logK)] 根据时间戳获取从t=0开始的绝对像素位置 (K是Timing点数量)
      */
-    const Timing* find_base_timing_for(uint32_t timestamp) const {
-        const auto& all_points = m_timings.get_all_timing_points();
+    double getAbsolutePixelAt(int64_t timestamp) const {
+        if (m_lookup_table.empty())
+            return timestamp * BASE_PIXELS_PER_MS * m_status.scroll_speed;
+
+        // 在vector上进行二分查找，定位区段
+        auto it =
+            std::upper_bound(m_lookup_table.begin(), m_lookup_table.end(),
+                             timestamp, [](int64_t ts, const LookupNode& node) {
+                                 return ts < node.timestamp;
+                             });
+
+        if (it != m_lookup_table.begin()) {
+            --it;  // it 现在指向包含 timestamp 的区段的起始节点
+        }
+
+        // 结果 = 区段起点的累积像素 + 在区段内的偏移像素
+        return it->accumulated_pixels +
+               (timestamp - it->timestamp) * it->pixels_per_ms;
+    }
+
+    /**
+     * @brief [O(logK)] 根据从t=0开始的绝对像素位置反查时间戳
+     */
+    int64_t getTimeAtAbsolutePixel(double absolute_pixel) const {
+        if (m_lookup_table.empty()) {
+            return static_cast<int64_t>(
+                absolute_pixel / (BASE_PIXELS_PER_MS * m_status.scroll_speed));
+        }
+
+        // 在vector上对累积像素进行二分查找
+        auto it = std::upper_bound(m_lookup_table.begin(), m_lookup_table.end(),
+                                   absolute_pixel,
+                                   [](double px, const LookupNode& node) {
+                                       return px < node.accumulated_pixels;
+                                   });
+
+        if (it != m_lookup_table.begin()) {
+            --it;
+        }
+
+        double pixels_into_segment = absolute_pixel - it->accumulated_pixels;
+        if (std::abs(it->pixels_per_ms) < 1e-9)
+            return it->timestamp;  // 避免除零
+
+        return it->timestamp +
+               static_cast<int64_t>(pixels_into_segment / it->pixels_per_ms);
+    }
+
+    // --- 用于预计算的辅助函数 ---
+
+    const Timing* find_base_timing_for(
+        int64_t timestamp, const TimingMap& timings,
+        const std::optional<Timing>& initial) const {
+        const auto& all_points = timings.get_all_timing_points();
         auto it = all_points.upper_bound(timestamp);
         while (it != all_points.begin()) {
             --it;
-            if (it->second.is_base_timing) {
-                return &(it->second);
-            }
+            if (it->second.is_base_timing) return &(it->second);
         }
-        if (m_initial_timing.has_value()) return &m_initial_timing.value();
+        if (initial.has_value()) return &initial.value();
         return nullptr;
     }
 
-    double get_pixels_per_ms(const Timing& timing) const {
+    double get_pixels_per_ms(const Timing& timing, const TimingMap& timings,
+                             const std::optional<Timing>& initial) const {
         const Timing* base_timing =
-            timing.is_base_timing ? &timing
-                                  : find_base_timing_for(timing.timestamp);
+            timing.is_base_timing
+                ? &timing
+                : find_base_timing_for(timing.timestamp, timings, initial);
 
-        // 这里的 `base_timing` 现在几乎不可能为 null
         if (!base_timing || base_timing->beat_length <= 0) {
             return BASE_PIXELS_PER_MS * m_status.scroll_speed;
         }
 
         double base_beat_length = base_timing->beat_length;
-
-        // 使用你写的公式，它在逻辑上是正确的
-        // REFERENCE_BPM_BEAT_LENGTH / current_beat_length
         double reference_beat_length =
-            (m_initial_timing.has_value() && m_initial_timing->beat_length > 0)
-                ? m_initial_timing->beat_length
-                : 400.0;  // 默认150bpm
+            (initial.has_value() && initial->beat_length > 0)
+                ? initial->beat_length
+                : 400.0;
         double bpm_multiplier = reference_beat_length / base_beat_length;
 
         double velocity_multiplier = 1.0;
@@ -194,6 +206,21 @@ class TimePixelConverter {
         }
         return BASE_PIXELS_PER_MS * m_status.scroll_speed * bpm_multiplier *
                velocity_multiplier;
+    }
+
+    double get_initial_pixels_per_ms(
+        const TimingMap& timings, const std::optional<Timing>& initial) const {
+        // 查找 t=0 时的真实timing点
+        const Timing* real_timing_at_zero = timings.get_timing_point_at(0);
+        if (real_timing_at_zero) {
+            return get_pixels_per_ms(*real_timing_at_zero, timings, initial);
+        }
+        // 如果 t=0 没有点，则使用基准BPM
+        if (initial.has_value()) {
+            return get_pixels_per_ms(initial.value(), timings, initial);
+        }
+        // 最后的防线
+        return BASE_PIXELS_PER_MS * m_status.scroll_speed;
     }
 };
 

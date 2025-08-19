@@ -31,4 +31,5 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
 
         buffer.push_back(cmd);
     }
+    // qDebug() << "bg layer done";
 }

@@ -132,4 +132,7 @@ void ProjectManager::onActivateProject(MProject* activated_project) {
     }
 }
 
-void ProjectManager::closeEvent(QCloseEvent* e) { delete service; }
+void ProjectManager::closeEvent(QCloseEvent* e) {
+    qDebug() << "close ProjectManager: delete service";
+    delete service;
+}

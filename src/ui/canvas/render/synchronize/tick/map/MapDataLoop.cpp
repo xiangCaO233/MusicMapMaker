@@ -11,9 +11,10 @@ void MapDataLoop::pre_tickEvent() {
     auto map = map_layermgr->map();
     auto mapinfo = static_cast<MapCanvasInfo*>(getinfo());
     if (!map) return;
-    // 初始化时间映射器
-    TimePixelConverter converter(map->timing_set(), mapinfo->baseInfo,
-                                 map->base_metadata().preference_bpm);
+    // 从管理器获取转换器 (这个操作现在非常快)
+    auto converter = map_layermgr->get_time_converter_manager()->getConverter(
+        map->timing_set(), mapinfo->baseInfo,
+        mapinfo->editorInfo.map->base_metadata().preference_bpm);
 
     // 与源物件集合同步可见的物件
     sync_system.update(map_layermgr->core(), map->note_set(), mapinfo,

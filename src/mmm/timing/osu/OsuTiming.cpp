@@ -76,22 +76,18 @@ void OsuTiming::from_osu_description(std::vector<std::string>& description) {
 
     // 先判断是否继承时间点
     is_inherit_timing = std::stoi(description.at(6)) == 0;
+    // beat_length
+    beat_length = std::stod(description.at(1));
+
     if (is_inherit_timing) {
         // bpm只存储倍速--并非bpm
-        beat_length = std::stod(description.at(1));
-        bpm = 100.0 / std::abs(beat_length);
         is_base_timing = false;
-        basebpm = last_base_bpm;
+        bpm = last_base_bpm;
     } else {
         // 真实bpm
-        beat_length = std::stod(description.at(1));
         bpm = 1.0 / beat_length * 1000.0 * 60.0;
         last_base_bpm = bpm;
-        basebpm = last_base_bpm;
     }
-
-    // beatlength
-    beat_length = 60000. / basebpm;
 
     // beats
     beat = std::stoi(description.at(2));

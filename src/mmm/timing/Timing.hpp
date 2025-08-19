@@ -32,25 +32,15 @@ class Timing {
     //
     int32_t timestamp{-1};
 
-    // 该时间点的bpm
-    // in-osu
-    // 拍长（精准小数）： 这个参数有两种含义：
-    // 对于非继承时间点（红线），这个参数即一拍的长度，单位是毫秒。
-    // 对于继承时间点（绿线），这个参数为负值，去掉符号后被 100
-    // 整除，即为这根绿线控制的滑条速度。例如，-50
-    // 代表这一时间段的滑条速度均为基础滑条速度的 2 倍。
-    // in-imd
+    // 该时间点的bpm(始终都携带最近的红线的歌曲bpm)
     //
     double bpm{-1.0};
 
-    // 非继承的最近的基准bpm
-    double basebpm{-1.0};
-
     ///< 拍长(ms)或滑条速度倍率(负值)
-    double beat_length{-1.0};
+    double beat_length{0};
 
     // 增加一个辅助的 to_string
-    std::string to_string() const {
+    virtual std::string to_string() const {
         return "Timing(ts=" + std::to_string(timestamp) + ", " +
                (is_base_timing ? "Base" : "Inherited") +
                ", val=" + std::to_string(beat_length) + ")";

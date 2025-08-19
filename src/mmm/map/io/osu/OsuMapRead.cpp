@@ -435,7 +435,7 @@ void MMap::readOsu() {
              timing_set().get_all_timing_points()) {
             // 使用第一个不带变速的绝对bpm
             if (timing.is_base_timing) {
-                basemeta.preference_bpm = timing.basebpm;
+                basemeta.preference_bpm = timing.bpm;
                 finded = true;
                 break;
             }
@@ -446,10 +446,8 @@ void MMap::readOsu() {
             if (timing_set().get_all_timing_points().empty()) {
                 basemeta.preference_bpm = 200;
             } else {
-                basemeta.preference_bpm = timing_set()
-                                              .get_all_timing_points()
-                                              .begin()
-                                              ->second.basebpm;
+                basemeta.preference_bpm =
+                    timing_set().get_all_timing_points().begin()->second.bpm;
             }
         }
 

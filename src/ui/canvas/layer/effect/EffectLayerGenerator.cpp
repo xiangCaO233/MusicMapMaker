@@ -8,4 +8,6 @@ EffectLayerGenerator::~EffectLayerGenerator() {
 
 // 生成图层
 void EffectLayerGenerator::generateLayer(LayerManager* manager,
-                                         ILayer::RenderDataBuffer& buffer) {}
+                                         ILayer::RenderDataBuffer& buffer) {
+    // qDebug() << "effect layer done";
+}

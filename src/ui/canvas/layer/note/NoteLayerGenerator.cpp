@@ -9,7 +9,7 @@ NoteLayerGenerator::~NoteLayerGenerator() {
     qDebug() << "物件图层生成线程释放";
 }
 
-// 生成交互层的数据
+// 生成物件层的数据
 void NoteLayerGenerator::generateLayer(LayerManager* manager,
                                        ILayer::RenderDataBuffer& buffer) {
     // 数据准备
@@ -18,9 +18,12 @@ void NoteLayerGenerator::generateLayer(LayerManager* manager,
     if (!map) return;
     auto l = layer<NoteLayer>();
     auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
-    // 初始化时间映射器
-    TimePixelConverter converter(map->timing_set(), mapinfo->baseInfo,
-                                 map->base_metadata().preference_bpm);
+    // 从管理器获取时间转换器
+    auto converter =
+        maplayer_manager->get_time_converter_manager()->getConverter(
+            map->timing_set(), mapinfo->baseInfo,
+            mapinfo->editorInfo.map->base_metadata().preference_bpm);
     // 更新物件逻辑位置
     time_system.update(maplayer_manager->core(), mapinfo, converter);
+    // qDebug() << "note layer done";
 }

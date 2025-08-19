@@ -8,4 +8,6 @@ TimelineLayerGenerator::~TimelineLayerGenerator() {
 
 // 生成交互层的数据
 void TimelineLayerGenerator::generateLayer(LayerManager* manager,
-                                           ILayer::RenderDataBuffer& buffer) {}
+                                           ILayer::RenderDataBuffer& buffer) {
+    // qDebug() << "timeline layer done";
+}

@@ -35,4 +35,7 @@ void LayerComputerBase::run() {
     synchronizer->workerFinishedFrame();
 }
 
-void LayerComputerBase::stop() { isrunning.store(false); }
+void LayerComputerBase::stop() {
+    isrunning.store(false);
+    // synchronizer->startNextFrame();
+}
