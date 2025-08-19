@@ -20,21 +20,26 @@ void GLCanvas::resizeEvent(QResizeEvent *e) {
     update_sharedInfo();
 }
 
-void GLCanvas::keyPressEvent(QKeyEvent *e) {}
+void GLCanvas::keyPressEvent(QKeyEvent *e) { QOpenGLWindow::keyPressEvent(e); }
 
-void GLCanvas::keyReleaseEvent(QKeyEvent *e) {}
+void GLCanvas::keyReleaseEvent(QKeyEvent *e) {
+    QOpenGLWindow::keyReleaseEvent(e);
+}
 
 void GLCanvas::mouseMoveEvent(QMouseEvent *e) {
+    QOpenGLWindow::mouseMoveEvent(e);
     canvas_info->realTimeInfo.mousePos = e->pos();
     update_sharedInfo();
 }
 
 void GLCanvas::mousePressEvent(QMouseEvent *e) {
+    QOpenGLWindow::mousePressEvent(e);
     canvas_info->realTimeInfo.buttons.insert(e->button());
     update_sharedInfo();
 }
 
 void GLCanvas::mouseReleaseEvent(QMouseEvent *e) {
+    QOpenGLWindow::mouseReleaseEvent(e);
     canvas_info->realTimeInfo.buttons.erase(e->button());
     update_sharedInfo();
 }

@@ -1,8 +1,6 @@
-#include <qkeysequence.h>
-
+#include <QKeySequence>
+#include <action/ActionManager.hpp>
 #include <action/modules/file/FileActions.hpp>
-
-#include "action/ActionManager.hpp"
 
 void FileActions::createActions() {
     auto action_manager = ActionManager::instance();
