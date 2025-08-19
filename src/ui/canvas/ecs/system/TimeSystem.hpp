@@ -15,7 +15,7 @@ class TimeSystem {
         const auto& realtime_info = info->realTimeInfo;
 
         // 1. 获取轨道布局信息
-        // 假设 all_tracks_rect 定义了所有轨道占据的矩形区域 {x, y, width,
+        // all_tracks_rect 定义了所有轨道占据的矩形区域 {x, y, width,
         // height}
         const glm::vec4& all_tracks_rect = info->editorInfo.track_layout;
         const int track_count =

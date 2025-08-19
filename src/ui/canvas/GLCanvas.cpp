@@ -86,6 +86,7 @@ void GLCanvas::updateFpsDisplay(int fps) {
 
 // 更新共享信息
 void GLCanvas::update_sharedInfo() const {
+    // 更新信息
     render_dataloop->update_info(canvas_info.get());
 }
 

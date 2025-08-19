@@ -5,6 +5,7 @@
 #include <info/MapCanvasInfo.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
+#include <mmm/project/MProject.hpp>
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
 #include <tool/note/NoteTool.hpp>
 #include <tool/select/SelectTool.hpp>
@@ -57,6 +58,8 @@ void MapCanvas::switch_map(MMap* smap) {
     map = smap;
     static_cast<MapLayerManager*>(dataloop()->layermanager())->updateMap(smap);
     auto mapcanvasInfo = info<MapCanvasInfo>();
+    mapcanvasInfo->bindProjectConfig(smap->project()->cfg());
+
     mapcanvasInfo->mapInfo.cover_path =
         smap->base_metadata().main_cover_path.generic_string();
     mapcanvasInfo->editorInfo.map = smap;

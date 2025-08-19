@@ -104,7 +104,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
 
     // 实际update处理时间
     long long actual_update_time;
-    friend class ProjectManager;
+    friend class ProjectService;
 };
 
 #endif  // MMM_GLCANVAS_HPP

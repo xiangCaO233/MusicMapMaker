@@ -7,14 +7,7 @@
 void MapCanvas::resizeEvent(QResizeEvent *e) {
     GLCanvas::resizeEvent(e);
     if (map) {
-        auto mapinfo = info<MapCanvasInfo>();
-        auto &layout = map->project()->cfg()->canvas_config.canvas_layout;
-        auto canvas_size = size();
-        auto x = float(canvas_size.width()) * layout.w;
-        auto y = float(canvas_size.height()) * layout.x;
-        auto w = float(canvas_size.width()) * layout.y - x;
-        auto h = float(canvas_size.height()) * layout.z - y;
-        mapinfo->editorInfo.track_layout = {x, y, w, h};
+        info<MapCanvasInfo>()->update_trackLayout();
         update_sharedInfo();
     }
 }

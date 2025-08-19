@@ -191,6 +191,8 @@ set(PROJECT_SOURCES
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp
     src/ui/project/projectmanagercontrols.cpp
+    src/ui/project/ProjectService.hpp
+    src/ui/project/ProjectService.cpp
     src/ui/project/projectmanager.ui
     src/ui/project/projectconfig.h
     src/ui/project/projectconfig.cpp

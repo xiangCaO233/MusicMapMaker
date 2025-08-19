@@ -20,11 +20,11 @@ MainWindow::MainWindow(QWidget* parent)
     ui->setupUi(this);
 
     qRegisterMetaType<std::string>("std::string");
-    // 注册 shared_ptr<MMap> 类型
+    // 注册 MMap* 类型
     qRegisterMetaType<MMap*>("MMap*");
 
-    ui->project_manager->bind_canvas(ui->editor->canvas());
-    ui->project_manager->bind_trackmgr(ui->track_manager);
+    // 初始化项目服务
+    ui->project_manager->initService(ui->editor->canvas(), ui->track_manager);
 
     // 捕获ui指针
     auto capui = ui;
@@ -33,11 +33,11 @@ MainWindow::MainWindow(QWidget* parent)
     connect(canvas, &GLCanvas::update_window_suffix, this,
             &MainWindow::update_title_suffix);
 
-    // connect(ui->track_manager, &TrackManager::close,
-    //         [capui]() { capui->actionTrack_Manager->setChecked(false); });
+    connect(ui->track_manager, &TrackManager::close,
+            [capui]() { capui->actionTrack_Manager->setChecked(false); });
 
-    // connect(ui->project_manager, &ProjectManager::close,
-    //         [capui]() { capui->actionProject_Manager->setChecked(false); });
+    connect(ui->project_manager, &ProjectManager::close,
+            [capui]() { capui->actionProject_Manager->setChecked(false); });
 
     connect(canvas, &MapCanvas::skinInitialized, this,
             &MainWindow::onDefSkinInitialized);

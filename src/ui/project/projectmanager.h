@@ -6,8 +6,9 @@
 #include <QStandardItem>
 #include <QWidget>
 #include <memory>
-#include <mmm/project/MProject.hpp>
 #include <unordered_map>
+
+#include "ProjectService.hpp"
 
 namespace Ui {
 class ProjectManager;
@@ -23,20 +24,12 @@ class ProjectManager : public QWidget {
     explicit ProjectManager(QWidget *parent = nullptr);
     ~ProjectManager() override;
 
-    // 设置项目需要 绑定的 画布上下文
-    void bind_canvas(MapCanvas *canvas);
+    // 初始化管理器
+    void initService(MapCanvas *canvas, TrackManager *trackmanager);
 
-    // 设置项目需要 绑定的 音轨管理器上下文
-    void bind_trackmgr(TrackManager *trackmanager);
-
-    // 打开项目
-    void open_project(std::string_view project_path);
-
-    // 关闭项目
-    void close_project(std::string_view project_name);
-
-    // 展示项目
-    void show_project(std::string_view project_name);
+   signals:
+    void openProject(std::string_view project_path);
+    void closeProject(std::string_view project_name);
 
    protected:
     void closeEvent(QCloseEvent *e) override;
@@ -52,20 +45,17 @@ class ProjectManager : public QWidget {
 
     void on_preference_button_clicked();
 
+    void onUpdateProjectListView(
+        const std::unordered_map<std::string, std::unique_ptr<MProject>,
+                                 StringHash, std::equal_to<>> *projects) const;
+    void onActivateProject(MProject *activated_project);
+
    private:
-    // 管理所有项目的内存-因为项目释放时需要使用gl上下文释放纹理
-    std::unordered_map<std::string, std::unique_ptr<MProject>, StringHash,
-                       std::equal_to<>>
-        projects;
+    // 项目服务
+    ProjectService *service{nullptr};
 
     // 项目配置界面
     ProjectConfig *config_ui;
-
-    // 绑定的画布上下文
-    MapCanvas *map_canvas{nullptr};
-
-    // 绑定的音轨管理器上下文
-    TrackManager *track_manager{nullptr};
 
     Ui::ProjectManager *ui;
 };
