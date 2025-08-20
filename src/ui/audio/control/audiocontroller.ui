@@ -272,7 +272,7 @@
              <item>
               <widget class="QLabel" name="total_label">
                <property name="text">
-                <string>00:00</string>
+                <string notr="true">00:00</string>
                </property>
               </widget>
              </item>
@@ -494,7 +494,7 @@
                 <enum>Qt::FocusPolicy::ClickFocus</enum>
                </property>
                <property name="text">
-                <string>00:00.000.000.000</string>
+                <string notr="true">00:00.000.000.000</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -574,7 +574,7 @@
         </widget>
         <widget class="QTabWidget" name="functions">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="basic_tab">
           <attribute name="title">
@@ -710,7 +710,7 @@
                 <string notr="true"/>
                </property>
                <property name="suffix">
-                <string>%</string>
+                <string notr="true">%</string>
                </property>
                <property name="minimum">
                 <double>25.000000000000000</double>
@@ -745,7 +745,7 @@
                 <string>Since the actual sampling is indivisible, the actual playback speed may not be exactly the same as the expected playback speed.</string>
                </property>
                <property name="text">
-                <string>100%</string>
+                <string notr="true">100%</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignmentFlag::AlignCenter</set>

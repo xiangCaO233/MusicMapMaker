@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include <mainwindow.h>
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -16,8 +16,8 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(65001);
-    std::setlocale(LC_ALL, ".UTF-8");
 #endif  //_WIN32
+    std::setlocale(LC_ALL, ".UTF-8");
 
     // 自动共享gl上下文
     // QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
@@ -28,6 +28,36 @@ int main(int argc, char* argv[]) {
 
     // 格式如 "zh_CN", "en_US"
     auto languageCode = systemLocale.name();
+
+    // 初始化 Qt 自带的标准对话框翻译
+    if (QTranslator qtTranslator;
+        qtTranslator.load("qt_" + languageCode,
+                          QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
+        QApplication::installTranslator(&qtTranslator);
+    }
+
+    // 加载应用程序的自定义翻译
+    QTranslator appTranslator;
+
+    // 从资源文件加载
+    bool loaded = appTranslator.load(":/translations/MusicMapMaker_" +
+                                     languageCode + ".qm");
+
+    // 如果资源加载失败，尝试从文件系统加载
+    if (!loaded) {
+        const QString localPath =
+            QDir(QApplication::applicationDirPath())
+                .filePath("translations/MusicMapMaker_" + languageCode + ".qm");
+        loaded = appTranslator.load(localPath);
+    }
+
+    if (loaded) {
+        QApplication::installTranslator(&appTranslator);
+        qDebug() << "Loaded translation for:" + languageCode.toStdString();
+    } else {
+        qDebug() << "Using default language (translation not found for" +
+                        languageCode.toStdString() + ")";
+    }
 
     // 初始化gl版本
     QSurfaceFormat format;

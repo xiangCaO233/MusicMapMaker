@@ -92,7 +92,7 @@ set(MMM_SOURCES
     src/mmm/map/io/mmm/MMapWrite.cpp)
 
 # 设置翻译文件
-set(TS_FILES)
+set(TS_FILES translations/MusicMapMaker_zh_CN.ts translations/MusicMapMaker_en_US.ts)
 
 # 设置着色器文件
 set(GLSL_FILES
@@ -252,6 +252,7 @@ qt_add_executable(
   ${CANVAS_SOURCES}
   ${PROJECT_SOURCES}
   ${GLSL_FILES}
+  ${TS_FILES}
   resources/glsrcs.qrc
   themes/ColinsTheme/Dark/darkstyle.qrc
   themes/ColinsTheme/Light/lightstyle.qrc
