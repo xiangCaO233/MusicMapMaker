@@ -177,6 +177,16 @@ set(CANVAS_SOURCES
 # 项目源文件
 set(PROJECT_SOURCES
     src/util/mutil.hpp
+    src/ui/action/ActionManager.hpp
+    src/ui/action/ActionManager.cpp
+    src/ui/action/modules/canvas/EditorActions.hpp
+    src/ui/action/modules/canvas/EditorActions.cpp
+    src/ui/action/modules/canvas/EditorActionHandler.hpp
+    src/ui/action/modules/canvas/EditorActionHandler.cpp
+    src/ui/action/modules/file/FileActions.hpp
+    src/ui/action/modules/file/FileActions.cpp
+    src/ui/action/modules/file/FileActionHandler.hpp
+    src/ui/action/modules/file/FileActionHandler.cpp
     src/ui/template/AutoResizeTableWidget.h
     src/ui/template/AutoResizeTableWidget.cpp
     src/ui/template/HideableToolWindow.hpp

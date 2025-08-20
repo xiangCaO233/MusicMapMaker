@@ -23,7 +23,7 @@ class TimePixelConverter {
     }
 
     /**
-     * @brief [O(logN)查询] 将时间戳转换为相对于判定线的屏幕像素位置。
+     * @brief [O(logN)查询] 将时间戳转换为相对于判定线的屏幕像素位置
      */
     float timeToPixel(int64_t timestamp, int64_t current_canvas_time) const {
         // 使用查找表分别获取两个时间点的“绝对像素位置”（从t=0开始算）

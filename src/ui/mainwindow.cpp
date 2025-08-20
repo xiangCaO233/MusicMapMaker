@@ -1,6 +1,7 @@
 #include <audio/track/trackmanager.h>
 #include <mainwindow.h>
 #include <project/projectmanager.h>
+#include <qobjectdefs.h>
 #include <ui_mainwindow.h>
 
 #include <QFile>
@@ -45,14 +46,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->track_manager, &TrackManager::audioLoadcbk_initialized, canvas,
             &MapCanvas::onAudioLoadcbkInitialized);
 
-    // MMap map(
-    //     "/Users/2333xiang/Downloads/Juggernaut. - Antler/Juggernaut. - Antler
-    //     "
-    //     "(xiang_233) [NOInsane].osu");
-    // auto notes = map.note_set().get_all_notes_ordered();
-    // for (const auto& handle : notes) {
-    //     qDebug() << map.note_set().get_note(handle)->toString();
-    // }
+    initActions();
 }
 
 MainWindow::~MainWindow() {

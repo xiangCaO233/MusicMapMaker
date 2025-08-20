@@ -3,17 +3,12 @@
 
 #include <edit/mapeditor.h>
 
+#include <GlobalSettings.hpp>
 #include <QMainWindow>
-
-#include "GlobalSettings.hpp"
 
 namespace Ui {
 class MainWindow;
 }
-
-class ProjectManager;
-class HideableToolWindow;
-class TrackManager;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -50,6 +45,9 @@ class MainWindow : public QMainWindow {
 
    private:
     Ui::MainWindow *ui;
+
+    // 初始化所有的action
+    void initActions();
 };
 
 #endif  // MAINWINDOW_H

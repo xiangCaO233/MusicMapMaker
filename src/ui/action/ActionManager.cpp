@@ -1,4 +1,5 @@
 #include <action/ActionManager.hpp>
+#include <action/modules/file/FileActions.hpp>
 
 ActionManager::ActionManager(QObject* parent) : QObject(parent) {}
 

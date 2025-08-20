@@ -40,16 +40,15 @@
     <property name="title">
      <string>File(&amp;F)</string>
     </property>
-    <addaction name="actionNew_O"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menuEdit_E">
     <property name="title">
      <string>Edit(&amp;E)</string>
     </property>
    </widget>
    <addaction name="menuFile_F"/>
+   <addaction name="menuEdit_E"/>
    <addaction name="menuView_V"/>
-   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="project_dock">
@@ -99,11 +98,6 @@
    </property>
    <property name="text">
     <string>Project Manager</string>
-   </property>
-  </action>
-  <action name="actionNew_O">
-   <property name="text">
-    <string>New(&amp;O)</string>
    </property>
   </action>
  </widget>
