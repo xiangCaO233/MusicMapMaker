@@ -40,6 +40,8 @@ void MapCanvas::initializeGL() {
                                 "../resources/textures/default",
                                 audioLoadCallback(), textureCallback()))
                .first->second.get();
+    info<MapCanvasInfo>()->editorInfo.skin = skin;
+    update_sharedInfo();
     emit skinInitialized();
 }
 

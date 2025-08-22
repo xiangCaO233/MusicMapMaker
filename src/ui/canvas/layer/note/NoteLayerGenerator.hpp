@@ -1,8 +1,11 @@
 #ifndef MMM_NOTELAYERGENERATOR_HPP
 #define MMM_NOTELAYERGENERATOR_HPP
 
+#include <ecs/system/MeshGenerateSystem.hpp>
 #include <ecs/system/TimeSystem.hpp>
 #include <layer/LayerComputerBase.hpp>
+
+#include "ecs/system/NormalRenderSystem.hpp"
 
 class NoteLayerGenerator : public LayerComputerBase {
    public:
@@ -16,6 +19,7 @@ class NoteLayerGenerator : public LayerComputerBase {
                        ILayer::RenderDataBuffer& buffer) override;
 
    private:
-    [[no_unique_address]] TimeSystem time_system;
+    [[no_unique_address]] MeshGenerateSystem mesh_system;
+    [[no_unique_address]] NormalRenderSystem normalRender_system;
 };
 #endif  // MMM_NOTELAYERGENERATOR_HPP

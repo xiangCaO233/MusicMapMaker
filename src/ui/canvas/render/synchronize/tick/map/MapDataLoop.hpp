@@ -1,9 +1,9 @@
 #ifndef MMM_MAPDATALOOP_HPP
 #define MMM_MAPDATALOOP_HPP
 
+#include <ecs/system/SyncSystem.hpp>
+#include <ecs/system/TimeSystem.hpp>
 #include <render/synchronize/tick/RenderDataLoop.hpp>
-
-#include "ecs/system/SyncSystem.hpp"
 
 class SharedCanvasInfo;
 
@@ -26,9 +26,8 @@ class MapDataLoop : public RenderDataLoop {
     void tickEvent() override;
     void after_tickEvent() override;
 
-    // 可重写的更新map接口
-    // void updateMap(MMap* map) override {}
    private:
-    SyncSystem sync_system;
+    [[no_unique_address]] SyncSystem sync_system;
+    [[no_unique_address]] TimeSystem time_system;
 };
 #endif  // MMM_MAPDATALOOP_HPP

@@ -93,20 +93,20 @@ std::string_view MSkin::fontFamilyASCII() {}
 std::string_view MSkin::fontFamilyUTF8() {}
 
 // 获取轨道判定纹理
-std::string_view MSkin::get_orbit_judge_texture() {}
+TextureInfo MSkin::get_orbit_judge_texture() {}
 
 // 获取轨道底板纹理
-std::string_view MSkin::get_orbit_bg_texture() {}
+TextureInfo MSkin::get_orbit_bg_texture() {}
 
 // 获取选择框纹理
-std::string_view MSkin::get_selected_border_texture(
+TextureInfo MSkin::get_selected_border_texture(
     SelectBorderDirection direction) {}
 
 // 获取判定线的纹理
-std::string_view MSkin::get_judgeline_texture() {}
+TextureInfo MSkin::get_judgeline_texture() {}
 
 // 获取物件的纹理
-std::string_view MSkin::get_object_texture(TexType type, ObjectStatus status) {}
+TextureInfo MSkin::get_object_texture(TexType type, ObjectStatus status) {}
 
 // 获取音效
 std::string_view MSkin::get_sound_effect(SoundEffectType type) {}

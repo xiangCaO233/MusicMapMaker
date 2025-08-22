@@ -274,71 +274,70 @@
 <context>
     <name>ProjectConfig</name>
     <message>
+        <source>Project Config</source>
+        <translation type="vanished">项目配置</translation>
+    </message>
+    <message>
         <location filename="../src/ui/project/projectconfig.ui" line="14"/>
         <source>Project Preference</source>
-        <translation>项目偏好</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="40"/>
-        <source>Project Config</source>
-        <translation>项目配置</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="98"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="72"/>
         <source>Project Name:</source>
         <translation>项目名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="123"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="97"/>
         <source>Editor Config</source>
         <translation>编辑器配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="154"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="128"/>
         <source>Edit Mode Preference:</source>
         <translation>偏好的编辑模式:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="192"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="166"/>
         <source>Audio Config</source>
         <translation>音频配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="238"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="212"/>
         <source>Global Volume</source>
         <translation>全局音量</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="273"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="247"/>
         <source>Main Track</source>
         <translation>主音轨</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="303"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="460"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="277"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="434"/>
         <source>Output Device:</source>
         <translation>输出设备:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="315"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="472"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="289"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="446"/>
         <source>Defalut</source>
         <translation>默认</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="344"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="501"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="318"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="475"/>
         <source>Volume:</source>
         <translation>音量:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="391"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="548"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="365"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="522"/>
         <source>Stretch:</source>
         <translation>拉伸倍率:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="430"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="404"/>
         <source>Effect Track</source>
         <translation>效果轨道</translation>
     </message>
@@ -401,7 +400,7 @@
         <translation>偏好</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="17"/>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="18"/>
         <source>select project directory</source>
         <translation>选择项目目录</translation>
     </message>

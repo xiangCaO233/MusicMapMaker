@@ -32,6 +32,14 @@ struct CanvasConfig {
     float object_height_scale{1.f};
 };
 
+// 谱面内配置
+struct MapConfig {
+    // 背景暗化比例
+    float darken{.2f};
+    // 背景不透明度
+    float alpha{.8f};
+};
+
 struct MProjectConfig {
     // 项目名称
     std::string project_name;

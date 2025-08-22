@@ -2,8 +2,10 @@
 #define MMM_SYNCSYSTEM_HPP
 
 #include <ecs/ECSCore.hpp>
-#include <ecs/NoteComponents.hpp>
-#include <ecs/RelationComponents.hpp>
+#include <ecs/component/CoreComponents.hpp>
+#include <ecs/component/NoteComponents.hpp>
+#include <ecs/component/RelationComponents.hpp>
+#include <ecs/component/TimingComponents.hpp>
 #include <ecs/system/TimePixelConverter.hpp>
 #include <entt.hpp>
 #include <info/MapCanvasInfo.hpp>
@@ -16,8 +18,10 @@
 class SyncSystem {
    public:
     void update(ECSCore& core, const NoteCollection& notes,
-                const MapCanvasInfo* info,
+                const TimingMap& timings, const MapCanvasInfo* info,
                 const TimePixelConverter& converter) const {
+        if (!info->editorInfo.map) return;
+
         // 获取计算所需的上下文信息
         const auto& base_info = info->baseInfo;
         const auto& realtime_info = info->realTimeInfo;
@@ -49,18 +53,18 @@ class SyncSystem {
             time_at_bottom - base_info.view_timeMargin;
         const uint32_t query_end_time = time_at_top + base_info.view_timeMargin;
 
-        // 使用计算出的时间范围查询 NoteCollection
-        const std::vector<NoteHandle> visible_handles =
-            notes.query_range(query_start_time, query_end_time);
-
         // 执行ECS同步逻辑
         auto& registry = core.ecs_registry();
         auto& handle_map = core.handle_to_entity_map();
 
+        // 使用计算出的时间范围查询 NoteCollection
+        const std::vector<NoteHandle> visible_handles =
+            notes.query_range(query_start_time, query_end_time);
+
         std::unordered_set<NoteHandle, NoteHandle::Hash> current_visible_set(
             visible_handles.begin(), visible_handles.end());
 
-        // 销毁不再可见的实体
+        // 销毁不再可见的物件实体
         for (auto it = handle_map.begin(); it != handle_map.end();) {
             if (current_visible_set.contains(it->first)) {
                 if (registry.valid(it->second)) {
@@ -78,18 +82,49 @@ class SyncSystem {
                 const Note* note_data = notes.get_note(handle);
                 if (!note_data) continue;
                 // 从 note_data 填充组件
-                handle_map[handle] = createEntity(registry, note_data, handle);
+                handle_map[handle] =
+                    createNoteEntity(registry, note_data, handle);
             }
+        }
+
+        // 使用计算出的时间范围查询 TimingMap
+        auto& timing_set = timings.get_all_timing_points();
+        auto start_timing_it = timing_set.upper_bound(query_start_time);
+        if (start_timing_it != timing_set.end() &&
+            start_timing_it != timing_set.begin()) {
+            --start_timing_it;
+        }
+        while (start_timing_it != timing_set.end() &&
+               start_timing_it->second.timestamp <= query_end_time) {
+            if (start_timing_it->second.timestamp >= query_start_time) {
+                createTimingEntity(registry, &start_timing_it->second);
+            }
+            ++start_timing_it;
         }
     }
 
-    // 创建实体
-    entt::entity createEntity(entt::registry& registry, const Note* note,
-                              NoteHandle handle) const {
+    // 创建timing实体
+    entt::entity createTimingEntity(entt::registry& registry,
+                                    const Timing* timing) const {
+        auto timing_entity = registry.create();
+        // 附加Time组件
+        registry.emplace<TimeComponent>(timing_entity, timing->timestamp);
+        // 附加Timing组件
+        registry.emplace<TimingComponent>(timing_entity, timing->bpm,
+                                          timing->beat_length,
+                                          timing->is_base_timing);
+        return timing_entity;
+    }
+
+    // 创建物件实体
+    entt::entity createNoteEntity(entt::registry& registry, const Note* note,
+                                  NoteHandle handle) const {
         auto note_entity = registry.create();
+        // 附加Time组件
+        registry.emplace<TimeComponent>(note_entity, note->timestamp());
+
         // 附加note组件(time,track,source)
-        registry.emplace<NoteComponent>(note_entity, note->timestamp(),
-                                        note->trackpos(), handle);
+        registry.emplace<NoteComponent>(note_entity, note->trackpos(), handle);
         switch (note->notetype()) {
             case NoteType::HOLD: {
                 auto hold_note = static_cast<const Hold*>(note);
@@ -107,7 +142,7 @@ class SyncSystem {
                 std::vector<entt::entity> children;
                 for (const auto& child_note : composed_note->children()) {
                     auto child_note_entity =
-                        createEntity(registry, child_note.get(), {0, 0});
+                        createNoteEntity(registry, child_note.get(), {0, 0});
                     // 附加父实体组件
                     registry.emplace<ChildOfComponent>(child_note_entity,
                                                        note_entity);

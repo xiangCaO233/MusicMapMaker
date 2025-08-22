@@ -92,7 +92,8 @@ set(MMM_SOURCES
     src/mmm/map/io/mmm/MMapWrite.cpp)
 
 # 设置翻译文件
-set(TS_FILES translations/MusicMapMaker_zh_CN.ts translations/MusicMapMaker_en_US.ts)
+set(TS_FILES translations/MusicMapMaker_zh_CN.ts
+             translations/MusicMapMaker_en_US.ts)
 
 # 设置着色器文件
 set(GLSL_FILES
@@ -132,13 +133,15 @@ set(CANVAS_SOURCES
     src/ui/canvas/tool/select/SelectTool.cpp
     src/ui/canvas/tool/note/NoteTool.hpp
     src/ui/canvas/tool/note/NoteTool.cpp
-    src/ui/canvas/ecs/CoreComponents.hpp
     src/ui/canvas/ecs/ECSCore.hpp
     src/ui/canvas/ecs/ECSCore.cpp
     src/ui/canvas/ecs/Entity.hpp
-    src/ui/canvas/ecs/NoteComponents.hpp
-    src/ui/canvas/ecs/RelationComponents.hpp
-    src/ui/canvas/ecs/StateComponents.hpp
+    src/ui/canvas/ecs/component/CoreComponents.hpp
+    src/ui/canvas/ecs/component/NoteComponents.hpp
+    src/ui/canvas/ecs/component/RelationComponents.hpp
+    src/ui/canvas/ecs/component/StateComponents.hpp
+    src/ui/canvas/ecs/component/TimingComponents.hpp
+    src/ui/canvas/ecs/component/TransformComponents.hpp
     src/ui/canvas/layer/ILayer.hpp
     src/ui/canvas/layer/LayerComputerBase.hpp
     src/ui/canvas/layer/LayerComputerBase.cpp

@@ -18,6 +18,7 @@ struct MapInfo {
     float alpha{.8f};
 };
 
+class MSkin;
 struct EditorInfo {
     // 绑定的项目配置
     const MProjectConfig* project_config{nullptr};
@@ -33,6 +34,9 @@ struct EditorInfo {
 
     // 轨道布局
     glm::vec4 track_layout;
+
+    // 编辑器皮肤
+    MSkin* skin;
 };
 
 struct MapCanvasInfo : public SharedCanvasInfo {

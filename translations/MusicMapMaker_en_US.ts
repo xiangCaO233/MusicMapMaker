@@ -279,66 +279,61 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="40"/>
-        <source>Project Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="98"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="72"/>
         <source>Project Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="123"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="97"/>
         <source>Editor Config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="154"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="128"/>
         <source>Edit Mode Preference:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="192"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="166"/>
         <source>Audio Config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="238"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="212"/>
         <source>Global Volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="273"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="247"/>
         <source>Main Track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="303"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="460"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="277"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="434"/>
         <source>Output Device:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="315"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="472"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="289"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="446"/>
         <source>Defalut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="344"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="501"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="318"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="475"/>
         <source>Volume:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="391"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="548"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="365"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="522"/>
         <source>Stretch:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="430"/>
+        <location filename="../src/ui/project/projectconfig.ui" line="404"/>
         <source>Effect Track</source>
         <translation type="unfinished"></translation>
     </message>
@@ -401,7 +396,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="17"/>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="18"/>
         <source>select project directory</source>
         <translation type="unfinished"></translation>
     </message>

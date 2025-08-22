@@ -30,7 +30,7 @@ class Timing {
     // 这个时间轴区间的结束时间即为下一个时间点的开始时间（如果这是最后一个时间点，则无结束时间）。
     // in-imd
     //
-    int32_t timestamp{-1};
+    uint32_t timestamp;
 
     // 该时间点的bpm(始终都携带最近的红线的歌曲bpm)
     //

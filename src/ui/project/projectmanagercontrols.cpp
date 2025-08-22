@@ -1,3 +1,4 @@
+#include <mainwindow.h>
 #include <projectmanager.h>
 #include <qdir.h>
 #include <qlogging.h>
@@ -55,6 +56,7 @@ void ProjectManager::on_preference_button_clicked() {
     auto selection = ui->project_list->selectionModel();
     if (selection->hasSelection()) {
         if (!config_ui->isVisible()) {
+            config_ui->setStyleSheet(MainWindow::global_style_sheet);
             config_ui->show();
         }
     }

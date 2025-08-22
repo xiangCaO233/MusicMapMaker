@@ -36,7 +36,7 @@ ProjectManager::ProjectManager(QWidget* parent)
     ui->video_listView->setModel(video_list_model);
 
     // 初始化项目配置ui
-    config_ui = new ProjectConfig(this);
+    config_ui = new ProjectConfig();
     config_ui->hide();
 }
 
@@ -133,6 +133,8 @@ void ProjectManager::onActivateProject(MProject* activated_project) {
 }
 
 void ProjectManager::closeEvent(QCloseEvent* e) {
+    qDebug() << "close ProjectManager: delete configui";
+    delete config_ui;
     qDebug() << "close ProjectManager: delete service";
     delete service;
 }

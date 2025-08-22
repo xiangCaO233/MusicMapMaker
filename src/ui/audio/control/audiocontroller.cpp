@@ -1,3 +1,4 @@
+#include <mainwindow.h>
 #include <qdir.h>
 #include <qlogging.h>
 #include <qtmetamacros.h>
@@ -52,6 +53,7 @@ AudioController::AudioController(QWidget* parent)
 
     connect(play_callback, &PlayPosCallBack::update_timepos, this,
             &AudioController::updateDisplayPosition);
+    setStyleSheet(MainWindow::global_style_sheet);
 }
 
 // 播放完成
