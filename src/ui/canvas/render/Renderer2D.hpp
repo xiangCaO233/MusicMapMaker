@@ -17,7 +17,7 @@ class GLCanvas;
 class Renderer2D : public TextureLoadCallback {
    public:
     explicit Renderer2D(GLCanvas* canvas);
-    ~Renderer2D();
+    ~Renderer2D() override;
 
     // 需要载入纹理
     void need_loadtexture_dir(std::string_view texdir) override;
@@ -83,6 +83,7 @@ class Renderer2D : public TextureLoadCallback {
 
     // gl函数上下文
     QOpenGLFunctions_4_1_Core* glf;
+
     // 着色器
     QOpenGLShaderProgram* shader_program;
 

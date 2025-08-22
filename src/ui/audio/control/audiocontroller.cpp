@@ -56,6 +56,13 @@ AudioController::AudioController(QWidget* parent)
     setStyleSheet(MainWindow::global_style_sheet);
 }
 
+// 添加播放回调
+void AudioController::add_playcallback(
+    const std::shared_ptr<ice::PlayCallBack>& play_callback) {
+    // 设置回调
+    source_node->add_playcallback(play_callback);
+}
+
 // 播放完成
 void AudioController::playDone() {
     // 设置播放器按钮为checked

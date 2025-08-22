@@ -89,6 +89,9 @@ class SyncSystem {
 
         // 使用计算出的时间范围查询 TimingMap
         auto& timing_set = timings.get_all_timing_points();
+
+        if (!info->editorInfo.map) return;
+
         auto start_timing_it = timing_set.upper_bound(query_start_time);
         if (start_timing_it != timing_set.end() &&
             start_timing_it != timing_set.begin()) {

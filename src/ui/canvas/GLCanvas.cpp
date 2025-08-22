@@ -63,6 +63,8 @@ GLCanvas::GLCanvas() {
 
 // 析构GLCanvas
 GLCanvas::~GLCanvas() {
+    render_dataloop.reset();
+    emit dataloop_stopped();
     render.reset();
     delete fpsCounter;
 }

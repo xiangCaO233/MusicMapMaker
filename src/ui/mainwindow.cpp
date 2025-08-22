@@ -28,17 +28,20 @@ MainWindow::MainWindow(QWidget* parent)
     ui->project_manager->initService(ui->editor->canvas(), ui->track_manager);
 
     // 捕获ui指针
-    auto capui = ui;
+    // auto capui = ui;
 
     auto canvas = ui->editor->canvas();
+
     connect(canvas, &GLCanvas::update_window_suffix, this,
             &MainWindow::update_title_suffix);
 
-    connect(ui->track_manager, &TrackManager::close,
-            [capui]() { capui->actionTrack_Manager->setChecked(false); });
+    // connect(ui->track_manager, &TrackManager::close,
+    //         [capui]() { capui->actionTrack_Manager->setChecked(false); });
+    // connect(ui->project_manager, &ProjectManager::close,
+    //         [capui]() { capui->actionProject_Manager->setChecked(false); });
 
-    connect(ui->project_manager, &ProjectManager::close,
-            [capui]() { capui->actionProject_Manager->setChecked(false); });
+    connect(canvas, &GLCanvas::dataloop_stopped, ui->project_manager,
+            &ProjectManager::onMapCanvasThreadStopped);
 
     connect(canvas, &MapCanvas::skinInitialized, this,
             &MainWindow::onDefSkinInitialized);

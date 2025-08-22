@@ -132,9 +132,14 @@ void ProjectManager::onActivateProject(MProject* activated_project) {
     }
 }
 
-void ProjectManager::closeEvent(QCloseEvent* e) {
-    qDebug() << "close ProjectManager: delete configui";
-    delete config_ui;
-    qDebug() << "close ProjectManager: delete service";
+void ProjectManager::onMapCanvasThreadStopped() {
+    // 在画布的线程完全停止后才释放项目资源
+    qDebug() << "ProjectManager: delete service";
     delete service;
+}
+
+void ProjectManager::closeEvent(QCloseEvent* e) {
+    service->selectMap("", nullptr);
+    qDebug() << "ProjectManager: delete configui";
+    delete config_ui;
 }

@@ -45,6 +45,10 @@ class AudioController : public HideableToolWindow {
     // 传递引用
     void set_audio_track(const std::shared_ptr<ice::AudioTrack> &track);
 
+    // 添加播放回调
+    void add_playcallback(
+        const std::shared_ptr<ice::PlayCallBack> &play_callback);
+
     void set_item(QStandardItem *item);
 
     inline const std::shared_ptr<ice::AudioTrack> &track() const {

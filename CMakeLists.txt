@@ -200,6 +200,7 @@ set(PROJECT_SOURCES
     src/ui/edit/mapeditor.cpp
     src/ui/edit/mapeditormenus.cpp
     src/ui/edit/mapeditorevent.cpp
+    src/ui/edit/mapeditorcontrols.cpp
     src/ui/edit/mapeditor.ui
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp

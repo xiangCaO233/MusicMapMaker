@@ -27,6 +27,8 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
 
    signals:
     void update_window_suffix(const QString &suffix);
+    // 数据循环停止信号
+    void dataloop_stopped();
 
    protected:
     void initializeGL() override;

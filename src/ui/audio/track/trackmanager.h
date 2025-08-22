@@ -37,8 +37,12 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
     // 获取音频轨道
     std::weak_ptr<ice::AudioTrack> get_track(const QString &audio_name);
 
+    // 获取音频控制器
+    AudioController *get_controller(const QString &audio_name);
+
     std::weak_ptr<ice::AudioTrack> loadBack(
         std::string_view audio_path) override;
+    AudioController *getController(std::string_view audio_name) override;
    signals:
     void audioLoadcbk_initialized(AudioLoadCallback *cbk);
 

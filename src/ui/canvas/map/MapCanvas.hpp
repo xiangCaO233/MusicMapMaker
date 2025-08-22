@@ -5,11 +5,14 @@
 #include <qobject.h>
 
 #include <canvas/GLCanvas.hpp>
+#include <ice/core/PlayCallBack.hpp>
 #include <map/skin/MSkin.hpp>
 #include <memory>
 #include <tool/BaseTool.hpp>
 #include <unordered_map>
 #include <util/StringHash.hpp>
+
+#include "info/MapCanvasInfo.hpp"
 
 class MMap;
 
@@ -46,6 +49,32 @@ class MapCanvas : public GLCanvas {
     void resizeEvent(QResizeEvent *event) override;
 
    private:
+    class CanvasAudioPlayCallback : public ice::PlayCallBack {
+       public:
+        explicit CanvasAudioPlayCallback(MapCanvas *cvs) : canvas(cvs) {};
+        // 播放完成完整一遍回调(传入是否循环)
+        void play_done(bool loop) const override {}
+        // 帧基
+        void frameplaypos_updated(size_t frame_pos) override {}
+
+        // 时间基
+        void timeplaypos_updated(std::chrono::nanoseconds time_pos) override {
+            auto timems =
+                std::chrono::duration_cast<std::chrono::milliseconds>(time_pos)
+                    .count();
+            auto mapinfo = canvas->info<MapCanvasInfo>();
+            if (mapinfo) {
+                mapinfo->realTimeInfo.current_canvas_time = uint32_t(timems);
+            }
+        }
+
+        // 画布
+        MapCanvas *canvas;
+    };
+
+    // 主音轨播放回调
+    std::shared_ptr<CanvasAudioPlayCallback> maintrack_callback;
+
     // 绑定的谱面
     MMap *map{nullptr};
 

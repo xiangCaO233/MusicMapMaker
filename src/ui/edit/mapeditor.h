@@ -23,6 +23,9 @@ class MapEditor : public QWidget {
     void keyPressEvent(QKeyEvent *e) override;
     void keyReleaseEvent(QKeyEvent *e) override;
 
+   private slots:
+    void on_pause_button_toggled(bool checked);
+
    private:
     Ui::MapEditor *ui;
 

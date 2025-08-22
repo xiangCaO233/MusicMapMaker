@@ -5,10 +5,12 @@
 #include <memory>
 #include <string_view>
 
+class AudioController;
 class AudioLoadCallback {
    public:
     // 析构AudioLoadCallback
     virtual ~AudioLoadCallback() = default;
+    virtual AudioController* getController(std::string_view audio_name) = 0;
     virtual std::weak_ptr<ice::AudioTrack> loadBack(
         std::string_view audio_path) = 0;
 };

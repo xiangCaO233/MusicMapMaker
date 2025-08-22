@@ -136,6 +136,20 @@ std::weak_ptr<ice::AudioTrack> TrackManager::loadBack(
     return loadin_audio(QString::fromStdString(std::string(audio_path)));
 }
 
+AudioController* TrackManager::getController(std::string_view audio_name) {
+    return get_controller(QString::fromStdString(std::string(audio_name)));
+}
+
+// 获取音频控制器
+AudioController* TrackManager::get_controller(const QString& audio_name) {
+    AudioController* res{nullptr};
+    if (auto controller_it = audio_controllers.find(audio_name);
+        controller_it != audio_controllers.end()) {
+        res = controller_it.value();
+    }
+    return res;
+}
+
 // 载入音频
 std::weak_ptr<ice::AudioTrack> TrackManager::loadin_audio(
     const QString& audio_file) {

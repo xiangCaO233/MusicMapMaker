@@ -16,9 +16,9 @@ struct TransformComponent_2 {
         glm::vec2 pos;
         glm::vec2 size;
         // 纹理信息
-        TextureInfo texture;
+        TextureInfo texture{};
         // 绘制层级，值越小越先绘制
-        int zIndex;
+        int zIndex{};
     };
     std::vector<Quad> mesh;
 };

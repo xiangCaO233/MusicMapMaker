@@ -34,6 +34,8 @@ class ProjectManager : public QWidget {
    protected:
     void closeEvent(QCloseEvent *e) override;
 
+   public slots:
+    void onMapCanvasThreadStopped();
    private slots:
     void on_create_project_button_clicked();
     void on_add_project_button_clicked();

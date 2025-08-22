@@ -1,3 +1,4 @@
+#include <audio/control/audiocontroller.h>
 #include <qalgorithms.h>
 
 #include <GLCanvas.hpp>
@@ -16,6 +17,8 @@ MapCanvas::MapCanvas() : GLCanvas() {
     initSharedInfo<MapCanvasInfo>();
     // 初始化工具
     creatTools();
+    // 初始化播放回调
+    maintrack_callback = std::make_shared<CanvasAudioPlayCallback>(this);
 }
 
 // 析构MapCanvas
@@ -51,7 +54,7 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
     // 载入全部默认皮肤的音效
     for (const auto& [type, soundRpath] : skin->sound_effects) {
         auto soundApath = skin->skinPath / soundRpath;
-        cbk->loadBack(soundApath.generic_string());
+        auto weak_track = cbk->loadBack(soundApath.generic_string());
     }
 }
 
@@ -65,6 +68,12 @@ void MapCanvas::switch_map(MMap* smap) {
     mapcanvasInfo->mapInfo.cover_path =
         smap->base_metadata().main_cover_path.generic_string();
     mapcanvasInfo->editorInfo.map = smap;
+
+    // 绑定播放回调
+    audioLoadCallback()
+        ->getController(smap->base_metadata().main_audio_path.generic_string())
+        ->add_playcallback(maintrack_callback);
+
     update_sharedInfo();
 }
 
