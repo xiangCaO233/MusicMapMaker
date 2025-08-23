@@ -16,9 +16,13 @@ class TimeSystem {
         auto& registry = core.ecs_registry();
         const auto& realtime_info = info->realTimeInfo;
 
+        // 计算判定线的绝对屏幕Y坐标 (Y向下为正)
+        const float judgeline_absolute_y =
+            info->baseInfo.canvasSize.height() * info->baseInfo.judgeline_pos;
+
         // 遍历所有需要定位的实体
         auto view = registry.view<TimeComponent>();
-        auto count{0};
+        // auto count{0};
         for (auto entity : view) {
             auto [time] = view.get<TimeComponent>(entity);
 
@@ -26,11 +30,15 @@ class TimeSystem {
             const float y =
                 converter.timeToPixel(time, realtime_info.current_canvas_time);
 
+            // 判定线位置 + 逻辑偏移
+            const float center_y =
+                info->baseInfo.canvasSize.height() - y - judgeline_absolute_y;
+
             // 附加或更新 TransformComponent_1
-            registry.emplace_or_replace<TransformComponent_1>(entity, y);
-            ++count;
+            registry.emplace_or_replace<TransformComponent_1>(entity, center_y);
+            // ++count;
         }
-        qDebug() << "共更新" << count << "个实体转换组件1";
+        // qDebug() << "共更新" << count << "个实体转换组件1";
     }
 };
 

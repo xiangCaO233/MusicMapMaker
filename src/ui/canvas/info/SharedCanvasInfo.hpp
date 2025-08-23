@@ -24,7 +24,9 @@ struct BaseCanvasStatus {
 
 struct RealTimeInfo {
     // 当前时间戳
-    uint32_t current_canvas_time{92000};
+    double current_canvas_time{92000};
+    // 是否暂停
+    bool pause{false};
     // 当前鼠标位置
     QPointF mousePos;
     // 正在按下的鼠标按钮

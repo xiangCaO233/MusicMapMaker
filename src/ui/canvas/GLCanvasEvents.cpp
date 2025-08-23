@@ -14,7 +14,9 @@ void GLCanvas::paintEvent(QPaintEvent *event) {
             .count();
     auto atime = time - lasttime;
     actual_update_time = double(atime) / 1000.0;
-    canvas_info->realTimeInfo.current_canvas_time += actual_update_time;
+    if (!canvas_info->realTimeInfo.pause) {
+        canvas_info->realTimeInfo.current_canvas_time += actual_update_time;
+    }
     lasttime = time;
 }
 

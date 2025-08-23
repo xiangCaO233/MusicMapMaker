@@ -20,7 +20,7 @@ class MeshGenerateSystem {
         const int track_count =
             info->editorInfo.map->base_metadata().track_count;
         if (track_count == 0) return;
-        const float single_track_width = all_tracks_rect.z / track_count;
+        const float single_track_width = all_tracks_rect.z / float(track_count);
         // 遍历所有需要生成网格的实体
         auto view =
             registry.view<TimeComponent, NoteComponent, TransformComponent_1>();
@@ -31,16 +31,17 @@ class MeshGenerateSystem {
             // --- 根据Note类型进行分支处理 ---
             auto& [track_index, handle] = registry.get<NoteComponent>(e);
             auto& [y] = registry.get<TransformComponent_1>(e);
+            const float x = all_tracks_rect.x +
+                            (float(track_index) + 0.5f) * single_track_width;
 
             if (registry.all_of<HoldComponent>(e)) {
+                mesh.emplace_back(glm::vec2(x - 40, y - 40), glm::vec2(80, 80));
                 // generateHoldMesh(registry, e);
             } else if (registry.all_of<FlickComponent>(e)) {
+                mesh.emplace_back(glm::vec2(x - 25, y - 25), glm::vec2(50, 50));
                 // generateFlickMesh(registry, e);
             } else {
-                // 默认是普通的Tap Note
-                const float x = all_tracks_rect.x +
-                                (track_index + 0.5f) * single_track_width;
-                mesh.emplace_back(glm::vec2(x, y), glm::vec2(50, 50));
+                mesh.emplace_back(glm::vec2(x - 25, y - 25), glm::vec2(50, 50));
                 // generateTapMesh(registry, e);
             }
         }

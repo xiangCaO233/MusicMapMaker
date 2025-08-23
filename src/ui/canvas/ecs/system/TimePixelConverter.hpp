@@ -31,7 +31,7 @@ class TimePixelConverter {
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
 
         // 两者的差值就是它们的相对像素距离，最后应用全局缩放
-        return static_cast<float>((pixel_at_current_time - pixel_at_timestamp) *
+        return static_cast<float>((pixel_at_timestamp - pixel_at_current_time) *
                                   m_status.timeline_zoom);
     }
 

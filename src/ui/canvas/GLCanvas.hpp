@@ -105,7 +105,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     qreal desiredFps;
 
     // 实际update处理时间
-    long long actual_update_time;
+    double actual_update_time;
     friend class ProjectService;
 };
 
