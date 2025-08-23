@@ -16,18 +16,21 @@ class TimeSystem {
         auto& registry = core.ecs_registry();
         const auto& realtime_info = info->realTimeInfo;
 
-        // 2. 遍历所有需要定位的实体
+        // 遍历所有需要定位的实体
         auto view = registry.view<TimeComponent>();
+        auto count{0};
         for (auto entity : view) {
             auto [time] = view.get<TimeComponent>(entity);
 
-            // 3. 使用转换器计算Y坐标
+            // 使用转换器计算Y坐标
             const float y =
                 converter.timeToPixel(time, realtime_info.current_canvas_time);
 
-            // 4. 附加或更新 TransformComponent_1
+            // 附加或更新 TransformComponent_1
             registry.emplace_or_replace<TransformComponent_1>(entity, y);
+            ++count;
         }
+        qDebug() << "共更新" << count << "个实体转换组件1";
     }
 };
 

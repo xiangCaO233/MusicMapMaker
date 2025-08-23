@@ -1,11 +1,36 @@
 #ifndef MMM_NOTEHANDLE_HPP
 #define MMM_NOTEHANDLE_HPP
 
+#include <math.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 
 // --- 稳定的句柄 (Stable Handle) ---
+
+// Timing点的唯一标识句柄
+struct TimingHandle {
+    int32_t timestamp;
+    double beat_length;  // 使用 beat_length 来区分红线和绿线
+
+    // 重载 operator== 以便在 map 和 set 中比较
+    bool operator==(const TimingHandle& other) const {
+        return timestamp == other.timestamp &&
+               std::abs(beat_length - other.beat_length) <
+                   1e-9;  // 比较double要用精度
+    }
+
+    // 为句柄提供一个哈希函数，以便用作 std::unordered_map 的 Key
+    struct Hash {
+        std::size_t operator()(const TimingHandle& h) const {
+            // 一个简单的组合哈希实现
+            auto hash1 = std::hash<int32_t>{}(h.timestamp);
+            auto hash2 = std::hash<double>{}(h.beat_length);
+            return hash1 ^ (hash2 << 1);  // 或者使用更复杂的组合哈希
+        }
+    };
+};
 
 /**
  * @struct NoteHandle

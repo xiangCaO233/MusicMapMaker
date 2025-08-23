@@ -2,7 +2,7 @@
 #define MMM_NOTECOMPONENTS_HPP
 
 #include <cstdint>
-#include <mmm/NoteHandle.hpp>
+#include <mmm/ObjectHandle.hpp>
 
 // 标记这是一个Note，并存储其轨道信息
 struct NoteComponent {

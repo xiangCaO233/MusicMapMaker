@@ -6,6 +6,7 @@
 #include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/RelationComponents.hpp>
 #include <ecs/component/TimingComponents.hpp>
+#include <ecs/component/TransformComponents.hpp>
 #include <ecs/system/TimePixelConverter.hpp>
 #include <entt.hpp>
 #include <info/MapCanvasInfo.hpp>
@@ -43,19 +44,25 @@ class SyncSystem {
         const auto pixel_y_bottom = 0.0f - judgeline_absolute_y;
 
         // 使用转换器计算时间边界
-        const uint32_t time_at_top =
+        const auto time_at_top =
             converter.pixelToTime(pixel_y_top, current_time);
-        const uint32_t time_at_bottom =
+        const auto time_at_bottom =
             converter.pixelToTime(pixel_y_bottom, current_time);
 
         // 应用预加载缓冲
-        const uint32_t query_start_time =
+        const auto query_start_time =
             time_at_bottom - base_info.view_timeMargin;
-        const uint32_t query_end_time = time_at_top + base_info.view_timeMargin;
+        const auto query_end_time = time_at_top + base_info.view_timeMargin;
 
         // 执行ECS同步逻辑
         auto& registry = core.ecs_registry();
+
         auto& handle_map = core.handle_to_entity_map();
+
+        // ----------debug------------
+        // auto current_entities = handle_map.size();
+        // qDebug() << "初始实体句柄表大小:" << current_entities;
+        // ----------debug------------
 
         // 使用计算出的时间范围查询 NoteCollection
         const std::vector<NoteHandle> visible_handles =
@@ -64,9 +71,13 @@ class SyncSystem {
         std::unordered_set<NoteHandle, NoteHandle::Hash> current_visible_set(
             visible_handles.begin(), visible_handles.end());
 
+        // ----------debug------------
+        // qDebug() << "当前可见实体数量:" << visible_handles.size();
+        // ----------debug------------
+
         // 销毁不再可见的物件实体
         for (auto it = handle_map.begin(); it != handle_map.end();) {
-            if (current_visible_set.contains(it->first)) {
+            if (!current_visible_set.contains(it->first)) {
                 if (registry.valid(it->second)) {
                     registry.destroy(it->second);
                 }
@@ -75,6 +86,11 @@ class SyncSystem {
                 ++it;
             }
         }
+        // ----------debug------------
+        // auto after_entities = handle_map.size();
+        // qDebug() << "销毁不可见实体数量:" << after_entities -
+        // current_entities;
+        // ----------debug------------
 
         // 为新出现的可见Note创建实体
         for (const auto& handle : visible_handles) {
@@ -87,22 +103,63 @@ class SyncSystem {
             }
         }
 
-        // 使用计算出的时间范围查询 TimingMap
-        auto& timing_set = timings.get_all_timing_points();
+        // ----------debug------------
+        // auto new_entities = handle_map.size();
+        // qDebug() << "新建可见实体数量:" << new_entities - after_entities;
+        // ----------debug------------
 
-        if (!info->editorInfo.map) return;
+        // Timing 实体同步逻辑
+        auto& timing_handle_map = core.handle_to_timingentity_map();
 
-        auto start_timing_it = timing_set.upper_bound(query_start_time);
-        if (start_timing_it != timing_set.end() &&
-            start_timing_it != timing_set.begin()) {
-            --start_timing_it;
-        }
-        while (start_timing_it != timing_set.end() &&
-               start_timing_it->second.timestamp <= query_end_time) {
-            if (start_timing_it->second.timestamp >= query_start_time) {
-                createTimingEntity(registry, &start_timing_it->second);
+        // 收集当前可见的 TimingHandle
+        std::unordered_set<TimingHandle, TimingHandle::Hash>
+            visible_timing_handles;
+        const auto& all_timing_points = timings.get_all_timing_points();
+
+        // 我们需要遍历 std::map 来获取所有Timing点
+        auto start_it = all_timing_points.upper_bound(query_start_time);
+        if (start_it != all_timing_points.begin()) --start_it;
+
+        for (auto it = start_it; it != all_timing_points.end(); ++it) {
+            const auto& [timestamp, timing] = *it;
+            if (timestamp > query_end_time) break;  // 优化：超出范围就停止
+
+            if (timestamp >= query_start_time) {
+                // *** 为每个Timing点创建一个唯一的句柄 ***
+                visible_timing_handles.insert({timestamp, timing.beat_length});
             }
-            ++start_timing_it;
+        }
+
+        // 销毁不再可见的 Timing 实体
+        for (auto it = timing_handle_map.begin();
+             it != timing_handle_map.end();) {
+            if (!visible_timing_handles.contains(it->first)) {
+                if (registry.valid(it->second)) registry.destroy(it->second);
+                it = timing_handle_map.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        // 创建新出现的 Timing 实体
+        for (const TimingHandle& handle : visible_timing_handles) {
+            if (!timing_handle_map.contains(handle)) {
+                // 因为句柄本身不足以定位Timing对象，我们还是需要查询map
+                // 但由于Timing点很少，这次查询的开销可以忽略不计
+                const auto& candidates =
+                    all_timing_points.find(handle.timestamp);
+                if (candidates != all_timing_points.end()) {
+                    // 找到对应时间戳的timing点
+                    const Timing* timing_data = &(candidates->second);
+
+                    // 确保 beat_length 也匹配
+                    if (std::abs(timing_data->beat_length -
+                                 handle.beat_length) < 1e-9) {
+                        timing_handle_map[handle] =
+                            createTimingEntity(registry, timing_data);
+                    }
+                }
+            }
         }
     }
 

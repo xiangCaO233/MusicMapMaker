@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
-#include <mmm/NoteHandle.hpp>
+#include <mmm/ObjectHandle.hpp>
 #include <mmm/obj/Hold.hpp>
 #include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Composite.hpp>

@@ -4,13 +4,17 @@
 
 void GLCanvas::paintEvent(QPaintEvent *event) {
     QOpenGLWindow::paintEvent(event);
-    static long long lasttime = 0;
+    static long long lasttime =
+        std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now().time_since_epoch())
+            .count();
     auto time =
         std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::high_resolution_clock::now().time_since_epoch())
             .count();
     auto atime = time - lasttime;
     actual_update_time = double(atime) / 1000.0;
+    canvas_info->realTimeInfo.current_canvas_time += actual_update_time;
     lasttime = time;
 }
 

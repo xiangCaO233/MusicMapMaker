@@ -1,7 +1,7 @@
 #ifndef MMM_TIMINGCOMPONENTS_HPP
 #define MMM_TIMINGCOMPONENTS_HPP
 
-// Timing组件,标记这是一个Timing实体
+// Timing组件
 struct TimingComponent {
     double bpm;
     double beat_length;

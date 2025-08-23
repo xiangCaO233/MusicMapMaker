@@ -54,18 +54,22 @@ class MapCanvas : public GLCanvas {
         explicit CanvasAudioPlayCallback(MapCanvas *cvs) : canvas(cvs) {};
         // 播放完成完整一遍回调(传入是否循环)
         void play_done(bool loop) const override {}
+
         // 帧基
         void frameplaypos_updated(size_t frame_pos) override {}
 
         // 时间基
         void timeplaypos_updated(std::chrono::nanoseconds time_pos) override {
+            // 定期同步
+            static uint32_t count{0};
             auto timems =
                 std::chrono::duration_cast<std::chrono::milliseconds>(time_pos)
                     .count();
-            auto mapinfo = canvas->info<MapCanvasInfo>();
-            if (mapinfo) {
+            if (auto mapinfo = canvas->info<MapCanvasInfo>();
+                mapinfo && count % 50 == 0) {
                 mapinfo->realTimeInfo.current_canvas_time = uint32_t(timems);
             }
+            ++count;
         }
 
         // 画布
