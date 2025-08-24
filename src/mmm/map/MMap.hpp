@@ -1,6 +1,7 @@
 #ifndef MMM_MMAP_HPP
 #define MMM_MMAP_HPP
 
+#include <ice/manage/AudioTrack.hpp>
 #include <memory>
 #include <mmm/DataStructures.hpp>
 #include <mmm/MetaData.hpp>
@@ -33,6 +34,9 @@ class MMap {
 
     // 访问基本元数据
     BaseMapMeta& base_metadata() { return basemeta; };
+
+    // 设置主音轨
+    void set_maintrack(const std::shared_ptr<ice::AudioTrack>& track);
 
    private:
     // (实际持有)

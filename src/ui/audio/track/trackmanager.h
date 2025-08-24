@@ -32,7 +32,8 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
     ~TrackManager() override;
 
     // 载入音频
-    std::weak_ptr<ice::AudioTrack> loadin_audio(const QString &audio_file);
+    std::weak_ptr<ice::AudioTrack> loadin_audio(const QString &audio_file,
+                                                bool is_maintrack);
 
     // 获取音频轨道
     std::weak_ptr<ice::AudioTrack> get_track(const QString &audio_name);
@@ -40,8 +41,15 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
     // 获取音频控制器
     AudioController *get_controller(const QString &audio_name);
 
-    std::weak_ptr<ice::AudioTrack> loadBack(
-        std::string_view audio_path) override;
+    // 获取主音轨名
+    const QStringList &get_maintrack() const;
+
+    // 设置主音轨名
+    void set_maintrack(const QString &name);
+
+    // 回调实现
+    std::weak_ptr<ice::AudioTrack> loadBack(std::string_view audio_path,
+                                            bool is_maintrack = false) override;
     AudioController *getController(std::string_view audio_name) override;
    signals:
     void audioLoadcbk_initialized(AudioLoadCallback *cbk);
@@ -73,6 +81,9 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
 
     // 各个音轨对应的控制器
     QHash<QString, AudioController *> audio_controllers;
+
+    // 主音轨
+    QStringList maintrack_names;
 
     // 线程池
     ice::ThreadPool threadpool{2};

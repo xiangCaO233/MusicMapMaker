@@ -77,12 +77,16 @@ void GLCanvas::updateFpsDisplay(int fps) {
     QString title_suffix =
         QString(
             "%1 FPS(frametime: "
-            "%2 us | updatetime(qt): %3 ms)")
+            "%2 us | updatetime(qt): %3 us)")
             .arg(fps)
             .arg(std::chrono::duration_cast<std::chrono::microseconds>(
                      pre_frame_time)
                      .count())
-            .arg(actual_update_time);
+            .arg(std::chrono::duration_cast<std::chrono::microseconds>(
+                     std::chrono::high_resolution_clock::now()
+                         .time_since_epoch())
+                     .count() -
+                 m_last_paint_time_us);
     emit update_window_suffix(title_suffix);
 }
 
@@ -152,8 +156,8 @@ void GLCanvas::paintGL() {
     {
         MPrimitiveCollector pc(render.get(), render_dataloop->layermanager());
 
-        // 绘制
-        GLDirectPainter painter(render.get());
+        // 直接绘制
+        // GLDirectPainter painter(render.get());
 
         // painter.paintImage(
         //     "../resources/textures/default/物件/arrowright_selected.png",
@@ -171,8 +175,8 @@ void GLCanvas::paintGL() {
         GLCALL(glClearColor(.23f, .23f, .23f, .23f));
         GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
-        painter.paintString("ComicShannsMono Nerd Font", 16, U"nmsl",
-                            {100, 100});
+        //    painter.paintString("ComicShannsMono Nerd Font", 16, U"nmsl",
+        //                        {100, 100});
     }
 
     fpsCounter->frameRendered();

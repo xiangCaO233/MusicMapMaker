@@ -12,7 +12,7 @@ class AudioLoadCallback {
     virtual ~AudioLoadCallback() = default;
     virtual AudioController* getController(std::string_view audio_name) = 0;
     virtual std::weak_ptr<ice::AudioTrack> loadBack(
-        std::string_view audio_path) = 0;
+        std::string_view audio_path, bool is_maintrack = false) = 0;
 };
 
 #endif  // MMM_AUDIOLOADCALLBACK_HPP

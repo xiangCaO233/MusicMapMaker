@@ -61,15 +61,20 @@ class MapCanvas : public GLCanvas {
         // 时间基
         void timeplaypos_updated(std::chrono::nanoseconds time_pos) override {
             // 定期同步
-            static uint32_t count{0};
-            auto timems =
-                std::chrono::duration_cast<std::chrono::milliseconds>(time_pos)
-                    .count();
-            if (auto mapinfo = canvas->info<MapCanvasInfo>();
-                mapinfo && count % 50 == 0) {
-                mapinfo->realTimeInfo.current_canvas_time = uint32_t(timems);
+            if (auto *mapinfo = canvas->info<MapCanvasInfo>()) {
+                // 1. 获取当前音频时间和系统时间
+                double audio_time_ms =
+                    std::chrono::duration<double, std::milli>(time_pos).count();
+                long long now_us =
+                    std::chrono::duration_cast<std::chrono::microseconds>(
+                        std::chrono::high_resolution_clock::now()
+                            .time_since_epoch())
+                        .count();
+
+                // 2. 将这个“校准快照”写入原子变量
+                mapinfo->realTimeInfo.last_audio_time_ms.store(audio_time_ms);
+                mapinfo->realTimeInfo.last_sync_point_us.store(now_us);
             }
-            ++count;
         }
 
         // 画布

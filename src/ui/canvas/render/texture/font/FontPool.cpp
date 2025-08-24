@@ -83,7 +83,7 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
         return;
     }
 
-    std::vector<uint32_t> font_sizes{16, 24, 36, 48};
+    std::vector<uint32_t> font_sizes{8, 12, 16, 24, 36, 48};
     // 为每个需要的字号启动一个异步加载任务
     for (const auto& font_size_to_load : font_sizes) {
         threadpool.enqueue([this, font_path_str = std::string(font_path),

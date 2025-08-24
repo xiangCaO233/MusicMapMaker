@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <layer/MapLayerManager.hpp>
 #include <layer/effect/EffectLayerGenerator.hpp>
 
 // 析构EffectLayerGenerator
@@ -9,5 +10,58 @@ EffectLayerGenerator::~EffectLayerGenerator() {
 // 生成图层
 void EffectLayerGenerator::generateLayer(LayerManager* manager,
                                          ILayer::RenderDataBuffer& buffer) {
+    // 数据准备
+    auto maplayer_manager = static_cast<MapLayerManager*>(manager);
+    auto map = maplayer_manager->map();
+    if (!map) return;
+    auto l = layer<NoteLayer>();
+    auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
+    auto& ecore = maplayer_manager->core();
+    const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
+                                      (1.f - mapinfo->baseInfo.judgeline_pos);
+    RenderCommand judgeline_cmd;
+    judgeline_cmd.baseInfo.pos = {mapinfo->editorInfo.track_layout.x,
+                                  judgeline_absolute_y};
+    judgeline_cmd.baseInfo.size = {mapinfo->editorInfo.track_layout.z, 4};
+    judgeline_cmd.baseInfo.color = {0, 1, 1, 1};
+    buffer.push_back(judgeline_cmd);
+
+    // 绘制当前时间字符串
+    auto timestr =
+        QString::number(uint32_t(mapinfo->realTimeInfo.current_canvas_time));
+    auto timestru32 = timestr.toStdU32String();
+
+    uint32_t xoffset{0};
+    uint32_t yoffset{0};
+
+    for (const auto& character : timestru32) {
+        // 获取字符纹理信息
+        auto fontoption = l->get("ComicShannsMono Nerd Font", 16, character);
+        if (fontoption.has_value()) {
+            auto& charInfo = fontoption.value();
+            auto& charTexture = charInfo.character_texinfo;
+
+            // 计算当前字符应该处于的位置
+            glm::vec2 charpos = {mapinfo->editorInfo.track_layout.x +
+                                     mapinfo->editorInfo.track_layout.z + 8.f,
+                                 judgeline_absolute_y};
+            charpos.x += xoffset;
+            charpos.y -= (charInfo.bearing.y);
+            charpos.y += 8;
+            // 提交渲染指令
+            RenderCommand charcommand(
+                {{charpos,
+                  charTexture.origin_size,
+                  0.f,
+                  {1.f, 1.f, 0.f, 1.f},
+                  true},
+                 {charTexture.uv_offset},
+                 {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}});
+            buffer.push_back(charcommand);
+
+            xoffset += charInfo.xadvance / 64;
+        }
+    }
+
     // qDebug() << "effect layer done";
 }

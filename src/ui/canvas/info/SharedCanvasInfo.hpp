@@ -25,6 +25,12 @@ struct BaseCanvasStatus {
 struct RealTimeInfo {
     // 当前时间戳
     double current_canvas_time{92000};
+    // --- 音频线程和主线程之间的同步点 ---
+    // 使用原子变量来安全地跨线程传递最新的校准信息
+    std::atomic<double> last_audio_time_ms{0.0};
+    // 上次同步时，系统高精度时钟的时间点
+    std::atomic<long long> last_sync_point_us{0};
+
     // 是否暂停
     bool pause{false};
     // 当前鼠标位置

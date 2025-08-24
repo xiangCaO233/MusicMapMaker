@@ -132,8 +132,9 @@ void TrackManager::closeEvent(QCloseEvent* event) {
 }
 
 std::weak_ptr<ice::AudioTrack> TrackManager::loadBack(
-    std::string_view audio_path) {
-    return loadin_audio(QString::fromStdString(std::string(audio_path)));
+    std::string_view audio_path, bool is_maintrack) {
+    return loadin_audio(QString::fromStdString(std::string(audio_path)),
+                        is_maintrack);
 }
 
 AudioController* TrackManager::getController(std::string_view audio_name) {
@@ -152,7 +153,7 @@ AudioController* TrackManager::get_controller(const QString& audio_name) {
 
 // 载入音频
 std::weak_ptr<ice::AudioTrack> TrackManager::loadin_audio(
-    const QString& audio_file) {
+    const QString& audio_file, bool is_maintrack) {
     auto track_it = audio_tracks.find(audio_file);
     if (track_it == audio_tracks.end()) {
         qDebug() << "lodin audio:" << audio_file;
@@ -175,7 +176,17 @@ std::weak_ptr<ice::AudioTrack> TrackManager::loadin_audio(
     // 默认未选中
     track_item->setCheckState(Qt::Unchecked);
 
+    // 添加音轨项目
     model->appendRow(track_item);
+
+    // 更新主音轨列表
+    if (is_maintrack) {
+        maintrack_names.push_back(audio_file);
+        // 主音轨立即初始化音频控制器
+        auto it = makeController(track, track_item);
+        it.value()->setVisible(true);
+        track_item->setCheckState(Qt::Checked);
+    }
     return track;
 }
 
@@ -187,4 +198,17 @@ std::weak_ptr<ice::AudioTrack> TrackManager::get_track(
         return std::weak_ptr<ice::AudioTrack>();
     }
     return track_it.value();
+}
+
+// 获取主音轨名
+const QStringList& TrackManager::get_maintrack() const {
+    return maintrack_names;
+}
+
+// 设置主音轨名
+void TrackManager::set_maintrack(const QString& name) {
+    if (auto track_it = audio_tracks.find(name);
+        track_it != audio_tracks.end() && !maintrack_names.contains(name)) {
+        maintrack_names.push_back(name);
+    }
 }

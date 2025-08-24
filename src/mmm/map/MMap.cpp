@@ -21,7 +21,7 @@ MMap::~MMap() = default;
 std::weak_ptr<MapMetadata> MMap::map_metadata(MapMetadataType type) {
     auto metaptr_it = metadatas.find(type);
     if (metaptr_it == metadatas.end()) {
-        return std::weak_ptr<MapMetadata>();
+        return {};
     }
     return metaptr_it->second;
 }

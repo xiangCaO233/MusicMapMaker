@@ -35,13 +35,19 @@ class MeshGenerateSystem {
                             (float(track_index) + 0.5f) * single_track_width;
 
             if (registry.all_of<HoldComponent>(e)) {
-                mesh.emplace_back(glm::vec2(x - 40, y - 40), glm::vec2(80, 80));
+                mesh.emplace_back(
+                    glm::vec2(x - (single_track_width / 2.f - 4.f), y - 40),
+                    glm::vec2(single_track_width - 8.f, 80));
                 // generateHoldMesh(registry, e);
             } else if (registry.all_of<FlickComponent>(e)) {
-                mesh.emplace_back(glm::vec2(x - 25, y - 25), glm::vec2(50, 50));
+                mesh.emplace_back(
+                    glm::vec2(x - (single_track_width / 2.f - 4.f), y - 15),
+                    glm::vec2(single_track_width - 8.f, 30));
                 // generateFlickMesh(registry, e);
             } else {
-                mesh.emplace_back(glm::vec2(x - 25, y - 25), glm::vec2(50, 50));
+                mesh.emplace_back(
+                    glm::vec2(x - (single_track_width / 2.f - 4.f), y - 15),
+                    glm::vec2(single_track_width - 8.f, 30));
                 // generateTapMesh(registry, e);
             }
         }

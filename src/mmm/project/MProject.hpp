@@ -47,8 +47,12 @@ class MProject {
         project_maps_table;
 
     // 项目音频列表(非音频资源持有)
+    // 项目非主音频列表
     std::map<std::string, std::weak_ptr<ice::AudioTrack>, std::less<>>
-        project_audios_table;
+        project_normal_audios_table;
+    // 项目主音频列表
+    std::map<std::string, std::weak_ptr<ice::AudioTrack>, std::less<>>
+        project_main_audios_table;
 
     // 项目图片列表
     std::set<std::string, std::less<>> project_image_table;

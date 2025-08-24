@@ -21,22 +21,11 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
 
         // 获取轨道布局信息
         const glm::vec4& all_tracks_rect = info->editorInfo.track_layout;
-        // 绘制轨道边界线
-        RenderCommand track_edge_leftcmd;
-        track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x, 0};
-        track_edge_leftcmd.baseInfo.size = {6,
-                                            info->baseInfo.canvasSize.height()};
-        RenderCommand track_edge_rightcmd;
-        track_edge_rightcmd.baseInfo.pos = {
-            all_tracks_rect.x + all_tracks_rect.z, 0};
-        track_edge_rightcmd.baseInfo.size = {
-            6, info->baseInfo.canvasSize.height()};
-        buffer.push_back(track_edge_leftcmd);
-        buffer.push_back(track_edge_rightcmd);
         const int track_count =
             info->editorInfo.map->base_metadata().track_count;
         if (track_count == 0) return;
-        const float single_track_width = all_tracks_rect.z / float(track_count);
+        // const float single_track_width = all_tracks_rect.z /
+        // float(track_count);
 
         auto background_image_path = info->mapInfo.cover_path;
         auto darken = info->mapInfo.darken;
@@ -53,6 +42,21 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
 
             buffer.push_back(cmd);
         }
+
+        // 绘制轨道边界线
+        RenderCommand track_edge_leftcmd;
+        track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x, 0};
+        track_edge_leftcmd.baseInfo.size = {6,
+                                            info->baseInfo.canvasSize.height()};
+        track_edge_leftcmd.baseInfo.color = {0, 1, 1, 1};
+        RenderCommand track_edge_rightcmd;
+        track_edge_rightcmd.baseInfo.pos = {
+            all_tracks_rect.x + all_tracks_rect.z, 0};
+        track_edge_rightcmd.baseInfo.size = {
+            6, info->baseInfo.canvasSize.height()};
+        track_edge_rightcmd.baseInfo.color = {0, 1, 1, 1};
+        buffer.push_back(track_edge_leftcmd);
+        buffer.push_back(track_edge_rightcmd);
     }
     // qDebug() << "bg layer done";
 }

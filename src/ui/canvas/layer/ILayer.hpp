@@ -62,6 +62,17 @@ class ILayer {
         return buffers[frontIndex];
     }
 
+    // 获取纹理信息
+    std::optional<TextureInfo> get(std::string_view path) const {
+        return rendererRef->texture_pool()->get(path);
+    }
+
+    // 获取字符纹理信息
+    std::optional<CharacterGlyph> get(std::string_view family, size_t font_size,
+                                      char32_t character) const {
+        return rendererRef->font_pool()->get(family, font_size, character);
+    }
+
    protected:
     // 更新信息
     void updateInfo(SharedCanvasInfo* info) { info_ref = info; }

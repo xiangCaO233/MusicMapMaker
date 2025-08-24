@@ -30,6 +30,7 @@ void NoteLayerGenerator::generateLayer(LayerManager* manager,
     mesh_system.update(ecore, mapinfo, converter);
 
     // 渲染一般可见物件
-    normalRender_system.update(ecore, mapinfo, converter, buffer);
+    normalRender_system.update(ecore, mapinfo, converter, l, buffer);
+
     // qDebug() << "note layer done";
 }

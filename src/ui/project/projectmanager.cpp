@@ -96,7 +96,15 @@ void ProjectManager::onActivateProject(MProject* activated_project) {
             qobject_cast<QStandardItemModel*>(ui->audio_listView->model());
         audio_model->clear();
         for (const auto& [audio_name, track] :
-             activated_project->project_audios_table) {
+             activated_project->project_main_audios_table) {
+            auto audio_item =
+                new QStandardItem(QString::fromStdString(audio_name));
+            audio_item->setData(QVariant::fromValue(track));
+            audio_item->setEditable(false);
+            audio_model->appendRow(audio_item);
+        }
+        for (const auto& [audio_name, track] :
+             activated_project->project_normal_audios_table) {
             auto audio_item =
                 new QStandardItem(QString::fromStdString(audio_name));
             audio_item->setData(QVariant::fromValue(track));

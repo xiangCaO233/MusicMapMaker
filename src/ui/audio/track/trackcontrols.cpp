@@ -68,7 +68,7 @@ void TrackManager::on_add_track_button_clicked() {
 
     for (const auto& audio_file : audio_files) {
         qDebug() << "selecte:" << audio_file;
-        loadin_audio(audio_file);
+        loadin_audio(audio_file, false);
     }
 }
 
