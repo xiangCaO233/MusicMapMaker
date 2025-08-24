@@ -9,6 +9,7 @@ void GLCanvas::paintEvent(QPaintEvent *event) {
         std::chrono::duration_cast<std::chrono::microseconds>(
             std::chrono::high_resolution_clock::now().time_since_epoch())
             .count();
+    last_update_time_us = now_us - m_last_paint_time_us;
 
     if (m_last_paint_time_us == 0) {
         m_last_paint_time_us = now_us;
@@ -35,11 +36,12 @@ void GLCanvas::paintEvent(QPaintEvent *event) {
         // 更平滑的方式 (低通滤波/lerp)：
         // 让画布时间以一个较快的速度“追赶”理想时间，而不是瞬时跳变。
         double current_time = canvas_info->realTimeInfo.current_canvas_time;
+        constexpr float LERP_RATIO = 0.15f;
         // 0.1 是一个平滑系数，可以调整。值越大，追赶速度越快。
         canvas_info->realTimeInfo.current_canvas_time =
-            current_time + (estimated_time - current_time) * 0.1;
+            current_time + (estimated_time - current_time) * LERP_RATIO;
 
-        // 如果你不需要平滑，可以直接使用下面这行：
+        // 如果不需要平滑，可以直接使用下面这行：
         // canvas_info->realTimeInfo.current_canvas_time = estimated_time;
     }
 

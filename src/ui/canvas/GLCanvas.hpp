@@ -104,8 +104,10 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 目标帧率
     qreal desiredFps;
 
-    // 实际update处理时间
     long long m_last_paint_time_us{0};
+
+    // 实际update处理时间
+    long long last_update_time_us{0};
 
     friend class ProjectService;
 };
