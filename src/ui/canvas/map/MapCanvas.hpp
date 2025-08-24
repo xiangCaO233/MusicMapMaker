@@ -60,20 +60,11 @@ class MapCanvas : public GLCanvas {
 
         // 时间基
         void timeplaypos_updated(std::chrono::nanoseconds time_pos) override {
-            // 定期同步
+            // 只报告原始音频时间
             if (auto *mapinfo = canvas->info<MapCanvasInfo>()) {
-                // 1. 获取当前音频时间和系统时间
-                double audio_time_ms =
+                double timems =
                     std::chrono::duration<double, std::milli>(time_pos).count();
-                long long now_us =
-                    std::chrono::duration_cast<std::chrono::microseconds>(
-                        std::chrono::high_resolution_clock::now()
-                            .time_since_epoch())
-                        .count();
-
-                // 2. 将这个“校准快照”写入原子变量
-                mapinfo->realTimeInfo.last_audio_time_ms.store(audio_time_ms);
-                mapinfo->realTimeInfo.last_sync_point_us.store(now_us);
+                mapinfo->realTimeInfo.raw_audio_time_ms.store(timems);
             }
         }
 

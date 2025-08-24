@@ -45,13 +45,13 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
 
         // 绘制轨道边界线
         RenderCommand track_edge_leftcmd;
-        track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x, 0};
+        track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x - 3, 0};
         track_edge_leftcmd.baseInfo.size = {6,
                                             info->baseInfo.canvasSize.height()};
         track_edge_leftcmd.baseInfo.color = {0, 1, 1, 1};
         RenderCommand track_edge_rightcmd;
         track_edge_rightcmd.baseInfo.pos = {
-            all_tracks_rect.x + all_tracks_rect.z, 0};
+            all_tracks_rect.x + all_tracks_rect.z - 3, 0};
         track_edge_rightcmd.baseInfo.size = {
             6, info->baseInfo.canvasSize.height()};
         track_edge_rightcmd.baseInfo.color = {0, 1, 1, 1};

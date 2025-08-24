@@ -35,8 +35,8 @@ AudioController::AudioController(QWidget* parent)
     ui->unit_selection->addItem(
         "min:s.ms.us.ns", QVariant::fromValue(PositionUnit::MinSecMsUsNs));
 
-    // 默认选最精确
-    ui->unit_selection->setCurrentText("min:s.ms.us.ns");
+    // 默认选min:s.ms
+    ui->unit_selection->setCurrentText("min:s.ms");
 
     // 初始化回调
     callback = std::make_shared<PlayPosCallBack>(this);
@@ -235,3 +235,7 @@ void AudioController::set_audio_track(
 }
 
 void AudioController::set_item(QStandardItem* item) { refitem = item; }
+
+const QPushButton* AudioController::pause_button() const {
+    return ui->pause_button;
+}

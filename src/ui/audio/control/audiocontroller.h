@@ -2,6 +2,7 @@
 #define AUDIOCONTROLLER_H
 
 #include <qobject.h>
+#include <qpushbutton.h>
 #include <qstandarditemmodel.h>
 #include <qtmetamacros.h>
 
@@ -68,6 +69,8 @@ class AudioController : public HideableToolWindow {
     inline void set_uitime_pos(std::chrono::nanoseconds time_pos) {
         uitime_pos = time_pos;
     }
+
+    const QPushButton *pause_button() const;
 
    signals:
     void update_output_node(const AudioController *controller,

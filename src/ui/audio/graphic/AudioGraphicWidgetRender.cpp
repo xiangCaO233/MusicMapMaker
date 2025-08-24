@@ -51,6 +51,7 @@ void AudioGraphicWidget::resizeGL(int w, int h) {
 void AudioGraphicWidget::paintGL() {
     GLCALL(glClearColor(.23f, .23f, .23f, 1.f));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+
     if (!renderer || !audio_track) return;
 
     // 计算引擎需要渲染多少帧 (基于引擎采样率)

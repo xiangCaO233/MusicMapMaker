@@ -4,6 +4,7 @@
 #include <QElapsedTimer>
 #include <QObject>
 #include <QQueue>
+#include <map/MapCanvasClock.hpp>
 #include <memory>
 
 class LayerManager;
@@ -73,20 +74,26 @@ class RenderDataLoop : public QObject {
 
    private:
     Renderer2D* render;
+    MapCanvasClock canvas_clock;
+
     // 持有图层管理器
     std::unique_ptr<LayerManager> layer_manager;
 
     // 是否正在运行
     bool isRunning{false};
 
+    // 目标帧数
+    qreal desiredFps;
     // tick时间(下限2000fps/1ms/1000us/1000000ns)
     uint64_t desiredTicktimeNs{1000000};
     uint64_t actualTicktimeNs{0};
 
-    qreal desiredFps;
+    // 平滑系数
+    const double m_delta_smoothing_factor = 0.1;
 
     // 当前fps
     qreal current_fps;
+    double m_smoothed_delta_ms{16.6};
 
     // 一个变量来平滑地存储我们计算出的、理想的睡眠时间
     std::atomic<int64_t> sleepAdjustmentNs{0};

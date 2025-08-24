@@ -70,9 +70,15 @@ void MapCanvas::switch_map(MMap* smap) {
     mapcanvasInfo->editorInfo.map = smap;
 
     // 绑定播放回调
-    audioLoadCallback()
-        ->getController(smap->base_metadata().main_audio_path.generic_string())
-        ->add_playcallback(maintrack_callback);
+    auto controller = audioLoadCallback()->getController(
+        smap->base_metadata().main_audio_path.generic_string());
+    controller->add_playcallback(maintrack_callback);
+
+    // 连接暂停按钮信号
+    connect(controller->pause_button(), &QPushButton::toggled,
+            [mapcanvasInfo](bool checked) {
+                mapcanvasInfo->realTimeInfo.is_playing = !checked;
+            });
 
     update_sharedInfo();
 }

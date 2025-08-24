@@ -25,14 +25,19 @@ struct BaseCanvasStatus {
 struct RealTimeInfo {
     // 当前时间戳
     double current_canvas_time{0};
-    // --- 音频线程和主线程之间的同步点 ---
-    // 使用原子变量来安全地跨线程传递最新的校准信息
-    std::atomic<double> last_audio_time_ms{0.0};
-    // 上次同步时，系统高精度时钟的时间点
-    std::atomic<long long> last_sync_point_us{0};
 
-    // 是否暂停
-    bool pause{false};
+    // --- 音频线程和主线程之间的同步点 ---
+    // --- 音频/谱面全局偏移量 (ms) ---
+    // 可以由UI控件修改，所以用原子保证线程安全
+    std::atomic<double> global_offset_ms{0.0};
+
+    // --- 音频线程提供的原始同步数据 ---
+    // 音频播放器报告的、未经偏移修正的原始播放时间
+    std::atomic<double> raw_audio_time_ms{0.0};
+
+    // --- 播放状态 ---
+    bool is_playing{false};
+
     // 当前鼠标位置
     QPointF mousePos;
     // 正在按下的鼠标按钮

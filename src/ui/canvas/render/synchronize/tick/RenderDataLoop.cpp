@@ -122,8 +122,12 @@ void RenderDataLoop::set_targetFPS(qreal fps) {
         }
     } else {
         desiredTicktimeNs = 2000000 / 2;
+
         desiredFps = 500;
     }
+
+    m_smoothed_delta_ms = desiredTicktimeNs * 2.0 / 1000000.0;
+
     qDebug() << "destickTime:" << desiredTicktimeNs;
 }
 
@@ -131,6 +135,19 @@ void RenderDataLoop::set_targetFPS(qreal fps) {
 void RenderDataLoop::tick() {
     actualTicktimeNs = timer.nsecsElapsed();
     timer.restart();
+    const double raw_delta_ms = actualTicktimeNs / 1000000.0;
+
+    // 2. *** 平滑帧间隔 ***
+    // 使用指数移动平均(EMA)来平滑掉原始delta的剧烈抖动
+    m_smoothed_delta_ms +=
+        (raw_delta_ms - m_smoothed_delta_ms) * m_delta_smoothing_factor;
+
+    // 3. 更新时钟，但这次传入的是平滑后的delta
+    auto *mapinfo = static_cast<MapCanvasInfo *>(getinfo());
+    if (mapinfo) {
+        // *** 传入平滑后的delta ***
+        canvas_clock.update(mapinfo->realTimeInfo, m_smoothed_delta_ms);
+    }
 
     pre_tickEvent();
     // 开始新一帧:打开栅栏A，让所有图层线程开始计算

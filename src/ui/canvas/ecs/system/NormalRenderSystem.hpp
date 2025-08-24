@@ -52,7 +52,7 @@ class NormalRenderSystem {
             for (const auto& character : timestru32) {
                 // 获取字符纹理信息
                 auto fontoption =
-                    layer->get("ComicShannsMono Nerd Font", 8, character);
+                    layer->get("ComicShannsMono Nerd Font", 12, character);
                 if (fontoption.has_value()) {
                     const auto& charInfo = fontoption.value();
                     const auto& charTexture = charInfo.character_texinfo;
