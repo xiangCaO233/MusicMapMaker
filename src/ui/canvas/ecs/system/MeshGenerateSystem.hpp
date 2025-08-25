@@ -53,8 +53,7 @@ class MeshGenerateSystem {
             const auto obj_scale =
                 single_track_width / head_texinfo.origin_size.x;
 
-            glm::vec2 head_size = {single_track_width,
-                                   obj_scale * head_texinfo.origin_size.y};
+            glm::vec2 head_size = obj_scale * head_texinfo.origin_size * 1.25f;
 
             // 共同的头网格(head在层级1)
             mesh.emplace_back(
