@@ -1,6 +1,7 @@
 #ifndef MMM_MSKIN_HPP
 #define MMM_MSKIN_HPP
 
+#include <QColor>
 #include <filesystem>
 #include <mmm/project/AudioLoadCallback.hpp>
 #include <mmm/project/TextureLoadCallback.hpp>
@@ -85,6 +86,7 @@ class MSkin {
     std::string_view get_sound_effect(SoundEffectType type);
 
    private:
+    TextureLoadCallback* texcallback;
     std::filesystem::path skinPath;
     // 基本信息
     std::string name;
@@ -93,11 +95,71 @@ class MSkin {
     std::string fontascii;
     std::string fontu8;
 
+    // 时间字体颜色
+    QColor timeinfo_font_color;
+
+    // 时间字体尺寸
+    int32_t timeinfo_font_size;
+
+    // 预览区背景色
+    QColor preview_area_bg_color;
+
+    // 皮肤配置
+    // 皮肤的根配置
+    json skinRootCfg;
+
+    json texture_config;
+
+    json bg_texture_config;
+
+    json object_texture_config;
+
+    json note_texture_config;
+
+    json head_texture_config;
+
+    json node_texture_config;
+
+    json hold_texture_config;
+
+    json vertical_holdbody_texture_config;
+
+    json horizontal_holdbody_texture_config;
+
+    json hold_end_texture_config;
+
+    json left_slide_end_texture_config;
+
+    json right_slide_end_texture_config;
+
+    // 选中框纹理配置
+    json selected_config;
+
+    // 击中特效纹理配置
+    json hit_effect_config;
+
+    // 背景纹理缓存
+    std::unordered_map<TexType, TextureInfo> bg_texture_buffer;
+
     // 音效表
     std::unordered_map<SoundEffectType, std::string> sound_effects;
 
-    // 皮肤的根配置
-    json skinRootCfg;
+    // 物件纹理缓存
+    std::unordered_map<TexType, std::unordered_map<ObjectStatus, TextureInfo>>
+        object_texture_buffer;
+
+    // 特效纹理目录
+    std::string nomal_hit_effect_dir;
+    std::string slide_hit_effect_dir;
+
+    // 特效帧数量
+    int32_t nomal_hit_effect_frame_count;
+    double normal_hit_effect_duration;
+    int32_t slide_hit_effect_frame_count;
+
+    // 时间分割线主题-(1/n-(颜色-宽度)列表)
+    std::unordered_map<int32_t, std::vector<std::pair<QColor, int32_t>>>
+        divisors_color_theme;
 
     friend class MapCanvas;
 };

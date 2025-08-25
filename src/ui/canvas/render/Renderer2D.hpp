@@ -18,10 +18,13 @@ class Renderer2D : public TextureLoadCallback {
     explicit Renderer2D(GLCanvas* canvas);
     ~Renderer2D() override;
 
+    // 实现表
     // 需要载入纹理
     void need_loadtexture_dir(std::string_view texdir) override;
     // 需要卸载纹理
     void need_unloadtexture_dir(std::string_view texdir) override;
+    // 获取信息
+    TextureInfo getInfo(std::string_view texname) override;
 
     // 直接访问着色器
     QOpenGLShaderProgram* shader() const { return shader_program; }

@@ -3,6 +3,7 @@
 #include <QOpenGLFunctions_4_1_Core>
 #include <canvas/GLCanvas.hpp>
 #include <canvas/render/Renderer2D.hpp>
+#include <filesystem>
 #include <mutex>
 #include <queue>
 #include <render/RenderCommand.hpp>
@@ -47,6 +48,11 @@ void Renderer2D::need_unloadtexture_dir(std::string_view texdir) {
 // 需要载入纹理
 void Renderer2D::need_loadtexture_dir(std::string_view texdir) {
     request_texture_from_path(std::string(texdir));
+}
+
+// 获取信息
+TextureInfo Renderer2D::getInfo(std::string_view texname) {
+    return texturepool->get(texname).value_or(TextureInfo{});
 }
 
 Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
