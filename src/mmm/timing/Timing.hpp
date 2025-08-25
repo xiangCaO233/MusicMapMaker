@@ -45,6 +45,12 @@ class Timing {
                (is_base_timing ? "Base" : "Inherited") +
                ", val=" + std::to_string(beat_length) + ")";
     }
+
+    bool operator==(const Timing& other) const {
+        return timestamp == other.timestamp &&
+               is_base_timing == other.is_base_timing && type == other.type &&
+               bpm == other.bpm && beat_length == other.beat_length;
+    }
 };
 
 #endif  // MMM_TIMING_HPP

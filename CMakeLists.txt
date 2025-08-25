@@ -122,6 +122,8 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/synchronize/FrameSynchronizer.cpp
     src/ui/canvas/render/synchronize/tick/RenderDataLoop.hpp
     src/ui/canvas/render/synchronize/tick/RenderDataLoop.cpp
+    src/ui/canvas/render/synchronize/tick/RenderLoopWorker.hpp
+    src/ui/canvas/render/synchronize/tick/RenderLoopWorker.cpp
     src/ui/canvas/render/synchronize/tick/map/MapDataLoop.hpp
     src/ui/canvas/render/synchronize/tick/map/MapDataLoop.cpp
     src/ui/canvas/FrameRateCounter.hpp

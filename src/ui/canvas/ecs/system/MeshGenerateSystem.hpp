@@ -11,7 +11,7 @@
 class MeshGenerateSystem {
    public:
     void update(ECSCore& core, const MapCanvasInfo* info,
-                const TimePixelConverter& converter) {
+                const TimePixelConverter& converter) const {
         // 生成物件的网格组件
         auto& registry = core.ecs_registry();
         // const auto& realtime_info = info->realTimeInfo;
@@ -29,8 +29,8 @@ class MeshGenerateSystem {
             auto& mesh = registry.get_or_emplace<TransformComponent_2>(e).mesh;
             mesh.clear();
             // --- 根据Note类型进行分支处理 ---
-            auto& [track_index, handle] = registry.get<NoteComponent>(e);
-            auto& [y] = registry.get<TransformComponent_1>(e);
+            const auto& [track_index, handle] = registry.get<NoteComponent>(e);
+            const auto& [y] = registry.get<TransformComponent_1>(e);
             const float x = all_tracks_rect.x +
                             (float(track_index) + 0.5f) * single_track_width;
 

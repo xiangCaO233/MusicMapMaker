@@ -3,6 +3,7 @@
 
 #include <qobject.h>
 #include <qpushbutton.h>
+#include <qslider.h>
 #include <qstandarditemmodel.h>
 #include <qtmetamacros.h>
 
@@ -71,6 +72,8 @@ class AudioController : public HideableToolWindow {
     }
 
     const QPushButton *pause_button() const;
+
+    const QSlider *speed_slider() const;
 
    signals:
     void update_output_node(const AudioController *controller,

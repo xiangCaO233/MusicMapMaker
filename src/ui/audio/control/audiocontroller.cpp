@@ -239,3 +239,7 @@ void AudioController::set_item(QStandardItem* item) { refitem = item; }
 const QPushButton* AudioController::pause_button() const {
     return ui->pause_button;
 }
+
+const QSlider* AudioController::speed_slider() const {
+    return ui->stretcher_speed_slider;
+}

@@ -11,6 +11,7 @@ class LayerManager;
 class Renderer2D;
 class MMap;
 class SharedCanvasInfo;
+class RenderLoopWorker;
 
 class RenderDataLoop : public QObject {
     Q_OBJECT
@@ -52,9 +53,6 @@ class RenderDataLoop : public QObject {
     // 获取信息
     SharedCanvasInfo* getinfo() { return info; }
 
-    // qt的事件
-    bool event(QEvent* e) override;
-
     // 内部访问原始的图层管理器
     std::unique_ptr<LayerManager>& manager() { return layer_manager; }
 
@@ -73,45 +71,28 @@ class RenderDataLoop : public QObject {
     virtual void updateMap(MMap* map);
 
    private:
+    friend class RenderLoopWorker;  // 允许私有工作类访问RenderDataLoop的成员
+    // --- 您的应用程序对象 (保留) ---
     Renderer2D* render;
     MapCanvasClock canvas_clock;
-
-    // 持有图层管理器
     std::unique_ptr<LayerManager> layer_manager;
+    // ... getinfo() 和 pre/tick/after_tickEvent() 的声明 ...
 
-    // 是否正在运行
-    bool isRunning{false};
-
-    // 目标帧数
-    qreal desiredFps;
-    // tick时间(下限2000fps/1ms/1000us/1000000ns)
-    uint64_t desiredTicktimeNs{1000000};
-    uint64_t actualTicktimeNs{0};
-
-    // 平滑系数
-    const double m_delta_smoothing_factor = 0.1;
-
-    // 当前fps
-    qreal current_fps;
-    double m_smoothed_delta_ms{16.6};
-
-    // 一个变量来平滑地存储我们计算出的、理想的睡眠时间
-    std::atomic<int64_t> sleepAdjustmentNs{0};
-
-    // 积分项，累积误差
-    double integral_error_ns{0.0};
-
-    // 需要记录上一次的误差
-    double last_error_ns{0.0};
-
-    // 过去N秒的FPS历史记录 (滑动窗口)
-    QQueue<int> fps_history;
-
-    // 窗口大小：5秒
-    const int HISTORY_SECONDS = 5;
-
-    // 定时器
+    // --- 循环控制 (保留) ---
+    std::atomic<bool> isRunning{false};
     QElapsedTimer timer;
+
+    // --- 节拍器相关成员 (来自新方案) ---
+    double desired_fps{60.0};
+    qint64 desired_frame_time_ns{16666666};
+    qint64 next_tick_time_ns{0};
+
+    // --- 平滑 Delta Time (保留) ---
+    const double m_delta_smoothing_factor = 0.1;
+    double m_smoothed_delta_ms{16.6};
+    // 【新增】一个指向内部工作线程的指针
+    QThread* m_worker_thread = nullptr;
+    RenderLoopWorker* m_worker = nullptr;  // 工作者对象
 };
 
 #endif  // MMM_RENDERDATALOOP_HPP

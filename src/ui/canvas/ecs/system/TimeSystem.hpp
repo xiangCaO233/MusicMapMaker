@@ -27,8 +27,8 @@ class TimeSystem {
             auto [time] = view.get<TimeComponent>(entity);
 
             // 使用转换器计算Y坐标
-            const float y =
-                converter.timeToPixel(time, realtime_info.current_canvas_time);
+            const float y = converter.timeToPixel(
+                time, realtime_info.presentation_canvas_time);
 
             // 判定线位置 + 逻辑偏移
             const float center_y = info->baseInfo.canvasSize.height() - y -

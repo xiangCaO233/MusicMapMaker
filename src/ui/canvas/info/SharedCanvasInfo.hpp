@@ -23,10 +23,17 @@ struct BaseCanvasStatus {
 };
 
 struct RealTimeInfo {
-    // 当前时间戳
-    double current_canvas_time{0};
+    // 【呈现时间】最终用于渲染的时间戳
+    double presentation_canvas_time{0.0};
+
+    // 【逻辑时间】时钟内部使用的、与音频严格同步的时间
+    // 这个时间对外部模块（如图层）是只读的，主要由时钟管理
+    double logic_canvas_time{0.0};
 
     // --- 音频线程和主线程之间的同步点 ---
+    // --- 音频/谱面固定偏移量 (ms) ---
+    std::atomic<double> global_static_offset_ms{-110.0};
+
     // --- 音频/谱面全局偏移量 (ms) ---
     // 可以由UI控件修改，所以用原子保证线程安全
     std::atomic<double> global_offset_ms{0.0};
@@ -34,6 +41,10 @@ struct RealTimeInfo {
     // --- 音频线程提供的原始同步数据 ---
     // 音频播放器报告的、未经偏移修正的原始播放时间
     std::atomic<double> raw_audio_time_ms{0.0};
+
+    // 音频播放器设定的播放速率 (1.0 = 正常, 0.5 = 半速, 2.0 = 倍速)
+    // 同样，它可能由UI线程修改，所以使用原子类型
+    std::atomic<double> audio_playback_rate{1.0};
 
     // --- 播放状态 ---
     bool is_playing{false};

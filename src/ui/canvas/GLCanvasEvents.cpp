@@ -11,6 +11,10 @@ void GLCanvas::paintEvent(QPaintEvent *event) {
             .count();
     last_update_time_us = now_us - m_last_paint_time_us;
     m_last_paint_time_us = now_us;
+    // if (canvas_info->realTimeInfo.is_playing) {
+    //     canvas_info->realTimeInfo.current_canvas_time +=
+    //         double(last_update_time_us) / 1000.0;
+    // }
 }
 
 void GLCanvas::resizeEvent(QResizeEvent *e) {

@@ -38,21 +38,18 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
         mapinfo->baseInfo.canvasSize.height() - judgeline_absolute_y;
     const auto pixel_y_bottom = 0.0f - judgeline_absolute_y;
 
+    const auto& time = mapinfo->realTimeInfo.presentation_canvas_time;
     // 使用转换器计算时间边界
-    const auto time_at_top = converter.pixelToTime(
-        pixel_y_top, mapinfo->realTimeInfo.current_canvas_time);
-    const auto time_at_bottom = converter.pixelToTime(
-        pixel_y_bottom, mapinfo->realTimeInfo.current_canvas_time);
+    const auto time_at_top = converter.pixelToTime(pixel_y_top, time);
+    const auto time_at_bottom = converter.pixelToTime(pixel_y_bottom, time);
 
     // 应用预加载缓冲
     const auto query_start_time =
         time_at_bottom - mapinfo->baseInfo.view_timeMargin;
     const auto query_end_time = time_at_top + mapinfo->baseInfo.view_timeMargin;
     // 使用转换器计算Y坐标
-    const float start_y = converter.timeToPixel(
-        query_start_time, mapinfo->realTimeInfo.current_canvas_time);
-    const float end_y = converter.timeToPixel(
-        query_end_time, mapinfo->realTimeInfo.current_canvas_time);
+    const float start_y = converter.timeToPixel(query_start_time, time);
+    const float end_y = converter.timeToPixel(query_end_time, time);
 
     RenderCommand start_cmd;
     start_cmd.baseInfo.pos = {0, mapinfo->baseInfo.canvasSize.height() -

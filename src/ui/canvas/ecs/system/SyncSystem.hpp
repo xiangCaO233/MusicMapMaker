@@ -26,7 +26,7 @@ class SyncSystem {
         // 获取计算所需的上下文信息
         const auto& base_info = info->baseInfo;
         const auto& realtime_info = info->realTimeInfo;
-        const uint32_t current_time = realtime_info.current_canvas_time;
+        const auto& current_time = realtime_info.presentation_canvas_time;
         const auto canvas_height = base_info.canvasSize.height();
 
         // 定义屏幕边界
@@ -116,17 +116,20 @@ class SyncSystem {
             visible_timing_handles;
         const auto& all_timing_points = timings.get_all_timing_points();
 
-        // 我们需要遍历 std::map 来获取所有Timing点
+        // 遍历 std::map 来获取所有Timing点
         auto start_it = all_timing_points.upper_bound(query_start_time);
         if (start_it != all_timing_points.begin()) --start_it;
 
         for (auto it = start_it; it != all_timing_points.end(); ++it) {
-            const auto& [timestamp, timing] = *it;
-            if (timestamp > query_end_time) break;  // 优化：超出范围就停止
-
+            const auto& [timestamp, timings] = *it;
+            // 超出范围立马停止
+            if (timestamp > query_end_time) break;
             if (timestamp >= query_start_time) {
-                // *** 为每个Timing点创建一个唯一的句柄 ***
-                visible_timing_handles.insert({timestamp, timing.beat_length});
+                for (const auto& timing : timings) {
+                    // *** 为每个Timing点创建一个唯一的句柄 ***
+                    visible_timing_handles.insert(
+                        {timestamp, timing.beat_length});
+                }
             }
         }
 
@@ -150,13 +153,14 @@ class SyncSystem {
                     all_timing_points.find(handle.timestamp);
                 if (candidates != all_timing_points.end()) {
                     // 找到对应时间戳的timing点
-                    const Timing* timing_data = &(candidates->second);
-
-                    // 确保 beat_length 也匹配
-                    if (std::abs(timing_data->beat_length -
-                                 handle.beat_length) < 1e-9) {
-                        timing_handle_map[handle] =
-                            createTimingEntity(registry, timing_data);
+                    const auto& timings = candidates->second;
+                    for (const auto& timing_data : timings) {
+                        // 确保 beat_length 也匹配
+                        if (std::abs(timing_data.beat_length -
+                                     handle.beat_length) < 1e-9) {
+                            timing_handle_map[handle] =
+                                createTimingEntity(registry, &timing_data);
+                        }
                     }
                 }
             }

@@ -427,16 +427,21 @@ void MMap::readOsu() {
             // 使用读取出的参数初始化timing
             osu_timing.from_osu_description(timing_point_paras);
             // 添加到timing表
-            timing_set().set_timing_point(osu_timing);
+            timing_set().add_timing_point(osu_timing);
         }
         bool finded{false};
         // 读取全图参考bpm
-        for (const auto& [time, timing] :
+        for (const auto& [time, timings] :
              timing_set().get_all_timing_points()) {
-            // 使用第一个不带变速的绝对bpm
-            if (timing.is_base_timing) {
-                basemeta.preference_bpm = timing.bpm;
-                finded = true;
+            for (const auto& timing : timings) {
+                // 使用第一个不带变速的绝对bpm
+                if (timing.is_base_timing) {
+                    basemeta.preference_bpm = timing.bpm;
+                    finded = true;
+                    break;
+                }
+            }
+            if (finded) {
                 break;
             }
         }
@@ -446,8 +451,11 @@ void MMap::readOsu() {
             if (timing_set().get_all_timing_points().empty()) {
                 basemeta.preference_bpm = 200;
             } else {
-                basemeta.preference_bpm =
-                    timing_set().get_all_timing_points().begin()->second.bpm;
+                basemeta.preference_bpm = timing_set()
+                                              .get_all_timing_points()
+                                              .begin()
+                                              ->second.begin()
+                                              ->bpm;
             }
         }
 

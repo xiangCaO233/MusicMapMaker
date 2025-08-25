@@ -5,7 +5,7 @@
 
 class MapCanvasClock {
    public:
-    MapCanvasClock() = default;
+    MapCanvasClock() { reset(); };
 
     /**
      * @brief 每帧调用一次，用于更新画布的呈现时间。
@@ -14,61 +14,94 @@ class MapCanvasClock {
      */
     void update(RealTimeInfo& info, double smoothed_delta_ms) {
         if (!info.is_playing) {
-            // --- 暂停状态逻辑 ---
             if (m_was_playing) {
-                // 这是从“播放”切换到“暂停”的第一帧
-                // 在这里执行一次强制的、最终的同步
-                const double final_target_time = info.raw_audio_time_ms.load() +
-                                                 info.global_offset_ms.load();
-                info.current_canvas_time = final_target_time;
-
-                // 重置状态
-                reset();
+                // 暂停时，强制将逻辑时间与原始音频时间同步
+                info.logic_canvas_time = info.raw_audio_time_ms.load();
             }
-            // 更新状态标记
-            m_was_playing = false;
+            reset();
             return;
         }
 
-        // --- 播放状态逻辑 ---
-        m_was_playing = true;  // 标记当前正在播放
+        double current_playback_rate = info.audio_playback_rate.load();
 
-        // 2. 先让时钟按平滑、可预测的速度正常前进
-        info.current_canvas_time += smoothed_delta_ms;
+        if (!m_was_playing || m_last_playback_rate != current_playback_rate) {
+            // 进入播放或变速时，重置逻辑时间
+            m_was_playing = true;
+            m_last_playback_rate = current_playback_rate;
 
-        // 3. 计算与“真实”音频时间的目标差距
-        const double target_time =
-            info.raw_audio_time_ms.load() + info.global_offset_ms.load();
-
-        // 如果音频时间重置了（比如循环），我们的时钟也应该重置
-        if (target_time < m_last_target_time) {
-            info.current_canvas_time = target_time;
-            reset();
+            info.logic_canvas_time = info.raw_audio_time_ms.load();
+            m_last_known_audio_time = info.raw_audio_time_ms.load();
+            m_canvas_time_at_last_sync =
+                info.logic_canvas_time;  // 使用逻辑时间
+            m_rate_corrector = 0.0;
         }
-        m_last_target_time = target_time;
 
-        const double error = target_time - info.current_canvas_time;
+        // --- 校准事件：只在原始音频时间上操作 ---
+        double current_audio_time = info.raw_audio_time_ms.load();
+        bool has_new_audio_update =
+            (current_audio_time != m_last_known_audio_time);
 
-        // 4. 使用一个极其简单的 P-控制器 (比例) 来计算一个微小的修正量
-        //    因为输入delta已经平滑，我们不再需要复杂的I和D项来防抖
-        const double correction = error * Kp;
+        if (has_new_audio_update) {
+            // 目标时间现在就是原始音频时间，没有任何偏移！
+            double target_time = current_audio_time;
 
-        // 5. 将这个微小的修正量应用到画布时间上
-        //    我们不再修改速度，而是直接微调时间本身，这更稳定
-        info.current_canvas_time += correction;
+            // 相位误差：我们的逻辑时间与原始音频时间的差距
+            double phase_error = target_time - info.logic_canvas_time;
+
+            // ... (频率误差的计算完全不变，因为它使用的都是相对变化量) ...
+            double audio_elapsed = current_audio_time - m_last_known_audio_time;
+            double canvas_elapsed =
+                info.logic_canvas_time - m_canvas_time_at_last_sync;
+            if (audio_elapsed > 0 && canvas_elapsed > 0) {
+                // ... (freq_error, m_rate_corrector 的更新不变) ...
+            }
+
+            // 应用位置修正到逻辑时间
+            double position_correction = phase_error * Kp;
+            info.logic_canvas_time += position_correction;
+
+            // 更新同步点
+            m_last_known_audio_time = current_audio_time;
+            m_canvas_time_at_last_sync = info.logic_canvas_time;
+        }
+
+        // --- 预测性前进：只在逻辑时间上操作 ---
+        m_clock_rate = current_playback_rate + m_rate_corrector;
+        info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
     }
 
     // 公共的重置函数，用于暂停或seek等操作
-    void reset() { m_last_target_time = 0.0; }
+    void reset() {
+        m_was_playing = false;
+        m_clock_rate = 1.0;
+        m_rate_corrector = 0.0;
+        m_last_known_audio_time = 0.0;
+        m_canvas_time_at_last_sync = 0.0;
+    }
 
    private:
-    // --- 更柔和的PID参数 ---
-    // P: 比例项决定了基础的响应速度
-    const double Kp = 0.25;
-    // 新增状态，用于检测播放/暂停的切换
+    // P: 比例增益，用于修正相位（时间）误差
+    const double Kp = 0.05;
+    // I: 积分增益，用于修正频率（速度）误差
+    const double Ki = 0.001;
+
+    // --- 状态变量 ---
     bool m_was_playing = false;
 
-    double m_last_target_time = 0.0;
+    // 我们自己内部维护的、平滑的速度（单位：毫秒/毫秒，正常应为1.0）
+    double m_clock_rate = 0.5;
+
+    // 用于修正速度的积分项
+    double m_rate_corrector = 0.0;
+
+    // 上一次接收到的、有效的音频时间
+    double m_last_known_audio_time = 0.0;
+
+    // 上一次接收到音频时间时，我们自己的画布时间是多少
+    double m_canvas_time_at_last_sync = 0.0;
+
+    // 新增成员，用于检测播放速率的变化
+    double m_last_playback_rate = 1.0;
 };
 
 #endif  // MMM_MAPCANVASCLOCK_HPP

@@ -1,8 +1,7 @@
 #ifndef MMM_RENDERER2D_HPP
 #define MMM_RENDERER2D_HPP
 
-#include <qopenglshaderprogram.h>
-
+#include <QOpenGLShaderProgram>
 #include <array>
 #include <glm/fwd.hpp>
 #include <mmm/project/TextureLoadCallback.hpp>

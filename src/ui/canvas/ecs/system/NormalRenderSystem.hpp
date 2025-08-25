@@ -32,7 +32,7 @@ class NormalRenderSystem {
                           return quad1.zIndex < quad2.zIndex;
                       });
             // 生成网格的渲染指令
-            for (auto& quad : mesh) {
+            for (const auto& quad : mesh) {
                 RenderCommand cmd;
                 cmd.baseInfo.pos = quad.pos;
                 cmd.baseInfo.size = quad.size;

@@ -11,6 +11,7 @@
 #include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Composite.hpp>
 #include <mmm/timing/Timing.hpp>
+#include <vector>
 
 // --- 辅助函数 ---
 
@@ -621,27 +622,82 @@ class TimingMap {
      * @return 如果添加或更新成功，返回 true。
      * @note 如果该时间戳已存在一个时间点，它将被新的时间点覆盖。
      */
-    bool set_timing_point(const Timing& timing) {
-        if (timing.timestamp < 0) {
-            return false;  // 无效时间戳
+    bool add_timing_point(const Timing& timing) {
+        // 直接使用 map 的下标运算符，如果不存在则创建，存在则向后添加
+        // 查找具有给定时间戳的条目
+        // 如果时间戳存在于 map 中
+        if (auto map_it = m_timeline.find(timing.timestamp);
+            map_it != m_timeline.end()) {
+            // 获取与时间戳关联的 std::vector<Timing> 的引用
+            auto& timings_vec = map_it->second;
+
+            // 在 vector 中查找此 Timing 对象
+            auto vec_it =
+                std::find(timings_vec.begin(), timings_vec.end(), timing);
+
+            // 如果在 vector 中找到了该对象
+            if (vec_it != timings_vec.end()) {
+                // 已有当前timing,添加失败
+                return false;
+            } else {
+                timings_vec.push_back(timing);
+                m_version++;
+                return true;
+            }
         }
-        // 直接使用 map 的下标运算符，如果不存在则创建，存在则覆盖。
-        m_timeline[timing.timestamp] = timing;
+        // 如果时间戳不存在，则直接添加
+        m_timeline[timing.timestamp].push_back(timing);
         m_version++;
         return true;
     }
 
     /**
-     * @brief 移除一个指定时间戳的时间点。
+     * @brief 移除一个指定时间戳的全部时间点。
      * @param timestamp 要移除的时间点的时间戳。
      * @return 如果找到了并成功移除，返回 true。
      */
-    bool remove_timing_point(int32_t timestamp) {
+    bool remove_timings_at_point(int32_t timestamp) {
         // map::erase(key) 返回被删除的元素数量（0或1）。
         if (m_timeline.erase(timestamp) > 0) {
             m_version++;
             return true;
         }
+        return false;
+    }
+
+    /**
+     * @brief 移除一个指定的时间点。
+     * @param timing 要移除的时间点的时间戳。
+     * @return 如果找到了并成功移除，返回 true。
+     */
+    bool remove_timing_point(const Timing& timing) {
+        // 1. 查找具有给定时间戳的条目
+        // 2. 如果时间戳存在于 map 中
+        if (auto map_it = m_timeline.find(timing.timestamp);
+            map_it != m_timeline.end()) {
+            // 获取与时间戳关联的 std::vector<Timing> 的引用
+            auto& timings_vec = map_it->second;
+
+            // 3. 在 vector 中查找要删除的特定 Timing 对象
+            auto vec_it =
+                std::find(timings_vec.begin(), timings_vec.end(), timing);
+
+            // 4. 如果在 vector 中找到了该对象
+            if (vec_it != timings_vec.end()) {
+                // 从 vector 中移除该对象
+                timings_vec.erase(vec_it);
+
+                // 5. 如果移除后 vector 变为空，则从 map 中也移除该时间戳条目
+                if (timings_vec.empty()) {
+                    m_timeline.erase(map_it);
+                }
+
+                m_version++;  // 成功移除了一个元素，更新版本号
+                return true;
+            }
+        }
+        // 如果时间戳不存在，或者时间戳存在但未找到具体的 timing 对象，则返回
+        // false
         return false;
     }
 
@@ -667,7 +723,7 @@ class TimingMap {
         // 我们要找的是 it 的前一个元素，它就是小于或等于 timestamp
         // 的最后一个时间点。
         --it;
-        return &(it->second);
+        return it->second.data();
     }
 
     /**
@@ -678,7 +734,7 @@ class TimingMap {
      */
     const Timing* get_timing_point_at(int32_t timestamp) const {
         if (auto it = m_timeline.find(timestamp); it != m_timeline.end()) {
-            return &(it->second);
+            return it->second.data();
         }
         return nullptr;
     }
@@ -687,7 +743,8 @@ class TimingMap {
      * @brief 获取所有时间点的只读引用，按时间戳排序。
      * @return 一个对内部 map 的 const 引用。
      */
-    const std::map<int32_t, Timing>& get_all_timing_points() const {
+    const std::map<int32_t, std::vector<Timing>>& get_all_timing_points()
+        const {
         return m_timeline;
     }
 
@@ -702,7 +759,7 @@ class TimingMap {
    private:
     // 使用 std::map 作为核心存储。Key 是时间戳，Value 是 Timing 对象。
     // std::map 自动按 Key 排序，并提供高效的对数时间复杂度查找。
-    std::map<int32_t, Timing> m_timeline;
+    std::map<int32_t, std::vector<Timing>> m_timeline;
     uint64_t m_version{0};
 };
 

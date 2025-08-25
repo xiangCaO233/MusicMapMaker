@@ -29,12 +29,11 @@ void MapCanvas::initializeGL() {
     // 初始化渲染数据循环
     dataloop() = std::make_unique<MapDataLoop>(renderer().get());
     dataloop()->initializeLayerManager();
-    dataloop()->set_targetFPS(desired_fps());
+    dataloop()->set_targetFPS(desired_fps() * 2);
     connect(dataloop().get(), &RenderDataLoop::renderUpdate, this,
             qOverload<>(&QOpenGLWindow::update));
     connect(fps_counter(), &FrameRateCounter::fpsUpdated, dataloop().get(),
             &RenderDataLoop::updateFPS);
-    dataloop()->start();
 
     // 初始化默认皮肤
     skin = editor_skins
@@ -46,6 +45,7 @@ void MapCanvas::initializeGL() {
     info<MapCanvasInfo>()->editorInfo.skin = skin;
     update_sharedInfo();
     emit skinInitialized();
+    dataloop()->start();
 }
 
 // 绑定音频载入回调
@@ -80,6 +80,12 @@ void MapCanvas::switch_map(MMap* smap) {
                 mapcanvasInfo->realTimeInfo.is_playing = !checked;
             });
 
+    // 连接调速滑块信号
+    connect(controller->speed_slider(), &QSlider::valueChanged,
+            [mapcanvasInfo](int value) {
+                mapcanvasInfo->realTimeInfo.audio_playback_rate.store(
+                    double(value) / 10000.);
+            });
     update_sharedInfo();
 }
 

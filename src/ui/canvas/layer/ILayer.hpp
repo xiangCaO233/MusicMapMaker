@@ -81,7 +81,7 @@ class ILayer {
     // 获取纹理信息
     TextureInfo textureInfo(std::string_view texpath) const {
         auto texinfoOption = rendererRef->texture_pool()->get(texpath);
-        return texinfoOption.value_or({});
+        return texinfoOption.value_or(TextureInfo{});
     }
 
    private:
