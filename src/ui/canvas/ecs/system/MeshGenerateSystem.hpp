@@ -51,9 +51,9 @@ class MeshGenerateSystem {
 
             // 物件缩放
             const auto obj_scale =
-                (single_track_width - 8.f) / head_texinfo.origin_size.x;
+                single_track_width / head_texinfo.origin_size.x;
 
-            glm::vec2 head_size = {single_track_width - 8.f,
+            glm::vec2 head_size = {single_track_width,
                                    obj_scale * head_texinfo.origin_size.y};
 
             // 共同的头网格(head在层级1)
@@ -64,8 +64,10 @@ class MeshGenerateSystem {
             if (registry.all_of<HoldComponent>(e)) {
                 // 计算持续面身高度
                 const auto& [duration] = registry.get<HoldComponent>(e);
-                auto body_height = converter.timeToPixel(
-                    duration, info->realTimeInfo.presentation_canvas_time);
+                auto body_height =
+                    y - converter.timeToPixel(
+                            time + duration,
+                            info->realTimeInfo.presentation_canvas_time, info);
 
                 // 获取面身纹理
                 TextureInfo hold_body_texinfo =

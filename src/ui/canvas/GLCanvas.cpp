@@ -125,8 +125,9 @@ void GLCanvas::initializeGL() {
 
     // 加载字体
     render->add_font_from_path(
-        "../resources/font/ComicShannsMonoNerdFont_Bold.otf");
-    render->add_font_from_path("../resources/font/NotoSansCJK-Bold.ttc");
+        "../../../../resources/font/ComicShannsMonoNerdFont_Bold.otf");
+    render->add_font_from_path(
+        "../../../../resources/font/NotoSansCJK-Bold.ttc");
 
     // 加载蒙版
 

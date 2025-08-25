@@ -48,17 +48,16 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
         time_at_bottom - mapinfo->baseInfo.view_timeMargin;
     const auto query_end_time = time_at_top + mapinfo->baseInfo.view_timeMargin;
     // 使用转换器计算Y坐标
-    const float start_y = converter.timeToPixel(query_start_time, time);
-    const float end_y = converter.timeToPixel(query_end_time, time);
+    const float start_y =
+        converter.timeToPixel(query_start_time, time, mapinfo);
+    const float end_y = converter.timeToPixel(query_end_time, time, mapinfo);
 
     RenderCommand start_cmd;
-    start_cmd.baseInfo.pos = {0, mapinfo->baseInfo.canvasSize.height() -
-                                     start_y - judgeline_absolute_y};
+    start_cmd.baseInfo.pos = {0, start_y};
     start_cmd.baseInfo.size = {mapinfo->baseInfo.canvasSize.width(), 8};
     start_cmd.baseInfo.color = {1, 0, 0, 1};
     RenderCommand end_cmd;
-    end_cmd.baseInfo.pos = {0, mapinfo->baseInfo.canvasSize.height() - end_y -
-                                   judgeline_absolute_y};
+    end_cmd.baseInfo.pos = {0, end_y};
     end_cmd.baseInfo.size = {mapinfo->baseInfo.canvasSize.width(), 8};
     end_cmd.baseInfo.color = {1, 0, 0, 1};
 

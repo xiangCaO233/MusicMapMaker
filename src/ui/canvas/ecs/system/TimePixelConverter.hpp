@@ -4,6 +4,8 @@
 #include <info/SharedCanvasInfo.hpp>
 #include <mmm/DataStructures.hpp>
 
+#include "info/MapCanvasInfo.hpp"
+
 class TimePixelConverter {
    public:
     static constexpr double BASE_PIXELS_PER_MS = 1.0;
@@ -14,13 +16,18 @@ class TimePixelConverter {
         buildLookupTable(timings, prebpm);
     }
 
-    float timeToPixel(int64_t timestamp, int64_t current_canvas_time) const {
+    float timeToPixel(int64_t timestamp, int64_t current_canvas_time,
+                      const MapCanvasInfo* info) const {
         double pixel_at_timestamp = getAbsolutePixelAt(timestamp);
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double relative_pixel_offset =
             pixel_at_timestamp - pixel_at_current_time;
-        return static_cast<float>(relative_pixel_offset *
-                                  m_status.timeline_zoom);
+        auto untranslated_y =
+            static_cast<float>(relative_pixel_offset * m_status.timeline_zoom);
+        return info->baseInfo.canvasSize.height() - untranslated_y -
+               (float(info->baseInfo.canvasSize.height()) -
+                info->baseInfo.canvasSize.height() *
+                    (1.f - info->baseInfo.judgeline_pos));
     }
 
     int64_t pixelToTime(float pixel_y, int64_t current_canvas_time) const {
