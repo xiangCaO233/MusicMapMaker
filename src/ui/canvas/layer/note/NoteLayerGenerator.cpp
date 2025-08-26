@@ -4,6 +4,7 @@
 #include <layer/MapLayerManager.hpp>
 #include <layer/note/NoteLayer.hpp>
 #include <layer/note/NoteLayerGenerator.hpp>
+#include <unordered_map>
 
 // 析构NoteLayerGenerator
 NoteLayerGenerator::~NoteLayerGenerator() {
@@ -12,7 +13,7 @@ NoteLayerGenerator::~NoteLayerGenerator() {
 
 // 生成物件层的数据
 void NoteLayerGenerator::generateLayer(LayerManager* manager,
-                                       ILayer::RenderDataBuffer& buffer) {
+                                       RenderDataBuffer& buffer) {
     // 数据准备
     auto maplayer_manager = static_cast<MapLayerManager*>(manager);
     auto map = maplayer_manager->map();
@@ -27,10 +28,12 @@ void NoteLayerGenerator::generateLayer(LayerManager* manager,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
 
     // 生成物件网格
-    mesh_system.update(ecore, mapinfo, converter);
+    std::unordered_map<entt::entity, GeneratedMesh> meshs;
+    mesh_system.update(ecore.ecs_registry(), mapinfo, converter, meshs);
 
     // 渲染一般可见物件
-    normalRender_system.update(ecore, mapinfo, converter, l, buffer);
+    normalRender_system.update(ecore.ecs_registry(), meshs, mapinfo, converter,
+                               l, buffer);
 
     // qDebug() << "note layer done";
 }

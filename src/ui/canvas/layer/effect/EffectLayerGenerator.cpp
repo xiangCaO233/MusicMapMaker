@@ -9,7 +9,7 @@ EffectLayerGenerator::~EffectLayerGenerator() {
 
 // 生成图层
 void EffectLayerGenerator::generateLayer(LayerManager* manager,
-                                         ILayer::RenderDataBuffer& buffer) {
+                                         RenderDataBuffer& buffer) {
     // 数据准备
     auto maplayer_manager = static_cast<MapLayerManager*>(manager);
     auto map = maplayer_manager->map();
@@ -19,12 +19,13 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
     auto& ecore = maplayer_manager->core();
     const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
                                       (1.f - mapinfo->baseInfo.judgeline_pos);
-    RenderCommand judgeline_cmd;
+    QuadCommand judgeline_cmd;
+    judgeline_cmd.cmdType = CommandType::QUAD;
     judgeline_cmd.baseInfo.pos = {mapinfo->editorInfo.track_layout.x,
                                   judgeline_absolute_y};
     judgeline_cmd.baseInfo.size = {mapinfo->editorInfo.track_layout.z, 4};
     judgeline_cmd.baseInfo.color = {0, 1, 1, 1};
-    buffer.push_back(judgeline_cmd);
+    buffer.add_QuadCommand(judgeline_cmd);
 
     // 绘制当前时间字符串
     auto timestr =
@@ -49,15 +50,16 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
             charpos.y -= (charInfo.bearing.y);
             charpos.y += 8;
             // 提交渲染指令
-            RenderCommand charcommand(
-                {{charpos,
-                  charTexture.origin_size,
-                  0.f,
-                  {1.f, 1.f, 0.f, 1.f},
-                  true},
-                 {charTexture.uv_offset},
-                 {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}});
-            buffer.push_back(charcommand);
+            QuadCommand charcommand{
+                {CommandType::QUAD,
+                 {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}},
+                charpos,
+                charTexture.origin_size,
+                0.f,
+                {1.f, 1.f, 0.f, 1.f},
+                true,
+                {charTexture.uv_offset}};
+            buffer.add_QuadCommand(charcommand);
 
             xoffset += charInfo.xadvance / 64;
         }

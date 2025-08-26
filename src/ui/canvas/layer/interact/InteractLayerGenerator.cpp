@@ -2,6 +2,7 @@
 #include <chrono>
 #include <glm/gtc/constants.hpp>
 #include <info/SharedCanvasInfo.hpp>
+#include <layer/MapLayerManager.hpp>
 #include <layer/interact/InteractLayerGenerator.hpp>
 #include <layer/interact/RealTimeInteractLayer.hpp>
 
@@ -19,11 +20,15 @@ const glm::vec4 AURA_COLOR = {0.65f, 0.75f, 1.0f, 1.0f};  // 干净、柔和的�
 
 // 生成交互层的数据
 void InteractLayerGenerator::generateLayer(LayerManager* manager,
-                                           ILayer::RenderDataBuffer& buffer) {
+                                           RenderDataBuffer& buffer) {
     // qDebug() << "生成交互图层";
+    auto maplayer_manager = static_cast<MapLayerManager*>(manager);
     auto l = layer<RealTimeInteractLayer>();
+    auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
+    auto& ecore = maplayer_manager->core();
+
     auto mouse = l->info()->realTimeInfo.mousePos;
-    auto pressed = l->info()->realTimeInfo.buttons.contains(Qt::LeftButton);
+    auto pressed = l->info()->realTimeInfo.mButtons.contains(Qt::LeftButton);
     // --- 1. 获取并处理时间 ---
     static auto start = std::chrono::high_resolution_clock::now();
     // 获取当前时间点
@@ -39,7 +44,8 @@ void InteractLayerGenerator::generateLayer(LayerManager* manager,
     if (pressed) {
         // --- 3. 循环创建每一个呼吸的圆环 ---
         for (int i = 0; i < NUM_RINGS; ++i) {
-            RenderCommand cmd;
+            QuadCommand cmd;
+            cmd.cmdType = CommandType::QUAD;
 
             // --- 每个圆环的时间都有一个微小的偏移，创造出波纹扩散的效果 ---
             float time_offset = (float(i) / NUM_RINGS) * glm::pi<float>();
@@ -68,8 +74,9 @@ void InteractLayerGenerator::generateLayer(LayerManager* manager,
             cmd.radiusInfo.radius_effect_param = 0.f;  // 禁用所有辉光特效
 
             // --- 将渲染指令推入缓冲区 ---
-            buffer.push_back(cmd);
+            buffer.add_QuadCommand(cmd);
         }
     }
+    interact_system.update(ecore, mapinfo, l, buffer);
     // qDebug() << "interact layer done";
 }

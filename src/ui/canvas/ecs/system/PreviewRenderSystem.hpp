@@ -14,7 +14,7 @@ class PreviewRenderSystem {
    public:
     void update(ECSCore& core, const MapCanvasInfo* info,
                 const TimePixelConverter& converter,
-                ILayer::RenderDataBuffer& buffer) const {
+                RenderDataBuffer& buffer) const {
         // 渲染虚影和即将删除的物件
         auto& registry = core.ecs_registry();
         // const auto& realtime_info = info->realTimeInfo;
@@ -32,7 +32,8 @@ class PreviewRenderSystem {
                       });
             // 生成网格的渲染指令
             for (const auto& quad : mesh) {
-                RenderCommand cmd;
+                QuadCommand cmd;
+                cmd.cmdType = CommandType::QUAD;
                 cmd.baseInfo.pos = quad.pos;
                 cmd.baseInfo.size = quad.size;
                 cmd.texturesInfo.texture = quad.texture;
@@ -49,7 +50,7 @@ class PreviewRenderSystem {
                     cmd.baseInfo.color.b = 0.f;
                     cmd.baseInfo.color.a = 0.35f;
                 }
-                buffer.push_back(cmd);
+                buffer.add_QuadCommand(cmd);
             }
 
             // 绘制物件精确时间字符串

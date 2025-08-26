@@ -1,7 +1,7 @@
 #ifndef MMM_RENDERCOMMAND_HPP
 #define MMM_RENDERCOMMAND_HPP
 
-#include <render/QuadData.hpp>
+#include <render/GPUData.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TextureInfo.hpp>
 
@@ -26,15 +26,33 @@ struct TexturesInfo {
     TexScaleMode tscale{TexScaleMode::AUTO_SCALE_AND_CUT};
 };
 
-struct RenderCommand {
-    BaseInfo baseInfo;
+enum class CommandType {
+    QUAD,
+    MESH,
+};
 
+struct CommandHandle {
+    CommandType type;
+    // 在各自指令表中的索引
+    size_t index_in_pool;
+};
+
+struct RenderCommand {
+    CommandType cmdType;
+    TexturesInfo texturesInfo;
+};
+
+struct MeshCommand : public RenderCommand {
+    // 网格数据
+    MeshData to_data() const { return {}; };
+};
+
+struct QuadCommand : public RenderCommand {
+    BaseInfo baseInfo;
     RadiusInfo radiusInfo;
 
-    TexturesInfo texturesInfo;
-
     QuadData to_data() const {
-        return {
+        return QuadData{
             baseInfo.pos + baseInfo.size / 2.f + radiusInfo.radius_effect_param,
             baseInfo.size + glm::vec2(2.f * radiusInfo.radius_effect_param),
             baseInfo.rotation,
@@ -52,9 +70,14 @@ struct RenderCommand {
 };
 
 struct RenderBatch {
+    CommandType type;
     uint32_t texture_array_id;
+    // 当渲染类型为矩形时,这是矩形实例的起始索引
+    // 当渲染类型为网格时,这是顶点的起始索引
     size_t startIndex;
-    size_t instanceCount;
+    // 当渲染类型为矩形时,这是矩形实例的个数
+    // 当渲染类型为网格时,这是顶点的个数
+    size_t elementCount;
 };
 
 #endif  // MMM_RENDERCOMMAND_HPP

@@ -7,7 +7,7 @@
 #include <glm/fwd.hpp>
 #include <mmm/project/TextureLoadCallback.hpp>
 #include <mutex>
-#include <render/QuadData.hpp>
+#include <render/GPUData.hpp>
 #include <render/RenderCommand.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TexturePool.hpp>
@@ -29,16 +29,19 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     TextureInfo getInfo(std::string_view texname) override;
 
     // 直接访问着色器
-    QOpenGLShaderProgram* shader() const { return shader_program; }
+    QOpenGLShaderProgram* quadshader() const { return quad_shader_program; }
+
+    QOpenGLShaderProgram* meshshader() const { return mesh_shader_program; }
 
     // 设置投影矩阵
     void update_viewport(glm::vec2 view);
 
+    // 提交渲染指令
+    void commit(const QuadCommand& command);
+    void commit(const MeshCommand& command);
+
     // 更新需要更新的资源等等
     void update();
-
-    // 提交渲染指令
-    void commit(const RenderCommand& command);
 
     // 新建蒙版
     void newMask(glm::vec4 rect, glm::vec4 effectParams, MaskEffect effect);
@@ -62,6 +65,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // 扩充矩形实例缓冲区
     void expandQuadDataBuffer();
+    // 扩充网格缓冲区
+    void expandMeshDataBuffer();
 
     // 访问纹理池
     const std::unique_ptr<TexturePool>& texture_pool() const {
@@ -93,17 +98,74 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     GLCanvas* cvs;
 
     // 着色器
-    QOpenGLShaderProgram* shader_program;
+    QOpenGLShaderProgram* quad_shader_program;
+    QOpenGLShaderProgram* mesh_shader_program;
 
     // 渲染指令序列
-    std::vector<RenderCommand> command_list;
-    std::vector<QuadData> quad_datas;
+    // 统一的、保证顺序的索引表
+    std::vector<CommandHandle> all_command_handles;
+    // 分离存储不同渲染指令
+    std::vector<QuadCommand> quad_command_list;
+    std::vector<MeshCommand> mesh_command_list;
+    RenderCommand nullCmd{};
 
-    std::vector<RenderBatch> command_batch;
+    // 辅助函数，通过句柄获取 RenderCommand 的引用
+    const RenderCommand& get_command_from_handle(const CommandHandle& handle) {
+        switch (handle.type) {
+            using enum CommandType;
+            case QUAD: {
+                return quad_command_list[handle.index_in_pool];
+            }
+            case MESH: {
+                return mesh_command_list[handle.index_in_pool];
+            }
+            default:
+                return nullCmd;
+        }
+    }
+
+    // 使用指定gpu实例
+    QOpenGLShaderProgram* useShader(CommandType type) {
+        switch (type) {
+            using enum CommandType;
+            case QUAD: {
+                return quad_shader_program;
+            }
+            case MESH: {
+                return mesh_shader_program;
+            }
+            default:
+                return nullptr;
+        }
+    }
+
+    uint32_t useVAO(CommandType type) const {
+        switch (type) {
+            using enum CommandType;
+            case QUAD: {
+                return quad_instance_dataAO;
+            }
+            case MESH: {
+                return mesh_dataAO;
+            }
+            default:
+                return 0;
+        }
+    }
+
+    void drawBatchFirst(const RenderBatch& batch) const;
+    void drawWireframeBatchNext(const RenderBatch& batch) const;
+
+    // gpu数据预缓存
+    std::vector<QuadData> quad_datas;
+    std::vector<MeshData> mesh_datas;
+
+    std::vector<RenderBatch> command_batchs;
     std::mutex command_mtx;
 
     // 最大矩形数量
     uint32_t max_quadcount{8192};
+    uint32_t max_mesh_vertexcount{32768};
 
     // 蒙版ubo句柄
     uint32_t mask_uBO;
@@ -127,11 +189,15 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     std::vector<MaskLayer_STD140> mask_stack_cpu;
 
     // gl资源
-    uint32_t instance_dataAO{0};
-    uint32_t instance_dataBO{0};
+    uint32_t quad_instance_dataAO{0};
+    uint32_t mesh_dataAO{0};
+    uint32_t quad_instance_dataBO{0};
+    uint32_t mesh_dataBO{0};
 
-    // 从指定实例位置开始更新顶点数组指针
-    void update_attribptrFromInstance(size_t instance_index);
+    // 从指定矩形实例位置开始更新矩形顶点数组指针
+    void updateQuadAttribptrFromInstance(size_t instance_index) const;
+    // 从指定顶点位置开始更新网格顶点数组指针
+    void updateMeshAttribptrFromInstance(size_t vertex_index) const;
 };
 
 #endif  // MMM_RENDERER2D_HPP

@@ -5,6 +5,7 @@
 // 构造MPainter
 GLDirectPainter::GLDirectPainter(Renderer2D* renderer2D)
     : renderer(renderer2D) {}
+
 // 析构MPainter
 GLDirectPainter::~GLDirectPainter() {
     // 析构时绘制
@@ -49,10 +50,11 @@ void GLDirectPainter::GLDirectPainter::paintString(
             charpos.y -= (charInfo.bearing.y);
             // 提交渲染指令
             renderer->commit(
-                {{charpos, charTexture.origin_size, rotation, color,
+                {{CommandType::QUAD,
+                  {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}},
+                 {charpos, charTexture.origin_size, rotation, color,
                   !applyMask},
-                 {charTexture.uv_offset},
-                 {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}});
+                 {charTexture.uv_offset}});
 
             switch (direction) {
                 case TextDirection::Horizontal: {
@@ -101,9 +103,12 @@ void GLDirectPainter::paintLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec4 color,
     TextureInfo texture{};
 
     // 提交渲染指令
-    renderer->commit({{pos, size, rotation, color, !applyMask},
-                      radiusInfo,
-                      {texture, TexAlignMode::CENTER, TexScaleMode::SINGLE}});
+    renderer->commit({
+        {CommandType::QUAD,
+         {texture, TexAlignMode::CENTER, TexScaleMode::SINGLE}},
+        {pos, size, rotation, color, !applyMask},
+        radiusInfo,
+    });
 }
 
 /**
@@ -130,10 +135,11 @@ void GLDirectPainter::drawImage(std::string_view resPath,
         //     TexAlignMode talign;
         //     TexScaleMode tscale;
         // }
-        renderer->commit({{rectOpts.pos, rectOpts.size, rectOpts.rotation,
+        renderer->commit({{CommandType::QUAD,
+                           {texture, mapOpts.alignMode, mapOpts.scaleMode}},
+                          {rectOpts.pos, rectOpts.size, rectOpts.rotation,
                            rectOpts.color, !rectOpts.applyMask},
-                          radiusInfo,
-                          {texture, mapOpts.alignMode, mapOpts.scaleMode}});
+                          radiusInfo});
     }
 }
 
@@ -152,9 +158,10 @@ void GLDirectPainter::paintImage(std::string_view resPath, glm::vec2 pos,
     if (texoption.has_value()) {
         const auto& texture = texoption.value();
         renderer->commit(
-            {{pos, texture.origin_size, rotation, tint, !applyMask},
-             radiusInfo,
-             {texture, TexAlignMode::CENTER, TexScaleMode::SINGLE}});
+            {{CommandType::QUAD,
+              {texture, TexAlignMode::CENTER, TexScaleMode::SINGLE}},
+             {pos, texture.origin_size, rotation, tint, !applyMask},
+             radiusInfo});
     }
 }
 

@@ -24,10 +24,36 @@ class SharedCanvasInfo;
 class Renderer2D;
 class ECSCore;
 
+struct RenderDataBuffer {
+    // 统一的、保证顺序的索引表
+    std::vector<CommandHandle> all_command_handles;
+
+    // 分离存储不同渲染指令
+    std::vector<QuadCommand> quad_command_list;
+    std::vector<MeshCommand> mesh_command_list;
+
+    void add_QuadCommand(const QuadCommand& cmd) {
+        quad_command_list.push_back(cmd);
+        all_command_handles.push_back(
+            {CommandType::QUAD, quad_command_list.size() - 1});
+    }
+
+    void add_MeshCommand(const MeshCommand& cmd) {
+        mesh_command_list.push_back(cmd);
+        all_command_handles.push_back(
+            {CommandType::MESH, mesh_command_list.size() - 1});
+    }
+
+    void clear() {
+        quad_command_list.clear();
+        mesh_command_list.clear();
+        all_command_handles.clear();
+    }
+};
+
 // 图层
 class ILayer {
    public:
-    using RenderDataBuffer = std::vector<RenderCommand>;
     // 构造ILayer
     ILayer(Renderer2D* renderer, ECSCore* ecore)
         : rendererRef(renderer), core(ecore) {}

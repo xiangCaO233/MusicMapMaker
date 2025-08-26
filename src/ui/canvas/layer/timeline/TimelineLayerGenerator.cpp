@@ -4,6 +4,8 @@
 #include <layer/MapLayerManager.hpp>
 #include <layer/timeline/TimelineLayerGenerator.hpp>
 
+#include "ecs/system/LinearTimeConverter.hpp"
+
 // 析构TimelineLayerGenerator
 TimelineLayerGenerator::~TimelineLayerGenerator() {
     qDebug() << "时间线图层生成线程释放";
@@ -11,19 +13,21 @@ TimelineLayerGenerator::~TimelineLayerGenerator() {
 
 // 生成交互层的数据
 void TimelineLayerGenerator::generateLayer(LayerManager* manager,
-                                           ILayer::RenderDataBuffer& buffer) {
+                                           RenderDataBuffer& buffer) {
     // 数据准备
     auto maplayer_manager = static_cast<MapLayerManager*>(manager);
     auto map = maplayer_manager->map();
     if (!map) return;
     auto l = layer<NoteLayer>();
     auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
+    auto& ecore = maplayer_manager->core();
 
     // 从管理器获取时间转换器
     auto converter =
         maplayer_manager->get_time_converter_manager()->getConverter(
             map->timing_set(), mapinfo->baseInfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
+    auto liner_converter = LinearTimeConverter(mapinfo);
 
     // 根据设定的坐标系 (Y=0在底部)，计算判定线的绝对像素位置。
     // 如果 judgeline_pos = 0.2f，意味着判定线在从下往上20%的高度。
@@ -52,17 +56,23 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
         converter.timeToPixel(query_start_time, time, mapinfo);
     const float end_y = converter.timeToPixel(query_end_time, time, mapinfo);
 
-    RenderCommand start_cmd;
+    // 绘制读取时间区间线(红色)
+    QuadCommand start_cmd;
+    start_cmd.cmdType = CommandType::QUAD;
     start_cmd.baseInfo.pos = {0, start_y};
     start_cmd.baseInfo.size = {mapinfo->baseInfo.canvasSize.width(), 8};
     start_cmd.baseInfo.color = {1, 0, 0, 1};
-    RenderCommand end_cmd;
+    QuadCommand end_cmd;
+    end_cmd.cmdType = CommandType::QUAD;
     end_cmd.baseInfo.pos = {0, end_y};
     end_cmd.baseInfo.size = {mapinfo->baseInfo.canvasSize.width(), 8};
     end_cmd.baseInfo.color = {1, 0, 0, 1};
 
-    buffer.push_back(start_cmd);
-    buffer.push_back(end_cmd);
+    buffer.add_QuadCommand(start_cmd);
+    buffer.add_QuadCommand(end_cmd);
+
+    // 生成时间线(拍线/识别分拍/小节线)
+    timeline_system.update(ecore, mapinfo, liner_converter, l, buffer);
 
     // qDebug() << "timeline layer done";
 }

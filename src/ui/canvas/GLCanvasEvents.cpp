@@ -37,13 +37,13 @@ void GLCanvas::mouseMoveEvent(QMouseEvent *e) {
 
 void GLCanvas::mousePressEvent(QMouseEvent *e) {
     QOpenGLWindow::mousePressEvent(e);
-    canvas_info->realTimeInfo.buttons.insert(e->button());
+    canvas_info->realTimeInfo.mButtons.insert(e->button());
     update_sharedInfo();
 }
 
 void GLCanvas::mouseReleaseEvent(QMouseEvent *e) {
     QOpenGLWindow::mouseReleaseEvent(e);
-    canvas_info->realTimeInfo.buttons.erase(e->button());
+    canvas_info->realTimeInfo.mButtons.erase(e->button());
     update_sharedInfo();
 }
 

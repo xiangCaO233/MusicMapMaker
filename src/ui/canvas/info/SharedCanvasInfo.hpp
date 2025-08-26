@@ -52,7 +52,7 @@ struct RealTimeInfo {
     // 当前鼠标位置
     QPointF mousePos;
     // 正在按下的鼠标按钮
-    std::unordered_set<Qt::MouseButton> buttons;
+    std::unordered_set<Qt::MouseButton> mButtons;
 };
 
 struct SharedCanvasInfo {

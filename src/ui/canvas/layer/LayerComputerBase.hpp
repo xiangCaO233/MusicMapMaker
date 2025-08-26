@@ -32,7 +32,7 @@ class LayerComputerBase : public QObject {
    protected:
     // 生成图层
     virtual void generateLayer(LayerManager* manager,
-                               ILayer::RenderDataBuffer& buffer) = 0;
+                               RenderDataBuffer& buffer) = 0;
 
    private:
     // 图层指针

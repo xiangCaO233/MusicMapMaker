@@ -19,10 +19,23 @@ MPrimitiveCollector::~MPrimitiveCollector() {
 void MPrimitiveCollector::collect() {
     // 按顺序遍历图层收集渲染指令
     auto render = renderer;
-    layer_manager->consume([render](const ILayer::RenderDataBuffer& buffer) {
-        for (auto& command : buffer) {
+    layer_manager->consume([render](const RenderDataBuffer& buffer) {
+        for (auto& command_handle : buffer.all_command_handles) {
             // 提交到渲染器
-            render->commit(command);
+            switch (command_handle.type) {
+                using enum CommandType;
+                case QUAD: {
+                    render->commit(
+                        buffer.quad_command_list[command_handle.index_in_pool]);
+                    break;
+                }
+                case MESH: {
+                    // 提交到渲染器
+                    render->commit(
+                        buffer.mesh_command_list[command_handle.index_in_pool]);
+                    break;
+                }
+            }
         }
     });
 }

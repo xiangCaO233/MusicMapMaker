@@ -1,17 +1,19 @@
 #ifndef MMM_TRANSFORMCOMPONENTS_HPP
 #define MMM_TRANSFORMCOMPONENTS_HPP
 
+#include <entt.hpp>
 #include <glm/glm.hpp>
 #include <render/texture/TextureInfo.hpp>
 #include <vector>
 
 // 转换组件1-指示此物件在画布中的逻辑中心位置
-struct TransformComponent_1 {
+struct TransformComponent {
     float y;
 };
 
-// 转换组件2-指示此实体的完整绘制网格列表
-struct TransformComponent_2 {
+struct GeneratedMesh {
+    // 标记这个网格属于哪个实体
+    entt::entity source_entity;
     struct Quad {
         glm::vec2 pos;
         glm::vec2 size;

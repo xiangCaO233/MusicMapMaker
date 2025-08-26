@@ -14,10 +14,11 @@
 
 class MeshGenerateSystem {
    public:
-    void update(ECSCore& core, const MapCanvasInfo* info,
-                TimePixelConverter& converter) const {
+    void update(const entt::registry& registry, const MapCanvasInfo* info,
+                const TimePixelConverter& converter,
+                std::unordered_map<entt::entity, GeneratedMesh>&
+                    out_generated_meshes) const {
         // 生成物件的网格组件
-        auto& registry = core.ecs_registry();
         // const auto& realtime_info = info->realTimeInfo;
         // 获取轨道布局信息
         const glm::vec4& all_tracks_rect = info->editorInfo.track_layout;
@@ -27,16 +28,20 @@ class MeshGenerateSystem {
         const float single_track_width = all_tracks_rect.z / float(track_count);
         // 遍历所有需要生成网格的实体(除去组合物件的子键)
         auto view =
-            registry.view<TimeComponent, NoteComponent, TransformComponent_1>(
+            registry.view<TimeComponent, NoteComponent, TransformComponent>(
                 entt::exclude<ChildOfComponent>);
         for (auto& e : view) {
+            auto& entity_mesh = out_generated_meshes[e];
+            entity_mesh.source_entity = e;
+
             const auto& [time] = registry.get<TimeComponent>(e);
             // 清理上一帧的网格数据
-            auto& mesh = registry.get_or_emplace<TransformComponent_2>(e).mesh;
-            mesh.clear();
+            // auto& mesh =
+            // registry.get_or_emplace<TransformComponent_2>(e).mesh;
+            // mesh.clear();
             // --- 根据Note类型进行分支处理 ---
             const auto& [track_index, handle] = registry.get<NoteComponent>(e);
-            const auto& [y] = registry.get<TransformComponent_1>(e);
+            const auto& [y] = registry.get<TransformComponent>(e);
             const float x = all_tracks_rect.x +
                             (float(track_index) + 0.5f) * single_track_width;
 
@@ -55,10 +60,10 @@ class MeshGenerateSystem {
 
             glm::vec2 head_size = obj_scale * head_texinfo.origin_size * 1.25f;
 
-            // 共同的头网格(head在层级1)
-            mesh.emplace_back(
+            // 共同的头网格(head在层级2(最上层))
+            entity_mesh.mesh.emplace_back(
                 glm::vec2(x - head_size.x / 2.f, y - head_size.y / 2.f),
-                head_size, head_texinfo, 1);
+                head_size, head_texinfo, 2);
 
             if (registry.all_of<HoldComponent>(e)) {
                 // 计算持续面身高度
@@ -75,7 +80,7 @@ class MeshGenerateSystem {
 
                 // 绘制面身(画在面条结束的位置)
                 // 面身网格(在层级0(最下层))
-                mesh.emplace_back(
+                entity_mesh.mesh.emplace_back(
                     glm::vec2(x - body_width / 2.f, y - body_height),
                     glm::vec2{body_width, body_height}, hold_body_texinfo, 0);
 
@@ -85,9 +90,10 @@ class MeshGenerateSystem {
                 TextureInfo hold_end_texinfo =
                     tex(info, registry, e, TexType::HOLD_END);
                 auto end_size = hold_end_texinfo.origin_size * obj_scale;
-                mesh.emplace_back(glm::vec2(x - end_size.x / 2.f,
-                                            y - body_height - end_size.y / 2.f),
-                                  end_size, hold_end_texinfo, 1);
+                entity_mesh.mesh.emplace_back(
+                    glm::vec2(x - end_size.x / 2.f,
+                              y - body_height - end_size.y / 2.f),
+                    end_size, hold_end_texinfo, 1);
             } else if (registry.all_of<FlickComponent>(e)) {
                 // 获取flick身纹理
                 // TextureInfo flick_body_texinfo =

@@ -27,7 +27,7 @@ class TimeSystem {
                 time, realtime_info.presentation_canvas_time, info);
 
             // 附加或更新 TransformComponent_1
-            registry.emplace_or_replace<TransformComponent_1>(entity, y);
+            registry.emplace_or_replace<TransformComponent>(entity, y);
             // ++count;
         }
         // qDebug() << "共更新" << count << "个实体转换组件1";

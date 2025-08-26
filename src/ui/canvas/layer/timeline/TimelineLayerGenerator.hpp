@@ -1,6 +1,7 @@
 #ifndef MMM_TIMELINELAYERGENERATOR_HPP
 #define MMM_TIMELINELAYERGENERATOR_HPP
 
+#include <ecs/system/TimeLineSystem.hpp>
 #include <layer/LayerComputerBase.hpp>
 
 class TimelineLayerGenerator : public LayerComputerBase {
@@ -12,6 +13,9 @@ class TimelineLayerGenerator : public LayerComputerBase {
    protected:
     // 生成交互层的数据
     void generateLayer(LayerManager* manager,
-                       ILayer::RenderDataBuffer& buffer) override;
+                       RenderDataBuffer& buffer) override;
+
+   private:
+    TimeLineSystem timeline_system;
 };
 #endif  // MMM_TIMELINELAYERGENERATOR_HPP

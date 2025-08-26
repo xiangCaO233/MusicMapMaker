@@ -105,7 +105,7 @@ set(GLSL_FILES
     resources/glsl/wavgraph_vshader.glsl.vert)
 
 set(CANVAS_SOURCES
-    src/ui/canvas/render/QuadData.hpp
+    src/ui/canvas/render/GPUData.hpp
     src/ui/canvas/render/texture/TexMode.hpp
     src/ui/canvas/render/texture/TextureInfo.hpp
     src/ui/canvas/render/texture/font/FontPool.hpp
