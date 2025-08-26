@@ -165,6 +165,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // 最大矩形数量
     uint32_t max_quadcount{8192};
+    // 最大网格顶点数量
     uint32_t max_mesh_vertexcount{32768};
 
     // 蒙版ubo句柄
