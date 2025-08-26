@@ -21,7 +21,7 @@ class TexturePool {
     TexturePool& operator=(const TexturePool&) = delete;
 
     // 是否需要更新
-    bool needupdate() const { return need_update.load(); };
+    std::atomic<bool>& needupdate() { return need_update; };
 
     // 其他线程调用来请求添加新路径纹理
     void request_new_directory(const std::string& dir);

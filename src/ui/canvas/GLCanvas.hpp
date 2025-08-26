@@ -24,6 +24,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 绑定音频载入回调
    public slots:
     virtual void onAudioLoadcbkInitialized(AudioLoadCallback *cbk);
+    virtual void onUpdateTexinfo();
 
    signals:
     void update_window_suffix(const QString &suffix);

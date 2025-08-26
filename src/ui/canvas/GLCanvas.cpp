@@ -86,6 +86,8 @@ void GLCanvas::updateFpsDisplay(int fps) {
     emit update_window_suffix(title_suffix);
 }
 
+void GLCanvas::onUpdateTexinfo() {}
+
 // 更新共享信息
 void GLCanvas::update_sharedInfo() const {
     // 更新信息
@@ -120,14 +122,17 @@ void GLCanvas::initializeGL() {
     // 初始化渲染器
     render = std::make_unique<Renderer2D>(this);
 
+    // 连接信号
+    connect(render.get(), &Renderer2D::needUpdateTexinfo, this,
+            &GLCanvas::onUpdateTexinfo);
+
     // 加载纹理
     // render->add_texture_from_path("../resources/textures/default");
 
     // 加载字体
     render->add_font_from_path(
-        "../../../../resources/font/ComicShannsMonoNerdFont_Bold.otf");
-    render->add_font_from_path(
-        "../../../../resources/font/NotoSansCJK-Bold.ttc");
+        "../resources/font/ComicShannsMonoNerdFont_Bold.otf");
+    render->add_font_from_path("../resources/font/NotoSansCJK-Bold.ttc");
 
     // 加载蒙版
 

@@ -85,6 +85,9 @@ class MSkin {
     // 获取音效
     std::string_view get_sound_effect(SoundEffectType type);
 
+    // 清除缓存
+    void clear_buffer();
+
    private:
     TextureLoadCallback* texcallback;
     std::filesystem::path skinPath;

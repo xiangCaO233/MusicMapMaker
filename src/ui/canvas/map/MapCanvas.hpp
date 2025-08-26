@@ -34,6 +34,7 @@ class MapCanvas : public GLCanvas {
     // 绑定音频载入回调
    public slots:
     void onAudioLoadcbkInitialized(AudioLoadCallback *cbk) override;
+    void onUpdateTexinfo() override;
 
    signals:
     void skinInitialized();

@@ -58,6 +58,12 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
     }
 }
 
+void MapCanvas::onUpdateTexinfo() {
+    // 清理皮肤缓存
+    qDebug() << "纹理重组,清理皮肤缓存";
+    skin->clear_buffer();
+}
+
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {
     map = smap;

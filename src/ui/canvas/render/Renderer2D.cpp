@@ -3,7 +3,6 @@
 #include <QOpenGLFunctions_4_1_Core>
 #include <canvas/GLCanvas.hpp>
 #include <canvas/render/Renderer2D.hpp>
-#include <filesystem>
 #include <mutex>
 #include <queue>
 #include <render/RenderCommand.hpp>
@@ -55,7 +54,7 @@ TextureInfo Renderer2D::getInfo(std::string_view texname) {
     return texturepool->get(texname).value_or(TextureInfo{});
 }
 
-Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
+Renderer2D::Renderer2D(GLCanvas* canvas) : cvs(canvas) {
     // 初始化纹理池
     texturepool = std::make_unique<TexturePool>(canvas);
 
@@ -106,99 +105,99 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : glf(canvas) {
 
     // 检查是否找到了（如果拼写错误或被优化掉，可能找不到）
     if (GLuint mask_ubo_index =
-            GLCALL(glf->glGetUniformBlockIndex(shader_program->programId(),
+            GLCALL(cvs->glGetUniformBlockIndex(shader_program->programId(),
                                                "MaskStackUBO"),
-                   glf);
+                   cvs);
         mask_ubo_index != GL_INVALID_INDEX) {
         // 将 uniform block 索引，绑定到绑定点 0
-        GLCALL(glf->glUniformBlockBinding(shader_program->programId(),
+        GLCALL(cvs->glUniformBlockBinding(shader_program->programId(),
                                           mask_ubo_index, 0),
-               glf);
+               cvs);
     } else {
         qWarning()
             << "Could not find uniform block 'MaskStackUBO' in shader program.";
     }
 
     // 初始化VAO
-    GLCALL(glf->glGenVertexArrays(1, &instance_dataAO), glf);
+    GLCALL(cvs->glGenVertexArrays(1, &instance_dataAO), cvs);
     // 绑定VAO
-    GLCALL(glf->glBindVertexArray(instance_dataAO), glf);
+    GLCALL(cvs->glBindVertexArray(instance_dataAO), cvs);
 
     // 初始化ubo
-    GLCALL(glf->glGenBuffers(1, &mask_uBO), glf);
+    GLCALL(cvs->glGenBuffers(1, &mask_uBO), cvs);
     // 绑定ubo
-    GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), glf);
+    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
     // 将UBO缓冲对象，也连接到绑定点 0
     // 这一步确保了绑定点0实际连接的是我们创建的 m_mask_ubo 这个GPU缓冲区
-    GLCALL(glf->glBindBufferBase(GL_UNIFORM_BUFFER, 0, mask_uBO), glf);
-    GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, 0), glf);
+    GLCALL(cvs->glBindBufferBase(GL_UNIFORM_BUFFER, 0, mask_uBO), cvs);
+    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
 
     // 初始化实例缓冲区
-    GLCALL(glf->glGenBuffers(1, &instance_dataBO), glf);
+    GLCALL(cvs->glGenBuffers(1, &instance_dataBO), cvs);
     // 绑定VBO
-    GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), glf);
-    GLCALL(glf->glBufferData(GL_ARRAY_BUFFER, max_quadcount * sizeof(QuadData),
+    GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), cvs);
+    GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER, max_quadcount * sizeof(QuadData),
                              nullptr, GL_DYNAMIC_DRAW),
-           glf);
+           cvs);
 
     // 0~2 vec2 pos
-    GLCALL(glf->glEnableVertexAttribArray(0), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(0), cvs);
 
     // 3~4 vec2 size
-    GLCALL(glf->glEnableVertexAttribArray(1), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(1), cvs);
 
     // 5 f32 rotation
-    GLCALL(glf->glEnableVertexAttribArray(2), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(2), cvs);
 
     // 6~9 vec4 color
-    GLCALL(glf->glEnableVertexAttribArray(3), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(3), cvs);
 
     // 10~11 vec2 radius
-    GLCALL(glf->glEnableVertexAttribArray(4), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(4), cvs);
 
     // 12 f32 radius_effect_param
-    GLCALL(glf->glEnableVertexAttribArray(5), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(5), cvs);
 
     // 13 uint radius_effect
-    GLCALL(glf->glEnableVertexAttribArray(6), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(6), cvs);
 
     // 14~15 vec2 uv_scale
-    GLCALL(glf->glEnableVertexAttribArray(7), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(7), cvs);
 
     // 16~17 vec2 group_size
-    GLCALL(glf->glEnableVertexAttribArray(8), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(8), cvs);
 
     // 18 uint no_filter
-    GLCALL(glf->glEnableVertexAttribArray(9), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(9), cvs);
 
     // 19 int layer_idx
-    GLCALL(glf->glEnableVertexAttribArray(10), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(10), cvs);
 
     // 20 uint texalignmode
-    GLCALL(glf->glEnableVertexAttribArray(11), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(11), cvs);
 
     // 21 uint texscalemode
-    GLCALL(glf->glEnableVertexAttribArray(12), glf);
+    GLCALL(cvs->glEnableVertexAttribArray(12), cvs);
 
     update_attribptrFromInstance(0);
 
-    GLCALL(glf->glVertexAttribDivisor(0, 1), glf);   // pos
-    GLCALL(glf->glVertexAttribDivisor(1, 1), glf);   // size
-    GLCALL(glf->glVertexAttribDivisor(2, 1), glf);   // rotation
-    GLCALL(glf->glVertexAttribDivisor(3, 1), glf);   // color
-    GLCALL(glf->glVertexAttribDivisor(4, 1), glf);   // radius
-    GLCALL(glf->glVertexAttribDivisor(5, 1), glf);   // radius_effect_param
-    GLCALL(glf->glVertexAttribDivisor(6, 1), glf);   // radius_effect
-    GLCALL(glf->glVertexAttribDivisor(7, 1), glf);   // uv_scale
-    GLCALL(glf->glVertexAttribDivisor(8, 1), glf);   // group_size
-    GLCALL(glf->glVertexAttribDivisor(9, 1), glf);   // layer_idx
-    GLCALL(glf->glVertexAttribDivisor(10, 1), glf);  // no_filter
-    GLCALL(glf->glVertexAttribDivisor(11, 1), glf);  // talign
-    GLCALL(glf->glVertexAttribDivisor(12, 1), glf);  // tscale
+    GLCALL(cvs->glVertexAttribDivisor(0, 1), cvs);   // pos
+    GLCALL(cvs->glVertexAttribDivisor(1, 1), cvs);   // size
+    GLCALL(cvs->glVertexAttribDivisor(2, 1), cvs);   // rotation
+    GLCALL(cvs->glVertexAttribDivisor(3, 1), cvs);   // color
+    GLCALL(cvs->glVertexAttribDivisor(4, 1), cvs);   // radius
+    GLCALL(cvs->glVertexAttribDivisor(5, 1), cvs);   // radius_effect_param
+    GLCALL(cvs->glVertexAttribDivisor(6, 1), cvs);   // radius_effect
+    GLCALL(cvs->glVertexAttribDivisor(7, 1), cvs);   // uv_scale
+    GLCALL(cvs->glVertexAttribDivisor(8, 1), cvs);   // group_size
+    GLCALL(cvs->glVertexAttribDivisor(9, 1), cvs);   // layer_idx
+    GLCALL(cvs->glVertexAttribDivisor(10, 1), cvs);  // no_filter
+    GLCALL(cvs->glVertexAttribDivisor(11, 1), cvs);  // talign
+    GLCALL(cvs->glVertexAttribDivisor(12, 1), cvs);  // tscale
 
     // 解绑
-    GLCALL(glf->glBindVertexArray(0), glf);
-    GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, 0), glf);
+    GLCALL(cvs->glBindVertexArray(0), cvs);
+    GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, 0), cvs);
 }
 
 Renderer2D::~Renderer2D() {
@@ -230,11 +229,17 @@ void Renderer2D::add_font_from_path(const std::string& path, bool is_qrc) {
 
 // 更新需要更新的资源等等
 void Renderer2D::update() {
-    if (texturepool->needupdate()) {
+    if (texturepool->needupdate().load()) {
         texturepool->processUpdateDirRequest();
         texturepool->processUploadQueue();
+        // 发送需更新皮肤信息信号
+        emit needUpdateTexinfo();
     }
-    fontpool->processUploadQueue();
+    if (fontpool->needupdate().load()) {
+        fontpool->processUploadQueue();
+        // 发送需更新皮肤信息信号
+        emit needUpdateTexinfo();
+    }
 
     if (update_view) {
         QMatrix4x4 projection;
@@ -248,12 +253,12 @@ void Renderer2D::update() {
     if (update_ubo) {
         // 更新ubo
         // 将CPU端的蒙版堆栈数据上传到UBO
-        GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), glf);
-        GLCALL(glf->glBufferData(GL_UNIFORM_BUFFER,
+        GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
+        GLCALL(cvs->glBufferData(GL_UNIFORM_BUFFER,
                                  MAX_MASK_LAYERS * sizeof(MaskLayer_STD140),
                                  mask_stack_cpu.data(), GL_STATIC_DRAW),
-               glf);
-        GLCALL(glf->glBindBuffer(GL_UNIFORM_BUFFER, 0), glf);
+               cvs);
+        GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
 
         // 需要一个uniform告诉着色器当前有多少个活跃的蒙版层
         shader_program->bind();
@@ -289,14 +294,14 @@ void Renderer2D::expandQuadDataBuffer() {
 
     if (need_update) {
         // 绑定现有的VBO
-        GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), glf);
+        GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), cvs);
         // 直接用 glBufferData 重新分配，驱动会处理好旧内存的释放
         GLCALL(
-            glf->glBufferData(GL_ARRAY_BUFFER, max_quadcount * sizeof(QuadData),
+            cvs->glBufferData(GL_ARRAY_BUFFER, max_quadcount * sizeof(QuadData),
                               nullptr, GL_DYNAMIC_DRAW),
-            glf);
+            cvs);
         // 解绑
-        GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, 0), glf);
+        GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, 0), cvs);
     }
 }
 
@@ -316,82 +321,82 @@ void Renderer2D::update_attribptrFromInstance(size_t instance_index) {
     size_t base_offset = instance_index * sizeof(QuadData);
 
     // 0~2 vec2 pos
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                0, 2, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, pos))),
-           glf);
+           cvs);
 
     // 3~4 vec2 size
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                1, 2, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, size))),
-           glf);
+           cvs);
 
     // 5 f32 rotation
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                2, 1, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, rotation))),
-           glf);
+           cvs);
 
     // 6~9 vec4 color
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                3, 4, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, color))),
-           glf);
+           cvs);
 
     // 10~11 vec2 radius
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                4, 2, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, radius))),
-           glf);
+           cvs);
 
     // 12 f32 radius_effect_param
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                5, 1, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, radius_effect_param))),
-           glf);
+           cvs);
 
     // 13 uint radius_effect
-    GLCALL(glf->glVertexAttribIPointer(
+    GLCALL(cvs->glVertexAttribIPointer(
                6, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, radius_effect))),
-           glf);
+           cvs);
 
     // 14~15 vec2 uv_scale
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                7, 2, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, uv_scale))),
-           glf);
+           cvs);
 
     // 16~17 vec2 group_size
-    GLCALL(glf->glVertexAttribPointer(
+    GLCALL(cvs->glVertexAttribPointer(
                8, 2, GL_FLOAT, false, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, group_size))),
-           glf);
+           cvs);
 
     // 18 int layer_idx
-    GLCALL(glf->glVertexAttribIPointer(
+    GLCALL(cvs->glVertexAttribIPointer(
                9, 1, GL_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, layer_idx))),
-           glf);
+           cvs);
 
     // 19 uint no_filter
-    GLCALL(glf->glVertexAttribIPointer(
+    GLCALL(cvs->glVertexAttribIPointer(
                10, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, no_filter))),
-           glf);
+           cvs);
 
     // 20 uint texalignmode
-    GLCALL(glf->glVertexAttribIPointer(
+    GLCALL(cvs->glVertexAttribIPointer(
                11, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, talign))),
-           glf);
+           cvs);
 
     // 21 uint texscalemode
-    GLCALL(glf->glVertexAttribIPointer(
+    GLCALL(cvs->glVertexAttribIPointer(
                12, 1, GL_UNSIGNED_INT, sizeof(QuadData),
                (void*)(base_offset + offsetof(QuadData, tscale))),
-           glf);
+           cvs);
 }
 
 // 结束绘制指令提交
@@ -446,14 +451,14 @@ void Renderer2D::render() {
 
     // 绑定核心对象
     shader_program->bind();
-    GLCALL(glf->glBindVertexArray(instance_dataAO), glf);
-    GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), glf);
+    GLCALL(cvs->glBindVertexArray(instance_dataAO), cvs);
+    GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, instance_dataBO), cvs);
 
     // 一次性上传所有实例数据
     GLCALL(
-        glf->glBufferData(GL_ARRAY_BUFFER, quad_datas.size() * sizeof(QuadData),
+        cvs->glBufferData(GL_ARRAY_BUFFER, quad_datas.size() * sizeof(QuadData),
                           quad_datas.data(), GL_DYNAMIC_DRAW),
-        glf);
+        cvs);
 
     // 不绘制线框
     shader_program->setUniformValue("u_IsDrawingWireframe", false);
@@ -461,9 +466,9 @@ void Renderer2D::render() {
     for (const auto& batch : command_batch) {
         // 绑定这个批次需要的纹理
         // 激活纹理单元0
-        GLCALL(glf->glActiveTexture(GL_TEXTURE0), glf);
-        GLCALL(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, batch.texture_array_id),
-               glf);
+        GLCALL(cvs->glActiveTexture(GL_TEXTURE0), cvs);
+        GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, batch.texture_array_id),
+               cvs);
         // 着色器采样器 u_samplerarray 使用纹理单元 0
         shader_program->setUniformValue("u_samplerarray", 0);
 
@@ -472,8 +477,8 @@ void Renderer2D::render() {
 
         // 发起绘制调用
         GLCALL(
-            glf->glDrawArraysInstanced(GL_TRIANGLES, 0, 6, batch.instanceCount),
-            glf);
+            cvs->glDrawArraysInstanced(GL_TRIANGLES, 0, 6, batch.instanceCount),
+            cvs);
     }
 
     // === 绘制调试线框 ===
@@ -482,15 +487,15 @@ void Renderer2D::render() {
         shader_program->setUniformValue("u_IsDrawingWireframe", true);
         for (const auto& batch : command_batch) {
             update_attribptrFromInstance(batch.startIndex);
-            GLCALL(glf->glDrawArraysInstanced(GL_LINE_LOOP, 0, 6,
+            GLCALL(cvs->glDrawArraysInstanced(GL_LINE_LOOP, 0, 6,
                                               batch.instanceCount),
-                   glf);
+                   cvs);
         }
     }
 
     // 清理
-    GLCALL(glf->glBindVertexArray(0), glf);
-    GLCALL(glf->glBindBuffer(GL_ARRAY_BUFFER, 0), glf);
+    GLCALL(cvs->glBindVertexArray(0), cvs);
+    GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, 0), cvs);
     shader_program->release();
 
     // 为下一帧做准备

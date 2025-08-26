@@ -195,6 +195,7 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
             // 通知主线程有数据了
             cv.notify_one();
         });
+        need_update.store(true);
     }
 }
 
@@ -205,6 +206,7 @@ void FontPool::processUploadQueue() {
     {
         std::lock_guard<std::mutex> lock(queue_mutex);
         if (upload_queue.empty()) {
+            need_update.store(false);
             return;
         }
         to_process.swap(upload_queue);

@@ -48,10 +48,15 @@ void MProject::open(std::string_view project_path_str) {
                         .first;
                 auto map_maintrack = mapit->second->base_metadata()
                                          .main_audio_path.generic_string();
-                auto map_track = audiocallback->loadBack(map_maintrack, true);
-                // 添加谱面的主音轨
-                qDebug() << "需要载入音频[" << map_maintrack << "]";
-                project_main_audios_table.try_emplace(map_maintrack, map_track);
+
+                if (!project_main_audios_table.contains(map_maintrack)) {
+                    auto map_track =
+                        audiocallback->loadBack(map_maintrack, true);
+                    // 添加谱面的主音轨
+                    qDebug() << "需要载入音频[" << map_maintrack << "]";
+                    project_main_audios_table.try_emplace(map_maintrack,
+                                                          map_track);
+                }
             } else if (filename.ends_with(".mp3") ||
                        filename.ends_with(".ogg") ||
                        filename.ends_with(".wav")) {

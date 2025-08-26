@@ -46,7 +46,7 @@ class FontPool {
     virtual ~FontPool();
 
     // 是否需要更新
-    bool needupdate() const { return need_update.load(); };
+    std::atomic<bool>& needupdate() { return need_update; };
 
     // 载入字体
     void load_font(std::string_view font_path, bool is_qrc);

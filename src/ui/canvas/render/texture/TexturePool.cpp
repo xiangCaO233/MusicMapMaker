@@ -342,6 +342,7 @@ void TexturePool::buildFromManifest(
                         {
                             std::lock_guard<std::mutex> lock(queue_mutex);
                             upload_queue.push(image_data);
+                            need_update.store(true);
                         }
                         // 在此之前，已经有了最终的渲染信息，所以先存起来
                         {
@@ -367,7 +368,6 @@ void TexturePool::buildFromManifest(
             internal_group.uploaded_layers.store(group.uploaded_layers);
         }
     }
-    need_update.store(true);
 }
 
 // 从主线程调用，处理已从磁盘加载完成的纹理，将其上传到GPU
@@ -377,6 +377,10 @@ void TexturePool::processUploadQueue() {
     // 将待处理任务快速移出,减少锁的持有时间
     {
         std::lock_guard<std::mutex> lock(queue_mutex);
+        if (upload_queue.empty()) {
+            need_update.store(false);
+            return;
+        }
         to_process.swap(upload_queue);
     }
 

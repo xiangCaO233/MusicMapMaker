@@ -1,6 +1,7 @@
 #ifndef MMM_RENDERER2D_HPP
 #define MMM_RENDERER2D_HPP
 
+#include <QObject>
 #include <QOpenGLShaderProgram>
 #include <array>
 #include <glm/fwd.hpp>
@@ -13,7 +14,8 @@
 #include <render/texture/font/FontPool.hpp>
 
 class GLCanvas;
-class Renderer2D : public TextureLoadCallback {
+class Renderer2D : public QObject, public TextureLoadCallback {
+    Q_OBJECT
    public:
     explicit Renderer2D(GLCanvas* canvas);
     ~Renderer2D() override;
@@ -69,6 +71,10 @@ class Renderer2D : public TextureLoadCallback {
     // 访问字体池
     const std::unique_ptr<FontPool>& font_pool() const { return fontpool; }
 
+   signals:
+    // 需要更新纹理信息信号
+    void needUpdateTexinfo();
+
    private:
     // 启用调试线框
     bool draw_wireframe{false};
@@ -83,8 +89,8 @@ class Renderer2D : public TextureLoadCallback {
     // 字体池
     std::unique_ptr<FontPool> fontpool;
 
-    // gl函数上下文
-    QOpenGLFunctions_4_1_Core* glf;
+    // gl上下文
+    GLCanvas* cvs;
 
     // 着色器
     QOpenGLShaderProgram* shader_program;

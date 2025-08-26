@@ -142,6 +142,12 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
 // 析构MSkin
 MSkin::~MSkin() {}
 
+// 清除缓存
+void MSkin::clear_buffer() {
+    bg_texture_buffer.clear();
+    object_texture_buffer.clear();
+}
+
 // 皮肤基本字体族
 std::string_view MSkin::fontFamilyASCII() { return fontascii; }
 
