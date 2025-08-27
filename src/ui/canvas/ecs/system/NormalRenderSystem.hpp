@@ -42,45 +42,45 @@ class NormalRenderSystem {
                 buffer.add_QuadCommand(cmd);
             }
 
-            // 绘制物件精确时间字符串
-            const auto& [entity_y] = view.get<TransformComponent>(e);
-            const auto& [time] = view.get<TimeComponent>(e);
-            // 绘制当前时间字符串
-            auto timestr = QString::number(uint32_t(time));
-            auto timestru32 = timestr.toStdU32String();
+            // // 绘制物件精确时间字符串
+            // const auto& [entity_y] = view.get<TransformComponent>(e);
+            // const auto& [time] = view.get<TimeComponent>(e);
+            // // 绘制当前时间字符串
+            // auto timestr = QString::number(uint32_t(time));
+            // auto timestru32 = timestr.toStdU32String();
 
-            uint32_t xoffset{0};
+            // uint32_t xoffset{0};
 
-            for (const auto& character : timestru32) {
-                // 获取字符纹理信息
-                auto fontoption =
-                    layer->get("ComicShannsMono Nerd Font", 12, character);
-                if (fontoption.has_value()) {
-                    const auto& charInfo = fontoption.value();
-                    const auto& charTexture = charInfo.character_texinfo;
+            // for (const auto& character : timestru32) {
+            //     // 获取字符纹理信息
+            //     auto fontoption =
+            //         layer->get("ComicShannsMono Nerd Font", 12, character);
+            //     if (fontoption.has_value()) {
+            //         const auto& charInfo = fontoption.value();
+            //         const auto& charTexture = charInfo.character_texinfo;
 
-                    // 计算当前字符应该处于的位置
-                    glm::vec2 charpos = mesh.back().pos + glm::vec2{4.f, 4.f};
-                    charpos.x += float(xoffset);
-                    charpos.y -= (charInfo.bearing.y);
-                    charpos.y += 8;
-                    // 提交渲染指令
-                    QuadCommand charcommand{
-                        {CommandType::QUAD,
-                         {charTexture, TexAlignMode::CENTER,
-                          TexScaleMode::CHARACTER}},
-                        {charpos,
-                         charTexture.origin_size,
-                         0.f,
-                         {1.f, 0.f, 1.f, 1.f},
-                         true},
-                        {charTexture.uv_offset},
-                    };
-                    buffer.add_QuadCommand(charcommand);
+            //         // 计算当前字符应该处于的位置
+            //         glm::vec2 charpos = mesh.back().pos +
+            //         glm::vec2{4.f, 4.f}; charpos.x += float(xoffset);
+            //         charpos.y -= (charInfo.bearing.y);
+            //         charpos.y += 8;
+            //         // 提交渲染指令
+            //         QuadCommand charcommand{
+            //             {CommandType::QUAD,
+            //              {charTexture, TexAlignMode::CENTER,
+            //               TexScaleMode::CHARACTER}},
+            //             {charpos,
+            //              charTexture.origin_size,
+            //              0.f,
+            //              {1.f, 0.f, 1.f, 1.f},
+            //              true},
+            //             {charTexture.uv_offset},
+            //         };
+            //         buffer.add_QuadCommand(charcommand);
 
-                    xoffset += charInfo.xadvance / 64;
-                }
-            }
+            //         xoffset += charInfo.xadvance / 64;
+            //     }
+            // }
         }
     }
 };

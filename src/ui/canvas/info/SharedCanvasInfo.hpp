@@ -13,13 +13,15 @@ struct BaseCanvasStatus {
     uint32_t view_timeMargin{100};
 
     // 滚动速度
-    float scroll_speed{1.f};
+    float scroll_speed{1.5f};
 
     // 时间线缩放
-    float timeline_zoom{1.f};
+    float timeline_zoom{1.2f};
 
     // 判定线位置
     float judgeline_pos{.2f};
+
+    bool operator==(const BaseCanvasStatus& _) const = default;
 };
 
 struct RealTimeInfo {

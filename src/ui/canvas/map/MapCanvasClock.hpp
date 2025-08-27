@@ -1,6 +1,7 @@
 #ifndef MMM_MAPCANVASCLOCK_HPP
 #define MMM_MAPCANVASCLOCK_HPP
 
+#include <QDebug>
 #include <info/SharedCanvasInfo.hpp>
 
 class MapCanvasClock {
@@ -13,12 +14,15 @@ class MapCanvasClock {
      * @param frame_delta_time_ms 上一帧到这一帧的实际间隔时间 (ms)。
      */
     void updateInt(RealTimeInfo& info, double smoothed_delta_ms) {
+        if (info.is_playing != m_was_playing) {
+            // 暂停或开始播放时，强制同步一次。
+            force_sync(info);
+        }
+
+        // 如果暂停，就不再往下执行
         if (!info.is_playing) {
-            if (m_was_playing) {
-                // 暂停时，强制将逻辑时间与原始音频时间同步
-                info.logic_canvas_time = info.raw_audio_time_ms.load();
-            }
-            reset();
+            // 在函数末尾统一更新 m_was_playing
+            m_was_playing = info.is_playing;
             return;
         }
 
@@ -88,13 +92,17 @@ class MapCanvasClock {
         m_clock_rate = current_playback_rate + m_rate_corrector;
         info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
     }
+
     void updateWBox(RealTimeInfo& info, double smoothed_delta_ms) {
+        if (info.is_playing != m_was_playing) {
+            // 暂停或开始播放时，强制同步一次。
+            force_sync(info);
+        }
+
+        // 如果暂停，就不再往下执行
         if (!info.is_playing) {
-            if (m_was_playing) {
-                // 暂停时，强制同步一次。此时允许“跳变”。
-                info.logic_canvas_time = info.raw_audio_time_ms.load();
-            }
-            reset();
+            // 在函数末尾统一更新 m_was_playing
+            m_was_playing = info.is_playing;
             return;
         }
 
@@ -140,9 +148,77 @@ class MapCanvasClock {
         info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
     }
 
+    void updateAutoAd(RealTimeInfo& info, double smoothed_delta_ms) {
+        if (info.is_playing != m_was_playing) {
+            // 暂停或开始播放时，强制同步一次。
+            force_sync(info);
+        }
+
+        // 如果暂停，就不再往下执行
+        if (!info.is_playing) {
+            // 在函数末尾统一更新 m_was_playing
+            m_was_playing = info.is_playing;
+            return;
+        }
+
+        // ---------------------------------------------------------------------
+        // 核心逻辑: 不再区分是否有音频更新，每一帧都执行相同的平滑调整
+        // ---------------------------------------------------------------------
+
+        double current_playback_rate = info.audio_playback_rate.load();
+
+        if (!m_was_playing || m_last_playback_rate != current_playback_rate) {
+            // 首次播放或变速，进行一次硬重置
+            m_was_playing = true;
+            m_last_playback_rate = current_playback_rate;
+            info.logic_canvas_time = info.raw_audio_time_ms.load();
+            m_clock_rate = current_playback_rate;  // 速率也立即重置
+        }
+
+        // 1. 计算当前时间误差
+        //    目标时间 = 音频时间 + 缓冲
+        double target_time_with_buffer =
+            info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
+        double error = target_time_with_buffer - info.logic_canvas_time;
+
+        // 2. 【核心】根据误差大小，选择不同的策略 (动态平滑)
+        double current_smoothing_factor;
+        if (std::abs(error) > STUTTER_THRESHOLD_MS) {
+            // 误差巨大，发生了卡顿！
+            // 我们选择极其缓慢的恢复策略。
+            current_smoothing_factor = STUTTER_RECOVERY_SMOOTHING_FACTOR;
+        } else {
+            // 误差在正常范围内，
+            // 我们可以进行更积极的微调。
+            current_smoothing_factor = NORMAL_SMOOTHING_FACTOR;
+        }
+
+        // 3. 计算一个理想的目标速率
+        //    这个P控制器只提供一个“方向”，而不是一个绝对命令
+        const double Kp = 0.002;  // Kp可以保持一个较小的值
+        double target_rate = current_playback_rate + (error * Kp);
+
+        // 4. 【关键】使用动态选择的平滑因子，极其平滑地逼近目标速率
+        m_clock_rate += (target_rate - m_clock_rate) * current_smoothing_factor;
+
+        // 5. 【无回弹前进】以当前极其平滑的速率，让时间前进
+        //    因为 m_clock_rate 的变化非常缓慢，所以时间的增加也是极其平滑的
+        info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
+    }
+
     // 公共的重置函数，用于暂停或seek等操作
     void reset() {
         m_was_playing = false;
+        m_clock_rate = 1.0;
+        m_rate_corrector = 0.0;
+        m_last_known_audio_time = 0.0;
+        m_canvas_time_at_last_sync = 0.0;
+    }
+
+    void force_sync(RealTimeInfo& info) {
+        // 强制同步一次,允许“跳变”
+        qDebug() << "force_sync";
+        info.logic_canvas_time = info.raw_audio_time_ms.load();
         m_clock_rate = 1.0;
         m_rate_corrector = 0.0;
         m_last_known_audio_time = 0.0;
@@ -157,10 +233,10 @@ class MapCanvasClock {
     const double Ki = 0.001;
 
     // --- 状态变量 ---
-    bool m_was_playing = false;
+    bool m_was_playing{false};
 
     // 我们自己内部维护的、平滑的速度（单位：毫秒/毫秒，正常应为1.0）
-    double m_clock_rate = 0.5;
+    double m_clock_rate = 1.;
 
     // 用于修正速度的积分项
     double m_rate_corrector = 0.0;
@@ -176,11 +252,11 @@ class MapCanvasClock {
 
     // 水箱模式
     // “水箱”的目标缓冲水平 (单位: ms)
-    // 这意味着我们总是试图让画布时间领先音频时间 20ms
+    // 这意味着我们总是试图让画布时间领先音频时间 x ms
     // 这个缓冲可以吸收音频和渲染循环之间的抖动
-    const double TARGET_BUFFER_MS = 20.0;
+    const double TARGET_BUFFER_MS = 30.0;
 
-    // 修正速率的最大调整幅度 (例如, 1.0 +/- 5%)
+    // 修正速率的最大调整幅度 (例如, 1.0 +/- 0.5%)
     // 这防止了因为一次巨大的误差导致画布速度变得过快或过慢
     const double MAX_RATE_ADJUSTMENT = 0.05;
 
@@ -188,6 +264,18 @@ class MapCanvasClock {
 
     // 用于平滑速率变化的平滑因子
     const double RATE_SMOOTHING_FACTOR = 0.005;
+
+    // 自适应调速模式
+    // “卡顿”的定义：当画布时间与目标时间的误差超过这个阈值时，
+    // 我们就认为发生了一次大卡顿 (单位: ms)。
+    const double STUTTER_THRESHOLD_MS = 100.0;
+
+    // 正常运行时的平滑因子。值越大，响应越快。
+    const double NORMAL_SMOOTHING_FACTOR = 0.01;
+
+    // 发生卡顿后，用于恢复的平滑因子。必须是一个极小的值，
+    // 以确保恢复过程极其柔和。
+    const double STUTTER_RECOVERY_SMOOTHING_FACTOR = 0.0005;
 };
 
 #endif  // MMM_MAPCANVASCLOCK_HPP

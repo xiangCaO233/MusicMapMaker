@@ -44,21 +44,17 @@ void RenderLoopWorker::doWork() {
         }
 
         // --- 2. 计算时间信息 ---
-        // (这部分逻辑不变)
-        auto raw_delta_ms = d->desired_frame_time_ns / 1000000.0;
-        // ... (处理卡顿的逻辑) ...
+        auto raw_delta_ms = double(d->desired_frame_time_ns / 1000) / 1000.0;
 
         // --- 3. 计算下一拍目标 ---
-        // (这部分逻辑不变)
         d->next_tick_time_ns += d->desired_frame_time_ns;
 
         // --- 4. 执行所有工作 ---
-        // (注意：这里直接调用了 RenderDataLoop 的私有/保护成员)
         d->m_smoothed_delta_ms += (raw_delta_ms - d->m_smoothed_delta_ms) *
                                   d->m_delta_smoothing_factor;
         if (auto mapinfo = static_cast<MapCanvasInfo*>(d->getinfo()); mapinfo) {
-            d->canvas_clock.updateWBox(mapinfo->realTimeInfo,
-                                       d->m_smoothed_delta_ms);
+            d->canvas_clock.updateAutoAd(mapinfo->realTimeInfo,
+                                         d->m_smoothed_delta_ms);
             // 在这一帧的开始，计算出最终的呈现时间
             // 是一个无状态的、纯粹的变换
             mapinfo->realTimeInfo.presentation_canvas_time =
