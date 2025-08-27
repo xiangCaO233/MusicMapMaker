@@ -107,19 +107,52 @@ class TimePixelConverter {
             }
 
             // 4. 根据最新的红线和绿线状态，计算新的速度
-            double bpm_multiplier =
-                (current_base_timing.beat_length > 0)
-                    ? (preference_beat_length / current_base_timing.beat_length)
-                    : 1.0;
+            double bpm_multiplier = 1.0;
+            // 防御：确保红线的 beat_length 是一个有效的正数
+            if (current_base_timing.beat_length > 1e-2) {  // 使用epsilon比较
+                bpm_multiplier =
+                    preference_beat_length / current_base_timing.beat_length;
+            } else {
+                // 如果红线BPM无效，我们可以选择继承上一个有效速度，或者使用默认值
+                // 这里我们简单地保持 bpm_multiplier 为 1.0
+                qWarning() << "在时间点" << timestamp
+                           << "检测到无效的红线 beat_length:"
+                           << current_base_timing.beat_length;
+            }
 
-            double velocity_multiplier =
-                (current_inherited_timing.beat_length < 0)
-                    ? (-100.0 / current_inherited_timing.beat_length)
-                    : 1.0;
+            double velocity_multiplier = 1.0;
+            // 防御：确保绿线的 beat_length 是一个有效的、远离零的负数
+            if (current_inherited_timing.beat_length < -1e-2) {
+                velocity_multiplier =
+                    -100.0 / current_inherited_timing.beat_length;
+            } else if (current_inherited_timing.beat_length != -100.0) {
+                // 如果它不是默认值-100，但又不符合 < -epsilon
+                // 的条件，说明它可能是0或一个无效值
+                qWarning() << "在时间点" << timestamp
+                           << "检测到无效的绿线 beat_length:"
+                           << current_inherited_timing.beat_length;
+                // 在这种情况下，我们强制它为 1.0x 速度
+            }
 
             double new_pixels_per_ms = BASE_PIXELS_PER_MS *
                                        m_status.scroll_speed * bpm_multiplier *
                                        velocity_multiplier;
+
+            // 确保速度不会是零或接近零，也非无穷大或NaN
+            if (std::abs(new_pixels_per_ms) < 1e-2) {
+                qWarning()
+                    << "在时间点" << timestamp
+                    << "计算出的像素速度接近于零，强制设为最小值以防崩溃。";
+                // 设置一个非常小的正值，而不是0
+                new_pixels_per_ms = 1e-2;
+            }
+            if (!std::isfinite(new_pixels_per_ms)) {
+                qWarning()
+                    << "在时间点" << timestamp
+                    << "计算出的像素速度为无穷大或NaN，强制重置为默认值。";
+                // 如果计算结果是 inf 或 NaN，回退到一个安全的速度
+                new_pixels_per_ms = last_pixels_per_ms;
+            }
 
             // 5. 添加新节点到查找表
             m_lookup_table.push_back(
@@ -161,7 +194,7 @@ class TimePixelConverter {
         if (it != m_lookup_table.begin()) --it;
 
         double pixels_into_segment = absolute_pixel - it->accumulated_pixels;
-        if (std::abs(it->pixels_per_ms) < 1e-9) return it->timestamp;
+        if (std::abs(it->pixels_per_ms) < 1e-2) return it->timestamp;
 
         return it->timestamp +
                static_cast<int64_t>(pixels_into_segment / it->pixels_per_ms);

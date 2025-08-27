@@ -29,7 +29,7 @@ void MapCanvas::initializeGL() {
     // 初始化渲染数据循环
     dataloop() = std::make_unique<MapDataLoop>(renderer().get());
     dataloop()->initializeLayerManager();
-    dataloop()->set_targetFPS(desired_fps() * 2);
+    dataloop()->set_targetFPS(desired_fps());
     connect(dataloop().get(), &RenderDataLoop::renderUpdate, this,
             qOverload<>(&QOpenGLWindow::update));
     connect(fps_counter(), &FrameRateCounter::fpsUpdated, dataloop().get(),

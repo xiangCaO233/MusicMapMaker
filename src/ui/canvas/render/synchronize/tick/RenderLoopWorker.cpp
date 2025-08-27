@@ -5,7 +5,7 @@
 #include <render/synchronize/tick/RenderLoopWorker.hpp>
 
 // --- 私有工作者的实现 ---
-RenderLoopWorker::RenderLoopWorker(RenderDataLoop *outer) : d(outer) {}
+RenderLoopWorker::RenderLoopWorker(RenderDataLoop* outer) : d(outer) {}
 
 void RenderLoopWorker::doWork() {
     d->timer.start();
@@ -56,12 +56,11 @@ void RenderLoopWorker::doWork() {
         // (注意：这里直接调用了 RenderDataLoop 的私有/保护成员)
         d->m_smoothed_delta_ms += (raw_delta_ms - d->m_smoothed_delta_ms) *
                                   d->m_delta_smoothing_factor;
-        if (auto *mapinfo = static_cast<MapCanvasInfo *>(d->getinfo());
-            mapinfo) {
-            d->canvas_clock.update(mapinfo->realTimeInfo,
-                                   d->m_smoothed_delta_ms);
-            // 2. 【核心】在这一帧的开始，计算出最终的呈现时间
-            //    这是一个无状态的、纯粹的变换
+        if (auto mapinfo = static_cast<MapCanvasInfo*>(d->getinfo()); mapinfo) {
+            d->canvas_clock.updateWBox(mapinfo->realTimeInfo,
+                                       d->m_smoothed_delta_ms);
+            // 在这一帧的开始，计算出最终的呈现时间
+            // 是一个无状态的、纯粹的变换
             mapinfo->realTimeInfo.presentation_canvas_time =
                 mapinfo->realTimeInfo.logic_canvas_time +
                 mapinfo->realTimeInfo.global_static_offset_ms.load() +

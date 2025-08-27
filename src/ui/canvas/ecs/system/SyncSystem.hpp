@@ -54,6 +54,9 @@ class SyncSystem {
             time_at_bottom - base_info.view_timeMargin;
         const auto query_end_time = time_at_top + base_info.view_timeMargin;
 
+        // qDebug() << "当前查询开始:" << query_start_time;
+        // qDebug() << "当前查询结束:" << query_end_time;
+
         // 执行ECS同步逻辑
         auto& registry = core.ecs_registry();
 
