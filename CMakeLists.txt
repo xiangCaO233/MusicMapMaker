@@ -116,6 +116,7 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/GLDirectPainter.cpp
     src/ui/canvas/render/Renderer2D.hpp
     src/ui/canvas/render/Renderer2D.cpp
+    src/ui/canvas/render/Renderer2DGLRess.cpp
     src/ui/canvas/render/MPrimitiveCollector.hpp
     src/ui/canvas/render/MPrimitiveCollector.cpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.hpp

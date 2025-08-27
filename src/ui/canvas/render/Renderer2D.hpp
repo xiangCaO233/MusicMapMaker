@@ -109,52 +109,21 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     std::vector<MeshCommand> mesh_command_list;
     RenderCommand nullCmd{};
 
+    // 初始化资源
+    void initQuadShader();
+    void initQuadObjectBuffers();
+    void initMeshShader();
+    void initMeshBuffers();
+
     // 辅助函数，通过句柄获取 RenderCommand 的引用
-    const RenderCommand& get_command_from_handle(const CommandHandle& handle) {
-        switch (handle.type) {
-            using enum CommandType;
-            case QUAD: {
-                return quad_command_list[handle.index_in_pool];
-            }
-            case MESH: {
-                return mesh_command_list[handle.index_in_pool];
-            }
-            default:
-                return nullCmd;
-        }
-    }
+    const RenderCommand& get_command_from_handle(const CommandHandle& handle);
 
     // 使用指定gpu实例
-    QOpenGLShaderProgram* useShader(CommandType type) {
-        switch (type) {
-            using enum CommandType;
-            case QUAD: {
-                return quad_shader_program;
-            }
-            case MESH: {
-                return mesh_shader_program;
-            }
-            default:
-                return nullptr;
-        }
-    }
+    QOpenGLShaderProgram* useShader(CommandType type);
 
-    uint32_t useVAO(CommandType type) const {
-        switch (type) {
-            using enum CommandType;
-            case QUAD: {
-                return quad_instance_dataAO;
-            }
-            case MESH: {
-                return mesh_dataAO;
-            }
-            default:
-                return 0;
-        }
-    }
+    uint32_t useVAO(CommandType type) const;
 
-    void drawBatchFirst(const RenderBatch& batch) const;
-    void drawWireframeBatchNext(const RenderBatch& batch) const;
+    void drawBatch(const RenderBatch& batch, GLenum mode) const;
 
     // gpu数据预缓存
     std::vector<QuadData> quad_datas;
