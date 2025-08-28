@@ -5,8 +5,8 @@
 #include <canvas/render/Renderer2D.hpp>
 #include <cstddef>
 #include <mutex>
-#include <render/GPUData.hpp>
-#include <render/RenderCommand.hpp>
+#include <render/command/GPUData.hpp>
+#include <render/command/RenderCommand.hpp>
 #include <render/texture/TexturePool.hpp>
 
 Renderer2D::Renderer2D(GLCanvas* canvas) : cvs(canvas) {

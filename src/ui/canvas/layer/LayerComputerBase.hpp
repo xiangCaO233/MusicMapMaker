@@ -4,7 +4,7 @@
 #include <qobject.h>
 
 #include <layer/ILayer.hpp>
-#include <render/RenderCommand.hpp>
+#include <render/command/RenderCommand.hpp>
 
 class FrameSynchronizer;
 class LayerManager;

@@ -37,7 +37,7 @@ struct CustomVertex {
     glm::uint32 no_filter;
 };
 
-struct MeshData {
+struct PointsData {
     std::vector<CustomVertex> vertices;
 };
 
@@ -64,7 +64,7 @@ struct MeshData {
  * layout(location = 12) in uint aTexScaleStratergy;
  */
 
-struct QuadData {
+struct PrimitiveData {
     // 基本信息
     glm::vec2 pos;
     glm::vec2 size;

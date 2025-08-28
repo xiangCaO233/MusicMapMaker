@@ -105,20 +105,25 @@ set(GLSL_FILES
     resources/glsl/wavgraph_vshader.glsl.vert)
 
 set(CANVAS_SOURCES
-    src/ui/canvas/render/GPUData.hpp
     src/ui/canvas/render/texture/TexMode.hpp
     src/ui/canvas/render/texture/TextureInfo.hpp
     src/ui/canvas/render/texture/font/FontPool.hpp
     src/ui/canvas/render/texture/font/FontPool.cpp
     src/ui/canvas/render/texture/TexturePool.hpp
     src/ui/canvas/render/texture/TexturePool.cpp
-    src/ui/canvas/render/GLDirectPainter.hpp
-    src/ui/canvas/render/GLDirectPainter.cpp
+    src/ui/canvas/render/command/GPUData.hpp
+    src/ui/canvas/render/command/RenderCommand.hpp
+    src/ui/canvas/render/command/GLDirectPainter.hpp
+    src/ui/canvas/render/command/GLDirectPainter.cpp
+    src/ui/canvas/render/command/MCommandCollector.hpp
+    src/ui/canvas/render/command/MCommandCollector.cpp
     src/ui/canvas/render/Renderer2D.hpp
     src/ui/canvas/render/Renderer2D.cpp
     src/ui/canvas/render/Renderer2DGLRess.cpp
-    src/ui/canvas/render/MPrimitiveCollector.hpp
-    src/ui/canvas/render/MPrimitiveCollector.cpp
+    src/ui/canvas/render/QuadRenderer2DRess.cpp
+    src/ui/canvas/render/MeshRenderer2DRess.cpp
+    src/ui/canvas/render/PrimitiveRenderer2DRess.cpp
+    src/ui/canvas/render/CurveRenderer2DRess.cpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.hpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.cpp
     src/ui/canvas/render/synchronize/tick/RenderDataLoop.hpp

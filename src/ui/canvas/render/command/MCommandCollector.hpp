@@ -7,13 +7,13 @@
 
 class Renderer2D;
 class LayerManager;
-class MPrimitiveCollector {
+class MCommandCollector {
    public:
     // 构造MPrimitiveCollector
-    explicit MPrimitiveCollector(Renderer2D* render, LayerManager* manager);
+    explicit MCommandCollector(Renderer2D* render, LayerManager* manager);
 
     // 析构MPrimitiveCollector
-    ~MPrimitiveCollector();
+    ~MCommandCollector();
 
     // 收集图元渲染指令
     void collect();

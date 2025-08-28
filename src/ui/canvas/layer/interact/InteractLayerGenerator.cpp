@@ -1,5 +1,4 @@
 #include <QDebug>
-#include <chrono>
 #include <glm/gtc/constants.hpp>
 #include <info/SharedCanvasInfo.hpp>
 #include <layer/MapLayerManager.hpp>

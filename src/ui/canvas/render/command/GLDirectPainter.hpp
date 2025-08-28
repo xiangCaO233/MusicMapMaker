@@ -2,7 +2,7 @@
 #define MMM_MPAINTER_HPP
 
 #include <glm/glm.hpp>
-#include <render/RenderCommand.hpp>
+#include <render/command/RenderCommand.hpp>
 #include <render/texture/TexMode.hpp>
 #include <string>
 #include <string_view>

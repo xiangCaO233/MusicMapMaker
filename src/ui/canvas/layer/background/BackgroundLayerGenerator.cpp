@@ -3,7 +3,7 @@
 #include <info/SharedCanvasInfo.hpp>
 #include <layer/background/BackgroundLayer.hpp>
 #include <layer/background/BackgroundLayerGenerator.hpp>
-#include <render/RenderCommand.hpp>
+#include <render/command/RenderCommand.hpp>
 
 // 析构BackgroundLayerGenerator
 BackgroundLayerGenerator::~BackgroundLayerGenerator() {

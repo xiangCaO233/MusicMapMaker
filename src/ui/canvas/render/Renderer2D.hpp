@@ -7,8 +7,8 @@
 #include <glm/fwd.hpp>
 #include <mmm/project/TextureLoadCallback.hpp>
 #include <mutex>
-#include <render/GPUData.hpp>
-#include <render/RenderCommand.hpp>
+#include <render/command/GPUData.hpp>
+#include <render/command/RenderCommand.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TexturePool.hpp>
 #include <render/texture/font/FontPool.hpp>
@@ -29,16 +29,17 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     TextureInfo getInfo(std::string_view texname) override;
 
     // 直接访问着色器
-    QOpenGLShaderProgram* quadshader() const { return quad_shader_program; }
-
-    QOpenGLShaderProgram* meshshader() const { return mesh_shader_program; }
+    // QOpenGLShaderProgram* quadshader() const { return quad_shader_program; }
+    // QOpenGLShaderProgram* meshshader() const { return mesh_shader_program; }
 
     // 设置投影矩阵
     void update_viewport(glm::vec2 view);
 
     // 提交渲染指令
     void commit(const QuadCommand& command);
+    void commit(const PrimitiveCommand& command);
     void commit(const MeshCommand& command);
+    void commit(const CurveCommand& command);
 
     // 更新需要更新的资源等等
     void update();
@@ -82,7 +83,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
    private:
     // 启用调试线框
-    bool draw_wireframe{true};
+    bool draw_wireframe{false};
 
     // 尺寸
     glm::vec2 viewport;
@@ -99,6 +100,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // 着色器
     QOpenGLShaderProgram* quad_shader_program;
+    QOpenGLShaderProgram* primitive_shader_program;
+    QOpenGLShaderProgram* curve_shader_program;
     QOpenGLShaderProgram* mesh_shader_program;
 
     // 渲染指令序列
@@ -106,6 +109,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     std::vector<CommandHandle> all_command_handles;
     // 分离存储不同渲染指令
     std::vector<QuadCommand> quad_command_list;
+    std::vector<PrimitiveCommand> primitive_command_list;
+    std::vector<CurveCommand> curve_command_list;
     std::vector<MeshCommand> mesh_command_list;
     RenderCommand nullCmd{};
 
@@ -127,8 +132,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     void drawBatch(const RenderBatch& batch, GLenum mode) const;
 
     // gpu数据预缓存
-    std::vector<QuadData> quad_datas;
-    std::vector<MeshData> mesh_datas;
+    std::vector<PrimitiveData> quad_datas;
+    std::vector<PointsData> mesh_datas;
     // 当前网格的总顶点数
     size_t current_mesh_vertex_count{0};
 

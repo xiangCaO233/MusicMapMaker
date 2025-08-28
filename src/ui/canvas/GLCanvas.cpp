@@ -5,8 +5,8 @@
 #include <canvas/render/Renderer2D.hpp>
 #include <chrono>
 #include <layer/LayerManager.hpp>
-#include <render/GLDirectPainter.hpp>
-#include <render/MPrimitiveCollector.hpp>
+#include <render/command/GLDirectPainter.hpp>
+#include <render/command/MCommandCollector.hpp>
 #include <render/synchronize/tick/RenderDataLoop.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TexturePool.hpp>
@@ -134,7 +134,8 @@ void GLCanvas::initializeGL() {
 
     // 标准混合模式
     GLCALL(glEnable(GL_BLEND), this);
-    // GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), this);
+    GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), this);
+    GLCALL(glDepthMask(GL_TRUE), this);
 
     // 初始化渲染器
     render = std::make_unique<Renderer2D>(this);
@@ -176,7 +177,7 @@ void GLCanvas::paintGL() {
     GLCALL(glClear(GL_COLOR_BUFFER_BIT), this);
 
     {
-        MPrimitiveCollector pc(render.get(), render_dataloop->layermanager());
+        MCommandCollector pc(render.get(), render_dataloop->layermanager());
 
         // 直接绘制
         // GLDirectPainter painter(render.get());

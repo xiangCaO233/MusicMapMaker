@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
-#include <render/GLDirectPainter.hpp>
 #include <render/Renderer2D.hpp>
+#include <render/command/GLDirectPainter.hpp>
 
 // 构造MPainter
 GLDirectPainter::GLDirectPainter(Renderer2D* renderer2D)
@@ -49,12 +49,12 @@ void GLDirectPainter::GLDirectPainter::paintString(
             }
             charpos.y -= (charInfo.bearing.y);
             // 提交渲染指令
-            renderer->commit(
-                {{CommandType::QUAD,
-                  {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}},
-                 {charpos, charTexture.origin_size, rotation, color,
-                  !applyMask},
-                 {charTexture.uv_offset}});
+            auto cmd = QuadCommand{
+                {CommandType::QUAD,
+                 {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}},
+                {charpos, charTexture.origin_size, rotation, color, !applyMask},
+                {charTexture.uv_offset}};
+            renderer->commit(cmd);
 
             switch (direction) {
                 case TextDirection::Horizontal: {
@@ -103,12 +103,13 @@ void GLDirectPainter::paintLine(glm::vec2 pos1, glm::vec2 pos2, glm::vec4 color,
     TextureInfo texture{};
 
     // 提交渲染指令
-    renderer->commit({
+    auto cmd = QuadCommand{
         {CommandType::QUAD,
          {texture, TexAlignMode::CENTER, TexScaleMode::SINGLE}},
         {pos, size, rotation, color, !applyMask},
         radiusInfo,
-    });
+    };
+    renderer->commit(cmd);
 }
 
 /**
@@ -135,11 +136,13 @@ void GLDirectPainter::drawImage(std::string_view resPath,
         //     TexAlignMode talign;
         //     TexScaleMode tscale;
         // }
-        renderer->commit({{CommandType::QUAD,
-                           {texture, mapOpts.alignMode, mapOpts.scaleMode}},
-                          {rectOpts.pos, rectOpts.size, rectOpts.rotation,
-                           rectOpts.color, !rectOpts.applyMask},
-                          radiusInfo});
+        auto cmd =
+            QuadCommand{{CommandType::QUAD,
+                         {texture, mapOpts.alignMode, mapOpts.scaleMode}},
+                        {rectOpts.pos, rectOpts.size, rectOpts.rotation,
+                         rectOpts.color, !rectOpts.applyMask},
+                        radiusInfo};
+        renderer->commit(cmd);
     }
 }
 
@@ -157,11 +160,12 @@ void GLDirectPainter::paintImage(std::string_view resPath, glm::vec2 pos,
     auto texoption = renderer->texture_pool()->get(std::string(resPath));
     if (texoption.has_value()) {
         const auto& texture = texoption.value();
-        renderer->commit(
-            {{CommandType::QUAD,
-              {texture, TexAlignMode::CENTER, TexScaleMode::SINGLE}},
-             {pos, texture.origin_size, rotation, tint, !applyMask},
-             radiusInfo});
+        auto cmd =
+            QuadCommand{{CommandType::QUAD,
+                         {texture, TexAlignMode::CENTER, TexScaleMode::SINGLE}},
+                        {pos, texture.origin_size, rotation, tint, !applyMask},
+                        radiusInfo};
+        renderer->commit(cmd);
     }
 }
 
