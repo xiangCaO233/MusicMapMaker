@@ -4,6 +4,7 @@
 #include <render/GPUData.hpp>
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TextureInfo.hpp>
+#include <vector>
 
 struct BaseInfo {
     glm::vec2 pos;
@@ -42,15 +43,45 @@ struct RenderCommand {
     TexturesInfo texturesInfo;
 };
 
+struct MeshVertex {
+    glm::vec2 vPos;
+    glm::vec2 vUV;
+    glm::vec4 vColor;
+};
+
 struct MeshCommand : public RenderCommand {
-    // 网格数据
-    MeshData to_data() const { return {}; };
+    // 顶点列表
+    std::vector<MeshVertex> vertices;
+    // 顶点索引列表
+    std::vector<size_t> indicies;
+    // 是否应用蒙版效果
+    glm::uint32 no_filter{false};
+    // 转换为网格数据
+    MeshData to_data() const {
+        MeshData data;
+        for (const auto& vIndex : indicies) {
+            const auto& mesh_vertex = vertices[vIndex];
+            // CustomVertex vertex{mesh_vertex.vPos,
+            //                     mesh_vertex.vUV,
+            //                     mesh_vertex.vColor,
+            //                     texturesInfo.texture.uv_scale,
+            //                     texturesInfo.texture.group_size,
+            //                     texturesInfo.texture.layer_index,
+            //                     no_filter};
+            data.vertices.emplace_back(
+                mesh_vertex.vPos, mesh_vertex.vUV, mesh_vertex.vColor,
+                texturesInfo.texture.uv_scale, texturesInfo.texture.group_size,
+                texturesInfo.texture.layer_index, no_filter);
+        }
+        return data;
+    };
 };
 
 struct QuadCommand : public RenderCommand {
     BaseInfo baseInfo;
     RadiusInfo radiusInfo;
 
+    // 转换为矩形数据
     QuadData to_data() const {
         return QuadData{
             baseInfo.pos + baseInfo.size / 2.f + radiusInfo.radius_effect_param,

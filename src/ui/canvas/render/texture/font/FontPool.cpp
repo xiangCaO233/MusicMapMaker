@@ -1,8 +1,8 @@
 #include <ft2build.h>
-#include <qlogging.h>
 
 #include <QFile>
 #include <render/texture/font/FontPool.hpp>
+#include <util/statistic.hpp>
 #include <vector>
 // 包含FreeType的头文件
 #include FT_FREETYPE_H
@@ -34,7 +34,13 @@ auto glCallImpl(Func func, const char* funcStr,
 }
 
 // 用于包装 OpenGL 调用并检查错误
-#define GLCALL(func, f) glCallImpl([&]() { return func; }, #func, f)
+#define GLCALL(func, f)       \
+    glCallImpl(               \
+        [&]() {               \
+            stat::gl_calls++; \
+            return func;      \
+        },                    \
+        #func, f)
 
 // 构造FontPool
 FontPool::FontPool(QOpenGLFunctions_4_1_Core* gl_functions)

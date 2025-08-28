@@ -3,6 +3,7 @@
 #include <QOpenGLFunctions_4_1_Core>
 #include <canvas/GLCanvas.hpp>
 #include <canvas/render/Renderer2D.hpp>
+#include <cstddef>
 #include <mutex>
 #include <render/GPUData.hpp>
 #include <render/RenderCommand.hpp>
@@ -15,6 +16,7 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : cvs(canvas) {
     // 初始化字体池
     fontpool = std::make_unique<FontPool>(canvas);
 
+    initMaskUBO();
     initQuadShader();
     initQuadObjectBuffers();
     initMeshShader();
@@ -142,6 +144,8 @@ void Renderer2D::commit(const MeshCommand& command) {
             {CommandType::MESH, mesh_command_list.size() - 1});
         // 填充gpu数据
         mesh_datas.push_back(command.to_data());
+        // 更新总顶点数
+        current_mesh_vertex_count += command.indicies.size();
     }
 }
 
@@ -165,8 +169,6 @@ void Renderer2D::finalize() {
     expandQuadDataBuffer();
     expandMeshDataBuffer();
 
-    command_batchs.clear();
-
     if (all_command_handles.empty()) {
         return;
     }
@@ -184,16 +186,27 @@ void Renderer2D::finalize() {
     // --- 创建第一个批次 ---
     const auto& first_handle = all_command_handles.front();
     const RenderCommand& first_cmd = get_command_from_handle(first_handle);
+
+    size_t elementCount{0};
+    // 更新相应的计数器
+    switch (first_cmd.cmdType) {
+        using enum CommandType;
+        case QUAD: {
+            elementCount = 1;
+            quad_instance_counter++;
+            break;
+        }
+        case MESH: {
+            elementCount =
+                static_cast<const MeshCommand&>(first_cmd).indicies.size();
+            mesh_instance_counter++;
+            break;
+        }
+    }
     command_batchs.emplace_back(
         first_cmd.cmdType, first_cmd.texturesInfo.texture.gl_texture_array_id,
         0,  // 第一个批次的 instanceStartIndex 总是 0
-        1);
-    // 更新相应的计数器
-    if (first_cmd.cmdType == CommandType::QUAD) {
-        quad_instance_counter++;
-    } else {
-        mesh_instance_counter++;
-    }
+        elementCount);
 
     // --- 从第二个指令开始遍历 ---
     for (size_t i = 1; i < all_command_handles.size(); ++i) {
@@ -202,17 +215,32 @@ void Renderer2D::finalize() {
 
         if (cmd_emergable(command, command_batchs)) {
             // 合并到当前批次
-            command_batchs.back().elementCount++;
+            switch (command.cmdType) {
+                using enum CommandType;
+                case QUAD: {
+                    command_batchs.back().elementCount++;
+                    break;
+                }
+                case MESH: {
+                    command_batchs.back().elementCount +=
+                        static_cast<const MeshCommand&>(command)
+                            .indicies.size();
+                    break;
+                }
+            }
         } else {
             // 不可合并，创建一个新的批次
             size_t new_instance_start_index = 0;
             switch (command.cmdType) {
                 using enum CommandType;
                 case QUAD: {
+                    elementCount = 1;
                     new_instance_start_index = quad_instance_counter;
                     break;
                 }
                 case MESH: {
+                    elementCount = static_cast<const MeshCommand&>(command)
+                                       .indicies.size();
                     new_instance_start_index = mesh_instance_counter;
                     break;
                 }
@@ -222,7 +250,7 @@ void Renderer2D::finalize() {
                 command.cmdType,
                 command.texturesInfo.texture.gl_texture_array_id,
                 // ★ 使用类型特定的实例索引
-                new_instance_start_index, 1);
+                new_instance_start_index, elementCount);
         }
 
         // 无论是否合并，都必须更新计数器

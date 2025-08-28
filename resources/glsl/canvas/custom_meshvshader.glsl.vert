@@ -42,6 +42,10 @@ flat out uint f_NoFilter;
 flat out vec2 f_GroupSize;
 
 void main() {
+
+    // 输出顶点坐标投影结果
+    gl_Position = projection * vec4(vPosition, 0.0, 1.0);
+
     // 插值内容
     v_WorldPos = vPosition;
     v_TexCoord = vTexCoord;

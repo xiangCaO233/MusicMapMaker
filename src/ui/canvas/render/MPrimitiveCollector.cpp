@@ -11,6 +11,20 @@ MPrimitiveCollector::MPrimitiveCollector(Renderer2D* render,
 MPrimitiveCollector::~MPrimitiveCollector() {
     collect();
     layer_manager->swapBuffers();
+
+    MeshCommand cmd;
+    cmd.cmdType = CommandType::MESH;
+    cmd.vertices.emplace_back(glm::vec2{20, 20}, glm::vec2{0},
+                              glm::vec4{1, 0, 0, 1});
+    cmd.vertices.emplace_back(glm::vec2{120, 20}, glm::vec2{0},
+                              glm::vec4{0, 1, 0, 1});
+    cmd.vertices.emplace_back(glm::vec2{20, 120}, glm::vec2{0},
+                              glm::vec4{0, 0, 1, 1});
+    cmd.indicies.emplace_back(0);
+    cmd.indicies.emplace_back(1);
+    cmd.indicies.emplace_back(2);
+    renderer->commit(cmd);
+
     renderer->finalize();
     renderer->render();
 }

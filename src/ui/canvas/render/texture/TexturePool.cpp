@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <format>
 #include <mutex>
+#include <util/statistic.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -32,7 +33,13 @@ auto glCallImpl(Func func, const char* funcStr,
 }
 
 // 用于包装 OpenGL 调用并检查错误
-#define GLCALL(func, f) glCallImpl([&]() { return func; }, #func, f)
+#define GLCALL(func, f)       \
+    glCallImpl(               \
+        [&]() {               \
+            stat::gl_calls++; \
+            return func;      \
+        },                    \
+        #func, f)
 
 // 构造TexturePool
 TexturePool::TexturePool(QOpenGLFunctions_4_1_Core* gl_functions)

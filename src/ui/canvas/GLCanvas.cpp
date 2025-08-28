@@ -1,5 +1,3 @@
-#include <qlogging.h>
-
 #include <QGuiApplication>
 #include <QOpenGLFunctions>
 #include <QScreen>
@@ -13,13 +11,14 @@
 #include <render/texture/TexMode.hpp>
 #include <render/texture/TexturePool.hpp>
 #include <type_traits>
+#include <util/statistic.hpp>
 #include <utility>
 
-// C++17 的 if constexpr 的模板帮助函数
 template <typename Func>
-auto glCallImpl(Func func, const char* funcStr) {
+auto glCallImpl(Func func, const char* funcStr,
+                QOpenGLFunctions_4_1_Core* glf) {
     // 1. 先清除所有历史错误，确保我们只捕获当前调用的错误
-    while (glGetError() != GL_NO_ERROR);
+    while (glf->glGetError() != GL_NO_ERROR);
 
     // 2. 对 lambda 本身的返回类型进行判断
     if constexpr (std::is_void_v<decltype(func())>) {
@@ -27,7 +26,7 @@ auto glCallImpl(Func func, const char* funcStr) {
     } else {
         auto&& result = func();  // 调用并捕获结果
         // 检查错误在调用之后
-        if (GLenum error = glGetError(); error != GL_NO_ERROR) {
+        if (GLenum error = glf->glGetError(); error != GL_NO_ERROR) {
             qDebug() << "OpenGL Error in [" << funcStr << "]: " << error
                      << "(Hex: 0x" << Qt::hex << error << Qt::dec << ")";
         }
@@ -35,14 +34,28 @@ auto glCallImpl(Func func, const char* funcStr) {
     }
 
     // 针对void返回类型的lambda，在调用后检查错误
-    if (GLenum error = glGetError(); error != GL_NO_ERROR) {
+    if (GLenum error = glf->glGetError(); error != GL_NO_ERROR) {
         qDebug() << "OpenGL Error in [" << funcStr << "]: " << error
                  << "(Hex: 0x" << Qt::hex << error << Qt::dec << ")";
     }
 }
 
 // 用于包装 OpenGL 调用并检查错误
-#define GLCALL(func) glCallImpl([&]() { return func; }, #func)
+#define GLCALL(func, f)       \
+    glCallImpl(               \
+        [&]() {               \
+            stat::gl_calls++; \
+            return func;      \
+        },                    \
+        #func, f)
+#define DRAWCALL(func, f)       \
+    glCallImpl(                 \
+        [&]() {                 \
+            stat::draw_calls++; \
+            stat::gl_calls++;   \
+            return func;        \
+        },                      \
+        #func, f)
 
 // 构造GLCanvas
 GLCanvas::GLCanvas() {
@@ -77,12 +90,16 @@ void GLCanvas::updateFpsDisplay(int fps) {
     QString title_suffix =
         QString(
             "%1 FPS(frametime: "
-            "%2 us | updatetime(qt): %3 us)")
+            "%2 us | updatetime(qt): %3 us) GLCALLS:%4 | DRAWCALLS:%5")
             .arg(fps)
             .arg(std::chrono::duration_cast<std::chrono::microseconds>(
                      pre_frame_time)
                      .count())
-            .arg(last_update_time_us);
+            .arg(last_update_time_us)
+            .arg(stat::gl_calls / fps)
+            .arg(stat::draw_calls / fps);
+    stat::gl_calls = 0;
+    stat::draw_calls = 0;
     emit update_window_suffix(title_suffix);
 }
 
@@ -97,13 +114,13 @@ void GLCanvas::update_sharedInfo() const {
 void GLCanvas::initializeGL() {
     initializeOpenGLFunctions();
     // 查询opengl版本
-    auto version = GLCALL(glGetString(GL_VERSION));
+    auto version = GLCALL(glGetString(GL_VERSION), this);
     qDebug() << "OpenGL 版本: "
              << std::string(reinterpret_cast<const char*>(version));
 
     // 查询最大支持抗锯齿MSAA倍率
     GLint maxSamples;
-    GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
+    GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples), this);
 
     // 初始化驱动信息
     qDebug() << "启用最大抗锯齿倍率: " << std::to_string(maxSamples);
@@ -112,12 +129,12 @@ void GLCanvas::initializeGL() {
 
     // 检查最大ubo size
     int maxUBOSize;
-    GLCALL(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize));
+    GLCALL(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize), this);
     qDebug() << "最大UBO块容量: " << std::to_string(maxUBOSize);
 
     // 标准混合模式
-    GLCALL(glEnable(GL_BLEND));
-    GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    GLCALL(glEnable(GL_BLEND), this);
+    // GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), this);
 
     // 初始化渲染器
     render = std::make_unique<Renderer2D>(this);
@@ -148,12 +165,15 @@ void GLCanvas::initializeGL() {
 }
 
 void GLCanvas::resizeGL(int w, int h) {
-    GLCALL(glViewport(0, 0, w, h));
+    GLCALL(glViewport(0, 0, w, h), this);
     render->update_viewport({w, h});
 }
 
 void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
+
+    GLCALL(glClearColor(.23f, .23f, .23f, .23f), this);
+    GLCALL(glClear(GL_COLOR_BUFFER_BIT), this);
 
     {
         MPrimitiveCollector pc(render.get(), render_dataloop->layermanager());
@@ -173,9 +193,7 @@ void GLCanvas::paintGL() {
         //     "../resources/textures/default/打击特效/划键打击特效/1.png",
         //     {100, 100}, {{1.f, 1.f}, 0.f});
 
-        // painter.paintLine({100, 50}, {200, 100}, {0.f, 0.f, 0.f, 1.f}, 4.f);
-        GLCALL(glClearColor(.23f, .23f, .23f, .23f));
-        GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+        // painter.paintLine({100, 50}, {200, 100}, {0.f, 0.f,0.f, 1.f}, 4.f);
 
         //    painter.paintString("ComicShannsMono Nerd Font", 16, U"nmsl",
         //                        {100, 100});

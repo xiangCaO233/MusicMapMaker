@@ -2,7 +2,9 @@
 #include <canvas/GLCanvas.hpp>
 #include <render/Renderer2D.hpp>
 #include <type_traits>
+#include <util/statistic.hpp>
 #include <utility>
+#include <vector>
 
 template <typename Func>
 auto glCallImpl(Func func, const char* funcStr,
@@ -31,7 +33,32 @@ auto glCallImpl(Func func, const char* funcStr,
 }
 
 // 用于包装 OpenGL 调用并检查错误
-#define GLCALL(func, f) glCallImpl([&]() { return func; }, #func, f)
+#define GLCALL(func, f)       \
+    glCallImpl(               \
+        [&]() {               \
+            stat::gl_calls++; \
+            return func;      \
+        },                    \
+        #func, f)
+#define DRAWCALL(func, f)       \
+    glCallImpl(                 \
+        [&]() {                 \
+            stat::draw_calls++; \
+            stat::gl_calls++;   \
+            return func;        \
+        },                      \
+        #func, f)
+
+void Renderer2D::initMaskUBO() {
+    // 初始化ubo
+    GLCALL(cvs->glGenBuffers(1, &mask_uBO), cvs);
+    // 绑定ubo
+    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
+    // 将UBO缓冲对象，也连接到绑定点 0
+    // 这一步确保了绑定点0实际连接的是我们创建的 m_mask_ubo 这个GPU缓冲区
+    GLCALL(cvs->glBindBufferBase(GL_UNIFORM_BUFFER, 0, mask_uBO), cvs);
+    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
+}
 
 // 初始化着色器
 void Renderer2D::initQuadShader() {
@@ -97,15 +124,6 @@ void Renderer2D::initQuadObjectBuffers() {
     GLCALL(cvs->glGenVertexArrays(1, &quad_instance_dataAO), cvs);
     // 绑定VAO
     GLCALL(cvs->glBindVertexArray(quad_instance_dataAO), cvs);
-
-    // 初始化ubo
-    GLCALL(cvs->glGenBuffers(1, &mask_uBO), cvs);
-    // 绑定ubo
-    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
-    // 将UBO缓冲对象，也连接到绑定点 0
-    // 这一步确保了绑定点0实际连接的是我们创建的 m_mask_ubo 这个GPU缓冲区
-    GLCALL(cvs->glBindBufferBase(GL_UNIFORM_BUFFER, 0, mask_uBO), cvs);
-    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
 
     // 初始化实例缓冲区
     GLCALL(cvs->glGenBuffers(1, &quad_instance_dataBO), cvs);
@@ -235,7 +253,84 @@ void Renderer2D::initMeshShader() {
     }
 }
 
-void Renderer2D::initMeshBuffers() {}
+void Renderer2D::initMeshBuffers() {
+    // meshbuffer
+    // 初始化VAO
+    GLCALL(cvs->glGenVertexArrays(1, &mesh_dataAO), cvs);
+    // 绑定VAO
+    GLCALL(cvs->glBindVertexArray(mesh_dataAO), cvs);
+
+    // 初始化网格顶点缓冲区
+    GLCALL(cvs->glGenBuffers(1, &mesh_dataBO), cvs);
+    // 绑定VBO
+    GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, mesh_dataBO), cvs);
+    GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
+                             max_mesh_vertexcount * sizeof(CustomVertex),
+                             nullptr, GL_DYNAMIC_DRAW),
+           cvs);
+
+    // // 顶点位置
+    // layout(location = 0) in vec2 vPosition;
+    // 0~2 vec2 pos
+    GLCALL(cvs->glEnableVertexAttribArray(0), cvs);
+    GLCALL(
+        cvs->glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(CustomVertex),
+                                   (void*)(offsetof(CustomVertex, pos))),
+        cvs);
+
+    // // 顶点uv
+    // layout(location = 1) in vec2 vTexCoord;
+    GLCALL(cvs->glEnableVertexAttribArray(1), cvs);
+    GLCALL(
+        cvs->glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(CustomVertex),
+                                   (void*)(offsetof(CustomVertex, uv))),
+        cvs);
+
+    // // 顶点颜色
+    // layout(location = 2) in vec4 vColor;
+    GLCALL(cvs->glEnableVertexAttribArray(2), cvs);
+    GLCALL(
+        cvs->glVertexAttribPointer(2, 4, GL_FLOAT, false, sizeof(CustomVertex),
+                                   (void*)(offsetof(CustomVertex, color))),
+        cvs);
+
+    // // 顶点纹理信息
+    // // 顶点使用的纹理在层中的尺寸比例
+    // layout(location = 3) in vec2 aUVScale;
+    GLCALL(cvs->glEnableVertexAttribArray(3), cvs);
+    GLCALL(
+        cvs->glVertexAttribPointer(3, 2, GL_FLOAT, false, sizeof(CustomVertex),
+                                   (void*)(offsetof(CustomVertex, uv_scale))),
+        cvs);
+
+    // // 顶点使用的纹理的textureArray的统一尺寸
+    // layout(location = 4) in vec2 aGroupSize;
+    GLCALL(cvs->glEnableVertexAttribArray(4), cvs);
+    GLCALL(
+        cvs->glVertexAttribPointer(4, 2, GL_FLOAT, false, sizeof(CustomVertex),
+                                   (void*)(offsetof(CustomVertex, group_size))),
+        cvs);
+
+    // // 顶点使用的纹理在层中层索引
+    // layout(location = 5) in int aTextureLayerIdx;
+    GLCALL(cvs->glEnableVertexAttribArray(5), cvs);
+    GLCALL(
+        cvs->glVertexAttribIPointer(5, 1, GL_INT, sizeof(CustomVertex),
+                                    (void*)(offsetof(CustomVertex, layer_idx))),
+        cvs);
+
+    // // 顶点使用的纹理是否应用ubo蒙版效果
+    // layout(location = 6) in uint aNoFilter;
+    GLCALL(cvs->glEnableVertexAttribArray(6), cvs);
+    GLCALL(
+        cvs->glVertexAttribIPointer(6, 1, GL_UNSIGNED_INT, sizeof(CustomVertex),
+                                    (void*)(offsetof(CustomVertex, no_filter))),
+        cvs);
+
+    // 解绑
+    GLCALL(cvs->glBindVertexArray(0), cvs);
+    GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, 0), cvs);
+}
 
 // 更新需要更新的资源等等
 void Renderer2D::update() {
@@ -257,6 +352,9 @@ void Renderer2D::update() {
         quad_shader_program->bind();
         quad_shader_program->setUniformValue("projection", projection);
         quad_shader_program->release();
+        mesh_shader_program->bind();
+        mesh_shader_program->setUniformValue("projection", projection);
+        mesh_shader_program->release();
         update_view = false;
     }
 
@@ -275,6 +373,11 @@ void Renderer2D::update() {
         quad_shader_program->setUniformValue("u_ActiveMaskLayerCount",
                                              int(mask_stack_cpu.size()));
         quad_shader_program->release();
+        // 需要一个uniform告诉着色器当前有多少个活跃的蒙版层
+        mesh_shader_program->bind();
+        mesh_shader_program->setUniformValue("u_ActiveMaskLayerCount",
+                                             int(mask_stack_cpu.size()));
+        mesh_shader_program->release();
         update_ubo = false;
     }
 }
@@ -326,6 +429,8 @@ void Renderer2D::expandMeshDataBuffer() {
 
 // 从指定矩形实例位置开始更新顶点数组指针
 void Renderer2D::updateQuadAttribptrFromInstance(size_t instance_index) const {
+    // 绑定矩形实例VBO
+    GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, quad_instance_dataBO), cvs);
     // 计算当前实例索引在VBO中的字节偏移量
     size_t base_offset = instance_index * sizeof(QuadData);
 
@@ -415,12 +520,16 @@ void Renderer2D::drawBatch(const RenderBatch& batch, GLenum mode) const {
         case QUAD: {
             // 更新矩形实例数组指针
             updateQuadAttribptrFromInstance(batch.startIndex);
-            GLCALL(cvs->glDrawArraysInstanced(mode, 0, 6, batch.elementCount),
-                   cvs);
+            GLCALL(cvs->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), cvs);
+            GLCALL(cvs->glDepthMask(GL_TRUE), cvs);
+            DRAWCALL(cvs->glDrawArraysInstanced(mode, 0, 6, batch.elementCount),
+                     cvs);
             break;
         }
         case MESH: {
-            GLCALL(
+            GLCALL(cvs->glBlendFunc(GL_SRC_ALPHA, GL_ONE), cvs);
+            GLCALL(cvs->glDepthMask(GL_FALSE), cvs);
+            DRAWCALL(
                 cvs->glDrawArrays(mode, batch.startIndex, batch.elementCount),
                 cvs);
             break;
@@ -452,11 +561,22 @@ void Renderer2D::render() {
     if (!mesh_datas.empty()) {
         // 绑定网格缓冲区
         GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, mesh_dataBO), cvs);
+
+        // 规范网格数据
+        std::vector<CustomVertex> stagingVertexBuffer;
+        stagingVertexBuffer.reserve(current_mesh_vertex_count);
+        for (const auto& meshData : mesh_datas) {
+            stagingVertexBuffer.insert(stagingVertexBuffer.end(),
+                                       meshData.vertices.begin(),
+                                       meshData.vertices.end());
+        }
+
         // 一次性上传所有网格数据
-        GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
-                                 mesh_datas.size() * sizeof(MeshData),
-                                 mesh_datas.data(), GL_DYNAMIC_DRAW),
-               cvs);
+        GLCALL(
+            cvs->glBufferData(GL_ARRAY_BUFFER,
+                              stagingVertexBuffer.size() * sizeof(CustomVertex),
+                              stagingVertexBuffer.data(), GL_DYNAMIC_DRAW),
+            cvs);
     }
 
     // === 2. 在单个循环中通过状态追踪进行渲染 ===
@@ -509,5 +629,6 @@ void Renderer2D::render() {
     // 为下一帧做准备
     quad_datas.clear();
     mesh_datas.clear();
+    current_mesh_vertex_count = 0;
     command_batchs.clear();
 }

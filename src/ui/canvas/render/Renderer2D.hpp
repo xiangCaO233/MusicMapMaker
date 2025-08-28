@@ -82,7 +82,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
    private:
     // 启用调试线框
-    bool draw_wireframe{false};
+    bool draw_wireframe{true};
 
     // 尺寸
     glm::vec2 viewport;
@@ -114,6 +114,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     void initQuadObjectBuffers();
     void initMeshShader();
     void initMeshBuffers();
+    void initMaskUBO();
 
     // 辅助函数，通过句柄获取 RenderCommand 的引用
     const RenderCommand& get_command_from_handle(const CommandHandle& handle);
@@ -128,6 +129,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     // gpu数据预缓存
     std::vector<QuadData> quad_datas;
     std::vector<MeshData> mesh_datas;
+    // 当前网格的总顶点数
+    size_t current_mesh_vertex_count{0};
 
     std::vector<RenderBatch> command_batchs;
     std::mutex command_mtx;

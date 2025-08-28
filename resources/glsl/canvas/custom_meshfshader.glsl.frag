@@ -10,7 +10,7 @@ uniform bool u_IsDrawingWireframe;
 uniform sampler2DArray u_samplerarray;
 
 // 传输来的片段颜色信息
-in vec2 v_Color;
+in vec4 v_Color;
 
 // 传输来的片段纹理信息
 in vec2 v_TexCoord;
@@ -73,5 +73,78 @@ UVResult calcUV() {
         result.visible = false;
         return result;
     }
+
+    // 将顶点UV坐标(0.0-1.0)映射到纹理在层内的实际区域
+    result.uv = v_TexCoord * f_UVScale;
+
+    return result;
 }
-void main() {}
+
+void main() {
+    if (u_IsDrawingWireframe) {
+        // 只绘制线框
+        FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+        return;
+    }
+
+    // 并非线框
+    vec4 finalColor;
+    if (f_TextureLayerIdx == -1) {
+        // 无纹理绘制
+        finalColor = v_Color;
+    } else {
+        // 计算UV坐标并获取基础纹理颜色
+        UVResult uvResult = calcUV();
+
+        // 如果片段不在有效纹理区域内，直接丢弃，不进行后续计算
+        if (!uvResult.visible) {
+            discard;
+        }
+
+        // 采样纹理并直接混合顶点颜色
+        finalColor = texture(u_samplerarray, vec3(uvResult.uv, f_TextureLayerIdx)) * v_Color;
+
+        // 如果采样出的颜色是完全透明的，可以提前丢弃以优化
+        if (finalColor.a == 0.0) {
+            discard;
+        }
+    }
+
+    // 蒙版处理
+    if (f_NoFilter == 0) {
+        // 应用蒙版
+        for (int mask_index = 0; mask_index < u_ActiveMaskLayerCount; ++mask_index) {
+            MaskLayer mask = u_MaskStack[mask_index];
+            bool is_inside_mask =
+                v_WorldPos.x >= mask.rect.x && v_WorldPos.x <= mask.rect.z &&
+                    v_WorldPos.y >= mask.rect.y && v_WorldPos.y <= mask.rect.w;
+            if (is_inside_mask) {
+                switch (mask.effect) {
+                    case MASK_EFFECT_NONE:
+                    {
+                        break;
+                    }
+                    case MASK_EFFECT_DARKEN:
+                    {
+                        // 暗化蒙版
+                        finalColor.rgb *= mask.effectParams.x;
+                        break;
+                    }
+                    case MASK_EFFECT_FILTER:
+                    {
+                        // 滤镜蒙版
+                        finalColor *= mask.effectParams;
+                        break;
+                    }
+                    case MASK_EFFECT_ALPHA_SHIFT:
+                    {
+                        finalColor.a *= mask.effectParams.x;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    FragColor = finalColor;
+}
