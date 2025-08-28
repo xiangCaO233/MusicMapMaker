@@ -26,9 +26,6 @@ layout(location = 10) in uint aNoFilter;
 layout(location = 11) in uint aTexAlignStratergy;
 layout(location = 12) in uint aTexScaleStratergy;
 
-// TBO 实例数据缓冲区
-uniform samplerBuffer u_instanceData;
-
 // Uniform 投影矩阵
 uniform mat4 projection;
 
