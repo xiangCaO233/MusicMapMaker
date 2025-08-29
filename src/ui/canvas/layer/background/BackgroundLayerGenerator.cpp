@@ -34,30 +34,33 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
 
         // 绘制背景图片
         if (!background_image_path.empty()) {
-            QuadCommand cmd;
-            cmd.cmdType = CommandType::QUAD;
+            PrimitiveCommand cmd;
+            cmd.cmdType = CommandType::PRIMITIVE;
             cmd.baseInfo = {{0.f, 0.f}, canvas_size, 0.f};
             cmd.baseInfo.color = {darken, darken, darken, alpha};
             cmd.texturesInfo.texture = texinfo;
-            buffer.add_QuadCommand(cmd);
+            cmd.primitive = PrimitiveType::QUAD;
+            buffer.add_PrimitiveCommand(cmd);
         }
 
         // 绘制轨道边界线
-        QuadCommand track_edge_leftcmd;
-        track_edge_leftcmd.cmdType = CommandType::QUAD;
+        PrimitiveCommand track_edge_leftcmd;
+        track_edge_leftcmd.cmdType = CommandType::PRIMITIVE;
         track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x - 3, 0};
         track_edge_leftcmd.baseInfo.size = {6,
                                             info->baseInfo.canvasSize.height()};
         track_edge_leftcmd.baseInfo.color = {0, 1, 1, 1};
-        QuadCommand track_edge_rightcmd;
-        track_edge_rightcmd.cmdType = CommandType::QUAD;
+        track_edge_leftcmd.primitive = PrimitiveType::QUAD;
+        PrimitiveCommand track_edge_rightcmd;
+        track_edge_rightcmd.cmdType = CommandType::PRIMITIVE;
         track_edge_rightcmd.baseInfo.pos = {
             all_tracks_rect.x + all_tracks_rect.z - 3, 0};
         track_edge_rightcmd.baseInfo.size = {
             6, info->baseInfo.canvasSize.height()};
         track_edge_rightcmd.baseInfo.color = {0, 1, 1, 1};
-        buffer.add_QuadCommand(track_edge_leftcmd);
-        buffer.add_QuadCommand(track_edge_rightcmd);
+        track_edge_rightcmd.primitive = PrimitiveType::QUAD;
+        buffer.add_PrimitiveCommand(track_edge_leftcmd);
+        buffer.add_PrimitiveCommand(track_edge_rightcmd);
     }
     // qDebug() << "bg layer done";
 }

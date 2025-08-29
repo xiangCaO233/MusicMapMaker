@@ -26,7 +26,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     // 需要卸载纹理
     void need_unloadtexture_dir(std::string_view texdir) override;
     // 获取信息
-    TextureInfo getInfo(std::string_view texname) override;
+    TextureInfo getTextureInfo(std::string_view texname) override;
 
     // 直接访问着色器
     // QOpenGLShaderProgram* quadshader() const { return quad_shader_program; }
@@ -37,8 +37,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // 提交渲染指令
     void commit(const QuadCommand& command);
-    void commit(const PrimitiveCommand& command);
     void commit(const MeshCommand& command);
+    void commit(const PrimitiveCommand& command);
     void commit(const CurveCommand& command);
 
     // 更新需要更新的资源等等
@@ -63,11 +63,6 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // 执行渲染
     void render();
-
-    // 扩充矩形实例缓冲区
-    void expandQuadDataBuffer();
-    // 扩充网格缓冲区
-    void expandMeshDataBuffer();
 
     // 访问纹理池
     const std::unique_ptr<TexturePool>& texture_pool() const {
@@ -118,8 +113,19 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     void initQuadShader();
     void initQuadObjectBuffers();
     void initMeshShader();
-    void initMeshBuffers();
+    void initMeshObjectBuffers();
+    void initPrimitiveShader();
+    void initPrimitiveObjectBuffers();
     void initMaskUBO();
+
+    // 扩充矩形实例缓冲区
+    void expandQuadDataBuffer();
+    // 扩充网格缓冲区
+    void expandMeshDataBuffer();
+    // 扩充图元缓冲区
+    void expandPrimitiveDataBuffer();
+    // 扩充曲线缓冲区
+    void expandCurveDataBuffer();
 
     // 辅助函数，通过句柄获取 RenderCommand 的引用
     const RenderCommand& get_command_from_handle(const CommandHandle& handle);
@@ -129,19 +135,29 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     uint32_t useVAO(CommandType type) const;
 
-    void drawBatch(const RenderBatch& batch, GLenum mode) const;
+    // 批绘制
+    void drawBatch(const RenderBatch& batch, QOpenGLShaderProgram* shader,
+                   bool wireframe) const;
+    // 更新gpu数据
+    void update_gpudata();
 
     // gpu数据预缓存
     std::vector<PrimitiveData> quad_datas;
     std::vector<PointsData> mesh_datas;
+    std::vector<PrimitiveData> primitive_datas;
+    std::vector<PrimitiveData> curve_datas;
     // 当前网格的总顶点数
     size_t current_mesh_vertex_count{0};
+    // 当前曲线的总顶点数
+    size_t current_curve_vertex_count{0};
 
     std::vector<RenderBatch> command_batchs;
     std::mutex command_mtx;
 
     // 最大矩形数量
     uint32_t max_quadcount{8192};
+    // 最大图元数量
+    uint32_t max_primitivecount{16384};
     // 最大网格顶点数量
     uint32_t max_mesh_vertexcount{32768};
 
@@ -168,14 +184,16 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // gl资源
     uint32_t quad_instance_dataAO{0};
-    uint32_t mesh_dataAO{0};
     uint32_t quad_instance_dataBO{0};
+    uint32_t mesh_dataAO{0};
     uint32_t mesh_dataBO{0};
+    uint32_t primitive_dataAO{0};
+    uint32_t primitive_dataBO{0};
+    uint32_t curve_dataAO{0};
+    uint32_t curve_dataBO{0};
 
     // 从指定矩形实例位置开始更新矩形顶点数组指针
     void updateQuadAttribptrFromInstance(size_t instance_index) const;
-    // 从指定顶点位置开始更新网格顶点数组指针
-    void updateMeshAttribptrFromInstance(size_t vertex_index) const;
 };
 
 #endif  // MMM_RENDERER2D_HPP

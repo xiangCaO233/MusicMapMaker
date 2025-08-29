@@ -10,7 +10,7 @@
 
 // 构造RenderTick
 
-RenderDataLoop::RenderDataLoop(Renderer2D *renderer, QObject *parent)
+RenderDataLoop::RenderDataLoop(Renderer2D* renderer, QObject* parent)
     : QObject(parent), render(renderer) {
     // 构造函数：创建但不启动线程
     m_worker_thread = new QThread(this);
@@ -44,7 +44,7 @@ void RenderDataLoop::stop() {
     if (!isRunning.load()) return;
     isRunning.store(false);
 
-    // 等待线程优雅退出
+    // 等待线程退出
     m_worker_thread->quit();
     if (!m_worker_thread->wait(5000)) {
         qWarning() << "RenderDataLoop thread did not stop gracefully, forcing "
@@ -52,6 +52,7 @@ void RenderDataLoop::stop() {
         m_worker_thread->terminate();
         m_worker_thread->wait();
     }
+    layer_manager.reset();
 }
 
 void RenderDataLoop::set_targetFPS(qreal fps) {
@@ -90,10 +91,10 @@ void RenderDataLoop::initializeLayerManager() {
     layer_manager->initializeLayers();
 }
 
-void RenderDataLoop::updateMap(MMap *map) { layer_manager->updateMap(map); }
+void RenderDataLoop::updateMap(MMap* map) { layer_manager->updateMap(map); }
 
 // 更新信息
-void RenderDataLoop::update_info(SharedCanvasInfo *newinfo) {
+void RenderDataLoop::update_info(SharedCanvasInfo* newinfo) {
     info = newinfo;
     layermanager()->updateInfoForLayers(newinfo);
 }

@@ -83,6 +83,12 @@ void Renderer2D::update() {
         mesh_shader_program->bind();
         mesh_shader_program->setUniformValue("projection", projection);
         mesh_shader_program->release();
+        primitive_shader_program->bind();
+        primitive_shader_program->setUniformValue("projection", projection);
+        primitive_shader_program->release();
+        // curve_shader_program->bind();
+        // curve_shader_program->setUniformValue("projection", projection);
+        // curve_shader_program->release();
         update_view = false;
     }
 
@@ -101,51 +107,119 @@ void Renderer2D::update() {
         quad_shader_program->setUniformValue("u_ActiveMaskLayerCount",
                                              int(mask_stack_cpu.size()));
         quad_shader_program->release();
-        // 需要一个uniform告诉着色器当前有多少个活跃的蒙版层
+
         mesh_shader_program->bind();
         mesh_shader_program->setUniformValue("u_ActiveMaskLayerCount",
                                              int(mask_stack_cpu.size()));
         mesh_shader_program->release();
+
+        primitive_shader_program->bind();
+        primitive_shader_program->setUniformValue("u_ActiveMaskLayerCount",
+                                                  int(mask_stack_cpu.size()));
+        primitive_shader_program->release();
+
+        // curve_shader_program->bind();
+        // curve_shader_program->setUniformValue("u_ActiveMaskLayerCount",
+        //                                       int(mask_stack_cpu.size()));
+        // curve_shader_program->release();
         update_ubo = false;
     }
 }
 
+QOpenGLShaderProgram* Renderer2D::useShader(CommandType type) {
+    switch (type) {
+        using enum CommandType;
+        case QUAD: {
+            return quad_shader_program;
+        }
+        case MESH: {
+            return mesh_shader_program;
+        }
+        case PRIMITIVE: {
+            return primitive_shader_program;
+        }
+        case CURVE: {
+            return curve_shader_program;
+        }
+        default:
+            return nullptr;
+    }
+}
+
+uint32_t Renderer2D::useVAO(CommandType type) const {
+    switch (type) {
+        using enum CommandType;
+        case QUAD: {
+            return quad_instance_dataAO;
+        }
+        case MESH: {
+            return mesh_dataAO;
+        }
+        case PRIMITIVE: {
+            return primitive_dataAO;
+        }
+        case CURVE: {
+            return curve_dataAO;
+        }
+        default:
+            return 0;
+    }
+}
+
 // 批绘制
-void Renderer2D::drawBatch(const RenderBatch& batch, GLenum mode) const {
+void Renderer2D::drawBatch(const RenderBatch& batch,
+                           QOpenGLShaderProgram* shader, bool wireframe) const {
     switch (batch.type) {
         using enum CommandType;
         case QUAD: {
             // 更新矩形实例数组指针
             updateQuadAttribptrFromInstance(batch.startIndex);
-            // GLCALL(cvs->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA),
-            // cvs); GLCALL(cvs->glDepthMask(GL_TRUE), cvs);
-            DRAWCALL(cvs->glDrawArraysInstanced(mode, 0, 6, batch.elementCount),
+            shader->setUniformValue("u_IsDrawingWireframe", false);
+            DRAWCALL(cvs->glDrawArraysInstanced(GL_TRIANGLES, 0, 6,
+                                                batch.elementCount),
                      cvs);
+            if (wireframe) {
+                shader->setUniformValue("u_IsDrawingWireframe", true);
+                DRAWCALL(cvs->glDrawArraysInstanced(GL_LINE_LOOP, 0, 6,
+                                                    batch.elementCount),
+                         cvs);
+            }
             break;
         }
-        case MESH: {
-            // GLCALL(cvs->glBlendFunc(GL_SRC_ALPHA, GL_ONE), cvs);
-            // GLCALL(cvs->glDepthMask(GL_FALSE), cvs);
-            DRAWCALL(
-                cvs->glDrawArrays(mode, batch.startIndex, batch.elementCount),
-                cvs);
+        case PRIMITIVE: {
+            shader->setUniformValue("u_IsDrawingWireframe", false);
+            DRAWCALL(cvs->glDrawArrays(GL_POINTS, batch.startIndex,
+                                       batch.elementCount),
+                     cvs);
+            if (wireframe) {
+                shader->setUniformValue("u_IsDrawingWireframe", true);
+                DRAWCALL(cvs->glDrawArrays(GL_LINE_LOOP, batch.startIndex,
+                                           batch.elementCount),
+                         cvs);
+            }
+            break;
+        }
+        case MESH:
+        case CURVE: {
+            shader->setUniformValue("u_IsDrawingWireframe", false);
+            DRAWCALL(cvs->glDrawArrays(GL_TRIANGLES, batch.startIndex,
+                                       batch.elementCount),
+                     cvs);
+            if (wireframe) {
+                shader->setUniformValue("u_IsDrawingWireframe", true);
+                DRAWCALL(cvs->glDrawArrays(GL_LINE_LOOP, batch.startIndex,
+                                           batch.elementCount),
+                         cvs);
+            }
             break;
         }
     }
 }
 
-// 渲染
-void Renderer2D::render() {
-    update();
-
-    if (command_batchs.empty()) {
-        quad_datas.clear();
-        mesh_datas.clear();
-        return;
-    }
-
-    // 更新gpu数据
+// 更新gpu数据
+void Renderer2D::update_gpudata() {
     // === 1. 一次性上传所有GPU数据 ===
+    // 矩形数据
     if (!quad_datas.empty()) {
         // 绑定矩形实例缓冲区
         GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, quad_instance_dataBO), cvs);
@@ -155,6 +229,8 @@ void Renderer2D::render() {
                                  quad_datas.data(), GL_DYNAMIC_DRAW),
                cvs);
     }
+
+    // 网格数据
     if (!mesh_datas.empty()) {
         // 绑定网格缓冲区
         GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, mesh_dataBO), cvs);
@@ -176,6 +252,37 @@ void Renderer2D::render() {
             cvs);
     }
 
+    // 图元数据
+    if (!primitive_datas.empty()) {
+        // 绑定图元实例缓冲区
+        GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, primitive_dataBO), cvs);
+        // 一次性上传所有矩形实例数据
+        GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
+                                 primitive_datas.size() * sizeof(PrimitiveData),
+                                 primitive_datas.data(), GL_DYNAMIC_DRAW),
+               cvs);
+    }
+
+    // 曲线数据
+    if (!curve_datas.empty()) {
+    }
+}
+
+// 渲染
+void Renderer2D::render() {
+    update();
+
+    if (command_batchs.empty()) {
+        quad_datas.clear();
+        mesh_datas.clear();
+        primitive_datas.clear();
+        curve_datas.clear();
+        return;
+    }
+
+    // 更新gpu数据
+    update_gpudata();
+
     // === 2. 在单个循环中通过状态追踪进行渲染 ===
     QOpenGLShaderProgram* current_shader{nullptr};
     uint32_t current_vao{0};
@@ -193,6 +300,7 @@ void Renderer2D::render() {
                 current_shader->release();
             }
             current_shader = required_shader;
+            // if (!current_shader) return;
             current_shader->bind();
         }
         if (current_vao != required_vao) {
@@ -207,14 +315,7 @@ void Renderer2D::render() {
         current_shader->setUniformValue("u_samplerarray", 0);
 
         // --- 发起绘制调用 ---
-        current_shader->setUniformValue("u_IsDrawingWireframe", false);
-        drawBatch(batch, GL_TRIANGLES);  // 明确告知使用三角形模式
-
-        // 2. 如果需要，再绘制线框模式
-        if (draw_wireframe) {
-            current_shader->setUniformValue("u_IsDrawingWireframe", true);
-            drawBatch(batch, GL_LINE_LOOP);  // 明确告知使用线循环模式
-        }
+        drawBatch(batch, current_shader, draw_wireframe);
     }
 
     // === 3. 最终清理 ===
@@ -226,6 +327,9 @@ void Renderer2D::render() {
     // 为下一帧做准备
     quad_datas.clear();
     mesh_datas.clear();
+    primitive_datas.clear();
+    curve_datas.clear();
     current_mesh_vertex_count = 0;
+    current_curve_vertex_count = 0;
     command_batchs.clear();
 }

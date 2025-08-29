@@ -17,6 +17,8 @@ layout(location = 5) in int aTextureLayerIdx;
 
 // 顶点使用的纹理是否应用ubo蒙版效果
 layout(location = 6) in uint aNoFilter;
+// 在点集合中的位置(0内部,1头部,-1尾部)
+layout(location = 7) in int aGroupPos;
 
 // Uniform 投影矩阵
 uniform mat4 projection;

@@ -47,3 +47,6 @@ auto glCallImpl(Func func, const char* funcStr,
             return func;        \
         },                      \
         #func, f)
+
+// 扩充曲线缓冲区
+void Renderer2D::expandCurveDataBuffer() {}

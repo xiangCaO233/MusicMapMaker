@@ -10,6 +10,6 @@ class TextureLoadCallback {
     virtual ~TextureLoadCallback() = default;
     virtual void need_loadtexture_dir(std::string_view texdir) = 0;
     virtual void need_unloadtexture_dir(std::string_view texdir) = 0;
-    virtual TextureInfo getInfo(std::string_view texname) = 0;
+    virtual TextureInfo getTextureInfo(std::string_view texname) = 0;
 };
 #endif  // MMM_TEXTURELOADCALLBACK_HPP

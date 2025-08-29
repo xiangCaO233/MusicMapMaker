@@ -108,7 +108,7 @@ void Renderer2D::initMeshShader() {
     }
 }
 
-void Renderer2D::initMeshBuffers() {
+void Renderer2D::initMeshObjectBuffers() {
     // meshbuffer
     // 初始化VAO
     GLCALL(cvs->glGenVertexArrays(1, &mesh_dataAO), cvs);
@@ -180,6 +180,14 @@ void Renderer2D::initMeshBuffers() {
     GLCALL(
         cvs->glVertexAttribIPointer(6, 1, GL_UNSIGNED_INT, sizeof(CustomVertex),
                                     (void*)(offsetof(CustomVertex, no_filter))),
+        cvs);
+
+    // 在点集合中的位置(0内部,1头部,-1尾部)
+    // layout(location = 7) in int aGroupPos;
+    GLCALL(cvs->glEnableVertexAttribArray(7), cvs);
+    GLCALL(
+        cvs->glVertexAttribIPointer(7, 1, GL_INT, sizeof(CustomVertex),
+                                    (void*)(offsetof(CustomVertex, group_pos))),
         cvs);
 
     // 解绑

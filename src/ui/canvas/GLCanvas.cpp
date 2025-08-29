@@ -118,6 +118,15 @@ void GLCanvas::initializeGL() {
     qDebug() << "OpenGL 版本: "
              << std::string(reinterpret_cast<const char*>(version));
 
+    GLint maxVertices, maxComponents;
+    GLCALL(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxVertices), this);
+    qDebug() << "几何着色器最大输出顶点数: " << std::to_string(maxVertices);
+    GLCALL(
+        glGetIntegerv(GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS, &maxComponents),
+        this);
+    qDebug() << "几何着色器最大输出顶点分量数: "
+             << std::to_string(maxComponents);
+
     // 查询最大支持抗锯齿MSAA倍率
     GLint maxSamples;
     GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples), this);
@@ -175,6 +184,24 @@ void GLCanvas::paintGL() {
 
     GLCALL(glClearColor(.23f, .23f, .23f, .23f), this);
     GLCALL(glClear(GL_COLOR_BUFFER_BIT), this);
+
+    // QuadCommand qcmd;
+    // qcmd.cmdType = CommandType::QUAD;
+    // qcmd.baseInfo.pos = {300, 300};
+    // qcmd.baseInfo.size = {100, 100};
+    // qcmd.baseInfo.color = {0, 1, 1, 1};
+
+    // PrimitiveCommand cmd;
+    // cmd.cmdType = CommandType::PRIMITIVE;
+    // cmd.baseInfo.pos = {100, 100};
+    // cmd.baseInfo.size = {100, 100};
+    // cmd.baseInfo.color = {1, 1, 0, 1};
+    // cmd.primitive = PrimitiveType::QUAD;
+
+    // render->commit(qcmd);
+    // render->commit(cmd);
+    // render->finalize();
+    // render->render();
 
     {
         MCommandCollector pc(render.get(), render_dataloop->layermanager());

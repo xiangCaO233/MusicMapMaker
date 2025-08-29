@@ -161,6 +161,9 @@ void Renderer2D::initQuadObjectBuffers() {
     // 21 uint texscalemode
     GLCALL(cvs->glEnableVertexAttribArray(12), cvs);
 
+    // 22 uint primitive
+    GLCALL(cvs->glEnableVertexAttribArray(13), cvs);
+
     updateQuadAttribptrFromInstance(0);
 
     GLCALL(cvs->glVertexAttribDivisor(0, 1), cvs);   // pos
@@ -176,6 +179,7 @@ void Renderer2D::initQuadObjectBuffers() {
     GLCALL(cvs->glVertexAttribDivisor(10, 1), cvs);  // no_filter
     GLCALL(cvs->glVertexAttribDivisor(11, 1), cvs);  // talign
     GLCALL(cvs->glVertexAttribDivisor(12, 1), cvs);  // tscale
+    GLCALL(cvs->glVertexAttribDivisor(13, 1), cvs);  // primitive
 
     // 解绑
     GLCALL(cvs->glBindVertexArray(0), cvs);
@@ -288,5 +292,11 @@ void Renderer2D::updateQuadAttribptrFromInstance(size_t instance_index) const {
     GLCALL(cvs->glVertexAttribIPointer(
                12, 1, GL_UNSIGNED_INT, sizeof(PrimitiveData),
                (void*)(base_offset + offsetof(PrimitiveData, tscale))),
+           cvs);
+
+    // 22 uint primitive
+    GLCALL(cvs->glVertexAttribIPointer(
+               13, 1, GL_UNSIGNED_INT, sizeof(PrimitiveData),
+               (void*)(base_offset + offsetof(PrimitiveData, primitive))),
            cvs);
 }

@@ -53,6 +53,8 @@ struct MeshVertex {
     glm::vec2 vPos;
     glm::vec2 vUV;
     glm::vec4 vColor;
+    // 在点集合中的位置(0内部,1头部,-1尾部)
+    glm::int32 group_pos;
 };
 
 struct PointsCommnad : public RenderCommand {
@@ -80,7 +82,8 @@ struct MeshCommand : public PointsCommnad {
             data.vertices.emplace_back(
                 mesh_vertex.vPos, mesh_vertex.vUV, mesh_vertex.vColor,
                 texturesInfo.texture.uv_scale, texturesInfo.texture.group_size,
-                texturesInfo.texture.layer_index, no_filter);
+                texturesInfo.texture.layer_index, no_filter,
+                mesh_vertex.group_pos);
         }
         return data;
     };
@@ -105,13 +108,15 @@ struct QuadCommand : public RenderCommand {
             texturesInfo.texture.layer_index,
             baseInfo.no_filter,
             texturesInfo.talign,
-            texturesInfo.tscale};
+            texturesInfo.tscale,
+            PrimitiveType::QUAD};
     }
 };
 
 struct PrimitiveCommand : public RenderCommand {
     BaseInfo baseInfo;
     RadiusInfo radiusInfo;
+    PrimitiveType primitive;
 
     // 转换为图元数据
     PrimitiveData to_data() const {
@@ -128,7 +133,8 @@ struct PrimitiveCommand : public RenderCommand {
             texturesInfo.texture.layer_index,
             baseInfo.no_filter,
             texturesInfo.talign,
-            texturesInfo.tscale};
+            texturesInfo.tscale,
+            primitive};
     }
 };
 
@@ -140,7 +146,7 @@ struct CurveCommand : public PointsCommnad {
             data.vertices.emplace_back(
                 vertex.vPos, vertex.vUV, vertex.vColor,
                 texturesInfo.texture.uv_scale, texturesInfo.texture.group_size,
-                texturesInfo.texture.layer_index, no_filter);
+                texturesInfo.texture.layer_index, no_filter, vertex.group_pos);
         }
         return data;
     };

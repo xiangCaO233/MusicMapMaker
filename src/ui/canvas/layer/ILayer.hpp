@@ -31,6 +31,8 @@ struct RenderDataBuffer {
     // 分离存储不同渲染指令
     std::vector<QuadCommand> quad_command_list;
     std::vector<MeshCommand> mesh_command_list;
+    std::vector<PrimitiveCommand> primitive_command_list;
+    std::vector<CurveCommand> curve_command_list;
 
     void add_QuadCommand(const QuadCommand& cmd) {
         quad_command_list.push_back(cmd);
@@ -44,9 +46,23 @@ struct RenderDataBuffer {
             {CommandType::MESH, mesh_command_list.size() - 1});
     }
 
+    void add_PrimitiveCommand(const PrimitiveCommand& cmd) {
+        primitive_command_list.push_back(cmd);
+        all_command_handles.push_back(
+            {CommandType::PRIMITIVE, primitive_command_list.size() - 1});
+    }
+
+    void add_CurveCommand(const CurveCommand& cmd) {
+        curve_command_list.push_back(cmd);
+        all_command_handles.push_back(
+            {CommandType::CURVE, curve_command_list.size() - 1});
+    }
+
     void clear() {
         quad_command_list.clear();
         mesh_command_list.clear();
+        primitive_command_list.clear();
+        curve_command_list.clear();
         all_command_handles.clear();
     }
 };

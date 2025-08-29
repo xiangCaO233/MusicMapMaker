@@ -34,12 +34,13 @@ class NormalRenderSystem {
                       });
             // 生成网格的渲染指令
             for (const auto& quad : mesh) {
-                QuadCommand cmd;
-                cmd.cmdType = CommandType::QUAD;
+                PrimitiveCommand cmd;
+                cmd.cmdType = CommandType::PRIMITIVE;
                 cmd.baseInfo.pos = quad.pos;
                 cmd.baseInfo.size = quad.size;
                 cmd.texturesInfo.texture = quad.texture;
-                buffer.add_QuadCommand(cmd);
+                cmd.primitive = PrimitiveType::QUAD;
+                buffer.add_PrimitiveCommand(cmd);
             }
 
             // // 绘制物件精确时间字符串

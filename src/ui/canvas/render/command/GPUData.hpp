@@ -22,6 +22,8 @@
  * layout(location = 5) in int aTextureLayerIdx;
  * 顶点使用的纹理是否应用ubo蒙版效果
  * layout(location = 6) in uint aNoFilter;
+ * 在点集合中的位置(0内部,1头部,-1尾部)
+ * layout(location = 7) in int aGroupPos;
  */
 
 struct CustomVertex {
@@ -35,6 +37,8 @@ struct CustomVertex {
     glm::int32 layer_idx;
     // 蒙版效果
     glm::uint32 no_filter;
+    // 在点集合中的位置(0内部,1头部,-1尾部)
+    glm::int32 group_pos;
 };
 
 struct PointsData {
@@ -62,7 +66,16 @@ struct PointsData {
  * 贴图策略
  * layout(location = 11) in uint aTexAlignStratergy;
  * layout(location = 12) in uint aTexScaleStratergy;
+ * 图元类型
+ * layout(location = 13) in uint aPrimitive;
  */
+
+enum class PrimitiveType : uint32_t {
+    // 矩形
+    QUAD = 1,
+    // 椭圆
+    OVAL = 2,
+};
 
 struct PrimitiveData {
     // 基本信息
@@ -87,6 +100,9 @@ struct PrimitiveData {
     // 纹理选项
     TexAlignMode talign;
     TexScaleMode tscale;
+
+    // 图元类型
+    PrimitiveType primitive;
 };
 
 #endif  // MMM_GPUDATA_HPP

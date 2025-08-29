@@ -31,8 +31,9 @@ class TimeLineSystem {
             const auto y = converter.timeToPixel(
                 time, realtime_info.presentation_canvas_time);
 
-            QuadCommand cmd;
-            cmd.cmdType = CommandType::QUAD;
+            PrimitiveCommand cmd;
+            cmd.cmdType = CommandType::PRIMITIVE;
+            cmd.primitive = PrimitiveType::QUAD;
             if (is_base_timing) {
                 // 是参考bpm的timing-绘制在轨道左侧(红线)
                 auto bpmstr = QString("bpm=%1").arg(bpm, 'f', 2);
@@ -114,7 +115,7 @@ class TimeLineSystem {
                 //     }
                 // }
             }
-            buffer.add_QuadCommand(cmd);
+            buffer.add_PrimitiveCommand(cmd);
         }
     }
 };

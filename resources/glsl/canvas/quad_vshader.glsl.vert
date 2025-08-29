@@ -25,6 +25,8 @@ layout(location = 10) in uint aNoFilter;
 // 贴图策略
 layout(location = 11) in uint aTexAlignStratergy;
 layout(location = 12) in uint aTexScaleStratergy;
+// 图元类型
+layout(location = 13) in uint aPrimitive;
 
 // Uniform 投影矩阵
 uniform mat4 projection;
@@ -39,6 +41,7 @@ const vec2 positions[6] = vec2[6](
         vec2(0.5, 0.5), // 右上
         vec2(-0.5, 0.5) // 左上
     );
+
 // 与上述6个顶点一一对应的UV坐标
 const vec2 uvs[6] = vec2[6](
         vec2(0.0, 0.0), // 左下

@@ -57,19 +57,21 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     const float end_y = converter.timeToPixel(query_end_time, time, mapinfo);
 
     // 绘制读取时间区间线(红色)
-    QuadCommand start_cmd;
-    start_cmd.cmdType = CommandType::QUAD;
+    PrimitiveCommand start_cmd;
+    start_cmd.cmdType = CommandType::PRIMITIVE;
     start_cmd.baseInfo.pos = {0, start_y};
     start_cmd.baseInfo.size = {mapinfo->baseInfo.canvasSize.width(), 8};
     start_cmd.baseInfo.color = {1, 0, 0, 1};
-    QuadCommand end_cmd;
-    end_cmd.cmdType = CommandType::QUAD;
+    start_cmd.primitive = PrimitiveType::QUAD;
+    PrimitiveCommand end_cmd;
+    end_cmd.cmdType = CommandType::PRIMITIVE;
     end_cmd.baseInfo.pos = {0, end_y};
     end_cmd.baseInfo.size = {mapinfo->baseInfo.canvasSize.width(), 8};
     end_cmd.baseInfo.color = {1, 0, 0, 1};
+    end_cmd.primitive = PrimitiveType::QUAD;
 
-    buffer.add_QuadCommand(start_cmd);
-    buffer.add_QuadCommand(end_cmd);
+    buffer.add_PrimitiveCommand(start_cmd);
+    buffer.add_PrimitiveCommand(end_cmd);
 
     // 生成时间线(拍线/识别分拍/小节线)
     timeline_system.update(ecore, mapinfo, liner_converter, l, buffer);

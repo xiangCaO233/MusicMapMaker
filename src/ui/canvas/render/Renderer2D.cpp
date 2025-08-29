@@ -20,7 +20,9 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : cvs(canvas) {
     initQuadShader();
     initQuadObjectBuffers();
     initMeshShader();
-    initMeshBuffers();
+    initMeshObjectBuffers();
+    initPrimitiveShader();
+    initPrimitiveObjectBuffers();
 }
 
 Renderer2D::~Renderer2D() {
@@ -39,7 +41,7 @@ void Renderer2D::need_loadtexture_dir(std::string_view texdir) {
 }
 
 // 获取信息
-TextureInfo Renderer2D::getInfo(std::string_view texname) {
+TextureInfo Renderer2D::getTextureInfo(std::string_view texname) {
     return texturepool->get(texname).value_or(TextureInfo{});
 }
 
@@ -53,36 +55,14 @@ const RenderCommand& Renderer2D::get_command_from_handle(
         case MESH: {
             return mesh_command_list[handle.index_in_pool];
         }
+        case PRIMITIVE: {
+            return primitive_command_list[handle.index_in_pool];
+        }
+        case CURVE: {
+            return curve_command_list[handle.index_in_pool];
+        }
         default:
             return nullCmd;
-    }
-}
-
-QOpenGLShaderProgram* Renderer2D::useShader(CommandType type) {
-    switch (type) {
-        using enum CommandType;
-        case QUAD: {
-            return quad_shader_program;
-        }
-        case MESH: {
-            return mesh_shader_program;
-        }
-        default:
-            return nullptr;
-    }
-}
-
-uint32_t Renderer2D::useVAO(CommandType type) const {
-    switch (type) {
-        using enum CommandType;
-        case QUAD: {
-            return quad_instance_dataAO;
-        }
-        case MESH: {
-            return mesh_dataAO;
-        }
-        default:
-            return 0;
     }
 }
 
@@ -149,6 +129,20 @@ void Renderer2D::commit(const MeshCommand& command) {
     }
 }
 
+void Renderer2D::commit(const PrimitiveCommand& command) {
+    {
+        std::lock_guard<std::mutex> lock(command_mtx);
+        primitive_command_list.push_back(command);
+        // 在统一的句柄列表中记录它的类型和位置
+        all_command_handles.push_back(
+            {CommandType::PRIMITIVE, primitive_command_list.size() - 1});
+        // 填充gpu数据
+        primitive_datas.push_back(command.to_data());
+    }
+}
+
+void Renderer2D::commit(const CurveCommand& command) {}
+
 bool cmd_emergable(const RenderCommand& command,
                    const std::vector<RenderBatch>& batchs) {
     // 检查当前指令是否可以合并到最后一个批次中
@@ -168,20 +162,28 @@ void Renderer2D::finalize() {
 
     expandQuadDataBuffer();
     expandMeshDataBuffer();
+    expandPrimitiveDataBuffer();
+    expandCurveDataBuffer();
 
     if (all_command_handles.empty()) {
         return;
     }
+
     if (quad_datas.empty() && mesh_datas.empty()) {
         // 清理原始命令队列
         quad_command_list.clear();
         mesh_command_list.clear();
+        primitive_command_list.clear();
+        curve_command_list.clear();
         all_command_handles.clear();
         return;
     }
+
     // 为不同类型的指令维护独立的实例计数器
     size_t quad_instance_counter = 0;
     size_t mesh_instance_counter = 0;
+    size_t primitive_instance_counter = 0;
+    size_t curve_instance_counter = 0;
 
     // --- 创建第一个批次 ---
     const auto& first_handle = all_command_handles.front();
@@ -202,7 +204,19 @@ void Renderer2D::finalize() {
             mesh_instance_counter++;
             break;
         }
+        case PRIMITIVE: {
+            elementCount = 1;
+            primitive_instance_counter++;
+            break;
+        }
+        case CURVE: {
+            elementCount =
+                static_cast<const CurveCommand&>(first_cmd).vertices.size();
+            curve_instance_counter++;
+            break;
+        }
     }
+
     command_batchs.emplace_back(
         first_cmd.cmdType, first_cmd.texturesInfo.texture.gl_texture_array_id,
         0,  // 第一个批次的 instanceStartIndex 总是 0
@@ -217,7 +231,8 @@ void Renderer2D::finalize() {
             // 合并到当前批次
             switch (command.cmdType) {
                 using enum CommandType;
-                case QUAD: {
+                case QUAD:
+                case PRIMITIVE: {
                     command_batchs.back().elementCount++;
                     break;
                 }
@@ -225,6 +240,12 @@ void Renderer2D::finalize() {
                     command_batchs.back().elementCount +=
                         static_cast<const MeshCommand&>(command)
                             .indicies.size();
+                    break;
+                }
+                case CURVE: {
+                    command_batchs.back().elementCount +=
+                        static_cast<const CurveCommand&>(command)
+                            .vertices.size();
                     break;
                 }
             }
@@ -238,10 +259,21 @@ void Renderer2D::finalize() {
                     new_instance_start_index = quad_instance_counter;
                     break;
                 }
+                case PRIMITIVE: {
+                    elementCount = 1;
+                    new_instance_start_index = primitive_instance_counter;
+                    break;
+                }
                 case MESH: {
                     elementCount = static_cast<const MeshCommand&>(command)
                                        .indicies.size();
                     new_instance_start_index = mesh_instance_counter;
+                    break;
+                }
+                case CURVE: {
+                    elementCount = static_cast<const CurveCommand&>(command)
+                                       .vertices.size();
+                    new_instance_start_index = curve_instance_counter;
                     break;
                 }
             }
@@ -254,15 +286,31 @@ void Renderer2D::finalize() {
         }
 
         // 无论是否合并，都必须更新计数器
-        if (command.cmdType == CommandType::QUAD) {
-            quad_instance_counter++;
-        } else {
-            mesh_instance_counter++;
+        switch (command.cmdType) {
+            using enum CommandType;
+            case QUAD: {
+                quad_instance_counter++;
+                break;
+            }
+            case PRIMITIVE: {
+                primitive_instance_counter++;
+                break;
+            }
+            case MESH: {
+                mesh_instance_counter++;
+                break;
+            }
+            case CURVE: {
+                curve_instance_counter++;
+                break;
+            }
         }
     }
 
     // 清理所有列表
     quad_command_list.clear();
     mesh_command_list.clear();
+    primitive_command_list.clear();
+    curve_command_list.clear();
     all_command_handles.clear();
 }

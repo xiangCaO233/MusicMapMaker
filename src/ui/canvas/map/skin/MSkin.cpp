@@ -161,7 +161,7 @@ TextureInfo MSkin::get_orbit_judge_texture() {
         ojudge_texit =
             bg_texture_buffer
                 .try_emplace(TexType::JUDGE_ORBIT,
-                             texcallback->getInfo(
+                             texcallback->getTextureInfo(
                                  bg_texture_config["panel"].value<std::string>(
                                      "judge_orbit", "none")))
                 .first;
@@ -176,7 +176,7 @@ TextureInfo MSkin::get_orbit_bg_texture() {
         obg_texit =
             bg_texture_buffer
                 .try_emplace(TexType::ORBIT_BG,
-                             texcallback->getInfo(
+                             texcallback->getTextureInfo(
                                  bg_texture_config["panel"].value<std::string>(
                                      "orbit_background", "none")))
                 .first;
@@ -189,33 +189,33 @@ TextureInfo MSkin::get_selected_border_texture(
     SelectBorderDirection direction) {
     switch (direction) {
         case SelectBorderDirection::LEFT: {
-            return texcallback->getInfo(
+            return texcallback->getTextureInfo(
                 selected_config.value<std::string>("left", "none"));
             break;
         }
         case SelectBorderDirection::RIGHT: {
-            return texcallback->getInfo(
+            return texcallback->getTextureInfo(
                 selected_config.value<std::string>("right", "none"));
             break;
         }
         case SelectBorderDirection::TOP: {
-            return texcallback->getInfo(
+            return texcallback->getTextureInfo(
                 selected_config.value<std::string>("top", "none"));
             break;
         }
         case SelectBorderDirection::BOTTOM: {
-            return texcallback->getInfo(
+            return texcallback->getTextureInfo(
                 selected_config.value<std::string>("bottom", "none"));
             break;
         }
         default:
-            return texcallback->getInfo("none");
+            return texcallback->getTextureInfo("none");
     }
 }
 
 // 获取判定线的纹理
 TextureInfo MSkin::get_judgeline_texture() {
-    return texcallback->getInfo(
+    return texcallback->getTextureInfo(
         bg_texture_config.value<std::string>("judgeline", "none"));
 }
 
@@ -296,7 +296,7 @@ TextureInfo MSkin::get_object_texture(TexType type, ObjectStatus status) {
     auto rpath =
         std::filesystem::path(config->value<std::string>(key, "unknown"));
     auto apath = skinPath / rpath;
-    auto texture = texcallback->getInfo(apath.generic_string());
+    auto texture = texcallback->getTextureInfo(apath.generic_string());
     object_texture_buffer[type][status] = texture;
     return object_texture_buffer[type][status];
 }

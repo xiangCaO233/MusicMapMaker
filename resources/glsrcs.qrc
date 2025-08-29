@@ -72,5 +72,11 @@
         <file>icons/hand-rock.svg</file>
         <file>glsl/canvas/custom_meshfshader.glsl.frag</file>
         <file>glsl/canvas/custom_meshvshader.glsl.vert</file>
+        <file>glsl/canvas/curve_fragment_shader.glsl.frag</file>
+        <file>glsl/canvas/curve_geometry_shader.glsl.geom</file>
+        <file>glsl/canvas/curve_vertex_shader.glsl.vert</file>
+        <file>glsl/canvas/primitive_fragment_shader.glsl.frag</file>
+        <file>glsl/canvas/primitive_geometry_shader.glsl.geom</file>
+        <file>glsl/canvas/primitive_vertex_shader.glsl.vert</file>
     </qresource>
 </RCC>

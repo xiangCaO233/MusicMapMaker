@@ -16,24 +16,26 @@ layout(location = 5) in int aTextureLayerIdx;
 
 // 顶点使用的纹理是否应用ubo蒙版效果
 layout(location = 6) in uint aNoFilter;
+// 在点集合中的位置(0内部,1头部,-1尾部)
+layout(location = 7) in int aGroupPos;
 
 // Uniform 投影矩阵
 uniform mat4 projection;
 
 // 输出颜色信息
-out vec4 v_Color;
+out vec4 g_Color;
 
 // 纹理在层中的尺寸比例
 // 在textureArray中未必占满整层
 // 不过必定绘制在0,0位置(所以可能有留黑)
 // 但是每一层尺寸都必须是一样的
-flat out vec2 f_UVScale;
+flat out vec2 g_UVScale;
 
 // 纹理所处的层数
-flat out int f_TextureLayerIdx;
-flat out uint f_NoFilter;
+flat out int g_TextureLayerIdx;
+flat out uint g_NoFilter;
 
 // 纹理组尺寸
-flat out vec2 f_GroupSize;
+flat out vec2 g_GroupSize;
 
 void main() {}

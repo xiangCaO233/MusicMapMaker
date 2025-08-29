@@ -19,13 +19,14 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
     auto& ecore = maplayer_manager->core();
     const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
                                       (1.f - mapinfo->baseInfo.judgeline_pos);
-    QuadCommand judgeline_cmd;
-    judgeline_cmd.cmdType = CommandType::QUAD;
+    PrimitiveCommand judgeline_cmd;
+    judgeline_cmd.cmdType = CommandType::PRIMITIVE;
     judgeline_cmd.baseInfo.pos = {mapinfo->editorInfo.track_layout.x,
                                   judgeline_absolute_y};
     judgeline_cmd.baseInfo.size = {mapinfo->editorInfo.track_layout.z, 4};
     judgeline_cmd.baseInfo.color = {0, 1, 1, 1};
-    buffer.add_QuadCommand(judgeline_cmd);
+    judgeline_cmd.primitive = PrimitiveType::QUAD;
+    buffer.add_PrimitiveCommand(judgeline_cmd);
 
     // 绘制当前时间字符串
     auto timestr =
@@ -50,16 +51,17 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
             charpos.y -= (charInfo.bearing.y);
             charpos.y += 8;
             // 提交渲染指令
-            QuadCommand charcommand{
-                {CommandType::QUAD,
+            PrimitiveCommand charcommand{
+                {CommandType::PRIMITIVE,
                  {charTexture, TexAlignMode::CENTER, TexScaleMode::CHARACTER}},
                 charpos,
                 charTexture.origin_size,
                 0.f,
                 {1.f, 1.f, 0.f, 1.f},
                 true,
-                {charTexture.uv_offset}};
-            buffer.add_QuadCommand(charcommand);
+                {charTexture.uv_offset},
+                PrimitiveType::QUAD};
+            buffer.add_PrimitiveCommand(charcommand);
 
             xoffset += charInfo.xadvance / 64;
         }

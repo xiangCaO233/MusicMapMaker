@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 
     // 初始化gl版本
     QSurfaceFormat format;
-
+    format.setRenderableType(QSurfaceFormat::OpenGL);
     // gl4.1版本
     format.setVersion(4, 1);
     // gl核心模式

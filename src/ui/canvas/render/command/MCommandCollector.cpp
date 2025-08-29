@@ -30,9 +30,20 @@ void MCommandCollector::collect() {
                     break;
                 }
                 case MESH: {
-                    // 提交到渲染器
                     render->commit(
                         buffer.mesh_command_list[command_handle.index_in_pool]);
+                    break;
+                }
+                case PRIMITIVE: {
+                    render->commit(
+                        buffer.primitive_command_list[command_handle
+                                                          .index_in_pool]);
+                    break;
+                }
+                case CURVE: {
+                    render->commit(
+                        buffer
+                            .curve_command_list[command_handle.index_in_pool]);
                     break;
                 }
             }
