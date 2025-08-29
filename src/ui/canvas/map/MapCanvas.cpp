@@ -22,7 +22,11 @@ MapCanvas::MapCanvas() : GLCanvas() {
 }
 
 // 析构MapCanvas
-MapCanvas::~MapCanvas() { qDeleteAll(tools); }
+MapCanvas::~MapCanvas() {
+    release_threads();
+    release_render();
+    qDeleteAll(tools);
+}
 
 void MapCanvas::initializeGL() {
     GLCanvas::initializeGL();

@@ -75,12 +75,16 @@ GLCanvas::GLCanvas() {
 }
 
 // 析构GLCanvas
-GLCanvas::~GLCanvas() {
+GLCanvas::~GLCanvas() { delete fpsCounter; }
+
+// 释放活动线程
+void GLCanvas::release_threads() {
     render_dataloop.reset();
     emit dataloop_stopped();
-    render.reset();
-    delete fpsCounter;
 }
+
+// 释放渲染器
+void GLCanvas::release_render() { render.reset(); }
 
 void GLCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
     audioLoadcbk = cbk;
