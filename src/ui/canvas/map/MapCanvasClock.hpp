@@ -206,6 +206,60 @@ class MapCanvasClock {
         info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
     }
 
+    void updateSyncWindow(RealTimeInfo& info, double smoothed_delta_ms) {
+        // --- 阶段 0: 处理硬重置事件 (播放/暂停/变速) ---
+        if (info.is_playing != m_was_playing ||
+            info.audio_playback_rate.load() != m_last_playback_rate) {
+            force_sync(info);
+            // 对于播放状态的切换，我们只做同步，不在这一帧前进时间，以避免跳跃
+            if (info.is_playing != m_was_playing) {
+                m_was_playing = info.is_playing;
+                return;
+            }
+        }
+
+        // 如果是暂停状态，直接返回
+        if (!info.is_playing) {
+            return;
+        }
+
+        // 到达这里，意味着正在稳定、连续地播放
+
+        // 1. 计算当前时间误差
+        //    目标时间 = 音频时间 + 缓冲
+        double target_time_with_buffer =
+            info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
+        double error = target_time_with_buffer - info.logic_canvas_time;
+
+        // 2. 根据误差大小，动态选择平滑策略
+        double current_smoothing_factor;
+        if (std::abs(error) > STUTTER_THRESHOLD_MS) {
+            // 误差巨大，发生了卡顿！选择极其缓慢的恢复策略。
+            current_smoothing_factor = STUTTER_RECOVERY_SMOOTHING_FACTOR;
+        } else {
+            // 误差在正常范围内，进行常规的、用于对抗漂移的微调。
+            current_smoothing_factor = NORMAL_SMOOTHING_FACTOR;
+        }
+
+        // 3. 计算一个理想的目标速率
+        double target_rate = info.audio_playback_rate.load() + (error * Kp);
+
+        // 4. 使用动态选择的平滑因子，极其平滑地逼近目标速率
+        m_clock_rate += (target_rate - m_clock_rate) * current_smoothing_factor;
+
+        // (可选，但推荐) 对速率进行一个合理的范围钳制，作为最终的保险
+        double max_rate_deviation = 0.1;  // 允许速率在基础速率上 +/- 10%
+        m_clock_rate = std::clamp(
+            m_clock_rate, info.audio_playback_rate.load() - max_rate_deviation,
+            info.audio_playback_rate.load() + max_rate_deviation);
+
+        // 5. 【无回弹前进】以当前极其平滑的速率，让时间前进
+        //    由于 m_clock_rate 被钳制在正数范围，时间永远不会倒退
+        if (smoothed_delta_ms > 0) {
+            info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
+        }
+    }
+
     // 公共的重置函数，用于暂停或seek等操作
     void reset() {
         m_was_playing = false;
@@ -213,22 +267,32 @@ class MapCanvasClock {
         m_rate_corrector = 0.0;
         m_last_known_audio_time = 0.0;
         m_canvas_time_at_last_sync = 0.0;
+        m_was_playing = false;
+        m_last_playback_rate = 1.0;
+        m_state = State::FreeRun;
+        m_phase_start_time = 0.0;
+        m_sync_error_to_correct = 0.0;
     }
 
     void force_sync(RealTimeInfo& info) {
         // 强制同步一次,允许“跳变”
         qDebug() << "force_sync";
         info.logic_canvas_time = info.raw_audio_time_ms.load();
-        m_clock_rate = 1.0;
+        m_clock_rate = info.audio_playback_rate.load();
         m_rate_corrector = 0.0;
         m_last_known_audio_time = 0.0;
         m_canvas_time_at_last_sync = 0.0;
+
+        info.logic_canvas_time = info.raw_audio_time_ms.load();
+        m_state = State::FreeRun;
+        m_phase_start_time = info.logic_canvas_time;
+        m_last_playback_rate = info.audio_playback_rate.load();
     }
 
    private:
     // 积分模式
     // P: 比例增益，用于修正相位（时间）误差
-    const double Kp = 0.0125;
+    const double Kp = 0.0005;
     // I: 积分增益，用于修正频率（速度）误差
     const double Ki = 0.001;
 
@@ -271,11 +335,28 @@ class MapCanvasClock {
     const double STUTTER_THRESHOLD_MS = 100.0;
 
     // 正常运行时的平滑因子。值越大，响应越快。
-    const double NORMAL_SMOOTHING_FACTOR = 0.01;
+    const double NORMAL_SMOOTHING_FACTOR = 0.001;
 
     // 发生卡顿后，用于恢复的平滑因子。必须是一个极小的值，
     // 以确保恢复过程极其柔和。
-    const double STUTTER_RECOVERY_SMOOTHING_FACTOR = 0.0005;
+    const double STUTTER_RECOVERY_SMOOTHING_FACTOR = 0.0001;
+
+    // 同步窗口
+    // --- 核心可调参数 ---
+    // 自由运行的时长 (ms)
+    const double FREE_RUN_INTERVAL_MS = 10000.0;  // 10秒
+    // 平滑同步窗口的时长 (ms)
+    const double SYNC_WINDOW_MS = 500.0;  // 0.5秒
+
+    // --- 状态变量 ---
+    enum class State { FreeRun, SyncWindow };
+    State m_state = State::FreeRun;
+
+    // --- 同步窗口相关的状态 ---
+    // 上一次自由运行阶段开始的时间点
+    double m_phase_start_time = 0.0;
+    // 在同步窗口开始时，计算出的需要修正的总误差
+    double m_sync_error_to_correct = 0.0;
 };
 
 #endif  // MMM_MAPCANVASCLOCK_HPP

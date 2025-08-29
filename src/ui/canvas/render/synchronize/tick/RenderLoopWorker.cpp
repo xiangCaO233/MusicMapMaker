@@ -53,8 +53,8 @@ void RenderLoopWorker::doWork() {
         d->m_smoothed_delta_ms += (raw_delta_ms - d->m_smoothed_delta_ms) *
                                   d->m_delta_smoothing_factor;
         if (auto mapinfo = static_cast<MapCanvasInfo*>(d->getinfo()); mapinfo) {
-            d->canvas_clock.updateAutoAd(mapinfo->realTimeInfo,
-                                         d->m_smoothed_delta_ms);
+            d->canvas_clock.updateWBox(mapinfo->realTimeInfo,
+                                       d->m_smoothed_delta_ms);
             // 在这一帧的开始，计算出最终的呈现时间
             // 是一个无状态的、纯粹的变换
             mapinfo->realTimeInfo.presentation_canvas_time =

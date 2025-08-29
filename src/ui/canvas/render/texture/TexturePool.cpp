@@ -79,9 +79,13 @@ TexturePool::~TexturePool() {
 }
 
 // 定义分箱尺寸集
-const std::vector<uint32_t> BUCKET_SIZES = {8,    16,   32,   64,    128,
-                                            256,  512,  1024, 2048,  3072,
-                                            4096, 6144, 8192, 12288, 16384};
+// const std::vector<uint32_t> BUCKET_SIZES = {8,    16,   32,   64,    128,
+//                                             256,  512,  1024, 2048,  3072,
+//                                             4096, 6144, 8192, 12288, 16384};
+const std::vector<uint32_t> BUCKET_SIZES = {512,  1024, 2048,  3072, 4096,
+                                            6144, 8192, 12288, 16384};
+// const std::vector<uint32_t> BUCKET_SIZES = {2048, 3072,  4096, 6144,
+//                                             8192, 12288, 16384};
 
 // 辅助函数：找到能容纳n的最小的2的幂次桶尺寸
 static uint32_t getBucketSize(uint32_t n) {
