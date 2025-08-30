@@ -68,25 +68,26 @@ struct MeshCommand : public PointsCommnad {
     // 顶点索引列表
     std::vector<size_t> indicies;
     // 转换为网格数据
-    PointsData to_data() const {
-        PointsData data;
-        for (const auto& vIndex : indicies) {
-            const auto& mesh_vertex = vertices[vIndex];
-            // CustomVertex vertex{mesh_vertex.vPos,
-            //                     mesh_vertex.vUV,
-            //                     mesh_vertex.vColor,
-            //                     texturesInfo.texture.uv_scale,
-            //                     texturesInfo.texture.group_size,
-            //                     texturesInfo.texture.layer_index,
-            //                     no_filter};
-            data.vertices.emplace_back(
-                mesh_vertex.vPos, mesh_vertex.vUV, mesh_vertex.vColor,
-                texturesInfo.texture.uv_scale, texturesInfo.texture.group_size,
-                texturesInfo.texture.layer_index, no_filter,
-                mesh_vertex.group_pos);
-        }
-        return data;
-    };
+    // PointsData to_data() const {
+    //     PointsData data;
+    //     for (const auto& vIndex : indicies) {
+    //         const auto& mesh_vertex = vertices[vIndex];
+    //         // CustomVertex vertex{mesh_vertex.vPos,
+    //         //                     mesh_vertex.vUV,
+    //         //                     mesh_vertex.vColor,
+    //         //                     texturesInfo.texture.uv_scale,
+    //         //                     texturesInfo.texture.group_size,
+    //         //                     texturesInfo.texture.layer_index,
+    //         //                     no_filter};
+    //         data.vertices.emplace_back(
+    //             mesh_vertex.vPos, mesh_vertex.vUV, mesh_vertex.vColor,
+    //             texturesInfo.texture.uv_scale,
+    //             texturesInfo.texture.group_size,
+    //             texturesInfo.texture.layer_index, no_filter,
+    //             mesh_vertex.group_pos);
+    //     }
+    //     return data;
+    // };
 };
 
 struct QuadCommand : public RenderCommand {
@@ -94,23 +95,23 @@ struct QuadCommand : public RenderCommand {
     RadiusInfo radiusInfo;
 
     // 转换为矩形数据
-    PrimitiveData to_data() const {
-        return PrimitiveData{
-            baseInfo.pos + baseInfo.size / 2.f + radiusInfo.radius_effect_param,
-            baseInfo.size + glm::vec2(2.f * radiusInfo.radius_effect_param),
-            baseInfo.rotation,
-            baseInfo.color,
-            radiusInfo.radius,
-            radiusInfo.radius_effect_param,
-            radiusInfo.radius_effect,
-            texturesInfo.texture.uv_scale,
-            texturesInfo.texture.group_size,
-            texturesInfo.texture.layer_index,
-            baseInfo.no_filter,
-            texturesInfo.talign,
-            texturesInfo.tscale,
-            PrimitiveType::QUAD};
-    }
+    // PrimitiveData to_data() const {
+    //     return PrimitiveData{
+    //         baseInfo.pos + baseInfo.size / 2.f +
+    //         radiusInfo.radius_effect_param, baseInfo.size + glm::vec2(2.f *
+    //         radiusInfo.radius_effect_param), baseInfo.rotation,
+    //         baseInfo.color,
+    //         radiusInfo.radius,
+    //         radiusInfo.radius_effect_param,
+    //         radiusInfo.radius_effect,
+    //         texturesInfo.texture.uv_scale,
+    //         texturesInfo.texture.group_size,
+    //         texturesInfo.texture.layer_index,
+    //         baseInfo.no_filter,
+    //         texturesInfo.talign,
+    //         texturesInfo.tscale,
+    //         PrimitiveType::QUAD};
+    // }
 };
 
 struct PrimitiveCommand : public RenderCommand {
@@ -119,37 +120,39 @@ struct PrimitiveCommand : public RenderCommand {
     PrimitiveType primitive;
 
     // 转换为图元数据
-    PrimitiveData to_data() const {
-        return PrimitiveData{
-            baseInfo.pos + baseInfo.size / 2.f + radiusInfo.radius_effect_param,
-            baseInfo.size + glm::vec2(2.f * radiusInfo.radius_effect_param),
-            baseInfo.rotation,
-            baseInfo.color,
-            radiusInfo.radius,
-            radiusInfo.radius_effect_param,
-            radiusInfo.radius_effect,
-            texturesInfo.texture.uv_scale,
-            texturesInfo.texture.group_size,
-            texturesInfo.texture.layer_index,
-            baseInfo.no_filter,
-            texturesInfo.talign,
-            texturesInfo.tscale,
-            primitive};
-    }
+    // PrimitiveData to_data() const {
+    //     return PrimitiveData{
+    //         baseInfo.pos + baseInfo.size / 2.f +
+    //         radiusInfo.radius_effect_param, baseInfo.size + glm::vec2(2.f *
+    //         radiusInfo.radius_effect_param), baseInfo.rotation,
+    //         baseInfo.color,
+    //         radiusInfo.radius,
+    //         radiusInfo.radius_effect_param,
+    //         radiusInfo.radius_effect,
+    //         texturesInfo.texture.uv_scale,
+    //         texturesInfo.texture.group_size,
+    //         texturesInfo.texture.layer_index,
+    //         baseInfo.no_filter,
+    //         texturesInfo.talign,
+    //         texturesInfo.tscale,
+    //         primitive};
+    // }
 };
 
 struct CurveCommand : public PointsCommnad {
     // 转换为曲线采样点数据
-    PointsData to_data() const {
-        PointsData data;
-        for (const auto& vertex : vertices) {
-            data.vertices.emplace_back(
-                vertex.vPos, vertex.vUV, vertex.vColor,
-                texturesInfo.texture.uv_scale, texturesInfo.texture.group_size,
-                texturesInfo.texture.layer_index, no_filter, vertex.group_pos);
-        }
-        return data;
-    };
+    // PointsData to_data() const {
+    //     PointsData data;
+    //     for (const auto& vertex : vertices) {
+    //         data.vertices.emplace_back(
+    //             vertex.vPos, vertex.vUV, vertex.vColor,
+    //             texturesInfo.texture.uv_scale,
+    //             texturesInfo.texture.group_size,
+    //             texturesInfo.texture.layer_index, no_filter,
+    //             vertex.group_pos);
+    //     }
+    //     return data;
+    // };
 };
 
 struct RenderBatch {

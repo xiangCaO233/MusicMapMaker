@@ -13,7 +13,7 @@ void RenderLoopWorker::doWork() {
 
     // 定义一个“切换到忙等待”的时间阈值 (单位: 纳秒)
     // 这是一个关键的可调参数。500微秒 (500,000 ns) 是一个合理的起点。
-    const qint64 busy_wait_threshold_ns = 500000;
+    const qint64 busy_wait_threshold_ns = 20000;
 
     while (d->isRunning.load()) {
         // --- 1. 智能混合等待 ---
@@ -22,8 +22,7 @@ void RenderLoopWorker::doWork() {
             time_to_wait_ns > 0) {
             // 如果需要等待的时间大于我们的阈值
             if (time_to_wait_ns > busy_wait_threshold_ns) {
-                // 我们进行一次性的睡眠，但要留出阈值的时间用于后续的忙等待
-                // 例如，如果需要等3ms，阈值是0.5ms，我们就睡2.5ms
+                // 进行一次性的睡眠，留出阈值的时间用于后续的忙等待
                 QThread::usleep((time_to_wait_ns - busy_wait_threshold_ns) /
                                 1000);
             }

@@ -8,6 +8,8 @@
 #include <render/command/GPUData.hpp>
 #include <render/command/RenderCommand.hpp>
 #include <render/texture/TexturePool.hpp>
+#include <utility>
+#include <vector>
 
 Renderer2D::Renderer2D(GLCanvas* canvas) : cvs(canvas) {
     // 初始化纹理池
@@ -111,7 +113,19 @@ void Renderer2D::commit(const QuadCommand& command) {
         all_command_handles.push_back(
             {CommandType::QUAD, quad_command_list.size() - 1});
         // 填充gpu数据
-        quad_datas.push_back(command.to_data());
+        quad_datas.emplace_back(
+            command.baseInfo.pos + command.baseInfo.size / 2.f +
+                command.radiusInfo.radius_effect_param,
+            command.baseInfo.size +
+                glm::vec2(2.f * command.radiusInfo.radius_effect_param),
+            command.baseInfo.rotation, command.baseInfo.color,
+            command.radiusInfo.radius, command.radiusInfo.radius_effect_param,
+            command.radiusInfo.radius_effect,
+            command.texturesInfo.texture.uv_scale,
+            command.texturesInfo.texture.group_size,
+            command.texturesInfo.texture.layer_index,
+            command.baseInfo.no_filter, command.texturesInfo.talign,
+            command.texturesInfo.tscale, PrimitiveType::QUAD);
     }
 }
 
@@ -123,7 +137,18 @@ void Renderer2D::commit(const MeshCommand& command) {
         all_command_handles.push_back(
             {CommandType::MESH, mesh_command_list.size() - 1});
         // 填充gpu数据
-        mesh_datas.push_back(command.to_data());
+        // mesh_datas.push_back(command.to_data());
+        std::vector<CustomVertex> vertices;
+        for (const auto& vIndex : command.indicies) {
+            const auto& mesh_vertex = command.vertices[vIndex];
+            vertices.emplace_back(mesh_vertex.vPos, mesh_vertex.vUV,
+                                  mesh_vertex.vColor,
+                                  command.texturesInfo.texture.uv_scale,
+                                  command.texturesInfo.texture.group_size,
+                                  command.texturesInfo.texture.layer_index,
+                                  command.no_filter, mesh_vertex.group_pos);
+        }
+        mesh_datas.emplace_back(std::move(vertices));
         // 更新总顶点数
         current_mesh_vertex_count += command.indicies.size();
     }
@@ -137,7 +162,20 @@ void Renderer2D::commit(const PrimitiveCommand& command) {
         all_command_handles.push_back(
             {CommandType::PRIMITIVE, primitive_command_list.size() - 1});
         // 填充gpu数据
-        primitive_datas.push_back(command.to_data());
+        // primitive_datas.push_back(command.to_data());
+        primitive_datas.emplace_back(
+            command.baseInfo.pos + command.baseInfo.size / 2.f +
+                command.radiusInfo.radius_effect_param,
+            command.baseInfo.size +
+                glm::vec2(2.f * command.radiusInfo.radius_effect_param),
+            command.baseInfo.rotation, command.baseInfo.color,
+            command.radiusInfo.radius, command.radiusInfo.radius_effect_param,
+            command.radiusInfo.radius_effect,
+            command.texturesInfo.texture.uv_scale,
+            command.texturesInfo.texture.group_size,
+            command.texturesInfo.texture.layer_index,
+            command.baseInfo.no_filter, command.texturesInfo.talign,
+            command.texturesInfo.tscale, command.primitive);
     }
 }
 
