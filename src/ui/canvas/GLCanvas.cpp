@@ -148,7 +148,11 @@ void GLCanvas::initializeGL() {
     // 标准混合模式
     GLCALL(glEnable(GL_BLEND), this);
     GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), this);
-    GLCALL(glDepthMask(GL_TRUE), this);
+
+    // 关闭深度测试，否则全屏矩形可能因为深度测试失败而被丢弃
+    GLCALL(glDisable(GL_DEPTH_TEST), this);
+    // 在模糊pass中通常也不需要混合
+    GLCALL(glDisable(GL_BLEND), this);
 
     // 初始化渲染器
     render = std::make_unique<Renderer2D>(this);
@@ -180,14 +184,12 @@ void GLCanvas::initializeGL() {
 
 void GLCanvas::resizeGL(int w, int h) {
     GLCALL(glViewport(0, 0, w, h), this);
-    render->update_viewport({w, h});
+    glm::vec2 viewport = {w, h};
+    render->update_viewport(viewport, viewport * float(devicePixelRatio()));
 }
 
 void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
-
-    GLCALL(glClearColor(.23f, .23f, .23f, .23f), this);
-    GLCALL(glClear(GL_COLOR_BUFFER_BIT), this);
 
     // QuadCommand qcmd;
     // qcmd.cmdType = CommandType::QUAD;

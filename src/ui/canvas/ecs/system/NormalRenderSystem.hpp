@@ -40,6 +40,10 @@ class NormalRenderSystem {
                 cmd.baseInfo.size = quad.size;
                 cmd.texturesInfo.texture = quad.texture;
                 cmd.primitive = PrimitiveType::QUAD;
+
+                cmd.radiusInfo.radius_effect_param = .8f;
+                cmd.radiusInfo.radius_effect = RadiusEffect::GLOWING;
+
                 buffer.add_PrimitiveCommand(cmd);
             }
 

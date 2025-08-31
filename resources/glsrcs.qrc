@@ -78,5 +78,8 @@
         <file>glsl/canvas/primitive_fragment_shader.glsl.frag</file>
         <file>glsl/canvas/primitive_geometry_shader.glsl.geom</file>
         <file>glsl/canvas/primitive_vertex_shader.glsl.vert</file>
+        <file>glsl/canvas/aftereffect/composite_fragment_shader.glsl.frag</file>
+        <file>glsl/canvas/aftereffect/fullscreen_vertex_shader.glsl.vert</file>
+        <file>glsl/canvas/aftereffect/gaussian_fragment_shader.glsl.frag</file>
     </qresource>
 </RCC>

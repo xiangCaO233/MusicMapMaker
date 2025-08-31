@@ -1,13 +1,21 @@
 #version 410 core
 
 // --- 输出/输入/Uniforms ---
-out vec4 FragColor;
+// layout(location = 0) 画到当前FBO的 GL_COLOR_ATTACHMENT0
+layout(location = 0) out vec4 out_SceneColor;
+
+// layout(location = 1) 画到当前FBO的 GL_COLOR_ATTACHMENT1
+layout(location = 1) out vec4 out_GlowMask;
+// Uniform 投影矩阵
+uniform mat4 projection;
 
 // 是否绘制线框
 uniform bool u_IsDrawingWireframe;
 
 // 使用的采样数组
 uniform sampler2DArray u_samplerarray;
+// 原始的发光纹理遮罩
+uniform sampler2D glowmask;
 
 // 传输来的片段颜色信息
 in vec4 v_Color;
@@ -83,7 +91,8 @@ UVResult calcUV() {
 void main() {
     if (u_IsDrawingWireframe) {
         // 只绘制线框
-        FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+        out_SceneColor = vec4(1.0, 1.0, 0.0, 1.0);
+        out_GlowMask = vec4(0.0, 0.0, 0.0, 1.0);
         return;
     }
 
@@ -146,5 +155,7 @@ void main() {
         }
     }
 
-    FragColor = finalColor;
+    out_SceneColor = finalColor;
+    vec4 glow_mask_color = vec4(0.0, 0.0, 0.0, 1.0);
+    // out_GlowMask = texture(glowmask, (projection * vec4(v_TexCoord, 0.0, 1.0)).xy) + glow_mask_color;
 }

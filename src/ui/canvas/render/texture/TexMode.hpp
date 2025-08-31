@@ -40,6 +40,8 @@ enum class TexAlignMode : uint32_t {
 enum class RadiusEffect : uint32_t {
     // 淡入淡出
     FADE_IN_AND_OUT = 0x00000001,
+    // 发光
+    GLOWING = 0x00000002,
 };
 
 // 纹理的蒙版效果

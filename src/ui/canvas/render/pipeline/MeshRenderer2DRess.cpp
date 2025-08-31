@@ -50,62 +50,10 @@ auto glCallImpl(Func func, const char* funcStr,
 
 void Renderer2D::initMeshShader() {
     // 初始化着色器
-    mesh_shader_program = new QOpenGLShaderProgram();
-
-    // 从资源qrc加载
-    QFile mesh_vert_source(":/glsl/canvas/custom_meshvshader.glsl.vert");
-    QFile mesh_frag_source(":/glsl/canvas/custom_meshfshader.glsl.frag");
-    // 检查文件是否成功打开
-    if (!mesh_vert_source.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        auto errormsg = mesh_vert_source.errorString();
-        auto errorstr = errormsg.toStdString();
-        qDebug() << "Failed to open mesh vertex source file:" << errorstr;
-    }
-    if (!mesh_frag_source.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        auto errormsg = mesh_frag_source.errorString();
-        auto errorstr = errormsg.toStdString();
-        qDebug() << "Failed to open mesh frag source file:" << errorstr;
-    }
-
-    // 用QTextStream读取内容
-    QTextStream meshvertin(&mesh_vert_source);
-    QTextStream meshfragin(&mesh_frag_source);
-
-    auto mesh_vertex_shader_qstr = meshvertin.readAll();
-    auto mesh_fragment_shader_qstr = meshfragin.readAll();
-
-    // 关闭文件
-    mesh_vert_source.close();
-    mesh_frag_source.close();
-
-    if (!mesh_shader_program->addShaderFromSourceCode(
-            QOpenGLShader::Vertex, mesh_vertex_shader_qstr)) {
-        qCritical() << "Renderer Mesh Vertex Shader compilation failed:"
-                    << mesh_shader_program->log();
-    }
-    if (!mesh_shader_program->addShaderFromSourceCode(
-            QOpenGLShader::Fragment, mesh_fragment_shader_qstr)) {
-        qCritical() << "Renderer Mesh Fragment Shader compilation failed:"
-                    << mesh_shader_program->log();
-    }
-    if (!mesh_shader_program->link()) {
-        qCritical() << "MeshShader link failed:" << mesh_shader_program->log();
-    }
-
-    // 检查是否找到了UBO块（如果拼写错误或被优化掉，可能找不到）
-    if (GLuint mesh_mask_ubo_index =
-            GLCALL(cvs->glGetUniformBlockIndex(mesh_shader_program->programId(),
-                                               "MaskStackUBO"),
-                   cvs);
-        mesh_mask_ubo_index != GL_INVALID_INDEX) {
-        // 将 uniform block 索引，绑定到绑定点 0
-        GLCALL(cvs->glUniformBlockBinding(mesh_shader_program->programId(),
-                                          mesh_mask_ubo_index, 0),
-               cvs);
-    } else {
-        qWarning() << "Could not find uniform block 'MaskStackUBO' in mesh "
-                      "shader program.";
-    }
+    initShader(mesh_shader_program, "Mesh",
+               ":/glsl/canvas/custom_meshvshader.glsl.vert",
+               ":/glsl/canvas/custom_meshfshader.glsl.frag");
+    initShaderUBO(mesh_shader_program, "Mesh", "MaskStackUBO", 0);
 }
 
 void Renderer2D::initMeshObjectBuffers() {

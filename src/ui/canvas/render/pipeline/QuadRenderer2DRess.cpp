@@ -51,59 +51,10 @@ auto glCallImpl(Func func, const char* funcStr,
 // 初始化着色器
 void Renderer2D::initQuadShader() {
     // 初始化着色器
-    quad_shader_program = new QOpenGLShaderProgram();
-    // 从资源qrc加载
-    QFile quad_vert_source(":/glsl/canvas/quad_vshader.glsl.vert");
-    QFile quad_frag_source(":/glsl/canvas/quad_fshader.glsl.frag");
-    // 检查文件是否成功打开
-    if (!quad_vert_source.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        auto errormsg = quad_vert_source.errorString();
-        auto errorstr = errormsg.toStdString();
-        qDebug() << "Failed to open quad vertex source file:" << errorstr;
-    }
-    if (!quad_frag_source.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        auto errormsg = quad_frag_source.errorString();
-        auto errorstr = errormsg.toStdString();
-        qDebug() << "Failed to open quad frag source file:" << errorstr;
-    }
-    // 用QTextStream读取内容
-    QTextStream quadvertin(&quad_vert_source);
-    QTextStream quadfragin(&quad_frag_source);
-    auto quad_vertex_shader_qstr = quadvertin.readAll();
-    auto quad_fragment_shader_qstr = quadfragin.readAll();
-    // 关闭文件
-    quad_vert_source.close();
-    quad_frag_source.close();
-
-    // 编译链接着色器
-    if (!quad_shader_program->addShaderFromSourceCode(
-            QOpenGLShader::Vertex, quad_vertex_shader_qstr)) {
-        qCritical() << "Renderer Quad Vertex Shader compilation failed:"
-                    << quad_shader_program->log();
-    }
-    if (!quad_shader_program->addShaderFromSourceCode(
-            QOpenGLShader::Fragment, quad_fragment_shader_qstr)) {
-        qCritical() << "Renderer Quad Fragment Shader compilation failed:"
-                    << quad_shader_program->log();
-    }
-    if (!quad_shader_program->link()) {
-        qCritical() << "QuadShader link failed:" << quad_shader_program->log();
-    }
-
-    // 检查是否找到了UBO块（如果拼写错误或被优化掉，可能找不到）
-    if (GLuint quad_mask_ubo_index =
-            GLCALL(cvs->glGetUniformBlockIndex(quad_shader_program->programId(),
-                                               "MaskStackUBO"),
-                   cvs);
-        quad_mask_ubo_index != GL_INVALID_INDEX) {
-        // 将 uniform block 索引，绑定到绑定点 0
-        GLCALL(cvs->glUniformBlockBinding(quad_shader_program->programId(),
-                                          quad_mask_ubo_index, 0),
-               cvs);
-    } else {
-        qWarning() << "Could not find uniform block 'MaskStackUBO' in quad "
-                      "shader program.";
-    }
+    initShader(quad_shader_program, "Quad",
+               ":/glsl/canvas/quad_vshader.glsl.vert",
+               ":/glsl/canvas/quad_fshader.glsl.frag");
+    initShaderUBO(quad_shader_program, "Quad", "MaskStackUBO", 0);
 }
 
 void Renderer2D::initQuadObjectBuffers() {

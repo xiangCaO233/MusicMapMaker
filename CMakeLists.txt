@@ -118,12 +118,13 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/command/MCommandCollector.hpp
     src/ui/canvas/render/command/MCommandCollector.cpp
     src/ui/canvas/render/Renderer2D.hpp
-    src/ui/canvas/render/Renderer2D.cpp
-    src/ui/canvas/render/Renderer2DGLRess.cpp
-    src/ui/canvas/render/QuadRenderer2DRess.cpp
-    src/ui/canvas/render/MeshRenderer2DRess.cpp
-    src/ui/canvas/render/PrimitiveRenderer2DRess.cpp
-    src/ui/canvas/render/CurveRenderer2DRess.cpp
+    src/ui/canvas/render/pipeline/Renderer2D.cpp
+    src/ui/canvas/render/pipeline/Renderer2DGLRess.cpp
+    src/ui/canvas/render/pipeline/QuadRenderer2DRess.cpp
+    src/ui/canvas/render/pipeline/MeshRenderer2DRess.cpp
+    src/ui/canvas/render/pipeline/PrimitiveRenderer2DRess.cpp
+    src/ui/canvas/render/pipeline/CurveRenderer2DRess.cpp
+    src/ui/canvas/render/pipeline/AfterEffectRenderer2DRess.cpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.hpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.cpp
     src/ui/canvas/render/synchronize/tick/RenderDataLoop.hpp

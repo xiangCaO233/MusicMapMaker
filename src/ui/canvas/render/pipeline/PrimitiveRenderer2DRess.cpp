@@ -50,83 +50,11 @@ auto glCallImpl(Func func, const char* funcStr,
 
 void Renderer2D::initPrimitiveShader() {
     // 初始化着色器
-    primitive_shader_program = new QOpenGLShaderProgram();
-    // 从资源qrc加载
-    QFile primitive_vert_source(
-        ":/glsl/canvas/primitive_vertex_shader.glsl.vert");
-    QFile primitive_geom_source(
-        ":/glsl/canvas/primitive_geometry_shader.glsl.geom");
-    QFile primitive_frag_source(
-        ":/glsl/canvas/primitive_fragment_shader.glsl.frag");
-
-    // 检查文件是否成功打开
-    if (!primitive_vert_source.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        auto errormsg = primitive_vert_source.errorString();
-        auto errorstr = errormsg.toStdString();
-        qDebug() << "Failed to open primitive vertex source file:" << errorstr;
-    }
-    if (!primitive_geom_source.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        auto errormsg = primitive_geom_source.errorString();
-        auto errorstr = errormsg.toStdString();
-        qDebug() << "Failed to open primitive geometry source file:"
-                 << errorstr;
-    }
-    if (!primitive_frag_source.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        auto errormsg = primitive_frag_source.errorString();
-        auto errorstr = errormsg.toStdString();
-        qDebug() << "Failed to open primitive frag source file:" << errorstr;
-    }
-    // 用QTextStream读取内容
-    QTextStream primitivevertin(&primitive_vert_source);
-    QTextStream primitivegeomin(&primitive_geom_source);
-    QTextStream primitivefragin(&primitive_frag_source);
-
-    auto primitive_vertex_shader_qstr = primitivevertin.readAll();
-    auto primitive_geometry_shader_qstr = primitivegeomin.readAll();
-    auto primitive_fragment_shader_qstr = primitivefragin.readAll();
-
-    // 关闭文件
-    primitive_vert_source.close();
-    primitive_geom_source.close();
-    primitive_frag_source.close();
-
-    // 编译链接着色器
-    if (!primitive_shader_program->addShaderFromSourceCode(
-            QOpenGLShader::Vertex, primitive_vertex_shader_qstr)) {
-        qCritical() << "Renderer Primitive Vertex Shader compilation failed:"
-                    << primitive_shader_program->log();
-    }
-    if (!primitive_shader_program->addShaderFromSourceCode(
-            QOpenGLShader::Geometry, primitive_geometry_shader_qstr)) {
-        qCritical() << "Renderer Primitive Geometry Shader compilation failed:"
-                    << primitive_shader_program->log();
-    }
-    if (!primitive_shader_program->addShaderFromSourceCode(
-            QOpenGLShader::Fragment, primitive_fragment_shader_qstr)) {
-        qCritical() << "Renderer Primitive Fragment Shader compilation failed:"
-                    << primitive_shader_program->log();
-    }
-
-    if (!primitive_shader_program->link()) {
-        qCritical() << "PrimitiveShader link failed:"
-                    << primitive_shader_program->log();
-    }
-
-    // 检查是否找到了UBO块（如果拼写错误或被优化掉，可能找不到）
-    if (GLuint primitive_mask_ubo_index =
-            GLCALL(cvs->glGetUniformBlockIndex(
-                       primitive_shader_program->programId(), "MaskStackUBO"),
-                   cvs);
-        primitive_mask_ubo_index != GL_INVALID_INDEX) {
-        // 将 uniform block 索引，绑定到绑定点 0
-        GLCALL(cvs->glUniformBlockBinding(primitive_shader_program->programId(),
-                                          primitive_mask_ubo_index, 0),
-               cvs);
-    } else {
-        qWarning()
-            << "Could not find uniform block 'MaskStackUBO' in primitive "
-               "shader program.";
-    }
+    initShader(primitive_shader_program, "Primitive",
+               ":/glsl/canvas/primitive_vertex_shader.glsl.vert",
+               ":/glsl/canvas/primitive_fragment_shader.glsl.frag",
+               ":/glsl/canvas/primitive_geometry_shader.glsl.geom");
+    initShaderUBO(primitive_shader_program, "Primitive", "MaskStackUBO", 0);
 }
 
 void Renderer2D::initPrimitiveObjectBuffers() {

@@ -25,11 +25,24 @@ Renderer2D::Renderer2D(GLCanvas* canvas) : cvs(canvas) {
     initMeshObjectBuffers();
     initPrimitiveShader();
     initPrimitiveObjectBuffers();
+    initCurveShader();
+    initCurveObjectBuffers();
+
+    initAfterEffectShaders();
+    initAfterEffectObjectBuffers();
 }
 
 Renderer2D::~Renderer2D() {
     // 释放纹理池
     texturepool.reset();
+    // 释放着色器和fbo
+    delete main_fbo;
+    delete blur_fbo_A;
+    delete blur_fbo_B;
+    delete quad_shader_program;
+    delete mesh_shader_program;
+    delete primitive_shader_program;
+    delete curve_shader_program;
 }
 
 // 需要卸载纹理
@@ -90,8 +103,9 @@ void Renderer2D::add_font_from_path(const std::string& path, bool is_qrc) {
     fontpool->load_font(path, is_qrc);
 }
 
-void Renderer2D::update_viewport(glm::vec2 view) {
+void Renderer2D::update_viewport(glm::vec2 view, glm::vec2 pviewport) {
     viewport = view;
+    phisical_viewport = pviewport;
     update_ubo = true;
     update_view = true;
 }

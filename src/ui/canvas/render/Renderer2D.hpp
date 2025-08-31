@@ -2,6 +2,7 @@
 #define MMM_RENDERER2D_HPP
 
 #include <QObject>
+#include <QOpenGLFramebufferObject>
 #include <QOpenGLShaderProgram>
 #include <array>
 #include <glm/fwd.hpp>
@@ -20,7 +21,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     explicit Renderer2D(GLCanvas* canvas);
     ~Renderer2D() override;
 
-    // 实现表
+    // 回调实现表
     // 需要载入纹理
     void need_loadtexture_dir(std::string_view texdir) override;
     // 需要卸载纹理
@@ -28,12 +29,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     // 获取信息
     TextureInfo getTextureInfo(std::string_view texname) override;
 
-    // 直接访问着色器
-    // QOpenGLShaderProgram* quadshader() const { return quad_shader_program; }
-    // QOpenGLShaderProgram* meshshader() const { return mesh_shader_program; }
-
     // 设置投影矩阵
-    void update_viewport(glm::vec2 view);
+    void update_viewport(glm::vec2 view, glm::vec2 phisical_viewport);
 
     // 提交渲染指令
     void commit(const QuadCommand& command);
@@ -82,6 +79,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // 尺寸
     glm::vec2 viewport;
+    // 物理尺寸
+    glm::vec2 phisical_viewport;
     bool update_view{true};
 
     // 纹理池
@@ -92,6 +91,23 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // gl上下文
     GLCanvas* cvs;
+
+    // 模糊处理迭代次数
+    uint32_t blur_iteration_count{8};
+
+    // 主渲染FBO
+    QOpenGLFramebufferObject* main_fbo{nullptr};
+    // 高斯模糊的乒乓FBO
+    QOpenGLFramebufferObject* blur_fbo_A{nullptr};
+    QOpenGLFramebufferObject* blur_fbo_B{nullptr};
+
+    // 后期处理着色器程序
+    // 发光附加着色器
+    QOpenGLShaderProgram* glow_extract_shader;
+    // 高斯模糊着色器
+    QOpenGLShaderProgram* gaussian_blur_shader;
+    // 混合着色器
+    QOpenGLShaderProgram* composite_shader;
 
     // 着色器
     QOpenGLShaderProgram* quad_shader_program;
@@ -110,12 +126,26 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     RenderCommand nullCmd{};
 
     // 初始化资源
+    void initShader(QOpenGLShaderProgram*& shader, const char* debug_name,
+                    const char* vertex_shader_source_path,
+                    const char* fragment_shader_source_path,
+                    const char* geometry_shader_source_path = nullptr) const;
+    void initShaderUBO(QOpenGLShaderProgram*& shader, const char* debug_name,
+                       const char* name_in_shader, uint32_t ubo_index);
+
+    // 初始化通用着色器/gl资源
     void initQuadShader();
     void initQuadObjectBuffers();
     void initMeshShader();
     void initMeshObjectBuffers();
     void initPrimitiveShader();
     void initPrimitiveObjectBuffers();
+    void initCurveShader();
+    void initCurveObjectBuffers();
+    // 初始化后期着色器/gl资源
+    void initAfterEffectShaders();
+    void initAfterEffectObjectBuffers();
+    // 初始化蒙版ubo
     void initMaskUBO();
 
     // 扩充矩形实例缓冲区
@@ -126,6 +156,15 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     void expandPrimitiveDataBuffer();
     // 扩充曲线缓冲区
     void expandCurveDataBuffer();
+
+    // 更新fbo
+    void update_fbo();
+
+    // 后期处理
+    void afterEffect();
+
+    // 混合着色
+    void composite();
 
     // 辅助函数，通过句柄获取 RenderCommand 的引用
     const RenderCommand& get_command_from_handle(const CommandHandle& handle);
@@ -146,6 +185,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     std::vector<PointsData> mesh_datas;
     std::vector<PrimitiveData> primitive_datas;
     std::vector<PrimitiveData> curve_datas;
+
     // 当前网格的总顶点数
     size_t current_mesh_vertex_count{0};
     // 当前曲线的总顶点数
@@ -191,6 +231,10 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     uint32_t primitive_dataBO{0};
     uint32_t curve_dataAO{0};
     uint32_t curve_dataBO{0};
+    uint32_t fullScreenAO{0};
+
+    // 手动管理纹理附件
+    uint32_t glow_mask_texture_id;
 
     // 从指定矩形实例位置开始更新矩形顶点数组指针
     void updateQuadAttribptrFromInstance(size_t instance_index) const;
