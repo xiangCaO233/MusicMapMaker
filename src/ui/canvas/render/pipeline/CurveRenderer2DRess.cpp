@@ -8,54 +8,54 @@
 template <typename Func>
 auto glCallImpl(Func func, const char* funcStr,
                 QOpenGLFunctions_4_1_Core* glf) {
-    // 1. 先清除所有历史错误，确保我们只捕获当前调用的错误
-    while (glf->glGetError() != GL_NO_ERROR);
+  // 1. 先清除所有历史错误，确保我们只捕获当前调用的错误
+  while (glf->glGetError() != GL_NO_ERROR);
 
-    // 2. 对 lambda 本身的返回类型进行判断
-    if constexpr (std::is_void_v<decltype(func())>) {
-        func();  // 调用 lambda
-    } else {
-        auto&& result = func();  // 调用并捕获结果
-        // 检查错误在调用之后
-        if (GLenum error = glf->glGetError(); error != GL_NO_ERROR) {
-            qDebug() << "OpenGL Error in [" << funcStr << "]: " << error
-                     << "(Hex: 0x" << Qt::hex << error << Qt::dec << ")";
-        }
-        return std::forward<decltype(result)>(result);
-    }
-
-    // 针对void返回类型的lambda，在调用后检查错误
+  // 2. 对 lambda 本身的返回类型进行判断
+  if constexpr (std::is_void_v<decltype(func())>) {
+    func();  // 调用 lambda
+  } else {
+    auto&& result = func();  // 调用并捕获结果
+    // 检查错误在调用之后
     if (GLenum error = glf->glGetError(); error != GL_NO_ERROR) {
-        qDebug() << "OpenGL Error in [" << funcStr << "]: " << error
-                 << "(Hex: 0x" << Qt::hex << error << Qt::dec << ")";
+      qDebug() << "OpenGL Error in [" << funcStr << "]: " << error << "(Hex: 0x"
+               << Qt::hex << error << Qt::dec << ")";
     }
+    return std::forward<decltype(result)>(result);
+  }
+
+  // 针对void返回类型的lambda，在调用后检查错误
+  if (GLenum error = glf->glGetError(); error != GL_NO_ERROR) {
+    qDebug() << "OpenGL Error in [" << funcStr << "]: " << error << "(Hex: 0x"
+             << Qt::hex << error << Qt::dec << ")";
+  }
 }
 
 // 用于包装 OpenGL 调用并检查错误
-#define GLCALL(func, f)       \
-    glCallImpl(               \
-        [&]() {               \
-            stat::gl_calls++; \
-            return func;      \
-        },                    \
-        #func, f)
-#define DRAWCALL(func, f)       \
-    glCallImpl(                 \
-        [&]() {                 \
-            stat::draw_calls++; \
-            stat::gl_calls++;   \
-            return func;        \
-        },                      \
-        #func, f)
+#define GLCALL(func, f)   \
+  glCallImpl(             \
+      [&]() {             \
+        stat::gl_calls++; \
+        return func;      \
+      },                  \
+      #func, f)
+#define DRAWCALL(func, f)   \
+  glCallImpl(               \
+      [&]() {               \
+        stat::draw_calls++; \
+        stat::gl_calls++;   \
+        return func;        \
+      },                    \
+      #func, f)
 
 void Renderer2D::initCurveShader() {
-    // 初始化着色器
-    // 初始化着色器
-    initShader(curve_shader_program, "Curve",
-               ":/glsl/canvas/curve_vertex_shader.glsl.vert",
-               ":/glsl/canvas/curve_fragment_shader.glsl.frag",
-               ":/glsl/canvas/curve_geometry_shader.glsl.geom");
-    initShaderUBO(primitive_shader_program, "Curve", "MaskStackUBO", 0);
+  // 初始化着色器
+  // 初始化着色器
+  initShader(curve_shader_program, "Curve",
+             ":/glsl/canvas/curve_vertex_shader.glsl.vert",
+             ":/glsl/canvas/curve_fragment_shader.glsl.frag",
+             ":/glsl/canvas/curve_geometry_shader.glsl.geom");
+  initShaderUBO(primitive_shader_program, "Curve", "MaskStackUBO", 0);
 }
 
 void Renderer2D::initCurveObjectBuffers() {}
