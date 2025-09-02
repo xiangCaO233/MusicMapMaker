@@ -19,6 +19,7 @@ class TimeLineSystem {
         // 生成物件的网格组件
         auto& registry = core.ecs_registry();
         const auto& realtime_info = info->realTimeInfo;
+        const auto& mousepos = info->realTimeInfo.mousePos;
         // 获取轨道布局信息
         const glm::vec4& all_tracks_rect = info->editorInfo.track_layout;
         // 遍历所有可见的timing实体
