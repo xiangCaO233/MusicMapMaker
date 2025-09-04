@@ -9,7 +9,7 @@ class GLCanvas;
 class FrameBuffer {
    public:
     // 构造FrameBuffer
-    FrameBuffer(GLCanvas* cvs);
+    FrameBuffer(GLCanvas* cvs, glm::vec2 current_size);
 
     // 析构FrameBuffer
     virtual ~FrameBuffer();

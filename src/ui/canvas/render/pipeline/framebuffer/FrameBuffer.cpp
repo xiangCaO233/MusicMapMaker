@@ -46,8 +46,10 @@ auto glCallImpl(Func func, const char* funcStr,
             return func;        \
         },                      \
         #func, f)
+
 // 构造FrameBuffer
-FrameBuffer::FrameBuffer(GLCanvas* canvas) : cvs(canvas) {
+FrameBuffer::FrameBuffer(GLCanvas* canvas, glm::vec2 current_size)
+    : cvs(canvas), physical_viewport(current_size) {
     GLCALL(cvs->glGenFramebuffers(1, &fbo), cvs);
 }
 
@@ -74,6 +76,33 @@ void FrameBuffer::release() {
 void FrameBuffer::update_viewport(glm::vec2 size) {
     // 更新全部纹理附件的尺寸
     physical_viewport = size;
+    // 重新创建纹理
+    GLCALL(cvs->glDeleteTextures(color_attachments.size(),
+                                 color_attachments.data()),
+           cvs);
+    GLCALL(
+        cvs->glGenTextures(color_attachments.size(), color_attachments.data()),
+        cvs);
+
+    for (auto& texture : color_attachments) {
+        GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, texture), cvs);
+        GLCALL(cvs->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+                                 physical_viewport.x, physical_viewport.y, 0,
+                                 GL_RGBA, GL_UNSIGNED_BYTE, nullptr),
+               cvs);
+        GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                                    GL_LINEAR),
+               cvs);
+        GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                                    GL_LINEAR),
+               cvs);
+        GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                                    GL_CLAMP_TO_EDGE),
+               cvs);
+        GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+                                    GL_CLAMP_TO_EDGE),
+               cvs);
+    }
 }
 
 // 添加纹理组件
@@ -81,9 +110,9 @@ uint32_t FrameBuffer::add_color_attachment() {
     uint32_t texture{0};
     GLCALL(cvs->glGenTextures(1, &texture), cvs);
     GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, texture), cvs);
-    GLCALL(cvs->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, physical_viewport.x,
+    GLCALL(cvs->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, physical_viewport.x,
                              physical_viewport.y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                             NULL),
+                             nullptr),
            cvs);
     GLCALL(
         cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR),
