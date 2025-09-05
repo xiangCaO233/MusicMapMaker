@@ -97,12 +97,6 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     // 模糊处理迭代次数
     uint32_t blur_iteration_count{8};
 
-    // 主渲染FBO
-    QOpenGLFramebufferObject* main_fbo{nullptr};
-    // 高斯模糊的乒乓FBO
-    QOpenGLFramebufferObject* blur_fbo_A{nullptr};
-    QOpenGLFramebufferObject* blur_fbo_B{nullptr};
-
     // 后期处理着色器程序
     // 发光附加着色器
     QOpenGLShaderProgram* glow_extract_shader;
@@ -242,14 +236,6 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     std::unique_ptr<FrameBuffer> compositeFBO{nullptr};
     std::unique_ptr<FrameBuffer> gaussianBlurFBOA{nullptr};
     std::unique_ptr<FrameBuffer> gaussianBlurFBOB{nullptr};
-
-    uint32_t main_FBO{0};
-    uint32_t composite_FBO{0};
-    uint32_t gaussian_blur_FBOA{0};
-    uint32_t gaussian_blur_FBOB{0};
-
-    // 手动管理纹理附件
-    uint32_t glow_mask_texture_id;
 
     // 从指定矩形实例位置开始更新矩形顶点数组指针
     void updateQuadAttribptrFromInstance(size_t instance_index) const;

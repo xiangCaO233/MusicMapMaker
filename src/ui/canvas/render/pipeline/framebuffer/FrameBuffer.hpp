@@ -14,6 +14,10 @@ class FrameBuffer {
     // 析构FrameBuffer
     virtual ~FrameBuffer();
 
+    // 禁用拷贝和赋值，防止资源管理错误
+    FrameBuffer(const FrameBuffer&) = delete;
+    FrameBuffer& operator=(const FrameBuffer&) = delete;
+
     // 绑定和释放
     void bind();
     void release();
@@ -36,6 +40,9 @@ class FrameBuffer {
     glm::vec2 physical_viewport;
     // 所有纹理组件
     std::vector<uint32_t> color_attachments;
+
+    // 帧缓冲完整性检查函数
+    bool check_completeness();
 };
 
 #endif  // MMM_FRAMEBUFFER_HPP

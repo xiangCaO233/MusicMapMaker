@@ -38,9 +38,10 @@ Renderer2D::~Renderer2D() {
     // 释放纹理池
     texturepool.reset();
     // 释放着色器和fbo
-    delete main_fbo;
-    delete blur_fbo_A;
-    delete blur_fbo_B;
+    mainFBO.reset();
+    compositeFBO.reset();
+    gaussianBlurFBOA.reset();
+    gaussianBlurFBOB.reset();
     delete quad_shader_program;
     delete mesh_shader_program;
     delete primitive_shader_program;
@@ -87,12 +88,18 @@ const RenderCommand& Renderer2D::get_command_from_handle(
 void Renderer2D::initAllFBOs() {
     mainFBO = std::make_unique<FrameBuffer>(
         cvs, glm::vec2{float(cvs->width()), float(cvs->height())});
+    mainFBO->add_color_attachment();  // GL_COLOR_ATTACHMENT0
+    mainFBO->add_color_attachment();  // GL_COLOR_ATTACHMENT1 (用于辉光)
+
     compositeFBO = std::make_unique<FrameBuffer>(
         cvs, glm::vec2{float(cvs->width()), float(cvs->height())});
+    compositeFBO->add_color_attachment();  // GL_COLOR_ATTACHMENT0
     gaussianBlurFBOA = std::make_unique<FrameBuffer>(
         cvs, glm::vec2{float(cvs->width() / 4.f), float(cvs->height() / 4.f)});
+    gaussianBlurFBOA->add_color_attachment();  // GL_COLOR_ATTACHMENT0
     gaussianBlurFBOB = std::make_unique<FrameBuffer>(
         cvs, glm::vec2{float(cvs->width() / 4.f), float(cvs->height() / 4.f)});
+    gaussianBlurFBOB->add_color_attachment();  // GL_COLOR_ATTACHMENT0
 }
 
 void Renderer2D::add_texture_from_path(const std::string& path) {

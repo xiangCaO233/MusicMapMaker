@@ -104,118 +104,14 @@ void Renderer2D::initMaskUBO() {
 
 // 更新fbo
 void Renderer2D::update_fbo() {
-    // 删除旧的 FBO (如果有)
-    delete main_fbo;
-    delete blur_fbo_A;
-    delete blur_fbo_B;
-    main_fbo = nullptr;
-    blur_fbo_A = nullptr;
-    blur_fbo_B = nullptr;
+    // 高效地更新每个FBO的纹理尺寸，而不是销毁重建
+    mainFBO->update_viewport(phisical_viewport);
+    compositeFBO->update_viewport(phisical_viewport);
 
-    // 根据新的视口尺寸创建新的 FBO
-    // 正常创建一个 *单目标* 的 FBO。
-    // 它会自动创建 GL_COLOR_ATTACHMENT0 的纹理和深度/模板附件。
-    QOpenGLFramebufferObjectFormat format;
-    format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-    format.setTextureTarget(GL_TEXTURE_2D);
-    format.setInternalTextureFormat(GL_RGBA8);
-    main_fbo = new QOpenGLFramebufferObject(phisical_viewport.x,
-                                            phisical_viewport.y, format);
-
-    // 手动删除手动创建的失效纹理
-    if (glow_mask_texture_id != 0) {
-        GLCALL(cvs->glDeleteTextures(1, &glow_mask_texture_id), cvs);
-        // 重置ID
-        glow_mask_texture_id = 0;
-    }
-
-    // 手动为辉光遮罩创建一个新的、独立的纹理
-    GLCALL(cvs->glGenTextures(1, &glow_mask_texture_id), cvs);
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, glow_mask_texture_id), cvs);
-    GLCALL(cvs->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, phisical_viewport.x,
-                             phisical_viewport.y, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                             nullptr),
-           cvs);
-    GLCALL(
-        cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR),
-        cvs);
-    GLCALL(
-        cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR),
-        cvs);
-    GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                                GL_CLAMP_TO_EDGE),
-           cvs);
-    GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                                GL_CLAMP_TO_EDGE),
-           cvs);
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, 0), cvs);
-
-    // 将这个手动创建的纹理，附加到 main_fbo 的第二个颜色槽位上
-    main_fbo->bind();
-    GLCALL(cvs->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
-                                       GL_TEXTURE_2D, glow_mask_texture_id, 0),
-           cvs);
-
-    // 检查 Main FBO
-    if (!main_fbo->isValid()) {
-        qWarning() << "Main FBO is not valid!";
-    }
-    main_fbo->release();
-
-    // 模糊用的FBO使用较低的分辨率以提高性能
-    QSize blur_size = {int(phisical_viewport.x / 4.0),
-                       int(phisical_viewport.y / 4.0)};
-
-    // --- 2. 为 Blur FBO 创建一个独立的、简单的 Format ---
-    QOpenGLFramebufferObjectFormat blur_format;
-    // 【最佳实践】明确告诉Qt我们不需要深度和模板附件
-    blur_format.setAttachment(QOpenGLFramebufferObject::NoAttachment);
-    blur_format.setTextureTarget(GL_TEXTURE_2D);
-    blur_format.setInternalTextureFormat(GL_RGBA8);
-
-    blur_fbo_A = new QOpenGLFramebufferObject(blur_size, blur_format);
-    blur_fbo_B = new QOpenGLFramebufferObject(blur_size, blur_format);
-    blur_fbo_A->bind();
-    // --- 3. 【关键修复】为 Blur FBO 的内部纹理设置正确的参数 ---
-    // 对 blur_fbo_A 的纹理进行设置
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, blur_fbo_A->texture()), cvs);
-    GLCALL(
-        cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR),
-        cvs);
-    GLCALL(
-        cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR),
-        cvs);
-    GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                                GL_CLAMP_TO_EDGE),
-           cvs);
-    GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                                GL_CLAMP_TO_EDGE),
-           cvs);
-    blur_fbo_A->release();
-
-    blur_fbo_B->bind();
-    // 对 blur_fbo_B 的纹理进行设置
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, blur_fbo_B->texture()), cvs);
-    GLCALL(
-        cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR),
-        cvs);
-    GLCALL(
-        cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR),
-        cvs);
-    GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                                GL_CLAMP_TO_EDGE),
-           cvs);
-    GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                                GL_CLAMP_TO_EDGE),
-           cvs);
-    blur_fbo_B->release();
-
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, 0), cvs);  // 解绑
-
-    // 使用 Qt 的方式检查 Blur FBOs
-    if (!blur_fbo_A->isValid() || !blur_fbo_B->isValid()) {
-        qWarning() << "Blur FBO creation failed!";
-    }
+    glm::vec2 blur_size = {phisical_viewport.x / 4.0f,
+                           phisical_viewport.y / 4.0f};
+    gaussianBlurFBOA->update_viewport(blur_size);
+    gaussianBlurFBOB->update_viewport(blur_size);
 }
 
 // 更新需要更新的资源等等
@@ -443,9 +339,7 @@ void Renderer2D::render() {
     update_gpudata();
 
     // 绑定多目标FBO
-    main_fbo->bind();
-    // 设置视口
-    glViewport(0, 0, main_fbo->width(), main_fbo->height());
+    mainFBO->bind();
 
     // 激活MRT
     // 列出将要写入的所有颜色附件
@@ -490,7 +384,7 @@ void Renderer2D::render() {
         GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, batch.texture_array_id),
                cvs);
         GLCALL(cvs->glActiveTexture(GL_TEXTURE1), cvs);
-        GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, glow_mask_texture_id), cvs);
+        GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]), cvs);
         current_shader->setUniformValue("u_samplerarray", 0);
         current_shader->setUniformValue("glowmask", 1);
 
@@ -504,7 +398,7 @@ void Renderer2D::render() {
         current_shader->release();
     }
 
-    main_fbo->release();
+    mainFBO->release();
 
     // 后期处理
     afterEffect();
@@ -535,16 +429,14 @@ void Renderer2D::afterEffect() {
         // 乒乓操作
         // --- Pass 1: 横向模糊 ---
         // 写入 B
-        blur_fbo_B->bind();
+        gaussianBlurFBOB->bind();
         GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
-        // 设置视口
-        glViewport(0, 0, blur_fbo_B->width(), blur_fbo_B->height());
 
         // 绑定源纹理
         if (first_iteration) {
             // 第一次读取辉光遮罩
             GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
-            GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, glow_mask_texture_id),
+            GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]),
                    cvs);
             GLCALL(cvs->glBindSampler(2, 0), cvs);
             GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
@@ -556,7 +448,8 @@ void Renderer2D::afterEffect() {
         } else {
             // 后续读取A的结果
             GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
-            GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, blur_fbo_A->texture()),
+            GLCALL(cvs->glBindTexture(GL_TEXTURE_2D,
+                                      gaussianBlurFBOA->textures()[0]),
                    cvs);
             GLCALL(cvs->glBindSampler(2, 0), cvs);
             GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
@@ -569,18 +462,18 @@ void Renderer2D::afterEffect() {
         gaussian_blur_shader->setUniformValue("horizontal", true);
         // 绘制全屏矩形
         GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
-        blur_fbo_B->release();
+        gaussianBlurFBOB->release();
 
         // --- Pass 2: 纵向模糊 ---
         // 写入 A
-        blur_fbo_A->bind();
+        gaussianBlurFBOA->bind();
         GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
-        // 设置视口
-        glViewport(0, 0, blur_fbo_A->width(), blur_fbo_A->height());
 
         // 绑定源纹理 (现在是B)
         GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
-        GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, blur_fbo_B->texture()), cvs);
+        GLCALL(
+            cvs->glBindTexture(GL_TEXTURE_2D, gaussianBlurFBOA->textures()[0]),
+            cvs);
         GLCALL(cvs->glBindSampler(2, 0), cvs);
         GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                                     GL_LINEAR),
@@ -590,7 +483,7 @@ void Renderer2D::afterEffect() {
                cvs);
         gaussian_blur_shader->setUniformValue("horizontal", false);
         GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
-        blur_fbo_A->release();
+        gaussianBlurFBOA->release();
 
         first_iteration = false;
     }
