@@ -19,39 +19,39 @@ class PreviewRenderSystem {
         auto& registry = core.ecs_registry();
         // const auto& realtime_info = info->realTimeInfo;
 
-        // 遍历所有需要渲染的普通实体(除去虚影和即将删除的)
-        auto view = registry.view<TimeComponent, TransformComponent_1,
-                                  TransformComponent_2>();
+        // 遍历所有需要渲染的预览实体
+        auto view =
+            registry.view<TimeComponent, GhostComponent, DeleteMarkComponent>();
         for (auto& e : view) {
-            auto& [mesh] = view.get<TransformComponent_2>(e);
+            auto& [time] = view.get<TimeComponent>(e);
             // 排序网格
-            std::sort(mesh.begin(), mesh.end(),
-                      [](const TransformComponent_2::Quad& quad1,
-                         const TransformComponent_2::Quad& quad2) {
-                          return quad1.zIndex < quad2.zIndex;
-                      });
-            // 生成网格的渲染指令
-            for (const auto& quad : mesh) {
-                QuadCommand cmd;
-                cmd.cmdType = CommandType::QUAD;
-                cmd.baseInfo.pos = quad.pos;
-                cmd.baseInfo.size = quad.size;
-                cmd.texturesInfo.texture = quad.texture;
-                // 虚影物件
-                if (registry.all_of<GhostComponent>(e)) {
-                    // 半透明效果
-                    cmd.baseInfo.color.a = 0.35f;
-                }
-                // 即将删除物件
+            // std::sort(mesh.begin(), mesh.end(),
+            //           [](const TransformComponent_2::Quad& quad1,
+            //              const TransformComponent_2::Quad& quad2) {
+            //               return quad1.zIndex < quad2.zIndex;
+            //           });
+            // // 生成网格的渲染指令
+            // for (const auto& quad : mesh) {
+            //     QuadCommand cmd;
+            //     cmd.cmdType = CommandType::QUAD;
+            //     cmd.baseInfo.pos = quad.pos;
+            //     cmd.baseInfo.size = quad.size;
+            //     cmd.texturesInfo.texture = quad.texture;
+            //     // 虚影物件
+            //     if (registry.all_of<GhostComponent>(e)) {
+            //         // 半透明效果
+            //         cmd.baseInfo.color.a = 0.35f;
+            //     }
+            //     // 即将删除物件
 
-                if (registry.all_of<DeleteMarkComponent>(e)) {
-                    // 红色滤镜半透明效果
-                    cmd.baseInfo.color.g = 0.f;
-                    cmd.baseInfo.color.b = 0.f;
-                    cmd.baseInfo.color.a = 0.35f;
-                }
-                buffer.add_QuadCommand(cmd);
-            }
+            //     if (registry.all_of<DeleteMarkComponent>(e)) {
+            //         // 红色滤镜半透明效果
+            //         cmd.baseInfo.color.g = 0.f;
+            //         cmd.baseInfo.color.b = 0.f;
+            //         cmd.baseInfo.color.a = 0.35f;
+            //     }
+            //     buffer.add_QuadCommand(cmd);
+            // }
 
             // 绘制物件精确时间字符串
             // const auto& [entity_y] = view.get<TransformComponent_1>(e);

@@ -344,12 +344,28 @@ void Renderer2D::render() {
     // 激活MRT
     // 列出将要写入的所有颜色附件
     GLenum drawBuffers[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    // 定义场景附件的背景色 (灰色)
+    // const float sceneClearColor[] = {0.23f, 0.23f, 0.23f, 1.0f};
+    // 定义辉光附件的背景色 (纯黑)
+    // const float bloomClearColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
+
     // 告诉OpenGL，接下来的绘制操作，片元着色器的 location=0
     // 的输出去附件0，location=1 的输出去附件1
     // 2是附件的数量
     GLCALL(cvs->glDrawBuffers(2, drawBuffers), cvs);
-    GLCALL(cvs->glClearColor(.23f, .23f, .23f, .23f), cvs);
-    GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
+    // 定义场景附件的背景色 (例如灰色)
+    const float sceneClearColor[] = {0.23f, 0.23f, 0.23f, 1.0f};
+    // ✨️ 定义辉光附件的背景色 (必须是纯黑！) ✨️
+    const float bloomClearColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    // 分别清空两个颜色附件
+    // cvs->glClearBufferfv(buffer_type, drawbuffer_index, value_pointer);
+    GLCALL(cvs->glClearBufferfv(GL_COLOR, 0, sceneClearColor),
+           cvs);  // 清空 attachment 0
+    GLCALL(cvs->glClearBufferfv(GL_COLOR, 1, bloomClearColor),
+           cvs);  // 清空 attachment 1
+
+    // GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
 
     // === 2. 在单个循环中通过状态追踪进行渲染 ===
     QOpenGLShaderProgram* current_shader{nullptr};
@@ -406,6 +422,9 @@ void Renderer2D::render() {
     // 混合着色
     composite();
 
+    // 交换到主帧缓冲
+    swap();
+
     // 为下一帧做准备
     quad_datas.clear();
     mesh_datas.clear();
@@ -424,13 +443,13 @@ void Renderer2D::afterEffect() {
     bool first_iteration = true;
 
     gaussian_blur_shader->setUniformValue("gaussian_source", 2);
+    cvs->glBindSampler(2, 0);
 
-    for (int i = 0; i < blur_iteration_count; i++) {
+    for (int i{0}; i < blur_iteration_count; ++i) {
         // 乒乓操作
         // --- Pass 1: 横向模糊 ---
         // 写入 B
         gaussianBlurFBOB->bind();
-        GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
 
         // 绑定源纹理
         if (first_iteration) {
@@ -438,25 +457,11 @@ void Renderer2D::afterEffect() {
             GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
             GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]),
                    cvs);
-            GLCALL(cvs->glBindSampler(2, 0), cvs);
-            GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                        GL_LINEAR),
-                   cvs);
-            GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                        GL_LINEAR),
-                   cvs);
         } else {
             // 后续读取A的结果
             GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
             GLCALL(cvs->glBindTexture(GL_TEXTURE_2D,
                                       gaussianBlurFBOA->textures()[0]),
-                   cvs);
-            GLCALL(cvs->glBindSampler(2, 0), cvs);
-            GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                        GL_LINEAR),
-                   cvs);
-            GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                        GL_LINEAR),
                    cvs);
         }
         gaussian_blur_shader->setUniformValue("horizontal", true);
@@ -467,20 +472,12 @@ void Renderer2D::afterEffect() {
         // --- Pass 2: 纵向模糊 ---
         // 写入 A
         gaussianBlurFBOA->bind();
-        GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
 
         // 绑定源纹理 (现在是B)
         GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
         GLCALL(
-            cvs->glBindTexture(GL_TEXTURE_2D, gaussianBlurFBOA->textures()[0]),
+            cvs->glBindTexture(GL_TEXTURE_2D, gaussianBlurFBOB->textures()[0]),
             cvs);
-        GLCALL(cvs->glBindSampler(2, 0), cvs);
-        GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                                    GL_LINEAR),
-               cvs);
-        GLCALL(cvs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                                    GL_LINEAR),
-               cvs);
         gaussian_blur_shader->setUniformValue("horizontal", false);
         GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
         gaussianBlurFBOA->release();
@@ -492,4 +489,57 @@ void Renderer2D::afterEffect() {
 }
 
 // 混合着色
-void Renderer2D::composite() {}
+void Renderer2D::composite() {
+    composite_shader->bind();
+    GLCALL(cvs->glBindVertexArray(fullScreenAO), cvs);
+    // 绑定混成fbo
+    compositeFBO->bind();
+
+    // 设置纹理槽0为mainfbo的原始纹理
+    GLCALL(cvs->glActiveTexture(GL_TEXTURE0), cvs);
+    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[0]), cvs);
+    composite_shader->setUniformValue("sources[0]", 0);
+
+    // 纹理槽1为模糊处理结果
+    GLCALL(cvs->glActiveTexture(GL_TEXTURE1), cvs);
+    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, gaussianBlurFBOA->textures()[0]),
+           cvs);
+    composite_shader->setUniformValue("sources[1]", 1);
+
+    // 设置混成强度值
+    composite_shader->setUniformValue("bloomIntensity", bloomIntensity);
+    // 设置激活的混成源纹理数量
+    composite_shader->setUniformValue("active_sources", 2);
+
+    // 执行绘制
+    GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
+
+    // 释放
+    compositeFBO->release();
+    GLCALL(cvs->glBindVertexArray(0), cvs);
+    composite_shader->release();
+}
+
+// 交换到主帧缓冲
+void Renderer2D::swap() {
+    composite_shader->bind();
+    GLCALL(cvs->glBindVertexArray(fullScreenAO), cvs);
+    GLCALL(
+        cvs->glBindFramebuffer(GL_FRAMEBUFFER, cvs->defaultFramebufferObject()),
+        cvs);
+    // 恢复视口到窗口物理大小
+    GLCALL(cvs->glViewport(0, 0, phisical_viewport.x, phisical_viewport.y),
+           cvs);
+
+    // 设置纹理槽0为混成结果纹理
+    GLCALL(cvs->glActiveTexture(GL_TEXTURE0), cvs);
+    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, compositeFBO->textures()[0]), cvs);
+    composite_shader->setUniformValue("sources[0]", 0);
+    // 设置激活的混成源纹理数量
+    composite_shader->setUniformValue("active_sources", 1);
+    // 执行绘制
+    GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
+
+    GLCALL(cvs->glBindVertexArray(0), cvs);
+    composite_shader->release();
+}

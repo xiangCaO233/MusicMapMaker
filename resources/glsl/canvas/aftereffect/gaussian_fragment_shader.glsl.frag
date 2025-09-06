@@ -9,9 +9,6 @@ out vec4 FragColor;
 
 uniform bool horizontal;
 
-// 5个权重，用于9点采样 (中心点 + 左右/上下各4个)
-// float weight[5] = float[](0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
-
 void main() {
     // 5个权重，用于9点采样 (中心点 + 左右/上下各4个)
     float weight[5];
@@ -35,5 +32,5 @@ void main() {
             result += texture(gaussian_source, vTexCoord - vec2(0.0, tex_offset.y * i)).rgb * weight[i];
         }
     }
-    FragColor = texture(gaussian_source, vTexCoord);
+    FragColor = vec4(result, 1.0);
 }

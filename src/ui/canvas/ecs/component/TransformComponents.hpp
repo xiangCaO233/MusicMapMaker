@@ -23,6 +23,7 @@ struct GeneratedMesh {
         int zIndex{};
     };
     std::vector<Quad> mesh;
+    std::vector<bool> glow_part;
 };
 
 #endif  // MMM_TRANSFORMCOMPONENTS_HPP

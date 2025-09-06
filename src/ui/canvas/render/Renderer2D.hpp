@@ -95,7 +95,8 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     GLCanvas* cvs;
 
     // 模糊处理迭代次数
-    uint32_t blur_iteration_count{8};
+    uint32_t blur_iteration_count{12};
+    float bloomIntensity{.8f};
 
     // 后期处理着色器程序
     // 发光附加着色器
@@ -163,6 +164,9 @@ class Renderer2D : public QObject, public TextureLoadCallback {
 
     // 混合着色
     void composite();
+
+    // 交换到主帧缓冲
+    void swap();
 
     // 辅助函数，通过句柄获取 RenderCommand 的引用
     const RenderCommand& get_command_from_handle(const CommandHandle& handle);

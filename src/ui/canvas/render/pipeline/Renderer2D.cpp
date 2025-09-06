@@ -94,9 +94,11 @@ void Renderer2D::initAllFBOs() {
     compositeFBO = std::make_unique<FrameBuffer>(
         cvs, glm::vec2{float(cvs->width()), float(cvs->height())});
     compositeFBO->add_color_attachment();  // GL_COLOR_ATTACHMENT0
+
     gaussianBlurFBOA = std::make_unique<FrameBuffer>(
         cvs, glm::vec2{float(cvs->width() / 4.f), float(cvs->height() / 4.f)});
     gaussianBlurFBOA->add_color_attachment();  // GL_COLOR_ATTACHMENT0
+
     gaussianBlurFBOB = std::make_unique<FrameBuffer>(
         cvs, glm::vec2{float(cvs->width() / 4.f), float(cvs->height() / 4.f)});
     gaussianBlurFBOB->add_color_attachment();  // GL_COLOR_ATTACHMENT0

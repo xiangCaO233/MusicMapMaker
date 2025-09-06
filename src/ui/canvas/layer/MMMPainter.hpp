@@ -6,7 +6,7 @@
 class MMMPainter {
    public:
     // 构造MMMPainter
-    explicit MMMPainter(ILayer::RenderDataBuffer& buffer);
+    explicit MMMPainter(RenderDataBuffer& buffer);
 
     // 析构MMMPainter
     virtual ~MMMPainter();

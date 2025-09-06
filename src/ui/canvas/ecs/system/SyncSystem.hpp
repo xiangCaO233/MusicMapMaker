@@ -5,6 +5,7 @@
 #include <ecs/component/CoreComponents.hpp>
 #include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/RelationComponents.hpp>
+#include <ecs/component/StateComponents.hpp>
 #include <ecs/component/TimingComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
 #include <ecs/system/TimePixelConverter.hpp>
@@ -105,6 +106,9 @@ class SyncSystem {
                     createNoteEntity(registry, note_data, handle);
             }
         }
+
+        // 清理所有hover组件
+        registry.clear<HoveredComponent>();
 
         // ----------debug------------
         // auto new_entities = handle_map.size();

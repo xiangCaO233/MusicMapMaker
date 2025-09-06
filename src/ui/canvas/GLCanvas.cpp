@@ -105,9 +105,9 @@ void GLCanvas::initializeGL() {
     GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), this);
 
     // 关闭深度测试，否则全屏矩形可能因为深度测试失败而被丢弃
-    GLCALL(glDisable(GL_DEPTH_TEST), this);
+    // GLCALL(glDisable(GL_DEPTH_TEST), this);
     // 在模糊pass中通常也不需要混合
-    GLCALL(glDisable(GL_BLEND), this);
+    // GLCALL(glDisable(GL_BLEND), this);
 
     // 初始化渲染器
     render = std::make_unique<Renderer2D>(this);
