@@ -10,8 +10,6 @@
 #include <info/MapCanvasInfo.hpp>
 #include <layer/ILayer.hpp>
 
-#include "ecs/component/StateComponents.hpp"
-
 class NormalRenderSystem {
    public:
     void update(
@@ -43,7 +41,6 @@ class NormalRenderSystem {
                 cmd.texturesInfo.texture = quad.texture;
                 cmd.primitive = PrimitiveType::QUAD;
 
-                // registry.all_of<HoveredComponent>(e)
                 if (quad.glow) {
                     cmd.radiusInfo.radius_effect_param = 1.f;
                     cmd.radiusInfo.radius_effect = RadiusEffect::GLOWING;

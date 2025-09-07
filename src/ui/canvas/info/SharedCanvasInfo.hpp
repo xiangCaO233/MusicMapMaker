@@ -3,6 +3,8 @@
 
 #include <QPoint>
 #include <QSize>
+#include <entt.hpp>
+#include <glm/glm.hpp>
 #include <unordered_set>
 
 struct BaseCanvasStatus {
@@ -22,6 +24,26 @@ struct BaseCanvasStatus {
     float judgeline_pos{.2f};
 
     bool operator==(const BaseCanvasStatus& _) const = default;
+};
+
+// 悬浮信息
+enum class HoverPart {
+    HEAD,
+    HOLD_BODY,
+    SLIDE_BODY,
+    HOLD_END,
+    SLIDE_END,
+};
+
+struct HoverInfo {
+    bool has_hovered_entity{false};
+    entt::entity e;
+    HoverPart part;
+};
+
+struct SelectFrame {
+    glm::vec2 pos{0};
+    glm::vec2 size{0};
 };
 
 struct RealTimeInfo {
@@ -53,8 +75,18 @@ struct RealTimeInfo {
 
     // 当前鼠标位置
     QPointF mousePos;
+
     // 正在按下的鼠标按钮
     std::unordered_set<Qt::MouseButton> mButtons;
+
+    // 鼠标悬浮(预选)的实体信息
+    HoverInfo hovered_info;
+
+    // 选中框
+    SelectFrame frame;
+
+    // 标记选中缓冲
+    std::unordered_set<entt::entity> selected_mark_buffer;
 };
 
 struct SharedCanvasInfo {

@@ -340,7 +340,7 @@ float sdRoundedBox(vec2 p, vec2 b, vec2 r) {
 void main() {
     if (u_IsDrawingWireframe) {
         out_SceneColor = vec4(1., 1., 0., 1.);
-        out_GlowMask = vec4(0., 0., 0., 1.);
+        out_GlowMask = vec4(1., 1., 0., 1.);
         return;
     }
     vec4 finalColor;

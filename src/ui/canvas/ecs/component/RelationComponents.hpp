@@ -5,7 +5,8 @@
 
 // 用于Composite Note的根节点
 struct CompositeRootComponent {
-    std::vector<entt::entity> children;  // 存储子Note实体的ID
+    // 存储子Note实体的ID
+    std::vector<entt::entity> children;
 };
 
 // 用于Composite Note的子节点，指向其父节点

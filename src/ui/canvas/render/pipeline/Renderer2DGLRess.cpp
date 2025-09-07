@@ -376,7 +376,6 @@ void Renderer2D::render() {
         if (batch.type == CommandType::MESH) continue;
 
         // 确定此批次所需的状态
-
         // 获取需要的gpu实例
         auto required_shader = useShader(batch.type);
         auto required_vao = useVAO(batch.type);

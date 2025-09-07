@@ -14,7 +14,7 @@
 
 class MeshGenerateSystem {
    public:
-    void update(const entt::registry& registry, const MapCanvasInfo* info,
+    void update(const entt::registry& registry, MapCanvasInfo* info,
                 const TimePixelConverter& converter,
                 std::unordered_map<entt::entity, GeneratedMesh>&
                     out_generated_meshes) const {
@@ -36,6 +36,7 @@ class MeshGenerateSystem {
         for (auto& e : view) {
             auto& entity_mesh = out_generated_meshes[e];
             entity_mesh.source_entity = e;
+            bool hovered{false};
 
             const auto& [time] = registry.get<TimeComponent>(e);
             // 清理上一帧的网格数据
@@ -66,9 +67,15 @@ class MeshGenerateSystem {
             // 共同的头网格(head在层级2(最上层))
             auto head_pos =
                 glm::vec2(x - head_size.x / 2.f, y - head_size.y / 2.f);
-            entity_mesh.mesh.emplace_back(
-                head_pos, head_size, head_texinfo, 2,
-                is_hover_part(head_pos, head_size, current_mouse_pos));
+            bool hoverd_head =
+                is_hover_part(head_pos, head_size, current_mouse_pos);
+            if (hoverd_head) {
+                info->realTimeInfo.hovered_info.part = HoverPart::HEAD;
+            }
+            entity_mesh.mesh.emplace_back(head_pos, head_size, head_texinfo, 2,
+                                          hoverd_head);
+            // 若有悬停到头部则确定悬停属性
+            hovered = hovered || hoverd_head;
 
             if (registry.all_of<HoldComponent>(e)) {
                 // 计算持续面身高度
@@ -88,9 +95,13 @@ class MeshGenerateSystem {
                 auto body_pos =
                     glm::vec2(x - body_width / 2.f, y - body_height);
                 auto body_size = glm::vec2(body_width, body_height);
+                bool hoverd_body =
+                    is_hover_part(body_pos, body_size, current_mouse_pos);
+                if (hoverd_body) {
+                    info->realTimeInfo.hovered_info.part = HoverPart::HOLD_BODY;
+                }
                 entity_mesh.mesh.emplace_back(
-                    body_pos, body_size, hold_body_texinfo, 0,
-                    is_hover_part(body_pos, body_size, current_mouse_pos));
+                    body_pos, body_size, hold_body_texinfo, 0, hoverd_body);
 
                 // 绘制一个面尾网格(同样画在面条结束的位置)
                 // 获取面尾纹理
@@ -100,9 +111,21 @@ class MeshGenerateSystem {
                 auto end_size = hold_end_texinfo.origin_size * obj_scale;
                 auto end_pos = glm::vec2(x - end_size.x / 2.f,
                                          y - body_height - end_size.y / 2.f);
-                entity_mesh.mesh.emplace_back(
-                    end_pos, end_size, hold_end_texinfo, 1,
-                    is_hover_part(end_pos, end_size, current_mouse_pos));
+                bool hoverd_end =
+                    is_hover_part(end_pos, end_size, current_mouse_pos);
+                if (hoverd_end) {
+                    info->realTimeInfo.hovered_info.part = HoverPart::HOLD_END;
+                }
+                entity_mesh.mesh.emplace_back(end_pos, end_size,
+                                              hold_end_texinfo, 1, hoverd_end);
+                // 若有悬停到中间部则确定悬停属性
+                // 若有悬停到尾部则确定悬停属性
+                hovered = hovered || hoverd_body || hoverd_end;
+                info->realTimeInfo.hovered_info.has_hovered_entity = hovered;
+                if (hovered) {
+                    info->realTimeInfo.hovered_info.e = e;
+                }
+
             } else if (registry.all_of<FlickComponent>(e)) {
                 // 获取flick身纹理
                 // TextureInfo flick_body_texinfo =
@@ -125,14 +148,7 @@ class MeshGenerateSystem {
         TextureInfo texinfo;
         using enum TexType;
         using enum ObjectStatus;
-        // 自动区分状态
-        if (registry.all_of<HoveredComponent>(e)) {
-            texinfo = info->editorInfo.skin->get_object_texture(type, HOVER);
-        } else if (registry.all_of<SelectedComponent>(e)) {
-            texinfo = info->editorInfo.skin->get_object_texture(type, SELECTED);
-        } else {
-            texinfo = info->editorInfo.skin->get_object_texture(type, COMMON);
-        }
+        texinfo = info->editorInfo.skin->get_object_texture(type, COMMON);
         return texinfo;
     }
 
@@ -145,9 +161,6 @@ class MeshGenerateSystem {
         // 注意：在许多图形系统中，y 轴是倒置的（0 在顶部）。
         // 此实现假设一个标准的坐标系。如果你的 y 轴是倒置的，可能需要调整。
         bool y_in_range = mouse_pos.y >= pos.y && mouse_pos.y < pos.y + size.y;
-        if (x_in_range && y_in_range) {
-            qDebug() << "hover at part";
-        }
 
         // 只有当 x 和 y 坐标都在范围内时，鼠标才悬停在该部分上。
         return x_in_range && y_in_range;

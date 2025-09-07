@@ -59,8 +59,17 @@ class SyncSystem {
         // qDebug() << "当前查询结束:" << query_end_time;
 
         // 执行ECS同步逻辑
-        auto& registry = core.ecs_registry();
+        // 同步Note实体
+        sync_notes(core, notes, info, query_start_time, query_end_time);
 
+        // 同步Timing 实体
+        sync_timings(core, timings, query_start_time, query_end_time);
+    }
+
+    void sync_notes(ECSCore& core, const NoteCollection& notes,
+                    const MapCanvasInfo* info, const int64_t query_start_time,
+                    const int64_t query_end_time) const {
+        auto& registry = core.ecs_registry();
         auto& handle_map = core.handle_to_entity_map();
 
         // ----------debug------------
@@ -81,7 +90,10 @@ class SyncSystem {
 
         // 销毁不再可见的物件实体
         for (auto it = handle_map.begin(); it != handle_map.end();) {
-            if (!current_visible_set.contains(it->first)) {
+            // 不处于当前可见实体集合中/且不处于选中集合中/且不为hoverd
+            if (!current_visible_set.contains(it->first) &&
+                !info->realTimeInfo.selected_mark_buffer.contains(it->second) &&
+                it->second != info->realTimeInfo.hovered_info.e) {
                 if (registry.valid(it->second)) {
                     registry.destroy(it->second);
                 }
@@ -106,15 +118,29 @@ class SyncSystem {
                     createNoteEntity(registry, note_data, handle);
             }
         }
-
-        // 清理所有hover组件
-        registry.clear<HoveredComponent>();
-
         // ----------debug------------
         // auto new_entities = handle_map.size();
         // qDebug() << "新建可见实体数量:" << new_entities - after_entities;
         // ----------debug------------
 
+        // 同步更新选中和悬浮组件
+        // 清理上一帧的
+        registry.clear<HoveredComponent>();
+        registry.clear<SelectedComponent>();
+        // 添加当前帧的
+        if (info->realTimeInfo.hovered_info.has_hovered_entity) {
+            registry.emplace<HoveredComponent>(
+                info->realTimeInfo.hovered_info.e);
+        }
+        for (const auto& e : info->realTimeInfo.selected_mark_buffer) {
+            registry.emplace<SelectedComponent>(e);
+        }
+    }
+
+    void sync_timings(ECSCore& core, const TimingMap& timings,
+                      const int64_t query_start_time,
+                      const int64_t query_end_time) const {
+        auto& registry = core.ecs_registry();
         // Timing 实体同步逻辑
         auto& timing_handle_map = core.handle_to_timingentity_map();
 

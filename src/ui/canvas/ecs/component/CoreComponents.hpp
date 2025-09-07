@@ -18,9 +18,13 @@ struct VisualsComponent {
 };
 
 // 虚幻组件(即将添加)
-struct GhostComponent {};
+struct GhostComponent {
+    bool confirm{false};
+};
 
-// 删除标记组件
-struct DeleteMarkComponent {};
+// 删除标记组件(即将删除)
+struct DeleteMarkComponent {
+    bool confirm{false};
+};
 
 #endif  // MMM_CORECOMPONENTS_HPP
