@@ -43,8 +43,9 @@ class NormalRenderSystem {
                 cmd.texturesInfo.texture = quad.texture;
                 cmd.primitive = PrimitiveType::QUAD;
 
-                // cmd.radiusInfo.radius_effect_param = .8f;
-                if (registry.all_of<HoveredComponent>(e)) {
+                // registry.all_of<HoveredComponent>(e)
+                if (quad.glow) {
+                    cmd.radiusInfo.radius_effect_param = 1.f;
                     cmd.radiusInfo.radius_effect = RadiusEffect::GLOWING;
                 }
 

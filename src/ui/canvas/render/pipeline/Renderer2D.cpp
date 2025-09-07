@@ -244,7 +244,8 @@ void Renderer2D::finalize() {
         return;
     }
 
-    if (quad_datas.empty() && mesh_datas.empty()) {
+    if (quad_datas.empty() && mesh_datas.empty() && primitive_datas.empty() &&
+        curve_datas.empty()) {
         // 清理原始命令队列
         quad_command_list.clear();
         mesh_command_list.clear();

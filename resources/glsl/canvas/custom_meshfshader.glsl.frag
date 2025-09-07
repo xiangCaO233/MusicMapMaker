@@ -156,6 +156,6 @@ void main() {
     }
 
     out_SceneColor = finalColor;
-    vec4 glow_mask_color = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 glow_mask_color = finalColor;
     out_GlowMask = texture(glowmask, (projection * vec4(v_TexCoord, 0.0, 1.0)).xy) + glow_mask_color;
 }

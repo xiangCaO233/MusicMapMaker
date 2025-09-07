@@ -173,10 +173,10 @@ void Renderer2D::update() {
                                                   int(mask_stack_cpu.size()));
         primitive_shader_program->release();
 
-        // curve_shader_program->bind();
-        // curve_shader_program->setUniformValue("u_ActiveMaskLayerCount",
-        //                                       int(mask_stack_cpu.size()));
-        // curve_shader_program->release();
+        curve_shader_program->bind();
+        curve_shader_program->setUniformValue("u_ActiveMaskLayerCount",
+                                              int(mask_stack_cpu.size()));
+        curve_shader_program->release();
         update_ubo = false;
     }
 }
@@ -372,9 +372,9 @@ void Renderer2D::render() {
     uint32_t current_vao{0};
 
     for (const auto& batch : command_batchs) {
-        if (batch.type == CommandType::MESH) {
-            continue;
-        }
+        // 跳过mesh绘制
+        if (batch.type == CommandType::MESH) continue;
+
         // 确定此批次所需的状态
 
         // 获取需要的gpu实例

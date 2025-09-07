@@ -95,7 +95,7 @@ class Renderer2D : public QObject, public TextureLoadCallback {
     GLCanvas* cvs;
 
     // 模糊处理迭代次数
-    uint32_t blur_iteration_count{12};
+    uint32_t blur_iteration_count{8};
     float bloomIntensity{.8f};
 
     // 后期处理着色器程序

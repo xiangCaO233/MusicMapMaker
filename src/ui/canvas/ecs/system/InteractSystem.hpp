@@ -43,13 +43,13 @@ class InteractSystem {
             m_mouse_track.pop_back();
         }
 
-        if (m_mouse_track.size() < 2) return;
+        if (m_mouse_track.size() <= 2) return;
 
         // --- 2. 定义外观和精度 ---
         const float start_width = 24.0f;
         const float end_width = 2.0f;
-        const float start_alpha = 0.7f;
-        const float end_alpha = 0.0f;
+        const float start_alpha = 1.f;
+        const float end_alpha = 1.f;
         const int joint_segments = 32;  // 圆形关节的平滑度
 
         // --- 3. 创建一个MeshCommand来容纳所有几何体 ---
@@ -102,6 +102,8 @@ class InteractSystem {
         if (!trail_cmd.vertices.empty()) {
             buffer.add_MeshCommand(trail_cmd);
         }
+
+        // 检测鼠标是否悬浮在某物件上
     }
 
    private:

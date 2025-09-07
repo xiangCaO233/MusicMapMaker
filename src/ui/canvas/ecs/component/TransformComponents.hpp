@@ -20,10 +20,10 @@ struct GeneratedMesh {
         // 纹理信息
         TextureInfo texture{};
         // 绘制层级，值越小越先绘制
-        int zIndex{};
+        int zIndex{0};
+        bool glow{false};
     };
     std::vector<Quad> mesh;
-    std::vector<bool> glow_part;
 };
 
 #endif  // MMM_TRANSFORMCOMPONENTS_HPP
