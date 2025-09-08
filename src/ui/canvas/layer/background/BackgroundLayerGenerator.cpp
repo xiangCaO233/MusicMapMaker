@@ -3,6 +3,7 @@
 #include <info/SharedCanvasInfo.hpp>
 #include <layer/background/BackgroundLayer.hpp>
 #include <layer/background/BackgroundLayerGenerator.hpp>
+#include <map/skin/MSkin.hpp>
 #include <render/command/RenderCommand.hpp>
 
 // 析构BackgroundLayerGenerator
@@ -24,8 +25,7 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
         const int track_count =
             info->editorInfo.map->base_metadata().track_count;
         if (track_count == 0) return;
-        // const float single_track_width = all_tracks_rect.z /
-        // float(track_count);
+        const float single_track_width = all_tracks_rect.z / float(track_count);
 
         auto background_image_path = info->mapInfo.cover_path;
         auto darken = info->mapInfo.darken;
@@ -36,32 +36,44 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
         if (!background_image_path.empty()) {
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
-            cmd.baseInfo = {{0.f, 0.f}, canvas_size, 0.f};
+            cmd.baseInfo = {{0.f, 0.f}, canvas_size};
             cmd.baseInfo.color = {darken, darken, darken, alpha};
             cmd.texturesInfo.texture = texinfo;
             cmd.primitive = PrimitiveType::QUAD;
             buffer.add_PrimitiveCommand(cmd);
         }
-        // 绘制轨道底纹理
 
-        // 绘制轨道边界线
-        // PrimitiveCommand track_edge_leftcmd;
-        // track_edge_leftcmd.cmdType = CommandType::PRIMITIVE;
-        // track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x - 3, 0};
-        // track_edge_leftcmd.baseInfo.size = {6,
-        //                                     info->baseInfo.canvasSize.height()};
-        // track_edge_leftcmd.baseInfo.color = {0, 1, 1, 1};
-        // track_edge_leftcmd.primitive = PrimitiveType::QUAD;
-        // PrimitiveCommand track_edge_rightcmd;
-        // track_edge_rightcmd.cmdType = CommandType::PRIMITIVE;
-        // track_edge_rightcmd.baseInfo.pos = {
-        //     all_tracks_rect.x + all_tracks_rect.z - 3, 0};
-        // track_edge_rightcmd.baseInfo.size = {
-        //     6, info->baseInfo.canvasSize.height()};
-        // track_edge_rightcmd.baseInfo.color = {0, 1, 1, 1};
-        // track_edge_rightcmd.primitive = PrimitiveType::QUAD;
-        // buffer.add_PrimitiveCommand(track_edge_leftcmd);
-        // buffer.add_PrimitiveCommand(track_edge_rightcmd);
+        // 绘制轨道纹理
+        auto oribit_bg_texture = info->editorInfo.skin->get_orbit_bg_texture();
+        auto oribit_judge_texture =
+            info->editorInfo.skin->get_orbit_judge_texture();
+        for (int i{0}; i < track_count; ++i) {
+            PrimitiveCommand cmd;
+            cmd.cmdType = CommandType::PRIMITIVE;
+            cmd.primitive = PrimitiveType::QUAD;
+            cmd.baseInfo = {{all_tracks_rect.x + i * single_track_width, 0.f},
+                            {single_track_width, canvas_size.y}};
+            cmd.texturesInfo.texture = oribit_bg_texture;
+            cmd.texturesInfo.tscale = TexScaleMode::TILE_BASEWIDTH_REPEAT;
+            buffer.add_PrimitiveCommand(cmd);
+
+            PrimitiveCommand jcmd;
+            jcmd.cmdType = CommandType::PRIMITIVE;
+            jcmd.primitive = PrimitiveType::QUAD;
+            glm::vec2 judgeline_size{single_track_width,
+                                     single_track_width /
+                                         oribit_judge_texture.origin_size.x *
+                                         oribit_judge_texture.origin_size.y};
+            judgeline_size *= 1.25f;
+            jcmd.baseInfo = {
+                {all_tracks_rect.x + (float(i) + .5f) * single_track_width -
+                     judgeline_size.x / 2.f,
+                 (1.f - info->baseInfo.judgeline_pos) * canvas_size.y -
+                     judgeline_size.y / 2.f},
+                judgeline_size};
+            jcmd.texturesInfo.texture = oribit_judge_texture;
+            buffer.add_PrimitiveCommand(jcmd);
+        }
     }
     // qDebug() << "bg layer done";
 }

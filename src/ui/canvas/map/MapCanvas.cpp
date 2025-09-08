@@ -43,7 +43,11 @@ void MapCanvas::initializeGL() {
     skin = editor_skins
                .try_emplace("Default-Nagisssa",
                             std::make_unique<MSkin>(
+#ifdef __APPLE__
+                                "../../../../resources/textures/default",
+#else
                                 "../resources/textures/default",
+#endif  //__APPLE__
                                 audioLoadCallback(), textureCallback()))
                .first->second.get();
     info<MapCanvasInfo>()->editorInfo.skin = skin;

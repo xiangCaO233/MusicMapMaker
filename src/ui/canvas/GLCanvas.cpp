@@ -116,13 +116,17 @@ void GLCanvas::initializeGL() {
     connect(render.get(), &Renderer2D::needUpdateTexinfo, this,
             &GLCanvas::onUpdateTexinfo);
 
-    // 加载纹理
-    // render->add_texture_from_path("../resources/textures/default");
-
-    // 加载字体
+// 加载字体
+#ifdef __APPLE__
+    render->add_font_from_path(
+        "../../../../resources/font/ComicShannsMonoNerdFont_Bold.otf");
+    render->add_font_from_path(
+        "../../../../resources/font/NotoSansCJK-Bold.ttc");
+#else
     render->add_font_from_path(
         "../resources/font/ComicShannsMonoNerdFont_Bold.otf");
     render->add_font_from_path("../resources/font/NotoSansCJK-Bold.ttc");
+#endif  //__APPLE__
 
     // 加载蒙版
 

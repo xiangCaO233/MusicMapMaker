@@ -158,12 +158,14 @@ std::string_view MSkin::fontFamilyUTF8() { return fontu8; }
 TextureInfo MSkin::get_orbit_judge_texture() {
     auto ojudge_texit = bg_texture_buffer.find(TexType::JUDGE_ORBIT);
     if (ojudge_texit == bg_texture_buffer.end()) {
+        auto rpath =
+            std::filesystem::path(bg_texture_config["panel"].value<std::string>(
+                "judge_orbit", "none"));
+        auto apath = skinPath / rpath;
         ojudge_texit =
             bg_texture_buffer
-                .try_emplace(TexType::JUDGE_ORBIT,
-                             texcallback->getTextureInfo(
-                                 bg_texture_config["panel"].value<std::string>(
-                                     "judge_orbit", "none")))
+                .try_emplace(TexType::JUDGE_ORBIT, texcallback->getTextureInfo(
+                                                       apath.generic_string()))
                 .first;
     }
     return ojudge_texit->second;
@@ -173,13 +175,15 @@ TextureInfo MSkin::get_orbit_judge_texture() {
 TextureInfo MSkin::get_orbit_bg_texture() {
     auto obg_texit = bg_texture_buffer.find(TexType::ORBIT_BG);
     if (obg_texit == bg_texture_buffer.end()) {
-        obg_texit =
-            bg_texture_buffer
-                .try_emplace(TexType::ORBIT_BG,
-                             texcallback->getTextureInfo(
-                                 bg_texture_config["panel"].value<std::string>(
-                                     "orbit_background", "none")))
-                .first;
+        auto rpath =
+            std::filesystem::path(bg_texture_config["panel"].value<std::string>(
+                "orbit_background", "none"));
+        auto apath = skinPath / rpath;
+        obg_texit = bg_texture_buffer
+                        .try_emplace(
+                            TexType::ORBIT_BG,
+                            texcallback->getTextureInfo(apath.generic_string()))
+                        .first;
     }
     return obg_texit->second;
 }
