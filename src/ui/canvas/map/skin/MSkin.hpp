@@ -85,6 +85,10 @@ class MSkin {
     // 获取音效
     std::string_view get_sound_effect(SoundEffectType type);
 
+    // 获取时间分割线主题-(1/n-(颜色-宽度)列表)
+    const std::vector<std::pair<QColor, int32_t>>& get_divisors_color_theme(
+        int32_t d);
+
     // 清除缓存
     void clear_buffer();
 
@@ -159,6 +163,8 @@ class MSkin {
     int32_t nomal_hit_effect_frame_count;
     double normal_hit_effect_duration;
     int32_t slide_hit_effect_frame_count;
+
+    std::vector<std::pair<QColor, int32_t>> default_divisor_theme;
 
     // 时间分割线主题-(1/n-(颜色-宽度)列表)
     std::unordered_map<int32_t, std::vector<std::pair<QColor, int32_t>>>

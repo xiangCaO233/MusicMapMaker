@@ -3,6 +3,7 @@
 
 #include <entt.hpp>
 #include <mmm/ObjectHandle.hpp>
+#include <mmm/timing/Beat.hpp>
 
 class MMap;
 class Note;
@@ -19,8 +20,11 @@ class ECSCore {
     entt::registry& ecs_registry();
     std::unordered_map<NoteHandle, entt::entity, NoteHandle::Hash>&
     handle_to_entity_map();
+
     std::unordered_map<TimingHandle, entt::entity, TimingHandle::Hash>&
     handle_to_timingentity_map();
+
+    std::unordered_map<BeatHandle, entt::entity>& handle_to_beatentity_map();
 
     // 更新map
     void updateMap(MMap* mmap);
@@ -38,5 +42,7 @@ class ECSCore {
     // TimingHandle -> entt::entity 的映射
     std::unordered_map<TimingHandle, entt::entity, TimingHandle::Hash>
         timing_handle_to_entity_map;
+    // BeatHandle -> entt::entity 的映射
+    std::unordered_map<BeatHandle, entt::entity> beat_handle_to_entity_map;
 };
 #endif  // MMM_ECSCORE_HPP

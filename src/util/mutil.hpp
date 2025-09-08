@@ -25,6 +25,8 @@
 #include <QSvgRenderer>
 #include <QTime>
 #include <QtSvgWidgets/QSvgWidget>
+#include <mmm/DataStructures.hpp>
+#include <mmm/timing/Beat.hpp>
 #include <string>
 
 #ifdef _WIN32
@@ -451,6 +453,112 @@ inline bool fileExistsInPath(const std::filesystem::path& f,
         return false;
     }
 }
+
+inline bool isApproxEqual(double a, double b, double tolerance) {
+    return std::abs(a - b) <= tolerance;
+}
+
+// 计算分音策略(2~64)并在找到有效策略时设置divpos
+inline int calculateDivisionStrategy(const NoteCollection& notes, Beat& beat,
+                                     double tolerance) {
+    double beat_length = beat.beat_length;
+    const auto& hitobjects = notes.get_all_notes_ordered();
+    if (hitobjects.empty() || beat_length <= 0) return 2;
+
+    // 收集当前拍内的所有物件(包括重复时间戳的) [beat_start, beat_end)
+    std::vector<NoteHandle> current_beat_object_handles =
+        notes.query_range(beat.beat_start, beat.beat_start + beat_length);
+    // 当前拍的时间戳表
+    std::vector<uint32_t> current_beat_object_times;
+    for (const auto& objhandle : current_beat_object_handles) {
+        auto note = notes.get_note(objhandle);
+        switch (note->notetype()) {
+            case NoteType::NORMAL:
+            case NoteType::SLIDE: {
+                // 滑键或普通单键-直接添加时间戳
+                auto time = note->timestamp();
+                if (time >= beat.beat_start &&
+                    time <= beat.beat_start + beat_length) {
+                    current_beat_object_times.push_back(time);
+                }
+                break;
+            }
+            case NoteType::HOLD: {
+                auto hold = static_cast<const Hold*>(note);
+                // 面条要添加头和尾的时间戳
+                auto time = note->timestamp();
+                if (time >= beat.beat_start &&
+                    time <= beat.beat_start + beat_length) {
+                    current_beat_object_times.push_back(time);
+                }
+
+                auto end_time = hold->timestamp() + hold->duration();
+                if (end_time >= beat.beat_start &&
+                    end_time <= beat.beat_start + beat_length) {
+                    current_beat_object_times.push_back(end_time);
+                }
+                break;
+            }
+            case NoteType::COMPOSITE: {
+                auto composite = static_cast<const Composite*>(note);
+                // 遍历添加所有子物件的头时间戳
+                for (const auto& child : composite->children()) {
+                    auto time = child->timestamp();
+                    if (time >= beat.beat_start &&
+                        time <= beat.beat_start + beat_length) {
+                        current_beat_object_times.push_back(time);
+                    }
+                }
+                // 若结尾是面条,则再添加一个面尾时间戳
+                auto& last = composite->children().back();
+                if (last->notetype() == NoteType::HOLD) {
+                    auto hold = static_cast<const Hold*>(last.get());
+                    auto end_time = hold->timestamp() + hold->duration();
+                    if (end_time >= beat.beat_start &&
+                        end_time <= beat.beat_start + beat_length) {
+                        current_beat_object_times.push_back(end_time);
+                    }
+                }
+                break;
+            }
+        }
+    }
+    if (current_beat_object_times.empty()) return 2;
+
+    // 从最小分音数开始检查（2到64）
+    for (int n{2}; n <= 64; ++n) {
+        bool valid = true;
+        double sub_beat = beat_length / n;
+
+        // 临时存储divpos值，验证通过后再设置
+        std::unordered_set<int32_t> divpos_map;
+
+        for (const auto& ts : current_beat_object_times) {
+            // 计算最接近的分音点位置
+            double pos = (ts - beat.beat_start) / sub_beat;
+            int32_t rounded_pos = static_cast<int32_t>(std::round(pos));
+            double closest_sub = beat.beat_start + rounded_pos * sub_beat;
+
+            if (isApproxEqual(ts, closest_sub, tolerance)) {
+                divpos_map.insert(rounded_pos);
+            } else {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid) {
+            // 设置所有匹配物件的divpos
+            // for (const auto& [obj, pos] : divpos_map) {
+            //     obj->divpos = pos;
+            // }
+            return n;
+        }
+    }
+
+    return 2;  // 无有效分音策略-返回默认2
+}
+
 }  // namespace mutil
 
 #endif  // MMM_MUTIL_HPP

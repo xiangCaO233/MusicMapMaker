@@ -305,3 +305,18 @@ TextureInfo MSkin::get_object_texture(TexType type, ObjectStatus status) {
 std::string_view MSkin::get_sound_effect(SoundEffectType type) {
     return sound_effects[type];
 }
+
+// 获取时间分割线主题-(1/n-(颜色-宽度)列表)
+const std::vector<std::pair<QColor, int32_t>>& MSkin::get_divisors_color_theme(
+    int32_t d) {
+    auto it = divisors_color_theme.find(d);
+    if (it != divisors_color_theme.end()) {
+        return it->second;
+    }
+    if (default_divisor_theme.size() < d - 1) {
+        for (auto i{default_divisor_theme.size()}; i < d - 1; ++i) {
+            default_divisor_theme.emplace_back("#888888FF", 2);
+        }
+    }
+    return default_divisor_theme;
+}

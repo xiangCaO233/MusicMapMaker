@@ -3,6 +3,7 @@
 
 #include <entt.hpp>
 #include <glm/glm.hpp>
+#include <render/texture/TexMode.hpp>
 #include <render/texture/TextureInfo.hpp>
 #include <vector>
 
@@ -22,6 +23,7 @@ struct GeneratedMesh {
         // 绘制层级，值越小越先绘制
         int zIndex{0};
         bool glow{false};
+        TexScaleMode mode{TexScaleMode::FORCE_FILL};
     };
     std::vector<Quad> mesh;
 };

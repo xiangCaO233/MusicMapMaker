@@ -3,8 +3,9 @@
 
 #include <cstdint>
 
-struct TimeLineComponents {
-    uint32_t timestamp;
+struct BeatComponent {
+    uint32_t divisors;
+    double beatLength;
 };
 
 #endif  // MMM_TIMELINECOMPONENTS_HPP

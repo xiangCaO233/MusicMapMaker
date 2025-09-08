@@ -2,9 +2,8 @@
 
 #include <format>
 #include <memory>
+#include <mmm/info/osu/OsuNoteInfo.hpp>
 #include <mmm/obj/osu/OsuNote.hpp>
-
-#include "mmm/info/osu/OsuNoteInfo.hpp"
 
 // 打印用
 std::string OsuNote::toString() const {
@@ -43,6 +42,7 @@ void OsuNote::from_osu_description(const std::vector<std::string>& description,
         metait->second = std::make_shared<OsuNoteMetadata>();
     }
     const auto& meta = metait->second;
+    set_notetype(NoteType::NORMAL);
 
     /*
      *长键（仅 osu!mania）

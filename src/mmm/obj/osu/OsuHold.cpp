@@ -8,6 +8,7 @@ std::string OsuHold::toString() const { return "[OsuHold]"; }
 // 从osu描述加载
 void OsuHold::from_osu_description(const std::vector<std::string>& description,
                                    int32_t orbit_count) {
+    set_notetype(NoteType::HOLD);
     /*
      *长键（仅 osu!mania）
      *长键语法： x,y,开始时间,物件类型,长键音效,结束时间,长键音效组

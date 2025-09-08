@@ -1,7 +1,7 @@
 #ifndef MMM_HOLD_HPP
 #define MMM_HOLD_HPP
 
-#include "mmm/obj/Note.hpp"
+#include <mmm/obj/Note.hpp>
 
 class Hold : public Note {
    public:

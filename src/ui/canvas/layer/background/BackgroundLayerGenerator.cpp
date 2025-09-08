@@ -42,25 +42,26 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
             cmd.primitive = PrimitiveType::QUAD;
             buffer.add_PrimitiveCommand(cmd);
         }
+        // 绘制轨道底纹理
 
         // 绘制轨道边界线
-        PrimitiveCommand track_edge_leftcmd;
-        track_edge_leftcmd.cmdType = CommandType::PRIMITIVE;
-        track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x - 3, 0};
-        track_edge_leftcmd.baseInfo.size = {6,
-                                            info->baseInfo.canvasSize.height()};
-        track_edge_leftcmd.baseInfo.color = {0, 1, 1, 1};
-        track_edge_leftcmd.primitive = PrimitiveType::QUAD;
-        PrimitiveCommand track_edge_rightcmd;
-        track_edge_rightcmd.cmdType = CommandType::PRIMITIVE;
-        track_edge_rightcmd.baseInfo.pos = {
-            all_tracks_rect.x + all_tracks_rect.z - 3, 0};
-        track_edge_rightcmd.baseInfo.size = {
-            6, info->baseInfo.canvasSize.height()};
-        track_edge_rightcmd.baseInfo.color = {0, 1, 1, 1};
-        track_edge_rightcmd.primitive = PrimitiveType::QUAD;
-        buffer.add_PrimitiveCommand(track_edge_leftcmd);
-        buffer.add_PrimitiveCommand(track_edge_rightcmd);
+        // PrimitiveCommand track_edge_leftcmd;
+        // track_edge_leftcmd.cmdType = CommandType::PRIMITIVE;
+        // track_edge_leftcmd.baseInfo.pos = {all_tracks_rect.x - 3, 0};
+        // track_edge_leftcmd.baseInfo.size = {6,
+        //                                     info->baseInfo.canvasSize.height()};
+        // track_edge_leftcmd.baseInfo.color = {0, 1, 1, 1};
+        // track_edge_leftcmd.primitive = PrimitiveType::QUAD;
+        // PrimitiveCommand track_edge_rightcmd;
+        // track_edge_rightcmd.cmdType = CommandType::PRIMITIVE;
+        // track_edge_rightcmd.baseInfo.pos = {
+        //     all_tracks_rect.x + all_tracks_rect.z - 3, 0};
+        // track_edge_rightcmd.baseInfo.size = {
+        //     6, info->baseInfo.canvasSize.height()};
+        // track_edge_rightcmd.baseInfo.color = {0, 1, 1, 1};
+        // track_edge_rightcmd.primitive = PrimitiveType::QUAD;
+        // buffer.add_PrimitiveCommand(track_edge_leftcmd);
+        // buffer.add_PrimitiveCommand(track_edge_rightcmd);
     }
     // qDebug() << "bg layer done";
 }

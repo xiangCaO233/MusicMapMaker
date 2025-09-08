@@ -74,7 +74,8 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     buffer.add_PrimitiveCommand(end_cmd);
 
     // 生成时间线(拍线/识别分拍/小节线)
-    timeline_system.update(ecore, mapinfo, liner_converter, l, buffer);
+    timeline_system.update(ecore, mapinfo, liner_converter, converter, l,
+                           buffer);
 
     // qDebug() << "timeline layer done";
 }

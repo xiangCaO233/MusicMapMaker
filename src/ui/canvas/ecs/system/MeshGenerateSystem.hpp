@@ -101,7 +101,8 @@ class MeshGenerateSystem {
                     info->realTimeInfo.hovered_info.part = HoverPart::HOLD_BODY;
                 }
                 entity_mesh.mesh.emplace_back(
-                    body_pos, body_size, hold_body_texinfo, 0, hoverd_body);
+                    body_pos, body_size, hold_body_texinfo, 0, hoverd_body,
+                    TexScaleMode::TILE_BASEWIDTH_REPEAT);
 
                 // 绘制一个面尾网格(同样画在面条结束的位置)
                 // 获取面尾纹理

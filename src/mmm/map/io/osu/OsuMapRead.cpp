@@ -429,6 +429,7 @@ void MMap::readOsu() {
             // 添加到timing表
             timing_set().add_timing_point(osu_timing);
         }
+
         bool finded{false};
         // 读取全图参考bpm
         for (const auto& [time, timings] :
@@ -457,6 +458,17 @@ void MMap::readOsu() {
                                               ->second.begin()
                                               ->bpm;
             }
+        }
+
+        // 最后生成全部拍
+        generateBeatInfo();
+
+        std::map<uint32_t, Beat> sorted_beats(beatInfo.begin(), beatInfo.end());
+        for (const auto& pair : sorted_beats) {
+            const Beat& b = pair.second;
+            qDebug() << "Beat at " << b.beat_start << "ms "
+                     << "(length: " << b.beat_length << "ms): "
+                     << "Best division found -> 1/" << b.divisors;
         }
 
         // 填充元数据

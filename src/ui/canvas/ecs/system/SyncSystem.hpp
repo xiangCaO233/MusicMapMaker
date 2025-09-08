@@ -6,6 +6,7 @@
 #include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/RelationComponents.hpp>
 #include <ecs/component/StateComponents.hpp>
+#include <ecs/component/TimeLineComponents.hpp>
 #include <ecs/component/TimingComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
 #include <ecs/system/TimePixelConverter.hpp>
@@ -20,7 +21,8 @@
 class SyncSystem {
    public:
     void update(ECSCore& core, const NoteCollection& notes,
-                const TimingMap& timings, const MapCanvasInfo* info,
+                const TimingMap& timings, const BeatTimeline& beatTimeLine,
+                const BeatInfo& beatInfo, const MapCanvasInfo* info,
                 const TimePixelConverter& converter) const {
         if (!info->editorInfo.map) return;
 
@@ -64,6 +66,10 @@ class SyncSystem {
 
         // 同步Timing 实体
         sync_timings(core, timings, query_start_time, query_end_time);
+
+        // 同步拍实体
+        sync_beats(core, beatTimeLine, beatInfo, info, query_start_time,
+                   query_end_time);
     }
 
     void sync_notes(ECSCore& core, const NoteCollection& notes,
@@ -200,17 +206,87 @@ class SyncSystem {
         }
     }
 
-    // 创建timing实体
-    entt::entity createTimingEntity(entt::registry& registry,
-                                    const Timing* timing) const {
-        auto timing_entity = registry.create();
-        // 附加Time组件
-        registry.emplace<TimeComponent>(timing_entity, timing->timestamp);
-        // 附加Timing组件
-        registry.emplace<TimingComponent>(timing_entity, timing->bpm,
-                                          timing->beat_length,
-                                          timing->is_base_timing);
-        return timing_entity;
+    void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
+                    const BeatInfo& beatInfo, const MapCanvasInfo* info,
+                    const int64_t query_start_time,
+                    const int64_t query_end_time) const {
+        auto& registry = core.ecs_registry();
+        auto& beat_handle_map = core.handle_to_beatentity_map();
+        // --- 1. 高效收集当前可见的 Beat 句柄 (时间戳) ---
+        std::unordered_set<BeatHandle> visible_beat_handles;
+
+        // 因为 beatTimeLine 是有序的，我们可以使用二分查找快速定位起点
+        // std::lower_bound 找到第一个不小于 query_start_time 的元素
+        auto start_it =
+            std::lower_bound(beatTimeLine.begin(), beatTimeLine.end(),
+                             static_cast<uint32_t>(query_start_time));
+        // 如果找到的不是第一个元素，就将迭代器向前移动一个位置
+        if (start_it != beatTimeLine.begin()) {
+            --start_it;
+        }
+        // c. 遍历扩展后的范围，直到超出可见范围的末尾
+        auto end_it = beatTimeLine.end();  // 预设为结尾
+        bool extended_end = false;         // 标记是否已经向后扩展了一个
+
+        for (auto it = start_it; it != beatTimeLine.end(); ++it) {
+            const BeatHandle& timestamp = *it;
+
+            // 将当前拍加入可见集合
+            visible_beat_handles.insert(timestamp);
+
+            // d. *** 核心修正：向后扩展一个拍 ***
+            // 当我们第一次遍历到超出 query_end_time 的拍时...
+            if (timestamp > query_end_time && !extended_end) {
+                extended_end = true;     // 标记我们已经包含了这个“额外”的拍
+                end_it = std::next(it);  // 记录下一次循环应该结束的位置
+            }
+
+            // 如果已经向后扩展过了，并且当前迭代器到达了记录的结束位置，就跳出循环
+            if (extended_end && it == std::prev(end_it)) {
+                break;
+            }
+        }
+
+        // --- 2. 销毁不再可见的 Beat 实体 ---
+        for (auto it = beat_handle_map.begin(); it != beat_handle_map.end();) {
+            // 这里还需要考虑编辑器交互状态，我们暂时简化
+            if (!visible_beat_handles.contains(it->first)) {
+                if (registry.valid(it->second)) {
+                    registry.destroy(it->second);
+                }
+                it = beat_handle_map.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        // --- 3. 创建新出现的 Beat 实体 ---
+        for (const BeatHandle& handle : visible_beat_handles) {
+            if (!beat_handle_map.contains(handle)) {
+                // 从 BeatInfo 中查找详细信息
+                auto beat_info_it = beatInfo.find(handle);
+                if (beat_info_it != beatInfo.end()) {
+                    const Beat* beat_data = &(beat_info_it->second);
+                    beat_handle_map[handle] =
+                        createBeatEntity(registry, beat_data);
+                }
+            }
+        }
+    }
+
+    // 创建拍实体
+    entt::entity createBeatEntity(entt::registry& registry,
+                                  const Beat* beat) const {
+        auto beat_entity = registry.create();
+
+        // 附加 TimeComponent，以便 TimeSystem 处理它的Y坐标
+        registry.emplace<TimeComponent>(beat_entity, beat->beat_start);
+
+        // 附加 BeatComponent，存储分拍数等特有信息
+        registry.emplace<BeatComponent>(beat_entity, beat->divisors,
+                                        beat->beat_length);
+
+        return beat_entity;
     }
 
     // 创建物件实体
@@ -253,6 +329,19 @@ class SyncSystem {
                 break;
         }
         return note_entity;
+    }
+
+    // 创建timing实体
+    entt::entity createTimingEntity(entt::registry& registry,
+                                    const Timing* timing) const {
+        auto timing_entity = registry.create();
+        // 附加Time组件
+        registry.emplace<TimeComponent>(timing_entity, timing->timestamp);
+        // 附加Timing组件
+        registry.emplace<TimingComponent>(timing_entity, timing->bpm,
+                                          timing->beat_length,
+                                          timing->is_base_timing);
+        return timing_entity;
     }
 };
 
