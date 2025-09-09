@@ -76,6 +76,8 @@ class MapCanvas : public GLCanvas {
     // 主音轨播放回调
     std::shared_ptr<CanvasAudioPlayCallback> maintrack_callback;
 
+    AudioLoadCallback *audio_callback;
+
     // 绑定的谱面
     MMap *map{nullptr};
 

@@ -212,3 +212,40 @@ void TrackManager::set_maintrack(const QString& name) {
         maintrack_names.push_back(name);
     }
 }
+
+// 播放一次指定音轨
+void TrackManager::play_oneshot(std::string_view audio_name) {
+    QString q_audio_name = QString::fromStdString(std::string(audio_name));
+
+    // 获取对应的音轨
+    std::shared_ptr<ice::AudioTrack> track = audio_tracks.value(q_audio_name);
+    if (!track) {
+        return;
+    }
+
+    // 获取或创建对应的 SourceNode 池
+    if (!one_shot_pool.contains(q_audio_name)) {
+        one_shot_pool.insert(q_audio_name, std::make_shared<SourceNodePool>());
+    }
+    std::shared_ptr<SourceNodePool> pool = one_shot_pool.value(q_audio_name);
+
+    std::shared_ptr<ice::SourceNode> node = pool->get_node();
+
+    if (!node) {
+        // 如果池中没有可用的节点，则动态创建新节点
+        node = std::make_shared<ice::SourceNode>(track);
+
+        // 设置独立的 PlayCallBack，用于播放完成后将节点放回池中
+        auto callback =
+            std::make_shared<SourceNodePool::OneShotPlayCallback>(pool, node);
+        node->add_playcallback(callback);
+
+        // 将新节点添加到 mixbus。一旦添加，mixbus 就会一直持有它。
+        mixbus->add_source(node);
+    }
+
+    node->set_playpos(0);
+
+    // 开始播放
+    node->play();
+}

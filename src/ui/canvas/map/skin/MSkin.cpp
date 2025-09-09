@@ -23,7 +23,6 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
     skinPath = std::filesystem::path(skin_path);
     auto cfgPath = skinPath / "skinconfig.json";
     std::ifstream ifs(cfgPath);
-    qDebug() << "配置路径:" << cfgPath;
     ifs >> skinRootCfg;
 
     // 读取配置
@@ -31,46 +30,30 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
     author = skinRootCfg.value<std::string>("author", "unknown author");
 
     texture_config = skinRootCfg["textures"];
-    qDebug() << "texture_config :" << texture_config.dump(4);
 
     bg_texture_config = texture_config["bg"];
-    qDebug() << "bg_texture_config :" << bg_texture_config.dump(4);
 
     object_texture_config = texture_config["hitobject"];
-    qDebug() << "object_texture_config:" << object_texture_config.dump(4);
 
     note_texture_config = object_texture_config["note"];
-    qDebug() << "note_texture_config:" << note_texture_config.dump(4);
 
     head_texture_config = object_texture_config["head"];
-    qDebug() << "head_texture_config:" << head_texture_config.dump(4);
 
     node_texture_config = object_texture_config["node"];
-    qDebug() << "node_texture_config:" << node_texture_config.dump(4);
 
     hold_texture_config = object_texture_config["hold"];
-    qDebug() << "hold_texture_config :" << hold_texture_config.dump(4);
 
     vertical_holdbody_texture_config = hold_texture_config["body"]["vertical"];
-    qDebug() << "vertical_holdbody_texture_config :"
-             << vertical_holdbody_texture_config.dump(4);
 
     horizontal_holdbody_texture_config =
         hold_texture_config["body"]["horizontal"];
-    qDebug() << "horizontal_holdbody_texture_config :"
-             << horizontal_holdbody_texture_config.dump(4);
 
     hold_end_texture_config = hold_texture_config["end"];
-    qDebug() << "hold_end_texture_config :" << hold_end_texture_config.dump(4);
 
     left_slide_end_texture_config = object_texture_config["slide"]["arrowleft"];
-    qDebug() << "left_slide_end_texture_config :"
-             << left_slide_end_texture_config.dump(4);
 
     right_slide_end_texture_config =
         object_texture_config["slide"]["arrowright"];
-    qDebug() << "right_slide_end_texture_config :"
-             << right_slide_end_texture_config.dump(4);
 
     // 音效配置
     auto sound_effects_config = skinRootCfg["sounds"];
@@ -88,11 +71,9 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
 
     // 选中框纹理配置
     selected_config = bg_texture_config["select-border"];
-    qDebug() << "selected_config :" << selected_config.dump(4);
 
     // 打击特效配置
     hit_effect_config = texture_config["effects"];
-    qDebug() << "hit_effect_config :" << hit_effect_config.dump(4);
     nomal_hit_effect_dir =
         hit_effect_config.value<std::string>("note-effectdir", "");
     nomal_hit_effect_frame_count = count_files_recursive(
@@ -135,6 +116,7 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
     // 载入默认皮肤的全部纹理
     textureLoadcbk->need_loadtexture_dir(skin_path);
 
+    qDebug() << "配置路径:" << cfgPath;
     qDebug() << "载入皮肤:[" << name << "]";
     qDebug() << "皮肤作者:[" << author << "]";
 }

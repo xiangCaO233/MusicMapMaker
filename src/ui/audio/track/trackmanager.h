@@ -8,6 +8,7 @@
 
 #include <GLCanvas.hpp>
 #include <QWidget>
+#include <audio/track/SourceNodePool.hpp>
 #include <ice/core/IAudioNode.hpp>
 #include <ice/core/MixBus.hpp>
 #include <ice/manage/AudioPool.hpp>
@@ -41,7 +42,7 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
     // 获取音频控制器
     AudioController *get_controller(const QString &audio_name);
 
-    // 获取主音轨名
+    // 获取所有主音轨名
     const QStringList &get_maintrack() const;
 
     // 设置主音轨名
@@ -51,6 +52,9 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
     std::weak_ptr<ice::AudioTrack> loadBack(std::string_view audio_path,
                                             bool is_maintrack = false) override;
     AudioController *getController(std::string_view audio_name) override;
+
+    void play_oneshot(std::string_view audio_name) override;
+
    signals:
     void audioLoadcbk_initialized(AudioLoadCallback *cbk);
 
@@ -96,6 +100,9 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
 
     // 混音器
     std::shared_ptr<ice::MixBus> mixbus{nullptr};
+
+    // 为每个音轨维护的SourceNode池
+    QHash<QString, std::shared_ptr<SourceNodePool>> one_shot_pool;
 
     // 创建轨道控制器
     decltype(audio_controllers.begin()) makeController(

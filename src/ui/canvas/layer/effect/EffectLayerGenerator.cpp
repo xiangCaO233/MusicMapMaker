@@ -19,14 +19,16 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
     auto& ecore = maplayer_manager->core();
     const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
                                       (1.f - mapinfo->baseInfo.judgeline_pos);
-    PrimitiveCommand judgeline_cmd;
-    judgeline_cmd.cmdType = CommandType::PRIMITIVE;
-    judgeline_cmd.baseInfo.pos = {mapinfo->editorInfo.track_layout.x,
-                                  judgeline_absolute_y};
-    judgeline_cmd.baseInfo.size = {mapinfo->editorInfo.track_layout.z, 4};
-    judgeline_cmd.baseInfo.color = {0, 1, 1, 1};
-    judgeline_cmd.primitive = PrimitiveType::QUAD;
-    buffer.add_PrimitiveCommand(judgeline_cmd);
+    auto skin = mapinfo->editorInfo.skin;
+    // 绘制判定线
+    // PrimitiveCommand judgeline_cmd;
+    // judgeline_cmd.cmdType = CommandType::PRIMITIVE;
+    // judgeline_cmd.baseInfo.pos = {mapinfo->editorInfo.track_layout.x,
+    //                               judgeline_absolute_y};
+    // judgeline_cmd.baseInfo.size = {mapinfo->editorInfo.track_layout.z, 4};
+    // judgeline_cmd.baseInfo.color = {0, 1, 1, 1};
+    // judgeline_cmd.primitive = PrimitiveType::QUAD;
+    // buffer.add_PrimitiveCommand(judgeline_cmd);
 
     // 绘制当前时间字符串
     auto timestr =

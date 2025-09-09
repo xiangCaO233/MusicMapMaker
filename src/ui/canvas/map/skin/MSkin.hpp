@@ -92,6 +92,15 @@ class MSkin {
     // 清除缓存
     void clear_buffer();
 
+    // 特效纹理目录
+    std::string nomal_hit_effect_dir;
+    std::string slide_hit_effect_dir;
+
+    // 特效帧数量
+    int32_t nomal_hit_effect_frame_count;
+    double normal_hit_effect_duration;
+    int32_t slide_hit_effect_frame_count;
+
    private:
     TextureLoadCallback* texcallback;
     std::filesystem::path skinPath;
@@ -154,15 +163,6 @@ class MSkin {
     // 物件纹理缓存
     std::unordered_map<TexType, std::unordered_map<ObjectStatus, TextureInfo>>
         object_texture_buffer;
-
-    // 特效纹理目录
-    std::string nomal_hit_effect_dir;
-    std::string slide_hit_effect_dir;
-
-    // 特效帧数量
-    int32_t nomal_hit_effect_frame_count;
-    double normal_hit_effect_duration;
-    int32_t slide_hit_effect_frame_count;
 
     std::vector<std::pair<QColor, int32_t>> default_divisor_theme;
 

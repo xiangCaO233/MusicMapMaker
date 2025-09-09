@@ -8,6 +8,7 @@
 #include <mmm/map/MMap.hpp>
 #include <mmm/project/MProject.hpp>
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
+#include <thread>
 #include <tool/note/NoteTool.hpp>
 #include <tool/select/SelectTool.hpp>
 
@@ -63,6 +64,19 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
     for (const auto& [type, soundRpath] : skin->sound_effects) {
         auto soundApath = skin->skinPath / soundRpath;
         auto weak_track = cbk->loadBack(soundApath.generic_string());
+
+        // std::thread t([cbk]() {
+        //     while (true) {
+        //         using namespace std::chrono_literals;
+        //         std::this_thread::sleep_for(10ms);
+        //         cbk->play_oneshot(
+        //             "/home/xiang/Documents/coding/c_cpp/MusicMapMaker/"
+        //             "resources/"
+        //             "textures/default/打击特效/key音/单键.wav");
+        //     }
+        // });
+
+        // t.detach();
     }
 }
 

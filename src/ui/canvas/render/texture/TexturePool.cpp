@@ -278,10 +278,10 @@ void TexturePool::buildFromManifest(
                                    GL_LINEAR),
                    glf);
             GLCALL(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
-                                   GL_CLAMP_TO_BORDER),
+                                   GL_MIRRORED_REPEAT),
                    glf);
             GLCALL(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
-                                   GL_CLAMP_TO_BORDER),
+                                   GL_MIRRORED_REPEAT),
                    glf);
 
             // 预计算TextureInfo并派发异步加载任务

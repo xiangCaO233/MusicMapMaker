@@ -33,8 +33,8 @@ class TimeLineSystem {
             const auto& [bpm, beat_length, is_base_timing] =
                 registry.get<TimingComponent>(e);
             // 转换时间线所处y位置
-            const auto y = converter.timeToPixel(
-                time, realtime_info.presentation_canvas_time);
+            const auto y = converter2.timeToPixel(
+                time, realtime_info.presentation_canvas_time, info);
 
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
