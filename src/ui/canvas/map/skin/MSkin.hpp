@@ -10,8 +10,17 @@
 
 using json = nlohmann::json;
 
+enum class EffectTextureType : int32_t {
+    NONE,
+    // 正常击中
+    NORMAL,
+    // 滑键尾部
+    SLIDE_END,
+};
+
 // 音效类型
 enum class SoundEffectType : int32_t {
+    NONE,
     // 正常击中
     COMMON_HIT = 0,
     // 滑动

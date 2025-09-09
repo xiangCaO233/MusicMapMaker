@@ -24,7 +24,8 @@ class TimeSystem {
 
             // 使用转换器计算Y坐标
             const float y = converter.timeToPixel(
-                time, realtime_info.presentation_canvas_time, info);
+                time, realtime_info.current_time_info.presentation_canvas_time,
+                info);
 
             // 附加或更新 TransformComponent_1
             registry.emplace_or_replace<TransformComponent>(entity, y);

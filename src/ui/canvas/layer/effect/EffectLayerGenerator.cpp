@@ -31,8 +31,8 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
     // buffer.add_PrimitiveCommand(judgeline_cmd);
 
     // 绘制当前时间字符串
-    auto timestr =
-        QString::number(uint32_t(mapinfo->realTimeInfo.logic_canvas_time));
+    auto timestr = QString::number(
+        uint32_t(mapinfo->realTimeInfo.current_time_info.logic_canvas_time));
     auto timestru32 = timestr.toStdU32String();
 
     uint32_t xoffset{0};

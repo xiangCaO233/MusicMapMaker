@@ -33,26 +33,30 @@ class MapCanvasClock {
             m_was_playing = true;
             m_last_playback_rate = current_playback_rate;
 
-            info.logic_canvas_time = info.raw_audio_time_ms.load();
-            m_last_known_audio_time = info.raw_audio_time_ms.load();
+            info.current_time_info.logic_canvas_time =
+                info.current_time_info.raw_audio_time_ms.load();
+            m_last_known_audio_time =
+                info.current_time_info.raw_audio_time_ms.load();
             m_canvas_time_at_last_sync =
-                info.logic_canvas_time;  // 使用逻辑时间
+                info.current_time_info.logic_canvas_time;  // 使用逻辑时间
             m_rate_corrector = 0.0;
         }
 
         // --- 校准事件：只在原始音频时间上操作 ---
-        double current_audio_time = info.raw_audio_time_ms.load();
+        double current_audio_time =
+            info.current_time_info.raw_audio_time_ms.load();
         bool has_new_audio_update =
             (current_audio_time != m_last_known_audio_time);
 
         if (has_new_audio_update) {
             double target_time = current_audio_time;
-            double phase_error = target_time - info.logic_canvas_time;
+            double phase_error =
+                target_time - info.current_time_info.logic_canvas_time;
 
             // 计算自上次同步以来，音频时间和画布时间各自前进了多少
             double audio_elapsed = current_audio_time - m_last_known_audio_time;
-            double canvas_elapsed =
-                info.logic_canvas_time - m_canvas_time_at_last_sync;
+            double canvas_elapsed = info.current_time_info.logic_canvas_time -
+                                    m_canvas_time_at_last_sync;
 
             // 只有在时间是前进的情况下才进行计算，以避免seek或loop导致的错误
             if (audio_elapsed > 0 && canvas_elapsed > 0) {
@@ -81,16 +85,18 @@ class MapCanvasClock {
 
             // 【P项】应用瞬时位置修正到逻辑时间
             double position_correction = phase_error * Kp;
-            info.logic_canvas_time += position_correction;
+            info.current_time_info.logic_canvas_time += position_correction;
 
             // 更新同步点信息
             m_last_known_audio_time = current_audio_time;
-            m_canvas_time_at_last_sync = info.logic_canvas_time;
+            m_canvas_time_at_last_sync =
+                info.current_time_info.logic_canvas_time;
         }
 
         // --- 预测性前进：只在逻辑时间上操作 ---
         m_clock_rate = current_playback_rate + m_rate_corrector;
-        info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
+        info.current_time_info.logic_canvas_time +=
+            smoothed_delta_ms * m_clock_rate;
     }
 
     void updateWBox(RealTimeInfo& info, double smoothed_delta_ms) {
@@ -116,15 +122,17 @@ class MapCanvasClock {
             // 首次播放或变速，进行一次硬重置
             m_was_playing = true;
             m_last_playback_rate = current_playback_rate;
-            info.logic_canvas_time = info.raw_audio_time_ms.load();
+            info.current_time_info.logic_canvas_time =
+                info.current_time_info.raw_audio_time_ms.load();
             m_clock_rate = current_playback_rate;  // 速率也立即重置
         }
 
         // 1. 计算当前“水箱”的水位 (即画布与音频的领先差距)
         //    目标时间 = 音频原始时间 + 目标缓冲
         double target_time_with_buffer =
-            info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
-        double buffer_error = target_time_with_buffer - info.logic_canvas_time;
+            info.current_time_info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
+        double buffer_error =
+            target_time_with_buffer - info.current_time_info.logic_canvas_time;
 
         // 2. 根据“水位”误差，计算一个理想的目标速率
         //    这是一个P控制器，但它控制的是“速率”，而不是“位置”
@@ -145,7 +153,8 @@ class MapCanvasClock {
         // 5. 【无回弹前进】以当前平滑的速率，让时间前进
         //    smoothed_delta_ms 必须 > 0, m_clock_rate 必须 > 0
         //    因此 logic_canvas_time 永远只会增加，绝不回弹！
-        info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
+        info.current_time_info.logic_canvas_time +=
+            smoothed_delta_ms * m_clock_rate;
     }
 
     void updateAutoAd(RealTimeInfo& info, double smoothed_delta_ms) {
@@ -171,15 +180,17 @@ class MapCanvasClock {
             // 首次播放或变速，进行一次硬重置
             m_was_playing = true;
             m_last_playback_rate = current_playback_rate;
-            info.logic_canvas_time = info.raw_audio_time_ms.load();
+            info.current_time_info.logic_canvas_time =
+                info.current_time_info.raw_audio_time_ms.load();
             m_clock_rate = current_playback_rate;  // 速率也立即重置
         }
 
         // 1. 计算当前时间误差
         //    目标时间 = 音频时间 + 缓冲
         double target_time_with_buffer =
-            info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
-        double error = target_time_with_buffer - info.logic_canvas_time;
+            info.current_time_info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
+        double error =
+            target_time_with_buffer - info.current_time_info.logic_canvas_time;
 
         // 2. 【核心】根据误差大小，选择不同的策略 (动态平滑)
         double current_smoothing_factor;
@@ -203,7 +214,8 @@ class MapCanvasClock {
 
         // 5. 【无回弹前进】以当前极其平滑的速率，让时间前进
         //    因为 m_clock_rate 的变化非常缓慢，所以时间的增加也是极其平滑的
-        info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
+        info.current_time_info.logic_canvas_time +=
+            smoothed_delta_ms * m_clock_rate;
     }
 
     void updateSyncWindow(RealTimeInfo& info, double smoothed_delta_ms) {
@@ -228,8 +240,9 @@ class MapCanvasClock {
         // 1. 计算当前时间误差
         //    目标时间 = 音频时间 + 缓冲
         double target_time_with_buffer =
-            info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
-        double error = target_time_with_buffer - info.logic_canvas_time;
+            info.current_time_info.raw_audio_time_ms.load() + TARGET_BUFFER_MS;
+        double error =
+            target_time_with_buffer - info.current_time_info.logic_canvas_time;
 
         // 2. 根据误差大小，动态选择平滑策略
         double current_smoothing_factor;
@@ -256,7 +269,8 @@ class MapCanvasClock {
         // 5. 【无回弹前进】以当前极其平滑的速率，让时间前进
         //    由于 m_clock_rate 被钳制在正数范围，时间永远不会倒退
         if (smoothed_delta_ms > 0) {
-            info.logic_canvas_time += smoothed_delta_ms * m_clock_rate;
+            info.current_time_info.logic_canvas_time +=
+                smoothed_delta_ms * m_clock_rate;
         }
     }
 
@@ -277,15 +291,17 @@ class MapCanvasClock {
     void force_sync(RealTimeInfo& info) {
         // 强制同步一次,允许“跳变”
         qDebug() << "force_sync";
-        info.logic_canvas_time = info.raw_audio_time_ms.load();
+        info.current_time_info.logic_canvas_time =
+            info.current_time_info.raw_audio_time_ms.load();
         m_clock_rate = info.audio_playback_rate.load();
         m_rate_corrector = 0.0;
         m_last_known_audio_time = 0.0;
         m_canvas_time_at_last_sync = 0.0;
 
-        info.logic_canvas_time = info.raw_audio_time_ms.load();
+        info.current_time_info.logic_canvas_time =
+            info.current_time_info.raw_audio_time_ms.load();
         m_state = State::FreeRun;
-        m_phase_start_time = info.logic_canvas_time;
+        m_phase_start_time = info.current_time_info.logic_canvas_time;
         m_last_playback_rate = info.audio_playback_rate.load();
     }
 

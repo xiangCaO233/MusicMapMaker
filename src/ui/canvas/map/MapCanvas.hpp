@@ -65,7 +65,8 @@ class MapCanvas : public GLCanvas {
             if (auto *mapinfo = canvas->info<MapCanvasInfo>()) {
                 double timems =
                     std::chrono::duration<double, std::milli>(time_pos).count();
-                mapinfo->realTimeInfo.raw_audio_time_ms.store(timems);
+                mapinfo->realTimeInfo.current_time_info.raw_audio_time_ms.store(
+                    timems);
             }
         }
 

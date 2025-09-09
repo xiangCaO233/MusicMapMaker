@@ -3,6 +3,7 @@
 
 #include <QPoint>
 #include <QSize>
+#include <atomic>
 #include <entt.hpp>
 #include <glm/glm.hpp>
 #include <unordered_set>
@@ -46,7 +47,7 @@ struct SelectFrame {
     glm::vec2 size{0};
 };
 
-struct RealTimeInfo {
+struct TimeInfo {
     // 【呈现时间】最终用于渲染的时间戳
     double presentation_canvas_time{0.0};
 
@@ -54,7 +55,12 @@ struct RealTimeInfo {
     // 这个时间对外部模块（如图层）是只读的，主要由时钟管理
     double logic_canvas_time{0.0};
 
-    // --- 音频线程和主线程之间的同步点 ---
+    // --- 音频线程提供的原始同步数据 ---
+    // 音频播放器报告的、未经偏移修正的原始播放时间
+    std::atomic<double> raw_audio_time_ms{0.0};
+};
+
+struct OffsetInfo {
     // --- 音频/谱面固定偏移量 (ms) ---
     std::atomic<double> global_static_offset_ms{-110.0};
 
@@ -62,9 +68,24 @@ struct RealTimeInfo {
     // 可以由UI控件修改，所以用原子保证线程安全
     std::atomic<double> global_offset_ms{0.0};
 
-    // --- 音频线程提供的原始同步数据 ---
-    // 音频播放器报告的、未经偏移修正的原始播放时间
-    std::atomic<double> raw_audio_time_ms{0.0};
+    // 特效固定偏移量 (ms)
+    std::atomic<double> effect_static_offset_ms{-110};
+
+    // 特效偏移量 (ms)
+    // 正值表示特效提前播放，负值表示延迟播放
+    std::atomic<double> effect_offset_ms{0};
+};
+
+struct RealTimeInfo {
+    // --- 音频线程和主线程之间的同步点 ---
+    // 当前帧的时间信息
+    TimeInfo current_time_info;
+
+    // 上一帧的时间信息
+    TimeInfo last_time_info;
+
+    // 偏移信息
+    OffsetInfo offset_info;
 
     // 音频播放器设定的播放速率 (1.0 = 正常, 0.5 = 半速, 2.0 = 倍速)
     // 同样，它可能由UI线程修改，所以使用原子类型

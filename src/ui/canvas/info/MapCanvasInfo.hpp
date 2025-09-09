@@ -7,6 +7,7 @@
 #include <mmm/project/MProjectConfig.hpp>
 #include <tool/BaseTool.hpp>
 
+class AudioLoadCallback;
 struct MapInfo {
     // 背景路径
     std::string cover_path{""};
@@ -44,6 +45,8 @@ struct MapCanvasInfo : public SharedCanvasInfo {
     MapInfo mapInfo;
     // 编辑信息
     EditorInfo editorInfo;
+    // 音频回调指针
+    AudioLoadCallback* audio_callback;
 
     // 绑定项目配置
     void bindProjectConfig(const MProjectConfig* cfg) {

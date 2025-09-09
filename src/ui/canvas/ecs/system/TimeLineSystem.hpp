@@ -34,7 +34,8 @@ class TimeLineSystem {
                 registry.get<TimingComponent>(e);
             // 转换时间线所处y位置
             const auto y = converter2.timeToPixel(
-                time, realtime_info.presentation_canvas_time, info);
+                time, realtime_info.current_time_info.presentation_canvas_time,
+                info);
 
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
@@ -149,8 +150,8 @@ class TimeLineSystem {
             const auto& current_beat = *it;
             // 转换时间线所处y位置
             const auto y = converter2.timeToPixel(
-                current_beat.timestamp, realtime_info.presentation_canvas_time,
-                info);
+                current_beat.timestamp,
+                realtime_info.current_time_info.presentation_canvas_time, info);
             // 生成拍头线
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
@@ -177,9 +178,11 @@ class TimeLineSystem {
                     }
 
                     auto theme = divtheme[j - 1];
-                    auto divy = converter2.timeToPixel(
-                        subdivision_timestamp,
-                        realtime_info.presentation_canvas_time, info);
+                    auto divy =
+                        converter2.timeToPixel(subdivision_timestamp,
+                                               realtime_info.current_time_info
+                                                   .presentation_canvas_time,
+                                               info);
 
                     PrimitiveCommand sub_cmd;
                     sub_cmd.cmdType = CommandType::PRIMITIVE;

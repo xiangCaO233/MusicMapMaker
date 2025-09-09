@@ -56,10 +56,11 @@ void RenderLoopWorker::doWork() {
                                        d->m_smoothed_delta_ms);
             // 在这一帧的开始，计算出最终的呈现时间
             // 是一个无状态的、纯粹的变换
-            mapinfo->realTimeInfo.presentation_canvas_time =
-                mapinfo->realTimeInfo.logic_canvas_time +
-                mapinfo->realTimeInfo.global_static_offset_ms.load() +
-                mapinfo->realTimeInfo.global_offset_ms.load();
+            mapinfo->realTimeInfo.current_time_info.presentation_canvas_time =
+                mapinfo->realTimeInfo.current_time_info.logic_canvas_time +
+                mapinfo->realTimeInfo.offset_info.global_static_offset_ms
+                    .load() +
+                mapinfo->realTimeInfo.offset_info.global_offset_ms.load();
         }
 
         d->pre_tickEvent();

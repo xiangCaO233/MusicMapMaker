@@ -24,11 +24,22 @@ void MapDataLoop::pre_tickEvent() {
                        converter);
     // 计算有时间属性的逻辑y轴位置
     time_system.update(ecore, mapinfo, converter);
+
+    // 同步特效
+    sync_system.update(ecore, map->note_set(), mapinfo, converter);
 }
 
 void MapDataLoop::tickEvent() {}
 
-void MapDataLoop::after_tickEvent() {}
+void MapDataLoop::after_tickEvent() {
+    auto mapinfo = static_cast<MapCanvasInfo *>(getinfo());
+    mapinfo->realTimeInfo.last_time_info.logic_canvas_time =
+        mapinfo->realTimeInfo.current_time_info.logic_canvas_time;
+    mapinfo->realTimeInfo.last_time_info.presentation_canvas_time =
+        mapinfo->realTimeInfo.current_time_info.presentation_canvas_time;
+    mapinfo->realTimeInfo.last_time_info.raw_audio_time_ms.store(
+        mapinfo->realTimeInfo.current_time_info.raw_audio_time_ms.load());
+}
 
 // 初始化层管理器
 void MapDataLoop::initializeLayerManager() {

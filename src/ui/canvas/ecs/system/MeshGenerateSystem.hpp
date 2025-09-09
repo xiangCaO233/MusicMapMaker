@@ -80,10 +80,11 @@ class MeshGenerateSystem {
             if (registry.all_of<HoldComponent>(e)) {
                 // 计算持续面身高度
                 const auto& [duration] = registry.get<HoldComponent>(e);
-                auto body_height =
-                    y - converter.timeToPixel(
-                            time + duration,
-                            info->realTimeInfo.presentation_canvas_time, info);
+                auto body_height = y - converter.timeToPixel(
+                                           time + duration,
+                                           info->realTimeInfo.current_time_info
+                                               .presentation_canvas_time,
+                                           info);
 
                 // 获取面身纹理
                 TextureInfo hold_body_texinfo =

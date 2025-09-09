@@ -1,4 +1,5 @@
 #include <ecs/ECSCore.hpp>
+#include <ecs/component/EffectComponents.hpp>
 
 // 构造ECSCore
 ECSCore::ECSCore() = default;
@@ -23,4 +24,23 @@ ECSCore::handle_to_beatentity_map() {
 }
 
 // 更新map
-void ECSCore::updateMap(MMap* mmap) { map = mmap; }
+void ECSCore::updateMap(MMap* mmap) {
+    map = mmap;
+    // 更新特效实体
+    // 清理可能残留的旧轨道特效
+    registry.clear<EffectComponent>();
+
+    for (int i = 0; i < map->base_metadata().track_count; ++i) {
+        auto entity = registry.create();
+        // 初始化时，特效处于“静默”状态
+        // 我们可以用一个特殊的 texture_type 或无效的 last_reset_time 来表示
+        registry.emplace<EffectComponent>(
+            entity, i, EffectTextureType::NONE,
+            std::chrono::steady_clock::time_point{});
+        // 附加一个轨道标签，便于查找
+        registry.emplace<TrackIdentifierComponent>(entity, i);
+
+        // 附加一个音效标签
+        registry.emplace<SoundStateComponent>(entity);
+    }
+}
