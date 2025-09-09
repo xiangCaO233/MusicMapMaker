@@ -69,5 +69,11 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
         }
     }
 
+    // 处理特效绘制
+    effect_render_system.update(ecore, mapinfo, l, buffer);
+
+    // 处理音频效果播放
+    audio_effect_system.update(ecore, mapinfo);
+
     // qDebug() << "effect layer done";
 }

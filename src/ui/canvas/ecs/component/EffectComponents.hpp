@@ -9,7 +9,7 @@
 // --- 特效状态组件 (每个轨道一个) ---
 struct EffectComponent {
     // 特效轨道号 (用于反向查找)
-    uint32_t track;
+    int track;
 
     // --- 视觉状态 ---
     // 当前应该播放哪种纹理序列

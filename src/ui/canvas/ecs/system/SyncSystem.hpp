@@ -72,14 +72,16 @@ class SyncSystem {
             info->realTimeInfo.last_time_info.presentation_canvas_time;
 
         // 计算出用于特效判断的逻辑时间
-        const int64_t effect_time =
+        const double effect_time =
             presentation_time +
-            info->realTimeInfo.offset_info.effect_static_offset_ms +
-            info->realTimeInfo.offset_info.effect_offset_ms;
-        const int64_t last_effect_time =
+            (info->realTimeInfo.offset_info.effect_static_offset_ms +
+             info->realTimeInfo.offset_info.effect_offset_ms) *
+                info->realTimeInfo.audio_playback_rate;
+        const double last_effect_time =
             last_presentation_time +
-            info->realTimeInfo.offset_info.effect_static_offset_ms +
-            info->realTimeInfo.offset_info.effect_offset_ms;
+            (info->realTimeInfo.offset_info.effect_static_offset_ms +
+             info->realTimeInfo.offset_info.effect_offset_ms) *
+                info->realTimeInfo.audio_playback_rate;
 
         // 遍历所有可见的Note实体
         auto view = registry.view<NoteComponent, TimeComponent>();
@@ -95,8 +97,8 @@ class SyncSystem {
                 auto note = notes.get_note(handle);
                 if (!note) continue;
 
-                qDebug() << "time[" << time << "],track[" << track
-                         << "]需要触发特效";
+                // qDebug() << "time[" << time << "],track[" << track
+                //          << "]需要触发特效";
                 // 查找对应轨道的特效实体并更新它
                 auto effect_view =
                     registry.view<EffectComponent, SoundStateComponent,

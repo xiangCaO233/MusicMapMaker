@@ -34,9 +34,7 @@ void ECSCore::updateMap(MMap* mmap) {
         auto entity = registry.create();
         // 初始化时，特效处于“静默”状态
         // 我们可以用一个特殊的 texture_type 或无效的 last_reset_time 来表示
-        registry.emplace<EffectComponent>(
-            entity, i, EffectTextureType::NONE,
-            std::chrono::steady_clock::time_point{});
+        registry.emplace<EffectComponent>(entity, i, EffectTextureType::NONE);
         // 附加一个轨道标签，便于查找
         registry.emplace<TrackIdentifierComponent>(entity, i);
 

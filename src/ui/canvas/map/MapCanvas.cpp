@@ -51,9 +51,7 @@ void MapCanvas::initializeGL() {
 #endif  //__APPLE__
                                 audioLoadCallback(), textureCallback()))
                .first->second.get();
-    auto mapinfo = info<MapCanvasInfo>();
-    mapinfo->editorInfo.skin = skin;
-    mapinfo->audio_callback = audioLoadCallback();
+    info<MapCanvasInfo>()->editorInfo.skin = skin;
     update_sharedInfo();
     emit skinInitialized();
     dataloop()->start();
@@ -80,6 +78,7 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
 
         // t.detach();
     }
+    info<MapCanvasInfo>()->audio_callback = cbk;
 }
 
 void MapCanvas::onUpdateTexinfo() {

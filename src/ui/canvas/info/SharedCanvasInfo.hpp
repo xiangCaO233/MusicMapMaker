@@ -69,7 +69,7 @@ struct OffsetInfo {
     std::atomic<double> global_offset_ms{0.0};
 
     // 特效固定偏移量 (ms)
-    std::atomic<double> effect_static_offset_ms{-110};
+    std::atomic<double> effect_static_offset_ms{80};
 
     // 特效偏移量 (ms)
     // 正值表示特效提前播放，负值表示延迟播放
