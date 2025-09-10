@@ -462,8 +462,8 @@ inline bool isApproxEqual(double a, double b, double tolerance) {
 inline int calculateDivisionStrategy(const NoteCollection& notes, Beat& beat,
                                      double tolerance) {
     double beat_length = beat.beat_length;
-    const auto& hitobjects = notes.get_all_notes_ordered();
-    if (hitobjects.empty() || beat_length <= 0) return 2;
+    const auto& hitobjects = notes.get_all_notes_unordered();
+    if (beat_length <= 0) return 2;
 
     // 收集当前拍内的所有物件(包括重复时间戳的) [beat_start, beat_end)
     std::vector<NoteHandle> current_beat_object_handles =

@@ -294,6 +294,7 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
     // 填充字形度量信息
     glyph.bearing = data.bearing;
     glyph.xadvance = data.xadvance;
+    glyph.height = data.height;
     // qDebug() << "字符" << glyph.c << "放在"
     //          << "[" << glyph.character_texinfo.uv_offset.x << ","
     //          << glyph.character_texinfo.uv_offset.y << "]";

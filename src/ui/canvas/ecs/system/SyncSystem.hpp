@@ -182,10 +182,15 @@ class SyncSystem {
         const auto time_at_bottom =
             converter.pixelToTime(pixel_y_bottom, current_time);
 
+        // qDebug() << "Render target time range:[" << time_at_bottom << "~"
+        //          << time_at_top << "]";
+
         // 应用预加载缓冲
         const auto query_start_time =
             time_at_bottom - base_info.view_timeMargin;
         const auto query_end_time = time_at_top + base_info.view_timeMargin;
+        // qDebug() << "Render absolute(append margin) time range:["
+        //          << query_start_time << "~" << query_end_time << "]";
 
         // qDebug() << "当前查询开始:" << query_start_time;
         // qDebug() << "当前查询结束:" << query_end_time;
@@ -200,6 +205,19 @@ class SyncSystem {
         // 同步拍实体
         sync_beats(core, beatTimeLine, beatInfo, info, query_start_time,
                    query_end_time);
+
+        // 排序beat实体
+        auto& beat_group_to_sort = core.get_beat_group();
+        if (beat_group_to_sort.size() < 101) {
+            // 对 beat group 进行排序
+            beat_group_to_sort.sort<TimeComponent>(
+                [](const auto& lhs, const auto& rhs) {
+                    return lhs.timestamp < rhs.timestamp;
+                });
+        } else {
+            // 放弃排序
+            qDebug() << "可见拍过多[],放弃排序(可能造成拍层级混乱)";
+        }
     }
 
     void sync_notes(ECSCore& core, const NoteCollection& notes,
@@ -281,31 +299,67 @@ class SyncSystem {
         auto& timing_handle_map = core.handle_to_timingentity_map();
 
         // 收集当前可见的 TimingHandle
-        std::unordered_set<TimingHandle, TimingHandle::Hash>
-            visible_timing_handles;
         const auto& all_timing_points = timings.get_all_timing_points();
 
         // 遍历 std::map 来获取所有Timing点
+        // --- 1. 第一阶段：无条件收集所有可见的 TimingHandle ---
+        std::vector<TimingHandle> all_visible_handles;
+
         auto start_it = all_timing_points.upper_bound(query_start_time);
         if (start_it != all_timing_points.begin()) --start_it;
 
         for (auto it = start_it; it != all_timing_points.end(); ++it) {
-            const auto& [timestamp, timings] = *it;
-            // 超出范围立马停止
+            const auto& [timestamp, timings_at_ts] = *it;
             if (timestamp > query_end_time) break;
+
             if (timestamp >= query_start_time) {
-                for (const auto& timing : timings) {
-                    // *** 为每个Timing点创建一个唯一的句柄 ***
-                    visible_timing_handles.insert(
+                for (const auto& timing : timings_at_ts) {
+                    all_visible_handles.push_back(
                         {timestamp, timing.beat_length});
                 }
             }
+        }
+        // --- 2. 第二阶段：根据数量决定是否应用密度限制 ---
+        std::unordered_set<TimingHandle, TimingHandle::Hash>
+            final_visible_handles;
+        const size_t DENSITY_LIMIT_THRESHOLD = 200;      // 定义阈值
+        const size_t DENSITY_LIMIT_TIME_THRESHOLD = 20;  // 定义密度限制值
+
+        if (all_visible_handles.size() > DENSITY_LIMIT_THRESHOLD) {
+            // --- 情况 A: 数量超过阈值，需要进行密度限制 ---
+            qDebug() << "同屏timing数量过多[共" << all_visible_handles.size()
+                     << ">" << DENSITY_LIMIT_THRESHOLD
+                     << "个],执行密度限制[间隔" << DENSITY_LIMIT_TIME_THRESHOLD
+                     << "ms]";
+
+            // 为了正确地进行密度限制，我们需要先对句柄排序
+            // (因为同一个时间戳可能有多个timing，而 map 只保证了时间戳的顺序)
+            std::sort(all_visible_handles.begin(), all_visible_handles.end(),
+                      [](const TimingHandle& a, const TimingHandle& b) {
+                          return a.timestamp < b.timestamp;
+                      });
+
+            final_visible_handles.reserve(DENSITY_LIMIT_THRESHOLD);  // 预留空间
+            int32_t prev_time = -1000;  // 使用一个足够小的值初始化
+
+            for (const auto& handle : all_visible_handles) {
+                if (std::abs(handle.timestamp - prev_time) >=
+                    DENSITY_LIMIT_TIME_THRESHOLD) {
+                    final_visible_handles.insert(handle);
+                    prev_time = handle.timestamp;
+                }
+            }
+
+        } else {
+            // --- 情况 B: 数量在可接受范围内，全部显示 ---
+            final_visible_handles.insert(all_visible_handles.begin(),
+                                         all_visible_handles.end());
         }
 
         // 销毁不再可见的 Timing 实体
         for (auto it = timing_handle_map.begin();
              it != timing_handle_map.end();) {
-            if (!visible_timing_handles.contains(it->first)) {
+            if (!final_visible_handles.contains(it->first)) {
                 if (registry.valid(it->second)) registry.destroy(it->second);
                 it = timing_handle_map.erase(it);
             } else {
@@ -314,7 +368,7 @@ class SyncSystem {
         }
 
         // 创建新出现的 Timing 实体
-        for (const TimingHandle& handle : visible_timing_handles) {
+        for (const TimingHandle& handle : final_visible_handles) {
             if (!timing_handle_map.contains(handle)) {
                 // 因为句柄本身不足以定位Timing对象，我们还是需要查询map
                 // 但由于Timing点很少，这次查询的开销可以忽略不计
@@ -342,7 +396,92 @@ class SyncSystem {
                     const int64_t query_end_time) const {
         auto& registry = core.ecs_registry();
         auto& beat_handle_map = core.handle_to_beatentity_map();
-        // --- 1. 高效收集当前可见的 Beat 句柄 (时间戳) ---
+        // --- 1. 第一阶段：无条件收集所有可见的 BeatHandle (包括前后扩展) ---
+        // std::vector<BeatHandle> all_visible_handles;
+
+        // // 定位起始点 (包含向前扩展的一个)
+        // auto start_it =
+        //     std::lower_bound(beatTimeLine.begin(), beatTimeLine.end(),
+        //                      static_cast<uint32_t>(query_start_time));
+        // if (start_it != beatTimeLine.begin()) {
+        //     --start_it;
+        // }
+
+        // // 收集所有在范围内的句柄，并向后扩展一个
+        // bool extended_end = false;
+        // for (auto it = start_it; it != beatTimeLine.end(); ++it) {
+        //     const BeatHandle& timestamp = *it;
+        //     all_visible_handles.push_back(timestamp);
+
+        //     if (timestamp > query_end_time && !extended_end) {
+        //         extended_end = true;
+        //     } else if (extended_end) {
+        //         // 在包含了第一个超出范围的拍之后，立即停止
+        //         break;
+        //     }
+        // }
+
+        // // 根据数量决定是否应用密度限制
+        // std::unordered_set<BeatHandle> final_visible_handles;
+        // const size_t DENSITY_LIMIT_THRESHOLD = 100;      // 定义Beat的阈值
+        // const size_t DENSITY_LIMIT_TIME_THRESHOLD = 10;  //
+        // 定义Beat密度限制阈值
+
+        // if (all_visible_handles.size() > DENSITY_LIMIT_THRESHOLD) {
+        //     // --- 情况 A: 数量超过阈值，需要进行密度限制 ---
+        //     qDebug() << "同屏beat数量过多[共" << all_visible_handles.size()
+        //              << ">" << DENSITY_LIMIT_THRESHOLD
+        //              << "个],执行密度限制[间隔" <<
+        //              DENSITY_LIMIT_TIME_THRESHOLD
+        //              << "ms]";
+        //     final_visible_handles.reserve(DENSITY_LIMIT_THRESHOLD);
+        //     BeatHandle prev_beat_handle = -1000;  // 使用一个足够小的值初始化
+
+        //     for (const auto& handle : all_visible_handles) {
+        //         if (std::abs(static_cast<int32_t>(handle) -
+        //                      static_cast<int32_t>(prev_beat_handle)) >=
+        //             DENSITY_LIMIT_TIME_THRESHOLD) {
+        //             final_visible_handles.insert(handle);
+        //             prev_beat_handle = handle;
+        //         }
+        //     }
+        // } else {
+        //     // --- 情况 B: 数量在可接受范围内，全部显示 ---
+        //     final_visible_handles.insert(all_visible_handles.begin(),
+        //                                  all_visible_handles.end());
+        // }
+
+        // // --- 3. 后续的同步逻辑 (销毁和创建) 使用 final_visible_handles ---
+        // //    这部分逻辑完全不变
+
+        // // a. 销毁不再可见的 Beat 实体
+        // for (auto it = beat_handle_map.begin(); it != beat_handle_map.end();)
+        // {
+        //     // 使用 final_visible_handles
+        //     if (!final_visible_handles.contains(it->first)) {
+        //         if (registry.valid(it->second)) {
+        //             registry.destroy(it->second);
+        //         }
+        //         it = beat_handle_map.erase(it);
+        //     } else {
+        //         ++it;
+        //     }
+        // }
+
+        // // b. 创建新出现的 Beat 实体
+        // for (const BeatHandle& handle :
+        //      final_visible_handles) {  // 使用 final_visible_handles
+        //     if (!beat_handle_map.contains(handle)) {
+        //         auto beat_info_it = beatInfo.find(handle);
+        //         if (beat_info_it != beatInfo.end()) {
+        //             const Beat* beat_data = &(beat_info_it->second);
+        //             beat_handle_map[handle] =
+        //                 createBeatEntity(registry, beat_data);
+        //         }
+        //     }
+        // }
+
+        // 收集当前可见的 Beat 句柄 (时间戳)
         std::unordered_set<BeatHandle> visible_beat_handles;
 
         // 因为 beatTimeLine 是有序的，我们可以使用二分查找快速定位起点
@@ -354,22 +493,32 @@ class SyncSystem {
         if (start_it != beatTimeLine.begin()) {
             --start_it;
         }
-        // c. 遍历扩展后的范围，直到超出可见范围的末尾
-        auto end_it = beatTimeLine.end();  // 预设为结尾
-        bool extended_end = false;         // 标记是否已经向后扩展了一个
+        // 遍历扩展后的范围，直到超出可见范围的末尾
+        // 预设为结尾
+        auto end_it = beatTimeLine.end();
+        // 标记是否已经向后扩展了一个
+        bool extended_end = false;
 
+        BeatHandle prev_beat_handle{-100};
         for (auto it = start_it; it != beatTimeLine.end(); ++it) {
             const BeatHandle& timestamp = *it;
+            if (std::abs(timestamp - prev_beat_handle) < 6) {
+                prev_beat_handle = timestamp;
+                continue;
+            }
 
             // 将当前拍加入可见集合
             visible_beat_handles.insert(timestamp);
 
-            // d. *** 核心修正：向后扩展一个拍 ***
-            // 当我们第一次遍历到超出 query_end_time 的拍时...
+            // 向后扩展一个拍
+            // 当第一次遍历到超出 query_end_time 的拍时
             if (timestamp > query_end_time && !extended_end) {
-                extended_end = true;     // 标记我们已经包含了这个“额外”的拍
-                end_it = std::next(it);  // 记录下一次循环应该结束的位置
+                // 标记已经包含了这个“额外”的拍
+                extended_end = true;
+                // 记录下一次循环应该结束的位置
+                end_it = std::next(it);
             }
+            prev_beat_handle = timestamp;
 
             // 如果已经向后扩展过了，并且当前迭代器到达了记录的结束位置，就跳出循环
             if (extended_end && it == std::prev(end_it)) {
@@ -377,9 +526,9 @@ class SyncSystem {
             }
         }
 
-        // --- 2. 销毁不再可见的 Beat 实体 ---
+        // 销毁不再可见的 Beat 实体
         for (auto it = beat_handle_map.begin(); it != beat_handle_map.end();) {
-            // 这里还需要考虑编辑器交互状态，我们暂时简化
+            // 这里还需要考虑编辑器交互状态
             if (!visible_beat_handles.contains(it->first)) {
                 if (registry.valid(it->second)) {
                     registry.destroy(it->second);
@@ -390,7 +539,7 @@ class SyncSystem {
             }
         }
 
-        // --- 3. 创建新出现的 Beat 实体 ---
+        // 创建新出现的 Beat 实体
         for (const BeatHandle& handle : visible_beat_handles) {
             if (!beat_handle_map.contains(handle)) {
                 // 从 BeatInfo 中查找详细信息

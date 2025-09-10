@@ -62,14 +62,14 @@ struct TimeInfo {
 
 struct OffsetInfo {
     // --- 音频/谱面固定偏移量 (ms) ---
-    std::atomic<double> global_static_offset_ms{-120.0};
+    std::atomic<double> global_static_offset_ms{-125.0};
 
     // --- 音频/谱面全局偏移量 (ms) ---
     // 可以由UI控件修改，所以用原子保证线程安全
     std::atomic<double> global_offset_ms{0.0};
 
     // 特效固定偏移量 (ms)
-    std::atomic<double> effect_static_offset_ms{100};
+    std::atomic<double> effect_static_offset_ms{75};
 
     // 特效偏移量 (ms)
     // 正值表示特效提前播放，负值表示延迟播放

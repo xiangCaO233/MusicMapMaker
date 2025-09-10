@@ -10,6 +10,7 @@
 #include <ecs/system/LinearTimeConverter.hpp>
 #include <ecs/system/TimePixelConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
+#include <iterator>
 #include <layer/ILayer.hpp>
 #include <map/skin/MSkin.hpp>
 
@@ -125,33 +126,45 @@ class TimeLineSystem {
         }
 
         // 生成拍
-        struct BeatRenderData {
-            int64_t timestamp;
-            uint32_t divisors;
-            double beat_length;
 
-            bool operator<(const BeatRenderData& other) const {
-                return timestamp < other.timestamp;
-            }
-        };
-        std::vector<BeatRenderData> sorted_beats;
-        auto beatview = registry.view<TimeComponent, BeatComponent>();
-        sorted_beats.reserve(beatview.size_hint());
+        auto& beats = core.get_beat_group();
 
-        for (const auto& e : beatview) {
-            const auto& [time] = registry.get<TimeComponent>(e);
-            const auto& [divisors, beat_length] =
-                registry.get<BeatComponent>(e);
-            sorted_beats.push_back({time, divisors, beat_length});
-        }
-        std::sort(sorted_beats.begin(), sorted_beats.end());
         int64_t next_beat_timestamp = INT64_MAX;
-        for (auto it = sorted_beats.rbegin(); it != sorted_beats.rend(); ++it) {
-            const auto& current_beat = *it;
+        for (auto it = beats.rbegin(); it != beats.rend(); ++it) {
+            const auto& current_beat_entity = *it;
+            const auto& [time] =
+                registry.get<TimeComponent>(current_beat_entity);
+            if (it != beats.rend() && std::next(it) != beats.rend()) {
+                auto next_beat_entity = *std::next(it);
+                const auto& [next_beat_time] =
+                    registry.get<TimeComponent>(next_beat_entity);
+                // 时间间隔过短,跳过绘制
+                if (std::abs(int(next_beat_time) - int(time)) < 6) {
+                    continue;
+                }
+                const auto& next_y = converter2.timeToPixel(
+                    next_beat_time,
+                    realtime_info.current_time_info.presentation_canvas_time,
+                    info);
+                // if (std::abs(next_y - y) < 6) {
+                //     // 拍间距过小/跳过分拍线绘制
+                //     // qDebug() << "跳过拍[" << current_beat.timestamp <<
+                //     // "]-div["
+                //     //          << current_beat.divisors
+                //     //          << "] 视觉拍间距:" << next_y - y;
+                //     continue;
+                // }
+            }
+            const auto& [divisors, beat_length] =
+                registry.get<BeatComponent>(current_beat_entity);
             // 转换时间线所处y位置
             const auto y = converter2.timeToPixel(
-                current_beat.timestamp,
+                time, realtime_info.current_time_info.presentation_canvas_time,
+                info);
+            const auto y_endbeat = converter2.timeToPixel(
+                time + beat_length,
                 realtime_info.current_time_info.presentation_canvas_time, info);
+
             // 生成拍头线
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
@@ -160,16 +173,19 @@ class TimeLineSystem {
             cmd.baseInfo.size = {all_tracks_rect.z, 6};
             cmd.baseInfo.color = {1, 1, 1, 1};
             buffer.add_PrimitiveCommand(cmd);
+            if (std::abs(y_endbeat - y) < 2) {
+                // 拍像素距离过小/跳过分拍线绘制
+                continue;
+            }
             // 生成分拍线 (加入检查逻辑)
-            if (current_beat.divisors > 1) {
-                auto divtheme = info->editorInfo.skin->get_divisors_color_theme(
-                    current_beat.divisors);
+            if (divisors > 1) {
+                auto divtheme =
+                    info->editorInfo.skin->get_divisors_color_theme(divisors);
 
-                for (uint32_t j = 1; j < current_beat.divisors; ++j) {
+                for (uint32_t j = 1; j < divisors; ++j) {
                     const int64_t subdivision_timestamp = static_cast<int64_t>(
-                        static_cast<double>(current_beat.timestamp) +
-                        current_beat.beat_length /
-                            static_cast<double>(current_beat.divisors) *
+                        static_cast<double>(time) +
+                        beat_length / static_cast<double>(divisors) *
                             static_cast<double>(j));
 
                     // 使用上一轮记录的 next_beat_timestamp
@@ -199,47 +215,8 @@ class TimeLineSystem {
             }
 
             // 更新“下一拍”的时间戳
-            next_beat_timestamp = current_beat.timestamp;
+            next_beat_timestamp = time;
         }
-        // for (const auto& e : beatview) {
-        //     const auto& [time] = registry.get<TimeComponent>(e);
-        //     const auto& [divisors, beat_length] =
-        //         registry.get<BeatComponent>(e);
-        //     // 转换时间线所处y位置
-        //     const auto y = converter2.timeToPixel(
-        //         time, realtime_info.presentation_canvas_time, info);
-        //     // 生成拍头线
-        //     PrimitiveCommand cmd;
-        //     cmd.cmdType = CommandType::PRIMITIVE;
-        //     cmd.primitive = PrimitiveType::QUAD;
-        //     cmd.baseInfo.pos = {all_tracks_rect.x, y - 3};
-        //     cmd.baseInfo.size = {all_tracks_rect.z, 6};
-        //     cmd.baseInfo.color = {1, 1, 1, 1};
-        //     buffer.add_PrimitiveCommand(cmd);
-
-        //     auto divtheme =
-        //         info->editorInfo.skin->get_divisors_color_theme(divisors);
-        //     // 生成小节线
-        //     for (int i{1}; i < divisors; ++i) {
-        //         auto theme = divtheme[i - 1];
-        //         auto divy = converter2.timeToPixel(
-        //             int64_t(double(time) +
-        //                     beat_length / double(divisors) * double(i)),
-        //             realtime_info.presentation_canvas_time, info);
-
-        //         PrimitiveCommand cmd;
-        //         cmd.cmdType = CommandType::PRIMITIVE;
-        //         cmd.primitive = PrimitiveType::QUAD;
-        //         cmd.baseInfo.pos = {all_tracks_rect.x,
-        //                             divy - theme.second / 2.f};
-        //         cmd.baseInfo.size = {all_tracks_rect.z, theme.second};
-        //         auto color = theme.first;
-        //         cmd.baseInfo.color = {
-        //             color.red() / 256.f, color.green() / 256.f,
-        //             color.blue() / 256.f, color.alpha() / 256.f};
-        //         buffer.add_PrimitiveCommand(cmd);
-        //     }
-        // }
     }
 };
 

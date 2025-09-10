@@ -2,7 +2,8 @@
 #include <ecs/component/EffectComponents.hpp>
 
 // 构造ECSCore
-ECSCore::ECSCore() = default;
+ECSCore::ECSCore()
+    : beat_group(registry.group<TimeComponent, BeatComponent>()) {};
 
 // 析构ECSCore
 ECSCore::~ECSCore() = default;

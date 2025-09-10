@@ -107,20 +107,25 @@ class TimePixelConverter {
             }
 
             // 4. 根据最新的红线和绿线状态，计算新的速度
-            double bpm_multiplier = 1.0;
+            double bpm_multiplier{1.0};
+            static double last_bpm_multiplier{1.0};
             // 防御：确保红线的 beat_length 是一个有效的正数
-            if (current_base_timing.beat_length > 1e-2) {  // 使用epsilon比较
+            if (current_base_timing.beat_length > 1e-2) {
+                // 使用epsilon比较
                 bpm_multiplier =
                     preference_beat_length / current_base_timing.beat_length;
             } else {
-                // 如果红线BPM无效，我们可以选择继承上一个有效速度，或者使用默认值
-                // 这里我们简单地保持 bpm_multiplier 为 1.0
+                // 如果红线BPM无效，可以选择继承上一个有效速度，或者使用默认值
+                // 这里简单地保持 bpm_multiplier 为 1.0
                 qWarning() << "在时间点" << timestamp
                            << "检测到无效的红线 beat_length:"
                            << current_base_timing.beat_length;
+                bpm_multiplier = last_bpm_multiplier;
             }
+            last_bpm_multiplier = bpm_multiplier;
 
-            double velocity_multiplier = 1.0;
+            double velocity_multiplier{1.0};
+            static double last_velocity_multiplier{1.0};
             // 防御：确保绿线的 beat_length 是一个有效的、远离零的负数
             if (current_inherited_timing.beat_length < -1e-2) {
                 velocity_multiplier =
@@ -131,8 +136,10 @@ class TimePixelConverter {
                 qWarning() << "在时间点" << timestamp
                            << "检测到无效的绿线 beat_length:"
                            << current_inherited_timing.beat_length;
-                // 在这种情况下，我们强制它为 1.0x 速度
+                // 在这种情况下，强制它为 1.0x 速度
+                velocity_multiplier = last_velocity_multiplier;
             }
+            last_velocity_multiplier = velocity_multiplier;
 
             double new_pixels_per_ms = BASE_PIXELS_PER_MS *
                                        m_status.scroll_speed * bpm_multiplier *

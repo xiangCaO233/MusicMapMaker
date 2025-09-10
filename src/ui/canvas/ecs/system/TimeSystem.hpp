@@ -27,11 +27,11 @@ class TimeSystem {
                 time, realtime_info.current_time_info.presentation_canvas_time,
                 info);
 
-            // 附加或更新 TransformComponent_1
+            // 附加或更新 TransformComponent
             registry.emplace_or_replace<TransformComponent>(entity, y);
             // ++count;
         }
-        // qDebug() << "共更新" << count << "个实体转换组件1";
+        // qDebug() << "共更新" << view->size() << "个实体时间转换组件";
     }
 };
 

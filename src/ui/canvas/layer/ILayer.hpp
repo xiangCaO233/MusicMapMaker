@@ -51,6 +51,13 @@ struct RenderDataBuffer {
         all_command_handles.push_back(
             {CommandType::PRIMITIVE, primitive_command_list.size() - 1});
     }
+    void add_PrimitiveCommand(std::vector<PrimitiveCommand>&& cmds) {
+        for (const auto& cmd : cmds) {
+            primitive_command_list.push_back(cmd);
+            all_command_handles.push_back(
+                {CommandType::PRIMITIVE, primitive_command_list.size() - 1});
+        }
+    }
 
     void add_CurveCommand(const CurveCommand& cmd) {
         curve_command_list.push_back(cmd);
@@ -107,6 +114,62 @@ class ILayer {
     // 获取纹理信息
     std::optional<TextureInfo> get(std::string_view path) const {
         return rendererRef->texture_pool()->get(path);
+    }
+
+    // 获取字符串绘制后的总尺寸
+    glm::vec2 stringMetrics(std::string_view family, size_t font_size,
+                            const std::u32string& str) {
+        glm::vec2 size{0};
+        for (const auto& character : str) {
+            auto fontoption = get(family, font_size, character);
+            if (fontoption.has_value()) {
+                auto& charInfo = fontoption.value();
+                auto& charTexture = charInfo.character_texinfo;
+                size.x += charInfo.xadvance / 64.f;
+                if (size.y < charInfo.height) {
+                    size.y = charInfo.height;
+                }
+            }
+        }
+        return size;
+    }
+
+    // 生成字符串绘制指令
+    std::vector<PrimitiveCommand> generateStringCommands(
+        std::string_view family, size_t font_size, const std::u32string& str,
+        glm::vec2 strpos, glm::vec4 color) {
+        std::vector<PrimitiveCommand> commands;
+        uint32_t xoffset{0};
+        uint32_t yoffset{0};
+
+        for (const auto& character : str) {
+            // 获取字符纹理信息
+            auto fontoption = get(family, font_size, character);
+            if (fontoption.has_value()) {
+                auto& charInfo = fontoption.value();
+                auto& charTexture = charInfo.character_texinfo;
+                // 计算当前字符应该处于的位置
+                // strpos.x += xoffset;
+                // strpos.y += 8;
+                // 提交渲染指令
+                PrimitiveCommand charcommand{
+                    {CommandType::PRIMITIVE,
+                     {charTexture, TexAlignMode::CENTER,
+                      TexScaleMode::CHARACTER}},
+                    glm::vec2{strpos.x + xoffset,
+                              strpos.y - charInfo.bearing.y + 8},
+                    charTexture.origin_size,
+                    0.f,
+                    color,
+                    true,
+                    {charTexture.uv_offset},
+                    PrimitiveType::QUAD};
+                commands.push_back(charcommand);
+
+                xoffset += charInfo.xadvance / 64;
+            }
+        }
+        return commands;
     }
 
     // 获取字符纹理信息
