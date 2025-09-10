@@ -114,7 +114,8 @@ class SyncSystem {
                         auto& effect =
                             registry.get<EffectComponent>(effect_entity);
 
-                        effect.duration = skin->normal_hit_effect_duration;
+                        effect.duration =
+                            skin->normal_hit_effect_duration * 1000.f;
                         effect.texture_type = EffectTextureType::NORMAL;
                         effect.frame_index = 0;
 

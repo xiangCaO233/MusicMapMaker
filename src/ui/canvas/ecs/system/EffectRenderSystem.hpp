@@ -9,7 +9,6 @@
 #include <info/MapCanvasInfo.hpp>
 #include <layer/ILayer.hpp>
 #include <map/skin/MSkin.hpp>
-#include <string>
 
 class EffectRenderSystem {
    public:
@@ -21,26 +20,47 @@ class EffectRenderSystem {
         const auto& track_count =
             info->editorInfo.map->base_metadata().track_count;
         const auto& track_layout = info->editorInfo.track_layout;
+        const auto& single_track_width = track_layout.z / float(track_count);
 
         auto view = registry.view<EffectComponent, TrackIdentifierComponent>();
         for (auto entity : view) {
             const auto& [effect, track_id] =
                 view.get<EffectComponent, TrackIdentifierComponent>(entity);
 
-            auto texture_path = skin.nomal_hit_effect_dir;
-            texture_path.append("/");
-            texture_path.append(std::to_string(effect.frame_index));
-            texture_path.append(".png");
-            auto texture = layer->get(texture_path);
-
             // 如果特效是静默状态，则跳过
             if (effect.texture_type == EffectTextureType::NONE) {
                 continue;
             }
+            auto effectdir = skin.nomal_hit_effect_dir;
+            auto effectframes = skin.nomal_hit_effect_frame_count;
+            if (effect.texture_type == EffectTextureType::SLIDE_END) {
+                effectdir = skin.slide_hit_effect_dir;
+                effectframes = skin.slide_hit_effect_frame_count;
+            }
+            auto texture_path =
+                std::format("{}/{}.png", effectdir,
+                            (effect.frame_index + 1) % effectframes + 1);
 
-            int frame_index = effect.frame_index;
+            auto texture = layer->get(texture_path);
+            auto texsize =
+                glm::vec2{single_track_width, single_track_width /
+                                                  texture->origin_size.x *
+                                                  texture->origin_size.y};
+            texsize *= 1.25f;
 
             // ... (计算特效的X, Y坐标，生成渲染指令到 buffer) ...
+            auto center_x = track_layout.x + single_track_width * effect.track +
+                            single_track_width / 2.f;
+            auto center_y = info->baseInfo.canvasSize.height() *
+                            (1.f - info->baseInfo.judgeline_pos);
+            PrimitiveCommand cmd;
+            cmd.cmdType = CommandType::PRIMITIVE;
+            cmd.primitive = PrimitiveType::QUAD;
+            cmd.baseInfo.pos = {center_x - texsize.x / 2.f,
+                                center_y - texsize.y / 2.f};
+            cmd.baseInfo.size = texsize;
+            cmd.texturesInfo.texture = texture.value();
+            buffer.add_PrimitiveCommand(cmd);
         }
     }
 };

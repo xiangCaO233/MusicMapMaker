@@ -32,7 +32,7 @@ struct SoundStateComponent {
 
 // 轨道标签，便于查找
 struct TrackIdentifierComponent {
-    uint32_t track;
+    int track;
 };
 
 #endif  // MMM_EFFECTCOMPONENTS_HPP

@@ -75,16 +75,14 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
     // 打击特效配置
     hit_effect_config = texture_config["effects"];
     nomal_hit_effect_dir =
-        hit_effect_config.value<std::string>("note-effectdir", "");
-    nomal_hit_effect_frame_count = count_files_recursive(
-        std::filesystem::path(skin_path) / nomal_hit_effect_dir);
+        skinPath / hit_effect_config.value<std::string>("note-effectdir", "");
+    nomal_hit_effect_frame_count = count_files_recursive(nomal_hit_effect_dir);
     normal_hit_effect_duration =
         hit_effect_config.value<double>("note-effect-duration", 0.1);
 
     slide_hit_effect_dir =
-        hit_effect_config.value<std::string>("slide-effectdir", "");
-    slide_hit_effect_frame_count = count_files_recursive(
-        std::filesystem::path(skin_path) / slide_hit_effect_dir);
+        skinPath / hit_effect_config.value<std::string>("slide-effectdir", "");
+    slide_hit_effect_frame_count = count_files_recursive(slide_hit_effect_dir);
 
     // 颜色配置
     preview_area_bg_color = QColor::fromString(skinRootCfg.value<std::string>(
