@@ -1,7 +1,6 @@
 #ifndef MMM_EFFECTCOMPONENTS_HPP
 #define MMM_EFFECTCOMPONENTS_HPP
 
-#include <chrono>
 #include <glm/glm.hpp>
 #include <map/MapCanvas.hpp>
 #include <mmm/obj/Note.hpp>
