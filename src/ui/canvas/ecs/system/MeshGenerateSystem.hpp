@@ -70,10 +70,10 @@ class MeshGenerateSystem {
             bool hoverd_head =
                 is_hover_part(head_pos, head_size, current_mouse_pos);
             if (hoverd_head) {
-                info->realTimeInfo.hovered_info.part = HoverPart::HEAD;
+                info->realTimeInfo.hovered_info.part = NotePart::HEAD;
             }
             entity_mesh.mesh.emplace_back(head_pos, head_size, head_texinfo, 2,
-                                          hoverd_head);
+                                          hoverd_head, NotePart::HEAD);
             // 若有悬停到头部则确定悬停属性
             hovered = hovered || hoverd_head;
 
@@ -99,11 +99,11 @@ class MeshGenerateSystem {
                 bool hoverd_body =
                     is_hover_part(body_pos, body_size, current_mouse_pos);
                 if (hoverd_body) {
-                    info->realTimeInfo.hovered_info.part = HoverPart::HOLD_BODY;
+                    info->realTimeInfo.hovered_info.part = NotePart::HOLD_BODY;
                 }
                 entity_mesh.mesh.emplace_back(
                     body_pos, body_size, hold_body_texinfo, 0, hoverd_body,
-                    TexScaleMode::TILE_BASEWIDTH_REPEAT);
+                    NotePart::HOLD_BODY, TexScaleMode::TILE_BASEWIDTH_REPEAT);
 
                 // 绘制一个面尾网格(同样画在面条结束的位置)
                 // 获取面尾纹理
@@ -116,10 +116,11 @@ class MeshGenerateSystem {
                 bool hoverd_end =
                     is_hover_part(end_pos, end_size, current_mouse_pos);
                 if (hoverd_end) {
-                    info->realTimeInfo.hovered_info.part = HoverPart::HOLD_END;
+                    info->realTimeInfo.hovered_info.part = NotePart::HOLD_END;
                 }
                 entity_mesh.mesh.emplace_back(end_pos, end_size,
-                                              hold_end_texinfo, 1, hoverd_end);
+                                              hold_end_texinfo, 1, hoverd_end,
+                                              NotePart::HOLD_END);
                 // 若有悬停到中间部则确定悬停属性
                 // 若有悬停到尾部则确定悬停属性
                 hovered = hovered || hoverd_body || hoverd_end;

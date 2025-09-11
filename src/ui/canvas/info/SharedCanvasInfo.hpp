@@ -6,6 +6,7 @@
 #include <atomic>
 #include <entt.hpp>
 #include <glm/glm.hpp>
+#include <info/NotePart.hpp>
 #include <unordered_set>
 
 struct BaseCanvasStatus {
@@ -27,19 +28,10 @@ struct BaseCanvasStatus {
     bool operator==(const BaseCanvasStatus& _) const = default;
 };
 
-// 悬浮信息
-enum class HoverPart {
-    HEAD,
-    HOLD_BODY,
-    SLIDE_BODY,
-    HOLD_END,
-    SLIDE_END,
-};
-
 struct HoverInfo {
     bool has_hovered_entity{false};
     entt::entity e;
-    HoverPart part;
+    NotePart part;
 };
 
 struct SelectFrame {
