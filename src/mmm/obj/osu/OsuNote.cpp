@@ -7,28 +7,29 @@
 
 // 打印用
 std::string OsuNote::toString() const {
-    std::string sampleStr;
-    switch (notesample()) {
-        using enum NoteSample;
-        case NORMAL:
-            sampleStr = "NORMAL";
-            break;
-        case WHISTLE:
-            sampleStr = "WHISTLE";
-            break;
-        case FINISH:
-            sampleStr = "FINISH";
-            break;
-        case CLAP:
-            sampleStr = "CLAP";
-            break;
-    }
-    return std::format(
-        "OsuNote{{timestamp={}\n, orbit={}\n, sample={}\n, normalSet={}\n, "
-        "additionalSet={}}}",
-        timestamp(), trackpos(), sampleStr,
-        static_cast<int>(note_samplegroup().normalSet),
-        static_cast<int>(note_samplegroup().additionalSet));
+    return Note::toString();
+    // std::string sampleStr;
+    // switch (notesample()) {
+    //     using enum NoteSample;
+    //     case NORMAL:
+    //         sampleStr = "NORMAL";
+    //         break;
+    //     case WHISTLE:
+    //         sampleStr = "WHISTLE";
+    //         break;
+    //     case FINISH:
+    //         sampleStr = "FINISH";
+    //         break;
+    //     case CLAP:
+    //         sampleStr = "CLAP";
+    //         break;
+    // }
+    // return std::format(
+    //     "OsuNote{{timestamp={}\n, orbit={}\n, sample={}\n, normalSet={}\n, "
+    //     "additionalSet={}}}",
+    //     timestamp(), trackpos(), sampleStr,
+    //     static_cast<int>(note_samplegroup().normalSet),
+    //     static_cast<int>(note_samplegroup().additionalSet));
 }
 
 // 从osu描述加载

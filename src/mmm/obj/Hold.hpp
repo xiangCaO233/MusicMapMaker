@@ -11,7 +11,13 @@ class Hold : public Note {
     ~Hold() override = default;
 
     // 打印用
-    std::string toString() const override { return ""; };
+    std::string toString() const override {
+        std::stringstream ss;
+        ss << "Hold:\n";
+        ss << Note::toString();
+        ss << "  Duration: " << duration_time << "\n";
+        return ss.str();
+    };
 
     inline uint32_t duration() const { return duration_time; }
 

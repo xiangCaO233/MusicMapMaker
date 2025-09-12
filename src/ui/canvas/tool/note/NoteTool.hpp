@@ -6,7 +6,7 @@
 class NoteTool : public BaseTool {
    public:
     // 构造NoteTool
-    explicit NoteTool(MapCanvas* cvs);
+    using BaseTool::BaseTool;
     // 析构NoteTool
     ~NoteTool() override;
 

@@ -5,6 +5,8 @@
 #include <cassert>
 #include <glm/glm.hpp>
 #include <info/NotePart.hpp>
+#include <iomanip>
+#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -15,7 +17,7 @@ struct BoundingBox {
     BoundingBox(const glm::vec2& p = {0, 0}, const glm::vec2& s = {0, 0})
         : pos(p), size(s) {}
 
-    bool contains(const glm::vec2& p) const {
+    bool contains(glm::vec2 p) const {
         return p.x >= pos.x && p.x <= pos.x + size.x && p.y >= pos.y &&
                p.y <= pos.y + size.y;
     }
@@ -26,7 +28,7 @@ template <typename T>
 class LooseQuadtree {
    public:
     // 松散因子k > 1.0。k=2.0意味着节点的有效边界是其物理边界的两倍大。
-    static constexpr float LoosenessFactor = 2.0f;
+    static constexpr float LoosenessFactor = 1.0f;
 
    private:
     struct Node {
@@ -58,8 +60,51 @@ class LooseQuadtree {
         : capacity(cap), maxDepth(max_depth) {
         root = std::make_unique<Node>(bounds, 0, nullptr);
     }
+    // ==========================================================
+    // === 新增：移动构造函数和移动赋值运算符 (Rule of Five) ===
+    // ==========================================================
+
+    // 移动构造函数
+    LooseQuadtree(LooseQuadtree&& other) noexcept
+        : root(std::move(other.root)),
+          capacity(other.capacity),
+          maxDepth(other.maxDepth) {
+        // other 的 root 已经被 std::move 掏空，变为 nullptr
+    }
+
+    // 移动赋值运算符
+    LooseQuadtree& operator=(LooseQuadtree&& other) noexcept {
+        // 防止自我赋值
+        if (this != &other) {
+            // 交换资源
+            root = std::move(other.root);
+            // capacity 和 maxDepth 是 const，不能被赋值，但我们可以假设
+            // 它们在逻辑上是一致的，或者通过重新构造来处理。
+            // 在我们的使用场景中，直接移动 root 指针就足够了。
+        }
+        return *this;
+    }
+
+    // 禁止拷贝（因为 std::unique_ptr 不可拷贝）
+    LooseQuadtree(const LooseQuadtree&) = delete;
+    LooseQuadtree& operator=(const LooseQuadtree&) = delete;
 
     ~LooseQuadtree() = default;
+
+    /**
+     * @brief 打印整个四叉树的结构到指定的输出流 (例如 std::cout).
+     * @param out 输出流.
+     */
+    void print_tree(std::ostream& out = std::cout) const {
+        out << "\n--- Quadtree Structure (Detailed) ---\n";
+        if (!root) {
+            out << "Tree is empty.\n";
+            return;
+        }
+        out << std::fixed << std::setprecision(1);
+        print_node_recursive(out, root.get(), "", true, "Root");
+        out << "-------------------------------------\n" << std::endl;
+    }
 
     void clear() {
         if (root) {
@@ -101,7 +146,7 @@ class LooseQuadtree {
         // 2. 检查对象是否仍在当前节点的松散边界内
         if (current_node->looseBounds.contains(
                 {object->bounds.pos.x, object->bounds.pos.y})) {
-            // 仍在边界内，什么都不用做！这就是松散四叉树的优势。
+            // 仍在边界内，什么都不用做
             return;
         }
 
@@ -117,10 +162,50 @@ class LooseQuadtree {
     }
 
    private:
-    // 获取对象包围盒的辅助函数，需要特化或修改以适应您的 T 类型
+    // 用于打印的私有递归辅助函数
+    void print_node_recursive(std::ostream& out, const Node* node,
+                              const std::string& prefix, bool isLast,
+                              const std::string& quadrantLabel) const {
+        if (!node) return;
+
+        out << prefix << (isLast ? "└── " : "├── ");
+        out << quadrantLabel << " Node [Depth: " << node->depth << ", ";
+        out << "Bounds: (" << node->bounds.pos.x << "," << node->bounds.pos.y
+            << ")-(" << node->bounds.size.x << "x" << node->bounds.size.y
+            << "), ";
+        out << "Objects: " << node->objects.size() << "]\n";
+
+        std::string objPrefix = prefix + (isLast ? "    " : "│   ");
+        for (const auto* obj : node->objects) {
+            out << objPrefix;
+            out << "  -> Part [Entity: " << std::setw(3)
+                << static_cast<uint32_t>(obj->source_entity);
+            out << ", Type: " << std::setw(10) << to_string(obj->part);
+            out << ", Pos: (" << std::setw(6) << obj->pos.x << ","
+                << std::setw(6) << obj->pos.y << ")";
+            out << ", Size: (" << std::setw(5) << obj->size.x << "x"
+                << std::setw(5) << obj->size.y << ")";
+            out << ", z: " << obj->zIndex << "]\n";
+        }
+
+        if (!node->isLeaf()) {
+            std::string childPrefix = prefix + (isLast ? "    " : "│   ");
+            // 分裂逻辑：0:左上, 1:右上, 2:左下, 3:右下
+            const char* labels[] = {"左上", "右上", "左下", "右下"};
+            for (int i = 0; i < 4; ++i) {
+                if (node->children[i]) {
+                    print_node_recursive(out, node->children[i].get(),
+                                         childPrefix, i == 3, labels[i]);
+                } else {
+                    out << childPrefix << (i == 3 ? "└── " : "├── ")
+                        << labels[i] << " (empty)\n";
+                }
+            }
+        }
+    }
+
     BoundingBox get_object_bounds(const T* object) const {
-        return BoundingBox({object->pos.x, object->pos.y}, object->size.x,
-                           object->size.y);
+        return BoundingBox(object->pos, object->size);
     }
 
     Node* find_best_fit_node(Node* startNode, const BoundingBox& bounds) {
@@ -164,18 +249,18 @@ class LooseQuadtree {
 
     void subdivide(Node* node) {
         const auto& p = node->bounds.pos;
-        const float hw = node->bounds.width * 0.5f;
-        const float hh = node->bounds.height * 0.5f;
+        const float hw = node->bounds.size.x * 0.5f;
+        const float hh = node->bounds.size.y * 0.5f;
         const int nextDepth = node->depth + 1;
 
         node->children[0] = std::make_unique<Node>(
-            BoundingBox{{p.x, p.y}, hw, hh}, nextDepth, node);  // 左上
+            BoundingBox{{p.x, p.y}, {hw, hh}}, nextDepth, node);  // 左上
         node->children[1] = std::make_unique<Node>(
-            BoundingBox{{p.x + hw, p.y}, hw, hh}, nextDepth, node);  // 右上
+            BoundingBox{{p.x + hw, p.y}, {hw, hh}}, nextDepth, node);  // 右上
         node->children[2] = std::make_unique<Node>(
-            BoundingBox{{p.x, p.y + hh}, hw, hh}, nextDepth, node);  // 左下
+            BoundingBox{{p.x, p.y + hh}, {hw, hh}}, nextDepth, node);  // 左下
         node->children[3] =
-            std::make_unique<Node>(BoundingBox{{p.x + hw, p.y + hh}, hw, hh},
+            std::make_unique<Node>(BoundingBox{{p.x + hw, p.y + hh}, {hw, hh}},
                                    nextDepth, node);  // 右下
 
         // 重新分配对象
@@ -244,21 +329,37 @@ class LooseQuadtree {
         }
     }
 
+    /**
+     * @brief 判断一个对象的包围盒能被哪个子象限完全容纳.
+     * @param parentBounds 父节点的边界.
+     * @param objBounds 对象的边界.
+     * @return 象限索引 (0=左上, 1=右上, 2=左下, 3=右下), 如果跨界则返回 -1.
+     */
     int get_quadrant(const BoundingBox& parentBounds,
                      const BoundingBox& objBounds) const {
-        const auto center =
-            glm::vec2{parentBounds.pos.x + parentBounds.size.x * 0.5f,
-                      parentBounds.pos.y + parentBounds.size.y * 0.5f};
-        if (objBounds.pos.x + objBounds.size.x < center.x) {
-            if (objBounds.pos.y + objBounds.size.y < center.y)
-                return 0;                              // 左上
-            if (objBounds.pos.y > center.y) return 2;  // 左下
-        } else if (objBounds.pos.x > center.x) {
-            if (objBounds.pos.y + objBounds.size.y < center.y)
-                return 1;                              // 右上
-            if (objBounds.pos.y > center.y) return 3;  // 右下
+        // 计算父节点的中心点
+        const glm::vec2 center = parentBounds.pos + parentBounds.size * 0.5f;
+
+        // 判断对象的包围盒是否完全位于某一侧
+        // fitsTop: 对象的底边在地平线上方
+        bool fitsTop = objBounds.pos.y + objBounds.size.y < center.y;
+        // fitsBottom: 对象的顶边在地平线下方
+        bool fitsBottom = objBounds.pos.y > center.y;
+        // fitsLeft: 对象的右边在垂直线左侧
+        bool fitsLeft = objBounds.pos.x + objBounds.size.x < center.x;
+        // fitsRight: 对象的左边在垂直线右侧
+        bool fitsRight = objBounds.pos.x > center.x;
+
+        if (fitsLeft) {
+            if (fitsTop) return 0;     // 左上
+            if (fitsBottom) return 2;  // 左下
+        } else if (fitsRight) {
+            if (fitsTop) return 1;     // 右上
+            if (fitsBottom) return 3;  // 右下
         }
-        return -1;  // 跨越边界
+
+        // 如果不满足以上任何一种情况，说明对象至少跨越了一条中心线
+        return -1;
     }
 
     int get_quadrant_for_point(const BoundingBox& parentBounds,

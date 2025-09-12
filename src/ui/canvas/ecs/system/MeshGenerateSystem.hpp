@@ -5,7 +5,6 @@
 #include <ecs/component/CoreComponents.hpp>
 #include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/RelationComponents.hpp>
-#include <ecs/component/StateComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
 #include <ecs/system/TimePixelConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
@@ -34,6 +33,9 @@ class MeshGenerateSystem {
             registry.view<TimeComponent, NoteComponent, TransformComponent>(
                 entt::exclude<ChildOfComponent>);
         for (auto& e : view) {
+            assert(registry.valid(e) &&
+                   "FATAL: Invalid entity handle detected!");
+            // qDebug() << "GeneratedMesh for entity:" << e;
             auto& entity_mesh = out_generated_meshes[e];
             entity_mesh.source_entity = e;
             bool hovered{false};
@@ -69,9 +71,7 @@ class MeshGenerateSystem {
                 glm::vec2(x - head_size.x / 2.f, y - head_size.y / 2.f);
             bool hoverd_head =
                 is_hover_part(head_pos, head_size, current_mouse_pos);
-            if (hoverd_head) {
-                info->realTimeInfo.hovered_info.part = NotePart::HEAD;
-            }
+
             entity_mesh.mesh.emplace_back(head_pos, head_size, head_texinfo, 2,
                                           hoverd_head, NotePart::HEAD);
             // 若有悬停到头部则确定悬停属性
@@ -98,9 +98,7 @@ class MeshGenerateSystem {
                 auto body_size = glm::vec2(body_width, body_height);
                 bool hoverd_body =
                     is_hover_part(body_pos, body_size, current_mouse_pos);
-                if (hoverd_body) {
-                    info->realTimeInfo.hovered_info.part = NotePart::HOLD_BODY;
-                }
+
                 entity_mesh.mesh.emplace_back(
                     body_pos, body_size, hold_body_texinfo, 0, hoverd_body,
                     NotePart::HOLD_BODY, TexScaleMode::TILE_BASEWIDTH_REPEAT);
@@ -115,19 +113,12 @@ class MeshGenerateSystem {
                                          y - body_height - end_size.y / 2.f);
                 bool hoverd_end =
                     is_hover_part(end_pos, end_size, current_mouse_pos);
-                if (hoverd_end) {
-                    info->realTimeInfo.hovered_info.part = NotePart::HOLD_END;
-                }
                 entity_mesh.mesh.emplace_back(end_pos, end_size,
                                               hold_end_texinfo, 1, hoverd_end,
                                               NotePart::HOLD_END);
                 // 若有悬停到中间部则确定悬停属性
                 // 若有悬停到尾部则确定悬停属性
                 hovered = hovered || hoverd_body || hoverd_end;
-                info->realTimeInfo.hovered_info.has_hovered_entity = hovered;
-                if (hovered) {
-                    info->realTimeInfo.hovered_info.e = e;
-                }
 
             } else if (registry.all_of<FlickComponent>(e)) {
                 // 获取flick身纹理

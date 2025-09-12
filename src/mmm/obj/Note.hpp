@@ -17,6 +17,21 @@ enum class NoteType {
     COMPOSITE,
 };
 
+inline std::string to_string(NoteType type) {
+    switch (type) {
+        case NoteType::NORMAL:
+            return "NORMAL";
+        case NoteType::HOLD:
+            return "HOLD";
+        case NoteType::SLIDE:
+            return "SLIDE";
+        case NoteType::COMPOSITE:
+            return "COMPOSITE";
+        default:
+            return "Unknown";
+    }
+}
+
 class MMap;
 class Slide;
 

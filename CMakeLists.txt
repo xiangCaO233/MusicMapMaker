@@ -146,7 +146,6 @@ set(CANVAS_SOURCES
     src/ui/canvas/tool/note/NoteTool.cpp
     src/ui/canvas/ecs/ECSCore.hpp
     src/ui/canvas/ecs/ECSCore.cpp
-    src/ui/canvas/ecs/Entity.hpp
     src/ui/canvas/ecs/component/CoreComponents.hpp
     src/ui/canvas/ecs/component/NoteComponents.hpp
     src/ui/canvas/ecs/component/RelationComponents.hpp

@@ -39,17 +39,10 @@ class RenderDataLoop : public QObject {
     // 停止循环
     void stop();
 
-   public slots:
-    // 1s接收一个
-    void updateFPS(int fps);
-
    signals:
     void renderUpdate();
 
    protected:
-    // 一个数据刻
-    void tick();
-
     // 获取信息
     SharedCanvasInfo* getinfo() { return info; }
 

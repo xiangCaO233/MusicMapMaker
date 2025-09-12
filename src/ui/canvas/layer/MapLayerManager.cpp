@@ -54,7 +54,8 @@ void MapLayerManager::initializeLayers() {
     auto note_generator =
         layer_generators()
             .try_emplace(NOTE, std::make_unique<NoteLayerGenerator>(
-                                   map_ecs_core, this, note_layer, &sync()))
+                                   map_ecs_core.ecs_registry(), this,
+                                   note_layer, &sync()))
             .first->second.get();
 
     auto effect_generator =

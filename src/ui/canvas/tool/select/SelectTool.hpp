@@ -6,7 +6,6 @@
 class SelectTool : public BaseTool {
    public:
     // 构造SelectTool
-    explicit SelectTool(MapCanvas* cvs);
     using BaseTool::BaseTool;
     // 析构SelectTool
     ~SelectTool() override;

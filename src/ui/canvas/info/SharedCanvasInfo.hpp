@@ -28,12 +28,6 @@ struct BaseCanvasStatus {
     bool operator==(const BaseCanvasStatus& _) const = default;
 };
 
-struct HoverInfo {
-    bool has_hovered_entity{false};
-    entt::entity e;
-    NotePart part;
-};
-
 struct SelectFrame {
     glm::vec2 pos{0};
     glm::vec2 size{0};
@@ -92,14 +86,8 @@ struct RealTimeInfo {
     // 正在按下的鼠标按钮
     std::unordered_set<Qt::MouseButton> mButtons;
 
-    // 鼠标悬浮(预选)的实体信息
-    HoverInfo hovered_info;
-
     // 选中框
     SelectFrame frame;
-
-    // 标记选中缓冲
-    std::unordered_set<entt::entity> selected_mark_buffer;
 };
 
 struct SharedCanvasInfo {

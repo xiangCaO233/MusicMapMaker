@@ -2,7 +2,6 @@
 #include <QEvent>
 #include <QObject>
 #include <QThread>
-#include <algorithm>
 #include <layer/LayerManager.hpp>
 #include <render/synchronize/FrameSynchronizer.hpp>
 #include <render/synchronize/tick/RenderDataLoop.hpp>
@@ -62,21 +61,6 @@ void RenderDataLoop::set_targetFPS(qreal fps) {
     } else {
         desired_frame_time_ns = 0;
     }
-}
-
-// updateFPS 槽函数现在需要线程安全地更新数据
-// 但实际上，它根本不需要了！因为我们不再有PID控制器
-// 我们可以保留这个接口，但让它什么都不做，或者只用于显示
-void RenderDataLoop::updateFPS(int fps) {
-    // 这个函数现在是可选的，因为节拍器是开环控制
-    // 我们可以用它来记录和显示实际帧率，但它不再参与控制
-    // qDebug() << "Actual measured FPS:" << fps;
-}
-
-// tick() 和 event() 函数现在是空的！
-// 因为所有逻辑都移动到了 RenderLoopWorker::doWork 中
-void RenderDataLoop::tick() {
-    // This function is now intentionally empty.
 }
 
 // 可重写的tick事件(执行其他任务)

@@ -4,7 +4,34 @@
 #include <mmm/obj/rm/Slide.hpp>
 
 // 打印用
-std::string Composite::toString() const { return ""; }
+std::string Composite::toString() const {
+    std::stringstream ss;
+    ss << "Composite:\n";
+    ss << Note::toString();  // 调用基类方法
+    ss << "  Total Duration: " << total_duration_time << "\n";
+    ss << "  Children: " << child_notes.size() << "\n";
+
+    // 遍历所有子音符，并递归调用它们的 toString() 方法
+    for (size_t i = 0; i < child_notes.size(); ++i) {
+        ss << "    --- Child #" << i << " ---\n";
+        // 缩进子音符的打印结果，增强可读性
+        std::string child_str = child_notes[i]->toString();
+
+        // 替换子字符串中的换行符以添加缩进
+        size_t pos = 0;
+        std::string tabbed_str = "    ";  // 额外的缩进
+        while ((pos = child_str.find('\n', pos)) != std::string::npos) {
+            child_str.replace(pos, 1, "\n" + tabbed_str);
+            pos += tabbed_str.length() + 1;
+        }
+
+        ss << tabbed_str << child_str;
+
+        ss << "\n";
+    }
+
+    return ss.str();
+}
 
 // 添加子物件
 bool Composite::add_child(std::unique_ptr<Note> note) {

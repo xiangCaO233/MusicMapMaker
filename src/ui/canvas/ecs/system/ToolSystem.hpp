@@ -1,79 +1,111 @@
 #ifndef MMM_TOOLSYSTEM_HPP
 #define MMM_TOOLSYSTEM_HPP
 
+#include <QDebug>
 #include <ecs/component/CoreComponents.hpp>
+#include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
 #include <ecs/system/QuadTree.hpp>
+#include <info/MapCanvasInfo.hpp>
+#include <list>
+#include <mmm/ObjectHandle.hpp>
 #include <unordered_map>
-#include <vector>
-
-struct HitResult {};
 
 class ToolSystem {
    public:
-    explicit ToolSystem(entt::registry& reg) : registry(reg) {};
+    explicit ToolSystem(entt::registry& reg) : registry(reg) {}
+    ~ToolSystem() = default;
+
+    /**
+     * @brief [工作线程] 增量更新空间索引.
+     * @param generated_meshes 当前帧所有可见实体的完整网格数据.
+     */
     void update(
-        const std::unordered_map<entt::entity, GeneratedMesh>& note_meshs) {
-        // 连接 PositionComponent 的创建、更新和销毁信号
-        // 当这些事件发生时，实体会被自动加入 m_dirty_entities 列表
-        connections.emplace_back(
-            registry.on_construct<TimeComponent>()
-                .connect<&ToolSystem::mark_as_dirty>(this));
-        connections.emplace_back(
-            registry.on_update<TimeComponent>()
-                .connect<&ToolSystem::mark_as_dirty>(this));
-        connections.emplace_back(
-            registry.on_destroy<TimeComponent>()
-                .connect<&ToolSystem::mark_as_dirty>(this));
+        const std::unordered_map<entt::entity, GeneratedMesh>& note_meshs,
+        const MapCanvasInfo* info) {
+        // 获取写锁，保护所有内部数据的修改
+        std::lock_guard<std::mutex> lock(mtx);
+
+        // --- 步骤 1: 清理所有旧数据 ---
+        mesh_info_storage.clear();
+        // 使用我们为四叉树实现的移动赋值运算符，基于最新的世界边界创建一个全新的空树
+        mesh_info_tree =
+            LooseQuadtree<MeshPartInfo>({{0, 0},
+                                         {info->baseInfo.canvasSize.width(),
+                                          info->baseInfo.canvasSize.height()}});
+
+        // --- 步骤 2: 填充新数据 ---
+        // 遍历传入的本帧所有网格
+        for (const auto& [entity, mesh] : note_meshs) {
+            const auto& [track, handle] = registry.get<NoteComponent>(entity);
+            // 遍历网格中的每一个部件 (Quad)
+            for (const auto& quad : mesh.mesh) {
+                // a. 在内存池中创建新的 MeshPartInfo 对象
+                mesh_info_storage.emplace_back(quad.pos, quad.size, entity,
+                                               quad.part, quad.zIndex, handle);
+
+                // b. 获取指向刚刚创建的、位于内存池末尾的对象的指针
+                const MeshPartInfo* new_part_ptr = &mesh_info_storage.back();
+
+                // c. 将这个指针插入到全新的四叉树中
+                mesh_info_tree.insert(new_part_ptr);
+            }
+        }
     }
 
-    // 更新画布世界箱尺寸
-    void update_world_boundbox(BoundingBox box);
+    // 更新画布世界碰撞箱尺寸
+    void update_world_boundbox(BoundingBox box) const {
+        // 这个操作会改变整个系统的状态，需要获取写锁
+        std::lock_guard<std::mutex> lock(mtx);
+
+        // 创建一个新的四叉树
+        mesh_info_tree = LooseQuadtree<MeshPartInfo>(box);
+
+        // 将所有已存在的几何部件重新插入新的四叉树
+        for (const auto& part : mesh_info_storage) {
+            mesh_info_tree.insert(&part);
+        }
+
+        // mesh_info_tree.print_tree();
+    }
 
     /**
      * @brief [线程安全] UI 线程可以调用此函数进行交互查询.
      *        您需要确保 UI 线程的读取与工作线程的 update 写入之间没有竞争.
      *        一个简单的策略是使用双缓冲，或者在查询时加一个读锁.
-     *        (为简化，这里暂不实现锁，但实际应用中必须考虑)
      * @param point 要查询的屏幕坐标.
      * @return 可选的命中结果.
      */
-    std::optional<HitResult> query(const glm::vec2& point) const;
+    std::optional<const MeshPartInfo*> query(const glm::vec2& point) const {
+        auto candidates = mesh_info_tree.query(point);
+        if (candidates.empty()) return std::nullopt;
 
-   private:
-    /**
-     * @brief [信号回调] 当 PositionComponent 发生变化时，将实体标记为“脏”.
-     */
-    void mark_as_dirty(entt::registry&, entt::entity entity);
-
-    /**
-     * @brief 移除一个实体的所有旧交互部件.
-     * @param entity 要移除的实体.
-     */
-    void remove_entity_parts(entt::entity entity);
-
-    /**
-     * @brief 为一个实体添加新的交互部件.
-     * @param entity 实体ID.
-     * @param mesh 该实体的新生成网格.
-     */
-    void add_entity_parts(entt::entity entity, const GeneratedMesh& mesh);
+        // 筛选最上层的匹配项
+        const MeshPartInfo* best_candidate = nullptr;
+        int min_z_index = INT_MAX;
+        for (const auto* part : candidates) {
+            if (part->contains(point)) {
+                if (part->zIndex < min_z_index) {
+                    min_z_index = part->zIndex;
+                    best_candidate = part;
+                }
+            }
+        }
+        if (best_candidate) {
+            return best_candidate;
+        }
+        return std::nullopt;
+    }
 
    private:
     // 网格信息仓库
-    std::vector<MeshPartInfo> mesh_info_storage;
+    std::list<MeshPartInfo> mesh_info_storage;
     // 网格空间索引树
-    LooseQuadtree<MeshPartInfo> mesh_info_tree{{}};
-    std::unordered_map<entt::entity,
-                       std::vector<std::vector<MeshPartInfo>::iterator>>
-        entity_to_parts;
-
-    // 对 registry 的引用，用于信号
+    mutable LooseQuadtree<MeshPartInfo> mesh_info_tree{{}};
+    // 写锁
+    mutable std::mutex mtx;
+    // 对 registry 的引用
     entt::registry& registry;
-    // --- 变化跟踪 ---
-    // 存储自上次 update 以来发生变化的实体
-    entt::dense_set<entt::entity> dirty_entities;
-    std::vector<entt::connection> connections;
 };
 
 #endif  // MMM_TOOLSYSTEM_HPP

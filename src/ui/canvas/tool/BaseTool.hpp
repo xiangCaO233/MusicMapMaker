@@ -15,10 +15,12 @@ enum class EditToolType {
 
 class MapCanvas;
 class GLDirectPainter;
+class ToolSystem;
 
 class BaseTool {
    public:
-    explicit BaseTool(MapCanvas* cvs) : m_canvas(cvs) {}
+    explicit BaseTool(MapCanvas* cvs, const ToolSystem* tool_system)
+        : m_canvas(cvs), toolSystem(tool_system) {}
     virtual ~BaseTool() = default;
 
     // 从Canvas转发过来的事件
@@ -28,19 +30,18 @@ class BaseTool {
     virtual void keyPressEvent(QKeyEvent* e) = 0;
     virtual void keyReleaseEvent(QKeyEvent* e) = 0;
 
-    // 获取类型
-    EditToolType type() const { return editType; }
-
    protected:
-    inline void setType(EditToolType t) { editType = t; }
+    // 访问画布
+    inline MapCanvas* canvas() const { return m_canvas; }
 
-    inline MapCanvas* canvas() { return m_canvas; }
+    // 访问工具系统
+    inline const ToolSystem* tool_system() const { return toolSystem; }
 
    private:
-    // 工具类型
-    EditToolType editType;
-    // 获取画布指针
+    // 画布指针
     MapCanvas* m_canvas{nullptr};
+    // 工具系统指针
+    const ToolSystem* toolSystem;
 };
 
 #endif  // MMM_BASETOOL_HPP

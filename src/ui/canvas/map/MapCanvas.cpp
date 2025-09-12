@@ -8,7 +8,6 @@
 #include <mmm/map/MMap.hpp>
 #include <mmm/project/MProject.hpp>
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
-#include <thread>
 #include <tool/note/NoteTool.hpp>
 #include <tool/select/SelectTool.hpp>
 
@@ -16,8 +15,6 @@
 MapCanvas::MapCanvas() : GLCanvas() {
     // 初始化共享信息
     initSharedInfo<MapCanvasInfo>();
-    // 初始化工具
-    creatTools();
     // 初始化播放回调
     maintrack_callback = std::make_shared<CanvasAudioPlayCallback>(this);
 }
@@ -37,8 +34,6 @@ void MapCanvas::initializeGL() {
     dataloop()->set_targetFPS(desired_fps() * 2);
     connect(dataloop().get(), &RenderDataLoop::renderUpdate, this,
             qOverload<>(&QOpenGLWindow::update));
-    connect(fps_counter(), &FrameRateCounter::fpsUpdated, dataloop().get(),
-            &RenderDataLoop::updateFPS);
 
     // 初始化默认皮肤
     skin = editor_skins
@@ -55,6 +50,10 @@ void MapCanvas::initializeGL() {
     update_sharedInfo();
     emit skinInitialized();
     dataloop()->start();
+
+    // 创建工具
+    creatTools(static_cast<const MapLayerManager*>(dataloop()->layermanager())
+                   ->get_tool_system());
 }
 
 // 绑定音频载入回调
@@ -127,10 +126,11 @@ void MapCanvas::use_tool(const QString& tool_name) {
 }
 
 // 创建工具
-void MapCanvas::creatTools() {
+void MapCanvas::creatTools(const ToolSystem* const toolsystem) {
     // 默认使用选择工具
-    current_tool =
-        tools.try_emplace("Select", new SelectTool(this)).first->second;
+    current_tool = tools.try_emplace("Select", new SelectTool(this, toolsystem))
+                       .first->second;
     // 创建物件工具
-    tools.try_emplace("Note", new NoteTool(this));
+    tools.try_emplace("Note", new NoteTool(this, toolsystem));
+    current_tool = tools["Note"];
 }

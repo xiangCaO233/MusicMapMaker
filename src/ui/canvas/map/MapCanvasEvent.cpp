@@ -2,13 +2,19 @@
 #include <QObject>
 #include <canvas/map/MapCanvas.hpp>
 #include <info/MapCanvasInfo.hpp>
+#include <layer/LayerManager.hpp>
+#include <layer/MapLayerManager.hpp>
 #include <mmm/project/MProject.hpp>
 
 void MapCanvas::resizeEvent(QResizeEvent *e) {
     GLCanvas::resizeEvent(e);
+    // 更新工具系统空间索引世界尺寸
+    static_cast<const MapLayerManager *>(dataloop()->layermanager())
+        ->get_tool_system()
+        ->update_world_boundbox({{0, 0}, {width(), height()}});
     if (map) {
+        // 更新轨道布局
         info<MapCanvasInfo>()->update_trackLayout();
-        update_sharedInfo();
     }
 }
 

@@ -32,7 +32,7 @@ void NoteLayerGenerator::generateLayer(LayerManager* manager,
     mesh_system.update(ecore.ecs_registry(), mapinfo, converter, meshs);
 
     // 更新工具系统
-    tool_system.update(meshs);
+    tool_system.update(meshs, mapinfo);
 
     // 渲染一般可见物件
     normalRender_system.update(ecore.ecs_registry(), meshs, mapinfo, converter,

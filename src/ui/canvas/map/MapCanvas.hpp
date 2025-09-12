@@ -6,15 +6,15 @@
 
 #include <canvas/GLCanvas.hpp>
 #include <ice/core/PlayCallBack.hpp>
+#include <info/MapCanvasInfo.hpp>
 #include <map/skin/MSkin.hpp>
 #include <memory>
 #include <tool/BaseTool.hpp>
 #include <unordered_map>
 #include <util/StringHash.hpp>
 
-#include "info/MapCanvasInfo.hpp"
-
 class MMap;
+class ToolSystem;
 
 class MapCanvas : public GLCanvas {
     Q_OBJECT
@@ -30,6 +30,9 @@ class MapCanvas : public GLCanvas {
 
     // 使用工具
     void use_tool(const QString &tool_name);
+
+    // 获取map
+    MMap *get_map() { return map; }
 
     // 绑定音频载入回调
    public slots:
@@ -97,7 +100,7 @@ class MapCanvas : public GLCanvas {
     BaseTool *current_tool{nullptr};
 
     // 创建工具
-    void creatTools();
+    void creatTools(const ToolSystem *const toolsystem);
 
     friend class MapEditor;
 };

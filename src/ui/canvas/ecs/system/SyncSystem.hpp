@@ -6,7 +6,6 @@
 #include <ecs/component/EffectComponents.hpp>
 #include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/RelationComponents.hpp>
-#include <ecs/component/StateComponents.hpp>
 #include <ecs/component/TimeLineComponents.hpp>
 #include <ecs/component/TimingComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
@@ -244,10 +243,8 @@ class SyncSystem {
 
         // 销毁不再可见的物件实体
         for (auto it = handle_map.begin(); it != handle_map.end();) {
-            // 不处于当前可见实体集合中/且不处于选中集合中/且不为hoverd
-            if (!current_visible_set.contains(it->first) &&
-                !info->realTimeInfo.selected_mark_buffer.contains(it->second) &&
-                it->second != info->realTimeInfo.hovered_info.e) {
+            // 不处于当前可见实体集合中
+            if (!current_visible_set.contains(it->first)) {
                 if (registry.valid(it->second)) {
                     registry.destroy(it->second);
                 }
@@ -276,19 +273,6 @@ class SyncSystem {
         // auto new_entities = handle_map.size();
         // qDebug() << "新建可见实体数量:" << new_entities - after_entities;
         // ----------debug------------
-
-        // 同步更新选中和悬浮组件
-        // 清理上一帧的
-        registry.clear<HoveredComponent>();
-        registry.clear<SelectedComponent>();
-        // 添加当前帧的
-        if (info->realTimeInfo.hovered_info.has_hovered_entity) {
-            registry.emplace<HoveredComponent>(
-                info->realTimeInfo.hovered_info.e);
-        }
-        for (const auto& e : info->realTimeInfo.selected_mark_buffer) {
-            registry.emplace<SelectedComponent>(e);
-        }
     }
 
     void sync_timings(ECSCore& core, const TimingMap& timings,

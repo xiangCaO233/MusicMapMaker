@@ -1,10 +1,5 @@
 #include <tool/select/SelectTool.hpp>
 
-// 构造SelectTool
-SelectTool::SelectTool(MapCanvas* cvs) : BaseTool(cvs) {
-    setType(EditToolType::SELECT);
-}
-
 // 析构SelectTool
 SelectTool::~SelectTool() = default;
 

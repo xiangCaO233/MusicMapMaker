@@ -90,6 +90,7 @@ class LayerManager {
     Renderer2D* render() { return renderer; };
     LayerData& layer_data() { return data_buffer; }
     LayerGenerators& layer_generators() { return generators; }
+    const LayerGenerators& layer_generators() const { return generators; }
 
     // 启动生成器
     void startGenerator(LayerType type, LayerComputerBase* layerGenerator) {
@@ -126,6 +127,7 @@ class LayerManager {
 
     // 持有帧同步器
     FrameSynchronizer synchronizer{5};
+
     friend class RenderDataLoop;
 };
 

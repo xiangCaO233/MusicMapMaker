@@ -2,6 +2,9 @@
 #define MMM_MAPLAYERMANAGER_HPP
 
 #include <layer/LayerManager.hpp>
+#include <layer/note/NoteLayerGenerator.hpp>
+#include <tool/ToolCommandQueue.hpp>
+#include <tool/ToolInteractionState.hpp>
 
 class TimePixelConverterManager {
    public:
@@ -59,6 +62,17 @@ class MapLayerManager : public LayerManager {
         return &time_converter_manager;
     }
 
+    // 获取工具系统
+    const ToolSystem* const get_tool_system() const {
+        auto notelayer = layer_generators().find(LayerType::NOTE);
+        if (notelayer != layer_generators().end()) {
+            return static_cast<NoteLayerGenerator*>(notelayer->second.get())
+                ->get_tool_system();
+        } else {
+            return nullptr;
+        }
+    }
+
    private:
     // 核心ecs
     ECSCore map_ecs_core;
@@ -68,6 +82,12 @@ class MapLayerManager : public LayerManager {
 
     // map引用
     MMap* mapref{nullptr};
+
+    // 工具命令队列
+    ToolCommandQueue toolCommandQueue;
+
+    // 工具交互状态
+    ToolInteractionState toolInteractionState;
 };
 
 #endif  // MMM_MAPLAYERMANAGER_HPP
