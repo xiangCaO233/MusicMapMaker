@@ -42,11 +42,11 @@ void updateHover(ToolSystem* toolSystem,
             // 不一样，或者之前没有悬浮 -> 更新为新的悬浮状态
             toolInteractionState->setHover(hit_info);
 
-            qDebug() << "更新hover到id:" << hit_info.handle.index;
-            qDebug() << "更新hover到entity:"
+            // qDebug() << "更新hover到id:" << hit_info.handle.index;
+            qDebug() << "检测到悬浮于实体:"
                      << static_cast<uint32_t>(hit_info.source_entity);
-            qDebug() << "更新hover到" << note->toString();
-            qDebug() << "hover part:" << to_string(hit_info.part);
+            qDebug() << "更新悬浮物件为" << note->toString();
+            qDebug() << "悬浮的部位:" << to_string(hit_info.part);
         }
 
         // qDebug() << "当前hover到id:" << hit_info.handle.index;
@@ -59,7 +59,7 @@ void updateHover(ToolSystem* toolSystem,
         if (old_hover.has_value()) {
             // 但之前有悬浮 -> 清除悬浮状态
             toolInteractionState->setHover(std::nullopt);
-            qDebug() << "鼠标下无物体,清理hover状态";
+            qDebug() << "鼠标下无物体,清理悬浮状态";
         }
         // 如果之前也没有，就什么都不做
     }
@@ -80,21 +80,19 @@ void processToolCommands(entt::registry& registry, ToolCommandQueue* toolCmdQ,
             [&](const auto& arg)
                 requires requires { arg.hit_info; }
             {
-                if (registry.valid(arg.hit_info.source_entity)) {
-                    // 修改 ECS Registry: 附加虚影组件
-                    registry.emplace_or_replace<GhostComponent>(
-                        arg.hit_info.source_entity);
+                // 修改 ECS Registry: 附加虚影组件
+                registry.emplace_or_replace<GhostComponent>(
+                    arg.hit_info.source_entity);
 
-                    // 更新 TIS: 设置拖拽状态
-                    toolInteractionState->startDrag(
-                        DragMode::Entity, arg.hit_info,
-                        {arg.hit_info.source_entity});
-                } else {
-                    qDebug()
-                        << "entity["
-                        << static_cast<uint32_t>(arg.hit_info.source_entity)
-                        << "]is not valid";
-                }
+                // 更新 TIS: 设置拖拽状态
+                toolInteractionState->startDrag(DragMode::Entity, arg.hit_info,
+                                                {arg.hit_info.source_entity});
+                auto mpos = arg.common_info.start_mouse_pos;
+                qDebug() << "交互:拖动实体["
+                         << static_cast<uint32_t>(arg.hit_info.source_entity)
+                         << "]的[" << to_string(arg.hit_info.part)
+                         << "]部分开始,开始时鼠标位于[" << "[" << mpos.x << ","
+                         << mpos.y << "]" << "]";
             },
 
             // --- 单独处理“拖拽选择集”的命令 ---
@@ -145,6 +143,13 @@ void processToolCommands(entt::registry& registry, ToolCommandQueue* toolCmdQ,
                 }
                 // 重置 TIS 中的拖拽状态
                 toolInteractionState->endDrag();
+                auto mpos = arg.final_mouse_pos;
+                qDebug() << "交互:拖动实体["
+                         << static_cast<uint32_t>(
+                                drag_info.drag_start_hit.source_entity)
+                         << "]的[" << to_string(drag_info.drag_start_hit.part)
+                         << "]部分完成,完成时鼠标位于[" << "[" << mpos.x << ","
+                         << mpos.y << "]" << "]";
             },
 
             // --- 默认处理器 (可选) ---
@@ -166,19 +171,6 @@ void SyncSystem::updateToolInteractions(ECSCore& core,
     auto toolSystem = layer_manager->get_tool_system();
     auto toolCmdQ = layer_manager->get_tool_cmdq();
     auto toolInteractionState = layer_manager->get_tool_interaction_state();
-
-    // qDebug() << "当前toolInteractionState悬浮信息:";
-    // auto hover = toolInteractionState->getHover();
-    // if (hover.has_value()) {
-    //     qDebug() << "hovered entity:"
-    //              << static_cast<uint32_t>(
-    //                     toolInteractionState->getHover().value().source_entity)
-    //              << ",is valid?:"
-    //              << toolSystem->get_registry().valid(
-    //                     toolInteractionState->getHover().value().source_entity);
-    // } else {
-    //     qDebug() << "no hovered entity";
-    // }
 
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)开始";
     // 更新悬浮状态

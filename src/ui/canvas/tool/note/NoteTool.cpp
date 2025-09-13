@@ -103,11 +103,12 @@ void NoteTool::mouseMoveEvent(QMouseEvent* e) {
 }
 
 void NoteTool::mouseReleaseEvent(QMouseEvent* e) {
-    qDebug() << "鼠标释放事件开始-位于qtui线程";
+    // qDebug() << "鼠标释放事件开始-位于qtui线程";
+
     BaseTool::mouseReleaseEvent(e);
     auto pos = e->pos();
     tool_command_queue()->push(EndDragCommand{{pos.x(), pos.y()}});
-    qDebug() << "鼠标释放事件结束-位于qtui线程(已发送结束拖拽指令)";
+    // qDebug() << "鼠标释放事件结束-位于qtui线程(已发送结束拖拽指令)";
 }
 
 void NoteTool::keyPressEvent(QKeyEvent* e) {}

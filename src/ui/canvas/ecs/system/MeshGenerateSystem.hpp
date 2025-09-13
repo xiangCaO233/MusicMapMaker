@@ -57,7 +57,7 @@ class MeshGenerateSystem {
                 // 无需渲染悬浮效果
                 generateMesh(std::nullopt, all_tracks_rect, track_index,
                              single_track_width, info, registry, e, entity_mesh,
-                             time, y, converter);
+                             time, y, converter, true);
             } else {
                 // 获取悬浮信息
                 auto hovered_info = tool_interaction_state->getHover();

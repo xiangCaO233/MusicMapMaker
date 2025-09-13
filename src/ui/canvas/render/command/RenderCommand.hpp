@@ -115,9 +115,9 @@ struct QuadCommand : public RenderCommand {
 };
 
 struct PrimitiveCommand : public RenderCommand {
-    BaseInfo baseInfo;
-    RadiusInfo radiusInfo;
-    PrimitiveType primitive;
+    BaseInfo baseInfo{};
+    RadiusInfo radiusInfo{};
+    PrimitiveType primitive{PrimitiveType::QUAD};
 
     // 转换为图元数据
     // PrimitiveData to_data() const {

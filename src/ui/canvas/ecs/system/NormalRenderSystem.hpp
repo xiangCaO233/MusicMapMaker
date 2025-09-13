@@ -22,8 +22,7 @@ class NormalRenderSystem {
 
         // 遍历所有需要渲染的普通实体(除去虚影和即将删除的)
         auto view =
-            registry.view<TimeComponent, NoteComponent, TransformComponent>(
-                entt::exclude<GhostComponent, DeleteMarkComponent>);
+            registry.view<TimeComponent, NoteComponent, TransformComponent>();
         for (auto& e : view) {
             auto& mesh = generated_meshes[e].mesh;
             // 排序网格
@@ -39,7 +38,6 @@ class NormalRenderSystem {
                 cmd.baseInfo.pos = quad.pos;
                 cmd.baseInfo.size = quad.size;
                 cmd.texturesInfo.texture = quad.texture;
-                cmd.primitive = PrimitiveType::QUAD;
 
                 if (quad.ghost) {
                     cmd.baseInfo.color = {1.f, 1.f, 1.f, .4f};
@@ -52,7 +50,7 @@ class NormalRenderSystem {
 
                 buffer.add_PrimitiveCommand(cmd);
 
-                if (quad.glow || quad.ghost) {
+                if (quad.glow) {
                     // 绘制物件精确时间字符串到鼠标旁边
                     const auto& [time] = view.get<TimeComponent>(e);
                     // 绘制当前时间字符串

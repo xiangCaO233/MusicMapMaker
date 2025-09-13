@@ -13,12 +13,12 @@ MouseState ToolInteractionState::getMouseState() const { return m_mouseState; }
 
 // 悬浮相关 (由 pretick 写入, 工作线程读取)
 void ToolInteractionState::setHover(const std::optional<MeshPartInfo> hover) {
-    if (hover.has_value()) {
-        auto id = hover.value().handle.index;
-        qDebug() << "设置更新悬浮位置:" << id;
-    } else {
-        qDebug() << "清除悬浮位置";
-    }
+    // if (hover.has_value()) {
+    //     auto id = hover.value().handle.index;
+    //     // qDebug() << "设置更新悬浮位置:" << id;
+    // } else {
+    //     // qDebug() << "清除悬浮位置";
+    // }
     m_hovered = hover;
 }
 
