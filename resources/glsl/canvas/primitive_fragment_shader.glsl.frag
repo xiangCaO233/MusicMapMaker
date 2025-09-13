@@ -13,6 +13,7 @@ uniform bool u_IsDrawingWireframe;
 
 // 使用的采样数组
 uniform sampler2DArray u_samplerarray;
+
 // 原始的发光纹理遮罩
 uniform sampler2D glowmask;
 

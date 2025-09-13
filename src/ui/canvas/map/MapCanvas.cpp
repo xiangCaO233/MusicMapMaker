@@ -31,7 +31,7 @@ void MapCanvas::initializeGL() {
     // 初始化渲染数据循环
     dataloop() = std::make_unique<MapDataLoop>(renderer().get());
     dataloop()->initializeLayerManager();
-    dataloop()->set_targetFPS(desired_fps() * 2);
+    dataloop()->set_targetFPS(desired_fps());
     connect(dataloop().get(), &RenderDataLoop::renderUpdate, this,
             qOverload<>(&QOpenGLWindow::update));
 
@@ -51,9 +51,11 @@ void MapCanvas::initializeGL() {
     emit skinInitialized();
     dataloop()->start();
 
+    auto layermanager =
+        static_cast<MapLayerManager*>(dataloop()->layermanager());
     // 创建工具
-    creatTools(static_cast<const MapLayerManager*>(dataloop()->layermanager())
-                   ->get_tool_system());
+    creatTools(layermanager->get_tool_system(), layermanager->get_tool_cmdq(),
+               layermanager->get_tool_interaction_state());
 }
 
 // 绑定音频载入回调
@@ -126,11 +128,17 @@ void MapCanvas::use_tool(const QString& tool_name) {
 }
 
 // 创建工具
-void MapCanvas::creatTools(const ToolSystem* const toolsystem) {
+void MapCanvas::creatTools(ToolSystem* toolsystem, ToolCommandQueue* const cmdq,
+                           ToolInteractionState* const toolIntState) {
     // 默认使用选择工具
-    current_tool = tools.try_emplace("Select", new SelectTool(this, toolsystem))
-                       .first->second;
+    current_tool =
+        tools
+            .try_emplace("Select",
+                         new SelectTool(this, toolsystem, cmdq, toolIntState))
+            .first->second;
     // 创建物件工具
-    tools.try_emplace("Note", new NoteTool(this, toolsystem));
+    tools.try_emplace("Note",
+                      new NoteTool(this, toolsystem, cmdq, toolIntState));
+
     current_tool = tools["Note"];
 }

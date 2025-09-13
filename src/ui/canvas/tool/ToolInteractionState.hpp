@@ -22,8 +22,7 @@ struct MouseState {
 
 // --- 子结构：选择状态 ---
 struct SelectionState {
-    std::vector<entt::entity> selected_entities;
-    // 未来可添加：选择框的矩形区域等
+    std::unordered_set<entt::entity> selected_entities;
 };
 
 // --- 子结构：拖拽状态 ---
@@ -46,7 +45,7 @@ struct DragState {
     // 拖拽开始时的命中信息 (部位、实体等)
     const MeshPartInfo* drag_start_hit;
     // 实际被拖拽的实体集合
-    std::vector<entt::entity> dragged_entities;
+    std::unordered_set<entt::entity> dragged_entities;
 };
 
 // 主结构ToolInteractionState
@@ -66,15 +65,15 @@ class ToolInteractionState {
     std::optional<const MeshPartInfo*> getHover() const;
 
     // 拖拽相关 (由 pretick 写入, 工作线程读取)
-    void startDrag(DragMode mode, const std::optional<const MeshPartInfo*>& hit,
-                   const std::vector<entt::entity>& selection);
+    void startDrag(DragMode mode, const MeshPartInfo& hit,
+                   const std::unordered_set<entt::entity>& selection);
     void endDrag();
     void setDragValidity(bool isValid);
     DragState getDragState() const;
 
     // 选择相关 (由 pretick 写入, 所有线程读取)
-    void setSelection(const std::vector<entt::entity>& entities);
-    std::vector<entt::entity> getSelection() const;
+    void setSelection(const std::unordered_set<entt::entity>& entities);
+    std::unordered_set<entt::entity> getSelection() const;
 
     // 操作/快捷键相关 (由UI/Action系统写入, pretick读取)
     // 这个可以用一个更简单的命令队列，或者一个原子标志位

@@ -41,13 +41,18 @@ class NormalRenderSystem {
                 cmd.texturesInfo.texture = quad.texture;
                 cmd.primitive = PrimitiveType::QUAD;
 
-                if (quad.glow) {
-                    cmd.radiusInfo.radius_effect_param = 1.f;
-                    cmd.radiusInfo.radius_effect = RadiusEffect::GLOWING;
+                if (quad.ghost) {
+                    cmd.baseInfo.color = {1.f, 1.f, 1.f, .4f};
+                } else {
+                    if (quad.glow) {
+                        cmd.radiusInfo.radius_effect_param = 1.f;
+                        cmd.radiusInfo.radius_effect = RadiusEffect::GLOWING;
+                    }
                 }
 
                 buffer.add_PrimitiveCommand(cmd);
-                if (quad.glow) {
+
+                if (quad.glow || quad.ghost) {
                     // 绘制物件精确时间字符串到鼠标旁边
                     const auto& [time] = view.get<TimeComponent>(e);
                     // 绘制当前时间字符串

@@ -3,6 +3,8 @@
 
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <tool/ToolCommandQueue.hpp>
+#include <tool/ToolInteractionState.hpp>
 
 enum class EditToolType {
     // 无操作的hand工具只有基本操作和拖动进度的功能
@@ -19,29 +21,46 @@ class ToolSystem;
 
 class BaseTool {
    public:
-    explicit BaseTool(MapCanvas* cvs, const ToolSystem* tool_system)
-        : m_canvas(cvs), toolSystem(tool_system) {}
+    explicit BaseTool(MapCanvas* cvs, ToolSystem* const tool_system,
+                      ToolCommandQueue* const tool_cmdq,
+                      ToolInteractionState* const tool_interaction_state)
+        : m_canvas(cvs),
+          toolSystem(tool_system),
+          toolCommandQueue(tool_cmdq),
+          toolInteractionState(tool_interaction_state) {}
     virtual ~BaseTool() = default;
 
     // 从Canvas转发过来的事件
-    virtual void mousePressEvent(QMouseEvent* event) = 0;
-    virtual void mouseMoveEvent(QMouseEvent* event) = 0;
-    virtual void mouseReleaseEvent(QMouseEvent* event) = 0;
-    virtual void keyPressEvent(QKeyEvent* e) = 0;
-    virtual void keyReleaseEvent(QKeyEvent* e) = 0;
+    virtual void mousePressEvent(QMouseEvent* e);
+    virtual void mouseMoveEvent(QMouseEvent* e);
+    virtual void mouseReleaseEvent(QMouseEvent* e);
+    virtual void keyPressEvent(QKeyEvent* e);
+    virtual void keyReleaseEvent(QKeyEvent* e);
 
    protected:
     // 访问画布
-    inline MapCanvas* canvas() const { return m_canvas; }
+    inline MapCanvas* canvas() { return m_canvas; }
 
     // 访问工具系统
-    inline const ToolSystem* tool_system() const { return toolSystem; }
+    inline ToolSystem* tool_system() { return toolSystem; }
+
+    // 访问工具指令队列
+    inline ToolCommandQueue* tool_command_queue() { return toolCommandQueue; }
+
+    // 访问交互管理器
+    inline ToolInteractionState* tool_interaction_state() {
+        return toolInteractionState;
+    }
 
    private:
     // 画布指针
     MapCanvas* m_canvas{nullptr};
     // 工具系统指针
-    const ToolSystem* toolSystem;
+    ToolSystem* const toolSystem;
+    // 工具指令队列指针
+    ToolCommandQueue* const toolCommandQueue;
+    // 工具交互状态管理器指针
+    ToolInteractionState* const toolInteractionState;
 };
 
 #endif  // MMM_BASETOOL_HPP

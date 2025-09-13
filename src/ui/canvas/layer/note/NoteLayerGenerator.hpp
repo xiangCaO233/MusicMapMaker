@@ -10,15 +10,15 @@
 
 class NoteLayerGenerator : public LayerComputerBase {
    public:
-    NoteLayerGenerator(entt::registry& reg, LayerManager* manager,
-                       ILayer* layer, FrameSynchronizer* sync,
+    NoteLayerGenerator(LayerManager* manager, ILayer* layer,
+                       FrameSynchronizer* sync, ToolSystem* toolsystem,
+                       ToolInteractionState* toolinteractionstate,
                        QObject* parent = nullptr)
-        : LayerComputerBase(manager, layer, sync, parent), tool_system(reg) {}
+        : LayerComputerBase(manager, layer, sync, parent),
+          tool_system(toolsystem),
+          tool_interaction_state(toolinteractionstate) {}
     // 析构NoteLayerGenerator
     ~NoteLayerGenerator() override;
-
-    // 获取工具系统指针
-    const ToolSystem* const get_tool_system() const { return &tool_system; }
 
    protected:
     // 生成交互层的数据
@@ -27,7 +27,8 @@ class NoteLayerGenerator : public LayerComputerBase {
 
    private:
     [[no_unique_address]] MeshGenerateSystem mesh_system;
-    ToolSystem tool_system;
     [[no_unique_address]] NormalRenderSystem normalRender_system;
+    ToolSystem* tool_system;
+    ToolInteractionState* tool_interaction_state;
 };
 #endif  // MMM_NOTELAYERGENERATOR_HPP

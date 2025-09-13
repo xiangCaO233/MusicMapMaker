@@ -1,8 +1,8 @@
 #ifndef MMM_MAPDATALOOP_HPP
 #define MMM_MAPDATALOOP_HPP
 
-#include <ecs/system/SyncSystem.hpp>
 #include <ecs/system/TimeSystem.hpp>
+#include <ecs/system/sync/SyncSystem.hpp>
 #include <render/synchronize/tick/RenderDataLoop.hpp>
 
 class SharedCanvasInfo;

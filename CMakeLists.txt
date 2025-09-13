@@ -51,7 +51,7 @@ if(APPLE)
   set(FFTLIB /opt/homebrew/lib/libfftw3f.dylib /opt/homebrew/lib/libfftw3f.a)
 else()
   set(FFTLIB fftw3f)
-endif(APPLE)
+endif()
 
 # 查找字体包
 find_package(Freetype REQUIRED)
@@ -64,27 +64,13 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 
 # 设置mmm相关文件
 set(MMM_SOURCES
-    src/mmm/info/osu/OsuMapInfo.hpp
     src/mmm/info/osu/OsuMapInfo.cpp
-    src/mmm/info/osu/OsuNoteInfo.hpp
-    src/mmm/project/TextureLoadCallback.hpp
-    src/mmm/project/MProject.hpp
     src/mmm/project/MProject.cpp
-    src/mmm/obj/Note.hpp
     src/mmm/obj/Note.cpp
-    src/mmm/obj/Hold.hpp
-    src/mmm/obj/rm/Slide.hpp
-    src/mmm/obj/rm/Composite.hpp
     src/mmm/obj/rm/Composite.cpp
-    src/mmm/obj/osu/OsuNote.hpp
     src/mmm/obj/osu/OsuNote.cpp
-    src/mmm/obj/osu/OsuHold.hpp
     src/mmm/obj/osu/OsuHold.cpp
-    src/mmm/timing/Timing.hpp
-    src/mmm/timing/osu/OsuTiming.hpp
     src/mmm/timing/osu/OsuTiming.cpp
-    src/mmm/DataStructures.hpp
-    src/mmm/map/MMap.hpp
     src/mmm/map/MMap.cpp
     src/mmm/map/io/osu/OsuMapRead.cpp
     src/mmm/map/io/osu/OsuMapWrite.cpp
@@ -105,21 +91,12 @@ set(GLSL_FILES
     resources/glsl/wavgraph_vshader.glsl.vert)
 
 set(CANVAS_SOURCES
-    src/ui/canvas/render/texture/TexMode.hpp
-    src/ui/canvas/render/texture/TextureInfo.hpp
-    src/ui/canvas/render/texture/font/FontPool.hpp
     src/ui/canvas/render/texture/font/FontPool.cpp
-    src/ui/canvas/render/texture/TexturePool.hpp
     src/ui/canvas/render/texture/TexturePool.cpp
-    src/ui/canvas/render/command/GPUData.hpp
-    src/ui/canvas/render/command/RenderCommand.hpp
-    src/ui/canvas/render/command/GLDirectPainter.hpp
     src/ui/canvas/render/command/GLDirectPainter.cpp
-    src/ui/canvas/render/command/MCommandCollector.hpp
     src/ui/canvas/render/command/MCommandCollector.cpp
-    src/ui/canvas/render/Renderer2D.hpp
-    src/ui/canvas/render/pipeline/framebuffer/FrameBuffer.hpp
     src/ui/canvas/render/pipeline/framebuffer/FrameBuffer.cpp
+    src/ui/canvas/render/Renderer2D.hpp
     src/ui/canvas/render/pipeline/Renderer2D.cpp
     src/ui/canvas/render/pipeline/Renderer2DGLRess.cpp
     src/ui/canvas/render/pipeline/QuadRenderer2DRess.cpp
@@ -127,61 +104,34 @@ set(CANVAS_SOURCES
     src/ui/canvas/render/pipeline/PrimitiveRenderer2DRess.cpp
     src/ui/canvas/render/pipeline/CurveRenderer2DRess.cpp
     src/ui/canvas/render/pipeline/AfterEffectRenderer2DRess.cpp
-    src/ui/canvas/render/synchronize/FrameSynchronizer.hpp
     src/ui/canvas/render/synchronize/FrameSynchronizer.cpp
-    src/ui/canvas/render/synchronize/tick/RenderDataLoop.hpp
     src/ui/canvas/render/synchronize/tick/RenderDataLoop.cpp
-    src/ui/canvas/render/synchronize/tick/RenderLoopWorker.hpp
     src/ui/canvas/render/synchronize/tick/RenderLoopWorker.cpp
-    src/ui/canvas/render/synchronize/tick/map/MapDataLoop.hpp
     src/ui/canvas/render/synchronize/tick/map/MapDataLoop.cpp
-    src/ui/canvas/FrameRateCounter.hpp
     src/ui/canvas/FrameRateCounter.cpp
     src/ui/canvas/GLCanvas.cpp
-    src/ui/canvas/GLCanvas.hpp
-    src/ui/canvas/tool/BaseTool.hpp
-    src/ui/canvas/tool/select/SelectTool.hpp
+    src/ui/canvas/tool/BaseTool.cpp
+    src/ui/canvas/tool/ToolInteractionState.cpp
     src/ui/canvas/tool/select/SelectTool.cpp
-    src/ui/canvas/tool/note/NoteTool.hpp
     src/ui/canvas/tool/note/NoteTool.cpp
-    src/ui/canvas/ecs/ECSCore.hpp
     src/ui/canvas/ecs/ECSCore.cpp
-    src/ui/canvas/ecs/component/CoreComponents.hpp
-    src/ui/canvas/ecs/component/NoteComponents.hpp
-    src/ui/canvas/ecs/component/RelationComponents.hpp
-    src/ui/canvas/ecs/component/StateComponents.hpp
-    src/ui/canvas/ecs/component/TimingComponents.hpp
-    src/ui/canvas/ecs/component/TransformComponents.hpp
-    src/ui/canvas/layer/ILayer.hpp
-    src/ui/canvas/layer/LayerComputerBase.hpp
+    src/ui/canvas/ecs/system/sync/SyncEntities.cpp
+    src/ui/canvas/ecs/system/sync/SyncEffects.cpp
+    src/ui/canvas/ecs/system/sync/SyncToolInteractions.cpp
     src/ui/canvas/layer/LayerComputerBase.cpp
-    src/ui/canvas/layer/LayerManager.hpp
-    src/ui/canvas/layer/MapLayerManager.hpp
     src/ui/canvas/layer/MapLayerManager.cpp
-    src/ui/canvas/layer/background/BackgroundLayer.hpp
     src/ui/canvas/layer/background/BackgroundLayer.cpp
-    src/ui/canvas/layer/background/BackgroundLayerGenerator.hpp
     src/ui/canvas/layer/background/BackgroundLayerGenerator.cpp
-    src/ui/canvas/layer/effect/EffectLayer.hpp
     src/ui/canvas/layer/effect/EffectLayer.cpp
-    src/ui/canvas/layer/effect/EffectLayerGenerator.hpp
     src/ui/canvas/layer/effect/EffectLayerGenerator.cpp
-    src/ui/canvas/layer/interact/InteractLayerGenerator.hpp
     src/ui/canvas/layer/interact/InteractLayerGenerator.cpp
-    src/ui/canvas/layer/interact/RealTimeInteractLayer.hpp
     src/ui/canvas/layer/interact/RealTimeInteractLayer.cpp
-    src/ui/canvas/layer/note/NoteLayer.hpp
     src/ui/canvas/layer/note/NoteLayer.cpp
-    src/ui/canvas/layer/note/NoteLayerGenerator.hpp
     src/ui/canvas/layer/note/NoteLayerGenerator.cpp
-    src/ui/canvas/layer/timeline/TimelineLayer.hpp
     src/ui/canvas/layer/timeline/TimelineLayer.cpp
-    src/ui/canvas/layer/timeline/TimelineLayerGenerator.hpp
     src/ui/canvas/layer/timeline/TimelineLayerGenerator.cpp
-    src/ui/canvas/map/MapCanvas.hpp
     src/ui/canvas/map/MapCanvas.cpp
     src/ui/canvas/map/MapCanvasEvent.cpp
-    src/ui/canvas/map/skin/MSkin.hpp
     src/ui/canvas/map/skin/MSkin.cpp
     src/ui/canvas/GLCanvasEvents.cpp
     src/ui/canvas/CanvasContainer.h

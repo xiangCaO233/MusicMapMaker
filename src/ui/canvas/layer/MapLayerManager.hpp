@@ -6,6 +6,8 @@
 #include <tool/ToolCommandQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
 
+#include "ecs/system/ToolSystem.hpp"
+
 class TimePixelConverterManager {
    public:
     TimePixelConverterManager() = default;
@@ -63,14 +65,14 @@ class MapLayerManager : public LayerManager {
     }
 
     // 获取工具系统
-    const ToolSystem* const get_tool_system() const {
-        auto notelayer = layer_generators().find(LayerType::NOTE);
-        if (notelayer != layer_generators().end()) {
-            return static_cast<NoteLayerGenerator*>(notelayer->second.get())
-                ->get_tool_system();
-        } else {
-            return nullptr;
-        }
+    inline ToolSystem* get_tool_system() { return &toolSystem; }
+
+    // 获取工具命令队列
+    inline ToolCommandQueue* get_tool_cmdq() { return &toolCommandQueue; }
+
+    // 获取工具交互管理
+    inline ToolInteractionState* get_tool_interaction_state() {
+        return &toolInteractionState;
     }
 
    private:
@@ -82,6 +84,9 @@ class MapLayerManager : public LayerManager {
 
     // map引用
     MMap* mapref{nullptr};
+
+    // 工具同步系统(ecs)
+    ToolSystem toolSystem{map_ecs_core.ecs_registry()};
 
     // 工具命令队列
     ToolCommandQueue toolCommandQueue;

@@ -9,6 +9,8 @@
 #include <info/MapCanvasInfo.hpp>
 #include <list>
 #include <mmm/ObjectHandle.hpp>
+#include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 
 class ToolSystem {
@@ -23,8 +25,8 @@ class ToolSystem {
     void update(
         const std::unordered_map<entt::entity, GeneratedMesh>& note_meshs,
         const MapCanvasInfo* info) {
-        // 获取写锁，保护所有内部数据的修改
-        std::lock_guard<std::mutex> lock(mtx);
+        // 使用 std::unique_lock 获取独占的写锁
+        std::unique_lock<std::shared_mutex> lock(mtx);
 
         // --- 步骤 1: 清理所有旧数据 ---
         mesh_info_storage.clear();
@@ -56,7 +58,8 @@ class ToolSystem {
     // 更新画布世界碰撞箱尺寸
     void update_world_boundbox(BoundingBox box) const {
         // 这个操作会改变整个系统的状态，需要获取写锁
-        std::lock_guard<std::mutex> lock(mtx);
+        // 使用 std::unique_lock 获取独占的写锁
+        std::unique_lock<std::shared_mutex> lock(mtx);
 
         // 创建一个新的四叉树
         mesh_info_tree = LooseQuadtree<MeshPartInfo>(box);
@@ -77,15 +80,17 @@ class ToolSystem {
      * @return 可选的命中结果.
      */
     std::optional<const MeshPartInfo*> query(const glm::vec2& point) const {
+        // 使用 std::shared_lock 获取共享的读锁
+        std::shared_lock<std::shared_mutex> lock(mtx);
         auto candidates = mesh_info_tree.query(point);
         if (candidates.empty()) return std::nullopt;
 
         // 筛选最上层的匹配项
         const MeshPartInfo* best_candidate = nullptr;
-        int min_z_index = INT_MAX;
+        int min_z_index = -1;
         for (const auto* part : candidates) {
             if (part->contains(point)) {
-                if (part->zIndex < min_z_index) {
+                if (part->zIndex > min_z_index) {
                     min_z_index = part->zIndex;
                     best_candidate = part;
                 }
@@ -102,8 +107,8 @@ class ToolSystem {
     std::list<MeshPartInfo> mesh_info_storage;
     // 网格空间索引树
     mutable LooseQuadtree<MeshPartInfo> mesh_info_tree{{}};
-    // 写锁
-    mutable std::mutex mtx;
+    // 读写锁
+    mutable std::shared_mutex mtx;
     // 对 registry 的引用
     entt::registry& registry;
 };

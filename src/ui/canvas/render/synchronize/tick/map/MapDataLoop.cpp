@@ -3,7 +3,7 @@
 #include <mmm/map/MMap.hpp>
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
 
-// 可重写的tick事件(执行其他任务)
+// pretick事件(执行其他任务)
 // 这里是同步的-时间太会影响帧数
 void MapDataLoop::pre_tickEvent() {
     // 先筛选可见物件
@@ -18,15 +18,18 @@ void MapDataLoop::pre_tickEvent() {
         mapinfo->editorInfo.map->base_metadata().preference_bpm);
     auto &ecore = map_layermgr->core();
 
+    // 同步工具交互状态
+    sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr);
+
     // 与源物件集合同步可见的物件和timing
-    sync_system.update(ecore, map->note_set(), map->timing_set(),
-                       map->beat_timeline(), map->beat_info(), mapinfo,
-                       converter);
+    sync_system.updateEntities(ecore, map->note_set(), map->timing_set(),
+                               map->beat_timeline(), map->beat_info(), mapinfo,
+                               converter);
     // 计算有时间属性的逻辑y轴位置
     time_system.update(ecore, mapinfo, converter);
 
     // 同步特效
-    sync_system.update(ecore, map->note_set(), mapinfo, converter);
+    sync_system.updateEffects(ecore, map->note_set(), mapinfo, converter);
 }
 
 void MapDataLoop::tickEvent() {}

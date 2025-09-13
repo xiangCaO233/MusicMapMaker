@@ -22,11 +22,16 @@ struct GeneratedMesh {
         glm::vec2 size;
         // 纹理信息
         TextureInfo texture{};
+
+        // 本矩形对应的物件部位
+        NotePart part;
+
+        // 是否为虚影模式
+        bool ghost;
+
         // 绘制层级，值越小越先绘制
         int zIndex{0};
         bool glow{false};
-        // 本矩形对应的物件部位
-        NotePart part;
         // 纹理缩放模式
         TexScaleMode mode{TexScaleMode::FORCE_FILL};
     };

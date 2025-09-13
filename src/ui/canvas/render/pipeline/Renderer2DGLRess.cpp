@@ -1,3 +1,5 @@
+#include <qshareddata.h>
+
 #include <QFile>
 #include <canvas/GLCanvas.hpp>
 #include <render/Renderer2D.hpp>
@@ -332,6 +334,7 @@ void Renderer2D::render() {
         mesh_datas.clear();
         primitive_datas.clear();
         curve_datas.clear();
+        swap();
         return;
     }
 
@@ -522,6 +525,12 @@ void Renderer2D::composite() {
 // 交换到主帧缓冲
 void Renderer2D::swap() {
     composite_shader->bind();
+    // 场景背景色
+    const float sceneClearColor[] = {0.23f, 0.23f, 0.23f, 1.0f};
+    GLCALL(cvs->glClearColor(sceneClearColor[0], sceneClearColor[1],
+                             sceneClearColor[2], sceneClearColor[3]),
+           cvs);
+    GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
     GLCALL(cvs->glBindVertexArray(fullScreenAO), cvs);
     GLCALL(
         cvs->glBindFramebuffer(GL_FRAMEBUFFER, cvs->defaultFramebufferObject()),

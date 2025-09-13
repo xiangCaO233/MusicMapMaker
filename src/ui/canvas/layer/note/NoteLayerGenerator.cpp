@@ -29,10 +29,11 @@ void NoteLayerGenerator::generateLayer(LayerManager* manager,
 
     // 生成物件网格
     std::unordered_map<entt::entity, GeneratedMesh> meshs;
-    mesh_system.update(ecore.ecs_registry(), mapinfo, converter, meshs);
+    mesh_system.update(ecore.ecs_registry(), mapinfo, converter,
+                       tool_interaction_state, meshs);
 
     // 更新工具系统
-    tool_system.update(meshs, mapinfo);
+    tool_system->update(meshs, mapinfo);
 
     // 渲染一般可见物件
     normalRender_system.update(ecore.ecs_registry(), meshs, mapinfo, converter,

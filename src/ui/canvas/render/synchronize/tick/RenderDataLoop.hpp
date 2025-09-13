@@ -25,7 +25,7 @@ class RenderDataLoop : public QObject {
     virtual void initializeLayerManager();
 
     // 获取图层管理器指针
-    LayerManager* layermanager() const { return layer_manager.get(); }
+    LayerManager* layermanager() { return layer_manager.get(); }
 
     // 更新信息
     void update_info(SharedCanvasInfo* newinfo);

@@ -7,10 +7,13 @@
 
 // 悬浮信息
 enum class NotePart {
+    NONE,
     HEAD,
+    HOLD_HEAD,
     HOLD_BODY,
-    SLIDE_BODY,
     HOLD_END,
+    SLIDE_HEAD,
+    SLIDE_BODY,
     SLIDE_END,
 };
 
@@ -19,12 +22,16 @@ inline std::string to_string(NotePart part) {
     switch (part) {
         case NotePart::HEAD:
             return "HEAD";
+        case NotePart::HOLD_HEAD:
+            return "HOLD_HEAD";
         case NotePart::HOLD_BODY:
             return "HOLD_BODY";
-        case NotePart::SLIDE_BODY:
-            return "SLIDE_BODY";
         case NotePart::HOLD_END:
             return "HOLD_END";
+        case NotePart::SLIDE_HEAD:
+            return "SLIDE_HEAD";
+        case NotePart::SLIDE_BODY:
+            return "SLIDE_BODY";
         case NotePart::SLIDE_END:
             return "SLIDE_END";
         default:

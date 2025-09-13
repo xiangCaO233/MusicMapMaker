@@ -2,7 +2,7 @@
 #define MMM_TOOLCOMMANDQUEUE_HPP
 
 #include <queue>
-#include <tool/ToolCommand.hpp>
+#include <tool/command/ToolCommand.hpp>
 
 class ToolCommandQueue {
    public:

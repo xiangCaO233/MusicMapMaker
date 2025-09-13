@@ -100,7 +100,8 @@ class MapCanvas : public GLCanvas {
     BaseTool *current_tool{nullptr};
 
     // 创建工具
-    void creatTools(const ToolSystem *const toolsystem);
+    void creatTools(ToolSystem *const toolsystem, ToolCommandQueue *const cmdq,
+                    ToolInteractionState *const toolIntState);
 
     friend class MapEditor;
 };
