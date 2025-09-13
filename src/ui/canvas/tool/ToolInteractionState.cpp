@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <tool/ToolInteractionState.hpp>
 // 线程安全的公共接口
 
@@ -11,26 +12,31 @@ void ToolInteractionState::updateMouse(const glm::vec2& pos,
 MouseState ToolInteractionState::getMouseState() const { return m_mouseState; }
 
 // 悬浮相关 (由 pretick 写入, 工作线程读取)
-void ToolInteractionState::setHover(
-    const std::optional<const MeshPartInfo*>& hover) {
+void ToolInteractionState::setHover(const std::optional<MeshPartInfo> hover) {
+    if (hover.has_value()) {
+        auto id = hover.value().handle.index;
+        qDebug() << "设置更新悬浮位置:" << id;
+    } else {
+        qDebug() << "清除悬浮位置";
+    }
     m_hovered = hover;
 }
 
-std::optional<const MeshPartInfo*> ToolInteractionState::getHover() const {
+std::optional<MeshPartInfo> ToolInteractionState::getHover() const {
     return m_hovered;
 }
 
 // 拖拽相关 (由 pretick 写入, 工作线程读取)
 void ToolInteractionState::startDrag(
-    DragMode mode, const MeshPartInfo& hit,
+    DragMode mode, MeshPartInfo hit,
     const std::unordered_set<entt::entity>& selection) {
-    m_dragState.drag_start_hit = &hit;
+    m_dragState.drag_start_hit = hit;
+    m_dragState.dragged_entities = selection;
     if (hit.part != NotePart::NONE) {
         m_dragState.mode = DragMode::Entity;
     } else {
         m_dragState.mode = DragMode::Marquee;
     }
-    m_dragState.dragged_entities = selection;
 }
 
 void ToolInteractionState::endDrag() {}

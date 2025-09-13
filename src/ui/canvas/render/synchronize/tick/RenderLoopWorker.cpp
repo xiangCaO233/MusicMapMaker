@@ -43,7 +43,7 @@ void RenderLoopWorker::doWork() {
         }
 
         // --- 2. 计算时间信息 ---
-        auto raw_delta_ms = double(d->desired_frame_time_ns / 1000) / 1000.0;
+        auto raw_delta_ms = double(d->desired_frame_time_ns / 1000.0) / 1000.0;
 
         // --- 3. 计算下一拍目标 ---
         d->next_tick_time_ns += d->desired_frame_time_ns;

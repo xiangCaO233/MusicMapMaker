@@ -48,7 +48,7 @@ class MeshGenerateSystem {
             auto* ghost = registry.try_get<GhostComponent>(e);
             if (ghost) {
                 auto drag_info = tool_interaction_state->getDragState();
-                if (drag_info.drag_start_hit->part == NotePart::HEAD) {
+                if (drag_info.drag_start_hit.part == NotePart::HEAD) {
                     // 若为头则计算并更新此时鼠标最近的分拍线时间作为物件时间
                     // 计算并更新此时鼠标最近的轨道
                 }
@@ -79,7 +79,7 @@ class MeshGenerateSystem {
         return texinfo;
     }
 
-    void generateMesh(const std::optional<const MeshPartInfo*>& hovered_info,
+    void generateMesh(const std::optional<MeshPartInfo>& hovered_info,
                       const glm::vec4& all_tracks_rect, int32_t track_index,
                       const float& single_track_width, MapCanvasInfo*& info,
                       const entt::registry& registry, const entt::entity& e,
@@ -87,11 +87,10 @@ class MeshGenerateSystem {
                       const float& y, const TimePixelConverter& converter,
                       bool ghost = false) const {
         // 判断悬浮情况
-        auto hovered = hovered_info.has_value() &&
-                       hovered_info.value()->source_entity == e;
-        auto hovered_part = hovered_info.has_value()
-                                ? hovered_info.value()->part
-                                : NotePart::NONE;
+        auto hovered =
+            hovered_info.has_value() && hovered_info.value().source_entity == e;
+        auto hovered_part = hovered_info.has_value() ? hovered_info.value().part
+                                                     : NotePart::NONE;
 
         // 根据note信息生成网格
         const float x = all_tracks_rect.x +

@@ -4,13 +4,17 @@
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
 
 // pretick事件(执行其他任务)
-// 这里是同步的-时间太会影响帧数
+// 这里是同步的-时间太长会影响帧数
 void MapDataLoop::pre_tickEvent() {
+    // qDebug() << "pretick开始";
     // 先筛选可见物件
     auto map_layermgr = static_cast<MapLayerManager *>(manager().get());
     auto map = map_layermgr->map();
     auto mapinfo = static_cast<MapCanvasInfo *>(getinfo());
-    if (!map) return;
+    if (!map) {
+        // qDebug() << "pretick结束";
+        return;
+    }
 
     // 初始化时间映射器 (自动构造/构造函数自动执行预计算)
     auto converter = map_layermgr->get_time_converter_manager()->getConverter(
@@ -18,6 +22,7 @@ void MapDataLoop::pre_tickEvent() {
         mapinfo->editorInfo.map->base_metadata().preference_bpm);
     auto &ecore = map_layermgr->core();
 
+    // qDebug() << "同步系统(at pretick)开始";
     // 同步工具交互状态
     sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr);
 
@@ -25,11 +30,16 @@ void MapDataLoop::pre_tickEvent() {
     sync_system.updateEntities(ecore, map->note_set(), map->timing_set(),
                                map->beat_timeline(), map->beat_info(), mapinfo,
                                converter);
+    // qDebug() << "时间转换系统(at pretick)开始";
     // 计算有时间属性的逻辑y轴位置
     time_system.update(ecore, mapinfo, converter);
+    // qDebug() << "时间转换系统(at pretick)结束";
 
     // 同步特效
     sync_system.updateEffects(ecore, map->note_set(), mapinfo, converter);
+    // qDebug() << "同步系统(at pretick)结束";
+
+    // qDebug() << "pretick结束";
 }
 
 void MapDataLoop::tickEvent() {}

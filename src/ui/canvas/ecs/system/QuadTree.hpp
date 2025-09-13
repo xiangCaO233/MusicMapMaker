@@ -23,18 +23,16 @@ struct BoundingBox {
     }
 };
 
-// --- 松散四叉树实现 ---
 template <typename T>
 class LooseQuadtree {
    public:
-    // 松散因子k > 1.0。k=2.0意味着节点的有效边界是其物理边界的两倍大。
     static constexpr float LoosenessFactor = 1.0f;
 
    private:
     struct Node {
-        BoundingBox bounds;       // 节点的物理边界
-        BoundingBox looseBounds;  // 节点的松散边界
-        std::vector<const T*> objects;
+        BoundingBox bounds;
+        BoundingBox looseBounds;
+        std::vector<T> objects;  // 变更: 直接存储对象，而不是指针。
         std::unique_ptr<Node> children[4];
         Node* parent;
         int depth;
@@ -47,7 +45,6 @@ class LooseQuadtree {
                            {bounds.size.x * LoosenessFactor,
                             bounds.size.y * LoosenessFactor}};
         }
-
         bool isLeaf() const { return children[0] == nullptr; }
     };
 
@@ -60,41 +57,74 @@ class LooseQuadtree {
         : capacity(cap), maxDepth(max_depth) {
         root = std::make_unique<Node>(bounds, 0, nullptr);
     }
-    // ==========================================================
-    // === 新增：移动构造函数和移动赋值运算符 (Rule of Five) ===
-    // ==========================================================
 
-    // 移动构造函数
+    // 移动构造函数等保持不变...
     LooseQuadtree(LooseQuadtree&& other) noexcept
         : root(std::move(other.root)),
           capacity(other.capacity),
-          maxDepth(other.maxDepth) {
-        // other 的 root 已经被 std::move 掏空，变为 nullptr
-    }
+          maxDepth(other.maxDepth) {}
 
-    // 移动赋值运算符
     LooseQuadtree& operator=(LooseQuadtree&& other) noexcept {
-        // 防止自我赋值
         if (this != &other) {
-            // 交换资源
             root = std::move(other.root);
-            // capacity 和 maxDepth 是 const，不能被赋值，但我们可以假设
-            // 它们在逻辑上是一致的，或者通过重新构造来处理。
-            // 在我们的使用场景中，直接移动 root 指针就足够了。
         }
         return *this;
     }
 
-    // 禁止拷贝（因为 std::unique_ptr 不可拷贝）
     LooseQuadtree(const LooseQuadtree&) = delete;
     LooseQuadtree& operator=(const LooseQuadtree&) = delete;
-
     ~LooseQuadtree() = default;
 
-    /**
-     * @brief 打印整个四叉树的结构到指定的输出流 (例如 std::cout).
-     * @param out 输出流.
-     */
+    void clear() {
+        if (root) {
+            // 现在这将正确地为所有存储的 T 对象调用析构函数。
+            root->objects.clear();
+            for (int i = 0; i < 4; ++i) {
+                root->children[i].reset();
+            }
+        }
+    }
+
+    // 变更: 新的插入 API。
+    // 为左值提供的重载 (拷贝对象)。
+    void insert(const T& object) {
+        Node* node = find_best_fit_node(root.get(), get_object_bounds(object));
+        insert_to_node(node, T(object));  // 创建一个副本并移动它
+    }
+
+    // 为右值提供的重载 (移动对象)。
+    void insert(T&& object) {
+        // 在对象被移动前，使用其数据获取边界
+        Node* node = find_best_fit_node(root.get(), get_object_bounds(object));
+        insert_to_node(node, std::move(object));
+    }
+
+    // 变更: 新的移除 API。
+    // 按值移除对象。要求 T 类型实现了 operator==。
+    bool remove(const T& object) {
+        Node* node = find_best_fit_node(root.get(), get_object_bounds(object));
+
+        auto& obj_list = node->objects;
+        // std::find 现在使用 T::operator== 来比较对象
+        auto it = std::find(obj_list.begin(), obj_list.end(), object);
+
+        if (it != obj_list.end()) {
+            obj_list.erase(it);
+            try_merge(node);
+            return true;
+        }
+        return false;
+    }
+
+    // 变更: Query 现在返回指向树内部拥有对象的指针。
+    // 警告: 这些指针仅在下一次对四叉树进行非 const 操作
+    // (insert, remove, clear 等) 之前有效。
+    std::vector<T> query(const glm::vec2& point) const {
+        std::vector<T> result;
+        query_recursive(root.get(), point, result);
+        return result;
+    }
+
     void print_tree(std::ostream& out = std::cout) const {
         out << "\n--- Quadtree Structure (Detailed) ---\n";
         if (!root) {
@@ -105,69 +135,42 @@ class LooseQuadtree {
         print_node_recursive(out, root.get(), "", true, "Root");
         out << "-------------------------------------\n" << std::endl;
     }
+    // 新增: 提取所有对象。这是一个破坏性操作，会清空树。
+    std::vector<T> extract_all_objects() {
+        std::vector<T> all_objects;
+        extract_recursive(root.get(), all_objects);
+        clear();  // 清空树结构
+        return all_objects;
+    }
 
-    void clear() {
-        if (root) {
-            root->objects.clear();
+   private:
+    // 变更: 接受 const 引用而不是指针。
+    BoundingBox get_object_bounds(const T& object) const {
+        return BoundingBox(object.pos, object.size);
+    }
+    // 新增: extract_all_objects 的递归辅助函数
+    void extract_recursive(Node* node, std::vector<T>& out_objects) {
+        if (!node) return;
+
+        // 移动节点中的对象到输出向量
+        out_objects.insert(out_objects.end(),
+                           std::make_move_iterator(node->objects.begin()),
+                           std::make_move_iterator(node->objects.end()));
+        node->objects.clear();
+
+        // 递归处理子节点
+        if (!node->isLeaf()) {
             for (int i = 0; i < 4; ++i) {
-                root->children[i].reset();
+                extract_recursive(node->children[i].get(), out_objects);
             }
         }
     }
 
-    void insert(const T* object) {
-        Node* node = find_best_fit_node(root.get(), get_object_bounds(object));
-        insert_to_node(node, object);
-    }
-
-    bool remove(const T* object) {
-        Node* node = find_best_fit_node(root.get(), get_object_bounds(object));
-
-        auto& obj_list = node->objects;
-        auto it = std::find(obj_list.begin(), obj_list.end(), object);
-
-        if (it != obj_list.end()) {
-            obj_list.erase(it);
-            try_merge(node);
-            return true;
-        }
-        // 如果在最优节点没找到，可能意味着对象移动了但我们用了旧位置查找
-        // 在一个完整的系统中，通常会有一个 map<T*, Node*> 来加速查找
-        // 这里为了简化，我们只在最优节点查找。
-        return false;
-    }
-
-    void update(const T* object) {
-        // 在松散四叉树中，更新操作非常高效
-        // 1. 找到对象当前所在的节点
-        Node* current_node = find_node_for_object(root.get(), object);
-        if (!current_node) return;  // 对象不在树中
-
-        // 2. 检查对象是否仍在当前节点的松散边界内
-        if (current_node->looseBounds.contains(
-                {object->bounds.pos.x, object->bounds.pos.y})) {
-            // 仍在边界内，什么都不用做
-            return;
-        }
-
-        // 3. 如果移出了边界，则执行完整的 remove 和 insert
-        remove(object);
-        insert(object);
-    }
-
-    std::vector<const T*> query(const glm::vec2& point) const {
-        std::vector<const T*> result;
-        query_recursive(root.get(), point, result);
-        return result;
-    }
-
-   private:
     // 用于打印的私有递归辅助函数
     void print_node_recursive(std::ostream& out, const Node* node,
                               const std::string& prefix, bool isLast,
                               const std::string& quadrantLabel) const {
         if (!node) return;
-
         out << prefix << (isLast ? "└── " : "├── ");
         out << quadrantLabel << " Node [Depth: " << node->depth << ", ";
         out << "Bounds: (" << node->bounds.pos.x << "," << node->bounds.pos.y
@@ -176,16 +179,16 @@ class LooseQuadtree {
         out << "Objects: " << node->objects.size() << "]\n";
 
         std::string objPrefix = prefix + (isLast ? "    " : "│   ");
-        for (const auto* obj : node->objects) {
+        for (const auto& obj : node->objects) {
             out << objPrefix;
             out << "  -> Part [Entity: " << std::setw(3)
-                << static_cast<uint32_t>(obj->source_entity);
-            out << ", Type: " << std::setw(10) << to_string(obj->part);
-            out << ", Pos: (" << std::setw(6) << obj->pos.x << ","
-                << std::setw(6) << obj->pos.y << ")";
-            out << ", Size: (" << std::setw(5) << obj->size.x << "x"
-                << std::setw(5) << obj->size.y << ")";
-            out << ", z: " << obj->zIndex << "]\n";
+                << static_cast<uint32_t>(obj.source_entity);
+            out << ", Type: " << std::setw(10) << to_string(obj.part);
+            out << ", Pos: (" << std::setw(6) << obj.pos.x << ","
+                << std::setw(6) << obj.pos.y << ")";
+            out << ", Size: (" << std::setw(5) << obj.size.x << "x"
+                << std::setw(5) << obj.size.y << ")";
+            out << ", z: " << obj.zIndex << "]\n";
         }
 
         if (!node->isLeaf()) {
@@ -204,43 +207,23 @@ class LooseQuadtree {
         }
     }
 
-    BoundingBox get_object_bounds(const T* object) const {
-        return BoundingBox(object->pos, object->size);
-    }
-
     Node* find_best_fit_node(Node* startNode, const BoundingBox& bounds) {
+        // 此函数逻辑不变
         Node* currentNode = startNode;
         while (!currentNode->isLeaf()) {
             int quadrant = get_quadrant(currentNode->bounds, bounds);
             if (quadrant == -1) {
-                break;  // 跨越边界，停在当前节点
+                break;
             }
+            if (!currentNode->children[quadrant]) break;  // 安全检查
             currentNode = currentNode->children[quadrant].get();
         }
         return currentNode;
     }
 
-    // 这个函数用于已经插入的对象，它必须存在于某个节点的 looseBounds 内
-    Node* find_node_for_object(Node* node, const T* object) const {
-        auto& obj_list = node->objects;
-        if (std::find(obj_list.begin(), obj_list.end(), object) !=
-            obj_list.end()) {
-            return node;
-        }
-
-        if (!node->isLeaf()) {
-            int quadrant =
-                get_quadrant(node->bounds, get_object_bounds(object));
-            if (quadrant != -1) {
-                return find_node_for_object(node->children[quadrant].get(),
-                                            object);
-            }
-        }
-        return nullptr;  // Should not happen if object is in tree
-    }
-
-    void insert_to_node(Node* node, const T* object) {
-        node->objects.push_back(object);
+    // 变更: 接受右值引用，以便高效地将对象移动到 vector 中。
+    void insert_to_node(Node* node, T&& object) {
+        node->objects.push_back(std::move(object));
         if (node->isLeaf() && node->objects.size() > capacity &&
             node->depth < maxDepth) {
             subdivide(node);
@@ -254,38 +237,37 @@ class LooseQuadtree {
         const int nextDepth = node->depth + 1;
 
         node->children[0] = std::make_unique<Node>(
-            BoundingBox{{p.x, p.y}, {hw, hh}}, nextDepth, node);  // 左上
+            BoundingBox{{p.x, p.y}, {hw, hh}}, nextDepth, node);
         node->children[1] = std::make_unique<Node>(
-            BoundingBox{{p.x + hw, p.y}, {hw, hh}}, nextDepth, node);  // 右上
+            BoundingBox{{p.x + hw, p.y}, {hw, hh}}, nextDepth, node);
         node->children[2] = std::make_unique<Node>(
-            BoundingBox{{p.x, p.y + hh}, {hw, hh}}, nextDepth, node);  // 左下
-        node->children[3] =
-            std::make_unique<Node>(BoundingBox{{p.x + hw, p.y + hh}, {hw, hh}},
-                                   nextDepth, node);  // 右下
+            BoundingBox{{p.x, p.y + hh}, {hw, hh}}, nextDepth, node);
+        node->children[3] = std::make_unique<Node>(
+            BoundingBox{{p.x + hw, p.y + hh}, {hw, hh}}, nextDepth, node);
 
-        // 重新分配对象
-        std::vector<const T*> old_objects = std::move(node->objects);
+        // 变更: 重新分配对象，而不是指针。
+        std::vector<T> old_objects = std::move(node->objects);
         node->objects.clear();
 
-        for (const T* obj : old_objects) {
+        for (auto& obj : old_objects) {  // 通过引用遍历以允许移动
             int quadrant = get_quadrant(node->bounds, get_object_bounds(obj));
             if (quadrant != -1) {
-                insert_to_node(node->children[quadrant].get(), obj);
+                // 将对象移动到子节点的 vector 中
+                insert_to_node(node->children[quadrant].get(), std::move(obj));
             } else {
-                node->objects.push_back(obj);
+                // 将对象移回父节点的 vector 中
+                node->objects.push_back(std::move(obj));
             }
         }
     }
 
     void try_merge(Node* node) {
-        if (!node || node == root.get() || !node->isLeaf()) {
-            return;
-        }
+        if (!node || node == root.get()) return;
 
         Node* parent = node->parent;
-        if (parent->isLeaf()) return;
+        if (!parent || parent->isLeaf()) return;
 
-        size_t total_objects = 0;
+        size_t total_objects = parent->objects.size();  // 父节点中跨界的对象
         for (int i = 0; i < 4; ++i) {
             if (!parent->children[i] || !parent->children[i]->isLeaf()) {
                 return;  // 只有当所有兄弟节点都是叶子时才合并
@@ -294,28 +276,32 @@ class LooseQuadtree {
         }
 
         if (total_objects <= capacity) {
-            std::vector<const T*> merged_objects;
+            // 变更: 合并对象，而不是指针。
+            std::vector<T> merged_objects = std::move(parent->objects);
             for (int i = 0; i < 4; ++i) {
                 auto& child = parent->children[i];
-                merged_objects.insert(merged_objects.end(),
-                                      child->objects.begin(),
-                                      child->objects.end());
+                // 使用 std::move_iterator 高效地转移对象
+                merged_objects.insert(
+                    merged_objects.end(),
+                    std::make_move_iterator(child->objects.begin()),
+                    std::make_move_iterator(child->objects.end()));
                 child.reset();
             }
-            parent->objects = merged_objects;
+            parent->objects =
+                std::move(merged_objects);  // 移动最终合并的 vector
 
-            // 尝试向上递归合并
             try_merge(parent);
         }
     }
 
     void query_recursive(Node* node, const glm::vec2& point,
-                         std::vector<const T*>& result) const {
-        if (!node->bounds.contains(point)) {
+                         std::vector<T>& result) const {
+        if (!node || !node->bounds.contains(point)) {  // 添加了空指针检查
             return;
         }
 
-        for (const T* obj : node->objects) {
+        // 变更: 通过引用遍历，然后存入指向内部对象的指针。
+        for (const T& obj : node->objects) {
             if (get_object_bounds(obj).contains(point)) {
                 result.push_back(obj);
             }
@@ -323,56 +309,44 @@ class LooseQuadtree {
 
         if (!node->isLeaf()) {
             int quadrant = get_quadrant_for_point(node->bounds, point);
-            if (quadrant != -1) {
+            if (quadrant != -1 &&
+                node->children[quadrant]) {  // 添加了空指针检查
                 query_recursive(node->children[quadrant].get(), point, result);
             }
         }
     }
 
-    /**
-     * @brief 判断一个对象的包围盒能被哪个子象限完全容纳.
-     * @param parentBounds 父节点的边界.
-     * @param objBounds 对象的边界.
-     * @return 象限索引 (0=左上, 1=右上, 2=左下, 3=右下), 如果跨界则返回 -1.
-     */
     int get_quadrant(const BoundingBox& parentBounds,
                      const BoundingBox& objBounds) const {
-        // 计算父节点的中心点
+        // 此函数逻辑不变
         const glm::vec2 center = parentBounds.pos + parentBounds.size * 0.5f;
-
-        // 判断对象的包围盒是否完全位于某一侧
-        // fitsTop: 对象的底边在地平线上方
         bool fitsTop = objBounds.pos.y + objBounds.size.y < center.y;
-        // fitsBottom: 对象的顶边在地平线下方
         bool fitsBottom = objBounds.pos.y > center.y;
-        // fitsLeft: 对象的右边在垂直线左侧
         bool fitsLeft = objBounds.pos.x + objBounds.size.x < center.x;
-        // fitsRight: 对象的左边在垂直线右侧
         bool fitsRight = objBounds.pos.x > center.x;
 
         if (fitsLeft) {
-            if (fitsTop) return 0;     // 左上
-            if (fitsBottom) return 2;  // 左下
+            if (fitsTop) return 0;
+            if (fitsBottom) return 2;
         } else if (fitsRight) {
-            if (fitsTop) return 1;     // 右上
-            if (fitsBottom) return 3;  // 右下
+            if (fitsTop) return 1;
+            if (fitsBottom) return 3;
         }
-
-        // 如果不满足以上任何一种情况，说明对象至少跨越了一条中心线
         return -1;
     }
 
     int get_quadrant_for_point(const BoundingBox& parentBounds,
                                const glm::vec2& p) const {
+        // 此函数逻辑不变
         const auto center =
             glm::vec2{parentBounds.pos.x + parentBounds.size.x * 0.5f,
                       parentBounds.pos.y + parentBounds.size.y * 0.5f};
         if (p.x < center.x) {
-            if (p.y < center.y) return 0;  // 左上
-            return 2;                      // 左下
+            if (p.y < center.y) return 0;
+            return 2;
         } else {
-            if (p.y < center.y) return 1;  // 右上
-            return 3;                      // 右下
+            if (p.y < center.y) return 1;
+            return 3;
         }
     }
 };

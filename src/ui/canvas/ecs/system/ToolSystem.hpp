@@ -7,7 +7,6 @@
 #include <ecs/component/TransformComponents.hpp>
 #include <ecs/system/QuadTree.hpp>
 #include <info/MapCanvasInfo.hpp>
-#include <list>
 #include <mmm/ObjectHandle.hpp>
 #include <mutex>
 #include <shared_mutex>
@@ -28,49 +27,52 @@ class ToolSystem {
         // 使用 std::unique_lock 获取独占的写锁
         std::unique_lock<std::shared_mutex> lock(mtx);
 
-        // --- 步骤 1: 清理所有旧数据 ---
-        mesh_info_storage.clear();
-        // 使用我们为四叉树实现的移动赋值运算符，基于最新的世界边界创建一个全新的空树
+        // 使用四叉树实现的移动赋值运算符，基于最新的世界边界创建一个全新的空树
         mesh_info_tree =
             LooseQuadtree<MeshPartInfo>({{0, 0},
                                          {info->baseInfo.canvasSize.width(),
                                           info->baseInfo.canvasSize.height()}});
 
-        // --- 步骤 2: 填充新数据 ---
         // 遍历传入的本帧所有网格
         for (const auto& [entity, mesh] : note_meshs) {
             const auto& [track, handle] = registry.get<NoteComponent>(entity);
             // 遍历网格中的每一个部件 (Quad)
             for (const auto& quad : mesh.mesh) {
-                // a. 在内存池中创建新的 MeshPartInfo 对象
-                mesh_info_storage.emplace_back(quad.pos, quad.size, entity,
-                                               quad.part, quad.zIndex, handle);
+                // 获取指向刚刚创建的、位于内存池末尾的对象的指针
+                MeshPartInfo new_part_ptr{quad.pos,  quad.size,   entity,
+                                          quad.part, quad.zIndex, handle};
 
-                // b. 获取指向刚刚创建的、位于内存池末尾的对象的指针
-                const MeshPartInfo* new_part_ptr = &mesh_info_storage.back();
-
-                // c. 将这个指针插入到全新的四叉树中
+                // 将这个指针插入到全新的四叉树中
                 mesh_info_tree.insert(new_part_ptr);
             }
         }
     }
 
+    // LooseQuadtree<MeshPartInfo>& get_mesh_info_tree() { return
+    // mesh_info_tree; } const entt::registry& get_registry() { return registry;
+    // }
+
     // 更新画布世界碰撞箱尺寸
-    void update_world_boundbox(BoundingBox box) const {
-        // 这个操作会改变整个系统的状态，需要获取写锁
-        // 使用 std::unique_lock 获取独占的写锁
-        std::unique_lock<std::shared_mutex> lock(mtx);
+    // void update_world_boundbox(BoundingBox box) const {
+    //     // 这个操作会改变整个系统的状态，需要获取写锁
+    //     // 获取独占的写锁
+    //     std::unique_lock<std::shared_mutex> lock(mtx);
 
-        // 创建一个新的四叉树
-        mesh_info_tree = LooseQuadtree<MeshPartInfo>(box);
+    //     // 1. 从当前的树中提取出所有已存储的 MeshPartInfo 对象。
+    //     //    这是一个移动操作，旧树在逻辑上变空了。
+    //     std::vector<MeshPartInfo> existing_parts =
+    //         mesh_info_tree.extract_all_objects();
 
-        // 将所有已存在的几何部件重新插入新的四叉树
-        for (const auto& part : mesh_info_storage) {
-            mesh_info_tree.insert(&part);
-        }
+    //     // 2. 用新的边界框创建一个全新的四叉树。
+    //     //    旧树的内存会被自动释放和替换。
+    //     mesh_info_tree = LooseQuadtree<MeshPartInfo>(box);
 
-        // mesh_info_tree.print_tree();
-    }
+    //     // 3. 将之前提取的所有几何部件重新插入到新的四叉树中。
+    //     for (auto& part : existing_parts) {
+    //         // 使用 std::move 将部件移动到新树中，避免拷贝
+    //         mesh_info_tree.insert(std::move(part));
+    //     }
+    // }
 
     /**
      * @brief [线程安全] UI 线程可以调用此函数进行交互查询.
@@ -79,19 +81,19 @@ class ToolSystem {
      * @param point 要查询的屏幕坐标.
      * @return 可选的命中结果.
      */
-    std::optional<const MeshPartInfo*> query(const glm::vec2& point) const {
+    std::optional<MeshPartInfo> query(const glm::vec2& point) const {
         // 使用 std::shared_lock 获取共享的读锁
         std::shared_lock<std::shared_mutex> lock(mtx);
         auto candidates = mesh_info_tree.query(point);
         if (candidates.empty()) return std::nullopt;
 
         // 筛选最上层的匹配项
-        const MeshPartInfo* best_candidate = nullptr;
+        std::optional<MeshPartInfo> best_candidate;
         int min_z_index = -1;
-        for (const auto* part : candidates) {
-            if (part->contains(point)) {
-                if (part->zIndex > min_z_index) {
-                    min_z_index = part->zIndex;
+        for (const auto& part : candidates) {
+            if (part.contains(point)) {
+                if (part.zIndex > min_z_index) {
+                    min_z_index = part.zIndex;
                     best_candidate = part;
                 }
             }
@@ -103,8 +105,6 @@ class ToolSystem {
     }
 
    private:
-    // 网格信息仓库
-    std::list<MeshPartInfo> mesh_info_storage;
     // 网格空间索引树
     mutable LooseQuadtree<MeshPartInfo> mesh_info_tree{{}};
     // 读写锁

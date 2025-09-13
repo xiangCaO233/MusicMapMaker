@@ -13,22 +13,22 @@ struct DragStartInfo {
 
 struct StartDragNormalNoteCommand {
     DragStartInfo common_info;
-    const MeshPartInfo &hit_info;
+    const MeshPartInfo hit_info;
 };
 
 struct StartDragHoldHeadCommand {
     DragStartInfo common_info;
-    const MeshPartInfo &hit_info;
+    const MeshPartInfo hit_info;
 };
 
 struct StartDragHoldTailCommand {
     DragStartInfo common_info;
-    const MeshPartInfo &hit_info;
+    const MeshPartInfo hit_info;
 };
 
 struct StartDragHoldBodyCommand {
     DragStartInfo common_info;
-    const MeshPartInfo &hit_info;
+    const MeshPartInfo hit_info;
 };
 
 struct StartDragSelectionCommand {

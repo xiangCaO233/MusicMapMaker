@@ -43,7 +43,7 @@ struct DragState {
 
     // 仅在 mode == Entity 时有效
     // 拖拽开始时的命中信息 (部位、实体等)
-    const MeshPartInfo* drag_start_hit;
+    MeshPartInfo drag_start_hit;
     // 实际被拖拽的实体集合
     std::unordered_set<entt::entity> dragged_entities;
 };
@@ -61,11 +61,11 @@ class ToolInteractionState {
     MouseState getMouseState() const;
 
     // 悬浮相关 (由 pretick 写入, 工作线程读取)
-    void setHover(const std::optional<const MeshPartInfo*>& hover);
-    std::optional<const MeshPartInfo*> getHover() const;
+    void setHover(const std::optional<MeshPartInfo> hover);
+    std::optional<MeshPartInfo> getHover() const;
 
     // 拖拽相关 (由 pretick 写入, 工作线程读取)
-    void startDrag(DragMode mode, const MeshPartInfo& hit,
+    void startDrag(DragMode mode, MeshPartInfo hit,
                    const std::unordered_set<entt::entity>& selection);
     void endDrag();
     void setDragValidity(bool isValid);
@@ -87,7 +87,7 @@ class ToolInteractionState {
     // 私有状态变量
     MouseState m_mouseState;
     // 当前悬浮的对象
-    std::optional<const MeshPartInfo*> m_hovered;
+    std::optional<MeshPartInfo> m_hovered;
     DragState m_dragState;
     SelectionState m_selectionState;
 };
