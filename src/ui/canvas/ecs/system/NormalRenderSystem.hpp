@@ -24,7 +24,8 @@ class NormalRenderSystem {
         auto view =
             registry.view<TimeComponent, NoteComponent, TransformComponent>();
         for (auto& e : view) {
-            auto& mesh = generated_meshes[e].mesh;
+            auto& meshinfo = generated_meshes[e];
+            auto& mesh = meshinfo.mesh;
             // 排序网格
             std::sort(mesh.begin(), mesh.end(),
                       [](const GeneratedMesh::Quad& quad1,
@@ -39,22 +40,37 @@ class NormalRenderSystem {
                 cmd.baseInfo.size = quad.size;
                 cmd.texturesInfo.texture = quad.texture;
 
-                if (quad.ghost) {
-                    cmd.baseInfo.color = {1.f, 1.f, 1.f, .4f};
-                } else {
-                    if (quad.glow) {
+                // 整个网格的附加状态
+                switch (meshinfo.state) {
+                    case MeshState::GHOST: {
+                        cmd.baseInfo.color = {1.f, 1.f, 1.f, .4f};
+                        break;
+                    }
+                    case MeshState::MARKDELETE: {
+                        cmd.baseInfo.color = {1.f, .1f, .1f, .8f};
+                    }
+                    default:
+                        break;
+                }
+
+                // 当前部分的发光状态
+                switch (quad.state) {
+                    case PartState::GLOW: {
                         cmd.radiusInfo.radius_effect_param = 1.f;
                         cmd.radiusInfo.radius_effect = RadiusEffect::GLOWING;
                     }
+                    default:
+                        break;
                 }
 
                 buffer.add_PrimitiveCommand(cmd);
 
-                if (quad.glow) {
+                if (meshinfo.state != MeshState::NONE) {
                     // 绘制物件精确时间字符串到鼠标旁边
-                    const auto& [time] = view.get<TimeComponent>(e);
+                    const auto& [src_time] = view.get<TimeComponent>(e);
+
                     // 绘制当前时间字符串
-                    auto timestr = QString::number(uint32_t(time));
+                    auto timestr = QString("src:%1").arg(uint32_t(src_time));
                     auto timestru32 = timestr.toStdU32String();
 
                     uint32_t xoffset{0};

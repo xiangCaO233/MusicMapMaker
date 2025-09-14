@@ -172,8 +172,9 @@ void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
 
     // 因为 beatTimeLine 是有序的，我们可以使用二分查找快速定位起点
     // std::lower_bound 找到第一个不小于 query_start_time 的元素
-    auto start_it = std::lower_bound(beatTimeLine.begin(), beatTimeLine.end(),
-                                     static_cast<uint32_t>(query_start_time));
+    auto start_it = std::lower_bound(
+        beatTimeLine.begin(), beatTimeLine.end(),
+        static_cast<uint32_t>(query_start_time < 0 ? 0 : query_start_time));
     // 如果找到的不是第一个元素，就将迭代器向前移动一个位置
     if (start_it != beatTimeLine.begin()) {
         --start_it;

@@ -46,6 +46,12 @@ void GLCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
 }
 
 void GLCanvas::updateFpsDisplay(int fps) {
+    size_t avgglcalls{0};
+    size_t avgdrawcalls{0};
+    if (fps != 0) {
+        avgglcalls = stat::gl_calls / fps;
+        avgdrawcalls = stat::draw_calls / fps;
+    }
     QString title_suffix =
         QString(
             "%1 FPS(frametime: "
@@ -55,8 +61,8 @@ void GLCanvas::updateFpsDisplay(int fps) {
                      pre_frame_time)
                      .count())
             .arg(last_update_time_us)
-            .arg(stat::gl_calls / fps)
-            .arg(stat::draw_calls / fps);
+            .arg(avgglcalls)
+            .arg(avgdrawcalls);
     stat::gl_calls = 0;
     stat::draw_calls = 0;
     emit update_window_suffix(title_suffix);

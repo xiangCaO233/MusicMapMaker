@@ -14,6 +14,19 @@ struct TransformComponent {
     float y;
 };
 
+// 整个网格的状态
+enum class MeshState {
+    NONE,
+    GHOST,
+    MARKDELETE,
+};
+
+// 网格内部分的状态
+enum class PartState {
+    NONE,
+    GLOW,
+};
+
 struct GeneratedMesh {
     // 标记这个网格属于哪个实体
     entt::entity source_entity;
@@ -26,16 +39,18 @@ struct GeneratedMesh {
         // 本矩形对应的物件部位
         NotePart part;
 
-        // 是否为虚影模式
-        bool ghost;
+        // 部分状态
+        PartState state;
 
         // 绘制层级，值越小越先绘制
         int zIndex{0};
-        bool glow{false};
+
         // 纹理缩放模式
         TexScaleMode mode{TexScaleMode::FORCE_FILL};
     };
     std::vector<Quad> mesh;
+    // 网格状态
+    MeshState state;
 };
 
 // --- to_string 函数实现 ---
@@ -55,7 +70,8 @@ inline std::string to_string(const GeneratedMesh& generatedMesh) {
         ss << "    pos: {" << quad.pos.x << ", " << quad.pos.y << "}\n";
         ss << "    size: {" << quad.size.x << ", " << quad.size.y << "}\n";
         ss << "    zIndex: " << quad.zIndex << "\n";
-        ss << "    glow: " << (quad.glow ? "true" : "false") << "\n";
+        ss << "    glow: " << (quad.state == PartState::GLOW ? "true" : "false")
+           << "\n";
         ss << "    part: " << to_string(quad.part) << "\n";
     }
 

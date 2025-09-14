@@ -41,18 +41,18 @@ inline std::string to_string(NotePart part) {
 
 struct MeshPartInfo {
     // 几何信息，直接从 Quad 获取
-    glm::vec2 pos;
-    glm::vec2 size;
+    glm::vec2 pos{0};
+    glm::vec2 size{0};
 
     // 身份信息
-    entt::entity source_entity;
-    NotePart part;
+    entt::entity source_entity{};
+    NotePart part{NotePart::NONE};
 
     // 筛选信息
-    int zIndex;
+    int zIndex{0};
 
     // 物件句柄
-    NoteHandle handle;
+    NoteHandle handle{};
 
     bool contains(const glm::vec2& p) const {
         // 计算矩形的右下角坐标

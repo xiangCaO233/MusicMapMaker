@@ -1,18 +1,10 @@
 #include <ecs/system/sync/SyncSystem.hpp>
+#include <ecs/system/sync/ToolCommandProcessor.hpp>
 #include <info/NotePart.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
 #include <tool/ToolCommandQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
-
-// --- Helper for std::visit ---
-template <class... Ts>
-struct overloaded : Ts... {
-    using Ts::operator()...;
-};
-// C++17 class template argument deduction
-template <class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
 
 void updateHover(ToolSystem* toolSystem,
                  ToolInteractionState* toolInteractionState,
@@ -65,101 +57,16 @@ void updateHover(ToolSystem* toolSystem,
     }
 }
 
-// 无信息
-const MeshPartInfo none{{}, {}, {}, NotePart::NONE, 0, {}};
-
 void processToolCommands(entt::registry& registry, ToolCommandQueue* toolCmdQ,
+                         ToolSystem* system,
                          ToolInteractionState* toolInteractionState) {
     auto cmds = toolCmdQ->drain();
     if (cmds.empty()) return;
 
     for (const auto& command : cmds) {
-        std ::visit(overloaded{
-            // --- 处理所有“开始拖拽”类的命令 ---
-            // 这个 lambda 会匹配所有包含 hit_info 的拖拽命令
-            [&](const auto& arg)
-                requires requires { arg.hit_info; }
-            {
-                // 修改 ECS Registry: 附加虚影组件
-                registry.emplace_or_replace<GhostComponent>(
-                    arg.hit_info.source_entity);
-
-                // 更新 TIS: 设置拖拽状态
-                toolInteractionState->startDrag(DragMode::Entity, arg.hit_info,
-                                                {arg.hit_info.source_entity});
-                auto mpos = arg.common_info.start_mouse_pos;
-                qDebug() << "交互:拖动实体["
-                         << static_cast<uint32_t>(arg.hit_info.source_entity)
-                         << "]的[" << to_string(arg.hit_info.part)
-                         << "]部分开始,开始时鼠标位于[" << "[" << mpos.x << ","
-                         << mpos.y << "]" << "]";
-            },
-
-            // --- 单独处理“拖拽选择集”的命令 ---
-            [&](const StartDragSelectionCommand& arg) {
-                // 更新 TIS 的选择集
-                toolInteractionState->setSelection(arg.selection);
-
-                // 更新 TIS 的拖拽状态
-                toolInteractionState->startDrag(
-                    DragMode::Entity,
-                    none,  // 多选时没有单一的命中部位
-                    arg.selection);
-
-                // 在 Registry 中为所有被拖拽的实体附加虚影组件
-                for (auto entity : arg.selection) {
-                    registry.emplace_or_replace<GhostComponent>(entity);
-                }
-            },
-
-            // --- 处理“结束拖拽”的命令 ---
-            [&](const EndDragCommand& arg) {
-                // 获取拖拽的最终状态和有效性
-                DragState drag_info = toolInteractionState->getDragState();
-
-                bool was_drag_valid = drag_info.is_valid;
-
-                if (was_drag_valid) {
-                    // 操作有效，在这里执行永久性的数据修改
-                    // 这部分逻辑可能很复杂，需要根据 drag_info.mode 和
-                    // drag_info.drag_start_hit.part 来决定如何修改
-                    // NoteCollection 例如:
-                    if (drag_info.mode == DragMode::Entity) {
-                        if (drag_info.drag_start_hit.part ==
-                            NotePart::HOLD_END) {
-                            // ... 计算并应用新的 duration ...
-                        } else {
-                            // ... 计算并应用新的位置 ...
-                        }
-                    }
-                }
-
-                // 无论如何，都结束拖拽状态
-                // 清理所有被拖拽实体的虚影组件
-                for (auto entity : drag_info.dragged_entities) {
-                    if (registry.valid(entity)) {
-                        registry.remove<GhostComponent>(entity);
-                    }
-                }
-                // 重置 TIS 中的拖拽状态
-                toolInteractionState->endDrag();
-                auto mpos = arg.final_mouse_pos;
-                qDebug() << "交互:拖动实体["
-                         << static_cast<uint32_t>(
-                                drag_info.drag_start_hit.source_entity)
-                         << "]的[" << to_string(drag_info.drag_start_hit.part)
-                         << "]部分完成,完成时鼠标位于[" << "[" << mpos.x << ","
-                         << mpos.y << "]" << "]";
-            },
-
-            // --- 默认处理器 (可选) ---
-            // 如果有命令没有被上面的 lambda 匹配，可以在这里处理
-            // [&](const auto& arg) {
-            //     // ... 默认逻辑 ...
-            // }
-
-            },
-            command);
+        ToolCommandProcessor processor(registry, *system,
+                                       *toolInteractionState);
+        processor.process(command);
     }
 }
 
@@ -174,7 +81,8 @@ void SyncSystem::updateToolInteractions(ECSCore& core,
 
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)开始";
     // 更新悬浮状态
-    processToolCommands(core.ecs_registry(), toolCmdQ, toolInteractionState);
+    processToolCommands(core.ecs_registry(), toolCmdQ, toolSystem,
+                        toolInteractionState);
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)结束";
 
     // qDebug() << "同步系统->同步工具状态->处理实时悬浮检测(at pretick)开始";
