@@ -12,6 +12,14 @@
 #include <map/skin/MSkin.hpp>
 
 class MeshGenerateSystem {
+    struct MapAxis {
+        uint32_t time{0};
+        uint32_t mousetime{0};
+        uint32_t track{0};
+        uint32_t x{0};
+        uint32_t y{0};
+    };
+
    public:
     void update(const entt::registry& registry, MapCanvasInfo* info,
                 const TimePixelConverter& converter,
@@ -21,6 +29,9 @@ class MeshGenerateSystem {
         const auto& realtime_info = info->realTimeInfo;
         const glm::vec2 current_mouse_pos = {realtime_info.mousePos.x(),
                                              realtime_info.mousePos.y()};
+
+        const auto judgeline_absolute_y =
+            info->baseInfo.canvasSize.height() * info->baseInfo.judgeline_pos;
         // 生成物件的网格组件
         // const auto& realtime_info = info->realTimeInfo;
         // 获取轨道布局信息
@@ -42,9 +53,9 @@ class MeshGenerateSystem {
             entity_mesh.source_entity = e;
 
             // 获取note原始详细信息
-            const auto [time] = registry.get<TimeComponent>(e);
-            const auto [track_index, handle] = registry.get<NoteComponent>(e);
-            const auto [y] = registry.get<TransformComponent>(e);
+            auto [time] = registry.get<TimeComponent>(e);
+            auto [track_index, handle] = registry.get<NoteComponent>(e);
+            auto [y] = registry.get<TransformComponent>(e);
 
             // 获取悬浮信息
             auto hovered_info = tool_interaction_state->getHover();
@@ -58,15 +69,30 @@ class MeshGenerateSystem {
                              time, y, converter);
             } else if (ghost) {
                 // 虚影方式渲染-根据工具交互状态确定如何渲染
+
                 entity_mesh.state = MeshState::GHOST;
                 auto drag_info = tool_interaction_state->getDragState();
                 auto mousePressPos =
                     tool_interaction_state->getMouseState().press_pos;
                 auto mousePos =
                     tool_interaction_state->getMouseState().current_pos;
-                if (drag_info.drag_start_hit.part == NotePart::HEAD) {
+                // auto mouse_time =
+                //     converter.pixelToTime(info->baseInfo.canvasSize.height()
+                //     -
+                //                               mousePos.y -
+                //                               judgeline_absolute_y,
+                //                           info->realTimeInfo.current_time_info
+                //                               .presentation_canvas_time);
+                if (drag_info.drag_start_hit.part == NotePart::HEAD ||
+                    drag_info.drag_start_hit.part == NotePart::HOLD_HEAD) {
                     // 若为头则计算并更新此时鼠标最近的分拍线时间作为物件时间
+
                     // 计算并更新此时鼠标最近的轨道
+
+                    auto axis = getPixelMapAxis(converter, mousePos, info);
+                    time = axis.time;
+                    track_index = axis.track;
+                    y = axis.y;
                 }
 
                 generateMesh(hovered_info, all_tracks_rect, track_index,
@@ -88,6 +114,56 @@ class MeshGenerateSystem {
         using enum ObjectStatus;
         texinfo = info->editorInfo.skin->get_object_texture(type, COMMON);
         return texinfo;
+    }
+
+    MapAxis getPixelMapAxis(const TimePixelConverter& converter,
+                            const glm::vec2& pixel,
+                            const MapCanvasInfo* info) const {
+        MapAxis axis;
+        auto map = info->editorInfo.map;
+        auto& beat_timeline = map->beat_timeline();
+        auto& beat_info = map->beat_info();
+        const auto judgeline_absolute_y =
+            info->baseInfo.canvasSize.height() * info->baseInfo.judgeline_pos;
+        axis.time = converter.pixelToTime(
+            info->baseInfo.canvasSize.height() - pixel.y - judgeline_absolute_y,
+            info->realTimeInfo.current_time_info.presentation_canvas_time);
+        axis.mousetime = axis.time;
+        axis.y = converter.timeToPixel(
+            axis.time,
+            info->realTimeInfo.current_time_info.presentation_canvas_time,
+            info);
+        // 查询最近的分拍
+        auto divinfo =
+            findNearestDivisorLine(axis.time, beat_timeline, beat_info);
+        // qDebug() << "judgeline pos:" << judgeline_absolute_y;
+        // qDebug() << "mousePos:" << QPointF(mousePos.x,
+        // mousePos.y); qDebug() << "mouse time:" << mouse_time;
+        // qDebug() << "neareast divisor:" << divinfo.divisor_time;
+        if (divinfo.is_valid()) {
+            // 更新吸附到最近的分拍
+            axis.time = divinfo.divisor_time;
+            axis.y = converter.timeToPixel(
+                axis.time,
+                info->realTimeInfo.current_time_info.presentation_canvas_time,
+                info);
+        }
+        // 更新轨道
+        const glm::vec4& all_tracks_rect = info->editorInfo.track_layout;
+        const int track_count =
+            info->editorInfo.map->base_metadata().track_count;
+        if (track_count == 0) return {};
+        const auto single_track_width = all_tracks_rect.z / float(track_count);
+        for (int i{0}; i < info->editorInfo.map->base_metadata().track_count;
+             ++i) {
+            if (pixel.x > all_tracks_rect.x + i * single_track_width) {
+                axis.track = i;
+            }
+        }
+        // 物件头的x轴位置(中心)
+        axis.x =
+            all_tracks_rect.x + (float(axis.track) + 0.5f) * single_track_width;
+        return axis;
     }
 
     void generateHeadMesh(const std::optional<MeshPartInfo>& hovered_info,

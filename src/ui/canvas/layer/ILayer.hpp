@@ -120,6 +120,7 @@ class ILayer {
     glm::vec2 stringMetrics(std::string_view family, size_t font_size,
                             const std::u32string& str) {
         glm::vec2 size{0};
+        auto max_bearingy{0};
         for (const auto& character : str) {
             auto fontoption = get(family, font_size, character);
             if (fontoption.has_value()) {
@@ -129,8 +130,12 @@ class ILayer {
                 if (size.y < charInfo.height) {
                     size.y = charInfo.height;
                 }
+                if (max_bearingy < charInfo.bearing.y) {
+                    max_bearingy = charInfo.bearing.y;
+                }
             }
         }
+        size.y += max_bearingy;
         return size;
     }
 

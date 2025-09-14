@@ -35,10 +35,10 @@ void updateHover(ToolSystem* toolSystem,
             toolInteractionState->setHover(hit_info);
 
             // qDebug() << "更新hover到id:" << hit_info.handle.index;
-            qDebug() << "检测到悬浮于实体:"
-                     << static_cast<uint32_t>(hit_info.source_entity);
-            qDebug() << "更新悬浮物件为" << note->toString();
-            qDebug() << "悬浮的部位:" << to_string(hit_info.part);
+            // qDebug() << "检测到悬浮于实体:"
+            //          << static_cast<uint32_t>(hit_info.source_entity);
+            // qDebug() << "更新悬浮物件为" << note->toString();
+            // qDebug() << "悬浮的部位:" << to_string(hit_info.part);
         }
 
         // qDebug() << "当前hover到id:" << hit_info.handle.index;
@@ -51,7 +51,7 @@ void updateHover(ToolSystem* toolSystem,
         if (old_hover.has_value()) {
             // 但之前有悬浮 -> 清除悬浮状态
             toolInteractionState->setHover(std::nullopt);
-            qDebug() << "鼠标下无物体,清理悬浮状态";
+            // qDebug() << "鼠标下无物体,清理悬浮状态";
         }
         // 如果之前也没有，就什么都不做
     }

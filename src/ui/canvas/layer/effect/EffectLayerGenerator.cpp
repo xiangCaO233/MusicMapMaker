@@ -19,21 +19,20 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
     auto& ecore = maplayer_manager->core();
     const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
                                       (1.f - mapinfo->baseInfo.judgeline_pos);
-    auto skin = mapinfo->editorInfo.skin;
 
     // 绘制当前时间字符串
-    auto timestr = QString::number(
-        uint32_t(mapinfo->realTimeInfo.current_time_info.logic_canvas_time));
+    auto timestr = QString::number(int64_t(
+        mapinfo->realTimeInfo.current_time_info.presentation_canvas_time));
     auto timestru32 = timestr.toStdU32String();
     // l->stringMetrics("ComicShannsMono Nerd Font", 16, timestru32);
     auto character_commands =
         l->generateStringCommands("ComicShannsMono Nerd Font", 16, timestru32,
                                   {mapinfo->editorInfo.track_layout.x +
                                        mapinfo->editorInfo.track_layout.z + 8.f,
-                                   judgeline_absolute_y},
+                                   judgeline_absolute_y - 8.f},
                                   {1.f, 1.f, 0.f, 1.f});
 
-    buffer.add_PrimitiveCommand(std::move(character_commands));
+    // buffer.add_PrimitiveCommand(std::move(character_commands));
 
     // 处理特效绘制
     effect_render_system.update(ecore, mapinfo, l, buffer);
