@@ -39,7 +39,11 @@ void ToolInteractionState::startDrag(
     }
 }
 
-void ToolInteractionState::endDrag() {}
+void ToolInteractionState::endDrag() {
+    m_dragState.mode = DragMode::None;
+    m_dragState.drag_start_hit = {};
+    m_dragState.dragged_entities.clear();
+}
 
 void ToolInteractionState::setDragValidity(bool isValid) {}
 

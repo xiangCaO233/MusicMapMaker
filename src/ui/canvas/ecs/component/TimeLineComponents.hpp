@@ -6,6 +6,7 @@
 struct BeatComponent {
     uint32_t divisors;
     double beatLength;
+    uint32_t beat_index;
 };
 
 #endif  // MMM_TIMELINECOMPONENTS_HPP

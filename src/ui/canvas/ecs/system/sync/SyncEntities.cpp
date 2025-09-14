@@ -9,7 +9,7 @@ entt::entity createBeatEntity(entt::registry& registry, const Beat* beat) {
 
     // 附加 BeatComponent，存储分拍数等特有信息
     registry.emplace<BeatComponent>(beat_entity, beat->divisors,
-                                    beat->beat_length);
+                                    beat->beat_length, beat->beat_index);
 
     return beat_entity;
 }

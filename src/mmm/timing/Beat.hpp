@@ -9,6 +9,8 @@
 
 class Timing;
 struct Beat {
+    // 拍号
+    uint32_t beat_index;
     // 拍开始时间
     uint32_t beat_start{0};
     double beat_length{100.};

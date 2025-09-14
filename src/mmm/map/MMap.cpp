@@ -100,6 +100,7 @@ void MMap::generateBeatInfo() {
             current_beat.divisors = division;
             current_beat.is_manual = false;
             current_beat.timing = current_timing;
+            current_beat.beat_index = beatTimeline.size();
             beatInfo[current_beat.beat_start] = current_beat;
 
             beatTimeline.emplace_back(current_beat.beat_start);

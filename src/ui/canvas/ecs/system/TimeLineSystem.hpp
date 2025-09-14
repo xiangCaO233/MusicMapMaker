@@ -13,6 +13,7 @@
 #include <iterator>
 #include <layer/ILayer.hpp>
 #include <map/skin/MSkin.hpp>
+#include <vector>
 
 class TimeLineSystem {
    public:
@@ -126,8 +127,13 @@ class TimeLineSystem {
         }
 
         // 生成拍
-
+        // 获取当前视口所有可见拍
         auto& beats = core.get_beat_group();
+
+        // 字符指令缓冲
+        std::vector<PrimitiveCommand> str_cmds;
+        // 预留(4分拍+1分拍策略) * 12空间给字符串绘制指令缓冲区
+        str_cmds.reserve(beats.size() * 5 * 12);
 
         int64_t next_beat_timestamp = INT64_MAX;
         for (auto it = beats.rbegin(); it != beats.rend(); ++it) {
@@ -146,16 +152,8 @@ class TimeLineSystem {
                     next_beat_time,
                     realtime_info.current_time_info.presentation_canvas_time,
                     info);
-                // if (std::abs(next_y - y) < 6) {
-                //     // 拍间距过小/跳过分拍线绘制
-                //     // qDebug() << "跳过拍[" << current_beat.timestamp <<
-                //     // "]-div["
-                //     //          << current_beat.divisors
-                //     //          << "] 视觉拍间距:" << next_y - y;
-                //     continue;
-                // }
             }
-            const auto& [divisors, beat_length] =
+            const auto& [divisors, beat_length, beat_index] =
                 registry.get<BeatComponent>(current_beat_entity);
             // 转换时间线所处y位置
             const auto y = converter2.timeToPixel(
@@ -172,6 +170,41 @@ class TimeLineSystem {
             cmd.baseInfo.pos = {all_tracks_rect.x, y - 3};
             cmd.baseInfo.size = {all_tracks_rect.z, 6};
             cmd.baseInfo.color = {1, 1, 1, 1};
+            // 拍头时间戳字符串
+            auto head_time = QString("%1").arg(time).toStdU32String();
+            auto head_time_metric = layer->stringMetrics(
+                "ComicShannsMono Nerd Font", 24, head_time);
+            auto head_time_pos =
+                glm::vec2{all_tracks_rect.x - head_time_metric.x - 4,
+                          cmd.baseInfo.pos.y - head_time_metric.y / 2.f + 18};
+            auto head_time_cmds = layer->generateStringCommands(
+                "ComicShannsMono Nerd Font", 24, head_time, head_time_pos,
+                {1.f, 1.f, 1.f, 1.f});
+            str_cmds.insert(str_cmds.end(), head_time_cmds.begin(),
+                            head_time_cmds.end());
+
+            // 本拍拍号字符串
+            auto index_str = QString("#%1").arg(beat_index).toStdU32String();
+            auto index_metric = layer->stringMetrics(
+                "ComicShannsMono Nerd Font", 32, index_str);
+            auto index_str_pos = glm::vec2{4, y - index_metric.y / 2.f + 24};
+            auto index_cmds = layer->generateStringCommands(
+                "ComicShannsMono Nerd Font", 32, index_str, index_str_pos,
+                {.85f, .35f, .35f, 1.f});
+            str_cmds.insert(str_cmds.end(), index_cmds.begin(),
+                            index_cmds.end());
+
+            // 本拍分拍策略字符串(画在拍号上面)
+            auto div_stratergy = QString("1/%1").arg(divisors).toStdU32String();
+            auto div_metric = layer->stringMetrics("ComicShannsMono Nerd Font",
+                                                   24, div_stratergy);
+            auto div_str_pos =
+                glm::vec2{index_str_pos.x, index_str_pos.y - div_metric.y - 4};
+            auto div_cmds = layer->generateStringCommands(
+                "ComicShannsMono Nerd Font", 24, div_stratergy, div_str_pos,
+                {.85f, .85f, .85f, 1.f});
+            str_cmds.insert(str_cmds.end(), div_cmds.begin(), div_cmds.end());
+
             buffer.add_PrimitiveCommand(cmd);
             if (std::abs(y_endbeat - y) < 2) {
                 // 拍像素距离过小/跳过分拍线绘制
@@ -211,11 +244,31 @@ class TimeLineSystem {
                         color.red() / 256.f, color.green() / 256.f,
                         color.blue() / 256.f, color.alpha() / 256.f};
                     buffer.add_PrimitiveCommand(sub_cmd);
+
+                    // 分拍线时间字符串
+                    auto div_time = QString("%1")
+                                        .arg(subdivision_timestamp)
+                                        .toStdU32String();
+                    auto div_time_metric = layer->stringMetrics(
+                        "ComicShannsMono Nerd Font", 16, div_time);
+                    auto div_time_pos = glm::vec2{
+                        all_tracks_rect.x - div_time_metric.x - 4,
+                        sub_cmd.baseInfo.pos.y - div_time_metric.y / 2.f + 12};
+                    auto div_time_cmds = layer->generateStringCommands(
+                        "ComicShannsMono Nerd Font", 16, div_time, div_time_pos,
+                        sub_cmd.baseInfo.color);
+                    str_cmds.insert(str_cmds.end(), div_time_cmds.begin(),
+                                    div_time_cmds.end());
                 }
             }
 
             // 更新“下一拍”的时间戳
             next_beat_timestamp = time;
+        }
+
+        // 一次提交所有字符指令
+        for (auto& charcmd : str_cmds) {
+            buffer.add_PrimitiveCommand(charcmd);
         }
     }
 };
