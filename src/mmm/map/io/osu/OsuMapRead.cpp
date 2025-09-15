@@ -461,7 +461,7 @@ void MMap::readOsu() {
         }
 
         // 最后生成全部拍
-        generateBeatInfo();
+        analyzeBeatInfo();
 
         std::map<uint32_t, Beat> sorted_beats(beatInfo.begin(), beatInfo.end());
         for (const auto& pair : sorted_beats) {

@@ -30,7 +30,7 @@ std::weak_ptr<MapMetadata> MMap::map_metadata(MapMetadataType type) {
 }
 
 // 更新拍信息(智能识别分拍)
-void MMap::generateBeatInfo() {
+void MMap::analyzeBeatInfo() {
     // 从 TimingMap 筛选出所有基础Timing点(红线)
     std::vector<const Timing*> base_timings;
     const auto& all_timings_map = timings.get_all_timing_points();

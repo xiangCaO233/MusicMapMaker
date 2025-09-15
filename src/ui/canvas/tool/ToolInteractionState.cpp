@@ -31,7 +31,10 @@ void ToolInteractionState::startDrag(
     DragMode mode, MeshPartInfo hit,
     const std::unordered_set<entt::entity>& selection) {
     m_dragState.drag_start_hit = hit;
-    m_dragState.dragged_entities = selection;
+    m_dragState.dragged_entities.clear();
+    for (auto& e : selection) {
+        m_dragState.dragged_entities.emplace(e);
+    }
     if (hit.part != NotePart::NONE) {
         m_dragState.mode = DragMode::Entity;
     } else {
@@ -47,6 +50,14 @@ void ToolInteractionState::endDrag() {
 
 void ToolInteractionState::setDragValidity(bool isValid) {
     m_dragState.is_valid = isValid;
+}
+
+void ToolInteractionState::setDragValidRes(const entt::entity& e,
+                                           const DragState::MapAxis& axis) {
+    auto it = m_dragState.dragged_entities.find(e);
+    if (it != m_dragState.dragged_entities.end()) {
+        it->second = axis;
+    }
 }
 
 DragState ToolInteractionState::getDragState() const { return m_dragState; }

@@ -36,16 +36,22 @@ enum class DragMode {
 };
 
 struct DragState {
+    struct MapAxis {
+        int64_t time{0};
+        int64_t mousetime{0};
+        int64_t track{0};
+        int64_t x{0};
+        int64_t y{0};
+    };
     // 拖拽模式
     DragMode mode{DragMode::None};
     // 拖拽操作是否有效
     bool is_valid{true};
-
     // 仅在 mode == Entity 时有效
     // 拖拽开始时的命中信息 (部位、实体等)
     MeshPartInfo drag_start_hit;
     // 实际被拖拽的实体集合
-    std::unordered_set<entt::entity> dragged_entities;
+    std::unordered_map<entt::entity, MapAxis> dragged_entities;
 };
 
 // 主结构ToolInteractionState
@@ -68,7 +74,10 @@ class ToolInteractionState {
     void startDrag(DragMode mode, MeshPartInfo hit,
                    const std::unordered_set<entt::entity>& selection);
     void endDrag();
+
     void setDragValidity(bool isValid);
+    void setDragValidRes(const entt::entity& e, const DragState::MapAxis& axis);
+
     DragState getDragState() const;
 
     // 选择相关 (由 pretick 写入, 所有线程读取)

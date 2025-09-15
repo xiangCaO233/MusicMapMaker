@@ -9,6 +9,8 @@
 #include <mmm/timing/Beat.hpp>
 #include <unordered_map>
 
+#include "mmm/NoteIDManager.hpp"
+
 class MProject;
 
 // map
@@ -27,6 +29,7 @@ class MMap {
 
     // 直接访问物件集合
     NoteCollection& note_set() { return notes; }
+    NoteIDManager& note_uuids() { return noteUUIDManager; }
 
     // 直接访问时间点集合
     TimingMap& timing_set() { return timings; }
@@ -53,6 +56,8 @@ class MMap {
 
     // 所有物件
     NoteCollection notes;
+    // 物件uuid管理器
+    NoteIDManager noteUUIDManager;
 
     // 所有时间点
     TimingMap timings;
@@ -81,7 +86,7 @@ class MMap {
     void writeMMM() {};
 
     // 更新拍信息(智能识别分拍)
-    void generateBeatInfo();
+    void analyzeBeatInfo();
 };
 
 #endif  // MMM_MMAP_HPP

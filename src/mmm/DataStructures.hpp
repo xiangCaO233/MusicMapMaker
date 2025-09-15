@@ -11,6 +11,7 @@
 #include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Composite.hpp>
 #include <mmm/timing/Timing.hpp>
+#include <optional>
 #include <vector>
 
 // --- 辅助函数 ---
@@ -34,7 +35,6 @@ inline std::pair<int64_t, int64_t> get_interval(const Note* note) {
 }
 
 /**
- * @file SlottedArray.h
  * @brief 一个支持高效增删和稳定引用的对象存储容器。
  */
 
@@ -73,14 +73,39 @@ class SlottedArray {
         }
     }
 
-    void remove(HandleType handle) {
-        if (!is_valid(handle)) return;
+    std::unique_ptr<T> remove(HandleType handle) {
+        if (!is_valid(handle)) return nullptr;
 
         Slot& slot = m_slots[handle.index];
-        slot.data.reset();
         slot.generation++;  // 使所有指向此槽位的旧句柄失效
         slot.next_free_slot = m_freelist_head;
         m_freelist_head = handle.index;
+        return std::move(slot.data);
+    }
+
+    /**
+     * @brief 替换指定句柄处的数据，并返回旧数据的所有权。
+     * @param handle 要替换的目标槽位的句柄。
+     * @param new_item 要放入槽位的新数据的 unique_ptr。
+     * @return 被替换掉的旧数据的 unique_ptr，如果句柄无效则返回 nullptr。
+     */
+    std::unique_ptr<T> replace(HandleType handle, std::unique_ptr<T> new_item) {
+        // 验证句柄是否指向一个有效的、存活的对象。
+        if (!is_valid(handle)) {
+            return nullptr;
+        }
+
+        // 定位到槽位。因为 is_valid() 已通过，所以索引是安全的。
+        Slot& slot = m_slots[handle.index];
+
+        // 使用 std::swap 原子地交换新旧数据的所有权。
+        // 这个操作对于 unique_ptr 是 noexcept (不会抛出异常) 的，
+        // 保证了操作的异常安全性。
+        std::swap(slot.data, new_item);
+
+        // 返回现在被 new_item 持有的旧数据。
+        // 函数结束后，调用者就获得了旧数据的所有权。
+        return new_item;
     }
 
     T* get(HandleType handle) {
@@ -91,14 +116,6 @@ class SlottedArray {
     const T* get(HandleType handle) const {
         if (!is_valid(handle)) return nullptr;
         return m_slots[handle.index].data.get();
-    }
-
-    std::unique_ptr<T>& get_mutable(HandleType handle) {
-        if (!is_valid(handle)) {
-            throw std::runtime_error(
-                "Attempt to get mutable from invalid handle.");
-        }
-        return m_slots[handle.index].data;
     }
 
     bool is_valid(HandleType handle) const {
@@ -374,8 +391,8 @@ class NoteCollection {
         return handle;
     }
 
-    void remove_note(NoteHandle handle) {
-        if (!m_storage.is_valid(handle)) return;
+    std::unique_ptr<Note> remove_note(NoteHandle handle) {
+        if (!m_storage.is_valid(handle)) return nullptr;
         const Note* note_to_remove = m_storage.get(handle);
         auto& notes_at_ts = m_timeline.at(note_to_remove->timestamp());
         notes_at_ts.erase(
@@ -387,17 +404,45 @@ class NoteCollection {
             m_interval_tree.remove(it->second);
             m_handle_to_interval_node.erase(it);
         }
-        m_storage.remove(handle);
+        return std::move(m_storage.remove(handle));
     }
 
-    bool update_note(NoteHandle handle, std::unique_ptr<Note> new_note_data) {
-        if (!m_storage.is_valid(handle) || !new_note_data) return false;
-        const Note* old_note = m_storage.get(handle);
-        const Note* new_note = new_note_data.get();
+    std::unique_ptr<Note> update_note(NoteHandle handle,
+                                      std::unique_ptr<Note> new_note_data) {
+        if (!m_storage.is_valid(handle) || !new_note_data) return nullptr;
+        // 先执行核心数据的替换操作
+        // 唯一的“危险”操作，放在最前面。
+        // replace返回后，old_note_data 就拥有了旧数据的唯一所有权。
+        std::unique_ptr<Note> old_note_data =
+            m_storage.replace(handle, std::move(new_note_data));
+
+        // 如果替换失败（例如，因为并发修改导致句柄失效），旧数据会是 nullptr。
+        if (!old_note_data) {
+            return nullptr;
+        }
+
+        // 现在，使用所有权明确的指针来进行后续操作。
+        // 不再需要从 m_storage 中 get 旧指针。
+        const Note* old_note = old_note_data.get();
+        // new_note 指针需要从 storage 中重新获取，
+        // 因为 new_note_data 的所有权已经转移。
+        const Note* new_note = m_storage.get(handle);
+
+        // 防御性检查，确保新Note已成功放入
+        if (!new_note) {
+            // 如果发生这种情况，意味着状态已损坏。
+            // 理想情况下，应该回滚操作，但至少我们能阻止进一步的错误。
+            // 把旧数据放回去
+            m_storage.replace(handle, std::move(old_note_data));
+            return nullptr;
+        }
+
+        // 使用安全的指针更新辅助数据结构。
         bool timestamp_changed =
             (old_note->timestamp() != new_note->timestamp());
         bool interval_changed =
             (get_interval(old_note) != get_interval(new_note));
+
         if (timestamp_changed) {
             auto& old_notes_at_ts = m_timeline.at(old_note->timestamp());
             old_notes_at_ts.erase(std::remove(old_notes_at_ts.begin(),
@@ -407,6 +452,7 @@ class NoteCollection {
                 m_timeline.erase(old_note->timestamp());
             m_timeline[new_note->timestamp()].push_back(handle);
         }
+
         if (interval_changed) {
             auto it = m_handle_to_interval_node.find(handle);
             if (it != m_handle_to_interval_node.end()) {
@@ -417,8 +463,9 @@ class NoteCollection {
                 m_handle_to_interval_node[handle] = new_node_ptr;
             }
         }
-        m_storage.get_mutable(handle) = std::move(new_note_data);
-        return true;
+
+        // 返回旧数据。
+        return old_note_data;
     }
 
     // --- 读取/查询 API ---
@@ -654,15 +701,20 @@ class TimingMap {
     /**
      * @brief 移除一个指定时间戳的全部时间点。
      * @param timestamp 要移除的时间点的时间戳。
-     * @return 如果找到了并成功移除，返回 true。
+     * @return 如果找到了，则返回被移除的 Timing 对象列表；否则返回
+     * std::nullopt。
      */
-    bool remove_timings_at_point(int32_t timestamp) {
-        // map::erase(key) 返回被删除的元素数量（0或1）。
-        if (m_timeline.erase(timestamp) > 0) {
+    std::optional<std::vector<Timing>> remove_timings_at_point(
+        int32_t timestamp) {
+        auto it = m_timeline.find(timestamp);
+        if (it != m_timeline.end()) {
+            // 使用 std::move 将 vector 的内容移出，避免不必要的拷贝
+            std::vector<Timing> removed_timings = std::move(it->second);
+            m_timeline.erase(it);  // 从 map 中移除该节点
             m_version++;
-            return true;
+            return removed_timings;  // 返回被移除的数据
         }
-        return false;
+        return std::nullopt;  // 没有找到任何东西
     }
 
     /**

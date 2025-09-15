@@ -80,7 +80,7 @@ class Note {
 
    private:
     // 物件类型
-    NoteType type;
+    NoteType type{NoteType::NORMAL};
 
     // 时间
     uint32_t time{0};
@@ -94,6 +94,8 @@ class Note {
     // 元数据集
     std::unordered_map<NoteMetadataType, std::shared_ptr<NoteMetadata>>
         metadatas;
+
+    friend class MMapEditor;
 };
 
 #endif  // MMM_NOTE_HPP

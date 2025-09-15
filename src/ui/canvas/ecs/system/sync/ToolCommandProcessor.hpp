@@ -17,8 +17,8 @@ overloaded(Ts...) -> overloaded<Ts...>;
 class ToolCommandProcessor {
    public:
     ToolCommandProcessor(entt::registry& r, ToolSystem& s,
-                         ToolInteractionState& i)
-        : registry(r), system(s), interactionState(i) {}
+                         ToolInteractionState& i, MMap* m)
+        : registry(r), system(s), interactionState(i), map(m) {}
 
     ~ToolCommandProcessor() = default;
 
@@ -51,6 +51,7 @@ class ToolCommandProcessor {
     entt::registry& registry;
     ToolSystem& system;
     ToolInteractionState& interactionState;
+    MMap* map;
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,
                            MeshPartInfo part = {}) {
@@ -84,21 +85,26 @@ class ToolCommandProcessor {
             // drag_info.drag_start_hit.part 来决定如何修改
             // NoteCollection 例如:
             if (drag_info.mode == DragMode::Entity) {
-                if (drag_info.drag_start_hit.part == NotePart::HOLD_END) {
-                    // ... 计算并应用新的 duration ...
-                } else {
-                    // ... 计算并应用新的位置 ...
+                if (drag_info.dragged_entities.size() == 1) {
+                    if (drag_info.drag_start_hit.part == NotePart::HEAD) {
+                        // ... 计算并应用新的位置 ...
+
+                    } else if (drag_info.drag_start_hit.part ==
+                               NotePart::HOLD_END) {
+                        // ... 计算并应用新的 duration ...
+                    }
                 }
             }
         }
 
         // 无论如何，都结束拖拽状态
         // 清理所有被拖拽实体的虚影组件
-        for (auto entity : drag_info.dragged_entities) {
+        for (auto [entity, mapaxis] : drag_info.dragged_entities) {
             if (registry.valid(entity)) {
                 registry.remove<GhostComponent>(entity);
             }
         }
+
         // 重置 TIS 中的拖拽状态
         interactionState.endDrag();
     }

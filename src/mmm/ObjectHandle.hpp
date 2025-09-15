@@ -45,6 +45,12 @@ struct NoteHandle {
     bool operator==(const NoteHandle& other) const = default;
     bool operator!=(const NoteHandle& other) const { return !(*this == other); }
 
+    // 提供一个简单的工厂函数来获取无效句柄，比手动创建更清晰。
+    static NoteHandle invalid() { return {0, 0}; }
+
+    // 提供一个检查句柄有效性的方法。通常 generation 为 0 表示无效。
+    bool isValid() const { return generation != 0; }
+
     // 为 std::unordered_map 提供哈希函数。
     struct Hash {
         size_t operator()(const NoteHandle& h) const {
@@ -54,5 +60,9 @@ struct NoteHandle {
         }
     };
 };
+
+using NoteUUID = uint64_t;
+// 定义一个常量来表示无效的稳定ID。
+constexpr NoteUUID InvalidStableNoteID = 0;
 
 #endif  // MMM_NOTEHANDLE_HPP

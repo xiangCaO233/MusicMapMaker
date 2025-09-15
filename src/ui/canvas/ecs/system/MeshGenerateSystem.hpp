@@ -12,13 +12,6 @@
 #include <map/skin/MSkin.hpp>
 
 class MeshGenerateSystem {
-    struct MapAxis {
-        int64_t time{0};
-        int64_t mousetime{0};
-        int64_t track{0};
-        int64_t x{0};
-        int64_t y{0};
-    };
     glm::vec2 current_mouse_pos;
     glm::vec4 all_tracks_rect;
     int track_count;
@@ -113,12 +106,13 @@ class MeshGenerateSystem {
                     // 验证更新
                     auto validity = axis.time >= 0 && axis.time <= maplength &&
                                     axis.track >= 0 && axis.track < track_count;
-                    toolInteractionState->setDragValidity(validity);
+                    tool_interaction_state->setDragValidity(validity);
                     drag_info = tool_interaction_state->getDragState();
                     if (drag_info.is_valid) {
                         time = axis.time;
                         track_index = axis.track;
                         y = axis.y;
+                        tool_interaction_state->setDragValidRes(e, axis);
                     }
                 }
 
@@ -140,8 +134,8 @@ class MeshGenerateSystem {
     }
 
     // 转化像素位置到谱面坐标系
-    MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
-        MapAxis axis;
+    DragState::MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
+        DragState::MapAxis axis;
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
         auto& beat_info = map->beat_info();
@@ -241,6 +235,7 @@ class MeshGenerateSystem {
             if (drag_info.is_valid) {
                 // 使用实时鼠标位置计算面条持续时间
                 duration = end_axis.time - time;
+                tool_interaction_state->setDragValidRes(e, end_axis);
             }
         }
 
@@ -329,6 +324,8 @@ class MeshGenerateSystem {
                          head_texinfo);
 
         if (registry->all_of<HoldComponent>(e)) {
+            // 检查是否拖拽面身-转换为组合物件
+            // 在下一帧加入
             generateHoldMesh(e, entity_mesh, time, obj_scale, x, y);
         } else if (registry->all_of<FlickComponent>(e)) {
             // 获取flick身纹理

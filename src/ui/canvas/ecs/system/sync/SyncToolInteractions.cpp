@@ -59,13 +59,14 @@ void updateHover(ToolSystem* toolSystem,
 
 void processToolCommands(entt::registry& registry, ToolCommandQueue* toolCmdQ,
                          ToolSystem* system,
-                         ToolInteractionState* toolInteractionState) {
+                         ToolInteractionState* toolInteractionState,
+                         MMap* map) {
     auto cmds = toolCmdQ->drain();
     if (cmds.empty()) return;
 
     for (const auto& command : cmds) {
-        ToolCommandProcessor processor(registry, *system,
-                                       *toolInteractionState);
+        ToolCommandProcessor processor(registry, *system, *toolInteractionState,
+                                       map);
         processor.process(command);
     }
 }
@@ -82,7 +83,7 @@ void SyncSystem::updateToolInteractions(ECSCore& core,
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)开始";
     // 更新悬浮状态
     processToolCommands(core.ecs_registry(), toolCmdQ, toolSystem,
-                        toolInteractionState);
+                        toolInteractionState, info->editorInfo.map);
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)结束";
 
     // qDebug() << "同步系统->同步工具状态->处理实时悬浮检测(at pretick)开始";
