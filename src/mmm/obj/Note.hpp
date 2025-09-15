@@ -68,6 +68,9 @@ class Note {
     // 从滑键转化
     static std::vector<Note> from_slide(std::shared_ptr<Slide> slide);
 
+    // 克隆物件
+    virtual std::unique_ptr<Note> clone(MMap* ref) const;
+
    protected:
     // 设置类型
     void set_notetype(NoteType t) { type = t; }
@@ -95,6 +98,9 @@ class Note {
     std::unordered_map<NoteMetadataType, std::shared_ptr<NoteMetadata>>
         metadatas;
 
+    friend class Composite;
+    friend class OsuNote;
+    friend class Hold;
     friend class MMapEditor;
 };
 

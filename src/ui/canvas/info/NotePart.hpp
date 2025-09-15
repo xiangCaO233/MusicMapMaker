@@ -51,8 +51,8 @@ struct MeshPartInfo {
     // 筛选信息
     int zIndex{0};
 
-    // 物件句柄
-    NoteHandle handle{};
+    // 物件uuid
+    NoteUUID uuid{InvalidStableNoteID};
 
     bool contains(const glm::vec2& p) const {
         // 计算矩形的右下角坐标

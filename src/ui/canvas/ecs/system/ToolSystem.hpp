@@ -35,12 +35,12 @@ class ToolSystem {
 
         // 遍历传入的本帧所有网格
         for (const auto& [entity, mesh] : note_meshs) {
-            const auto& [track, handle] = registry.get<NoteComponent>(entity);
+            const auto& [track, uuid] = registry.get<NoteComponent>(entity);
             // 遍历网格中的每一个部件 (Quad)
             for (const auto& quad : mesh.mesh) {
                 // 获取指向刚刚创建的、位于内存池末尾的对象的指针
                 MeshPartInfo new_part_ptr{quad.pos,  quad.size,   entity,
-                                          quad.part, quad.zIndex, handle};
+                                          quad.part, quad.zIndex, uuid};
 
                 // 将这个指针插入到全新的四叉树中
                 mesh_info_tree.insert(new_part_ptr);

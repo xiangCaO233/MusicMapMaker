@@ -397,7 +397,8 @@ void MMap::readOsu() {
                 if (hold->timestamp() + hold->duration() > basemeta.map_length)
                     basemeta.map_length = hold->timestamp() + hold->duration();
                 // 把长条物件加入缓存
-                note_set().add_note(std::move(hold));
+                auto handle = note_set().add_note(std::move(hold));
+                noteUUIDManager.register_new_note(handle);
             } else {
                 auto note = std::make_unique<OsuNote>(this);
                 // 使用读取出的参数初始化物件
@@ -407,7 +408,8 @@ void MMap::readOsu() {
                     basemeta.map_length = note->timestamp();
 
                 // 加入物件列表
-                note_set().add_note(std::move(note));
+                auto handle = note_set().add_note(std::move(note));
+                noteUUIDManager.register_new_note(handle);
             }
         }
 

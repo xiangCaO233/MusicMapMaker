@@ -21,8 +21,7 @@ class ECSCore {
 
     // 获取ecs reg
     entt::registry& ecs_registry();
-    std::unordered_map<NoteHandle, entt::entity, NoteHandle::Hash>&
-    handle_to_entity_map();
+    std::unordered_map<NoteUUID, entt::entity>& uuid_to_entity_map();
 
     std::unordered_map<TimingHandle, entt::entity, TimingHandle::Hash>&
     handle_to_timingentity_map();
@@ -49,8 +48,7 @@ class ECSCore {
     decltype(registry.group<TimeComponent, BeatComponent>()) beat_group;
 
     // NoteHandle -> entt::entity 的映射
-    std::unordered_map<NoteHandle, entt::entity, NoteHandle::Hash>
-        handle_to_entity;
+    std::unordered_map<NoteUUID, entt::entity> uudi_to_entity;
     // TimingHandle -> entt::entity 的映射
     std::unordered_map<TimingHandle, entt::entity, TimingHandle::Hash>
         timing_handle_to_entity_map;

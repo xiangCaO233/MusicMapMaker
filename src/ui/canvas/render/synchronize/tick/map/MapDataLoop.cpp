@@ -27,16 +27,17 @@ void MapDataLoop::pre_tickEvent() {
     sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr);
 
     // 与源物件集合同步可见的物件和timing
-    sync_system.updateEntities(ecore, map->note_set(), map->timing_set(),
-                               map->beat_timeline(), map->beat_info(), mapinfo,
-                               converter);
+    sync_system.updateEntities(ecore, map->note_set(), map->note_uuids(),
+                               map->timing_set(), map->beat_timeline(),
+                               map->beat_info(), mapinfo, converter);
     // qDebug() << "时间转换系统(at pretick)开始";
     // 计算有时间属性的逻辑y轴位置
     time_system.update(ecore, mapinfo, converter);
     // qDebug() << "时间转换系统(at pretick)结束";
 
     // 同步特效
-    sync_system.updateEffects(ecore, map->note_set(), mapinfo, converter);
+    sync_system.updateEffects(ecore, map->note_set(), map->note_uuids(),
+                              mapinfo, converter);
     // qDebug() << "同步系统(at pretick)结束";
 
     // qDebug() << "pretick结束";

@@ -88,3 +88,51 @@ std::unique_ptr<Note> Composite::pop_back() {
     child_notes.pop_back();
     return last_note;
 }
+
+// 设置时间戳
+void Composite::set_timestamp(uint32_t t) {
+    // 递归更新所有子物件的时间戳
+    auto oldtime = timestamp();
+    for (auto& child_note : child_notes) {
+        auto delta_time = child_note->timestamp() - oldtime;
+        child_note->set_timestamp(t + delta_time);
+    }
+    time = t;
+}
+
+// 设置轨道
+void Composite::set_trackpos(uint32_t o) {
+    // 递归更新所有子物件的轨道
+    auto oldtrack = trackpos();
+    for (auto& child_note : child_notes) {
+        auto delta_track = child_note->trackpos() - oldtrack;
+        child_note->set_trackpos(o + delta_track);
+    }
+    track = o;
+}
+
+// 克隆物件
+std::unique_ptr<Note> Composite::clone(MMap* ref) const {
+    auto new_note_data = std::make_unique<Composite>(ref);
+    auto new_composite = static_cast<Composite*>(new_note_data.get());
+    for (const auto& old_child : children()) {
+        std::unique_ptr<Note> new_child{nullptr};
+        switch (old_child->notetype()) {
+            case NoteType::HOLD: {
+                new_child = std::make_unique<Hold>(ref);
+                new_child->set_notetype(NoteType::HOLD);
+                break;
+            }
+            case NoteType::SLIDE: {
+                new_child = std::make_unique<Slide>(ref);
+                new_child->set_notetype(NoteType::SLIDE);
+                break;
+            }
+            case NoteType::NORMAL:
+            case NoteType::COMPOSITE:
+                break;
+        }
+        new_composite->add_child(std::move(new_child));
+    }
+    return new_note_data;
+}

@@ -1,5 +1,6 @@
 #include <ecs/ECSCore.hpp>
 #include <ecs/component/EffectComponents.hpp>
+#include <mmm/map/MMap.hpp>
 
 // 构造ECSCore
 ECSCore::ECSCore()
@@ -11,9 +12,8 @@ ECSCore::~ECSCore() = default;
 // 获取ecs reg
 entt::registry& ECSCore::ecs_registry() { return registry; }
 
-std::unordered_map<NoteHandle, entt::entity, NoteHandle::Hash>&
-ECSCore::handle_to_entity_map() {
-    return handle_to_entity;
+std::unordered_map<NoteUUID, entt::entity>& ECSCore::uuid_to_entity_map() {
+    return uudi_to_entity;
 }
 std::unordered_map<TimingHandle, entt::entity, TimingHandle::Hash>&
 ECSCore::handle_to_timingentity_map() {

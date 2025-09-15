@@ -3,10 +3,11 @@
 
 #include <glm/glm.hpp>
 #include <info/SharedCanvasInfo.hpp>
-#include <mmm/map/MMap.hpp>
 #include <mmm/project/MProjectConfig.hpp>
 #include <tool/BaseTool.hpp>
 
+class MMap;
+class MMapEditor;
 class AudioLoadCallback;
 struct MapInfo {
     // 背景路径

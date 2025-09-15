@@ -10,6 +10,7 @@
 #include <info/MapCanvasInfo.hpp>
 #include <layer/ILayer.hpp>
 #include <map/skin/MSkin.hpp>
+#include <mmm/map/MMap.hpp>
 
 class MeshGenerateSystem {
     glm::vec2 current_mouse_pos;

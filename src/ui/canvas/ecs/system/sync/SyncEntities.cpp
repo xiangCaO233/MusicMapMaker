@@ -16,13 +16,13 @@ entt::entity createBeatEntity(entt::registry& registry, const Beat* beat) {
 
 // 创建物件实体
 entt::entity createNoteEntity(entt::registry& registry, const Note* note,
-                              NoteHandle handle) {
+                              NoteUUID uuid) {
     auto note_entity = registry.create();
     // 附加Time组件
     registry.emplace<TimeComponent>(note_entity, note->timestamp());
 
     // 附加note组件(time,track,source)
-    registry.emplace<NoteComponent>(note_entity, note->trackpos(), handle);
+    registry.emplace<NoteComponent>(note_entity, note->trackpos(), uuid);
     switch (note->notetype()) {
         case NoteType::HOLD: {
             auto hold_note = static_cast<const Hold*>(note);
@@ -38,8 +38,8 @@ entt::entity createNoteEntity(entt::registry& registry, const Note* note,
             auto composed_note = static_cast<const Composite*>(note);
             std::vector<entt::entity> children;
             for (const auto& child_note : composed_note->children()) {
-                auto child_note_entity =
-                    createNoteEntity(registry, child_note.get(), {0, 0});
+                auto child_note_entity = createNoteEntity(
+                    registry, child_note.get(), InvalidStableNoteID);
                 // 附加父实体组件
                 registry.emplace<ChildOfComponent>(child_note_entity,
                                                    note_entity);
@@ -239,10 +239,10 @@ void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
 }
 
 void sync_notes(ECSCore& core, const NoteCollection& notes,
-                const MapCanvasInfo* info, const int64_t query_start_time,
-                const int64_t query_end_time) {
+                const NoteIDManager& uuidManager, const MapCanvasInfo* info,
+                const int64_t query_start_time, const int64_t query_end_time) {
     auto& registry = core.ecs_registry();
-    auto& handle_map = core.handle_to_entity_map();
+    auto& uuid_map = core.uuid_to_entity_map();
 
     // ----------debug------------
     // auto current_entities = handle_map.size();
@@ -253,21 +253,24 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     const std::vector<NoteHandle> visible_handles =
         notes.query_range(query_start_time, query_end_time);
 
-    std::unordered_set<NoteHandle, NoteHandle::Hash> current_visible_set(
-        visible_handles.begin(), visible_handles.end());
+    // 获取到uuid集合
+    std::unordered_set<NoteUUID> current_visible_uuidset;
+    for (const auto& handle : visible_handles) {
+        current_visible_uuidset.insert(uuidManager.get_id(handle));
+    }
 
     // ----------debug------------
     // qDebug() << "当前可见实体数量:" << visible_handles.size();
     // ----------debug------------
 
     // 销毁不再可见的物件实体
-    for (auto it = handle_map.begin(); it != handle_map.end();) {
+    for (auto it = uuid_map.begin(); it != uuid_map.end();) {
         // 不处于当前可见实体集合中
-        if (!current_visible_set.contains(it->first)) {
+        if (!current_visible_uuidset.contains(it->first)) {
             if (registry.valid(it->second)) {
                 registry.destroy(it->second);
             }
-            it = handle_map.erase(it);
+            it = uuid_map.erase(it);
         } else {
             ++it;
         }
@@ -279,12 +282,13 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     // ----------debug------------
 
     // 为新出现的可见Note创建实体
-    for (const auto& handle : visible_handles) {
-        if (!handle_map.contains(handle)) {
+    for (const auto& uuid : current_visible_uuidset) {
+        if (!uuid_map.contains(uuid)) {
+            auto handle = uuidManager.get_handle(uuid);
             const Note* note_data = notes.get_note(handle);
             if (!note_data) continue;
             // 从 note_data 填充组件
-            handle_map[handle] = createNoteEntity(registry, note_data, handle);
+            uuid_map[uuid] = createNoteEntity(registry, note_data, uuid);
         }
     }
     // ----------debug------------
@@ -294,6 +298,7 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
 }
 // 同步物件/拍/时间点实体
 void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
+                                const NoteIDManager& uuidManager,
                                 const TimingMap& timings,
                                 const BeatTimeline& beatTimeLine,
                                 const BeatInfo& beatInfo,
@@ -340,7 +345,8 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
 
     // 执行ECS同步逻辑
     // 同步Note实体
-    sync_notes(core, notes, info, query_start_time, query_end_time);
+    sync_notes(core, notes, uuidManager, info, query_start_time,
+               query_end_time);
 
     // 同步Timing 实体
     sync_timings(core, timings, query_start_time, query_end_time);

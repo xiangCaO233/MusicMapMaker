@@ -28,11 +28,13 @@ class SyncSystem {
 
     // 同步特效实体
     void updateEffects(ECSCore& core, const NoteCollection& notes,
+                       const NoteIDManager& uuidManager,
                        const MapCanvasInfo* info,
                        const TimePixelConverter& converter) const;
 
     // 同步物件/拍/时间点实体
     void updateEntities(ECSCore& core, const NoteCollection& notes,
+                        const NoteIDManager& uuidManager,
                         const TimingMap& timings,
                         const BeatTimeline& beatTimeLine,
                         const BeatInfo& beatInfo, const MapCanvasInfo* info,

@@ -9,6 +9,7 @@
 #include <info/MapCanvasInfo.hpp>
 #include <map/skin/MSkin.hpp>
 #include <memory>
+#include <mmm/map/MMapEditor.hpp>
 #include <tool/BaseTool.hpp>
 #include <unordered_map>
 #include <util/StringHash.hpp>

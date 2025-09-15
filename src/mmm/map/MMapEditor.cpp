@@ -1,5 +1,8 @@
+#include <memory>
 #include <mmm/map/MMapEditor.hpp>
 #include <mmm/obj/Note.hpp>
+#include <mmm/obj/rm/Composite.hpp>
+#include <mmm/obj/rm/Slide.hpp>
 
 MMapEditor::MMapEditor(MMap* m) : map(m) {}
 
@@ -34,17 +37,38 @@ void MMapEditor::createHoldAt(int64_t timestamp, int track, int64_t duration) {
 }
 
 // 删除多个物件
-void MMapEditor::deleteNotes(const std::unordered_set<NoteUUID>& note_uuids) {
+void MMapEditor::deleteNotes(const std::unordered_set<NoteUUID>& uuids) {
     // 通过操作管理器执行命令
     operationManager.executeCommand(
-        std::make_unique<RemoveMultipleNotesCommand>(
-            map->note_set(), map->note_uuids(), note_uuids));
+        std::make_unique<RemoveMultipleNotesCommand>(map->note_set(),
+                                                     map->note_uuids(), uuids));
+}
+
+// 移动物件到指定位置
+void MMapEditor::moveNote(NoteUUID uuid, int64_t timestamp, int track) {
+    auto old = map->note_set().get_note(map->note_uuids().get_handle(uuid));
+
+    std::unique_ptr<Note> new_note_data = old->clone(map);
+    new_note_data->set_timestamp(timestamp);
+    new_note_data->set_trackpos(track);
+
+    updateNoteData(uuid, std::move(new_note_data));
+}
+
+// 移动物件到指定位置
+void MMapEditor::changeHold(NoteUUID uuid, int64_t duration) {
+    auto old = map->note_set().get_note(map->note_uuids().get_handle(uuid));
+
+    auto new_note_data = old->clone(map);
+    auto hold = static_cast<Hold*>(new_note_data.get());
+    hold->set_duration(duration);
+
+    updateNoteData(uuid, std::move(new_note_data));
 }
 
 // 修改音符属性
-void MMapEditor::updateNoteData(NoteUUID id_to_update,
-                                std::unique_ptr<Note> new_data) {
+void MMapEditor::updateNoteData(NoteUUID uuid, std::unique_ptr<Note> new_data) {
     auto command = std::make_unique<UpdateNoteCommand>(
-        map->note_set(), map->note_uuids(), id_to_update, std::move(new_data));
+        map->note_set(), map->note_uuids(), uuid, std::move(new_data));
     operationManager.executeCommand(std::move(command));
 }

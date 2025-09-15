@@ -17,10 +17,13 @@ class MMapEditor {
     void createHoldAt(int64_t timestamp, int track, int64_t duration);
 
     // 删除多个物件
-    void deleteNotes(const std::unordered_set<NoteUUID>& note_uuids);
+    void deleteNotes(const std::unordered_set<NoteUUID>& uuids);
 
-    // 修改音符属性
-    void updateNoteData(NoteUUID id_to_update, std::unique_ptr<Note> new_data);
+    // 移动物件到指定位置
+    void moveNote(NoteUUID uuid, int64_t timestamp, int track);
+
+    // 移动物件到指定位置
+    void changeHold(NoteUUID uuid, int64_t duration);
 
     // 撤销和重做
     void undo();
@@ -29,6 +32,9 @@ class MMapEditor {
    private:
     MMap* map;
     OperationManager operationManager;
+
+    // 修改音符属性
+    void updateNoteData(NoteUUID uuid, std::unique_ptr<Note> new_data);
 };
 
 #endif  // MMM_MMAPEDITOR_HPP

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <memory>
 #include <mmm/map/MMap.hpp>
+#include <mmm/map/MMapEditor.hpp>
 #include <util/mutil.hpp>
 
 MMap::MMap() {}
@@ -16,6 +17,8 @@ MMap::MMap(std::string_view file) {
     } else if (file.ends_with(".mmm")) {
         readMMM();
     }
+    // 初始化对应编辑器
+    mapeditor = std::make_unique<MMapEditor>(this);
 }
 
 MMap::~MMap() = default;

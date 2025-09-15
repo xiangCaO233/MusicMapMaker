@@ -5,13 +5,13 @@
 #include <memory>
 #include <mmm/DataStructures.hpp>
 #include <mmm/MetaData.hpp>
+#include <mmm/NoteIDManager.hpp>
 #include <mmm/map/BaseMapMeta.hpp>
 #include <mmm/timing/Beat.hpp>
 #include <unordered_map>
 
-#include "mmm/NoteIDManager.hpp"
-
 class MProject;
+class MMapEditor;
 
 // map
 class MMap {
@@ -46,6 +46,9 @@ class MMap {
     // 访问基本元数据
     BaseMapMeta& base_metadata() { return basemeta; };
 
+    // 访问对应的谱面编辑器
+    MMapEditor& editor() { return *mapeditor; }
+
     // 设置主音轨
     void set_maintrack(const std::shared_ptr<ice::AudioTrack>& track);
 
@@ -68,6 +71,9 @@ class MMap {
 
     // 基础谱面信息
     BaseMapMeta basemeta;
+
+    // 一对一编辑器
+    std::unique_ptr<MMapEditor> mapeditor;
 
     // 项目引用
     MProject* project_ref;

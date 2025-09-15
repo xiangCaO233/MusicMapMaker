@@ -32,8 +32,8 @@ void ToolInteractionState::startDrag(
     const std::unordered_set<entt::entity>& selection) {
     m_dragState.drag_start_hit = hit;
     m_dragState.dragged_entities.clear();
-    for (auto& e : selection) {
-        m_dragState.dragged_entities.emplace(e);
+    for (auto e : selection) {
+        m_dragState.dragged_entities.emplace(e, DragState::MapAxis{});
     }
     if (hit.part != NotePart::NONE) {
         m_dragState.mode = DragMode::Entity;

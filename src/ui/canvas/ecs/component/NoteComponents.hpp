@@ -7,7 +7,7 @@
 // 标记这是一个Note，并存储其轨道信息
 struct NoteComponent {
     uint32_t track_index;
-    NoteHandle sourceHandle;
+    NoteUUID sourceUUID;
 };
 
 // Hold Note的特有组件

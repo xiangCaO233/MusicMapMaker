@@ -7,29 +7,30 @@
 
 // 打印用
 std::string OsuNote::toString() const {
-    return Note::toString();
-    // std::string sampleStr;
-    // switch (notesample()) {
-    //     using enum NoteSample;
-    //     case NORMAL:
-    //         sampleStr = "NORMAL";
-    //         break;
-    //     case WHISTLE:
-    //         sampleStr = "WHISTLE";
-    //         break;
-    //     case FINISH:
-    //         sampleStr = "FINISH";
-    //         break;
-    //     case CLAP:
-    //         sampleStr = "CLAP";
-    //         break;
-    // }
-    // return std::format(
-    //     "OsuNote{{timestamp={}\n, orbit={}\n, sample={}\n, normalSet={}\n, "
-    //     "additionalSet={}}}",
-    //     timestamp(), trackpos(), sampleStr,
-    //     static_cast<int>(note_samplegroup().normalSet),
-    //     static_cast<int>(note_samplegroup().additionalSet));
+    auto parent = Note::toString();
+    std::string sampleStr;
+    switch (notesample()) {
+        using enum NoteSample;
+        case NORMAL:
+            sampleStr = "NORMAL";
+            break;
+        case WHISTLE:
+            sampleStr = "WHISTLE";
+            break;
+        case FINISH:
+            sampleStr = "FINISH";
+            break;
+        case CLAP:
+            sampleStr = "CLAP";
+            break;
+    }
+    auto samplestr = std::format(
+        "Sample:{{timestamp={}, orbit={}, sample={}, normalSet={}, "
+        "additionalSet={}}}",
+        timestamp(), trackpos(), sampleStr,
+        static_cast<int>(note_samplegroup().normalSet),
+        static_cast<int>(note_samplegroup().additionalSet));
+    return parent + "\n" + sampleStr;
 }
 
 // 从osu描述加载
@@ -175,4 +176,14 @@ std::string OsuNote::to_osu_description(int32_t orbit_count) {
     }
 
     return oss.str();
+}
+
+// 克隆物件
+std::unique_ptr<Note> OsuNote::clone(MMap* ref) const {
+    auto newnote = std::make_unique<OsuNote>(ref);
+    newnote->set_timestamp(time);
+    newnote->set_trackpos(track);
+    newnote->set_note_samplegroup(note_samplegroup());
+    newnote->set_notesample(notesample());
+    return newnote;
 }

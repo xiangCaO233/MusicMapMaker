@@ -14,3 +14,10 @@ std::vector<Note> Note::from_slide(std::shared_ptr<Slide> slide) {
     // TODO(xiang 2025-08-08): 实现滑键转多个物件
     return {};
 }
+
+std::unique_ptr<Note> Note::clone(MMap* ref) const {
+    auto newnote = std::make_unique<Note>(ref);
+    newnote->set_timestamp(time);
+    newnote->set_trackpos(track);
+    return newnote;
+}

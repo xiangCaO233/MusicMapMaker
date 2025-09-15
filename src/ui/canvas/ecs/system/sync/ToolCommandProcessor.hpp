@@ -5,6 +5,8 @@
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
 
+#include "mmm/map/MMapEditor.hpp"
+
 // --- Helper for std::visit ---
 template <class... Ts>
 struct overloaded : Ts... {
@@ -16,9 +18,9 @@ overloaded(Ts...) -> overloaded<Ts...>;
 
 class ToolCommandProcessor {
    public:
-    ToolCommandProcessor(entt::registry& r, ToolSystem& s,
+    ToolCommandProcessor(entt::registry& r, ToolSystem& s, MMapEditor& e,
                          ToolInteractionState& i, MMap* m)
-        : registry(r), system(s), interactionState(i), map(m) {}
+        : registry(r), system(s), interactionState(i), mapEditor(e), map(m) {}
 
     ~ToolCommandProcessor() = default;
 
@@ -51,6 +53,7 @@ class ToolCommandProcessor {
     entt::registry& registry;
     ToolSystem& system;
     ToolInteractionState& interactionState;
+    MMapEditor& mapEditor;
     MMap* map;
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,
@@ -87,12 +90,23 @@ class ToolCommandProcessor {
             if (drag_info.mode == DragMode::Entity) {
                 if (drag_info.dragged_entities.size() == 1) {
                     if (drag_info.drag_start_hit.part == NotePart::HEAD) {
-                        // ... 计算并应用新的位置 ...
+                        // 应用新的位置
+                        auto entity = drag_info.dragged_entities.begin()->first;
+                        auto [track, uuid] =
+                            registry.get<NoteComponent>(entity);
+                        auto mapAxisRes =
+                            drag_info.dragged_entities.begin()->second;
+
+                        // 向编辑器应用修改
+                        mapEditor.moveNote(uuid, mapAxisRes.time,
+                                           mapAxisRes.track);
 
                     } else if (drag_info.drag_start_hit.part ==
                                NotePart::HOLD_END) {
                         // ... 计算并应用新的 duration ...
                     }
+                } else {
+                    // 拖拽多个
                 }
             }
         }

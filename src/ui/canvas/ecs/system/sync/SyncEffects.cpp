@@ -2,6 +2,7 @@
 
 // 同步特效实体
 void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
+                               const NoteIDManager& uuidManager,
                                const MapCanvasInfo* info,
                                const TimePixelConverter& converter) const {
     auto& registry = core.ecs_registry();
@@ -71,8 +72,8 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
         // Note的时间戳，是否在本帧“特效时间”前进的区间内
         if (time > last_effect_time && time <= effect_time) {
             // 这个Note需要触发特效
-            const auto& [track, handle] = registry.get<NoteComponent>(entity);
-            auto note = notes.get_note(handle);
+            const auto& [track, uuid] = registry.get<NoteComponent>(entity);
+            auto note = notes.get_note(uuidManager.get_handle(uuid));
             if (!note) continue;
 
             // qDebug() << "time[" << time << "],track[" << track

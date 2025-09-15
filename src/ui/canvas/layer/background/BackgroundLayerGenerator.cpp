@@ -4,6 +4,7 @@
 #include <layer/background/BackgroundLayer.hpp>
 #include <layer/background/BackgroundLayerGenerator.hpp>
 #include <map/skin/MSkin.hpp>
+#include <mmm/map/MMap.hpp>
 #include <render/command/RenderCommand.hpp>
 
 // 析构BackgroundLayerGenerator
