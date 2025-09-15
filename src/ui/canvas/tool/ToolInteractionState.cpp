@@ -45,7 +45,9 @@ void ToolInteractionState::endDrag() {
     m_dragState.dragged_entities.clear();
 }
 
-void ToolInteractionState::setDragValidity(bool isValid) {}
+void ToolInteractionState::setDragValidity(bool isValid) {
+    m_dragState.is_valid = isValid;
+}
 
 DragState ToolInteractionState::getDragState() const { return m_dragState; }
 

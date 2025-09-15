@@ -13,15 +13,16 @@
 
 class MeshGenerateSystem {
     struct MapAxis {
-        uint32_t time{0};
-        uint32_t mousetime{0};
-        uint32_t track{0};
-        uint32_t x{0};
-        uint32_t y{0};
+        int64_t time{0};
+        int64_t mousetime{0};
+        int64_t track{0};
+        int64_t x{0};
+        int64_t y{0};
     };
     glm::vec2 current_mouse_pos;
     glm::vec4 all_tracks_rect;
     int track_count;
+    uint32_t maplength;
     float judgeline_absolute_y;
     float single_track_width;
     float canvas_height;
@@ -58,6 +59,7 @@ class MeshGenerateSystem {
         // 获取轨道布局信息
         all_tracks_rect = info->editorInfo.track_layout;
         track_count = info->editorInfo.map->base_metadata().track_count;
+        maplength = info->editorInfo.map->base_metadata().map_length;
         if (track_count == 0) return;
         single_track_width = all_tracks_rect.z / float(track_count);
         // 获取悬浮信息
@@ -88,6 +90,7 @@ class MeshGenerateSystem {
             } else if (ghost) {
                 // 虚影方式渲染-根据工具交互状态确定如何渲染
 
+                // --------------------物件头拖动交互--------------------------
                 entity_mesh.state = MeshState::GHOST;
                 auto drag_info = tool_interaction_state->getDragState();
                 auto mousePressPos =
@@ -103,14 +106,20 @@ class MeshGenerateSystem {
                 //                               .presentation_canvas_time);
                 if (drag_info.drag_start_hit.part == NotePart::HEAD ||
                     drag_info.drag_start_hit.part == NotePart::HOLD_HEAD) {
-                    // 若为头则计算并更新此时鼠标最近的分拍线时间作为物件时间
-
-                    // 计算并更新此时鼠标最近的轨道
-
+                    // 若为头则计算此时鼠标最近的分拍线时间作为物件时间
+                    // 计算此时鼠标最近的轨道
                     auto axis = getPixelMapAxis(mousePos);
-                    time = axis.time;
-                    track_index = axis.track;
-                    y = axis.y;
+
+                    // 验证更新
+                    auto validity = axis.time >= 0 && axis.time <= maplength &&
+                                    axis.track >= 0 && axis.track < track_count;
+                    toolInteractionState->setDragValidity(validity);
+                    drag_info = tool_interaction_state->getDragState();
+                    if (drag_info.is_valid) {
+                        time = axis.time;
+                        track_index = axis.track;
+                        y = axis.y;
+                    }
                 }
 
                 generateMesh(track_index, e, entity_mesh, time, y);
@@ -150,6 +159,8 @@ class MeshGenerateSystem {
             axis.time = divinfo.divisor_time;
             axis.y = converter->timeToPixel(axis.time, presentation_canvas_time,
                                             info);
+        } else {
+            axis.time = -1;
         }
         // 更新轨道
         for (int i{0}; i < track_count; ++i) {
@@ -211,6 +222,7 @@ class MeshGenerateSystem {
         // 计算持续面身高度
         auto [duration] = registry->get<HoldComponent>(e);
 
+        // --------------------面条尾拖动交互--------------------------
         // 判断是否在拖动面尾-更新面条持续时间
         auto drag_info = tool_interaction_state->getDragState();
         if (drag_info.dragged_entities.contains(e) &&
@@ -219,8 +231,17 @@ class MeshGenerateSystem {
                 tool_interaction_state->getMouseState().press_pos;
             auto mousePos = tool_interaction_state->getMouseState().current_pos;
             auto end_axis = getPixelMapAxis(mousePos);
-            // 使用实时鼠标位置计算面条持续时间
-            duration = end_axis.time - time;
+            // 验证合法性
+            auto validity = end_axis.time >= time;
+            // qDebug() << "headtime:" << time;
+            // qDebug() << "endtime:" << end_axis.time;
+
+            tool_interaction_state->setDragValidity(validity);
+            drag_info = tool_interaction_state->getDragState();
+            if (drag_info.is_valid) {
+                // 使用实时鼠标位置计算面条持续时间
+                duration = end_axis.time - time;
+            }
         }
 
         // 根据面条持续时间计算面身高度

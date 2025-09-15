@@ -27,10 +27,10 @@ using BeatTimeline = std::vector<uint32_t>;
 
 // 定义一个结构体来存储查询结果
 struct DivisorLineInfo {
-    uint32_t beat_start;
-    double divisor_time;     // 分拍线的时间
-    uint32_t divisor_index;  // 第几个分拍线 (0 到 divisors-1)
-    double distance;         // 查询时间与分拍线的距离
+    int64_t beat_start;
+    double divisor_time;    // 分拍线的时间
+    int64_t divisor_index;  // 第几个分拍线 (0 到 divisors-1)
+    double distance;        // 查询时间与分拍线的距离
     bool is_valid() const {
         return distance != std::numeric_limits<double>::infinity();
     }
@@ -51,9 +51,9 @@ inline std::vector<double> getDivisorTimesForBeat(const Beat& beat) {
 inline DivisorLineInfo findNearestDivisorLine(int64_t query_time,
                                               const BeatTimeline& beat_timeline,
                                               const BeatInfo& beat_info) {
-    if (beat_timeline.empty() || beat_info.empty()) {
+    if (query_time < 0 || beat_timeline.empty() || beat_info.empty()) {
         return {
-            0, 0.0, 0,
+            -1, -1, -1,
             std::numeric_limits<double>::infinity()};  // 返回一个无效的默认值
     }
 
