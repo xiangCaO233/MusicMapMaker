@@ -20,7 +20,7 @@ struct BaseCanvasStatus {
     float scroll_speed{1.f};
 
     // 时间线缩放
-    float timeline_zoom{1.f};
+    float timeline_zoom{.8f};
 
     // 判定线位置
     float judgeline_pos{.2f};

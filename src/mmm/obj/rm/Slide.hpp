@@ -21,10 +21,10 @@ class Slide : public Note {
     }
 
     // 获取dtrack
-    inline uint32_t delta_track() const { return dtrack; }
+    inline int64_t delta_track() const { return dtrack; }
 
     // 设置dtrack
-    inline void set_track_orbit(uint32_t delta_track) { dtrack = delta_track; }
+    inline void set_track_orbit(int64_t delta_track) { dtrack = delta_track; }
 
     // 克隆物件
     std::unique_ptr<Note> clone(MMap* ref) const override {
@@ -37,7 +37,7 @@ class Slide : public Note {
     }
 
    private:
-    uint32_t dtrack{1};
+    int64_t dtrack{1};
 };
 
 #endif  // MMM_SLIDE_HPP

@@ -210,7 +210,9 @@ void MMap::readImd() {
         // 缓存父类指针
         std::unique_ptr<Note> temp_note;
         // 缓存组合键指针
-        std::unique_ptr<Composite> temp_complex_note;
+        std::unique_ptr<Composite> temp_complex_note{nullptr};
+        // 组合键是否构建完成
+        bool comp_done{true};
 
         int obj_count = 0;
 
@@ -278,9 +280,10 @@ void MMap::readImd() {
                 case 0x60: {
                     // 组合键头(开始键)
                     temp_complex_note = std::make_unique<Composite>(this);
-                    // 添加本头
-                    temp_complex_note->add_child(std::move(temp_note));
+                    comp_done = false;
                     temp_complex_note->set_notetype(NoteType::COMPOSITE);
+                    temp_complex_note->set_timestamp(note_timestamp);
+                    temp_complex_note->set_trackpos(note_orbit);
                     break;
                 }
                 case 0x20: {
@@ -288,7 +291,7 @@ void MMap::readImd() {
                     // 非法出现组合键信息-跳过
                     if (!temp_complex_note) continue;
                     // 只是一味添加
-                    temp_complex_note->add_child(std::move(temp_note));
+                    // temp_complex_note->add_child(std::move(temp_note));
                     break;
                 }
                 case 0xa0: {
@@ -296,26 +299,29 @@ void MMap::readImd() {
                     // 设置父物件
                     // 非法出现组合键信息-跳过
                     if (!temp_complex_note) continue;
-                    // 只是一味添加
-                    temp_complex_note->add_child(std::move(temp_note));
+                    comp_done = true;
                     break;
                 }
             }
 
-            // 更新本物件并添加到物件列表
+            // 更新本物件
+            temp_note->set_timestamp(note_timestamp);
+            temp_note->set_trackpos(note_orbit);
             if (temp_complex_note) {
-                temp_complex_note->set_timestamp(note_timestamp);
-                temp_complex_note->set_trackpos(note_orbit);
-                // 把组合物件加入集合(组合在此之后失效)
-                auto handle = note_set().add_note(std::move(temp_complex_note));
-                noteUUIDManager.register_new_note(handle);
+                // 添加当前物件到缓存组合键
+                temp_complex_note->add_child(std::move(temp_note));
+                if (comp_done) {
+                    // 把组合物件加入集合(组合在此之后失效)
+                    auto handle =
+                        note_set().add_note(std::move(temp_complex_note));
+                    noteUUIDManager.register_new_note(handle);
+                }
             } else {
-                temp_note->set_timestamp(note_timestamp);
-                temp_note->set_trackpos(note_orbit);
                 // 把物件加入集合(物件在此之后失效)
                 auto handle = note_set().add_note(std::move(temp_note));
                 noteUUIDManager.register_new_note(handle);
             }
+
             ++obj_count;
         }
 

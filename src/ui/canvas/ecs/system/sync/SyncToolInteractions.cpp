@@ -31,6 +31,7 @@ void updateHover(ToolSystem* toolSystem,
         // 检查是否和旧的悬浮状态是同一个物体/部位
         if (!old_hover.has_value() ||
             old_hover.value().source_entity != hit_info.source_entity ||
+            old_hover.value().child_entity != hit_info.child_entity ||
             old_hover.value().part != hit_info.part) {
             // 不一样，或者之前没有悬浮 -> 更新为新的悬浮状态
             toolInteractionState->setHover(hit_info);

@@ -19,7 +19,7 @@ struct HoldComponent {
 // Flick Note的特有组件
 struct FlickComponent {
     // 轨道偏移量, e.g., +1 or -1
-    uint32_t delta_track;
+    int64_t delta_track;
 };
 
 #endif  // MMM_NOTECOMPONENTS_HPP

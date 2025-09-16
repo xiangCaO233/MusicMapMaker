@@ -66,6 +66,7 @@ entt::entity createNoteEntity(entt::registry& registry, const Note* note,
 
     // 附加note组件(time,track,source)
     registry.emplace<NoteComponent>(note_entity, note->trackpos(), uuid);
+
     switch (note->notetype()) {
         case NoteType::HOLD: {
             auto hold_note = static_cast<const Hold*>(note);
