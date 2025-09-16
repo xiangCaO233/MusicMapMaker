@@ -1,11 +1,11 @@
 #ifndef MMM_TOOLCOMMANDPROCESSOR_HPP
 #define MMM_TOOLCOMMANDPROCESSOR_HPP
 
+#include <ecs/component/CoreComponents.hpp>
 #include <ecs/system/ToolSystem.hpp>
+#include <mmm/map/MMapEditor.hpp>
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
-
-#include "mmm/map/MMapEditor.hpp"
 
 // --- Helper for std::visit ---
 template <class... Ts>
@@ -89,7 +89,9 @@ class ToolCommandProcessor {
             // NoteCollection 例如:
             if (drag_info.mode == DragMode::Entity) {
                 if (drag_info.dragged_entities.size() == 1) {
-                    if (drag_info.drag_start_hit.part == NotePart::HEAD) {
+                    if (drag_info.drag_start_hit.part == NotePart::HEAD ||
+                        drag_info.drag_start_hit.part == NotePart::HOLD_HEAD ||
+                        drag_info.drag_start_hit.part == NotePart::SLIDE_HEAD) {
                         // 应用新的位置
                         auto entity = drag_info.dragged_entities.begin()->first;
                         auto [track, uuid] =
@@ -101,9 +103,24 @@ class ToolCommandProcessor {
                         mapEditor.moveNote(uuid, mapAxisRes.time,
                                            mapAxisRes.track);
 
+                        // 附加脏组件
+                        registry.emplace<DirtyMarkComponent>(entity);
+
                     } else if (drag_info.drag_start_hit.part ==
                                NotePart::HOLD_END) {
                         // ... 计算并应用新的 duration ...
+                        // 应用新的位置
+                        auto entity = drag_info.dragged_entities.begin()->first;
+                        auto [track, uuid] =
+                            registry.get<NoteComponent>(entity);
+                        auto [time] = registry.get<TimeComponent>(entity);
+                        auto mapAxisRes =
+                            drag_info.dragged_entities.begin()->second;
+                        auto duration = mapAxisRes.time - time;
+                        // 向编辑器应用修改
+                        mapEditor.changeHold(uuid, duration);
+                        // 附加脏组件
+                        registry.emplace<DirtyMarkComponent>(entity);
                     }
                 } else {
                     // 拖拽多个

@@ -35,6 +35,7 @@ class SyncSystem {
     // 同步物件/拍/时间点实体
     void updateEntities(ECSCore& core, const NoteCollection& notes,
                         const NoteIDManager& uuidManager,
+                        MapLayerManager* layer_manager,
                         const TimingMap& timings,
                         const BeatTimeline& beatTimeLine,
                         const BeatInfo& beatInfo, const MapCanvasInfo* info,

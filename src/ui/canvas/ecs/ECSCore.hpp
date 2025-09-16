@@ -4,6 +4,7 @@
 #include <entt.hpp>
 #include <mmm/ObjectHandle.hpp>
 #include <mmm/timing/Beat.hpp>
+#include <unordered_map>
 
 class MMap;
 class Note;

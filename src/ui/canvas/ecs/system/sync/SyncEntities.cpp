@@ -1,4 +1,6 @@
+#include <ecs/component/RelationComponents.hpp>
 #include <ecs/system/sync/SyncSystem.hpp>
+#include <layer/MapLayerManager.hpp>
 
 // 创建拍实体
 entt::entity createBeatEntity(entt::registry& registry, const Beat* beat) {
@@ -12,6 +14,45 @@ entt::entity createBeatEntity(entt::registry& registry, const Beat* beat) {
                                     beat->beat_length, beat->beat_index);
 
     return beat_entity;
+}
+
+// 更新物件实体
+entt::entity updateNoteEntity(entt::registry& registry,
+                              const entt::entity& note_entity,
+                              const Note* note) {
+    // 附加Time组件
+    auto& [time] = registry.get<TimeComponent>(note_entity);
+    time = note->timestamp();
+
+    // 附加note组件(time,track,source)
+    auto& [track, uuid] = registry.get<NoteComponent>(note_entity);
+    track = note->trackpos();
+
+    switch (note->notetype()) {
+        case NoteType::HOLD: {
+            auto hold_note = static_cast<const Hold*>(note);
+            auto& [duration] = registry.get<HoldComponent>(note_entity);
+            duration = hold_note->duration();
+            break;
+        }
+        case NoteType::SLIDE: {
+            auto slide_note = static_cast<const Slide*>(note);
+            auto& [delta_track] = registry.get<FlickComponent>(note_entity);
+            delta_track = slide_note->delta_track();
+        }
+        case NoteType::COMPOSITE: {
+            auto composed_note = static_cast<const Composite*>(note);
+            auto& [children] =
+                registry.get<CompositeRootComponent>(note_entity);
+            for (int i{0}; i < children.size(); ++i) {
+                updateNoteEntity(registry, children[i],
+                                 composed_note->children()[i].get());
+            }
+        }
+        default:
+            break;
+    }
+    return note_entity;
 }
 
 // 创建物件实体
@@ -100,7 +141,7 @@ void sync_timings(ECSCore& core, const TimingMap& timings,
     const size_t DENSITY_LIMIT_TIME_THRESHOLD = 20;  // 定义密度限制值
 
     if (all_visible_handles.size() > DENSITY_LIMIT_THRESHOLD) {
-        // --- 情况 A: 数量超过阈值，需要进行密度限制 ---
+        // 数量超过阈值，需要进行密度限制
         qDebug() << "同屏timing数量过多[共" << all_visible_handles.size() << ">"
                  << DENSITY_LIMIT_THRESHOLD << "个],执行密度限制[间隔"
                  << DENSITY_LIMIT_TIME_THRESHOLD << "ms]";
@@ -124,7 +165,7 @@ void sync_timings(ECSCore& core, const TimingMap& timings,
         }
 
     } else {
-        // --- 情况 B: 数量在可接受范围内，全部显示 ---
+        //  数量在可接受范围内，全部显示
         final_visible_handles.insert(all_visible_handles.begin(),
                                      all_visible_handles.end());
     }
@@ -239,7 +280,8 @@ void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
 }
 
 void sync_notes(ECSCore& core, const NoteCollection& notes,
-                const NoteIDManager& uuidManager, const MapCanvasInfo* info,
+                const NoteIDManager& uuidManager,
+                MapLayerManager* layer_manager, const MapCanvasInfo* info,
                 const int64_t query_start_time, const int64_t query_end_time) {
     auto& registry = core.ecs_registry();
     auto& uuid_map = core.uuid_to_entity_map();
@@ -263,10 +305,13 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     // qDebug() << "当前可见实体数量:" << visible_handles.size();
     // ----------debug------------
 
+    auto drag_info =
+        layer_manager->get_tool_interaction_state()->getDragState();
     // 销毁不再可见的物件实体
     for (auto it = uuid_map.begin(); it != uuid_map.end();) {
-        // 不处于当前可见实体集合中
-        if (!current_visible_uuidset.contains(it->first)) {
+        // 不处于当前可见实体集合中/且不处于拖动集合中
+        if (!current_visible_uuidset.contains(it->first) &&
+            !drag_info.dragged_entities.contains(it->second)) {
             if (registry.valid(it->second)) {
                 registry.destroy(it->second);
             }
@@ -291,6 +336,17 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
             uuid_map[uuid] = createNoteEntity(registry, note_data, uuid);
         }
     }
+
+    // 更新脏物件
+    auto dirty_view = registry.view<NoteComponent, DirtyMarkComponent>();
+    for (const auto& e : dirty_view) {
+        auto& [track, uuid] = registry.get<NoteComponent>(e);
+        auto handle = uuidManager.get_handle(uuid);
+        auto note_data = notes.get_note(handle);
+        updateNoteEntity(registry, e, note_data);
+    }
+    registry.clear<DirtyMarkComponent>();
+
     // ----------debug------------
     // auto new_entities = handle_map.size();
     // qDebug() << "新建可见实体数量:" << new_entities - after_entities;
@@ -299,6 +355,7 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
 // 同步物件/拍/时间点实体
 void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
                                 const NoteIDManager& uuidManager,
+                                MapLayerManager* layer_manager,
                                 const TimingMap& timings,
                                 const BeatTimeline& beatTimeLine,
                                 const BeatInfo& beatInfo,
@@ -345,7 +402,7 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
 
     // 执行ECS同步逻辑
     // 同步Note实体
-    sync_notes(core, notes, uuidManager, info, query_start_time,
+    sync_notes(core, notes, uuidManager, layer_manager, info, query_start_time,
                query_end_time);
 
     // 同步Timing 实体

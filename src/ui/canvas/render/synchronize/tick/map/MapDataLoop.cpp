@@ -28,8 +28,9 @@ void MapDataLoop::pre_tickEvent() {
 
     // 与源物件集合同步可见的物件和timing
     sync_system.updateEntities(ecore, map->note_set(), map->note_uuids(),
-                               map->timing_set(), map->beat_timeline(),
-                               map->beat_info(), mapinfo, converter);
+                               map_layermgr, map->timing_set(),
+                               map->beat_timeline(), map->beat_info(), mapinfo,
+                               converter);
     // qDebug() << "时间转换系统(at pretick)开始";
     // 计算有时间属性的逻辑y轴位置
     time_system.update(ecore, mapinfo, converter);

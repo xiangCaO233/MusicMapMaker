@@ -25,7 +25,7 @@ struct SelectionState {
     std::unordered_set<entt::entity> selected_entities;
 };
 
-// --- 子结构：拖拽状态 ---
+// 拖拽状态
 enum class DragMode {
     // 无拖动内容:生成选择框
     None,

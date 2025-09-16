@@ -27,4 +27,7 @@ struct DeleteMarkComponent {
     bool confirm{false};
 };
 
+// 脏标记组件
+struct DirtyMarkComponent {};
+
 #endif  // MMM_CORECOMPONENTS_HPP
