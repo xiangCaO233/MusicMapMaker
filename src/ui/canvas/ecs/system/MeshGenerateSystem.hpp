@@ -68,6 +68,8 @@ class MeshGenerateSystem {
             //        "FATAL: Invalid entity handle detected!");
             // 填充目标网格属性
             auto& entity_mesh = out_generated_meshes[e];
+
+            // 最终来源实体
             entity_mesh.source_entity = e;
 
             // 获取note原始详细信息
@@ -207,8 +209,9 @@ class MeshGenerateSystem {
         // 更新物件头部位为更精确的内部位置
         entity_mesh.mesh.back().part = NotePart::HOLD_HEAD;
         // 判断悬浮情况
-        auto hovered_entity =
-            hovered_info.has_value() && hovered_info.value().source_entity == e;
+        auto hovered_entity = hovered_info.has_value() &&
+                              (hovered_info.value().source_entity == e ||
+                               hovered_info.value().child_entity == e);
 
         // 是否悬浮在面身部分
         auto hovered_hold_body =
@@ -304,9 +307,9 @@ class MeshGenerateSystem {
                               const uint32_t& time, const float& obj_scale,
                               const float& x, const float& y,
                               float& body_height) const {
-        // 判断悬浮情况
+        // 判断悬浮情况(仅可能为子实体)
         auto hovered_entity =
-            hovered_info.has_value() && hovered_info.value().source_entity == e;
+            hovered_info.has_value() && hovered_info.value().child_entity == e;
         // 绘制一个面尾网格(同样画在面条结束的位置)
         // 是否悬浮在面尾节点部分
         auto hovered_hold_node =
@@ -355,6 +358,7 @@ class MeshGenerateSystem {
         auto head_pos = glm::vec2(x - head_size.x / 2.f, y - head_size.y / 2.f);
 
         if (!registry->all_of<ChildOfComponent>(e)) {
+            entity_mesh.child_entity = e;
             generateHeadMesh(e, entity_mesh, x, y, head_pos, head_size,
                              head_texinfo);
         }

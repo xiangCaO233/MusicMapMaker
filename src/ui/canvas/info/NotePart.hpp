@@ -48,6 +48,7 @@ struct MeshPartInfo {
 
     // 身份信息
     entt::entity source_entity{};
+    entt::entity child_entity{entt::entity(-1)};
     NotePart part{NotePart::NONE};
 
     // 筛选信息

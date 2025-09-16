@@ -39,6 +39,7 @@ entt::entity updateNoteEntity(entt::registry& registry,
             auto slide_note = static_cast<const Slide*>(note);
             auto& [delta_track] = registry.get<FlickComponent>(note_entity);
             delta_track = slide_note->delta_track();
+            break;
         }
         case NoteType::COMPOSITE: {
             auto composed_note = static_cast<const Composite*>(note);
@@ -48,6 +49,7 @@ entt::entity updateNoteEntity(entt::registry& registry,
                 updateNoteEntity(registry, children[i],
                                  composed_note->children()[i].get());
             }
+            break;
         }
         default:
             break;
@@ -74,6 +76,7 @@ entt::entity createNoteEntity(entt::registry& registry, const Note* note,
             auto slide_note = static_cast<const Slide*>(note);
             registry.emplace<FlickComponent>(note_entity,
                                              slide_note->delta_track());
+            break;
         }
         case NoteType::COMPOSITE: {
             auto composed_note = static_cast<const Composite*>(note);
@@ -89,6 +92,7 @@ entt::entity createNoteEntity(entt::registry& registry, const Note* note,
             }
             // 父实体附加子实体列表组件
             registry.emplace<CompositeRootComponent>(note_entity, children);
+            break;
         }
         default:
             break;
