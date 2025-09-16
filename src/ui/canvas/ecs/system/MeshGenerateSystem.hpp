@@ -270,10 +270,14 @@ class MeshGenerateSystem {
                                      body_height);
                 break;
             }
-            default:
+            case HoldTailType::NODE: {
+                generateHoldNodeMesh(e, entity_mesh, time, obj_scale, x, y,
+                                     body_height);
                 break;
+            }
         }
     }
+
     void generateHoldTailMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
                               const uint32_t& time, const float& obj_scale,
                               const float& x, const float& y,
@@ -295,6 +299,34 @@ class MeshGenerateSystem {
             end_pos, end_size, hold_end_texinfo, NotePart::HOLD_END,
             hovered_hold_tail ? PartState::GLOW : PartState::NONE, 1);
     }
+
+    void generateHoldNodeMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
+                              const uint32_t& time, const float& obj_scale,
+                              const float& x, const float& y,
+                              float& body_height) const {
+        // 判断悬浮情况
+        auto hovered_entity =
+            hovered_info.has_value() && hovered_info.value().source_entity == e;
+        // 绘制一个面尾网格(同样画在面条结束的位置)
+        // 是否悬浮在面尾节点部分
+        auto hovered_hold_node =
+            hovered_entity && hovered_info.value().part == NotePart::HOLD_NODE;
+        // 面尾网格(在层级1)
+        // 获取面尾纹理
+        TextureInfo node_texinfo = tex(TexType::NODE);
+        auto end_size = node_texinfo.origin_size * obj_scale;
+        auto end_pos =
+            glm::vec2(x - end_size.x / 2.f, y - body_height - end_size.y / 2.f);
+        entity_mesh.mesh.emplace_back(
+            end_pos, end_size, node_texinfo, NotePart::HOLD_NODE,
+            hovered_hold_node ? PartState::GLOW : PartState::NONE, 1);
+    }
+
+    void generateSlideMesh(
+        const entt::entity& e, GeneratedMesh& entity_mesh, const uint32_t& time,
+        const float& obj_scale, const float& x, const float& y,
+        SlideTailType tailType =
+            MeshGenerateSystem::SlideTailType::GENERAL) const {}
 
     void generateMesh(int32_t track_index, const entt::entity& e,
                       GeneratedMesh& entity_mesh, const uint32_t& time,
@@ -321,18 +353,36 @@ class MeshGenerateSystem {
 
         // 共同的头网格(head在层级2(最上层))
         auto head_pos = glm::vec2(x - head_size.x / 2.f, y - head_size.y / 2.f);
-        generateHeadMesh(e, entity_mesh, x, y, head_pos, head_size,
-                         head_texinfo);
+
+        if (!registry->all_of<ChildOfComponent>(e)) {
+            generateHeadMesh(e, entity_mesh, x, y, head_pos, head_size,
+                             head_texinfo);
+        }
 
         if (registry->all_of<HoldComponent>(e)) {
-            // 检查是否拖拽面身-转换为组合物件
-            // 在下一帧加入
-            generateHoldMesh(e, entity_mesh, time, obj_scale, x, y);
+            // 检查是否为子物件-区分尾部绘制的是节点还是面尾
+            generateHoldMesh(e, entity_mesh, time, obj_scale, x, y,
+                             registry->all_of<ChildOfComponent>(e)
+                                 ? MeshGenerateSystem::HoldTailType::NODE
+                                 : MeshGenerateSystem::HoldTailType::GENERAL);
         } else if (registry->all_of<FlickComponent>(e)) {
-            // 获取flick身纹理
-            // 绘制一个滑尾网格
+            // 检查是否为子物件-区分尾部绘制的是节点还是滑尾
+            generateSlideMesh(e, entity_mesh, time, obj_scale, x, y,
+                              registry->all_of<ChildOfComponent>(e)
+                                  ? MeshGenerateSystem::SlideTailType::NODE
+                                  : MeshGenerateSystem::SlideTailType::GENERAL);
         } else if (registry->all_of<CompositeRootComponent>(e)) {
+            auto& [children] = registry->get<CompositeRootComponent>(e);
             // 组合键-二级遍历
+            for (const auto& child_e : children) {
+                // 获取note原始详细信息
+                auto [child_time] = registry->get<TimeComponent>(child_e);
+                auto [child_track_index, handle] =
+                    registry->get<NoteComponent>(child_e);
+                auto [child_y] = registry->get<TransformComponent>(child_e);
+                generateMesh(track_index, child_e, entity_mesh, child_time,
+                             child_y);
+            }
         }
     }
 };

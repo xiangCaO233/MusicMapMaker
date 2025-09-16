@@ -76,7 +76,9 @@ set(MMM_SOURCES
     src/mmm/map/io/osu/OsuMapRead.cpp
     src/mmm/map/io/osu/OsuMapWrite.cpp
     src/mmm/map/io/mmm/MMapRead.cpp
-    src/mmm/map/io/mmm/MMapWrite.cpp)
+    src/mmm/map/io/mmm/MMapWrite.cpp
+    src/mmm/map/io/rm/RMMapRead.cpp
+    src/mmm/map/io/rm/RMMapWrite.cpp)
 
 # 设置翻译文件
 set(TS_FILES translations/MusicMapMaker_zh_CN.ts

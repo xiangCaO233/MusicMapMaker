@@ -12,9 +12,11 @@ enum class NotePart {
     HOLD_HEAD,
     HOLD_BODY,
     HOLD_END,
+    HOLD_NODE,
     SLIDE_HEAD,
     SLIDE_BODY,
     SLIDE_END,
+    SLIDE_NODE,
 };
 
 // --- 用于打印 NotePart 枚举的辅助函数 ---
