@@ -100,6 +100,7 @@ class Note {
 
     friend class Composite;
     friend class OsuNote;
+    friend class MMap;
     friend class Hold;
     friend class MMapEditor;
 };

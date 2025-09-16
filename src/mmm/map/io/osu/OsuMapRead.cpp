@@ -285,7 +285,7 @@ void MMap::readOsu() {
         // author = Creator;
         metadata->Version =
             osureader.get_value("Metadata", "Version", std::string("[mmm]"));
-        // version = Version;
+        basemeta.version = metadata->Version;
         // XWARN("载入osu谱面Version:" + Version);
         metadata->Source =
             osureader.get_value("Metadata", "Source", std::string(""));

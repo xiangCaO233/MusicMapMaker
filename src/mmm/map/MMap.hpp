@@ -80,10 +80,10 @@ class MMap {
 
     // 谱面io操作
     void readOsu();
-    void writeOsu() {};
+    void writeOsu();
 
-    void readImd() {};
-    void writeImd() {};
+    void readImd();
+    void writeImd();
 
     void readMc() {};
     void writeMc() {};

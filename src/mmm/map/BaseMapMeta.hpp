@@ -23,6 +23,9 @@ struct BaseMapMeta {
     // 主背景文件路径
     std::filesystem::path main_cover_path;
 
+    // 谱面版本名
+    std::string version;
+
     // 谱面参考bpm
     double preference_bpm{100.};
     // 谱面轨道数
