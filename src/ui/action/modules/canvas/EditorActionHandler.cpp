@@ -9,6 +9,7 @@ EditorActionHandler::~EditorActionHandler() = default;
 
 void EditorActionHandler::onPause_Resume() {
     //
+    emit pause_or_resume_canvas();
     qDebug() << "触发暂停/恢复";
 }
 void EditorActionHandler::onCancel() {

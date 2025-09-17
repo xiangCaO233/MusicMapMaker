@@ -145,6 +145,7 @@ void TrackManager::set_playpos_for(std::string_view audio_name,
                                    std::chrono::nanoseconds time) {
     auto controller =
         get_controller(QString::fromStdString(std::string(audio_name)));
+
     if (controller) {
         controller->set_playpos(time);
     }

@@ -6,10 +6,17 @@
 class EditorActionHandler : public QObject {
     Q_OBJECT
    public:
+    inline static EditorActionHandler* instance() {
+        static EditorActionHandler instance;
+        return &instance;
+    }
     // 构造EditorActionHandler
     explicit EditorActionHandler(QObject* parent = nullptr);
     // 析构EditorActionHandler
     ~EditorActionHandler() override;
+
+   signals:
+    void pause_or_resume_canvas();
 
    public slots:
     void onPause_Resume();

@@ -7,6 +7,10 @@ class FileActionHandler : public QObject {
     Q_OBJECT
 
    public:
+    inline static FileActionHandler* instance() {
+        static FileActionHandler instance;
+        return &instance;
+    }
     // 构造FileActionHandler
     explicit FileActionHandler(QObject* parent = nullptr);
 

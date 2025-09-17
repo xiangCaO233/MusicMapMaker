@@ -67,19 +67,7 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
     // qDebug() << "鼠标按下事件结束-位于qtui线程";
 }
 
-void NoteTool::mouseMoveEvent(QMouseEvent* e) {
-    BaseTool::mouseMoveEvent(e);
-    // auto modifiers = QApplication::keyboardModifiers();
-    // auto a = modifiers.testFlag(Qt::ShiftModifier);
-    // auto mousepos = e->pos();
-    // auto candidate = tool_system()->query({mousepos.x(), mousepos.y()});
-    // if (candidate.has_value()) {
-    //     auto note =
-    //         canvas()->get_map()->note_set().get_note(candidate.value()->handle);
-    //     qDebug() << "hover at note:";
-    //     qDebug() << note->toString();
-    // }
-}
+void NoteTool::mouseMoveEvent(QMouseEvent* e) { BaseTool::mouseMoveEvent(e); }
 
 void NoteTool::mouseReleaseEvent(QMouseEvent* e) {
     // qDebug() << "鼠标释放事件开始-位于qtui线程";

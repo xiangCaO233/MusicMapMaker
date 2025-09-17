@@ -15,7 +15,7 @@ void MainWindow::initActions() {
     auto am = ActionManager::instance();
     // 文件菜单
     FileActions::createActions();
-    auto fileHandler = new FileActionHandler(this);
+    auto fileHandler = FileActionHandler::instance();
     am->connectCommand("project.new", fileHandler, SLOT(onNewProject()));
     am->connectCommand("file.new", fileHandler, SLOT(onNewFile()));
     am->connectCommand("file.open", fileHandler, SLOT(onOpen()));
@@ -34,7 +34,7 @@ void MainWindow::initActions() {
 
     // 编辑菜单
     EditorActions::createActions();
-    auto editHandler = new EditorActionHandler(this);
+    auto editHandler = EditorActionHandler::instance();
     am->connectCommand("canvas.pause_or_resume", editHandler,
                        SLOT(onPause_Resume()));
     am->connectCommand("canvas.cancel", editHandler, SLOT(onCancel()));

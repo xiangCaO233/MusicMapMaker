@@ -73,6 +73,8 @@ class AudioController : public HideableToolWindow {
 
     void set_playpos(std::chrono::nanoseconds time_pos) {
         source_node->set_playpos(time_pos);
+        set_uitime_pos(time_pos);
+        set_uiframe_pos(source_node->get_playpos());
     }
 
     const QPushButton *pause_button() const;

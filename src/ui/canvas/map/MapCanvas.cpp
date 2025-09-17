@@ -2,6 +2,7 @@
 #include <qalgorithms.h>
 
 #include <GLCanvas.hpp>
+#include <action/modules/canvas/EditorActionHandler.hpp>
 #include <canvas/map/MapCanvas.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <layer/MapLayerManager.hpp>
@@ -17,6 +18,22 @@ MapCanvas::MapCanvas() : GLCanvas() {
     initSharedInfo<MapCanvasInfo>();
     // 初始化播放回调
     maintrack_callback = std::make_shared<CanvasAudioPlayCallback>(this);
+
+    auto thiscp = this;
+    // 连接信号
+    connect(EditorActionHandler::instance(),
+            &EditorActionHandler::pause_or_resume_canvas, [thiscp]() {
+                auto maintrack = thiscp->map->base_metadata().main_audio_path;
+                auto controller = thiscp->audio_callback->getController(
+                    maintrack.generic_string());
+                auto sourcenode = controller->node();
+                auto mapinfo = thiscp->info<MapCanvasInfo>();
+                if (auto node = sourcenode.lock()) {
+                    // 切换播放状态
+                    node->isplaying() ? node->pause() : node->play();
+                    mapinfo->realTimeInfo.is_playing = node->isplaying();
+                }
+            });
 }
 
 // 析构MapCanvas
