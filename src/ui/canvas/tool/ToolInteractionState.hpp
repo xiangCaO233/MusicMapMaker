@@ -25,6 +25,11 @@ struct SelectionState {
     std::unordered_set<entt::entity> selected_entities;
 };
 
+// --- 子结构：删除标记状态 ---
+struct DeleteMarkStates {
+    std::unordered_set<entt::entity> marked_entities;
+};
+
 // 拖拽状态
 enum class DragMode {
     // 无拖动内容:生成选择框
@@ -80,6 +85,13 @@ class ToolInteractionState {
 
     DragState getDragState() const;
 
+    // 删除相关
+    void startDeleteCheck(const std::unordered_set<entt::entity>& selection);
+
+    void endDeleteCheck();
+
+    DeleteMarkStates getDeleteMarkStates() const;
+
     // 选择相关 (由 pretick 写入, 所有线程读取)
     void setSelection(const std::unordered_set<entt::entity>& entities);
     std::unordered_set<entt::entity> getSelection() const;
@@ -99,6 +111,7 @@ class ToolInteractionState {
     std::optional<MeshPartInfo> m_hovered;
     DragState m_dragState;
     SelectionState m_selectionState;
+    DeleteMarkStates m_deleteMarkState;
 };
 
 #endif  // MMM_TOOLINTERACTIONSTATE_HPP

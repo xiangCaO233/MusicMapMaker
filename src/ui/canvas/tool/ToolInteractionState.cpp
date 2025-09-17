@@ -62,6 +62,20 @@ void ToolInteractionState::setDragValidRes(const entt::entity& e,
 
 DragState ToolInteractionState::getDragState() const { return m_dragState; }
 
+// 删除相关
+void ToolInteractionState::startDeleteCheck(
+    const std::unordered_set<entt::entity>& selection) {
+    m_deleteMarkState.marked_entities = selection;
+}
+
+void ToolInteractionState::endDeleteCheck() {
+    m_deleteMarkState.marked_entities.clear();
+}
+
+DeleteMarkStates ToolInteractionState::getDeleteMarkStates() const {
+    return m_deleteMarkState;
+}
+
 // 选择相关 (由 pretick 写入, 所有线程读取)
 void ToolInteractionState::setSelection(
     const std::unordered_set<entt::entity>& entities) {

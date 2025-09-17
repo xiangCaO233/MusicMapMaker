@@ -32,6 +32,8 @@ class ToolSystem {
             LooseQuadtree<MeshPartInfo>({{0, 0},
                                          {info->baseInfo.canvasSize.width(),
                                           info->baseInfo.canvasSize.height()}});
+        // 清空索引
+        mesh_map.clear();
 
         // 遍历传入的本帧所有网格
         for (const auto& [entity, mesh] : note_meshs) {
@@ -42,6 +44,10 @@ class ToolSystem {
                 MeshPartInfo new_part_ptr{
                     quad.pos,  quad.size,   entity, mesh.child_entity,
                     quad.part, quad.zIndex, uuid};
+                mesh_map.insert({mesh.child_entity != entt::null
+                                     ? mesh.child_entity
+                                     : mesh.source_entity,
+                                 new_part_ptr});
 
                 // 将这个指针插入到全新的四叉树中
                 mesh_info_tree.insert(new_part_ptr);
@@ -50,6 +56,13 @@ class ToolSystem {
     }
 
     LooseQuadtree<MeshPartInfo>& get_mesh_info_tree() { return mesh_info_tree; }
+    MeshPartInfo find_MeshPartInfo(const entt::entity& e) {
+        auto partit = mesh_map.find(e);
+        if (partit != mesh_map.end()) {
+            return partit->second;
+        }
+        return {};
+    }
     const entt::registry& get_registry() { return registry; }
 
     /**
@@ -87,6 +100,8 @@ class ToolSystem {
     mutable LooseQuadtree<MeshPartInfo> mesh_info_tree{{}};
     // 读写锁
     mutable std::shared_mutex mtx;
+    // 用于删除的索引
+    std::unordered_map<entt::entity, MeshPartInfo> mesh_map;
     // 对 registry 的引用
     entt::registry& registry;
 };

@@ -31,7 +31,7 @@ struct GeneratedMesh {
     // 标记这个网格属于哪个实体(若为子物件则此为父实体)
     entt::entity source_entity;
     // (若为子物件则此为子实体)
-    entt::entity child_entity;
+    entt::entity child_entity{entt::null};
     struct Quad {
         glm::vec2 pos;
         glm::vec2 size;

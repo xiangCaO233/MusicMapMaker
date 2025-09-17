@@ -63,6 +63,8 @@ struct MeshPartInfo {
     // 物件uuid
     NoteUUID uuid{InvalidNoteUUID};
 
+    bool operator==(const MeshPartInfo& other) const = default;
+
     bool contains(const glm::vec2& p) const {
         // 计算矩形的右下角坐标
         const glm::vec2 bottom_right = pos + size;

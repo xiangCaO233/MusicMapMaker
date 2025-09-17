@@ -1,11 +1,10 @@
 #ifndef MMM_TOOLCOMMAND_HPP
 #define MMM_TOOLCOMMAND_HPP
 
-#include <tool/command/HoldCommand.hpp>
-#include <tool/command/SlideCommand.hpp>
+#include <tool/command/DragCommand.hpp>
 #include <variant>
 
-struct StartDragNormalNoteCommand {
+struct StartDragCommand {
     DragStartInfo common_info;
     const MeshPartInfo hit_info;
 };
@@ -18,6 +17,7 @@ struct StartDragSelectionCommand {
 // 标记删除指令
 struct MarkDeleteCommand {
     const MeshPartInfo hit_info;
+    std::unordered_set<entt::entity> selection;
 };
 
 // 标记删除指令
@@ -32,11 +32,7 @@ struct ConfirmDeleteCommand {
 
 // 用 std::variant 将所有命令类型聚合到一个类型中
 using ToolCommand =
-    std::variant<StartDragNormalNoteCommand, StartDragHoldHeadCommand,
-                 StartDragHoldBodyCommand, StartDragHoldTailCommand,
-                 StartDragHoldNodeCommand, StartDragSlideHeadCommand,
-                 StartDragSlideBodyCommand, StartDragSlideTailCommand,
-                 StartDragSlideNodeCommand, StartDragSelectionCommand,
-                 EndDragCommand>;
+    std::variant<StartDragCommand, StartDragSelectionCommand, EndDragCommand,
+                 MarkDeleteCommand, ConfirmDeleteCommand>;
 
 #endif  // MMM_TOOLCOMMAND_HPP

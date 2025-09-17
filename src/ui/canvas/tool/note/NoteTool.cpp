@@ -12,23 +12,19 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
     //
     BaseTool::mousePressEvent(e);
     auto pos = e->pos();
-    auto modifiers = QApplication::keyboardModifiers();
+    auto modifiers = e->modifiers();
+    auto buttons = e->buttons();
     auto hoveredinfo = tool_interaction_state()->getHover();
     auto& notes = canvas()->get_map()->note_set();
 
     if (hoveredinfo.has_value()) {
+        // 当前有悬浮物件
         auto selections = tool_interaction_state()->getSelection();
         auto info = hoveredinfo.value();
 
-        // qDebug() << "当前帧空间索引:";
-        // tool_system()->get_mesh_info_tree().print_tree();
-        // qDebug() << "press Note:" << notes.get_note(info.handle)->toString();
-        // qDebug() << "pressed note entity:"
-        //          << static_cast<uint32_t>(info.source_entity);
-        // qDebug() << "pressed entity valid?:"
-        //          << tool_system()->get_registry().valid(info.source_entity);
-
         if (selections.size() > 1) {
+            // 多项操作
+            // 若当前悬浮物件不在选中集合内/添加到选中集合
             auto entity = hoveredinfo.value().source_entity;
             // 是在选中了大量物件下的情况拖动了某一个物件
             if (!selections.contains(entity)) {
@@ -36,89 +32,38 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
                 // 添加拖动物件
                 selections.insert(entity);
             }
+            if (buttons.testFlag(Qt::LeftButton)) {
+                // 发送拖拽选中内容命令
+                tool_command_queue()->push(StartDragSelectionCommand{
+                    glm::vec2{pos.x(), pos.y()}, modifiers, selections});
+            } else if (buttons.testFlag(Qt::RightButton)) {
+                // 右键按下-发送即将删除
+                tool_command_queue()->push(
+                    MarkDeleteCommand{hoveredinfo.value(), selections});
+            }
 
-            // 发送拖拽选中内容命令
-            tool_command_queue()->push(StartDragSelectionCommand{
-                glm::vec2{pos.x(), pos.y()}, modifiers, selections});
         } else {
-            // 是在某个物件的某个部位开始按下的,根据拖拽部位发送不同拖拽开始命令
-            switch (hoveredinfo.value().part) {
-                case NotePart::HEAD: {
-                    // qDebug() << "发送开始拖拽普通物件事件";
-                    tool_command_queue()->push(StartDragNormalNoteCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
+            if (buttons.testFlag(Qt::LeftButton)) {
+                // 单一操作
+                if (modifiers.testFlag(Qt::ShiftModifier)) {
+                    // 按住shift拖动
+                } else {
+                    // 直接拖动
+                    // 是在某个物件的某个部位开始按下的,根据拖拽部位发送不同拖拽开始命令
+                    tool_command_queue()->push(
+                        StartDragCommand{glm::vec2{pos.x(), pos.y()}, modifiers,
+                                         hoveredinfo.value()});
                 }
-                case NotePart::HOLD_HEAD: {
-                    // qDebug() << "发送开始拖拽长条物件头事件";
-                    tool_command_queue()->push(StartDragHoldHeadCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-                case NotePart::HOLD_BODY: {
-                    // qDebug() << "发送开始拖拽长条物件身事件";
-                    tool_command_queue()->push(StartDragHoldBodyCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-                case NotePart::HOLD_END: {
-                    // qDebug() << "发送开始拖拽长条物件尾事件";
-                    tool_command_queue()->push(StartDragHoldTailCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-                case NotePart::HOLD_NODE: {
-                    // qDebug() << "发送开始拖拽长条物件节点事件";
-                    tool_command_queue()->push(StartDragHoldNodeCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-                case NotePart::SLIDE_HEAD: {
-                    // qDebug() << "发送开始拖拽滑键物件头事件";
-                    tool_command_queue()->push(StartDragSlideHeadCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-                case NotePart::SLIDE_BODY: {
-                    // qDebug() << "发送开始拖拽滑键物件身事件";
-                    tool_command_queue()->push(StartDragSlideBodyCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-                case NotePart::SLIDE_END: {
-                    // qDebug() << "发送开始拖拽滑键物件尾事件";
-                    tool_command_queue()->push(StartDragSlideTailCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-                case NotePart::SLIDE_NODE: {
-                    // qDebug() << "发送开始拖拽长条物件节点事件";
-                    tool_command_queue()->push(StartDragSlideNodeCommand{
-                        glm::vec2{pos.x(), pos.y()}, modifiers,
-                        hoveredinfo.value()});
-                    break;
-                }
-
-                case NotePart::NONE: {
-                    // 放置物件/shift防止长条
-                    // qDebug() << "未发送任何拖拽事件";
-                    // tool_command_queue()->push(
-                    //     StartDragHoldTailCommand{glm::vec2{pos.x(), pos.y()},
-                    //                              modifiers,
-                    //                              *hoveredinfo.value()});
-                    break;
-                }
+            } else if (buttons.testFlag(Qt::RightButton)) {
+                // 右键按下-发送即将删除单个
+                tool_command_queue()->push(MarkDeleteCommand{
+                    hoveredinfo.value(), {hoveredinfo.value().source_entity}});
             }
         }
+    } else {
+        // 清除选中物件
     }
+
     // qDebug() << "鼠标按下事件结束-位于qtui线程";
 }
 
@@ -140,8 +85,20 @@ void NoteTool::mouseReleaseEvent(QMouseEvent* e) {
     // qDebug() << "鼠标释放事件开始-位于qtui线程";
 
     BaseTool::mouseReleaseEvent(e);
+    auto button = e->button();
     auto pos = e->pos();
-    tool_command_queue()->push(EndDragCommand{{pos.x(), pos.y()}});
+    if (button == Qt::LeftButton) {
+        // 左键松开-发送结束拖拽命令
+        tool_command_queue()->push(EndDragCommand{{pos.x(), pos.y()}});
+    } else if (button == Qt::RightButton) {
+        auto hover_state = tool_interaction_state()->getHover();
+        // 右键松开-发送确认删除命令
+        tool_command_queue()->push(ConfirmDeleteCommand{
+            hover_state.has_value() &&
+            tool_interaction_state()
+                ->getDeleteMarkStates()
+                .marked_entities.contains(hover_state->source_entity)});
+    }
     // qDebug() << "鼠标释放事件结束-位于qtui线程(已发送结束拖拽指令)";
 }
 

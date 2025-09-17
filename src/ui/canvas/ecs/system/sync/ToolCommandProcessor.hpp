@@ -6,6 +6,7 @@
 #include <mmm/map/MMapEditor.hpp>
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
+#include <vector>
 
 #include "info/NotePart.hpp"
 
@@ -27,28 +28,40 @@ class ToolCommandProcessor {
     ~ToolCommandProcessor() = default;
 
     void process(const ToolCommand& command) {
-        std ::visit(overloaded{
-            // 所有开始拖拽命令
-            // 匹配所有包含 hit_info 的拖拽命令
-            [&](const auto& arg)
-                requires requires { arg.hit_info; }
-            { startDragEntities({arg.hit_info.source_entity}, arg.hit_info); },
-            // 拖拽单物件头
-            // [&](const StartDragNormalNoteCommand& arg) {
-            //     startDragEntities({arg.hit_info.source_entity},
-            //     arg.hit_info);
-            // },
+        std::visit(overloaded{
+                       // 所有开始拖拽命令
+                       // 匹配所有包含 hit_info 的拖拽命令
+                       [&](const StartDragCommand& arg) {
+                           startDragEntities({arg.hit_info.source_entity},
+                                             arg.hit_info);
+                       },
+                       // 拖拽单物件头
+                       // [&](const StartDragNormalNoteCommand& arg) {
+                       //     startDragEntities({arg.hit_info.source_entity},
+                       //     arg.hit_info);
+                       // },
 
-            // 拖拽选择集
-            [&](const StartDragSelectionCommand& arg) {
-                startDragEntities(arg.selection);
-            },
+                       // 拖拽选择集
+                       [&](const StartDragSelectionCommand& arg) {
+                           startDragEntities(arg.selection);
+                       },
 
-            // 结束拖拽命令
-            [&](const EndDragCommand& arg) { endDrag(); },
+                       // 结束拖拽命令
+                       [&](const EndDragCommand& arg) { endDrag(); },
 
-            },
-            command);
+                       // 标记删除命令
+                       [&](const MarkDeleteCommand& arg) {
+                           //
+                           markDeleteEntities(arg.selection, arg.hit_info);
+                       },
+                       // 确认删除命令
+                       [&](const ConfirmDeleteCommand& arg) {
+                           //
+                           confirmDeleteEntities(arg.confirm);
+                       },
+
+                   },
+                   command);
     }
 
    private:
@@ -57,6 +70,49 @@ class ToolCommandProcessor {
     ToolInteractionState& interactionState;
     MMapEditor& mapEditor;
     MMap* map;
+
+    void markDeleteEntities(const std::unordered_set<entt::entity>& selections,
+                            MeshPartInfo part = {}) {
+        // 更新 TIS 的删除标记集
+        interactionState.startDeleteCheck(selections);
+        // 为所有被拖拽的实体附加删除标记组件
+        for (auto& entity : selections) {
+            registry.emplace_or_replace<DeleteMarkComponent>(entity);
+        }
+    }
+
+    void confirmDeleteEntities(bool confirm) {
+        // 删除标记组件
+        std::vector<entt::entity> entities;
+        auto view = registry.view<DeleteMarkComponent>();
+        for (const auto& e : view) {
+            entities.push_back(e);
+        }
+        registry.clear<DeleteMarkComponent>();
+
+        // 确定删除
+        if (confirm) {
+            // 收集uuid/删除实体
+            std::unordered_set<NoteUUID> uuids_toremove;
+            for (const auto& e : entities) {
+                auto& [track, uuid] = registry.get<NoteComponent>(e);
+                uuids_toremove.insert(uuid);
+                if (registry.valid(e)) {
+                    registry.destroy(e);
+                }
+                // 获取空间网格值
+                const auto part = system.find_MeshPartInfo(e);
+                // 删除空间索引
+                system.get_mesh_info_tree().remove(part);
+            }
+            // 清理交互的hover状态
+            interactionState.setHover(std::nullopt);
+            // 删除物件
+            mapEditor.deleteNotes(uuids_toremove);
+        }
+
+        interactionState.endDeleteCheck();
+    }
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,
                            MeshPartInfo part = {}) {
@@ -70,7 +126,7 @@ class ToolCommandProcessor {
             part,
             // 选中列表
             selections);
-        qDebug() << "startDrag:" << to_string(part.part);
+        // qDebug() << "startDrag:" << to_string(part.part);
 
         // 为所有被拖拽的实体附加虚影组件
         for (auto& entity : selections) {
