@@ -27,6 +27,27 @@ void updateHover(ToolSystem* toolSystem,
         // 当前鼠标下有物体
         const auto hit_info = current_hit.value();
         auto note = notes.get_note(uuidManager.get_handle(hit_info.uuid));
+        if (!note) {
+            // 组合键子键
+            auto& [parent, child_index] =
+                toolSystem->get_registry().get<ChildOfComponent>(
+                    hit_info.child_entity);
+            // 父实体失效
+            if (!toolSystem->get_registry().valid(parent)) return;
+            auto& [parent_track, parent_uuid] =
+                toolSystem->get_registry().get<NoteComponent>(parent);
+            auto parent_note =
+                notes.get_note(uuidManager.get_handle(parent_uuid));
+            if (!parent_note) {
+                // 父实体失效
+                return;
+            } else {
+                // 获取到此子物件
+                note = static_cast<const Composite*>(parent_note)
+                           ->children()[child_index]
+                           .get();
+            }
+        }
 
         // 检查是否和旧的悬浮状态是同一个物体/部位
         if (!old_hover.has_value() ||
@@ -38,15 +59,14 @@ void updateHover(ToolSystem* toolSystem,
 
             // toolSystem->get_mesh_info_tree().print_tree();
 
-            // qDebug() << "更新hover到uuid:" << hit_info.uuid;
-            // qDebug() << "检测到悬浮于最终来源实体:"
-            //          << static_cast<uint32_t>(hit_info.source_entity);
-            // if (hit_info.child_entity != entt::entity(-1)) {
-            //     qDebug() << "检测到悬浮于子实体:"
-            //              << static_cast<uint32_t>(hit_info.child_entity);
-            // }
-            // // qDebug() << "更新悬浮物件为" << note->toString();
-            // qDebug() << "悬浮的部位:" << to_string(hit_info.part);
+            qDebug() << "更新hover到uuid:" << hit_info.uuid;
+            qDebug() << "检测到悬浮于最终来源实体:"
+                     << static_cast<uint32_t>(hit_info.source_entity);
+            qDebug() << "检测到悬浮于子实体:"
+                     << static_cast<uint32_t>(hit_info.child_entity);
+
+            qDebug() << "更新悬浮物件为" << note->toString();
+            qDebug() << "悬浮的部位:" << to_string(hit_info.part);
         }
 
         // qDebug() << "当前hover到id:" << hit_info.handle.index;

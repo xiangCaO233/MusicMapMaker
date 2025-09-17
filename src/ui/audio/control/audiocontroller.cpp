@@ -53,6 +53,7 @@ AudioController::AudioController(QWidget* parent)
 
     connect(play_callback, &PlayPosCallBack::update_timepos, this,
             &AudioController::updateDisplayPosition);
+
     setStyleSheet(MainWindow::global_style_sheet);
 }
 

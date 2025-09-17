@@ -16,3 +16,5 @@ void BaseTool::mouseReleaseEvent(QMouseEvent* event) {}
 void BaseTool::keyPressEvent(QKeyEvent* e) {}
 
 void BaseTool::keyReleaseEvent(QKeyEvent* e) {}
+
+void BaseTool::wheelEvent(QWheelEvent* e) {}

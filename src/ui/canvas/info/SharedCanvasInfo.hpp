@@ -44,6 +44,12 @@ struct TimeInfo {
     // --- 音频线程提供的原始同步数据 ---
     // 音频播放器报告的、未经偏移修正的原始播放时间
     std::atomic<double> raw_audio_time_ms{0.0};
+
+    void operator+=(double delta_time) {
+        logic_canvas_time += delta_time;
+        presentation_canvas_time += delta_time;
+        raw_audio_time_ms += delta_time;
+    }
 };
 
 struct OffsetInfo {

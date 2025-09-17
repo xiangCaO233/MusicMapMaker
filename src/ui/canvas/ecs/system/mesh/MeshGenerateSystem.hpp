@@ -226,8 +226,6 @@ class MeshGenerateSystem {
         if (!registry->all_of<ChildOfComponent>(e)) {
             generateHeadMesh(e, entity_mesh, x, y, head_pos, head_size,
                              head_texinfo);
-        } else {
-            entity_mesh.child_entity = e;
         }
 
         if (registry->all_of<HoldComponent>(e)) {
@@ -278,13 +276,15 @@ class MeshGenerateSystem {
                 auto [child_track_index, handle] =
                     registry->get<NoteComponent>(child_e);
                 auto [child_y] = registry->get<TransformComponent>(child_e);
-                // qDebug() << "生成子物件实体网格:"
+                // qDebug() << "父物件实体:" << static_cast<uint32_t>(e)
+                //          << "递归生成子物件实体网格:"
                 //          << static_cast<uint32_t>(child_e);
                 // 填充目标网格属性
                 auto& child_mesh = (*generated_meshes)[child_e];
 
                 // 最终来源实体
                 child_mesh.source_entity = e;
+                child_mesh.child_entity = child_e;
                 generateMesh(child_track_index, child_e, child_mesh, child_time,
                              child_y,
                              // 是否为末尾

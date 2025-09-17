@@ -42,3 +42,46 @@ void MapCanvas::mouseReleaseEvent(QMouseEvent *e) {
     GLCanvas::mouseReleaseEvent(e);
     current_tool->mouseReleaseEvent(e);
 }
+
+void MapCanvas::wheelEvent(QWheelEvent *e) {
+    GLCanvas::wheelEvent(e);
+    auto mapinfo = info<MapCanvasInfo>();
+    // 先响应map滚动
+    auto modifiers = e->modifiers();
+    auto d = e->angleDelta();
+    auto dy = d.y();
+    if (map) {
+        if (modifiers.testFlag(Qt::ShiftModifier)) {
+            if (dy > 0) {
+                mapinfo->realTimeInfo.current_time_info += 200.;
+            }
+            if (dy < 0) {
+                mapinfo->realTimeInfo.current_time_info += -200.;
+            }
+            audio_callback->set_playpos_for(
+                map->base_metadata().main_audio_path.generic_string(),
+                std::chrono::milliseconds(
+                    mapinfo->realTimeInfo.current_time_info.raw_audio_time_ms));
+        } else if (modifiers.testFlag(Qt::ControlModifier)) {
+            // 修改缩放
+            if (dy > 0) {
+                mapinfo->baseInfo.timeline_zoom += 0.05;
+            }
+            if (dy < 0) {
+                mapinfo->baseInfo.timeline_zoom -= 0.05;
+            }
+        } else {
+            if (dy > 0) {
+                mapinfo->realTimeInfo.current_time_info += 50.;
+            }
+            if (dy < 0) {
+                mapinfo->realTimeInfo.current_time_info += -50.;
+            }
+            audio_callback->set_playpos_for(
+                map->base_metadata().main_audio_path.generic_string(),
+                std::chrono::milliseconds(
+                    mapinfo->realTimeInfo.current_time_info.raw_audio_time_ms));
+        }
+    }
+    current_tool->wheelEvent(e);
+}

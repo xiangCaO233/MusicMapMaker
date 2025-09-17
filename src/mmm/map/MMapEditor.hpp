@@ -22,8 +22,11 @@ class MMapEditor {
     // 移动物件到指定位置
     void moveNote(NoteUUID uuid, int64_t timestamp, int track);
 
-    // 移动物件到指定位置
-    void changeHold(NoteUUID uuid, int64_t duration);
+    // 更新面条
+    void updateHold(NoteUUID uuid, int64_t duration);
+
+    // 更新滑键
+    void updateSlide(NoteUUID uuid, int64_t delta_track);
 
     // 撤销和重做
     void undo();

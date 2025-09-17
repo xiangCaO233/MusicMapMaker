@@ -7,6 +7,8 @@
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
 
+#include "info/NotePart.hpp"
+
 // --- Helper for std::visit ---
 template <class... Ts>
 struct overloaded : Ts... {
@@ -68,6 +70,7 @@ class ToolCommandProcessor {
             part,
             // 选中列表
             selections);
+        qDebug() << "startDrag:" << to_string(part.part);
 
         // 为所有被拖拽的实体附加虚影组件
         for (auto& entity : selections) {
@@ -118,10 +121,29 @@ class ToolCommandProcessor {
                             drag_info.dragged_entities.begin()->second;
                         auto duration = mapAxisRes.time - time;
                         // 向编辑器应用修改
-                        mapEditor.changeHold(uuid, duration);
+                        mapEditor.updateHold(uuid, duration);
+                        // 附加脏组件
+                        registry.emplace<DirtyMarkComponent>(entity);
+                    } else if (drag_info.drag_start_hit.part ==
+                               NotePart::SLIDE_END) {
+                        // ... 计算并应用新的 delta track ...
+                        // 应用新的位置
+                        auto entity = drag_info.dragged_entities.begin()->first;
+                        auto [track, uuid] =
+                            registry.get<NoteComponent>(entity);
+                        auto mapAxisRes =
+                            drag_info.dragged_entities.begin()->second;
+                        auto delta_track = mapAxisRes.track - track;
+
+                        // 向编辑器应用修改
+                        mapEditor.updateSlide(uuid, delta_track);
+
                         // 附加脏组件
                         registry.emplace<DirtyMarkComponent>(entity);
                     }
+                    // else if () {
+                    //
+                    // }
                 } else {
                     // 拖拽多个
                 }

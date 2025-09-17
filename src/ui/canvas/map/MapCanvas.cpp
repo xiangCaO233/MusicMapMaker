@@ -79,6 +79,7 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
 
         // t.detach();
     }
+    audio_callback = cbk;
     info<MapCanvasInfo>()->audio_callback = cbk;
 }
 

@@ -53,6 +53,9 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
                                             bool is_maintrack = false) override;
     AudioController *getController(std::string_view audio_name) override;
 
+    void set_playpos_for(std::string_view audio_name,
+                         std::chrono::nanoseconds time) override;
+
     void play_oneshot(std::string_view audio_name) override;
 
    signals:

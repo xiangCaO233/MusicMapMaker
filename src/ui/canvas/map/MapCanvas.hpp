@@ -50,6 +50,7 @@ class MapCanvas : public GLCanvas {
     void mouseMoveEvent(QMouseEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
+    void wheelEvent(QWheelEvent *e) override;
 
     void resizeEvent(QResizeEvent *event) override;
 
@@ -81,7 +82,7 @@ class MapCanvas : public GLCanvas {
     // 主音轨播放回调
     std::shared_ptr<CanvasAudioPlayCallback> maintrack_callback;
 
-    AudioLoadCallback *audio_callback;
+    AudioLoadCallback *audio_callback{nullptr};
 
     // 绑定的谱面
     MMap *map{nullptr};

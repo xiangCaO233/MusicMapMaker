@@ -79,21 +79,21 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
                     break;
                 }
                 case NotePart::SLIDE_HEAD: {
-                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    // qDebug() << "发送开始拖拽滑键物件头事件";
                     tool_command_queue()->push(StartDragSlideHeadCommand{
                         glm::vec2{pos.x(), pos.y()}, modifiers,
                         hoveredinfo.value()});
                     break;
                 }
                 case NotePart::SLIDE_BODY: {
-                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    // qDebug() << "发送开始拖拽滑键物件身事件";
                     tool_command_queue()->push(StartDragSlideBodyCommand{
                         glm::vec2{pos.x(), pos.y()}, modifiers,
                         hoveredinfo.value()});
                     break;
                 }
                 case NotePart::SLIDE_END: {
-                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    // qDebug() << "发送开始拖拽滑键物件尾事件";
                     tool_command_queue()->push(StartDragSlideTailCommand{
                         glm::vec2{pos.x(), pos.y()}, modifiers,
                         hoveredinfo.value()});
@@ -108,6 +108,7 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
                 }
 
                 case NotePart::NONE: {
+                    // 放置物件/shift防止长条
                     // qDebug() << "未发送任何拖拽事件";
                     // tool_command_queue()->push(
                     //     StartDragHoldTailCommand{glm::vec2{pos.x(), pos.y()},

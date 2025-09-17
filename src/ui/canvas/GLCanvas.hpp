@@ -44,6 +44,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     void mouseMoveEvent(QMouseEvent* e) override;
     void mousePressEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
+    void wheelEvent(QWheelEvent* e) override;
 
     void closeEvent(QCloseEvent* e) override;
 

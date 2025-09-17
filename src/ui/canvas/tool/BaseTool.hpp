@@ -3,6 +3,7 @@
 
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <tool/ToolCommandQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
 
@@ -34,6 +35,8 @@ class BaseTool {
     virtual void mousePressEvent(QMouseEvent* e);
     virtual void mouseMoveEvent(QMouseEvent* e);
     virtual void mouseReleaseEvent(QMouseEvent* e);
+    virtual void wheelEvent(QWheelEvent* e);
+
     virtual void keyPressEvent(QKeyEvent* e);
     virtual void keyReleaseEvent(QKeyEvent* e);
 

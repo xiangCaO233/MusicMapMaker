@@ -56,12 +56,23 @@ void MMapEditor::moveNote(NoteUUID uuid, int64_t timestamp, int track) {
 }
 
 // 移动物件到指定位置
-void MMapEditor::changeHold(NoteUUID uuid, int64_t duration) {
+void MMapEditor::updateHold(NoteUUID uuid, int64_t duration) {
     auto old = map->note_set().get_note(map->note_uuids().get_handle(uuid));
 
     auto new_note_data = old->clone(map);
     auto hold = static_cast<Hold*>(new_note_data.get());
     hold->set_duration(duration);
+
+    updateNoteData(uuid, std::move(new_note_data));
+}
+
+// 更新滑键
+void MMapEditor::updateSlide(NoteUUID uuid, int64_t delta_track) {
+    auto old = map->note_set().get_note(map->note_uuids().get_handle(uuid));
+
+    auto new_note_data = old->clone(map);
+    auto slide = static_cast<Slide*>(new_note_data.get());
+    slide->set_track_orbit(delta_track);
 
     updateNoteData(uuid, std::move(new_note_data));
 }

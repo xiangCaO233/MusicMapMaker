@@ -47,4 +47,6 @@ void GLCanvas::mouseReleaseEvent(QMouseEvent *e) {
     update_sharedInfo();
 }
 
+void GLCanvas::wheelEvent(QWheelEvent *e) { QOpenGLWindow::wheelEvent(e); }
+
 void GLCanvas::closeEvent(QCloseEvent *e) { render_dataloop->stop(); }

@@ -82,7 +82,10 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                     auto& [parent, child_index] =
                         registry.get<ChildOfComponent>(entity);
                     // 父实体失效
-                    if (!registry.valid(parent)) continue;
+                    if (!registry.valid(parent)) {
+                        qDebug() << "parent 失效";
+                        continue;
+                    }
                     auto& [parent_track, parent_uuid] =
                         registry.get<NoteComponent>(parent);
                     auto parent_note =
@@ -92,8 +95,8 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                         continue;
                     } else {
                         // 获取到此子物件
-                        note = static_cast<const Composite*>(parent_note)
-                                   ->children()[child_index]
+                        note = (static_cast<const Composite*>(parent_note)
+                                    ->children()[child_index])
                                    .get();
                     }
                 } else {
@@ -116,9 +119,34 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                 auto destrack = note->trackpos();
                 if (note->notetype() == NoteType::SLIDE) {
                     // 若是组合键中的物件则跳过生成
-                    // if (registry.all_of<ChildOfComponent>(entity)) {
-                    //     break;
-                    // }
+                    if (registry.all_of<ChildOfComponent>(entity)) {
+                        auto& [parent, child_index] =
+                            registry.get<ChildOfComponent>(entity);
+                        // 父实体失效
+                        if (!registry.valid(parent)) {
+                            qDebug() << "parent 失效";
+                            continue;
+                        }
+                        auto& [parent_track, parent_uuid] =
+                            registry.get<NoteComponent>(parent);
+                        auto parent_note =
+                            notes.get_note(uuidManager.get_handle(parent_uuid));
+                        if (!parent_note) {
+                            // 父实体失效
+                            continue;
+                        } else {
+                            auto parent_note_ptr =
+                                static_cast<const Composite*>(parent_note);
+                            // 获取到此子物件
+                            auto& child_note =
+                                (parent_note_ptr->children()[child_index]);
+                            if (child_note !=
+                                parent_note_ptr->children().back()) {
+                                // 除了最后一个滑键都跳过
+                                break;
+                            }
+                        }
+                    }
                     destrack += static_cast<const Slide*>(note)->delta_track();
                 }
 
@@ -141,7 +169,6 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                         auto hold = static_cast<const Hold*>(note);
                         effect.duration = hold->duration();
                     }
-
                     // 叠加音效
                     auto& sound_state =
                         registry.get<SoundStateComponent>(effect_entity);

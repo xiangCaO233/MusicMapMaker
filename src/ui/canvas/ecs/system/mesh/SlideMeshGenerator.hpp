@@ -140,7 +140,7 @@ class SlideMeshGenerator {
             auto validity =
                 end_axis.track <
                     info->editorInfo.map->base_metadata().track_count &&
-                end_axis.track != thistrack;
+                end_axis.track != thistrack && end_axis.track >= 0;
             // qDebug() << "headtime:" << time;
             // qDebug() << "endtime:" << end_axis.time;
 

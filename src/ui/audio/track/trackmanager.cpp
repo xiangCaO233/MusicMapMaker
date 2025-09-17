@@ -141,6 +141,15 @@ AudioController* TrackManager::getController(std::string_view audio_name) {
     return get_controller(QString::fromStdString(std::string(audio_name)));
 }
 
+void TrackManager::set_playpos_for(std::string_view audio_name,
+                                   std::chrono::nanoseconds time) {
+    auto controller =
+        get_controller(QString::fromStdString(std::string(audio_name)));
+    if (controller) {
+        controller->set_playpos(time);
+    }
+}
+
 // 获取音频控制器
 AudioController* TrackManager::get_controller(const QString& audio_name) {
     AudioController* res{nullptr};

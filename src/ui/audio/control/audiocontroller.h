@@ -53,22 +53,26 @@ class AudioController : public HideableToolWindow {
 
     void set_item(QStandardItem *item);
 
-    inline const std::shared_ptr<ice::AudioTrack> &track() const {
+    const std::shared_ptr<ice::AudioTrack> &track() const {
         return audio_track;
     }
 
-    inline QStandardItem *item() const { return refitem; }
+    QStandardItem *item() const { return refitem; }
 
-    inline std::weak_ptr<ice::SourceNode> node() const { return source_node; }
+    std::weak_ptr<ice::SourceNode> node() const { return source_node; }
 
-    inline const std::shared_ptr<ice::IAudioNode> &output() const {
+    const std::shared_ptr<ice::IAudioNode> &output() const {
         return output_node;
     }
 
-    inline void set_uiframe_pos(size_t frame_pos) { uiframe_pos = frame_pos; }
+    void set_uiframe_pos(size_t frame_pos) { uiframe_pos = frame_pos; }
 
-    inline void set_uitime_pos(std::chrono::nanoseconds time_pos) {
+    void set_uitime_pos(std::chrono::nanoseconds time_pos) {
         uitime_pos = time_pos;
+    }
+
+    void set_playpos(std::chrono::nanoseconds time_pos) {
+        source_node->set_playpos(time_pos);
     }
 
     const QPushButton *pause_button() const;
