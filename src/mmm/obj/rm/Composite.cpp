@@ -75,6 +75,12 @@ bool Composite::add_child(std::unique_ptr<Note> note) {
     }
     if (success) {
         child_notes.push_back(std::move(note));
+        if (auto end = child_notes.back().get();
+            end->notetype() == NoteType::HOLD) {
+            auto hold = static_cast<Hold*>(end);
+            // 更新总持续时间
+            total_duration_time += hold->duration();
+        }
     }
     return success;
 }
@@ -116,22 +122,7 @@ std::unique_ptr<Note> Composite::clone(MMap* ref) const {
     auto new_note_data = std::make_unique<Composite>(ref);
     auto new_composite = static_cast<Composite*>(new_note_data.get());
     for (const auto& old_child : children()) {
-        std::unique_ptr<Note> new_child{nullptr};
-        switch (old_child->notetype()) {
-            case NoteType::HOLD: {
-                new_child = std::make_unique<Hold>(ref);
-                new_child->set_notetype(NoteType::HOLD);
-                break;
-            }
-            case NoteType::SLIDE: {
-                new_child = std::make_unique<Slide>(ref);
-                new_child->set_notetype(NoteType::SLIDE);
-                break;
-            }
-            case NoteType::NORMAL:
-            case NoteType::COMPOSITE:
-                break;
-        }
+        std::unique_ptr<Note> new_child = old_child->clone(ref);
         new_composite->add_child(std::move(new_child));
     }
     return new_note_data;

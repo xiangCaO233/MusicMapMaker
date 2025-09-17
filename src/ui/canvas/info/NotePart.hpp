@@ -22,6 +22,8 @@ enum class NotePart {
 // --- 用于打印 NotePart 枚举的辅助函数 ---
 inline std::string to_string(NotePart part) {
     switch (part) {
+        case NotePart::NONE:
+            return "NONE";
         case NotePart::HEAD:
             return "HEAD";
         case NotePart::HOLD_HEAD:
@@ -30,12 +32,16 @@ inline std::string to_string(NotePart part) {
             return "HOLD_BODY";
         case NotePart::HOLD_END:
             return "HOLD_END";
+        case NotePart::HOLD_NODE:
+            return "HOLD_NODE";
         case NotePart::SLIDE_HEAD:
             return "SLIDE_HEAD";
         case NotePart::SLIDE_BODY:
             return "SLIDE_BODY";
         case NotePart::SLIDE_END:
             return "SLIDE_END";
+        case NotePart::SLIDE_NODE:
+            return "SLIDE_NODE";
         default:
             return "Unknown";
     }
@@ -48,14 +54,14 @@ struct MeshPartInfo {
 
     // 身份信息
     entt::entity source_entity{};
-    entt::entity child_entity{entt::entity(-1)};
+    entt::entity child_entity{};
     NotePart part{NotePart::NONE};
 
     // 筛选信息
     int zIndex{0};
 
     // 物件uuid
-    NoteUUID uuid{InvalidStableNoteID};
+    NoteUUID uuid{InvalidNoteUUID};
 
     bool contains(const glm::vec2& p) const {
         // 计算矩形的右下角坐标

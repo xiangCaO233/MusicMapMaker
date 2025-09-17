@@ -1,4 +1,6 @@
 #include <ecs/system/sync/SyncSystem.hpp>
+#include <mmm/obj/rm/Composite.hpp>
+#include <mmm/obj/rm/Slide.hpp>
 
 // 同步特效实体
 void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
@@ -72,12 +74,37 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
         // Note的时间戳，是否在本帧“特效时间”前进的区间内
         if (time > last_effect_time && time <= effect_time) {
             // 这个Note需要触发特效
-            const auto& [track, uuid] = registry.get<NoteComponent>(entity);
+            const auto [track, uuid] = registry.get<NoteComponent>(entity);
+            // 这里可能获取到子物件(从集合中获取到的note指针是null)
             auto note = notes.get_note(uuidManager.get_handle(uuid));
-            if (!note) continue;
+            if (!note) {
+                if (registry.all_of<ChildOfComponent>(entity)) {
+                    auto& [parent, child_index] =
+                        registry.get<ChildOfComponent>(entity);
+                    // 父实体失效
+                    if (!registry.valid(parent)) continue;
+                    auto& [parent_track, parent_uuid] =
+                        registry.get<NoteComponent>(parent);
+                    auto parent_note =
+                        notes.get_note(uuidManager.get_handle(parent_uuid));
+                    if (!parent_note) {
+                        // 父实体失效
+                        continue;
+                    } else {
+                        // 获取到此子物件
+                        note = static_cast<const Composite*>(parent_note)
+                                   ->children()[child_index]
+                                   .get();
+                    }
+                } else {
+                    // 实体失效
+                    continue;
+                }
+            }
 
             // qDebug() << "time[" << time << "],track[" << track
             //          << "]需要触发特效";
+
             // 查找对应轨道的特效实体并更新它
             auto effect_view =
                 registry.view<EffectComponent, SoundStateComponent,
@@ -85,8 +112,17 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
             for (auto effect_entity : effect_view) {
                 const auto& [track] =
                     registry.get<TrackIdentifierComponent>(effect_entity);
+                // 目标轨道确定(若为滑键则在结束位置绘制特效)
+                auto destrack = note->trackpos();
+                if (note->notetype() == NoteType::SLIDE) {
+                    // 若是组合键中的物件则跳过生成
+                    // if (registry.all_of<ChildOfComponent>(entity)) {
+                    //     break;
+                    // }
+                    destrack += static_cast<const Slide*>(note)->delta_track();
+                }
 
-                if (track == note->trackpos()) {
+                if (track == destrack) {
                     // 找到了这条轨道的特效实体！
 
                     // 更新视觉状态：重置时间和纹理类型
@@ -99,7 +135,8 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                     // 根据 Note 类型决定新的纹理特效目录和持续时间
                     if (note->notetype() == NoteType::SLIDE) {
                         effect.texture_type = EffectTextureType::SLIDE_END;
-                        effect.duration = skin->normal_hit_effect_duration;
+                        effect.duration =
+                            skin->normal_hit_effect_duration * 1000.f;
                     } else if (note->notetype() == NoteType::HOLD) {
                         auto hold = static_cast<const Hold*>(note);
                         effect.duration = hold->duration();
@@ -111,7 +148,8 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                     // 如果已有同类请求，则在其上累加；如果没有，则创建新的
                     // 根据 Note 类型决定音效类型
                     SoundEffectType sound_to_play = SoundEffectType::COMMON_HIT;
-                    if (note->notetype() == NoteType::SLIDE) {
+                    if (!registry.all_of<ChildOfComponent>(entity) &&
+                        note->notetype() == NoteType::SLIDE) {
                         sound_to_play = SoundEffectType::SLIDE;
                     }
                     // 直接在 map 中增加对应音效的计数

@@ -36,13 +36,17 @@ void updateHover(ToolSystem* toolSystem,
             // 不一样，或者之前没有悬浮 -> 更新为新的悬浮状态
             toolInteractionState->setHover(hit_info);
 
-            qDebug() << "更新hover到uuid:" << hit_info.uuid;
-            qDebug() << "检测到悬浮于最终来源实体:"
-                     << static_cast<uint32_t>(hit_info.source_entity);
-            qDebug() << "检测到悬浮于子实体:"
-                     << static_cast<uint32_t>(hit_info.child_entity);
-            qDebug() << "更新悬浮物件为" << note->toString();
-            qDebug() << "悬浮的部位:" << to_string(hit_info.part);
+            // toolSystem->get_mesh_info_tree().print_tree();
+
+            // qDebug() << "更新hover到uuid:" << hit_info.uuid;
+            // qDebug() << "检测到悬浮于最终来源实体:"
+            //          << static_cast<uint32_t>(hit_info.source_entity);
+            // if (hit_info.child_entity != entt::entity(-1)) {
+            //     qDebug() << "检测到悬浮于子实体:"
+            //              << static_cast<uint32_t>(hit_info.child_entity);
+            // }
+            // // qDebug() << "更新悬浮物件为" << note->toString();
+            // qDebug() << "悬浮的部位:" << to_string(hit_info.part);
         }
 
         // qDebug() << "当前hover到id:" << hit_info.handle.index;

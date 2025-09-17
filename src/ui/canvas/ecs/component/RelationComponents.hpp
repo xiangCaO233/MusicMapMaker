@@ -10,8 +10,10 @@ struct CompositeRootComponent {
 };
 
 // 用于Composite Note的子节点，指向其父节点
+// 包含处于父物件集合中的索引
 struct ChildOfComponent {
     entt::entity parent;
+    size_t child_index;
 };
 
 #endif  // MMM_RELATIONCOMPONENTS_HPP

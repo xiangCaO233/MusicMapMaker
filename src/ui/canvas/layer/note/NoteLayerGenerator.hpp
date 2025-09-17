@@ -1,10 +1,10 @@
 #ifndef MMM_NOTELAYERGENERATOR_HPP
 #define MMM_NOTELAYERGENERATOR_HPP
 
-#include <ecs/system/MeshGenerateSystem.hpp>
 #include <ecs/system/NormalRenderSystem.hpp>
 #include <ecs/system/TimeSystem.hpp>
 #include <ecs/system/ToolSystem.hpp>
+#include <ecs/system/mesh/MeshGenerateSystem.hpp>
 #include <entt.hpp>
 #include <layer/LayerComputerBase.hpp>
 

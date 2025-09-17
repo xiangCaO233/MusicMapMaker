@@ -82,12 +82,14 @@ entt::entity createNoteEntity(entt::registry& registry, const Note* note,
         case NoteType::COMPOSITE: {
             auto composed_note = static_cast<const Composite*>(note);
             std::vector<entt::entity> children;
-            for (const auto& child_note : composed_note->children()) {
+            for (decltype(composed_note->children().size()) i{0};
+                 i < composed_note->children().size(); ++i) {
                 auto child_note_entity = createNoteEntity(
-                    registry, child_note.get(), InvalidStableNoteID);
+                    registry, composed_note->children()[i].get(),
+                    InvalidNoteUUID);
                 // 附加父实体组件
                 registry.emplace<ChildOfComponent>(child_note_entity,
-                                                   note_entity);
+                                                   note_entity, i);
                 // 添加实体到父实体的复合组件的子实体列表
                 children.push_back(child_note_entity);
             }

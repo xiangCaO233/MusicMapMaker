@@ -96,7 +96,7 @@ class NoteIDManager {
         if (it != m_volatile_to_stable.end()) {
             return it->second;
         }
-        return InvalidStableNoteID;
+        return InvalidNoteUUID;
     }
 
     /**

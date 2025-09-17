@@ -49,31 +49,8 @@ class ToolSystem {
         }
     }
 
-    // LooseQuadtree<MeshPartInfo>& get_mesh_info_tree() { return
-    // mesh_info_tree; } const entt::registry& get_registry() { return registry;
-    // }
-
-    // 更新画布世界碰撞箱尺寸
-    // void update_world_boundbox(BoundingBox box) const {
-    //     // 这个操作会改变整个系统的状态，需要获取写锁
-    //     // 获取独占的写锁
-    //     std::unique_lock<std::shared_mutex> lock(mtx);
-
-    //     // 1. 从当前的树中提取出所有已存储的 MeshPartInfo 对象。
-    //     //    这是一个移动操作，旧树在逻辑上变空了。
-    //     std::vector<MeshPartInfo> existing_parts =
-    //         mesh_info_tree.extract_all_objects();
-
-    //     // 2. 用新的边界框创建一个全新的四叉树。
-    //     //    旧树的内存会被自动释放和替换。
-    //     mesh_info_tree = LooseQuadtree<MeshPartInfo>(box);
-
-    //     // 3. 将之前提取的所有几何部件重新插入到新的四叉树中。
-    //     for (auto& part : existing_parts) {
-    //         // 使用 std::move 将部件移动到新树中，避免拷贝
-    //         mesh_info_tree.insert(std::move(part));
-    //     }
-    // }
+    LooseQuadtree<MeshPartInfo>& get_mesh_info_tree() { return mesh_info_tree; }
+    const entt::registry& get_registry() { return registry; }
 
     /**
      * @brief [线程安全] UI 线程可以调用此函数进行交互查询.

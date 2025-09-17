@@ -135,7 +135,7 @@ class AddNoteCommand : public OperationCommand {
         : m_collection(collection),
           m_id_manager(id_manager),
           m_note_to_add(std::move(note)),
-          m_id(InvalidStableNoteID) {}  // 初始时没有稳定ID
+          m_id(InvalidNoteUUID) {}  // 初始时没有稳定ID
 
     bool execute() override {
         // Redo 逻辑: 如果是重做，备份数据里有 Note，稳定ID也已存在
@@ -152,7 +152,7 @@ class AddNoteCommand : public OperationCommand {
         if (!new_handle.isValid()) return false;
 
         // 根据情况注册或更新 ID
-        if (m_id == InvalidStableNoteID) {
+        if (m_id == InvalidNoteUUID) {
             // 首次执行 (Execute): 注册一个全新的稳定 ID
             m_id = m_id_manager.register_new_note(new_handle);
         } else {

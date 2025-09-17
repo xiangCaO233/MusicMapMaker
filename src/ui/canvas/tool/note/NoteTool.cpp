@@ -71,10 +71,43 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
                         hoveredinfo.value()});
                     break;
                 }
-                case NotePart::NONE:
-                case NotePart::SLIDE_HEAD:
-                case NotePart::SLIDE_BODY:
+                case NotePart::HOLD_NODE: {
+                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    tool_command_queue()->push(StartDragHoldNodeCommand{
+                        glm::vec2{pos.x(), pos.y()}, modifiers,
+                        hoveredinfo.value()});
+                    break;
+                }
+                case NotePart::SLIDE_HEAD: {
+                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    tool_command_queue()->push(StartDragSlideHeadCommand{
+                        glm::vec2{pos.x(), pos.y()}, modifiers,
+                        hoveredinfo.value()});
+                    break;
+                }
+                case NotePart::SLIDE_BODY: {
+                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    tool_command_queue()->push(StartDragSlideBodyCommand{
+                        glm::vec2{pos.x(), pos.y()}, modifiers,
+                        hoveredinfo.value()});
+                    break;
+                }
                 case NotePart::SLIDE_END: {
+                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    tool_command_queue()->push(StartDragSlideTailCommand{
+                        glm::vec2{pos.x(), pos.y()}, modifiers,
+                        hoveredinfo.value()});
+                    break;
+                }
+                case NotePart::SLIDE_NODE: {
+                    // qDebug() << "发送开始拖拽长条物件节点事件";
+                    tool_command_queue()->push(StartDragSlideNodeCommand{
+                        glm::vec2{pos.x(), pos.y()}, modifiers,
+                        hoveredinfo.value()});
+                    break;
+                }
+
+                case NotePart::NONE: {
                     // qDebug() << "未发送任何拖拽事件";
                     // tool_command_queue()->push(
                     //     StartDragHoldTailCommand{glm::vec2{pos.x(), pos.y()},

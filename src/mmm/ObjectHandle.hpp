@@ -63,6 +63,6 @@ struct NoteHandle {
 
 using NoteUUID = uint64_t;
 // 定义一个常量来表示无效的稳定ID。
-constexpr NoteUUID InvalidStableNoteID = 0;
+constexpr NoteUUID InvalidNoteUUID = 0;
 
 #endif  // MMM_NOTEHANDLE_HPP

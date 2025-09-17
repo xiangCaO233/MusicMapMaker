@@ -1,47 +1,11 @@
 #ifndef MMM_TOOLCOMMAND_HPP
 #define MMM_TOOLCOMMAND_HPP
 
-#include <qnamespace.h>
-
-#include <info/NotePart.hpp>
+#include <tool/command/HoldCommand.hpp>
+#include <tool/command/SlideCommand.hpp>
 #include <variant>
 
-struct DragStartInfo {
-    glm::vec2 start_mouse_pos;
-    QFlags<Qt::KeyboardModifier> modifiers;
-};
-
 struct StartDragNormalNoteCommand {
-    DragStartInfo common_info;
-    const MeshPartInfo hit_info;
-};
-
-struct StartDragHoldHeadCommand {
-    DragStartInfo common_info;
-    const MeshPartInfo hit_info;
-};
-
-struct StartDragHoldTailCommand {
-    DragStartInfo common_info;
-    const MeshPartInfo hit_info;
-};
-
-struct StartDragHoldBodyCommand {
-    DragStartInfo common_info;
-    const MeshPartInfo hit_info;
-};
-
-struct StartDragSlideHeadCommand {
-    DragStartInfo common_info;
-    const MeshPartInfo hit_info;
-};
-
-struct StartDragSlideTailCommand {
-    DragStartInfo common_info;
-    const MeshPartInfo hit_info;
-};
-
-struct StartDragSlideBodyCommand {
     DragStartInfo common_info;
     const MeshPartInfo hit_info;
 };
@@ -49,12 +13,6 @@ struct StartDragSlideBodyCommand {
 struct StartDragSelectionCommand {
     DragStartInfo common_info;
     std::unordered_set<entt::entity> selection;
-};
-
-// 当拖拽结束时的命令
-struct EndDragCommand {
-    // 可以包含最终鼠标位置等信息
-    glm::vec2 final_mouse_pos;
 };
 
 // 标记删除指令
@@ -76,6 +34,9 @@ struct ConfirmDeleteCommand {
 using ToolCommand =
     std::variant<StartDragNormalNoteCommand, StartDragHoldHeadCommand,
                  StartDragHoldBodyCommand, StartDragHoldTailCommand,
-                 StartDragSelectionCommand, EndDragCommand>;
+                 StartDragHoldNodeCommand, StartDragSlideHeadCommand,
+                 StartDragSlideBodyCommand, StartDragSlideTailCommand,
+                 StartDragSlideNodeCommand, StartDragSelectionCommand,
+                 EndDragCommand>;
 
 #endif  // MMM_TOOLCOMMAND_HPP
