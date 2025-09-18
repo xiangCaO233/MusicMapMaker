@@ -9,6 +9,7 @@
 
 AutoResizeTableWidget::AutoResizeTableWidget(QWidget* parent)
     : QTableWidget(parent) {
+    verticalHeader()->hide();
     // 监听列宽度调整
     connect(horizontalHeader(), &QHeaderView::sectionResized, this,
             &AutoResizeTableWidget::columsection_resized);
@@ -114,7 +115,7 @@ void AutoResizeTableWidget::resizeEvent(QResizeEvent* e) {
     }
     auto unit = width() / (double)stretchcount;
 
-    double size_left{double(width()) * 0.99};
+    double size_left{double(width()) * 0.95};
 
     for (int i = 0; i < colum_stretchs.size() - 1; ++i) {
         auto res = int(std::round(colum_stretchs[i] * unit));

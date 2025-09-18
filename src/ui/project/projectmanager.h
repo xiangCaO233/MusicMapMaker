@@ -24,6 +24,8 @@ class ProjectManager : public QWidget {
     // 初始化管理器
     void initService(MapCanvas *canvas, TrackManager *trackmanager);
 
+    ProjectService *get_service();
+
    signals:
     void openProject(std::string_view project_path);
     void closeProject(std::string_view project_name);

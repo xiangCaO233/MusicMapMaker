@@ -59,6 +59,8 @@ void ProjectManager::initService(MapCanvas* canvas,
             &ProjectManager::onActivateProject);
 }
 
+ProjectService* ProjectManager::get_service() { return service; }
+
 // void ProjectManager::onUpdateProjectListView(
 //     const std::unordered_map<std::string, std::unique_ptr<MProject>,
 //     StringHash,

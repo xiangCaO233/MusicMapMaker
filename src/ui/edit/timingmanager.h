@@ -9,6 +9,7 @@ class TimingEditor;
 }
 
 class MMap;
+class MProject;
 class Timing;
 
 class TimingManager : public QWidget {
@@ -25,10 +26,11 @@ class TimingManager : public QWidget {
 
    public slots:
     void onTimingItemChanged(QStandardItem *item);
-    void onMapUpdated(MMap *map);
+    void onMapUpdated(MProject *project, MMap *map);
 
    private:
     Ui::TimingEditor *ui;
+    MMap *map_ref;
 };
 
 #endif  // TIMINGMANAGER_H

@@ -2,6 +2,7 @@
 #include <mainwindow.h>
 #include <project/projectmanager.h>
 #include <qobjectdefs.h>
+#include <timingmanager.h>
 #include <ui_mainwindow.h>
 
 #include <QFile>
@@ -26,6 +27,10 @@ MainWindow::MainWindow(QWidget* parent)
 
     // 初始化项目服务
     ui->project_manager->initService(ui->editor->canvas(), ui->track_manager);
+
+    // 连接激活map事件
+    connect(ui->project_manager->get_service(), &ProjectService::activateMap,
+            ui->timing_editor, &TimingManager::onMapUpdated);
 
     // 捕获ui指针
     // auto capui = ui;
