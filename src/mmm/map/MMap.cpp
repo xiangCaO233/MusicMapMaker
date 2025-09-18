@@ -18,18 +18,24 @@ MMap::MMap(std::string_view file) {
     } else if (file.ends_with(".mmm")) {
         readMMM();
     }
-    // 初始化对应编辑器
-    // mapeditor = std::make_unique<MMapEditor>(this);
-
-    // auto mapeditor_ref = mapeditor.get();
-    // // 连接编辑器信号
-    // connect(EditorActionHandler::instance(), &EditorActionHandler::undo,
-    //         [mapeditor_ref]() { mapeditor_ref->undo(); });
-    // connect(EditorActionHandler::instance(), &EditorActionHandler::redo,
-    //         [mapeditor_ref]() { mapeditor_ref->redo(); });
 }
 
 MMap::~MMap() = default;
+
+// 注册编辑器
+void MMap::register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue) {
+    if (!mapeditor) {
+        // 初始化对应编辑器
+        mapeditor = std::make_unique<MMapEditor>(this, editEventQueue);
+    }
+
+    auto mapeditor_ref = mapeditor.get();
+    // 连接编辑器信号
+    connect(EditorActionHandler::instance(), &EditorActionHandler::undo,
+            [mapeditor_ref]() { mapeditor_ref->undo(); });
+    connect(EditorActionHandler::instance(), &EditorActionHandler::redo,
+            [mapeditor_ref]() { mapeditor_ref->redo(); });
+}
 
 // 访问谱面元数据
 std::weak_ptr<MapMetadata> MMap::map_metadata(MapMetadataType type) {

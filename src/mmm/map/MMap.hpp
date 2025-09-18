@@ -8,7 +8,9 @@
 #include <mmm/MetaData.hpp>
 #include <mmm/NoteIDManager.hpp>
 #include <mmm/map/BaseMapMeta.hpp>
+#include <mmm/map/editor/MMapEditEvent.hpp>
 #include <mmm/timing/Beat.hpp>
+#include <tool/ThreadSafeQueue.hpp>
 #include <unordered_map>
 
 class MProject;
@@ -47,6 +49,9 @@ class MMap : public QObject {
 
     // 访问基本元数据
     BaseMapMeta& base_metadata() { return basemeta; };
+
+    // 注册编辑器
+    void register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue);
 
     // 访问对应的谱面编辑器
     MMapEditor* editor() { return mapeditor.get(); }

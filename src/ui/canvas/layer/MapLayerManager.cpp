@@ -6,6 +6,7 @@ MapLayerManager::~MapLayerManager() = default;
 // 更新map
 void MapLayerManager::updateMap(MMap* map) {
     mapref = map;
+    map->register_editor(editEventQueue);
     map_ecs_core.updateMap(map);
 }
 

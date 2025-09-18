@@ -47,8 +47,13 @@ struct TimeInfo {
 
     void operator+=(double delta_time) {
         logic_canvas_time += delta_time;
-        presentation_canvas_time += delta_time;
         raw_audio_time_ms += delta_time;
+        if (logic_canvas_time < 0 || raw_audio_time_ms < 0) {
+            logic_canvas_time = 0;
+            raw_audio_time_ms = 0;
+        } else {
+            presentation_canvas_time += delta_time;
+        }
     }
 };
 
