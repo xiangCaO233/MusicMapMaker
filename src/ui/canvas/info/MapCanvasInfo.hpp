@@ -17,7 +17,7 @@ struct MapInfo {
     float darken{.2f};
 
     // 背景透明度
-    float alpha{.8f};
+    float alpha{1.f};
 };
 
 class MSkin;
@@ -35,7 +35,7 @@ struct EditorInfo {
     float pageScrollStep{120.f};
 
     // 时间线缩放滚动步长
-    float timelineScrollStep{.02f};
+    float timelineScrollStep{.03f};
 
     // 当前的map指针
     MMap* map;

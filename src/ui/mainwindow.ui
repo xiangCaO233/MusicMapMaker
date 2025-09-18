@@ -78,6 +78,15 @@
    </attribute>
    <widget class="TrackManager" name="track_manager"/>
   </widget>
+  <widget class="QDockWidget" name="timingManager">
+   <property name="windowTitle">
+    <string>Timing Manager</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="TimingManager" name="timing_editor"/>
+  </widget>
   <action name="actionTrack_Manager">
    <property name="checkable">
     <bool>true</bool>
@@ -118,6 +127,12 @@
    <class>TrackManager</class>
    <extends>QWidget</extends>
    <header location="global">trackmanager.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TimingManager</class>
+   <extends>QWidget</extends>
+   <header location="global">timingmanager.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

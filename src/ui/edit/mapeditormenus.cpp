@@ -57,10 +57,10 @@ void MapEditor::initializeBgMenu() const {
     auto bg_alpha_label = new QLabel(tr("alpha"));
     auto bg_alpha_slider = new QSlider(Qt::Vertical, bgalphawidget);
     bg_alpha_slider->setRange(0, 100);
-    bg_alpha_slider->setValue(80);
+    bg_alpha_slider->setValue(100);
     bg_alpha_slider->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
-    auto bg_alpha_value_label = new QLabel("80");
+    auto bg_alpha_value_label = new QLabel("100");
     // bgopacylabel->setFont(font);
     bg_alpha_value_label->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
