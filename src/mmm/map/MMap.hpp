@@ -1,6 +1,7 @@
 #ifndef MMM_MMAP_HPP
 #define MMM_MMAP_HPP
 
+#include <QObject>
 #include <ice/manage/AudioTrack.hpp>
 #include <memory>
 #include <mmm/DataStructures.hpp>
@@ -14,7 +15,8 @@ class MProject;
 class MMapEditor;
 
 // map
-class MMap {
+class MMap : public QObject {
+    Q_OBJECT
    public:
     MMap();
     explicit MMap(std::string_view file);

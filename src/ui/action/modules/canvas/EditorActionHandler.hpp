@@ -17,6 +17,8 @@ class EditorActionHandler : public QObject {
 
    signals:
     void pause_or_resume_canvas();
+    void undo();
+    void redo();
 
    public slots:
     void onPause_Resume();

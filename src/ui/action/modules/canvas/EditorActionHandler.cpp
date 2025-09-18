@@ -43,10 +43,12 @@ void EditorActionHandler::onDelete() {
 }
 void EditorActionHandler::onUndo() {
     //
+    emit undo();
     qDebug() << "触发撤销";
 }
 void EditorActionHandler::onRedo() {
     //
+    emit redo();
     qDebug() << "触发重做";
 }
 

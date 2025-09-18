@@ -20,6 +20,7 @@ MapCanvas::MapCanvas() : GLCanvas() {
     maintrack_callback = std::make_shared<CanvasAudioPlayCallback>(this);
 
     auto thiscp = this;
+
     // 连接信号
     connect(EditorActionHandler::instance(),
             &EditorActionHandler::pause_or_resume_canvas, [thiscp]() {

@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <action/modules/canvas/EditorActionHandler.hpp>
 #include <algorithm>
 #include <memory>
 #include <mmm/map/MMap.hpp>
@@ -19,6 +20,13 @@ MMap::MMap(std::string_view file) {
     }
     // 初始化对应编辑器
     mapeditor = std::make_unique<MMapEditor>(this);
+
+    auto mapeditor_ref = mapeditor.get();
+    // 连接编辑器信号
+    connect(EditorActionHandler::instance(), &EditorActionHandler::undo,
+            [mapeditor_ref]() { mapeditor_ref->undo(); });
+    connect(EditorActionHandler::instance(), &EditorActionHandler::redo,
+            [mapeditor_ref]() { mapeditor_ref->redo(); });
 }
 
 MMap::~MMap() = default;

@@ -34,7 +34,7 @@ class NoteIDManager {
 
     /**
      * @brief 当一个 Note 被永久删除时，注销其ID和句柄。
-     * @param id 要移除的 Note 的 StableNoteID。
+     * @param id 要移除的 Note 的 UUID。
      */
     void remove_note(NoteUUID id) {
         auto it = m_stable_to_volatile.find(id);
@@ -47,29 +47,19 @@ class NoteIDManager {
 
     /**
      * @brief 在撤销/重做操作后，更新一个稳定ID对应的句柄。
-     * @param id 保持不变的 StableNoteID。
+     * @param id 保持不变的 UUID
      * @param new_handle Note 被恢复后获得的新 NoteHandle。
      */
     void update_handle(NoteUUID id, NoteHandle new_handle) {
+        // 1. 检查这个ID是否已经有一个旧的句柄需要被清理
         auto it = m_stable_to_volatile.find(id);
-        // 断言确保我们正在更新一个已存在的ID
-        assert(it != m_stable_to_volatile.end() &&
-               "Attempted to update a handle for a non-existent StableNoteID.");
-        if (it == m_stable_to_volatile.end()) return;
+        if (it != m_stable_to_volatile.end()) {
+            // 如果存在旧句柄，从反向映射中移除它
+            m_volatile_to_stable.erase(it->second);
+        }
 
-        // 1. 获取旧的句柄
-        NoteHandle old_handle = it->second;
-
-        // 2. 如果新旧句柄不同，才需要更新
-        if (old_handle == new_handle) return;
-
-        // 3. 从反向映射中移除旧句柄
-        m_volatile_to_stable.erase(old_handle);
-
-        // 4. 更新正向映射
-        it->second = new_handle;
-
-        // 5. 在反向映射中添加新句柄
+        // 2. 建立新的映射关系（对于 map 的下标运算符，这既是插入也是更新）
+        m_stable_to_volatile[id] = new_handle;
         m_volatile_to_stable[new_handle] = id;
     }
 

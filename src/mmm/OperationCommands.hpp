@@ -1,6 +1,7 @@
 #ifndef MMM_OPERATIONCOMMAND_HPP
 #define MMM_OPERATIONCOMMAND_HPP
 
+#include <QDebug>
 #include <mmm/DataStructures.hpp>
 #include <mmm/NoteIDManager.hpp>
 #include <mmm/timing/Timing.hpp>
@@ -110,6 +111,7 @@ class UpdateNoteCommand : public OperationCommand {
 
     void undo() override {
         if (!m_old_data) return;
+        qDebug() << "撤销更新物件:";
 
         // 同样，动态获取句柄
         NoteHandle current_handle = m_id_manager.get_handle(m_id);
@@ -138,28 +140,23 @@ class AddNoteCommand : public OperationCommand {
           m_id(InvalidNoteUUID) {}  // 初始时没有稳定ID
 
     bool execute() override {
-        // Redo 逻辑: 如果是重做，备份数据里有 Note，稳定ID也已存在
-        if (!m_note_to_add) {
-            if (m_note_backup_for_redo) {
-                m_note_to_add = std::move(m_note_backup_for_redo);
-            } else {
-                return false;  // 没有数据可以添加/重做
-            }
+        // Redo 逻辑: 如果是重做，从备份中恢复 note 数据
+        if (!m_note_to_add && m_note_backup_for_redo) {
+            m_note_to_add = std::move(m_note_backup_for_redo);
         }
+        if (!m_note_to_add) return false;
 
-        // 执行添加，得到一个临时的 handle
         NoteHandle new_handle = m_collection.add_note(std::move(m_note_to_add));
         if (!new_handle.isValid()) return false;
 
-        // 根据情况注册或更新 ID
         if (m_id == InvalidNoteUUID) {
             // 首次执行 (Execute): 注册一个全新的稳定 ID
             m_id = m_id_manager.register_new_note(new_handle);
         } else {
-            // 重做 (Redo): 更新稳定 ID 对应的句柄
+            // 重做 (Redo): 此时 m_id 是已知的，我们必须使用 update_handle
+            // 来恢复映射
             m_id_manager.update_handle(m_id, new_handle);
         }
-
         return true;
     }
 
