@@ -1,12 +1,11 @@
 #ifndef MMM_MAPLAYERMANAGER_HPP
 #define MMM_MAPLAYERMANAGER_HPP
 
+#include <ecs/system/ToolSystem.hpp>
 #include <layer/LayerManager.hpp>
 #include <layer/note/NoteLayerGenerator.hpp>
-#include <tool/ToolCommandQueue.hpp>
+#include <tool/ThreadSafeQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
-
-#include "ecs/system/ToolSystem.hpp"
 
 class TimePixelConverterManager {
    public:
@@ -68,7 +67,9 @@ class MapLayerManager : public LayerManager {
     inline ToolSystem* get_tool_system() { return &toolSystem; }
 
     // 获取工具命令队列
-    inline ToolCommandQueue* get_tool_cmdq() { return &toolCommandQueue; }
+    inline ThreadSafeQueue<ToolCommand>* get_tool_cmdq() {
+        return &toolCommandQueue;
+    }
 
     // 获取工具交互管理
     inline ToolInteractionState* get_tool_interaction_state() {
@@ -89,7 +90,7 @@ class MapLayerManager : public LayerManager {
     ToolSystem toolSystem{map_ecs_core.ecs_registry()};
 
     // 工具命令队列
-    ToolCommandQueue toolCommandQueue;
+    ThreadSafeQueue<ToolCommand> toolCommandQueue;
 
     // 工具交互状态
     ToolInteractionState toolInteractionState;

@@ -147,7 +147,8 @@ void MapCanvas::use_tool(const QString& tool_name) {
 }
 
 // 创建工具
-void MapCanvas::creatTools(ToolSystem* toolsystem, ToolCommandQueue* const cmdq,
+void MapCanvas::creatTools(ToolSystem* toolsystem,
+                           ThreadSafeQueue<ToolCommand>* const cmdq,
                            ToolInteractionState* const toolIntState) {
     // 默认使用选择工具
     current_tool =

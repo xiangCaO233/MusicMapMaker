@@ -3,7 +3,7 @@
 #include <info/NotePart.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
-#include <tool/ToolCommandQueue.hpp>
+#include <tool/ThreadSafeQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
 
 void updateHover(ToolSystem* toolSystem,
@@ -85,7 +85,8 @@ void updateHover(ToolSystem* toolSystem,
     }
 }
 
-void processToolCommands(entt::registry& registry, ToolCommandQueue* toolCmdQ,
+void processToolCommands(entt::registry& registry,
+                         ThreadSafeQueue<ToolCommand>* toolCmdQ,
                          ToolSystem* system, MMapEditor* editor,
                          ToolInteractionState* toolInteractionState,
                          MMap* map) {

@@ -4,8 +4,9 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
-#include <tool/ToolCommandQueue.hpp>
+#include <tool/ThreadSafeQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
+#include <tool/command/ToolCommand.hpp>
 
 enum class EditToolType {
     // 无操作的hand工具只有基本操作和拖动进度的功能
@@ -23,7 +24,7 @@ class ToolSystem;
 class BaseTool {
    public:
     explicit BaseTool(MapCanvas* cvs, ToolSystem* const tool_system,
-                      ToolCommandQueue* const tool_cmdq,
+                      ThreadSafeQueue<ToolCommand>* const tool_cmdq,
                       ToolInteractionState* const tool_interaction_state)
         : m_canvas(cvs),
           toolSystem(tool_system),
@@ -48,7 +49,9 @@ class BaseTool {
     inline ToolSystem* tool_system() { return toolSystem; }
 
     // 访问工具指令队列
-    inline ToolCommandQueue* tool_command_queue() { return toolCommandQueue; }
+    inline ThreadSafeQueue<ToolCommand>* tool_command_queue() {
+        return toolCommandQueue;
+    }
 
     // 访问交互管理器
     inline ToolInteractionState* tool_interaction_state() {
@@ -61,7 +64,7 @@ class BaseTool {
     // 工具系统指针
     ToolSystem* const toolSystem;
     // 工具指令队列指针
-    ToolCommandQueue* const toolCommandQueue;
+    ThreadSafeQueue<ToolCommand>* const toolCommandQueue;
     // 工具交互状态管理器指针
     ToolInteractionState* const toolInteractionState;
 };
