@@ -20,6 +20,11 @@ class FileActionHandler : public QObject {
    signals:
     void open(std::string file);
     void open_directory(std::string dir);
+    void save();
+
+    // 需要默认名称
+    void save_as();
+    void export_as();
 
    public slots:
     void onNewProject();

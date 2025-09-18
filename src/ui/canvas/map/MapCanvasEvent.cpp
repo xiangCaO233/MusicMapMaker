@@ -70,10 +70,16 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
             if (dy > 0) {
                 mapinfo->baseInfo.timeline_zoom +=
                     mapinfo->editorInfo.timelineScrollStep;
+                if (mapinfo->baseInfo.timeline_zoom > 5.f) {
+                    mapinfo->baseInfo.timeline_zoom = 5.f;
+                }
             }
             if (dy < 0) {
                 mapinfo->baseInfo.timeline_zoom -=
                     mapinfo->editorInfo.timelineScrollStep;
+                if (mapinfo->baseInfo.timeline_zoom < .1f) {
+                    mapinfo->baseInfo.timeline_zoom = .1f;
+                }
             }
         } else {
             if (dy > 0) {

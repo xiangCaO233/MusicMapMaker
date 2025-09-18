@@ -35,7 +35,7 @@ struct EditorInfo {
     float pageScrollStep{120.f};
 
     // 时间线缩放滚动步长
-    float timelineScrollStep{.4f};
+    float timelineScrollStep{.02f};
 
     // 当前的map指针
     MMap* map;

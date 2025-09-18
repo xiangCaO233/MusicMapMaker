@@ -135,6 +135,7 @@ set(CANVAS_SOURCES
     src/ui/canvas/layer/timeline/TimelineLayer.cpp
     src/ui/canvas/layer/timeline/TimelineLayerGenerator.cpp
     src/ui/canvas/map/MapCanvas.cpp
+    src/ui/canvas/map/MapCanvasActions.cpp
     src/ui/canvas/map/MapCanvasEvent.cpp
     src/ui/canvas/map/skin/MSkin.cpp
     src/ui/canvas/GLCanvasEvents.cpp

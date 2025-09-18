@@ -272,17 +272,24 @@ void MMap::readOsu() {
         auto metadata = osumeta->get_chapter<OsuMapChapterMetadata>("Metadata");
         metadata->Title =
             osureader.get_value("Metadata", "Title", std::string(""));
+        basemeta.title = metadata->Title;
+
         metadata->TitleUnicode =
             osureader.get_value("Metadata", "TitleUnicode", std::string(""));
+        basemeta.title_unicode = metadata->TitleUnicode;
+
         metadata->Artist =
             osureader.get_value("Metadata", "Artist", std::string(""));
-        // artist = Artist;
+        basemeta.artist = metadata->Artist;
+
         metadata->ArtistUnicode =
             osureader.get_value("Metadata", "ArtistUnicode", std::string(""));
-        // artist_unicode = ArtistUnicode;
+        basemeta.artist_unicode = metadata->ArtistUnicode;
+
         metadata->Creator =
             osureader.get_value("Metadata", "Creator", std::string("mmm"));
-        // author = Creator;
+        basemeta.author = metadata->Creator;
+
         metadata->Version =
             osureader.get_value("Metadata", "Version", std::string("[mmm]"));
         basemeta.version = metadata->Version;

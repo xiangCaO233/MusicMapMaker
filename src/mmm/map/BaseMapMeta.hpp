@@ -25,6 +25,8 @@ struct BaseMapMeta {
 
     // 谱面版本名
     std::string version;
+    // 谱面作者
+    std::string author;
 
     // 谱面参考bpm
     double preference_bpm{100.};

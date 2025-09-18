@@ -106,6 +106,9 @@ class MapCanvas : public GLCanvas {
                     ThreadSafeQueue<ToolCommand> *const cmdq,
                     ToolInteractionState *const toolIntState);
 
+    // 连接action
+    void connectActions();
+
     friend class MapEditor;
 };
 #endif  // MMM_MAPCANVAS_HPP

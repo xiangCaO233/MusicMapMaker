@@ -279,6 +279,81 @@ inline QString getSaveDirectoryWithFilename(
     return QString();  // 用户取消选择
 }
 
+/**
+ * @brief 弹出一个文件保存对话框，用于保存单一类型的文件。
+ *
+ * @param parent            父窗口指针。
+ * @param title             对话框的标题。
+ * @param format_label      文件格式的描述性标签（例如 "PNG Image"）。
+ * @param formatFilter      文件格式的过滤器（例如 "*.png"）。
+ * @param defaultFilename   不带扩展名的默认文件名（例如 "untitled"）。
+ * @param defaultPath       对话框打开时的默认路径。
+ * @return QString 用户选择的完整文件路径；如果用户取消，则返回空字符串。
+ */
+/**
+ * @brief 弹出一个文件保存对话框，用于保存单一类型的文件。（健壮版本）
+ *
+ * @param parent            父窗口指针。
+ * @param title             对话框的标题。
+ * @param format_label      文件格式的描述性标签（例如 "MMM Map File"）。
+ * @param formatFilter      文件格式的过滤器（例如 "*.mmm" 或 ".mmm"
+ * 都能接受）。
+ * @param defaultFilename   不带扩展名的默认文件名（例如 "untitled"）。
+ * @param defaultPath       对话框打开时的默认路径。
+ * @return QString 用户选择的完整文件路径；如果用户取消，则返回空字符串。
+ */
+inline QString getSaveAsFile(QWidget* parent, const QString& title,
+                             const QString& format_label,
+                             const QString& formatFilter,
+                             const QString& defaultFilename,
+                             const QString& defaultPath = QDir::homePath()) {
+    // --- 修正部分 开始 ---
+    QString correctedFilter = formatFilter.trimmed();
+    if (!correctedFilter.startsWith("*.")) {
+        if (correctedFilter.startsWith(".")) {
+            correctedFilter.prepend("*");  // .mmm -> *.mmm
+        } else {
+            correctedFilter.prepend("*.");  // mmm -> *.mmm
+        }
+    }
+    // --- 修正部分 结束 ---
+
+    // 1. 组合过滤器字符串 (使用修正后的过滤器)
+    const QString filter =
+        QString("%1 (%2)").arg(format_label, correctedFilter);
+
+    // 2. 从过滤器中提取扩展名
+    QString extension;
+    const int dotIndex = correctedFilter.lastIndexOf('.');
+    if (dotIndex != -1) {
+        extension = correctedFilter.mid(dotIndex);  // 结果是 ".mmm"
+    }
+
+    // 3. 组合默认的文件路径
+    const QString defaultFullPath =
+        QDir(defaultPath).filePath(defaultFilename + extension);
+
+    // 4. 调用静态函数显示对话框
+    QString selectedFile =
+        QFileDialog::getSaveFileName(parent, title, defaultFullPath, filter,
+                                     nullptr, QFileDialog::DontUseNativeDialog);
+
+    // 5. 后处理：确保文件有正确的扩展名
+    if (!selectedFile.isEmpty() && !extension.isEmpty()) {
+        QFileInfo fileInfo(selectedFile);
+        if (fileInfo.suffix().isEmpty()) {
+            selectedFile.append(extension);
+        } else if (fileInfo.suffix().compare(extension.mid(1),
+                                             Qt::CaseInsensitive) != 0) {
+            // 如果用户输入了错误的后缀，也可以考虑强制修正
+            // selectedFile = fileInfo.path() + "/" +
+            // fileInfo.completeBaseName() + extension;
+        }
+    }
+
+    return selectedFile;
+}
+
 // 判断字符串是否完全由数字组成
 inline bool isStringAllDigits_Iteration(const QString& str) {
     // 1. 处理空字符串的情况 (根据需求，空字符串可能算 true 或 false)

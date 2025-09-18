@@ -51,12 +51,15 @@ void FileActionHandler::onOpenDirectory() {
 void FileActionHandler::onSave() {
     //
     qDebug() << "触发保存";
+    emit save();
 }
 void FileActionHandler::onSaveAs() {
     //
     qDebug() << "触发另存为";
+    emit save_as();
 }
 void FileActionHandler::onExport() {
     //
     qDebug() << "触发导出";
+    emit export_as();
 }
