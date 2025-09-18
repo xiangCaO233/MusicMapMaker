@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <memory>
 #include <mmm/map/MMap.hpp>
-#include <mmm/map/MMapEditor.hpp>
+#include <mmm/map/editor/MMapEditor.hpp>
 #include <util/mutil.hpp>
 
 MMap::MMap() {}
@@ -19,14 +19,14 @@ MMap::MMap(std::string_view file) {
         readMMM();
     }
     // 初始化对应编辑器
-    mapeditor = std::make_unique<MMapEditor>(this);
+    // mapeditor = std::make_unique<MMapEditor>(this);
 
-    auto mapeditor_ref = mapeditor.get();
-    // 连接编辑器信号
-    connect(EditorActionHandler::instance(), &EditorActionHandler::undo,
-            [mapeditor_ref]() { mapeditor_ref->undo(); });
-    connect(EditorActionHandler::instance(), &EditorActionHandler::redo,
-            [mapeditor_ref]() { mapeditor_ref->redo(); });
+    // auto mapeditor_ref = mapeditor.get();
+    // // 连接编辑器信号
+    // connect(EditorActionHandler::instance(), &EditorActionHandler::undo,
+    //         [mapeditor_ref]() { mapeditor_ref->undo(); });
+    // connect(EditorActionHandler::instance(), &EditorActionHandler::redo,
+    //         [mapeditor_ref]() { mapeditor_ref->redo(); });
 }
 
 MMap::~MMap() = default;

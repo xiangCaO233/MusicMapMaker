@@ -7,7 +7,7 @@
 
 class MMapEditor {
    public:
-    MMapEditor(MMap* m);
+    MMapEditor(MMap* m, ThreadSafeQueue<MMapEditEvent>& editEventQueue);
     ~MMapEditor() = default;
 
     // 创建单键音符

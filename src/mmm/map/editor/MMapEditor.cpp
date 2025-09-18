@@ -1,10 +1,11 @@
 #include <memory>
-#include <mmm/map/MMapEditor.hpp>
+#include <mmm/map/editor/MMapEditor.hpp>
 #include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Composite.hpp>
 #include <mmm/obj/rm/Slide.hpp>
 
-MMapEditor::MMapEditor(MMap* m) : map(m) {}
+MMapEditor::MMapEditor(MMap* m, ThreadSafeQueue<MMapEditEvent>& editEventQueue)
+    : map(m), operationManager(editEventQueue) {}
 
 // 撤销和重做
 void MMapEditor::undo() { operationManager.undo(); }

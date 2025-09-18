@@ -112,7 +112,7 @@ void SyncSystem::updateToolInteractions(ECSCore& core,
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)开始";
     // 更新悬浮状态
     processToolCommands(core.ecs_registry(), toolCmdQ, toolSystem,
-                        &info->editorInfo.map->editor(), toolInteractionState,
+                        info->editorInfo.map->editor(), toolInteractionState,
                         info->editorInfo.map);
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)结束";
 

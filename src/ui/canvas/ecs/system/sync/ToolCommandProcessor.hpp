@@ -3,7 +3,7 @@
 
 #include <ecs/component/CoreComponents.hpp>
 #include <ecs/system/ToolSystem.hpp>
-#include <mmm/map/MMapEditor.hpp>
+#include <mmm/map/editor/MMapEditor.hpp>
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
 #include <vector>
