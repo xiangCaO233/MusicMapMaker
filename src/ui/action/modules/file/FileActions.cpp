@@ -8,12 +8,15 @@ void FileActions::createActions() {
     action_manager->createAction(
         "project.new", tr("New Project..."),
         QKeySequence::AddTab);  // ctrl + t/ctrl + shift + n
-    action_manager->createAction("file.new", tr("New File...(&N)"),
+    action_manager->createAction("file.new", tr("New File...(&n)"),
                                  QKeySequence::New);  // ctrl + n
-    action_manager->createAction("file.open", tr("Open File/Project...(&O)"),
-                                 QKeySequence::Open);  // ctrl + n
+    action_manager->createAction("file.open", tr("Open File...(&o)"),
+                                 QKeySequence::Open);  // ctrl + o
+    action_manager->createAction(
+        "file.openDirectory", tr("Open Directory...(&O)"),
+        QKeySequence("Ctrl+Shift+O"));  // ctrl + shift + o
 
-    action_manager->createAction("file.save", tr("Save(&S)"),
+    action_manager->createAction("file.save", tr("Save(&s)"),
                                  QKeySequence::Save);  // ctrl + s
     action_manager->createAction("file.saveas", tr("Save As..."),
                                  QKeySequence::SaveAs);  // ctrl + shift + s

@@ -1,7 +1,6 @@
 #ifndef MMM_MMAPEDITEVENT_HPP
 #define MMM_MMAPEDITEVENT_HPP
 
-#include <memory>
 #include <mmm/ObjectHandle.hpp>
 #include <variant>
 
@@ -24,6 +23,7 @@ enum class MMapEditEventType {
 
 using MapEditData = std::variant<NoteUUID, Timing*>;
 
+// 编辑事件
 struct MMapEditEvent {
     MMapEditEventType type;
     MapEditData editData;

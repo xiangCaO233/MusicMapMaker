@@ -1,5 +1,6 @@
 #include <audio/track/trackmanager.h>
 
+#include <action/modules/file/FileActionHandler.hpp>
 #include <canvas/map/MapCanvas.hpp>
 #include <memory>
 #include <mmm/project/MProject.hpp>
@@ -11,6 +12,15 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
     : QObject(parent) {
     map_canvas = canvas;
     track_manager = trackmanager;
+    auto service = this;
+
+    // 连接action的打开文件夹操作到此
+    connect(FileActionHandler::instance(), &FileActionHandler::open_directory,
+            [service](std::string dir) {
+                service->onOpenProject(dir);
+                service->selectProject(
+                    std::filesystem::path(dir).filename().generic_string());
+            });
 }
 
 // 析构ProjectService
@@ -23,9 +33,11 @@ ProjectService::~ProjectService() {
 void ProjectService::selectProject(std::string_view project_name) {
     auto it = projects.find(project_name);
     if (it != projects.end()) {
-        emit activateProject(it->second.get());
+        current_selected_porject = it->second.get();
+        emit activateProject(current_selected_porject);
     }
 }
+MProject* ProjectService::currentPorject() { return current_selected_porject; }
 
 void ProjectService::selectMap(std::string_view current_project_name,
                                MMap* map) {
@@ -76,8 +88,8 @@ void ProjectService::onOpenProject(std::string_view path) {
         // 打开项目
         project->open(project_path.generic_string());
     }
-    // 发送更新列表信号
-    emit updateProjectListView(&projects);
+    // 发送更新项目列表信号
+    emit updateProjectList(&projects);
 }
 
 void ProjectService::onCloseProject(std::string_view project_name) {
@@ -88,5 +100,5 @@ void ProjectService::onCloseProject(std::string_view project_name) {
     }
     projects.erase(it);
     // 发送更新列表信号
-    emit updateProjectListView(&projects);
+    emit updateProjectList(&projects);
 }

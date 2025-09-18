@@ -29,95 +29,95 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="352"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="345"/>
         <source>backward 5 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="434"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="427"/>
         <source>forward 5 seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="553"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="546"/>
         <source>time unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="581"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="574"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="617"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="610"/>
         <source>volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="653"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="646"/>
         <source>Apply to Graph</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="673"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="666"/>
         <source>Stretcher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="681"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="674"/>
         <source>expected playback speed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="732"/>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="745"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="725"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="738"/>
         <source>Since the actual sampling is indivisible, the actual playback speed may not be exactly the same as the expected playback speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="735"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="728"/>
         <source>actual playback speed: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="785"/>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="917"/>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1711"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="778"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="910"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1704"/>
         <source>reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="793"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="786"/>
         <source>PitchShifter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="813"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="806"/>
         <source>+12.0 is one octave higher, -12.0 is one octave lower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="816"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="809"/>
         <source>semitones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="861"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="854"/>
         <source>change pitch directly by scale value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="864"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="857"/>
         <source>scale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="925"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="918"/>
         <source>GraphicEqualizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1721"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1714"/>
         <source>Compresser</source>
         <translation type="unfinished"></translation>
     </message>
@@ -181,6 +181,29 @@
     </message>
 </context>
 <context>
+    <name>FileActionHandler</name>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="24"/>
+        <source>select file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="25"/>
+        <source>Audio File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="26"/>
+        <source>Map File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="40"/>
+        <source>select project directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FileActions</name>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="9"/>
@@ -189,26 +212,31 @@
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="11"/>
-        <source>New File...(&amp;N)</source>
+        <source>New File...(&amp;n)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="13"/>
-        <source>Open File/Project...(&amp;O)</source>
+        <source>Open File...(&amp;o)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="16"/>
-        <source>Save(&amp;S)</source>
+        <source>Open Directory...(&amp;O)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="18"/>
-        <source>Save As...</source>
+        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="19"/>
+        <source>Save(&amp;s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="21"/>
+        <source>Save As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="24"/>
         <source>Export...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -248,7 +276,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="103"/>
+        <location filename="../src/ui/mainwindow.cpp" line="106"/>
         <source>MusicMapMaker--&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -346,58 +374,28 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="51"/>
-        <source>Recent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="73"/>
-        <source>Projects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="112"/>
-        <source>New</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="130"/>
-        <source>Add</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="148"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="191"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="49"/>
         <source>Maps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="216"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="74"/>
         <source>Audios</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="241"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="99"/>
         <source>Images</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="266"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="124"/>
         <source>Videos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="325"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="183"/>
         <source>preferrence</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="18"/>
-        <source>select project directory</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

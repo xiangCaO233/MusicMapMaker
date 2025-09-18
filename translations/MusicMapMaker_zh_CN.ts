@@ -29,95 +29,95 @@
         <translation>实时</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="352"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="345"/>
         <source>backward 5 seconds</source>
         <translation>快退五秒</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="434"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="427"/>
         <source>forward 5 seconds</source>
         <translation>快进五秒</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="553"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="546"/>
         <source>time unit</source>
         <translation>时间单位</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="581"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="574"/>
         <source>Basic</source>
         <translation>基本设置</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="617"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="610"/>
         <source>volume</source>
         <translation>音量</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="653"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="646"/>
         <source>Apply to Graph</source>
         <translation>应用到图形</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="673"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="666"/>
         <source>Stretcher</source>
         <translation>拉伸器</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="681"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="674"/>
         <source>expected playback speed:</source>
         <translation>期望的播放速度:</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="732"/>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="745"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="725"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="738"/>
         <source>Since the actual sampling is indivisible, the actual playback speed may not be exactly the same as the expected playback speed.</source>
         <translation>由于实际采样是不可分割的，因此实际播放速度可能与预期播放速度不完全相同。</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="735"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="728"/>
         <source>actual playback speed: </source>
         <translation>实际播放速度: </translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="785"/>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="917"/>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1711"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="778"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="910"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1704"/>
         <source>reset</source>
         <translation>重置</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="793"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="786"/>
         <source>PitchShifter</source>
         <translation>变调器</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="813"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="806"/>
         <source>+12.0 is one octave higher, -12.0 is one octave lower</source>
         <translation>+12.0 表示高一个八度，-12.0 表示低一个八度</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="816"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="809"/>
         <source>semitones</source>
         <translation>半音</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="861"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="854"/>
         <source>change pitch directly by scale value</source>
         <translation>通过比例值直接改变音高</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="864"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="857"/>
         <source>scale</source>
         <translation>比例</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="925"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="918"/>
         <source>GraphicEqualizer</source>
         <translation>图形均衡器</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1721"/>
+        <location filename="../src/ui/audio/control/audiocontroller.ui" line="1714"/>
         <source>Compresser</source>
         <translation>压缩器</translation>
     </message>
@@ -181,6 +181,29 @@
     </message>
 </context>
 <context>
+    <name>FileActionHandler</name>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="24"/>
+        <source>select file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="25"/>
+        <source>Audio File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="26"/>
+        <source>Map File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="40"/>
+        <source>select project directory</source>
+        <translation type="unfinished">选择项目目录</translation>
+    </message>
+</context>
+<context>
     <name>FileActions</name>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="9"/>
@@ -188,27 +211,44 @@
         <translation>新建项目...</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="11"/>
         <source>New File...(&amp;N)</source>
-        <translation>新建文件...(&amp;N)</translation>
+        <translation type="vanished">新建文件...(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Open File/Project...(&amp;O)</source>
+        <translation type="vanished">打开文件/项目...(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Save(&amp;S)</source>
+        <translation type="vanished">保存(&amp;S)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="11"/>
+        <source>New File...(&amp;n)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="13"/>
-        <source>Open File/Project...(&amp;O)</source>
-        <translation>打开文件/项目...(&amp;O)</translation>
+        <source>Open File...(&amp;o)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="16"/>
-        <source>Save(&amp;S)</source>
-        <translation>保存(&amp;S)</translation>
+        <source>Open Directory...(&amp;O)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="18"/>
+        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="19"/>
+        <source>Save(&amp;s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="21"/>
         <source>Save As...</source>
         <translation>另存为...</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="21"/>
+        <location filename="../src/ui/action/modules/file/FileActions.cpp" line="24"/>
         <source>Export...</source>
         <translation>导出...</translation>
     </message>
@@ -248,7 +288,7 @@
         <translation>音轨管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="103"/>
+        <location filename="../src/ui/mainwindow.cpp" line="106"/>
         <source>MusicMapMaker--&gt;</source>
         <translation>谱面编辑器--&gt;</translation>
     </message>
@@ -350,59 +390,53 @@
         <translation>项目管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="51"/>
         <source>Recent</source>
-        <translation>最近</translation>
+        <translation type="vanished">最近</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="73"/>
         <source>Projects</source>
-        <translation>项目列表</translation>
+        <translation type="vanished">项目列表</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="112"/>
         <source>New</source>
-        <translation>新建</translation>
+        <translation type="vanished">新建</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="130"/>
         <source>Add</source>
-        <translation>添加</translation>
+        <translation type="vanished">添加</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="148"/>
         <source>Close</source>
-        <translation>关闭</translation>
+        <translation type="vanished">关闭</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="191"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="49"/>
         <source>Maps</source>
         <translation>谱面</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="216"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="74"/>
         <source>Audios</source>
         <translation>音频</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="241"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="99"/>
         <source>Images</source>
         <translation>图像</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="266"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="124"/>
         <source>Videos</source>
         <translation>视频</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="325"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="183"/>
         <source>preferrence</source>
         <translation>偏好</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="18"/>
         <source>select project directory</source>
-        <translation>选择项目目录</translation>
+        <translation type="vanished">选择项目目录</translation>
     </message>
 </context>
 <context>

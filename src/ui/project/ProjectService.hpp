@@ -18,7 +18,7 @@ class ProjectService : public QObject {
     void onCloseProject(std::string_view project_name);
 
    signals:
-    void updateProjectListView(
+    void updateProjectList(
         const std::unordered_map<std::string, std::unique_ptr<MProject>,
                                  StringHash, std::equal_to<>>* projects) const;
     void activateProject(MProject* activated_project);
@@ -32,6 +32,7 @@ class ProjectService : public QObject {
     ~ProjectService() override;
 
     void selectProject(std::string_view project_name);
+    MProject* currentPorject();
     void selectMap(std::string_view current_project_name, MMap* map);
 
    private:
@@ -39,6 +40,8 @@ class ProjectService : public QObject {
     std::unordered_map<std::string, std::unique_ptr<MProject>, StringHash,
                        std::equal_to<>>
         projects;
+
+    MProject* current_selected_porject{nullptr};
 
     // 绑定的画布上下文
     MapCanvas* map_canvas{nullptr};

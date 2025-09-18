@@ -12,12 +12,12 @@
 ProjectManager::ProjectManager(QWidget* parent)
     : QWidget(parent), ui(new Ui::ProjectManager) {
     ui->setupUi(this);
-    ui->main_splitter->setSizes({0, 300});
+    // ui->main_splitter->setSizes({0, 300});
     ui->project_content_splitter->setSizes({220, 300});
 
     // 项目列表模型
-    auto project_list_model = new QStandardItemModel(ui->project_list);
-    ui->project_list->setModel(project_list_model);
+    // auto project_list_model = new QStandardItemModel(ui->project_list);
+    // ui->project_list->setModel(project_list_model);
 
     // 谱面列表模型
     auto map_list_model = new QStandardItemModel(ui->map_listView);
@@ -53,27 +53,29 @@ void ProjectManager::initService(MapCanvas* canvas,
             &ProjectService::onOpenProject);
     connect(this, &ProjectManager::closeProject, service,
             &ProjectService::onCloseProject);
-    connect(service, &ProjectService::updateProjectListView, this,
-            &ProjectManager::onUpdateProjectListView);
+    // connect(service, &ProjectService::updateProjectListView, this,
+    //         &ProjectManager::onUpdateProjectListView);
     connect(service, &ProjectService::activateProject, this,
             &ProjectManager::onActivateProject);
 }
 
-void ProjectManager::onUpdateProjectListView(
-    const std::unordered_map<std::string, std::unique_ptr<MProject>, StringHash,
-                             std::equal_to<>>* projects) const {
-    auto model = qobject_cast<QStandardItemModel*>(ui->project_list->model());
-    model->clear();
-    for (const auto& [name, project] : *projects) {
-        // 新建列表项
-        auto project_item = new QStandardItem(QString::fromStdString(name));
-        project_item->setData(QVariant::fromValue(name));
-        project_item->setEditable(false);
-
-        // 添加列表项
-        model->appendRow(project_item);
-    }
-}
+// void ProjectManager::onUpdateProjectListView(
+//     const std::unordered_map<std::string, std::unique_ptr<MProject>,
+//     StringHash,
+//                              std::equal_to<>>* projects) const {
+//     auto model =
+//     qobject_cast<QStandardItemModel*>(ui->project_list->model());
+//     model->clear();
+//     for (const auto& [name, project] : *projects) {
+//         // 新建列表项
+//         auto project_item = new QStandardItem(QString::fromStdString(name));
+//         project_item->setData(QVariant::fromValue(name));
+//         project_item->setEditable(false);
+//
+//         // 添加列表项
+//         model->appendRow(project_item);
+//     }
+// }
 
 // 激活项目
 void ProjectManager::onActivateProject(MProject* activated_project) {

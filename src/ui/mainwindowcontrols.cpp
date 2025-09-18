@@ -19,6 +19,8 @@ void MainWindow::initActions() {
     am->connectCommand("project.new", fileHandler, SLOT(onNewProject()));
     am->connectCommand("file.new", fileHandler, SLOT(onNewFile()));
     am->connectCommand("file.open", fileHandler, SLOT(onOpen()));
+    am->connectCommand("file.openDirectory", fileHandler,
+                       SLOT(onOpenDirectory()));
 
     am->connectCommand("file.save", fileHandler, SLOT(onSave()));
     am->connectCommand("file.saveas", fileHandler, SLOT(onSaveAs()));
@@ -27,6 +29,7 @@ void MainWindow::initActions() {
     ui->menuFile_F->addAction(am->getAction("project.new"));
     ui->menuFile_F->addAction(am->getAction("file.new"));
     ui->menuFile_F->addAction(am->getAction("file.open"));
+    ui->menuFile_F->addAction(am->getAction("file.openDirectory"));
     ui->menuFile_F->addSeparator();
     ui->menuFile_F->addAction(am->getAction("file.save"));
     ui->menuFile_F->addAction(am->getAction("file.saveas"));

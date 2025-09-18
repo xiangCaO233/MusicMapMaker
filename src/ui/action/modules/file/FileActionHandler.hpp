@@ -17,10 +17,15 @@ class FileActionHandler : public QObject {
     // 析构FileActionHandler
     ~FileActionHandler() override;
 
+   signals:
+    void open(std::string file);
+    void open_directory(std::string dir);
+
    public slots:
     void onNewProject();
     void onNewFile();
     void onOpen();
+    void onOpenDirectory();
 
     void onSave();
     void onSaveAs();
