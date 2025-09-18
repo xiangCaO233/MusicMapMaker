@@ -9,8 +9,6 @@
 
 AutoResizeTableWidget::AutoResizeTableWidget(QWidget* parent)
     : QTableWidget(parent) {
-    verticalHeader()->hide();
-
     // 监听列宽度调整
     connect(horizontalHeader(), &QHeaderView::sectionResized, this,
             &AutoResizeTableWidget::columsection_resized);

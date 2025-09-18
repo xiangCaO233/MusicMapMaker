@@ -167,6 +167,10 @@ set(PROJECT_SOURCES
     src/ui/edit/mapeditorevent.cpp
     src/ui/edit/mapeditorcontrols.cpp
     src/ui/edit/mapeditor.ui
+    src/ui/edit/timingmanager.h
+    src/ui/edit/timingmanager.cpp
+    src/ui/edit/timingmanagercontrolls.cpp
+    src/ui/edit/timingmanager.ui
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp
     src/ui/project/projectmanagercontrols.cpp
@@ -226,8 +230,7 @@ qt_add_executable(
   themes/ColinsTheme/Dark/darkstyle.qrc
   themes/ColinsTheme/Light/lightstyle.qrc
   themes/OpenTheme/QtThemeDark/QtThemeDark.qrc
-  themes/OpenTheme/QtThemeLight/QtThemeLight.qrc
-  src/ui/edit/timingmanager.h src/ui/edit/timingmanager.cpp src/ui/edit/timingmanager.ui)
+  themes/OpenTheme/QtThemeLight/QtThemeLight.qrc)
 
 add_dependencies(MusicMapMaker IonCachyEngin-dev)
 
