@@ -12,6 +12,7 @@
 #include <mmm/obj/rm/Composite.hpp>
 #include <mmm/timing/Timing.hpp>
 #include <optional>
+#include <utility>
 #include <vector>
 
 // --- 辅助函数 ---
@@ -773,6 +774,58 @@ class TimingMap {
         // 的最后一个时间点。
         --it;
         return it->second.back().get();
+    }
+
+    /**
+     * @brief 用新数据替换一个旧的 Timing 对象，并返回旧数据的所有权。
+     * @param old_timing_ptr 指向要被替换的对象的指针。
+     * @param new_timing_data 包含新数据的 unique_ptr。
+     * @return 成功则返回被替换的旧对象的 unique_ptr，失败则返回 nullptr。
+     */
+    std::unique_ptr<Timing> update_timing_point(
+        Timing* old_timing_ptr, std::unique_ptr<Timing> new_timing_data) {
+        // 输入验证
+        // 确保我们有有效的目标指针和有效的新数据。
+        if (!old_timing_ptr || !new_timing_data) {
+            return nullptr;
+        }
+
+        if (old_timing_ptr->timestamp != new_timing_data->timestamp) {
+            return nullptr;
+        }
+
+        // 查找时间戳对应的表
+        auto map_it = m_timeline.find(old_timing_ptr->timestamp);
+        if (map_it == m_timeline.end()) {
+            // 如果连时间戳都不存在，那么这个对象肯定不在这里。
+            return nullptr;
+        }
+
+        // 在表中查找精确的对象
+        auto& timings_vec = map_it->second;
+        auto vec_it = std::find_if(timings_vec.begin(), timings_vec.end(),
+                                   [&](const std::unique_ptr<Timing>& p) {
+                                       // 比较裸指针的地址来确认是同一个对象。
+                                       return p.get() == old_timing_ptr;
+                                   });
+
+        if (vec_it == timings_vec.end()) {
+            // 在这个时间戳下找到了向量，但没有找到我们想更新的那个具体对象。
+            // old_timing_ptr 可能是一个悬垂指针或来自其他地方。
+            return nullptr;
+        }
+
+        // 执行替换并返回旧数据
+
+        m_version++;  // 只有在确定要修改时才增加版本号
+
+        // std::exchange(*vec_it, std::move(new_timing_data)) ：
+        //  将 new_timing_data 的所有权移动到 *vec_it 中
+        //  将 *vec_it 原来的值（即旧的 unique_ptr）返回
+        std::unique_ptr<Timing> old_data =
+            std::exchange(*vec_it, std::move(new_timing_data));
+
+        return old_data;
     }
 
     /**

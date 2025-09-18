@@ -14,79 +14,211 @@ class OperationCommand {
     virtual void undo() = 0;
 };
 
-// class AddTimingPointCommand : public OperationCommand {
-//    public:
-//     AddTimingPointCommand(TimingMap& timing_map, const Timing& timing_to_add)
-//         : m_timing_map(timing_map), m_timing(timing_to_add) {}
-//
-//     bool execute() override { return m_timing_map.add_timing_point(m_timing);
-//     }
-//
-//     void undo() override {
-//         // 撤销添加就是移除
-//         m_timing_map.remove_timing_point(m_timing);
-//     }
-//
-//    private:
-//     TimingMap& m_timing_map;
-//     Timing m_timing;  // 按值存储，作为数据的备份
-// };
-//
-// class RemoveTimingPointCommand : public OperationCommand {
-//    public:
-//     RemoveTimingPointCommand(TimingMap& timing_map,
-//                              const Timing& timing_to_remove)
-//         : m_timing_map(timing_map), m_timing(timing_to_remove) {}
-//
-//     bool execute() override {
-//         return m_timing_map.remove_timing_point(m_timing);
-//     }
-//
-//     void undo() override {
-//         // 撤销移除就是重新添加
-//         m_timing_map.add_timing_point(m_timing);
-//     }
-//
-//    private:
-//     TimingMap& m_timing_map;
-//     Timing m_timing;  // 按值存储，作为数据的备份
-// };
-//
-// class RemoveTimingsAtPointCommand : public OperationCommand {
-//    public:
-//     RemoveTimingsAtPointCommand(TimingMap& timing_map, int32_t timestamp)
-//         : m_timing_map(timing_map), m_timestamp(timestamp) {}
-//
-//     bool execute() override {
-//         // 调用修改后的方法，它会返回被删除的数据
-//         auto removed_data =
-//         m_timing_map.remove_timings_at_point(m_timestamp);
-//
-//         if (removed_data.has_value()) {
-//             // 保存被删除的数据，以便 undo
-//             m_removed_timings = std::move(*removed_data);
-//             return true;
-//         }
-//         return false;
-//     }
-//
-//     void undo() override {
-//         // 如果我们成功备份了数据
-//         if (!m_removed_timings.empty()) {
-//             // 撤销删除就是把所有备份的数据重新加回去
-//             for (const auto& timing : m_removed_timings) {
-//                 m_timing_map.add_timing_point(timing);
-//             }
-//             // 清空备份，以免在 redo 后再次 undo 时出错
-//             m_removed_timings.clear();
-//         }
-//     }
-//
-//    private:
-//     TimingMap& m_timing_map;
-//     int32_t m_timestamp;
-//     std::vector<Timing> m_removed_timings;  // 用于备份被删除的数据
-// };
+class AddTimingPointCommand : public OperationCommand {
+   public:
+    AddTimingPointCommand(TimingMap& timing_map,
+                          std::unique_ptr<Timing> timing_to_add)
+        : m_timing_map(timing_map),
+          m_timing_data(std::move(timing_to_add)),
+          m_added_timing_ptr(nullptr) {}
+
+    bool execute() override {
+        // 如果数据已经被移走（例如在 redo 之后又 undo），则直接返回失败
+        if (!m_timing_data) return false;
+
+        // 调用 map 的 add 方法，所有权从命令转移到 map
+        m_added_timing_ptr =
+            m_timing_map.add_timing_point(std::move(m_timing_data));
+
+        if (m_added_timing_ptr) {
+            // 操作成功，发布事件
+            // queue.push({MMapEditorEventType::TimingAdded,
+            // m_added_timing_ptr});
+            return true;
+        }
+
+        // 添加失败，可能因为重复。我们需要取回所有权。
+        // （这需要 add_timing_point 在失败时能返回
+        // unique_ptr，或者我们就不支持失败情况） 为了简化，我们假设 add 失败时
+        // timing_data 不会被销毁。
+        return false;
+    }
+
+    void undo() override {
+        // 如果没有记录下成功添加的对象的指针，则无法撤销
+        if (!m_added_timing_ptr) return;
+
+        // 调用 map 的 remove 方法，所有权从 map 转移回命令的 m_timing_data 中
+        m_timing_data = m_timing_map.remove_timing_point(m_added_timing_ptr);
+
+        if (m_timing_data) {
+            // 撤销成功，发布事件
+            // queue.push(
+            //     {MMapEditorEventType::TimingRemoved, m_added_timing_ptr});
+        }
+
+        // 清空指针，因为对象已不在 map 中，此指针不再有效
+        m_added_timing_ptr = nullptr;
+    }
+
+   private:
+    TimingMap& m_timing_map;
+    // 用于存储 Timing 数据的 unique_ptr。所有权在 execute 和 undo 之间转移。
+    std::unique_ptr<Timing> m_timing_data;
+    // 指向被添加到 map 中的那个对象的非拥有指针，用于在 undo 时精确定位。
+    Timing* m_added_timing_ptr;
+};
+
+class RemoveTimingPointCommand : public OperationCommand {
+   public:
+    // 构造函数接收一个裸指针，用于识别要删除的目标
+    RemoveTimingPointCommand(TimingMap& timing_map, Timing* timing_to_remove)
+        : m_timing_map(timing_map), m_timing_to_remove_ptr(timing_to_remove) {}
+
+    bool execute() override {
+        if (!m_timing_to_remove_ptr) return false;
+
+        // 调用 map 的 remove 方法，所有权从 map 转移到命令的备份成员中
+        m_removed_timing_backup =
+            m_timing_map.remove_timing_point(m_timing_to_remove_ptr);
+
+        if (m_removed_timing_backup) {
+            // 操作成功，发布事件
+            // queue.push(
+            //     {MMapEditorEventType::TimingRemoved,
+            //     m_timing_to_remove_ptr});
+            return true;
+        }
+        return false;
+    }
+
+    void undo() override {
+        // 如果没有备份数据，说明 execute 未成功或已撤销
+        if (!m_removed_timing_backup) return;
+
+        // 调用 map 的 add 方法，所有权从命令的备份成员转移回 map
+        Timing* restored_ptr =
+            m_timing_map.add_timing_point(std::move(m_removed_timing_backup));
+
+        if (restored_ptr) {
+            // 撤销成功，发布事件
+            // queue.push({MMapEditorEventType::TimingAdded, restored_ptr});
+        }
+    }
+
+   private:
+    TimingMap& m_timing_map;
+    // 用于识别要删除的对象的非拥有指针
+    Timing* m_timing_to_remove_ptr;
+    // 用于存储被删除对象数据的备份，以便 undo
+    std::unique_ptr<Timing> m_removed_timing_backup;
+};
+
+class UpdateTimingCommand : public OperationCommand {
+   public:
+    // 构造函数接收一个裸指针用于识别目标，以及包含新数据的 unique_ptr
+    UpdateTimingCommand(TimingMap& timing_map, Timing* timing_to_update,
+                        std::unique_ptr<Timing> new_data)
+        : m_timing_map(timing_map),
+          m_timing_to_update_ptr(timing_to_update),
+          m_new_data(std::move(new_data)) {}
+
+    bool execute() override {
+        if (!m_timing_to_update_ptr || !m_new_data) return false;
+
+        // 调用 map 的 update 方法，将新数据的所有权交给 map，
+        // 同时接管 map 返回的旧数据的所有权作为备份。
+        m_old_data_backup = m_timing_map.update_timing_point(
+            m_timing_to_update_ptr, std::move(m_new_data));
+
+        if (m_old_data_backup) {
+            // 操作成功，发布事件
+            // queue.push(
+            //     {MMapEditorEventType::TimingUpdated,
+            //     m_timing_to_update_ptr});
+            return true;
+        }
+        return false;
+    }
+
+    void undo() override {
+        if (!m_timing_to_update_ptr || !m_old_data_backup) return;
+
+        // 再次调用 map 的 update 方法，但这次是用备份的旧数据去替换当前数据。
+        // 当前数据（即之前的新数据）的所有权被返回，并存入 m_new_data 以备
+        // redo。
+        m_new_data = m_timing_map.update_timing_point(
+            m_timing_to_update_ptr, std::move(m_old_data_backup));
+
+        if (m_new_data) {
+            // 撤销成功，也发布更新事件，因为对象状态同样发生了变化
+            // queue.push({MMapEditorEventType::TimingUpdated,
+            // m_timing_to_update_ptr});
+        }
+    }
+
+   private:
+    TimingMap& m_timing_map;
+    // 用于识别要更新的对象的非拥有指针
+    Timing* m_timing_to_update_ptr;
+    // 用于存储被替换掉的旧数据的备份
+    std::unique_ptr<Timing> m_old_data_backup;
+    // 用于存储要应用的新数据
+    std::unique_ptr<Timing> m_new_data;
+};
+
+class RemoveTimingsAtPointCommand : public OperationCommand {
+   public:
+    RemoveTimingsAtPointCommand(TimingMap& timing_map, int32_t timestamp)
+        : m_timing_map(timing_map), m_timestamp(timestamp) {}
+
+    bool execute() override {
+        // 在执行前清空备份，以支持 redo
+        m_removed_timings_backup.clear();
+
+        // 调用 map 的方法，它返回一个包含所有被删除对象所有权的 optional
+        auto removed_data_opt =
+            m_timing_map.remove_timings_at_point(m_timestamp);
+
+        if (removed_data_opt.has_value()) {
+            m_removed_timings_backup = std::move(*removed_data_opt);
+
+            // 为每个被删除的对象发布事件
+            // for (const auto& removed_timing : m_removed_timings_backup) {
+            //     queue.push({MMapEditorEventType::TimingRemoved,
+            //     removed_timing.get()});
+            // }
+            return true;
+        }
+        return false;
+    }
+
+    void undo() override {
+        if (m_removed_timings_backup.empty()) return;
+
+        // 遍历备份（必须使用非 const 引用以便 std::move）
+        for (auto& timing_data : m_removed_timings_backup) {
+            if (timing_data) {
+                // 将所有权交还给 map，并获取指向新添加对象的指针
+                Timing* restored_ptr =
+                    m_timing_map.add_timing_point(std::move(timing_data));
+                if (restored_ptr) {
+                    // 为每个恢复的对象发布事件
+                    // queue.push({MMapEditorEventType::TimingAdded,
+                    // restored_ptr});
+                }
+            }
+        }
+        // 清空备份，因为所有权已全部移交
+        m_removed_timings_backup.clear();
+    }
+
+   private:
+    TimingMap& m_timing_map;
+    int32_t m_timestamp;
+    // 存储一批被删除对象的所有权
+    std::vector<std::unique_ptr<Timing>> m_removed_timings_backup;
+};
 
 class UpdateNoteCommand : public OperationCommand {
    public:
