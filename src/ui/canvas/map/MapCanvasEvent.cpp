@@ -50,13 +50,16 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
     auto modifiers = e->modifiers();
     auto d = e->angleDelta();
     auto dy = d.y();
+
     if (map) {
         if (modifiers.testFlag(Qt::ShiftModifier)) {
             if (dy > 0) {
-                mapinfo->realTimeInfo.current_time_info += 200.;
+                mapinfo->realTimeInfo.current_time_info +=
+                    (mapinfo->editorInfo.pageScrollStep * 3);
             }
             if (dy < 0) {
-                mapinfo->realTimeInfo.current_time_info += -200.;
+                mapinfo->realTimeInfo.current_time_info +=
+                    -(mapinfo->editorInfo.pageScrollStep * 3);
             }
             audio_callback->set_playpos_for(
                 map->base_metadata().main_audio_path.generic_string(),
@@ -65,17 +68,21 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
         } else if (modifiers.testFlag(Qt::ControlModifier)) {
             // 修改缩放
             if (dy > 0) {
-                mapinfo->baseInfo.timeline_zoom += 0.05;
+                mapinfo->baseInfo.timeline_zoom +=
+                    mapinfo->editorInfo.timelineScrollStep;
             }
             if (dy < 0) {
-                mapinfo->baseInfo.timeline_zoom -= 0.05;
+                mapinfo->baseInfo.timeline_zoom -=
+                    mapinfo->editorInfo.timelineScrollStep;
             }
         } else {
             if (dy > 0) {
-                mapinfo->realTimeInfo.current_time_info += 50.;
+                mapinfo->realTimeInfo.current_time_info +=
+                    mapinfo->editorInfo.pageScrollStep;
             }
             if (dy < 0) {
-                mapinfo->realTimeInfo.current_time_info += -50.;
+                mapinfo->realTimeInfo.current_time_info +=
+                    -mapinfo->editorInfo.pageScrollStep;
             }
             audio_callback->set_playpos_for(
                 map->base_metadata().main_audio_path.generic_string(),

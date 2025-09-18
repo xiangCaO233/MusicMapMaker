@@ -31,6 +31,12 @@ struct EditorInfo {
     // 工具选择
     EditToolType currentEditTool;
 
+    // 页滚动步长
+    float pageScrollStep{120.f};
+
+    // 时间线缩放滚动步长
+    float timelineScrollStep{.4f};
+
     // 当前的map指针
     MMap* map;
 
