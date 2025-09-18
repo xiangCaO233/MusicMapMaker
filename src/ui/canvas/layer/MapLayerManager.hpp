@@ -64,15 +64,17 @@ class MapLayerManager : public LayerManager {
     }
 
     // 获取工具系统
-    inline ToolSystem* get_tool_system() { return &toolSystem; }
+    ToolSystem* get_tool_system() { return &toolSystem; }
 
     // 获取工具命令队列
-    inline ThreadSafeQueue<ToolCommand>* get_tool_cmdq() {
-        return &toolCommandQueue;
+    ThreadSafeQueue<ToolCommand>* get_tool_cmdq() { return &toolCommandQueue; }
+
+    ThreadSafeQueue<MMapEditEvent>* get_edit_eventq() {
+        return &editEventQueue;
     }
 
     // 获取工具交互管理
-    inline ToolInteractionState* get_tool_interaction_state() {
+    ToolInteractionState* get_tool_interaction_state() {
         return &toolInteractionState;
     }
 

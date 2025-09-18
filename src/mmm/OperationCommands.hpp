@@ -4,14 +4,16 @@
 #include <QDebug>
 #include <mmm/DataStructures.hpp>
 #include <mmm/NoteIDManager.hpp>
+#include <mmm/map/editor/MMapEditEvent.hpp>
 #include <mmm/timing/Timing.hpp>
+#include <tool/ThreadSafeQueue.hpp>
 #include <unordered_set>
 
 class OperationCommand {
    public:
     virtual ~OperationCommand() = default;
-    virtual bool execute() = 0;
-    virtual void undo() = 0;
+    virtual bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) = 0;
+    virtual void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) = 0;
 };
 
 class AddTimingPointCommand : public OperationCommand {
@@ -22,7 +24,7 @@ class AddTimingPointCommand : public OperationCommand {
           m_timing_data(std::move(timing_to_add)),
           m_added_timing_ptr(nullptr) {}
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 如果数据已经被移走（例如在 redo 之后又 undo），则直接返回失败
         if (!m_timing_data) return false;
 
@@ -32,8 +34,8 @@ class AddTimingPointCommand : public OperationCommand {
 
         if (m_added_timing_ptr) {
             // 操作成功，发布事件
-            // queue.push({MMapEditorEventType::TimingAdded,
-            // m_added_timing_ptr});
+            editEventQueue.push(
+                {MMapEditEventType::TimingAdded, m_added_timing_ptr});
             return true;
         }
 
@@ -44,7 +46,7 @@ class AddTimingPointCommand : public OperationCommand {
         return false;
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 如果没有记录下成功添加的对象的指针，则无法撤销
         if (!m_added_timing_ptr) return;
 
@@ -53,8 +55,8 @@ class AddTimingPointCommand : public OperationCommand {
 
         if (m_timing_data) {
             // 撤销成功，发布事件
-            // queue.push(
-            //     {MMapEditorEventType::TimingRemoved, m_added_timing_ptr});
+            editEventQueue.push(
+                {MMapEditEventType::TimingRemoved, m_added_timing_ptr});
         }
 
         // 清空指针，因为对象已不在 map 中，此指针不再有效
@@ -75,7 +77,7 @@ class RemoveTimingPointCommand : public OperationCommand {
     RemoveTimingPointCommand(TimingMap& timing_map, Timing* timing_to_remove)
         : m_timing_map(timing_map), m_timing_to_remove_ptr(timing_to_remove) {}
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         if (!m_timing_to_remove_ptr) return false;
 
         // 调用 map 的 remove 方法，所有权从 map 转移到命令的备份成员中
@@ -84,15 +86,14 @@ class RemoveTimingPointCommand : public OperationCommand {
 
         if (m_removed_timing_backup) {
             // 操作成功，发布事件
-            // queue.push(
-            //     {MMapEditorEventType::TimingRemoved,
-            //     m_timing_to_remove_ptr});
+            editEventQueue.push(
+                {MMapEditEventType::TimingRemoved, m_timing_to_remove_ptr});
             return true;
         }
         return false;
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 如果没有备份数据，说明 execute 未成功或已撤销
         if (!m_removed_timing_backup) return;
 
@@ -102,7 +103,7 @@ class RemoveTimingPointCommand : public OperationCommand {
 
         if (restored_ptr) {
             // 撤销成功，发布事件
-            // queue.push({MMapEditorEventType::TimingAdded, restored_ptr});
+            editEventQueue.push({MMapEditEventType::TimingAdded, restored_ptr});
         }
     }
 
@@ -123,7 +124,7 @@ class UpdateTimingCommand : public OperationCommand {
           m_timing_to_update_ptr(timing_to_update),
           m_new_data(std::move(new_data)) {}
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         if (!m_timing_to_update_ptr || !m_new_data) return false;
 
         // 调用 map 的 update 方法，将新数据的所有权交给 map，
@@ -133,15 +134,14 @@ class UpdateTimingCommand : public OperationCommand {
 
         if (m_old_data_backup) {
             // 操作成功，发布事件
-            // queue.push(
-            //     {MMapEditorEventType::TimingUpdated,
-            //     m_timing_to_update_ptr});
+            editEventQueue.push(
+                {MMapEditEventType::TimingUpdated, m_timing_to_update_ptr});
             return true;
         }
         return false;
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         if (!m_timing_to_update_ptr || !m_old_data_backup) return;
 
         // 再次调用 map 的 update 方法，但这次是用备份的旧数据去替换当前数据。
@@ -152,8 +152,8 @@ class UpdateTimingCommand : public OperationCommand {
 
         if (m_new_data) {
             // 撤销成功，也发布更新事件，因为对象状态同样发生了变化
-            // queue.push({MMapEditorEventType::TimingUpdated,
-            // m_timing_to_update_ptr});
+            editEventQueue.push(
+                {MMapEditEventType::TimingUpdated, m_timing_to_update_ptr});
         }
     }
 
@@ -172,7 +172,7 @@ class RemoveTimingsAtPointCommand : public OperationCommand {
     RemoveTimingsAtPointCommand(TimingMap& timing_map, int32_t timestamp)
         : m_timing_map(timing_map), m_timestamp(timestamp) {}
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 在执行前清空备份，以支持 redo
         m_removed_timings_backup.clear();
 
@@ -184,16 +184,16 @@ class RemoveTimingsAtPointCommand : public OperationCommand {
             m_removed_timings_backup = std::move(*removed_data_opt);
 
             // 为每个被删除的对象发布事件
-            // for (const auto& removed_timing : m_removed_timings_backup) {
-            //     queue.push({MMapEditorEventType::TimingRemoved,
-            //     removed_timing.get()});
-            // }
+            for (const auto& removed_timing : m_removed_timings_backup) {
+                editEventQueue.push(
+                    {MMapEditEventType::TimingRemoved, removed_timing.get()});
+            }
             return true;
         }
         return false;
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         if (m_removed_timings_backup.empty()) return;
 
         // 遍历备份（必须使用非 const 引用以便 std::move）
@@ -204,8 +204,8 @@ class RemoveTimingsAtPointCommand : public OperationCommand {
                     m_timing_map.add_timing_point(std::move(timing_data));
                 if (restored_ptr) {
                     // 为每个恢复的对象发布事件
-                    // queue.push({MMapEditorEventType::TimingAdded,
-                    // restored_ptr});
+                    editEventQueue.push(
+                        {MMapEditEventType::TimingAdded, restored_ptr});
                 }
             }
         }
@@ -230,7 +230,7 @@ class UpdateNoteCommand : public OperationCommand {
           m_id(id),
           m_new_data(std::move(new_data)) {}
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         if (!m_new_data) return false;
 
         // 动态地从稳定ID获取当前句柄
@@ -240,12 +240,16 @@ class UpdateNoteCommand : public OperationCommand {
         // 执行更新，并保存返回的“旧数据”，以便 undo
         m_old_data =
             m_collection.update_note(current_handle, std::move(m_new_data));
-        return m_old_data != nullptr;
+        auto success = m_old_data != nullptr;
+        if (success) {
+            // 发布事件
+            editEventQueue.push({MMapEditEventType::NoteUpdated, m_id});
+        }
+        return success;
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         if (!m_old_data) return;
-        qDebug() << "撤销更新物件:";
 
         // 同样，动态获取句柄
         NoteHandle current_handle = m_id_manager.get_handle(m_id);
@@ -254,6 +258,9 @@ class UpdateNoteCommand : public OperationCommand {
         // 撤销更新，就是用旧数据再更新一次
         m_new_data =
             m_collection.update_note(current_handle, std::move(m_old_data));
+
+        // 发布事件
+        editEventQueue.push({MMapEditEventType::NoteUpdated, m_id});
     }
 
    private:
@@ -273,7 +280,7 @@ class AddNoteCommand : public OperationCommand {
           m_note_to_add(std::move(note)),
           m_id(InvalidNoteUUID) {}  // 初始时没有稳定ID
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // Redo 逻辑: 如果是重做，从备份中恢复 note 数据
         if (!m_note_to_add && m_note_backup_for_redo) {
             m_note_to_add = std::move(m_note_backup_for_redo);
@@ -291,10 +298,12 @@ class AddNoteCommand : public OperationCommand {
             // 来恢复映射
             m_id_manager.update_handle(m_id, new_handle);
         }
+        // 发布事件
+        editEventQueue.push({MMapEditEventType::NoteAdded, m_id});
         return true;
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 通过稳定 ID 获取当前的句柄
         NoteHandle current_handle = m_id_manager.get_handle(m_id);
         if (!current_handle.isValid()) return;
@@ -305,6 +314,8 @@ class AddNoteCommand : public OperationCommand {
             // 从管理器中注销，但保留 m_id 以便 Redo
             m_id_manager.remove_note(m_id);
         }
+        // 发布事件
+        editEventQueue.push({MMapEditEventType::NoteRemoved, m_id});
     }
 
    private:
@@ -322,7 +333,7 @@ class RemoveNoteCommand : public OperationCommand {
                       NoteUUID id)
         : m_collection(collection), m_id_manager(id_manager), m_id(id) {}
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 通过稳定 ID 动态获取当前句柄
         NoteHandle current_handle = m_id_manager.get_handle(m_id);
         if (!current_handle.isValid()) return false;
@@ -332,20 +343,24 @@ class RemoveNoteCommand : public OperationCommand {
         if (m_removed_note_backup) {
             // 从管理器中注销
             m_id_manager.remove_note(m_id);
+            // 发布事件
+            editEventQueue.push({MMapEditEventType::NoteRemoved, m_id});
             return true;
         }
         return false;
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         if (!m_removed_note_backup) return;
 
         // 1. 撤销删除就是重新添加它，会得到一个全新的句柄
         NoteHandle new_handle =
             m_collection.add_note(std::move(m_removed_note_backup));
         if (new_handle.isValid()) {
-            // 2. 关键：通知管理器，原来的稳定ID现在指向了这个新句柄
+            // 通知管理器，原来的UUID现在指向了这个新句柄
             m_id_manager.update_handle(m_id, new_handle);
+            // 发布事件
+            editEventQueue.push({MMapEditEventType::NoteAdded, m_id});
         }
     }
 
@@ -375,7 +390,7 @@ class RemoveMultipleNotesCommand : public OperationCommand {
           m_id_manager(id_manager),
           m_ids_to_remove(ids) {}
 
-    bool execute() override {
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 在执行前清空旧的备份，以支持重做(redo)操作
         m_removed_notes_backup.clear();
 
@@ -397,13 +412,15 @@ class RemoveMultipleNotesCommand : public OperationCommand {
                 // 4. 从ID管理器中注销这个ID
                 m_id_manager.remove_note(id);
             }
+            // 发布事件
+            editEventQueue.push({MMapEditEventType::NoteRemoved, id});
         }
 
         // 如果我们成功删除了至少一个音符，则认为命令执行成功
         return !m_removed_notes_backup.empty();
     }
 
-    void undo() override {
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
         // 如果没有备份数据，说明上次执行没有删除任何东西，直接返回
         if (m_removed_notes_backup.empty()) {
             return;
@@ -419,6 +436,8 @@ class RemoveMultipleNotesCommand : public OperationCommand {
                 // 2. 关键：修复稳定ID与新句柄之间的映射关系
                 m_id_manager.update_handle(id, new_handle);
             }
+            // 发布事件
+            editEventQueue.push({MMapEditEventType::NoteAdded, id});
         }
 
         // 清空备份数据，因为所有权已经移交回 NoteCollection

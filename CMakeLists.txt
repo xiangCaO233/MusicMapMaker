@@ -118,6 +118,7 @@ set(CANVAS_SOURCES
     src/ui/canvas/tool/select/SelectTool.cpp
     src/ui/canvas/tool/note/NoteTool.cpp
     src/ui/canvas/ecs/ECSCore.cpp
+    src/ui/canvas/ecs/system/sync/SyncEditStatus.cpp
     src/ui/canvas/ecs/system/sync/SyncEntities.cpp
     src/ui/canvas/ecs/system/sync/SyncEffects.cpp
     src/ui/canvas/ecs/system/sync/SyncToolInteractions.cpp

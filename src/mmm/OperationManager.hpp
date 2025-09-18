@@ -12,7 +12,7 @@ class OperationManager {
         : editEventQ(editEventQueue) {}
 
     void executeCommand(std::unique_ptr<OperationCommand> command) {
-        if (command && command->execute()) {
+        if (command && command->execute(editEventQ)) {
             m_undo_stack.push(std::move(command));
             clearRedoStack();
         }
@@ -22,7 +22,7 @@ class OperationManager {
         if (m_undo_stack.empty()) return;
         auto command = std::move(m_undo_stack.top());
         m_undo_stack.pop();
-        command->undo();
+        command->undo(editEventQ);
         m_redo_stack.push(std::move(command));
     }
 
@@ -30,7 +30,7 @@ class OperationManager {
         if (m_redo_stack.empty()) return;
         auto command = std::move(m_redo_stack.top());
         m_redo_stack.pop();
-        if (command->execute()) {
+        if (command->execute(editEventQ)) {
             m_undo_stack.push(std::move(command));
         }
     }

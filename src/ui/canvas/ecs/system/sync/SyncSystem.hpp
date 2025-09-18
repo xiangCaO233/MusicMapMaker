@@ -22,6 +22,9 @@ class MapLayerManager;
 
 class SyncSystem {
    public:
+    // 同步编辑状态(处理编辑器事件)
+    void updateEditStatus(ECSCore& core, MapLayerManager* layer_manager);
+
     // 同步工具交互
     void updateToolInteractions(ECSCore& core, const MapCanvasInfo* info,
                                 MapLayerManager* layer_manager) const;

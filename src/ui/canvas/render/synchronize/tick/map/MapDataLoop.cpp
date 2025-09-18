@@ -23,6 +23,9 @@ void MapDataLoop::pre_tickEvent() {
     auto &ecore = map_layermgr->core();
 
     // qDebug() << "同步系统(at pretick)开始";
+    // 同步编辑事件
+    sync_system.updateEditStatus(ecore, map_layermgr);
+
     // 同步工具交互状态
     sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr);
 

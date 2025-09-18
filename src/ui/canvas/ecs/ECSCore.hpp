@@ -48,8 +48,8 @@ class ECSCore {
     // 拥有 TimeComponent 和 BeatComponent 的 group
     decltype(registry.group<TimeComponent, BeatComponent>()) beat_group;
 
-    // NoteHandle -> entt::entity 的映射
-    std::unordered_map<NoteUUID, entt::entity> uudi_to_entity;
+    // NoteUUID -> entt::entity 的映射
+    std::unordered_map<NoteUUID, entt::entity> uuid_to_entity;
     // TimingHandle -> entt::entity 的映射
     std::unordered_map<TimingHandle, entt::entity, TimingHandle::Hash>
         timing_handle_to_entity_map;

@@ -13,7 +13,7 @@ ECSCore::~ECSCore() = default;
 entt::registry& ECSCore::ecs_registry() { return registry; }
 
 std::unordered_map<NoteUUID, entt::entity>& ECSCore::uuid_to_entity_map() {
-    return uudi_to_entity;
+    return uuid_to_entity;
 }
 std::unordered_map<TimingHandle, entt::entity, TimingHandle::Hash>&
 ECSCore::handle_to_timingentity_map() {

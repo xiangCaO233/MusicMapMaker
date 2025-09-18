@@ -22,7 +22,7 @@ enum class MMapEditEventType {
     TimingUpdated,
 };
 
-using MapEditData = std::variant<NoteUUID, std::unique_ptr<Timing>>;
+using MapEditData = std::variant<NoteUUID, Timing*>;
 
 struct MMapEditEvent {
     MMapEditEventType type;

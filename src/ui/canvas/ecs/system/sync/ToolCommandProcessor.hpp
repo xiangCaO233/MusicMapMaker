@@ -3,12 +3,11 @@
 
 #include <ecs/component/CoreComponents.hpp>
 #include <ecs/system/ToolSystem.hpp>
+#include <info/NotePart.hpp>
 #include <mmm/map/editor/MMapEditor.hpp>
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
 #include <vector>
-
-#include "info/NotePart.hpp"
 
 // --- Helper for std::visit ---
 template <class... Ts>
