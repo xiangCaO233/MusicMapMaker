@@ -92,10 +92,10 @@ class TimePixelConverter {
 
             // 3. 更新当前生效的红线和绿线状态
             for (const auto& timing : timing_list) {
-                if (timing.is_base_timing) {
-                    current_base_timing = timing;
+                if (timing->is_base_timing) {
+                    current_base_timing = *timing;
                 } else {
-                    current_inherited_timing = timing;
+                    current_inherited_timing = *timing;
                 }
             }
             // 重要：绿线的生效时间点如果早于红线，它会继承旧的红线BPM

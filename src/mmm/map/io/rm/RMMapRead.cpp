@@ -164,32 +164,32 @@ void MMap::readImd() {
         qDebug() << "读取到imd文件时间点数:[" +
                         std::to_string(timing_point_amount) + "]";
 
-        std::vector<Timing> temp_timings;
+        std::vector<std::unique_ptr<Timing>> temp_timings;
         // 接下来每12字节按4字节int32+8字节float64(double)组合为一个时间点
         // 共${图时间点数}组timing数据
-        Timing timing;
+
+        Timing* timing{nullptr};
         // rm的timing不能变速,只能变bpm写谱--(附:ivm没写)
-        timing.type = TimingType::RMTIMING;
 
         for (int i = 0; i < timing_point_amount; i++) {
             auto timing_timestamp = reader.read_value<int32_t>(data_pos);
             data_pos += 4;
             auto timing_bpm = reader.read_value<double>(data_pos);
             data_pos += 8;
-            Timing read_timing;
-            read_timing.type = TimingType::RMTIMING;
-            read_timing.timestamp = timing_timestamp;
-            read_timing.bpm = timing_bpm;
-            read_timing.beat_length = 60000. / timing_bpm;
+            auto read_timing = std::make_unique<Timing>();
+            read_timing->type = TimingType::RMTIMING;
+            read_timing->timestamp = timing_timestamp;
+            read_timing->bpm = timing_bpm;
+            read_timing->beat_length = 60000. / timing_bpm;
 
             // 防止ivm生成的一万个重复timing
-            if (read_timing.bpm != timing.bpm) {
-                timing = read_timing;
+            if (!timing || read_timing->bpm != timing->bpm) {
+                timing = read_timing.get();
                 // 加入缓存timing列表
-                temp_timings.emplace_back(timing);
+                temp_timings.emplace_back(std::move(read_timing));
                 qDebug() << "读取到timing:[time:"
-                         << std::to_string(timing.timestamp)
-                         << ",bpm:" << std::to_string(timing.bpm) << "]";
+                         << std::to_string(timing->timestamp)
+                         << ",bpm:" << std::to_string(timing->bpm) << "]";
             }
         }
 
@@ -334,8 +334,8 @@ void MMap::readImd() {
                         std::to_string(basemeta.track_count) + "k] " +
                         basemeta.version;
         // 把timing添加到timing集合
-        for (const auto& timing : temp_timings) {
-            timing_set().add_timing_point(timing);
+        for (auto& timing : temp_timings) {
+            timing_set().add_timing_point(std::move(timing));
         }
 
         // 最后生成全部拍

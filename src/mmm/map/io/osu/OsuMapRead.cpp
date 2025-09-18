@@ -425,11 +425,11 @@ void MMap::readOsu() {
                 timing_point_paras.emplace_back(token);
             }
             // 创建timing
-            OsuTiming osu_timing;
+            auto osu_timing = std::make_unique<OsuTiming>();
             // 使用读取出的参数初始化timing
-            osu_timing.from_osu_description(timing_point_paras);
+            osu_timing->from_osu_description(timing_point_paras);
             // 添加到timing表
-            timing_set().add_timing_point(osu_timing);
+            timing_set().add_timing_point(std::move(osu_timing));
         }
 
         bool finded{false};
@@ -438,8 +438,8 @@ void MMap::readOsu() {
              timing_set().get_all_timing_points()) {
             for (const auto& timing : timings) {
                 // 使用第一个不带变速的绝对bpm
-                if (timing.is_base_timing) {
-                    basemeta.preference_bpm = timing.bpm;
+                if (timing->is_base_timing) {
+                    basemeta.preference_bpm = timing->bpm;
                     finded = true;
                     break;
                 }
@@ -458,6 +458,7 @@ void MMap::readOsu() {
                                               .get_all_timing_points()
                                               .begin()
                                               ->second.begin()
+                                              ->get()
                                               ->bpm;
             }
         }

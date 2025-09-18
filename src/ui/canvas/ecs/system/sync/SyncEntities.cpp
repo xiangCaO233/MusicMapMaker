@@ -136,7 +136,7 @@ void sync_timings(ECSCore& core, const TimingMap& timings,
 
         if (timestamp >= query_start_time) {
             for (const auto& timing : timings_at_ts) {
-                all_visible_handles.push_back({timestamp, timing.beat_length});
+                all_visible_handles.push_back({timestamp, timing->beat_length});
             }
         }
     }
@@ -196,10 +196,10 @@ void sync_timings(ECSCore& core, const TimingMap& timings,
                 const auto& timings = candidates->second;
                 for (const auto& timing_data : timings) {
                     // 确保 beat_length 也匹配
-                    if (std::abs(timing_data.beat_length - handle.beat_length) <
-                        1e-9) {
+                    if (std::abs(timing_data->beat_length -
+                                 handle.beat_length) < 1e-9) {
                         timing_handle_map[handle] =
-                            createTimingEntity(registry, &timing_data);
+                            createTimingEntity(registry, timing_data.get());
                     }
                 }
             }

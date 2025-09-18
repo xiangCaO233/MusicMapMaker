@@ -47,9 +47,9 @@ void MMap::analyzeBeatInfo() {
     const auto& all_timings_map = timings.get_all_timing_points();
     for (const auto& pair : all_timings_map) {
         // pair.first is timestamp, pair.second is std::vector<Timing>
-        for (const Timing& t : pair.second) {
-            if (t.is_base_timing && t.beat_length > 0) {
-                base_timings.push_back(&t);
+        for (const auto& t : pair.second) {
+            if (t->is_base_timing && t->beat_length > 0) {
+                base_timings.push_back(t.get());
                 // 每个时间点只有一个红线
                 break;
             }

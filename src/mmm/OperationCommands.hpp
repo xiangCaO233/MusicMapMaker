@@ -14,77 +14,79 @@ class OperationCommand {
     virtual void undo() = 0;
 };
 
-class AddTimingPointCommand : public OperationCommand {
-   public:
-    AddTimingPointCommand(TimingMap& timing_map, const Timing& timing_to_add)
-        : m_timing_map(timing_map), m_timing(timing_to_add) {}
-
-    bool execute() override { return m_timing_map.add_timing_point(m_timing); }
-
-    void undo() override {
-        // 撤销添加就是移除
-        m_timing_map.remove_timing_point(m_timing);
-    }
-
-   private:
-    TimingMap& m_timing_map;
-    Timing m_timing;  // 按值存储，作为数据的备份
-};
-
-class RemoveTimingPointCommand : public OperationCommand {
-   public:
-    RemoveTimingPointCommand(TimingMap& timing_map,
-                             const Timing& timing_to_remove)
-        : m_timing_map(timing_map), m_timing(timing_to_remove) {}
-
-    bool execute() override {
-        return m_timing_map.remove_timing_point(m_timing);
-    }
-
-    void undo() override {
-        // 撤销移除就是重新添加
-        m_timing_map.add_timing_point(m_timing);
-    }
-
-   private:
-    TimingMap& m_timing_map;
-    Timing m_timing;  // 按值存储，作为数据的备份
-};
-
-class RemoveTimingsAtPointCommand : public OperationCommand {
-   public:
-    RemoveTimingsAtPointCommand(TimingMap& timing_map, int32_t timestamp)
-        : m_timing_map(timing_map), m_timestamp(timestamp) {}
-
-    bool execute() override {
-        // 调用修改后的方法，它会返回被删除的数据
-        auto removed_data = m_timing_map.remove_timings_at_point(m_timestamp);
-
-        if (removed_data.has_value()) {
-            // 保存被删除的数据，以便 undo
-            m_removed_timings = std::move(*removed_data);
-            return true;
-        }
-        return false;
-    }
-
-    void undo() override {
-        // 如果我们成功备份了数据
-        if (!m_removed_timings.empty()) {
-            // 撤销删除就是把所有备份的数据重新加回去
-            for (const auto& timing : m_removed_timings) {
-                m_timing_map.add_timing_point(timing);
-            }
-            // 清空备份，以免在 redo 后再次 undo 时出错
-            m_removed_timings.clear();
-        }
-    }
-
-   private:
-    TimingMap& m_timing_map;
-    int32_t m_timestamp;
-    std::vector<Timing> m_removed_timings;  // 用于备份被删除的数据
-};
+// class AddTimingPointCommand : public OperationCommand {
+//    public:
+//     AddTimingPointCommand(TimingMap& timing_map, const Timing& timing_to_add)
+//         : m_timing_map(timing_map), m_timing(timing_to_add) {}
+//
+//     bool execute() override { return m_timing_map.add_timing_point(m_timing);
+//     }
+//
+//     void undo() override {
+//         // 撤销添加就是移除
+//         m_timing_map.remove_timing_point(m_timing);
+//     }
+//
+//    private:
+//     TimingMap& m_timing_map;
+//     Timing m_timing;  // 按值存储，作为数据的备份
+// };
+//
+// class RemoveTimingPointCommand : public OperationCommand {
+//    public:
+//     RemoveTimingPointCommand(TimingMap& timing_map,
+//                              const Timing& timing_to_remove)
+//         : m_timing_map(timing_map), m_timing(timing_to_remove) {}
+//
+//     bool execute() override {
+//         return m_timing_map.remove_timing_point(m_timing);
+//     }
+//
+//     void undo() override {
+//         // 撤销移除就是重新添加
+//         m_timing_map.add_timing_point(m_timing);
+//     }
+//
+//    private:
+//     TimingMap& m_timing_map;
+//     Timing m_timing;  // 按值存储，作为数据的备份
+// };
+//
+// class RemoveTimingsAtPointCommand : public OperationCommand {
+//    public:
+//     RemoveTimingsAtPointCommand(TimingMap& timing_map, int32_t timestamp)
+//         : m_timing_map(timing_map), m_timestamp(timestamp) {}
+//
+//     bool execute() override {
+//         // 调用修改后的方法，它会返回被删除的数据
+//         auto removed_data =
+//         m_timing_map.remove_timings_at_point(m_timestamp);
+//
+//         if (removed_data.has_value()) {
+//             // 保存被删除的数据，以便 undo
+//             m_removed_timings = std::move(*removed_data);
+//             return true;
+//         }
+//         return false;
+//     }
+//
+//     void undo() override {
+//         // 如果我们成功备份了数据
+//         if (!m_removed_timings.empty()) {
+//             // 撤销删除就是把所有备份的数据重新加回去
+//             for (const auto& timing : m_removed_timings) {
+//                 m_timing_map.add_timing_point(timing);
+//             }
+//             // 清空备份，以免在 redo 后再次 undo 时出错
+//             m_removed_timings.clear();
+//         }
+//     }
+//
+//    private:
+//     TimingMap& m_timing_map;
+//     int32_t m_timestamp;
+//     std::vector<Timing> m_removed_timings;  // 用于备份被删除的数据
+// };
 
 class UpdateNoteCommand : public OperationCommand {
    public:

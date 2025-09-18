@@ -666,14 +666,14 @@ class TimingMap {
     /**
      * @brief 添加或更新一个时间点。
      * @param timing 要添加的 Timing 对象。
-     * @return 如果添加或更新成功，返回 true。
+     * @return 如果添加或更新成功，返回刚刚添加的确切地址
      * @note 如果该时间戳已存在一个时间点，它将被新的时间点覆盖。
      */
-    bool add_timing_point(const Timing& timing) {
+    Timing* add_timing_point(std::unique_ptr<Timing> timing) {
         // 直接使用 map 的下标运算符，如果不存在则创建，存在则向后添加
         // 查找具有给定时间戳的条目
         // 如果时间戳存在于 map 中
-        if (auto map_it = m_timeline.find(timing.timestamp);
+        if (auto map_it = m_timeline.find(timing->timestamp);
             map_it != m_timeline.end()) {
             // 获取与时间戳关联的 std::vector<Timing> 的引用
             auto& timings_vec = map_it->second;
@@ -685,17 +685,19 @@ class TimingMap {
             // 如果在 vector 中找到了该对象
             if (vec_it != timings_vec.end()) {
                 // 已有当前timing,添加失败
-                return false;
+                return nullptr;
             } else {
-                timings_vec.push_back(timing);
+                Timing* added_timing_ptr = timing.get();
+                timings_vec.push_back(std::move(timing));
                 m_version++;
-                return true;
+                return added_timing_ptr;
             }
         }
+        Timing* added_timing_ptr = timing.get();
         // 如果时间戳不存在，则直接添加
-        m_timeline[timing.timestamp].push_back(timing);
+        m_timeline[timing->timestamp].push_back(std::move(timing));
         m_version++;
-        return true;
+        return added_timing_ptr;
     }
 
     /**
@@ -704,12 +706,13 @@ class TimingMap {
      * @return 如果找到了，则返回被移除的 Timing 对象列表；否则返回
      * std::nullopt。
      */
-    std::optional<std::vector<Timing>> remove_timings_at_point(
+    std::optional<std::vector<std::unique_ptr<Timing>>> remove_timings_at_point(
         int32_t timestamp) {
         auto it = m_timeline.find(timestamp);
         if (it != m_timeline.end()) {
             // 使用 std::move 将 vector 的内容移出，避免不必要的拷贝
-            std::vector<Timing> removed_timings = std::move(it->second);
+            std::vector<std::unique_ptr<Timing>> removed_timings =
+                std::move(it->second);
             m_timeline.erase(it);  // 从 map 中移除该节点
             m_version++;
             return removed_timings;  // 返回被移除的数据
@@ -722,35 +725,29 @@ class TimingMap {
      * @param timing 要移除的时间点的时间戳。
      * @return 如果找到了并成功移除，返回 true。
      */
-    bool remove_timing_point(const Timing& timing) {
-        // 1. 查找具有给定时间戳的条目
-        // 2. 如果时间戳存在于 map 中
-        if (auto map_it = m_timeline.find(timing.timestamp);
-            map_it != m_timeline.end()) {
-            // 获取与时间戳关联的 std::vector<Timing> 的引用
-            auto& timings_vec = map_it->second;
+    std::unique_ptr<Timing> remove_timing_point(Timing* timing_ptr) {
+        if (!timing_ptr) return nullptr;
 
-            // 3. 在 vector 中查找要删除的特定 Timing 对象
-            auto vec_it =
-                std::find(timings_vec.begin(), timings_vec.end(), timing);
+        auto map_it = m_timeline.find(timing_ptr->timestamp);
+        if (map_it == m_timeline.end()) return nullptr;
 
-            // 4. 如果在 vector 中找到了该对象
-            if (vec_it != timings_vec.end()) {
-                // 从 vector 中移除该对象
-                timings_vec.erase(vec_it);
+        auto& timings_vec = map_it->second;
+        auto vec_it =
+            std::find_if(timings_vec.begin(), timings_vec.end(),
+                         [&](const auto& p) { return p.get() == timing_ptr; });
 
-                // 5. 如果移除后 vector 变为空，则从 map 中也移除该时间戳条目
-                if (timings_vec.empty()) {
-                    m_timeline.erase(map_it);
-                }
+        if (vec_it != timings_vec.end()) {
+            // 从 vector 中“取出”unique_ptr 的所有权
+            std::unique_ptr<Timing> removed_timing = std::move(*vec_it);
+            timings_vec.erase(vec_it);
 
-                m_version++;  // 成功移除了一个元素，更新版本号
-                return true;
+            if (timings_vec.empty()) {
+                m_timeline.erase(map_it);
             }
+            m_version++;
+            return removed_timing;  // 返回被删除对象的所有权
         }
-        // 如果时间戳不存在，或者时间戳存在但未找到具体的 timing 对象，则返回
-        // false
-        return false;
+        return nullptr;
     }
 
     /**
@@ -775,7 +772,7 @@ class TimingMap {
         // 我们要找的是 it 的前一个元素，它就是小于或等于 timestamp
         // 的最后一个时间点。
         --it;
-        return it->second.data();
+        return it->second.back().get();
     }
 
     /**
@@ -784,19 +781,19 @@ class TimingMap {
      * @return 指向 Timing 对象的 const 指针。如果该时间戳没有定义时间点，则返回
      * nullptr。
      */
-    const Timing* get_timing_point_at(int32_t timestamp) const {
-        if (auto it = m_timeline.find(timestamp); it != m_timeline.end()) {
-            return it->second.data();
-        }
-        return nullptr;
-    }
+    // const Timing* get_timing_point_at(int32_t timestamp) const {
+    //     if (auto it = m_timeline.find(timestamp); it != m_timeline.end()) {
+    //         return it->second.;
+    //     }
+    //     return nullptr;
+    // }
 
     /**
      * @brief 获取所有时间点的只读引用，按时间戳排序。
      * @return 一个对内部 map 的 const 引用。
      */
-    const std::map<int32_t, std::vector<Timing>>& get_all_timing_points()
-        const {
+    const std::map<int32_t, std::vector<std::unique_ptr<Timing>>>&
+    get_all_timing_points() const {
         return m_timeline;
     }
 
@@ -811,7 +808,7 @@ class TimingMap {
    private:
     // 使用 std::map 作为核心存储。Key 是时间戳，Value 是 Timing 对象。
     // std::map 自动按 Key 排序，并提供高效的对数时间复杂度查找。
-    std::map<int32_t, std::vector<Timing>> m_timeline;
+    std::map<int32_t, std::vector<std::unique_ptr<Timing>>> m_timeline;
     uint64_t m_version{0};
 };
 
