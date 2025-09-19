@@ -9,131 +9,45 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QSpacerItem>
+#include <TimingTableUsefulWidgets.hpp>
 #include <cstdlib>
 #include <mmm/map/MMap.hpp>
+#include <mmm/map/editor/MMapEditor.hpp>
 #include <mmm/timing/Timing.hpp>
 #include <util/mutil.hpp>
+#include <utility>
 
-// 时间编辑组件
-class TimeEditWidget : public QWidget {
-   public:
-    TimeEditWidget(Timing *timing, QTableWidget *parent, int index,
-                   QIntValidator *validator)
-        : QWidget(parent), parent(parent) {
-        layout = new QHBoxLayout(this);
-        timingIndex = new QLabel(this);
-        timeEdit = new QLineEdit(this);
-        gotoButton = new QPushButton(this);
-        QColor color = Qt::white;
-        mutil::set_button_svgcolor(gotoButton, ":/icons/arrow-right.svg", color,
-                                   16, 16);
-        layout->addWidget(timingIndex);
-        layout->addWidget(timeEdit);
-        layout->addWidget(gotoButton);
-        layout->setSpacing(2);
-        layout->setContentsMargins(2, 0, 0, 2);
-        layout->setStretch(0, 0);
-        layout->setStretch(1, 1);
-        layout->setStretch(2, 0);
-        setLayout(layout);
-        timingIndex->setText(QString::number(index) + ":");
-        timeEdit->setText(QString::number(timing->timestamp));
-        timeEdit->setValidator(validator);
-    }
-    QTableWidget *parent;
-    QHBoxLayout *layout;
-    QLabel *timingIndex;
-    QLineEdit *timeEdit;
-    QPushButton *gotoButton;
-};
+auto addTimingItemToTable(MMap *map, Timing *timing,
+                          QTableWidget *timing_table_widget, int row_index,
+                          QIntValidator *intvalidator,
+                          QDoubleValidator *doublevalidator) {
+    // 在表格末尾插入一个新行
+    timing_table_widget->insertRow(row_index);
 
-class TimingParameterEditor : public QWidget {
-   public:
-    TimingParameterEditor(Timing *timing, QTableWidget *parent,
-                          QDoubleValidator *validator)
-        : QWidget() {
-        layout = new QHBoxLayout(this);
-        title = new QLabel(this);
-        bpmEdit = new QLineEdit(this);
-        bpmEdit->setValidator(validator);
-        speedSpinBox = new QDoubleSpinBox(this);
-        speedSpinBox->setDecimals(2);
-        speedSpinBox->setSuffix("x");
-        bpmEdit->setText(QString::number(timing->bpm, 'f', 2));
-        layout->addWidget(title);
-        if (timing->is_base_timing) {
-            speedSpinBox->setValue(1.0);
-            title->setText(bpmTitle);
-            layout->addWidget(bpmEdit);
-            speedSpinBox->hide();
-        } else {
-            title->setText(speedTitle);
-            layout->addWidget(speedSpinBox);
-            speedSpinBox->setValue(100.0 / std::abs(timing->beat_length));
-            bpmEdit->hide();
-        }
-        setLayout(layout);
-    }
-    QHBoxLayout *layout;
-    QString speedTitle = tr("speed:");
-    QString bpmTitle = "bpm:";
-    QLabel *title;
-    QLineEdit *bpmEdit;
-    QDoubleSpinBox *speedSpinBox;
-};
+    auto timingRow =
+        new TimingRowItem(map, timing, timing_table_widget, row_index,
+                          intvalidator, doublevalidator);
 
-// 时间点设置组件
-class TimingSettingWidget : public QWidget {
-   public:
-    TimingSettingWidget(Timing *timing, QTableWidget *parent)
-        : QWidget(parent) {
-        layout = new QHBoxLayout(this);
-        deleteButton = new QPushButton(this);
-        QColor color = Qt::white;
-        mutil::set_button_svgcolor(deleteButton, ":icons/close.svg", color, 16,
-                                   16);
+    // 时间
+    timing_table_widget->setCellWidget(row_index, 0, timingRow->timeEditWgt);
 
-        doneButton = new QPushButton(this);
-        mutil::set_button_svgcolor(doneButton, ":icons/check.svg", color, 16,
-                                   16);
-        spacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding,
-                                 QSizePolicy::Policy::Minimum);
-        layout->addItem(spacer);
-        layout->addWidget(doneButton);
-        layout->addWidget(deleteButton);
-        setLayout(layout);
-    };
-    QTableWidget *parent;
-    QHBoxLayout *layout;
-    QSpacerItem *spacer;
-    QPushButton *deleteButton;
-    QPushButton *doneButton;
-};
+    // 继承
+    timing_table_widget->setCellWidget(row_index, 1,
+                                       timingRow->uninheritedComboBox);
 
-class TimingRowItem {
-   public:
-    TimingRowItem(Timing *timing, QTableWidget *parent, int index,
-                  QIntValidator *intvalidator,
-                  QDoubleValidator *doublevalidator) {
-        timeEditWgt = new TimeEditWidget(timing, parent, index, intvalidator);
-        uninheritedComboBox = new QComboBox(parent);
-        uninheritedComboBox->addItems({"true", "false"});
-        uninheritedComboBox->setCurrentIndex(timing->is_base_timing ? 0 : 1);
-        paramEditor =
-            new TimingParameterEditor(timing, parent, doublevalidator);
-        timingSettingWgt = new TimingSettingWidget(timing, parent);
-    }
-    TimeEditWidget *timeEditWgt;
-    QComboBox *uninheritedComboBox;
-    TimingParameterEditor *paramEditor;
-    TimingSettingWidget *timingSettingWgt;
-};
+    // 参数
+    timing_table_widget->setCellWidget(row_index, 2, timingRow->paramEditor);
 
-void TimingManager::onTimingItemChanged(QStandardItem *item) {}
+    // 设置
+    timing_table_widget->setCellWidget(row_index, 3,
+                                       timingRow->timingSettingWgt);
+    return timingRow;
+}
 
 void TimingManager::onMapUpdated(MProject *project, MMap *map) {
+    if (map_ref == map) return;
     map_ref = map;
-    ui->timing_table_widget->clear();
+    ui->timing_table_widget->setRowCount(0);
     if (map_ref) {
         qDebug() << "正在生成timing列表";
         // 读取map中所有timing导入timing表
@@ -142,30 +56,42 @@ void TimingManager::onMapUpdated(MProject *project, MMap *map) {
             for (const auto &timing : timing_vec) {
                 // 获取新行的索引 (即当前的行数)
                 int newRowIndex = ui->timing_table_widget->rowCount();
-                // 在表格末尾插入一个新行
-                ui->timing_table_widget->insertRow(newRowIndex);
-
-                auto timingRow = new TimingRowItem(
-                    timing.get(), ui->timing_table_widget, newRowIndex,
+                auto item = addTimingItemToTable(
+                    map, timing.get(), ui->timing_table_widget, newRowIndex,
                     timeInputValidator, parameterInputValidator);
-
-                // 时间
-                ui->timing_table_widget->setCellWidget(newRowIndex, 0,
-                                                       timingRow->timeEditWgt);
-
-                // 继承
-                ui->timing_table_widget->setCellWidget(
-                    newRowIndex, 1, timingRow->uninheritedComboBox);
-
-                // 参数
-                ui->timing_table_widget->setCellWidget(newRowIndex, 2,
-                                                       timingRow->paramEditor);
-
-                // 设置
-                ui->timing_table_widget->setCellWidget(
-                    newRowIndex, 3, timingRow->timingSettingWgt);
+                auto timing_ptr = timing.get();
             }
         }
+
+        auto addingItem = new AddTimingItem(ui->timing_table_widget);
+        // 获取新行的索引 (即当前的行数)
+        int newRowIndex = ui->timing_table_widget->rowCount();
+        // 在表格末尾插入一个新行
+        ui->timing_table_widget->insertRow(newRowIndex);
+        // 设置
+        ui->timing_table_widget->setCellWidget(newRowIndex, 3,
+                                               addingItem->setting_widget);
+
+        auto timing_table_ref = ui->timing_table_widget;
+        QIntValidator *intvalidator = timeInputValidator;
+        QDoubleValidator *doublevalidator = parameterInputValidator;
+
+        // 添加timing按键
+        connect(addingItem->insertButton, &QPushButton::clicked,
+                [map, timing_table_ref, intvalidator, doublevalidator]() {
+                    auto timing = std::make_unique<Timing>();
+                    timing->timestamp = map->base_metadata().map_length;
+                    timing->bpm = 60;
+                    timing->is_base_timing = true;
+                    timing->beat_length = 1000;
+                    auto item = addTimingItemToTable(
+                        map, timing.get(), timing_table_ref,
+                        timing_table_ref->rowCount() - 1, intvalidator,
+                        doublevalidator);
+                    map->editor()->creatTiming(std::move(timing));
+                });
+
         ui->timing_table_widget->setHorizontalHeaderLabels(timing_metaNames());
+        qDebug() << "生成timing列表完成";
     }
 }

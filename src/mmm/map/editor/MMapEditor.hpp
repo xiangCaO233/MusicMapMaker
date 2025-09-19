@@ -1,6 +1,7 @@
 #ifndef MMM_MMAPEDITOR_HPP
 #define MMM_MMAPEDITOR_HPP
 
+#include <memory>
 #include <mmm/OperationManager.hpp>
 #include <mmm/map/MMap.hpp>
 #include <unordered_set>
@@ -27,6 +28,12 @@ class MMapEditor {
 
     // 更新滑键
     void updateSlide(NoteUUID uuid, int64_t delta_track);
+
+    // 创建timing
+    void creatTiming(std::unique_ptr<Timing> timingData);
+
+    // 更新timing
+    void updateTiming(Timing* srcTiming, std::unique_ptr<Timing> newTimingData);
 
     // 撤销和重做
     void undo();

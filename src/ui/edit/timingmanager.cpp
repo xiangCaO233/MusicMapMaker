@@ -19,13 +19,13 @@ TimingManager::TimingManager(QWidget *parent)
     parameterInputValidator->setBottom(0.01);
 
     // 初始化timing表模型
-    auto timing_table_model = new QStandardItemModel(ui->timing_table_widget);
     ui->timing_table_widget->setColumnCount(timing_metaNames().size());
     ui->timing_table_widget->setColumStretchs({1, 1, 1, 1});
     ui->timing_table_widget->setHorizontalHeaderLabels(timing_metaNames());
-    // 连接模型信号到项改变槽
-    connect(timing_table_model, &QStandardItemModel::itemChanged, this,
-            &TimingManager::onTimingItemChanged);
 }
 
 TimingManager::~TimingManager() { delete ui; }
+void TimingManager::bind_toolcmdq(
+    ThreadSafeQueue<ToolCommand> *tool_cmd_queue) {
+    this->tool_cmd_queue = tool_cmd_queue;
+}

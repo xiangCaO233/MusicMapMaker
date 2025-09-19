@@ -3,8 +3,9 @@
 
 #include <qvalidator.h>
 
-#include <QStandardItem>
 #include <QWidget>
+#include <tool/ThreadSafeQueue.hpp>
+#include <tool/command/ToolCommand.hpp>
 
 namespace Ui {
 class TimingEditor;
@@ -24,15 +25,16 @@ class TimingManager : public QWidget {
 
    signals:
     void navigateToTiming(Timing *timing);
-    void updateTiming(Timing *timing);
+    void updateTiming(Timing *timing, std::unique_ptr<Timing> &desdata);
 
    public slots:
-    void onTimingItemChanged(QStandardItem *item);
     void onMapUpdated(MProject *project, MMap *map);
+    void bind_toolcmdq(ThreadSafeQueue<ToolCommand> *tool_cmd_queue);
 
    private:
     Ui::TimingEditor *ui;
     MMap *map_ref;
+    ThreadSafeQueue<ToolCommand> *tool_cmd_queue;
     QIntValidator *timeInputValidator;
     QDoubleValidator *parameterInputValidator;
 };

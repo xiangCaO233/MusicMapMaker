@@ -117,53 +117,117 @@ class RemoveTimingPointCommand : public OperationCommand {
 
 class UpdateTimingCommand : public OperationCommand {
    public:
-    // 构造函数接收一个裸指针用于识别目标，以及包含新数据的 unique_ptr
+    /**
+     * @brief 构造函数。
+     * @param timing_map Timing 数据存储的引用。
+     * @param timing_to_update 指向要更新的 Timing 对象的非拥有指针。
+     * @param new_data 包含新数据的 unique_ptr，其所有权将转移给此命令。
+     */
     UpdateTimingCommand(TimingMap& timing_map, Timing* timing_to_update,
                         std::unique_ptr<Timing> new_data)
         : m_timing_map(timing_map),
           m_timing_to_update_ptr(timing_to_update),
-          m_new_data(std::move(new_data)) {}
-
-    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
-        if (!m_timing_to_update_ptr || !m_new_data) return false;
-
-        // 调用 map 的 update 方法，将新数据的所有权交给 map，
-        // 同时接管 map 返回的旧数据的所有权作为备份。
-        m_old_data_backup = m_timing_map.update_timing_point(
-            m_timing_to_update_ptr, std::move(m_new_data));
-
-        if (m_old_data_backup) {
-            // 操作成功，发布事件
-            editEventQueue.push(
-                {MMapEditEventType::TimingUpdated, m_timing_to_update_ptr});
-            return true;
+          m_new_data(std::move(new_data)) {
+        // 在构造时就立即克隆一份原始数据作为备份。
+        // 这是最安全的方式，因为它只在命令创建时发生一次。
+        if (m_timing_to_update_ptr) {
+            m_old_data_backup = m_timing_to_update_ptr->clone();
         }
-        return false;
     }
 
-    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
-        if (!m_timing_to_update_ptr || !m_old_data_backup) return;
+    bool execute(ThreadSafeQueue<MMapEditEvent>& queue) override {
+        // --- 前置条件检查 ---
+        // 1. 确保我们有有效的目标指针。
+        // 2. 确保我们有新数据可以应用 (m_new_data)。
+        // 3. 确保我们有旧数据的备份 (m_old_data_backup) 以便撤销。
+        if (!m_timing_to_update_ptr || !m_new_data || !m_old_data_backup) {
+            return false;
+        }
 
-        // 再次调用 map 的 update 方法，但这次是用备份的旧数据去替换当前数据。
-        // 当前数据（即之前的新数据）的所有权被返回，并存入 m_new_data 以备
-        // redo。
-        m_new_data = m_timing_map.update_timing_point(
-            m_timing_to_update_ptr, std::move(m_old_data_backup));
+        // --- 准备调用 ---
+        // 因为 update_timing_point 可能会失败并消耗掉 m_new_data，
+        // 我们必须先克隆一份新数据，以备操作失败或未来重做(redo)时使用。
+        auto new_data_for_redo = m_new_data->clone();
 
-        if (m_new_data) {
-            // 撤销成功，也发布更新事件，因为对象状态同样发生了变化
-            editEventQueue.push(
+        // --- 执行操作 ---
+        // 调用 map 的 update 方法。无论成功或失败，m_new_data
+        // 的所有权都将被移交。
+        std::unique_ptr<Timing> returned_old_data =
+            m_timing_map.update_timing_point(m_timing_to_update_ptr,
+                                             std::move(m_new_data));
+
+        if (returned_old_data) {
+            // --- 成功路径 ---
+            // 1. 操作成功。返回的旧数据应该与我们的备份逻辑上相等。
+            //    (我们可以加一个 assert(*returned_old_data ==
+            //    *m_old_data_backup) 来验证)
+
+            // 2. 将之前准备的克隆体存入 m_new_data，为将来的 undo
+            // 操作做好准备。
+            //    现在 m_old_data_backup 存着旧数据，m_new_data 存着新数据。
+            m_new_data = std::move(new_data_for_redo);
+
+            // 3. 发布事件。注意：如果时间戳变了，实体可能会被重建，
+            //    所以 old_timing_ptr 可能失效。但对于“标记脏”这个目的，
+            //    使用它来查找实体是可以的，因为查找发生在状态改变之前。
+            //    更安全的方式是为 Timing 也引入稳定ID。
+            queue.push(
                 {MMapEditEventType::TimingUpdated, m_timing_to_update_ptr});
+
+            return true;
+        } else {
+            // --- 失败路径 ---
+            // 1. 操作失败。m_new_data 的所有权已被消耗。
+            // 2. 我们必须用克隆体恢复 m_new_data，以保持命令状态的一致性，
+            //    这样用户可以修改参数后再次尝试执行。
+            m_new_data = std::move(new_data_for_redo);
+            return false;
+        }
+    }
+
+    void undo(ThreadSafeQueue<MMapEditEvent>& queue) override {
+        // --- 前置条件检查 ---
+        if (!m_timing_to_update_ptr || !m_old_data_backup || !m_new_data) {
+            return;
+        }
+
+        // --- 准备调用 ---
+        // 同样，为 m_old_data_backup 克隆一份，以备撤销失败或未来重做(redo)
+        auto old_data_for_redo = m_old_data_backup->clone();
+
+        // --- 执行撤销 ---
+        // 用备份的旧数据去替换当前数据。
+        std::unique_ptr<Timing> returned_new_data =
+            m_timing_map.update_timing_point(m_timing_to_update_ptr,
+                                             std::move(m_old_data_backup));
+
+        if (returned_new_data) {
+            // --- 成功路径 ---
+            // 1. 撤销成功。返回的新数据应该与我们持有的 m_new_data 逻辑上相等。
+            // 2. 将之前准备的克隆体存入 m_old_data_backup，为将来的 redo
+            // 操作做好准备。
+            m_old_data_backup = std::move(old_data_for_redo);
+
+            // 3. 发布事件，通知UI状态已回滚。
+            queue.push(
+                {MMapEditEventType::TimingUpdated, m_timing_to_update_ptr});
+
+        } else {
+            // --- 失败路径 (非常罕见) ---
+            // 撤销失败意味着程序状态可能已不一致。
+            // 我们能做的就是恢复命令自身的状态。
+            m_old_data_backup = std::move(old_data_for_redo);
         }
     }
 
    private:
     TimingMap& m_timing_map;
-    // 用于识别要更新的对象的非拥有指针
+    // 用于识别要更新的对象的非拥有指针。
+    // 假设在命令的生命周期内，如果对象没有被删除，这个指针是有效的。
     Timing* m_timing_to_update_ptr;
-    // 用于存储被替换掉的旧数据的备份
+    // 存储被替换掉的旧数据的“逻辑副本”
     std::unique_ptr<Timing> m_old_data_backup;
-    // 用于存储要应用的新数据
+    // 存储要应用的“新数据”的逻辑副本
     std::unique_ptr<Timing> m_new_data;
 };
 

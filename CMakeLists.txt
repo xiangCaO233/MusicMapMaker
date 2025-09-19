@@ -170,6 +170,7 @@ set(PROJECT_SOURCES
     src/ui/edit/timingmanager.h
     src/ui/edit/timingmanager.cpp
     src/ui/edit/timingmanagercontrolls.cpp
+    src/ui/edit/TimingTableUsefulWidgets.cpp
     src/ui/edit/timingmanager.ui
     src/ui/project/projectmanager.h
     src/ui/project/projectmanager.cpp

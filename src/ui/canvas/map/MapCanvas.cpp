@@ -59,6 +59,8 @@ void MapCanvas::initializeGL() {
     // 创建工具
     creatTools(layermanager->get_tool_system(), layermanager->get_tool_cmdq(),
                layermanager->get_tool_interaction_state());
+    // 发送cmdq绑定信号
+    emit toolcmdqInitialized(layermanager->get_tool_cmdq());
 }
 
 // 绑定音频载入回调

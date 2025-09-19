@@ -56,7 +56,7 @@ class TrackManager : public HideableToolWindow, public AudioLoadCallback {
     void set_playpos_for(std::string_view audio_name,
                          std::chrono::nanoseconds time) override;
 
-    void play_oneshot(std::string_view audio_name) override;
+    void play_oneshot(std::string_view audio_name, float volume) override;
 
    signals:
     void audioLoadcbk_initialized(AudioLoadCallback *cbk);

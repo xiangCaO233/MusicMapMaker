@@ -154,9 +154,28 @@ void TrackManager::set_playpos_for(std::string_view audio_name,
 // 获取音频控制器
 AudioController* TrackManager::get_controller(const QString& audio_name) {
     AudioController* res{nullptr};
-    if (auto controller_it = audio_controllers.find(audio_name);
-        controller_it != audio_controllers.end()) {
+    auto controller_it = audio_controllers.find(audio_name);
+    if (controller_it != audio_controllers.end()) {
         res = controller_it.value();
+    } else {
+        // 现场初始化
+        auto track_it = audio_tracks.find(audio_name);
+        if (track_it != audio_tracks.end()) {
+            auto model =
+                qobject_cast<QStandardItemModel*>(ui->track_list->model());
+            // 查找item
+            for (int i{0}; i < model->rowCount(); ++i) {
+                auto item = model->item(i);
+                if (item->data(Qt::UserRole + 1)
+                        .value<std::shared_ptr<ice::AudioTrack>>() ==
+                    track_it.value()) {
+                    // 查到了现场初始化
+                    controller_it = makeController(track_it.value(), item);
+                    res = controller_it.value();
+                    break;
+                }
+            }
+        }
     }
     return res;
 }
@@ -194,8 +213,9 @@ std::weak_ptr<ice::AudioTrack> TrackManager::loadin_audio(
         maintrack_names.push_back(audio_file);
         // 主音轨立即初始化音频控制器
         auto it = makeController(track, track_item);
-        it.value()->setVisible(true);
-        track_item->setCheckState(Qt::Checked);
+        // 立即显示控制器
+        // it.value()->setVisible(true);
+        // track_item->setCheckState(Qt::Checked);
     }
     return track;
 }
@@ -224,7 +244,7 @@ void TrackManager::set_maintrack(const QString& name) {
 }
 
 // 播放一次指定音轨
-void TrackManager::play_oneshot(std::string_view audio_name) {
+void TrackManager::play_oneshot(std::string_view audio_name, float volume) {
     QString q_audio_name = QString::fromStdString(std::string(audio_name));
 
     // 获取对应的音轨
@@ -255,6 +275,7 @@ void TrackManager::play_oneshot(std::string_view audio_name) {
     }
 
     node->set_playpos(0);
+    node->setvolume(volume);
 
     // 开始播放
     node->play();

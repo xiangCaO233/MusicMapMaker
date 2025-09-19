@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget* parent)
     // auto capui = ui;
 
     auto canvas = ui->editor->canvas();
+    connect(canvas, &MapCanvas::toolcmdqInitialized, ui->timing_editor,
+            &TimingManager::bind_toolcmdq);
 
     connect(canvas, &GLCanvas::update_window_suffix, this,
             &MainWindow::update_title_suffix);

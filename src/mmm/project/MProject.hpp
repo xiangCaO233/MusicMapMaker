@@ -6,11 +6,10 @@
 #include <map>
 #include <memory>
 #include <mmm/map/MMap.hpp>
+#include <mmm/project/AudioLoadCallback.hpp>
+#include <mmm/project/MProjectConfig.hpp>
 #include <set>
 #include <string>
-
-#include "mmm/project/AudioLoadCallback.hpp"
-#include "mmm/project/MProjectConfig.hpp"
 
 class TextureLoadCallback;
 class MProject {

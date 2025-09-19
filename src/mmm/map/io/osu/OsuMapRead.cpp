@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <algorithm>
 #include <fstream>
 #include <mmm/info/osu/OsuMapInfo.hpp>
 #include <mmm/map/MMap.hpp>
@@ -81,6 +82,11 @@ class OsuFileReader {
                 if (eq_pos != std::string::npos) {
                     std::string key = line.substr(0, eq_pos);
                     std::string value = line.substr(eq_pos + 1);
+                    // 去掉前导空格
+                    value.erase(0, value.find_first_not_of(" \t\n\r\f\v"));
+                    // 去掉尾随空格
+                    value.erase(value.find_last_not_of(" \t\n\r\f\v") + 1);
+
                     // XWARN("key:" + key);
                     // XWARN("value:" + value);
                     map_properties[current_chapter][key] = value;

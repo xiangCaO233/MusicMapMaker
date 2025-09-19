@@ -3,6 +3,7 @@
 #include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Composite.hpp>
 #include <mmm/obj/rm/Slide.hpp>
+#include <utility>
 
 MMapEditor::MMapEditor(MMap* m, ThreadSafeQueue<MMapEditEvent>& editEventQueue)
     : map(m), operationManager(editEventQueue) {}
@@ -82,5 +83,20 @@ void MMapEditor::updateSlide(NoteUUID uuid, int64_t delta_track) {
 void MMapEditor::updateNoteData(NoteUUID uuid, std::unique_ptr<Note> new_data) {
     auto command = std::make_unique<UpdateNoteCommand>(
         map->note_set(), map->note_uuids(), uuid, std::move(new_data));
+    operationManager.executeCommand(std::move(command));
+}
+
+// 创建timing
+void MMapEditor::creatTiming(std::unique_ptr<Timing> timingData) {
+    auto command = std::make_unique<AddTimingPointCommand>(
+        map->timing_set(), std::move(timingData));
+    operationManager.executeCommand(std::move(command));
+}
+
+// 更新timing
+void MMapEditor::updateTiming(Timing* srcTiming,
+                              std::unique_ptr<Timing> newTimingData) {
+    auto command = std::make_unique<UpdateTimingCommand>(
+        map->timing_set(), srcTiming, std::move(newTimingData));
     operationManager.executeCommand(std::move(command));
 }

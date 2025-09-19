@@ -28,7 +28,8 @@ class AudioEffectSystem {
                     // 播放 sound_strength (即 count) 次
                     for (uint32_t i = 0; i < count; ++i) {
                         audio_callback->play_oneshot(
-                            skin.get_sound_effect(sound_type));
+                            skin.get_sound_effect(sound_type),
+                            info->realTimeInfo.effect_volume);
                     }
                 }
             }

@@ -50,22 +50,22 @@ void MProject::open(std::string_view project_path_str) {
                                          .main_audio_path.generic_string();
 
                 if (!project_main_audios_table.contains(map_maintrack)) {
+                    // 添加谱面的主音轨
+                    qDebug() << "map加载需要载入音频[" << map_maintrack << "]";
+                    project_main_audios_table.try_emplace(map_maintrack);
                     auto map_track =
                         audiocallback->loadBack(map_maintrack, true);
-                    // 添加谱面的主音轨
-                    qDebug() << "需要载入音频[" << map_maintrack << "]";
-                    project_main_audios_table.try_emplace(map_maintrack,
-                                                          map_track);
+                    project_main_audios_table[map_maintrack] = map_track;
                 }
             } else if (filename.ends_with(".mp3") ||
                        filename.ends_with(".ogg") ||
                        filename.ends_with(".wav")) {
                 if (!project_main_audios_table.contains(filename)) {
-                    qDebug() << "需要载入音频[" << filename << "]";
+                    qDebug() << "目录加载需要载入音频[" << filename << "]";
+                    project_normal_audios_table.try_emplace(filename);
                     // 直接通过音频轨道管理器回调载入音轨
                     auto track_weakptr = audiocallback->loadBack(filename);
-                    project_normal_audios_table.try_emplace(filename,
-                                                            track_weakptr);
+                    project_main_audios_table[filename] = track_weakptr;
                 }
             } else if (filename.ends_with(".mp4") ||
                        filename.ends_with(".mkv")) {

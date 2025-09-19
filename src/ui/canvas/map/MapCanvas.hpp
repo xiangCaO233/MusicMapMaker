@@ -42,6 +42,7 @@ class MapCanvas : public GLCanvas {
 
    signals:
     void skinInitialized();
+    void toolcmdqInitialized(ThreadSafeQueue<ToolCommand> *q);
 
    protected:
     void initializeGL() override;
