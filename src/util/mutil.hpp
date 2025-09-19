@@ -12,6 +12,7 @@
 #include <qmenu.h>
 #include <qpushbutton.h>
 #include <qsize.h>
+#include <qsvgrenderer.h>
 #include <qtoolbutton.h>
 #include <qtreeview.h>
 #include <qvariant.h>
@@ -105,6 +106,83 @@ inline std::string sanitizeFilename_ascii(std::string filename) {
         }
     }
     return filename;
+}
+
+// 将毫秒值转换为 "hh:mm:ss.zzz" 格式 QString
+inline QString millisecondsToQString(long long totalMilliseconds) {
+    if (totalMilliseconds < 0) {
+        totalMilliseconds = 0;  // QTime 不直接处理负的总毫秒数，这里将其视为0
+    }
+    // QTime::fromMSecsSinceStartOfDay 处理的是一天内的毫秒数
+    // 如果毫秒数可能超过一天 (24 * 3600 * 1000)，需要手动计算小时
+    const qlonglong msPerDay = 24LL * 60 * 60 * 1000;
+    qlonglong days = totalMilliseconds / msPerDay;
+    int msecs = totalMilliseconds % msPerDay;
+
+    QTime time = QTime::fromMSecsSinceStartOfDay(msecs);
+
+    // 手动加上超过24小时的部分
+    qlonglong totalHours = days * 24 + time.hour();
+
+    // 格式化输出，注意小时数可能超过两位
+    return QString("%1:%2:%3.%4")
+        .arg(totalHours, 2, 10, QChar('0'))  // 至少2位，用0填充
+        .arg(time.minute(), 2, 10, QChar('0'))
+        .arg(time.second(), 2, 10, QChar('0'))
+        .arg(time.msec(), 3, 10, QChar('0'));  // 毫秒总是3位
+
+    // --- 或者，如果保证毫秒数不超过一天，可以简化 ---
+    // QTime time = QTime(0,0,0,0).addMSecs(static_cast<int>(totalMilliseconds %
+    // msPerDay)); // 注意 addMSecs 参数是 int return
+    // time.toString("hh:mm:ss.zzz"); 但这种方式对于超过 int
+    // 范围或超过一天的毫秒数会出问题或不准确
+    // 因此，上面的手动计算方式更可靠处理任意大的 long long 毫秒值
+}
+
+// 将 "hh:mm:ss.zzz" 格式 QString 转换为毫秒值
+inline long long qstringToMilliseconds(const QString& timeString) {
+    // QTime::fromString 不能直接处理超过 23:59:59.999 的时间
+    // 我们需要手动解析
+    QStringList parts = timeString.split(':');
+    if (parts.size() != 3) {
+        qWarning()
+            << "Invalid time string format (parts based on ':'). Expected "
+               "hh:mm:ss.zzz, got:"
+            << timeString;
+        return -1;  // 或者抛出异常
+    }
+
+    QStringList secMsPart = parts[2].split('.');
+    if (secMsPart.size() != 2) {
+        qWarning()
+            << "Invalid time string format (parts based on '.'). Expected "
+               "hh:mm:ss.zzz, got:"
+            << timeString;
+        return -1;  // 或者抛出异常
+    }
+
+    bool okH, okM, okS, okMs;
+    qlonglong hh = parts[0].toLongLong(&okH);
+    int mm = parts[1].toInt(&okM);
+    int ss = secMsPart[0].toInt(&okS);
+    int ms = secMsPart[1].toInt(&okMs);
+
+    // 检查转换是否成功和基本范围
+    if (!okH || !okM || !okS || !okMs || hh < 0 || mm < 0 || mm >= 60 ||
+        ss < 0 || ss >= 60 || ms < 0 || ms >= 1000) {
+        qWarning()
+            << "Invalid time component values or conversion failed in string:"
+            << timeString;
+        return -1;  // 或者抛出异常
+    }
+
+    long long totalMilliseconds = 0;
+    totalMilliseconds += hh * 60 * 60 * 1000;
+    totalMilliseconds += static_cast<long long>(mm) * 60 * 1000;
+    totalMilliseconds += static_cast<long long>(ss) * 1000;
+    totalMilliseconds += ms;
+
+    return totalMilliseconds;
 }
 
 // 判断路径是否以指定字符串结尾
@@ -632,6 +710,74 @@ inline int calculateDivisionStrategy(const NoteCollection& notes, Beat& beat,
     }
 
     return 2;  // 无有效分音策略-返回默认2
+}
+
+inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgPath,
+                                    QColor& color, QSize& size) {
+    // 将原始SVG渲染到一个临时的、透明的画布上，作为“形状模板”。
+    auto file = QString(svgPath);
+    QSvgRenderer renderer(file);
+    if (!renderer.isValid() || size.isEmpty()) {
+        pixmap = QPixmap();  // 返回空Pixmap
+        return;
+    }
+
+    QPixmap shapePixmap(size);
+    shapePixmap.fill(Qt::transparent);
+    QPainter shapePainter(&shapePixmap);
+    renderer.render(&shapePainter);
+
+    // 步骤 2: 准备最终的输出画布。
+    // 这是关键的修正：首先将目标pixmap填充为透明。
+    // 这一步强制QPixmap分配一个Alpha通道，确保它能够处理透明度
+    pixmap = QPixmap(size);
+    pixmap.fill(Qt::transparent);
+
+    // 步骤 3: 在这个透明的画布上执行颜色混合操作。
+    QPainter painter(&pixmap);
+
+    // a. 先铺上我们的目标颜色。
+    painter.setBrush(color);
+    painter.setPen(Qt::NoPen);  // 不需要边框
+    painter.drawRect(pixmap.rect());
+
+    // b. 设置混合模式，使用 shapePixmap 的Alpha通道作为遮罩。
+    painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+
+    // c. 将形状绘制上去，应用遮罩。
+    painter.drawPixmap(0, 0, shapePixmap);
+}
+
+inline void set_button_svgcolor(QPushButton* button, const char* svgpath,
+                                QColor& color, int32_t w, int32_t h) {
+    // 创建QPixmap
+    QPixmap pixmap;
+    QSize size(w, h);
+    get_colored_icon_pixmap(pixmap, svgpath, color, size);
+
+    // 设置图标
+    button->setIcon(QIcon(pixmap));
+}
+inline void set_toolbutton_svgcolor(QToolButton* button, const char* svgpath,
+                                    QColor& color, int32_t w, int32_t h) {
+    // 创建QPixmap
+    QPixmap pixmap;
+    QSize size(w, h);
+    get_colored_icon_pixmap(pixmap, svgpath, color, size);
+
+    // 设置图标
+    button->setIcon(QIcon(pixmap));
+}
+
+inline void set_action_svgcolor(QAction* action, const char* svgpath,
+                                QColor& color) {
+    // 创建QPixmap
+    QPixmap pixmap;
+    QSize size(28, 28);
+    get_colored_icon_pixmap(pixmap, svgpath, color, size);
+
+    // 设置图标
+    action->setIcon(QIcon(pixmap));
 }
 
 }  // namespace mutil

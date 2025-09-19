@@ -59,7 +59,7 @@ struct TimeInfo {
 
 struct OffsetInfo {
     // --- 音频/谱面固定偏移量 (ms) ---
-    std::atomic<double> global_static_offset_ms{-125.0};
+    std::atomic<double> global_static_offset_ms{-100.0};
 
     // --- 音频/谱面全局偏移量 (ms) ---
     // 可以由UI控件修改，所以用原子保证线程安全

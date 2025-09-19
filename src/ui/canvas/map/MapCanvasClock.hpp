@@ -274,6 +274,68 @@ class MapCanvasClock {
         }
     }
 
+    void updateWBoxPeriodical(RealTimeInfo& info, double smoothed_delta_ms) {
+        // --- 暂停/开始/变速时的硬重置逻辑 (保持不变) ---
+        if (info.is_playing != m_was_playing ||
+            info.audio_playback_rate.load() != m_last_playback_rate) {
+            force_sync(info);  // 将硬同步逻辑封装成一个函数
+            if (info.is_playing != m_was_playing) {
+                m_was_playing = info.is_playing;
+                return;
+            }
+            return;  // 重置后，直接结束本次更新
+        }
+
+        if (!info.is_playing) {
+            return;
+        }
+
+        // --- 核心改动：周期性校准逻辑 ---
+
+        auto now = std::chrono::steady_clock::now();
+        bool should_check_sync =
+            (now - m_last_sync_check_time) > SYNC_CHECK_INTERVAL;
+
+        double error = info.current_time_info.raw_audio_time_ms.load() -
+                       info.current_time_info.logic_canvas_time;
+
+        // 定义误差阈值 (ms)
+        const double IGNORE_THRESHOLD = 10.0;      // 小于此误差，忽略
+        const double HARD_JUMP_THRESHOLD = 100.0;  // 大于此误差，硬跳变
+
+        if (m_is_smoothing_correction) {
+            // --- A. 当前处于“平滑追赶”模式 ---
+            if (std::abs(error) < IGNORE_THRESHOLD) {
+                // 误差已经收敛，退出追赶模式
+                m_is_smoothing_correction = false;
+            } else {
+                // 继续执行平滑追赶 (类似之前的水箱逻辑)
+                smooth_catch_up(info, smoothed_delta_ms, error);
+            }
+        } else if (should_check_sync) {
+            // --- B. 到达检查时间点 ---
+            m_last_sync_check_time = now;  // 重置计时器
+
+            if (std::abs(error) > HARD_JUMP_THRESHOLD) {
+                // 偏差过大，执行硬跳变
+                force_sync(info);
+            } else if (std::abs(error) > IGNORE_THRESHOLD) {
+                // 偏差较大，启动平滑追赶模式
+                m_is_smoothing_correction = true;
+                smooth_catch_up(info, smoothed_delta_ms, error);
+            }
+            // 如果误差在 IGNORE_THRESHOLD 之内，则什么都不做
+        }
+
+        // --- C. 如果不处于追赶模式，也没有到检查时间，则执行“自然流逝” ---
+        if (!m_is_smoothing_correction) {
+            natural_flow(info, smoothed_delta_ms);
+        }
+
+        // 更新状态以备下一帧使用
+        m_was_playing = info.is_playing;
+    }
+
     // 公共的重置函数，用于暂停或seek等操作
     void reset() {
         m_was_playing = false;
@@ -303,9 +365,38 @@ class MapCanvasClock {
         m_state = State::FreeRun;
         m_phase_start_time = info.current_time_info.logic_canvas_time;
         m_last_playback_rate = info.audio_playback_rate.load();
+        // 重置周期检查计时器和追赶状态
+        m_last_sync_check_time = std::chrono::steady_clock::now();
+        m_is_smoothing_correction = false;
     }
 
    private:
+    /**
+     * @brief 模式一：自然流逝
+     */
+    void natural_flow(RealTimeInfo& info, double smoothed_delta_ms) {
+        // 画布时间完全根据上次记录的速率和现实时间前进
+        info.current_time_info.logic_canvas_time +=
+            smoothed_delta_ms * m_last_playback_rate;
+    }
+
+    /**
+     * @brief 模式二：平滑追赶
+     */
+    void smooth_catch_up(RealTimeInfo& info, double smoothed_delta_ms,
+                         double error) {
+        // 这里就是你之前的水箱模型，但目标是消除误差
+        const double Kp = 0.05;  // 可以用一个更激进的值，以便快速收敛
+        double target_rate = m_last_playback_rate + (error * Kp);
+
+        // 速率限制
+        target_rate = std::clamp(target_rate, m_last_playback_rate * 0.9,
+                                 m_last_playback_rate * 1.1);
+
+        // 以修正后的速率前进
+        info.current_time_info.logic_canvas_time +=
+            smoothed_delta_ms * target_rate;
+    }
     // 积分模式
     // P: 比例增益，用于修正相位（时间）误差
     const double Kp = 0.0005;
@@ -373,6 +464,14 @@ class MapCanvasClock {
     double m_phase_start_time = 0.0;
     // 在同步窗口开始时，计算出的需要修正的总误差
     double m_sync_error_to_correct = 0.0;
+
+    // 用于周期性检查
+    std::chrono::steady_clock::time_point m_last_sync_check_time;
+    // 校准周期，例如5秒
+    const std::chrono::seconds SYNC_CHECK_INTERVAL{8};
+
+    // 标记当前是否处于“平滑追赶”模式
+    bool m_is_smoothing_correction = false;
 };
 
 #endif  // MMM_MAPCANVASCLOCK_HPP

@@ -100,3 +100,20 @@ void OsuTiming::from_osu_description(std::vector<std::string>& description) {
     // 效果
     effect = (int8_t)std::stoi(description.at(7));
 }
+
+std::unique_ptr<Timing> OsuTiming::clone() {
+    auto newTiming = std::make_unique<OsuTiming>();
+    newTiming->timestamp = timestamp;
+    newTiming->bpm = bpm;
+    newTiming->beat_length = beat_length;
+    newTiming->type = type;
+    newTiming->metatype = metatype;
+    newTiming->is_inherit_timing = is_inherit_timing;
+    newTiming->effect = effect;
+    newTiming->beat = beat;
+    newTiming->volume = volume;
+    newTiming->note_properties = note_properties;
+    newTiming->sample_set = sample_set;
+    newTiming->sample_parameter = sample_parameter;
+    return newTiming;
+}

@@ -102,7 +102,7 @@ class TimingMetadata {
     virtual ~TimingMetadata() = default;
 
     // 元数据类型
-    TimingMetadataType type;
+    TimingMetadataType metatype;
 
     // 属性表
     std::unordered_map<std::string, std::string, StringHash, std::equal_to<>>

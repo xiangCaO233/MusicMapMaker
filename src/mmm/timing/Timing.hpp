@@ -2,6 +2,7 @@
 #define MMM_TIMING_HPP
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 enum class TimingType {
@@ -38,6 +39,15 @@ class Timing {
 
     ///< 拍长(ms)或滑条速度倍率(负值)
     double beat_length{0};
+
+    virtual std::unique_ptr<Timing> clone() {
+        auto newTiming = std::make_unique<Timing>();
+        newTiming->timestamp = timestamp;
+        newTiming->bpm = bpm;
+        newTiming->beat_length = beat_length;
+        newTiming->type = type;
+        return newTiming;
+    }
 
     // 增加一个辅助的 to_string
     virtual std::string to_string() const {

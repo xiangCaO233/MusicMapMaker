@@ -1,6 +1,8 @@
 #ifndef TIMINGMANAGER_H
 #define TIMINGMANAGER_H
 
+#include <qvalidator.h>
+
 #include <QStandardItem>
 #include <QWidget>
 
@@ -31,6 +33,8 @@ class TimingManager : public QWidget {
    private:
     Ui::TimingEditor *ui;
     MMap *map_ref;
+    QIntValidator *timeInputValidator;
+    QDoubleValidator *parameterInputValidator;
 };
 
 #endif  // TIMINGMANAGER_H

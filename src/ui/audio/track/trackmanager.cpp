@@ -24,7 +24,7 @@ QStringList TrackManager::metaNames() {
 TrackManager::TrackManager(QWidget* parent)
     : HideableToolWindow(parent), ui(new Ui::TrackManager) {
     ui->setupUi(this);
-    ui->splitter_3->setSizes({300, 0});
+    ui->splitter_3->setSizes({150, 0});
 
     // 初始化sdl播放后端
     ice::SDLPlayer::init_backend();
