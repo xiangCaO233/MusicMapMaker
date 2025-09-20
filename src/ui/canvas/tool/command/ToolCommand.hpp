@@ -14,6 +14,12 @@ struct StartDragSelectionCommand {
     std::unordered_set<entt::entity> selection;
 };
 
+// 创建物件(单键)指令
+struct StartCreateNewNoteCommand {
+    double time;
+    int track;
+};
+
 // 标记删除指令
 struct MarkDeleteCommand {
     const MeshPartInfo hit_info;
@@ -31,8 +37,8 @@ struct ConfirmDeleteCommand {
 // };
 
 // 用 std::variant 将所有命令类型聚合到一个类型中
-using ToolCommand =
-    std::variant<StartDragCommand, StartDragSelectionCommand, EndDragCommand,
-                 MarkDeleteCommand, ConfirmDeleteCommand>;
+using ToolCommand = std::variant<StartDragCommand, StartDragSelectionCommand,
+                                 EndDragCommand, StartCreateNewNoteCommand,
+                                 MarkDeleteCommand, ConfirmDeleteCommand>;
 
 #endif  // MMM_TOOLCOMMAND_HPP

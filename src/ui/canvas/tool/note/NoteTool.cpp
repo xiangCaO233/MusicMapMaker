@@ -47,6 +47,7 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
                 // 单一操作
                 if (modifiers.testFlag(Qt::ShiftModifier)) {
                     // 按住shift拖动
+                    // 更改物件
                 } else {
                     // 直接拖动
                     // 是在某个物件的某个部位开始按下的,根据拖拽部位发送不同拖拽开始命令
@@ -62,6 +63,13 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
         }
     } else {
         // 清除选中物件
+        tool_interaction_state()->setSelection({});
+        if (modifiers.testFlag(Qt::ShiftModifier)) {
+            // 放置面条或组合物件
+
+        } else {
+            // 放置一个单键并立马选中开始拖动
+        }
     }
 
     // qDebug() << "鼠标按下事件结束-位于qtui线程";

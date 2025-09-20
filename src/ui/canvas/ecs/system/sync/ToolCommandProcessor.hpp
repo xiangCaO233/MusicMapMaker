@@ -28,17 +28,18 @@ class ToolCommandProcessor {
 
     void process(const ToolCommand& command) {
         std::visit(overloaded{
+                       // 放置物件
+                       // 放置单物件
+                       [&](const StartCreateNewNoteCommand& arg) {
+                           // startDragEntities({arg.hit_info.source_entity},
+                           // arg.hit_info);
+                       },
                        // 所有开始拖拽命令
                        // 匹配所有包含 hit_info 的拖拽命令
                        [&](const StartDragCommand& arg) {
                            startDragEntities({arg.hit_info.source_entity},
                                              arg.hit_info);
                        },
-                       // 拖拽单物件头
-                       // [&](const StartDragNormalNoteCommand& arg) {
-                       //     startDragEntities({arg.hit_info.source_entity},
-                       //     arg.hit_info);
-                       // },
 
                        // 拖拽选择集
                        [&](const StartDragSelectionCommand& arg) {
@@ -48,6 +49,7 @@ class ToolCommandProcessor {
                        // 结束拖拽命令
                        [&](const EndDragCommand& arg) { endDrag(); },
 
+                       // 删除相关
                        // 标记删除命令
                        [&](const MarkDeleteCommand& arg) {
                            //

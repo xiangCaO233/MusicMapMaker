@@ -18,6 +18,8 @@ class MMapEditor : public QObject {
     // 创建长键音符
     void createHoldAt(int64_t timestamp, int track, int64_t duration);
 
+    // void createCompositeAt(int64_t timestamp, );
+
     // 删除多个物件
     void deleteNotes(const std::unordered_set<NoteUUID>& uuids);
 
