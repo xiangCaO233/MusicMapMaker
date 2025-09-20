@@ -32,10 +32,9 @@ class ECSCore {
     // 更新map
     void updateMap(MMap* mmap);
 
-    // auto beat_group() { return registry.group<TimeComponent,
-    // BeatComponent>(); }
     // 提供访问器
     auto& get_beat_group() { return beat_group; }
+
     const auto& get_beat_group() const { return beat_group; }
 
    private:

@@ -6,7 +6,8 @@
 #include <mmm/map/MMap.hpp>
 #include <unordered_set>
 
-class MMapEditor {
+class MMapEditor : public QObject {
+    Q_OBJECT
    public:
     MMapEditor(MMap* m, ThreadSafeQueue<MMapEditEvent>& editEventQueue);
     ~MMapEditor() = default;
@@ -35,9 +36,15 @@ class MMapEditor {
     // 更新timing
     void updateTiming(Timing* srcTiming, std::unique_ptr<Timing> newTimingData);
 
+    // 删除timing
+    void deleteTiming(Timing* srcTiming);
+
     // 撤销和重做
     void undo();
     void redo();
+
+   signals:
+    void timingMapUpdated();
 
    private:
     MMap* map;

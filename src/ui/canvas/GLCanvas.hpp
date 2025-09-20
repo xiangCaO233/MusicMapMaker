@@ -12,6 +12,7 @@
 class TexturePool;
 class LayerManager;
 class AudioLoadCallback;
+class Timing;
 
 class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     Q_OBJECT
@@ -25,6 +26,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
    public slots:
     virtual void onAudioLoadcbkInitialized(AudioLoadCallback* cbk);
     virtual void onUpdateTexinfo();
+    virtual void gotoTiming(Timing* timing);
 
    signals:
     void update_window_suffix(const QString& suffix);

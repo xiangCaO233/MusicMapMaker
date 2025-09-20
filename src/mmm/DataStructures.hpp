@@ -787,12 +787,12 @@ class TimingMap {
      */
     std::unique_ptr<Timing> update_timing_point(
         Timing* old_timing_ptr, std::unique_ptr<Timing> new_timing_data) {
-        // --- 1. 输入验证 ---
+        // 输入验证
         if (!old_timing_ptr || !new_timing_data) {
             return nullptr;
         }
 
-        // --- 2. 查找并移除旧对象 ---
+        // 查找并移除旧对象
         // 我们的目标是先从 map 中“取出”旧的 unique_ptr，但要记住它的位置。
         auto old_timestamp = old_timing_ptr->timestamp;
         auto map_it_old = m_timeline.find(old_timestamp);
@@ -813,17 +813,17 @@ class TimingMap {
         std::unique_ptr<Timing> old_data_backup = std::move(*vec_it_old);
         vec_old.erase(vec_it_old);
 
-        // --- 3. 尝试将新对象添加到新位置 ---
+        // 尝试将新对象添加到新位置
         auto new_timestamp = new_timing_data->timestamp;
         auto& vec_new = m_timeline[new_timestamp];
 
-        // 检查在“新家”是否已有重复的对象
+        // 检查在新位置是否已有重复的对象
         auto vec_it_new = std::find_if(
             vec_new.begin(), vec_new.end(),
             [&](const auto& p) { return *p == *new_timing_data; });  // 比较内容
 
         if (vec_it_new != vec_new.end()) {
-            // --- 失败处理：操作无法完成，必须回滚！---
+            // 失败处理：操作无法完成，回滚
             // 我们不能添加新数据，因为它会产生重复。
             // 必须将刚才取出的旧数据放回原位，以保持系统状态不变。
             map_it_old->second.push_back(std::move(old_data_backup));
@@ -843,7 +843,7 @@ class TimingMap {
             return nullptr;  // 返回失败
         }
 
-        // --- 4. 成功：完成添加和清理 ---
+        // 成功：完成添加和清理
         vec_new.push_back(std::move(new_timing_data));
 
         // 如果移除旧对象后，其所在的 vector 变空了，现在可以安全地清理它了

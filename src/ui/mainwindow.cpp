@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(canvas, &GLCanvas::update_window_suffix, this,
             &MainWindow::update_title_suffix);
 
+    connect(ui->timing_editor, &TimingManager::navigateToTiming, canvas,
+            &MapCanvas::gotoTiming);
+
     // connect(ui->track_manager, &TrackManager::close,
     //         [capui]() { capui->actionTrack_Manager->setChecked(false); });
     // connect(ui->project_manager, &ProjectManager::close,

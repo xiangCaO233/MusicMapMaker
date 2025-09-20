@@ -39,6 +39,7 @@ class MapCanvas : public GLCanvas {
    public slots:
     void onAudioLoadcbkInitialized(AudioLoadCallback *cbk) override;
     void onUpdateTexinfo() override;
+    void gotoTiming(Timing *timing) override;
 
    signals:
     void skinInitialized();

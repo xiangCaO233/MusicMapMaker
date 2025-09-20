@@ -23,9 +23,15 @@ void SyncSystem::updateEditStatus(ECSCore& core,
                 break;
             }
             case MMapEditEventType::TimingUpdated: {
-                qDebug() << "接收到Timing更新编辑事件:目标timing["
-                         << std::get<Timing*>(e.editData) << "]";
-                // 重建所有转换器
+                auto timing = std::get<Timing*>(e.editData);
+                qDebug() << "接收到Timing更新编辑事件:目标timing[" << timing
+                         << "]";
+                if (timing->is_base_timing) {
+                    // 重新生成拍信息
+                    layer_manager->map()->beat_timeline().clear();
+                    layer_manager->map()->beat_info().clear();
+                    layer_manager->map()->analyzeBeatInfo();
+                }
 
                 break;
             }

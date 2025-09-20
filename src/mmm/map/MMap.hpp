@@ -59,6 +59,9 @@ class MMap : public QObject {
     // 设置主音轨
     void set_maintrack(const std::shared_ptr<ice::AudioTrack>& track);
 
+    // 更新拍信息(智能识别分拍)
+    void analyzeBeatInfo();
+
    private:
     // (实际持有)
     // 谱面元数据集
@@ -97,9 +100,6 @@ class MMap : public QObject {
 
     void readMMM() {};
     void writeMMM() {};
-
-    // 更新拍信息(智能识别分拍)
-    void analyzeBeatInfo();
 };
 
 #endif  // MMM_MMAP_HPP

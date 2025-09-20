@@ -9,8 +9,24 @@ MMapEditor::MMapEditor(MMap* m, ThreadSafeQueue<MMapEditEvent>& editEventQueue)
     : map(m), operationManager(editEventQueue) {}
 
 // 撤销和重做
-void MMapEditor::undo() { operationManager.undo(); }
-void MMapEditor::redo() { operationManager.redo(); }
+void MMapEditor::undo() {
+    auto cmdref = operationManager.undo();
+    auto addtimingcmd = dynamic_cast<AddTimingPointCommand*>(cmdref);
+    auto removetimingcmd = dynamic_cast<RemoveTimingPointCommand*>(cmdref);
+    auto updatetimingcmd = dynamic_cast<UpdateTimingCommand*>(cmdref);
+    if (addtimingcmd || removetimingcmd || updatetimingcmd) {
+        emit timingMapUpdated();
+    }
+}
+void MMapEditor::redo() {
+    auto cmdref = operationManager.redo();
+    auto addtimingcmd = dynamic_cast<AddTimingPointCommand*>(cmdref);
+    auto removetimingcmd = dynamic_cast<RemoveTimingPointCommand*>(cmdref);
+    auto updatetimingcmd = dynamic_cast<UpdateTimingCommand*>(cmdref);
+    if (addtimingcmd || removetimingcmd || updatetimingcmd) {
+        emit timingMapUpdated();
+    }
+}
 
 // 创建单键音符
 void MMapEditor::createNoteAt(int64_t timestamp, int track) {
@@ -91,6 +107,7 @@ void MMapEditor::creatTiming(std::unique_ptr<Timing> timingData) {
     auto command = std::make_unique<AddTimingPointCommand>(
         map->timing_set(), std::move(timingData));
     operationManager.executeCommand(std::move(command));
+    emit timingMapUpdated();
 }
 
 // 更新timing
@@ -99,4 +116,13 @@ void MMapEditor::updateTiming(Timing* srcTiming,
     auto command = std::make_unique<UpdateTimingCommand>(
         map->timing_set(), srcTiming, std::move(newTimingData));
     operationManager.executeCommand(std::move(command));
+    emit timingMapUpdated();
+}
+
+// 删除timing
+void MMapEditor::deleteTiming(Timing* srcTiming) {
+    auto command = std::make_unique<RemoveTimingPointCommand>(map->timing_set(),
+                                                              srcTiming);
+    operationManager.executeCommand(std::move(command));
+    emit timingMapUpdated();
 }

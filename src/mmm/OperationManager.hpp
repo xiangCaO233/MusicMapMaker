@@ -18,21 +18,25 @@ class OperationManager {
         }
     }
 
-    void undo() {
-        if (m_undo_stack.empty()) return;
+    OperationCommand* undo() {
+        if (m_undo_stack.empty()) return nullptr;
         auto command = std::move(m_undo_stack.top());
+        auto cmdptr = command.get();
         m_undo_stack.pop();
         command->undo(editEventQ);
         m_redo_stack.push(std::move(command));
+        return cmdptr;
     }
 
-    void redo() {
-        if (m_redo_stack.empty()) return;
+    OperationCommand* redo() {
+        if (m_redo_stack.empty()) return nullptr;
         auto command = std::move(m_redo_stack.top());
+        auto cmdptr = command.get();
         m_redo_stack.pop();
         if (command->execute(editEventQ)) {
             m_undo_stack.push(std::move(command));
         }
+        return cmdptr;
     }
 
    private:

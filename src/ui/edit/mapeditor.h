@@ -8,6 +8,7 @@ class MapEditor;
 }
 
 class MapCanvas;
+class Timing;
 
 class MapEditor : public QWidget {
     Q_OBJECT

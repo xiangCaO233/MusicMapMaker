@@ -93,6 +93,17 @@ void MapCanvas::onUpdateTexinfo() {
     qDebug() << "纹理重组,清理皮肤缓存";
     skin->clear_buffer();
 }
+void MapCanvas::gotoTiming(Timing* timing) {
+    auto mapcanvasInfo = info<MapCanvasInfo>();
+    audio_callback->set_playpos_for(
+        map->base_metadata().main_audio_path.generic_string(),
+        std::chrono::milliseconds(timing->timestamp));
+    mapcanvasInfo->realTimeInfo.current_time_info.logic_canvas_time =
+        timing->timestamp -
+        mapcanvasInfo->realTimeInfo.offset_info.global_offset_ms;
+    // mapcanvasInfo->realTimeInfo.current_time_info.presentation_canvas_time =
+    // timing->timestamp;
+}
 
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {

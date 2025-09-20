@@ -5,6 +5,7 @@
 #include <canvas/render/Renderer2D.hpp>
 #include <chrono>
 #include <layer/LayerManager.hpp>
+#include <mmm/timing/Timing.hpp>
 #include <render/command/GLDirectPainter.hpp>
 #include <render/command/MCommandCollector.hpp>
 #include <render/synchronize/tick/RenderDataLoop.hpp>
@@ -69,6 +70,12 @@ void GLCanvas::updateFpsDisplay(int fps) {
 }
 
 void GLCanvas::onUpdateTexinfo() {}
+
+void GLCanvas::gotoTiming(Timing* timing) {
+    canvas_info->realTimeInfo.current_time_info.logic_canvas_time =
+        timing->timestamp -
+        canvas_info->realTimeInfo.offset_info.global_offset_ms;
+}
 
 // 更新共享信息
 void GLCanvas::update_sharedInfo() const {

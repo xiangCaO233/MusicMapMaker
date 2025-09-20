@@ -18,8 +18,13 @@ class MMap;
 class TimeEditWidget : public QWidget {
     Q_OBJECT
    public:
-    TimeEditWidget(Timing *&timing, QTableWidget *parent, int index,
+    TimeEditWidget(Timing *&timing, QTableWidget *parent,
                    QIntValidator *validator);
+   signals:
+    void gotoTiming(Timing *timing);
+
+   public:
+    Timing *&timing;
     QTableWidget *parent;
     QHBoxLayout *layout;
     QLabel *timingIndex;
@@ -55,9 +60,12 @@ class TimingSettingWidget : public QWidget {
 class TimingRowItem : public QObject {
     Q_OBJECT
    public:
-    TimingRowItem(MMap *map, Timing *&timing, QTableWidget *parent, int index,
+    TimingRowItem(MMap *map, Timing *timing, QTableWidget *parent,
                   QIntValidator *intvalidator,
                   QDoubleValidator *doublevalidator);
+
+   public:
+    // void updateTiming(Timing *timing);
     Timing *timing;
     TimeEditWidget *timeEditWgt;
     QComboBox *uninheritedComboBox;
