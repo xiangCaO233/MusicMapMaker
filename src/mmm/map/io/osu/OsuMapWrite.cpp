@@ -394,7 +394,7 @@ void MMap::writeOsu(const std::string& desfile) {
 
     //  [TimingPoints]	时间轴设定	逗号分隔的列表
     os << "[TimingPoints]" << slashn;
-    auto timings = timing_set().get_all_timing_points();
+    auto& timings = timing_set().get_all_timing_points();
     for (const auto& [time, timing_vec] : timings) {
         for (const auto& timing : timing_vec) {
             auto otiming = static_cast<OsuTiming*>(timing.get());
