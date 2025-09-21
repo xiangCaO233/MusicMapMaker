@@ -316,7 +316,7 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     for (auto it = uuid_map.begin(); it != uuid_map.end();) {
         // 不处于当前可见实体集合中/且不处于拖动集合中
         if (!current_visible_uuidset.contains(it->first) &&
-            !drag_info.dragged_entities.contains(it->second)) {
+            !drag_info.dragged_entitiesWithRes.contains(it->second)) {
             if (registry.valid(it->second)) {
                 // 若为组合物件实体/递归移除所有子实体
                 if (registry.all_of<CompositeRootComponent>(it->second)) {
@@ -367,6 +367,155 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     // qDebug() << "新建可见实体数量:" << new_entities - after_entities;
     // ----------debug------------
 }
+
+void sync_creating_noteEntity(ECSCore& core, MapLayerManager* layer_manager,
+                              const MapCanvasInfo* info) {
+    auto& registry = core.ecs_registry();
+    auto createState =
+        layer_manager->get_tool_interaction_state()->getCreateState();
+    // 将registry中的创建中实体与交互状态同步
+    auto view = registry.view<CreatingNoteComponent>();
+    // 若非创建模式,移除所有创建中实体
+    if (createState.mode == CreateMode::None) {
+        // 无创建，清理所有创建中实体
+        for (auto e : view) {
+            registry.destroy(e);
+        }
+        return;
+    }
+    if (createState.mode == CreateMode::Normal) {
+        // 单键模式：保持一个实体
+        entt::entity entity = entt::null;
+        if (!view.empty()) {
+            entity = view.front();  // 假设只有一个
+            // 如果有多个，清理多余的
+            for (auto it = view.begin() + 1; it != view.end(); ++it) {
+                registry.destroy(*it);
+            }
+        } else {
+            entity = registry.create();
+            registry.emplace<CreatingNoteComponent>(entity);
+            registry.emplace<TimeComponent>(entity);
+            registry.emplace<NoteComponent>(entity);
+            // 可能还需要TransformComponent或其他，但根据原代码未指定
+        }
+
+        if (!createState.createState_nodes.empty()) {
+            const auto& axis = createState.createState_nodes.front();
+            auto& timeComp = registry.get<TimeComponent>(entity);
+            timeComp.timestamp = axis.time;
+            auto& noteComp = registry.get<NoteComponent>(entity);
+            noteComp.track_index = axis.track;
+        }
+        return;
+    }
+
+    if (createState.mode == CreateMode::Composite) {
+        // 复合模式：维护父实体和子实体
+        entt::entity parent = entt::null;
+        std::vector<entt::entity> existing_children;
+
+        // 查找现有的父实体（假设只有一个CompositeRootComponent）
+        auto root_view = registry.view<CompositeRootComponent>();
+        if (!root_view.empty()) {
+            parent = root_view.front();
+            auto& root = registry.get<CompositeRootComponent>(parent);
+            existing_children = root.children;
+            // 清理多余根
+            auto it = root_view.begin();
+            ++it;
+            for (; it != root_view.end(); ++it) {
+                registry.destroy(*it);
+            }
+        }
+
+        size_t target_size = createState.createState_nodes.size();
+        if (target_size < 2) {
+            // 至少需要2个node才有连接
+            // 如果少于2，清理所有复合相关
+            if (parent != entt::null) {
+                for (auto child : existing_children) {
+                    registry.destroy(child);
+                }
+                registry.destroy(parent);
+            }
+            return;
+        }
+
+        size_t child_count = target_size - 1;  // 子实体数 = nodes - 1
+
+        // 创建或复用父实体
+        if (parent == entt::null) {
+            parent = registry.create();
+            registry.emplace<CreatingNoteComponent>(parent);
+            registry.emplace<CompositeRootComponent>(parent);
+            registry.emplace<TimeComponent>(parent);
+            registry.emplace<NoteComponent>(parent);
+        }
+
+        auto& root = registry.get<CompositeRootComponent>(parent);
+        root.children.resize(child_count);  // 调整到目标子实体数
+
+        // 设置父实体的time和track为第一个node
+        const auto& first_axis = createState.createState_nodes.front();
+        registry.get<TimeComponent>(parent).timestamp = first_axis.time;
+        registry.get<NoteComponent>(parent).track_index = first_axis.track;
+
+        // 遍历createState_nodes的前n-1个，同步子实体
+        auto nodes_it = createState.createState_nodes.begin();
+        for (size_t i = 0; i < child_count; ++i, ++nodes_it) {
+            entt::entity child = (i < existing_children.size())
+                                     ? existing_children[i]
+                                     : entt::null;
+            if (child == entt::null) {
+                child = registry.create();
+                registry.emplace<CreatingNoteComponent>(child);
+                registry.emplace<TimeComponent>(child);
+                registry.emplace<NoteComponent>(child);
+                registry.emplace<ChildOfComponent>(child, parent, i);
+            }
+            root.children[i] = child;
+
+            // 更新子实体的time和track为当前node
+            registry.get<TimeComponent>(child).timestamp = nodes_it->time;
+            registry.get<NoteComponent>(child).track_index = nodes_it->track;
+
+            // 决定组件类型：每个子实体都有连接到下一个
+            auto next_it = std::next(nodes_it);
+            bool same_track = (nodes_it->track == next_it->track);
+            bool same_time = (nodes_it->time == next_it->time);
+
+            // 根据规则，必然一个相同一个不同，且交替
+            if (same_track && !same_time) {
+                // Hold
+                if (registry.all_of<FlickComponent>(child)) {
+                    registry.remove<FlickComponent>(child);
+                }
+                auto& hold = registry.emplace_or_replace<HoldComponent>(child);
+                hold.duration =
+                    static_cast<uint32_t>(next_it->time - nodes_it->time);
+            } else if (!same_track && same_time) {
+                // Flick
+                if (registry.all_of<HoldComponent>(child)) {
+                    registry.remove<HoldComponent>(child);
+                }
+                auto& flick =
+                    registry.emplace_or_replace<FlickComponent>(child);
+                flick.delta_track = next_it->track - nodes_it->track;
+            } else {
+                // 无效，但tool_interaction_state已确保
+            }
+        }
+
+        // 清理多余的现有子实体
+        for (size_t i = child_count; i < existing_children.size(); ++i) {
+            registry.destroy(existing_children[i]);
+        }
+
+        return;
+    }
+}
+
 // 同步物件/拍/时间点实体
 void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
                                 const NoteIDManager& uuidManager,
@@ -416,7 +565,10 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
     // qDebug() << "当前查询结束:" << query_end_time;
 
     // 执行ECS同步逻辑
-    // 同步Note实体
+    // 同步创建中的Note实体
+    sync_creating_noteEntity(core, layer_manager, info);
+
+    // 同步已有的Note实体
     sync_notes(core, notes, uuidManager, layer_manager, info, query_start_time,
                query_end_time);
 

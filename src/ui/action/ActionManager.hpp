@@ -18,6 +18,8 @@ class ActionManager : public QObject {
     // 注册事件
     void createAction(const QString& id, const QString& text,
                       const QKeySequence& shortcut = QKeySequence());
+    void createAction(const QString& id, const QString& text,
+                      const QList<QKeySequence>& shortcuts = {});
     QAction* getAction(const QString& id);
     void connectCommand(const QString& actionId, const QObject* receiver,
                         const char* slot);

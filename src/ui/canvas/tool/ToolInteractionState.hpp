@@ -6,6 +6,9 @@
 #include <entt.hpp>
 #include <glm/glm.hpp>
 #include <info/NotePart.hpp>
+#include <list>
+#include <memory>
+#include <mmm/obj/Note.hpp>
 #include <vector>
 
 // --- 子结构：鼠标状态 ---
@@ -40,14 +43,27 @@ enum class DragMode {
     Marquee,
 };
 
+enum class CreateMode {
+    // 无创建内容
+    None,
+    // 单键
+    Normal,
+    // 复合
+    Composite,
+};
+struct MapAxis {
+    int64_t time{0};
+    int64_t mousetime{0};
+    int64_t track{0};
+    int64_t x{0};
+    int64_t y{0};
+
+    bool operator==(const MapAxis& other) const {
+        return time == other.time && track == other.track;
+    }
+};
+
 struct DragState {
-    struct MapAxis {
-        int64_t time{0};
-        int64_t mousetime{0};
-        int64_t track{0};
-        int64_t x{0};
-        int64_t y{0};
-    };
     // 拖拽模式
     DragMode mode{DragMode::None};
     // 拖拽操作是否有效
@@ -56,7 +72,16 @@ struct DragState {
     // 拖拽开始时的命中信息 (部位、实体等)
     MeshPartInfo drag_start_hit;
     // 实际被拖拽的实体集合
-    std::unordered_map<entt::entity, MapAxis> dragged_entities;
+    std::unordered_map<entt::entity, MapAxis> dragged_entitiesWithRes;
+};
+
+struct CreateState {
+    // 创建模式
+    CreateMode mode;
+    // 创建结果是否合法
+    bool is_valid{true};
+    // 创建出的节点路径
+    std::list<MapAxis> createState_nodes;
 };
 
 // 主结构ToolInteractionState
@@ -81,9 +106,16 @@ class ToolInteractionState {
     void endDrag();
 
     void setDragValidity(bool isValid);
-    void setDragValidRes(const entt::entity& e, const DragState::MapAxis& axis);
+    void setDragValidRes(const entt::entity& e, const MapAxis& axis);
 
     DragState getDragState() const;
+
+    // 创建相关(由 pretick 写入, 工作线程读取)
+    void startCreate(CreateMode mode);
+    void updateCreateNode(const MapAxis& axis);
+    void setCreateValidity(bool isValid);
+    CreateState getCreateState() const;
+    void endCreate();
 
     // 删除相关
     void startDeleteCheck(const std::unordered_set<entt::entity>& selection);
@@ -110,6 +142,7 @@ class ToolInteractionState {
     // 当前悬浮的对象
     std::optional<MeshPartInfo> m_hovered;
     DragState m_dragState;
+    CreateState m_createState;
     SelectionState m_selectionState;
     DeleteMarkStates m_deleteMarkState;
 };

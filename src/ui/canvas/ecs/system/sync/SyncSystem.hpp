@@ -27,7 +27,8 @@ class SyncSystem {
 
     // 同步工具交互
     void updateToolInteractions(ECSCore& core, const MapCanvasInfo* info,
-                                MapLayerManager* layer_manager) const;
+                                MapLayerManager* layer_manager,
+                                TimePixelConverter& converter) const;
 
     // 同步特效实体
     void updateEffects(ECSCore& core, const NoteCollection& notes,

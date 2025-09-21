@@ -8,9 +8,9 @@
 void MapDataLoop::pre_tickEvent() {
     // qDebug() << "pretick开始";
     // 先筛选可见物件
-    auto map_layermgr = static_cast<MapLayerManager *>(manager().get());
+    auto map_layermgr = static_cast<MapLayerManager*>(manager().get());
     auto map = map_layermgr->map();
-    auto mapinfo = static_cast<MapCanvasInfo *>(getinfo());
+    auto mapinfo = static_cast<MapCanvasInfo*>(getinfo());
     if (!map) {
         // qDebug() << "pretick结束";
         return;
@@ -20,14 +20,14 @@ void MapDataLoop::pre_tickEvent() {
     auto converter = map_layermgr->get_time_converter_manager()->getConverter(
         map->timing_set(), mapinfo->baseInfo,
         mapinfo->editorInfo.map->base_metadata().preference_bpm);
-    auto &ecore = map_layermgr->core();
+    auto& ecore = map_layermgr->core();
 
     // qDebug() << "同步系统(at pretick)开始";
     // 同步编辑事件
     sync_system.updateEditStatus(ecore, map_layermgr);
 
     // 同步工具交互状态
-    sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr);
+    sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr, converter);
 
     // 与源物件集合同步可见的物件和timing
     sync_system.updateEntities(ecore, map->note_set(), map->note_uuids(),
@@ -50,7 +50,7 @@ void MapDataLoop::pre_tickEvent() {
 void MapDataLoop::tickEvent() {}
 
 void MapDataLoop::after_tickEvent() {
-    auto mapinfo = static_cast<MapCanvasInfo *>(getinfo());
+    auto mapinfo = static_cast<MapCanvasInfo*>(getinfo());
     mapinfo->realTimeInfo.last_time_info.logic_canvas_time =
         mapinfo->realTimeInfo.current_time_info.logic_canvas_time;
     mapinfo->realTimeInfo.last_time_info.presentation_canvas_time =

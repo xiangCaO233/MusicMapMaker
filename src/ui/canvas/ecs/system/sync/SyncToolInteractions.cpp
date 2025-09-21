@@ -26,26 +26,34 @@ void updateHover(ToolSystem* toolSystem,
     if (current_hit.has_value()) {
         // 当前鼠标下有物体
         const auto hit_info = current_hit.value();
+        auto& registry = toolSystem->get_registry();
         auto note = notes.get_note(uuidManager.get_handle(hit_info.uuid));
         if (!note) {
-            // 组合键子键
-            auto& [parent, child_index] =
-                toolSystem->get_registry().get<ChildOfComponent>(
-                    hit_info.child_entity);
-            // 父实体失效
-            if (!toolSystem->get_registry().valid(parent)) return;
-            auto& [parent_track, parent_uuid] =
-                toolSystem->get_registry().get<NoteComponent>(parent);
-            auto parent_note =
-                notes.get_note(uuidManager.get_handle(parent_uuid));
-            if (!parent_note) {
-                // 父实体失效
-                return;
+            if (hit_info.source_entity != entt::null &&
+                hit_info.child_entity == entt::null &&
+                hit_info.uuid == InvalidNoteUUID) {
+                // 仅sourceentity有效
+
             } else {
-                // 获取到此子物件
-                note = static_cast<const Composite*>(parent_note)
-                           ->children()[child_index]
-                           .get();
+                // 组合键子键
+                auto& [parent, child_index] =
+                    toolSystem->get_registry().get<ChildOfComponent>(
+                        hit_info.child_entity);
+                // 父实体失效
+                if (!toolSystem->get_registry().valid(parent)) return;
+                auto& [parent_track, parent_uuid] =
+                    toolSystem->get_registry().get<NoteComponent>(parent);
+                auto parent_note =
+                    notes.get_note(uuidManager.get_handle(parent_uuid));
+                if (!parent_note) {
+                    // 父实体失效
+                    return;
+                } else {
+                    // 获取到此子物件
+                    note = static_cast<const Composite*>(parent_note)
+                               ->children()[child_index]
+                               .get();
+                }
             }
         }
 
@@ -65,7 +73,8 @@ void updateHover(ToolSystem* toolSystem,
             qDebug() << "检测到悬浮于子实体:"
                      << static_cast<uint32_t>(hit_info.child_entity);
 
-            qDebug() << "更新悬浮物件为" << note->toString();
+            qDebug() << "更新悬浮物件为"
+                     << (note ? note->toString() : "创建中的物件");
             qDebug() << "悬浮的部位:" << to_string(hit_info.part);
         }
 
@@ -88,14 +97,16 @@ void updateHover(ToolSystem* toolSystem,
 void processToolCommands(entt::registry& registry,
                          ThreadSafeQueue<ToolCommand>* toolCmdQ,
                          ToolSystem* system, MMapEditor* editor,
-                         ToolInteractionState* toolInteractionState,
-                         MMap* map) {
+                         ToolInteractionState* toolInteractionState, MMap* map,
+                         const MapCanvasInfo* info,
+                         TimePixelConverter& converter) {
     auto cmds = toolCmdQ->drain();
     if (cmds.empty()) return;
 
     for (const auto& command : cmds) {
         ToolCommandProcessor processor(registry, *system, *editor,
-                                       *toolInteractionState, map);
+                                       *toolInteractionState, map, info,
+                                       &converter);
         processor.process(command);
     }
 }
@@ -103,7 +114,8 @@ void processToolCommands(entt::registry& registry,
 // 同步工具交互
 void SyncSystem::updateToolInteractions(ECSCore& core,
                                         const MapCanvasInfo* info,
-                                        MapLayerManager* layer_manager) const {
+                                        MapLayerManager* layer_manager,
+                                        TimePixelConverter& converter) const {
     // qDebug() << "同步系统->同步工具状态(at pretick)开始";
     auto toolSystem = layer_manager->get_tool_system();
     auto toolCmdQ = layer_manager->get_tool_cmdq();
@@ -113,7 +125,7 @@ void SyncSystem::updateToolInteractions(ECSCore& core,
     // 更新悬浮状态
     processToolCommands(core.ecs_registry(), toolCmdQ, toolSystem,
                         info->editorInfo.map->editor(), toolInteractionState,
-                        info->editorInfo.map);
+                        info->editorInfo.map, info, converter);
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)结束";
 
     // qDebug() << "同步系统->同步工具状态->处理实时悬浮检测(at pretick)开始";

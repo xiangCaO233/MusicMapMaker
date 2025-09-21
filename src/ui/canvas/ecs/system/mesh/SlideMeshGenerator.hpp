@@ -58,8 +58,8 @@ class SlideMeshGenerator {
         return texinfo;
     }
     // 转化像素位置到谱面坐标系
-    DragState::MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
-        DragState::MapAxis axis;
+    MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
+        MapAxis axis;
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
         auto& beat_info = map->beat_info();
@@ -130,7 +130,7 @@ class SlideMeshGenerator {
         // --------------------滑尾拖动交互--------------------------
         // 判断是否在拖动滑动尾-更新滑键轨道差值
         auto drag_info = tool_interaction_state->getDragState();
-        if (drag_info.dragged_entities.contains(e) &&
+        if (drag_info.dragged_entitiesWithRes.contains(e) &&
             drag_info.drag_start_hit.part == NotePart::SLIDE_END) {
             auto mousePressPos =
                 tool_interaction_state->getMouseState().press_pos;

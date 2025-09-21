@@ -12,6 +12,15 @@ void ActionManager::createAction(const QString& id, const QString& text,
         actions.insert(id, action);
     }
 }
+// 注册事件
+void ActionManager::createAction(const QString& id, const QString& text,
+                                 const QList<QKeySequence>& shortcuts) {
+    if (!actions.contains(id)) {
+        auto action = new QAction(text, this);
+        action->setShortcuts(shortcuts);
+        actions.insert(id, action);
+    }
+}
 
 QAction* ActionManager::getAction(const QString& id) {
     return actions.value(id, nullptr);

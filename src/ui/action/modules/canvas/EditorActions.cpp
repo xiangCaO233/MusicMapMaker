@@ -8,7 +8,9 @@ void EditorActions::createActions() {
     auto action_manager = ActionManager::instance();
 
     action_manager->createAction("canvas.pause_or_resume", tr("Pause/Resume"),
-                                 QKeySequence::fromString("Space"));
+                                 {QKeySequence::fromString("Space"),
+                                  QKeySequence::fromString("Shift+Space")});
+
     action_manager->createAction("canvas.cancel", tr("Cancel"),
                                  QKeySequence::Cancel);
 

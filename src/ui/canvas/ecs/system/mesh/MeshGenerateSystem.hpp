@@ -32,8 +32,8 @@ class MeshGenerateSystem {
     std::unordered_map<entt::entity, GeneratedMesh>* generated_meshes;
 
     // 转化像素位置到谱面坐标系
-    DragState::MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
-        DragState::MapAxis axis;
+    MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
+        MapAxis axis;
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
         auto& beat_info = map->beat_info();
@@ -121,7 +121,7 @@ class MeshGenerateSystem {
 
             // 获取note原始详细信息
             auto [time] = registry->get<TimeComponent>(e);
-            auto [track_index, handle] = registry->get<NoteComponent>(e);
+            auto [track_index, uuid] = registry->get<NoteComponent>(e);
             auto [y] = registry->get<TransformComponent>(e);
 
             auto* ghost = registry->try_get<GhostComponent>(e);
@@ -169,7 +169,16 @@ class MeshGenerateSystem {
 
                 generateMesh(track_index, e, entity_mesh, time, y);
             } else {
-                // 非虚影方式渲染-直接渲染原始物件
+                // 非虚影或即将删除方式渲染
+                // 区分是否为即将创建
+                if (uuid == InvalidNoteUUID) {
+                    // 无uuid,是即将创建的物件-跟随创建状态中的创建节点
+                    // 节点需在同步系统中完成InvalidNoteUUID的实体创建和附件更新
+                    // 使用虚影渲染
+                    entity_mesh.state = MeshState::GHOST;
+                } else {
+                    // 有uuid,是真实在谱面中存在的物件-正常渲染
+                }
                 generateMesh(track_index, e, entity_mesh, time, y);
             }
         }
@@ -285,6 +294,8 @@ class MeshGenerateSystem {
                 // 最终来源实体
                 child_mesh.source_entity = e;
                 child_mesh.child_entity = child_e;
+                // 跟随父物件的网格状态(如虚影)
+                child_mesh.state = entity_mesh.state;
                 generateMesh(child_track_index, child_e, child_mesh, child_time,
                              child_y,
                              // 是否为末尾

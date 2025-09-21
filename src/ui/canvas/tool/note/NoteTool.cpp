@@ -14,6 +14,7 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
     auto pos = e->pos();
     auto modifiers = e->modifiers();
     auto buttons = e->buttons();
+    auto button = e->button();
     auto hoveredinfo = tool_interaction_state()->getHover();
     auto& notes = canvas()->get_map()->note_set();
 
@@ -64,18 +65,31 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
     } else {
         // 清除选中物件
         tool_interaction_state()->setSelection({});
-        if (modifiers.testFlag(Qt::ShiftModifier)) {
-            // 放置面条或组合物件
+        // 清除拖动状态
+        tool_command_queue()->push(ClearDragStateCommand{});
 
-        } else {
-            // 放置一个单键并立马选中开始拖动
+        if (button == Qt::LeftButton) {
+            if (modifiers.testFlag(Qt::ShiftModifier)) {
+                // 放置面条或组合物件
+                tool_command_queue()->push(
+                    StartCreateNewCompositeNoteCommand{});
+
+            } else {
+                // 开始放置一个单键
+                tool_command_queue()->push(StartCreateNewNormalNoteCommand{});
+            }
+        } else if (button == Qt::RightButton) {
         }
     }
 
     // qDebug() << "鼠标按下事件结束-位于qtui线程";
 }
 
-void NoteTool::mouseMoveEvent(QMouseEvent* e) { BaseTool::mouseMoveEvent(e); }
+void NoteTool::mouseMoveEvent(QMouseEvent* e) {
+    BaseTool::mouseMoveEvent(e);
+    // 根据是否正在创建新物件发送更新创建坐标指令
+    tool_command_queue()->push(UpdateCreateNodeCommand{});
+}
 
 void NoteTool::mouseReleaseEvent(QMouseEvent* e) {
     // qDebug() << "鼠标释放事件开始-位于qtui线程";
@@ -84,8 +98,16 @@ void NoteTool::mouseReleaseEvent(QMouseEvent* e) {
     auto button = e->button();
     auto pos = e->pos();
     if (button == Qt::LeftButton) {
-        // 左键松开-发送结束拖拽命令
-        tool_command_queue()->push(EndDragCommand{{pos.x(), pos.y()}});
+        // 左键松开
+        if (tool_interaction_state()
+                ->getDragState()
+                .dragged_entitiesWithRes.empty()) {
+            // 无拖拽实体,这是在创建物件
+            tool_command_queue()->push(ConfirmCreateNewNoteCommand{});
+        } else {
+            // 有拖拽实体,发送结束拖拽命令
+            tool_command_queue()->push(EndDragCommand{{pos.x(), pos.y()}});
+        }
     } else if (button == Qt::RightButton) {
         auto hover_state = tool_interaction_state()->getHover();
         // 右键松开-发送确认删除命令
