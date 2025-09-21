@@ -40,7 +40,7 @@ class Timing {
     ///< 拍长(ms)或滑条速度倍率(负值)
     double beat_length{0};
 
-    virtual std::unique_ptr<Timing> clone() {
+    virtual std::unique_ptr<Timing> clone() const {
         auto newTiming = std::make_unique<Timing>();
         newTiming->timestamp = timestamp;
         newTiming->bpm = bpm;

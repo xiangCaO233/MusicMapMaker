@@ -16,7 +16,7 @@ class OsuHold : public Hold, public OsuNoteMetadata {
     std::string toString() const override;
 
     // 克隆物件
-    std::unique_ptr<Note> clone(MMap* ref) const override;
+    std::unique_ptr<Note> clone(const MMap* ref) const override;
 
     // 从osu描述加载
     void from_osu_description(const std::vector<std::string>& description,

@@ -39,7 +39,7 @@ class Slide;
 class Note {
    public:
     // 构造Note
-    explicit Note(MMap* map) : map_ref(map) {};
+    explicit Note(const MMap* map) : map_ref(map) {};
 
     // 析构Note
     virtual ~Note() = default;
@@ -69,7 +69,7 @@ class Note {
     static std::vector<Note> from_slide(std::shared_ptr<Slide> slide);
 
     // 克隆物件
-    virtual std::unique_ptr<Note> clone(MMap* ref) const;
+    virtual std::unique_ptr<Note> clone(const MMap* ref) const;
 
    protected:
     // 设置类型
@@ -92,7 +92,7 @@ class Note {
     uint32_t track{0};
 
     // map引用
-    MMap* map_ref;
+    const MMap* map_ref;
 
     // 元数据集
     std::unordered_map<NoteMetadataType, std::shared_ptr<NoteMetadata>>

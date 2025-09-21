@@ -10,8 +10,6 @@
 #include <tool/command/ToolCommand.hpp>
 #include <vector>
 
-#include "mmm/obj/rm/Composite.hpp"
-
 // --- Helper for std::visit ---
 template <class... Ts>
 struct overloaded : Ts... {

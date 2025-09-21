@@ -27,7 +27,7 @@ class Slide : public Note {
     inline void set_track_orbit(int64_t delta_track) { dtrack = delta_track; }
 
     // 克隆物件
-    std::unique_ptr<Note> clone(MMap* ref) const override {
+    std::unique_ptr<Note> clone(const MMap* ref) const override {
         auto new_note_data = std::make_unique<Slide>(ref);
         new_note_data->set_notetype(NoteType::SLIDE);
         new_note_data->set_timestamp(timestamp());

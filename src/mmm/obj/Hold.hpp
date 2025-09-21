@@ -24,7 +24,7 @@ class Hold : public Note {
     inline void set_duration(uint32_t duration) { duration_time = duration; }
 
     // 克隆物件
-    std::unique_ptr<Note> clone(MMap* ref) const override {
+    std::unique_ptr<Note> clone(const MMap* ref) const override {
         auto new_note_data = std::make_unique<Hold>(ref);
         new_note_data->set_notetype(NoteType::HOLD);
         new_note_data->set_timestamp(timestamp());

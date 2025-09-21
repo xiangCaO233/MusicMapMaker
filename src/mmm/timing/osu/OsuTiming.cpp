@@ -101,7 +101,7 @@ void OsuTiming::from_osu_description(std::vector<std::string>& description) {
     effect = (int8_t)std::stoi(description.at(7));
 }
 
-std::unique_ptr<Timing> OsuTiming::clone() {
+std::unique_ptr<Timing> OsuTiming::clone() const {
     auto newTiming = std::make_unique<OsuTiming>();
     newTiming->timestamp = timestamp;
     newTiming->bpm = bpm;

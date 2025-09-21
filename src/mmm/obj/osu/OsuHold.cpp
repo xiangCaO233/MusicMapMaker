@@ -150,7 +150,7 @@ std::string OsuHold::to_osu_description(int32_t orbit_count) {
 }
 
 // 克隆物件
-std::unique_ptr<Note> OsuHold::clone(MMap* ref) const {
+std::unique_ptr<Note> OsuHold::clone(const MMap* ref) const {
     auto new_note_data = std::make_unique<OsuHold>(ref);
     new_note_data->set_notetype(NoteType::HOLD);
     new_note_data->set_timestamp(timestamp());

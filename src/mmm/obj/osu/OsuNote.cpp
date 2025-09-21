@@ -179,7 +179,7 @@ std::string OsuNote::to_osu_description(int32_t orbit_count) {
 }
 
 // 克隆物件
-std::unique_ptr<Note> OsuNote::clone(MMap* ref) const {
+std::unique_ptr<Note> OsuNote::clone(const MMap* ref) const {
     auto newnote = std::make_unique<OsuNote>(ref);
     newnote->set_timestamp(time);
     newnote->set_trackpos(track);

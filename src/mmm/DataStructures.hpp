@@ -778,81 +778,56 @@ class TimingMap {
 
     /**
      * @brief 更新一个 Timing 对象，允许时间戳的改变。
-     * @details 如果时间戳未改变，这是一个原地更新。如果时间戳改变，这在逻辑上
-     *          是一个“移除 + 添加”操作，对象将在 map 中移动到新的时间戳位置。
-     * @param old_timing_ptr 指向要被替换的对象的非拥有指针。
-     * @param new_timing_data 包含新数据的 unique_ptr。
-     * @return 成功则返回被替换的旧对象的 unique_ptr，失败则返回 nullptr（并将
-     * new_timing_data 的所有权还给调用者）。
+     * @return 一个 pair。first 为 bool 代表成功/失败。
+     *         second 为 unique_ptr，成功时持有旧数据，失败时归还新数据。
      */
-    std::unique_ptr<Timing> update_timing_point(
+    std::pair<bool, std::unique_ptr<Timing>> update_timing_point(
         Timing* old_timing_ptr, std::unique_ptr<Timing> new_timing_data) {
-        // 输入验证
+        // --- 1. 输入验证 ---
         if (!old_timing_ptr || !new_timing_data) {
-            return nullptr;
+            // 失败，归还 new_timing_data 的所有权
+            return {false, std::move(new_timing_data)};
         }
 
-        // 查找并移除旧对象
-        // 我们的目标是先从 map 中“取出”旧的 unique_ptr，但要记住它的位置。
+        // --- 2. 查找并移除旧对象 (逻辑不变) ---
         auto old_timestamp = old_timing_ptr->timestamp;
         auto map_it_old = m_timeline.find(old_timestamp);
         if (map_it_old == m_timeline.end()) {
-            return nullptr;  // 目标对象不存在
+            return {false, std::move(new_timing_data)};
         }
-
         auto& vec_old = map_it_old->second;
         auto vec_it_old = std::find_if(
             vec_old.begin(), vec_old.end(),
             [&](const auto& p) { return p.get() == old_timing_ptr; });
-
         if (vec_it_old == vec_old.end()) {
-            return nullptr;  // 目标对象不存在
+            return {false, std::move(new_timing_data)};
         }
-
-        // 从旧的 vector 中“取出”旧数据的所有权，但先不删除 map 条目
         std::unique_ptr<Timing> old_data_backup = std::move(*vec_it_old);
         vec_old.erase(vec_it_old);
 
-        // 尝试将新对象添加到新位置
+        // --- 3. 尝试将新对象添加到新位置 (逻辑不变) ---
         auto new_timestamp = new_timing_data->timestamp;
         auto& vec_new = m_timeline[new_timestamp];
-
-        // 检查在新位置是否已有重复的对象
-        auto vec_it_new = std::find_if(
-            vec_new.begin(), vec_new.end(),
-            [&](const auto& p) { return *p == *new_timing_data; });  // 比较内容
+        auto vec_it_new =
+            std::find_if(vec_new.begin(), vec_new.end(),
+                         [&](const auto& p) { return *p == *new_timing_data; });
 
         if (vec_it_new != vec_new.end()) {
-            // 失败处理：操作无法完成，回滚
-            // 我们不能添加新数据，因为它会产生重复。
-            // 必须将刚才取出的旧数据放回原位，以保持系统状态不变。
+            // --- 失败处理：回滚并归还所有权 ---
             map_it_old->second.push_back(std::move(old_data_backup));
-
-            // 我们必须将 new_timing_data 的所有权“归还”给调用者，
-            // 以便 UpdateTimingCommand 能够再次尝试或正确地撤销。
-            // 我们通过修改函数签名或返回一个包含状态和数据的 struct
-            // 来做到这一点。 为了保持接口一致，我们返回
-            // nullptr，但调用者需要意识到 new_data 仍然有效。
-            // 最好的方式是让命令类在调用前clone一份。
-            // 这里我们假设命令类会处理这种情况，暂时只返回失败。
-            // (在实际项目中，这里需要更复杂的错误处理机制)
-
-            // 为了让命令能取回所有权，我们把new_data的所有权赋给old_data_backup,
-            // 然后返回
-            old_data_backup = std::move(new_timing_data);
-            return nullptr;  // 返回失败
+            // 明确地返回失败状态和 new_timing_data 的所有权
+            return {false, std::move(new_timing_data)};
         }
 
-        // 成功：完成添加和清理
+        // --- 4. 成功：完成添加和清理 (逻辑不变) ---
         vec_new.push_back(std::move(new_timing_data));
-
-        // 如果移除旧对象后，其所在的 vector 变空了，现在可以安全地清理它了
         if (map_it_old->second.empty()) {
             m_timeline.erase(map_it_old);
         }
-
         m_version++;
-        return old_data_backup;  // 返回被替换的旧数据
+
+        // 明确地返回成功状态和 old_data_backup 的所有权
+        return {true, std::move(old_data_backup)};
     }
 
     /**

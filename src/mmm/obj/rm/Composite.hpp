@@ -38,7 +38,7 @@ class Composite : public Note {
     void set_trackpos(uint32_t o) override;
 
     // 克隆物件
-    std::unique_ptr<Note> clone(MMap* ref) const override;
+    std::unique_ptr<Note> clone(const MMap* ref) const override;
 
    private:
     // 子物件

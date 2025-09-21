@@ -17,7 +17,7 @@ class OsuTiming : public Timing, public OsuTimingMetadata {
     // 从osu的字符串读取
     void from_osu_description(std::vector<std::string>& description) override;
 
-    std::unique_ptr<Timing> clone() override;
+    std::unique_ptr<Timing> clone() const override;
 };
 
 #endif  // MMM_OSUTIMING_HPP

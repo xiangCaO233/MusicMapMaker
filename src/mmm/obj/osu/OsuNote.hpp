@@ -25,7 +25,7 @@ class OsuNote : public Note, public OsuNoteMetadata {
     std::string to_osu_description(int32_t orbit_count) override;
 
     // 克隆物件
-    std::unique_ptr<Note> clone(MMap* ref) const override;
+    std::unique_ptr<Note> clone(const MMap* ref) const override;
 };
 
 #endif  // MMM_OSUNOTE_HPP

@@ -15,7 +15,7 @@ std::vector<Note> Note::from_slide(std::shared_ptr<Slide> slide) {
     return {};
 }
 
-std::unique_ptr<Note> Note::clone(MMap* ref) const {
+std::unique_ptr<Note> Note::clone(const MMap* ref) const {
     auto newnote = std::make_unique<Note>(ref);
     newnote->set_timestamp(time);
     newnote->set_trackpos(track);
