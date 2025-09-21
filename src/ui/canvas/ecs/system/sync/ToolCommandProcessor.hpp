@@ -10,6 +10,8 @@
 #include <tool/command/ToolCommand.hpp>
 #include <vector>
 
+#include "mmm/obj/rm/Composite.hpp"
+
 // --- Helper for std::visit ---
 template <class... Ts>
 struct overloaded : Ts... {
@@ -220,8 +222,41 @@ class ToolCommandProcessor {
     }
 
     void endCreateNewNote() {
-        // 结束创建新物件
+        auto createState = interactionState.getCreateState();
+        // 结束创建新物件状态
         interactionState.endCreate();
+        if (createState.is_valid) {
+            // 创建新物件
+            if (createState.mode == CreateMode::Normal) {
+                // 创建单键
+                auto axis = createState.createState_nodes.front();
+                mapEditor.createNoteAt(axis.time, axis.track);
+            } else if (createState.mode == CreateMode::Composite) {
+                auto& axies = createState.createState_nodes;
+                if (axies.size() == 2) {
+                    // 只创建hold或slide
+                    auto& node1 = axies.front();
+                    auto& node2 = axies.back();
+                    auto time_same = node1.time == node2.time;
+                    auto track_same = node1.track == node2.track;
+                    if (time_same) {
+                        // 创建slide物件
+                        mapEditor.createFlickAt(node1.time, node1.track,
+                                                node2.track - node1.track);
+                        return;
+                    }
+                    if (track_same) {
+                        // 创建hold物件
+                        mapEditor.createHoldAt(node1.time, node1.track,
+                                               node2.time - node1.time);
+                        return;
+                    }
+                } else {
+                    // 创建复合键
+                    mapEditor.createCompositeWithAxis(axies);
+                }
+            }
+        }
     }
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,

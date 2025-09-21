@@ -4,7 +4,6 @@
 #include <mmm/map/editor/MMapEditor.hpp>
 #include <mmm/timing/Timing.hpp>
 #include <util/mutil.hpp>
-#include <utility>
 
 TimeEditWidget::TimeEditWidget(Timing *&timing, QTableWidget *parent,
                                QIntValidator *validator)
@@ -38,27 +37,52 @@ TimingParameterEditor::TimingParameterEditor(Timing *&timing,
                                              QTableWidget *parent,
                                              QDoubleValidator *validator)
     : QWidget() {
-    layout = new QHBoxLayout(this);
-    title = new QLabel(this);
+    // 1. 只创建一个主布局
+    mainLayout = new QHBoxLayout(this);  // 直接设置给 this
+    mainLayout->setSpacing(2);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+
+    // 2. 创建所有可能用到的控件
+    bpmTitle = new QLabel("bpm:", this);
     bpmEdit = new QLineEdit(this);
+
     bpmEdit->setValidator(validator);
+    bpmEdit->setText(QString::number(timing->bpm, 'f', 5));
+
+    speedTitle = new QLabel(tr("speed:"), this);
     speedSpinBox = new QDoubleSpinBox(this);
     speedSpinBox->setDecimals(5);
     speedSpinBox->setSuffix("x");
-    bpmEdit->setText(QString::number(timing->bpm, 'f', 2));
-    layout->addWidget(title);
+
+    // 3. 将所有控件都添加到主布局中
+    mainLayout->addWidget(bpmTitle);
+    mainLayout->addWidget(bpmEdit);
+    mainLayout->addWidget(speedTitle);
+    mainLayout->addWidget(speedSpinBox);
+
+    // 4. 根据条件切换控件的可见性
     if (timing->is_base_timing) {
         speedSpinBox->setValue(1.0);
-        title->setText(bpmTitle);
-        layout->addWidget(bpmEdit);
+
+        // 隐藏速度相关的控件
+        speedTitle->hide();
         speedSpinBox->hide();
+
+        // 显示BPM相关的控件 (确保它们是可见的)
+        bpmTitle->show();
+        bpmEdit->show();
+
     } else {
-        title->setText(speedTitle);
-        layout->addWidget(speedSpinBox);
         speedSpinBox->setValue(100.0 / std::abs(timing->beat_length));
+
+        // 隐藏BPM相关的控件
+        bpmTitle->hide();
         bpmEdit->hide();
+
+        // 显示速度相关的控件
+        speedTitle->show();
+        speedSpinBox->show();
     }
-    setLayout(layout);
 }
 TimingSettingWidget::TimingSettingWidget(Timing *&timing, QTableWidget *parent)
     : QWidget(parent) {
@@ -87,6 +111,30 @@ TimingRowItem::TimingRowItem(MMap *map, Timing *timing, QTableWidget *parent,
     uninheritedComboBox->setCurrentIndex(timing->is_base_timing ? 0 : 1);
     paramEditor = new TimingParameterEditor(timing, parent, doublevalidator);
     timingSettingWgt = new TimingSettingWidget(timing, parent);
+
+    // 切换继承
+    connect(uninheritedComboBox, &QComboBox::currentIndexChanged,
+            [this](int index) {
+                // 切换参数编辑器的布局
+                if (index == 0) {
+                    // 隐藏速度相关的控件
+                    paramEditor->speedTitle->hide();
+                    paramEditor->speedSpinBox->hide();
+
+                    // 显示BPM相关的控件
+                    paramEditor->bpmTitle->show();
+                    paramEditor->bpmEdit->show();
+                }
+                if (index == 1) {
+                    // 隐藏BPM相关的控件
+                    paramEditor->bpmTitle->hide();
+                    paramEditor->bpmEdit->hide();
+
+                    // 显示速度相关的控件
+                    paramEditor->speedTitle->show();
+                    paramEditor->speedSpinBox->show();
+                }
+            });
 }
 
 AddTimingItem::AddTimingItem(QTableWidget *parent) : parent(parent) {

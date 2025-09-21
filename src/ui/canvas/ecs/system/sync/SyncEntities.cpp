@@ -416,8 +416,9 @@ void sync_creating_noteEntity(ECSCore& core, MapLayerManager* layer_manager,
         std::vector<entt::entity> existing_children;
 
         // 查找现有的父实体（假设只有一个CompositeRootComponent）
-        auto root_view = registry.view<CompositeRootComponent>();
-        if (!root_view.empty()) {
+        auto root_view =
+            registry.view<CreatingNoteComponent, CompositeRootComponent>();
+        if (root_view.begin() != root_view.end()) {
             parent = root_view.front();
             auto& root = registry.get<CompositeRootComponent>(parent);
             existing_children = root.children;

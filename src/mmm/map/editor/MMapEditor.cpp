@@ -54,6 +54,58 @@ void MMapEditor::createHoldAt(int64_t timestamp, int track, int64_t duration) {
         map->note_set(), map->note_uuids(), std::move(new_note_data)));
 }
 
+// 创建滑键音符
+void MMapEditor::createFlickAt(int64_t timestamp, int track,
+                               int32_t delta_track) {
+    // 创建 Note 的原始数据
+    auto new_note_data = std::make_unique<Slide>(map);
+    new_note_data->set_notetype(NoteType::SLIDE);
+    new_note_data->set_timestamp(timestamp);
+    new_note_data->set_trackpos(track);
+    new_note_data->set_track_orbit(delta_track);
+
+    // 通过操作管理器执行命令
+    operationManager.executeCommand(std::make_unique<AddNoteCommand>(
+        map->note_set(), map->note_uuids(), std::move(new_note_data)));
+}
+
+// 创建复合键音符
+void MMapEditor::createCompositeWithAxis(std::list<MapAxis>& axis) {
+    auto new_note_data = std::make_unique<Composite>(map);
+    new_note_data->set_notetype(NoteType::COMPOSITE);
+    new_note_data->set_timestamp(axis.front().time);
+    new_note_data->set_trackpos(axis.front().track);
+    for (auto it = axis.begin(); std::next(it) != axis.end(); ++it) {
+        auto& node1 = *it;
+        auto& node2 = *(std::next(it));
+        auto time_same = node1.time == node2.time;
+        auto track_same = node1.track == node2.track;
+        std::unique_ptr<Note> child{nullptr};
+        if (time_same) {
+            // 创建slide物件加入组合物件
+            child = std::make_unique<Slide>(map);
+            auto child_slide = static_cast<Slide*>(child.get());
+            child_slide->set_notetype(NoteType::SLIDE);
+            child_slide->set_timestamp(node1.time);
+            child_slide->set_trackpos(node1.track);
+            child_slide->set_track_orbit(node2.track - node1.track);
+        } else if (track_same) {
+            // 创建hold物件加入组合物件
+            child = std::make_unique<Hold>(map);
+            auto child_hold = static_cast<Hold*>(child.get());
+            child_hold->set_notetype(NoteType::HOLD);
+            child_hold->set_timestamp(node1.time);
+            child_hold->set_trackpos(node1.track);
+            child_hold->set_duration(node2.time - node1.time);
+        }
+
+        new_note_data->add_child(std::move(child));
+    }
+    // 通过操作管理器执行命令
+    operationManager.executeCommand(std::make_unique<AddNoteCommand>(
+        map->note_set(), map->note_uuids(), std::move(new_note_data)));
+}
+
 // 删除多个物件
 void MMapEditor::deleteNotes(const std::unordered_set<NoteUUID>& uuids) {
     // 通过操作管理器执行命令

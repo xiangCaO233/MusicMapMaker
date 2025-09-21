@@ -130,52 +130,52 @@
         <translation>暂停/继续</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="12"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="14"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="15"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="17"/>
         <source>Select Page</source>
         <translation>选择整页</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="17"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="19"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="20"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="22"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="21"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="23"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="22"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="24"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="24"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="26"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="27"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="29"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="28"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="30"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="29"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="31"/>
         <source>Find</source>
         <translation>查找</translation>
     </message>
@@ -185,22 +185,22 @@
     <message>
         <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="24"/>
         <source>select file</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文件</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="25"/>
         <source>Audio File</source>
-        <translation type="unfinished"></translation>
+        <translation>音频文件</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="26"/>
         <source>Map File</source>
-        <translation type="unfinished"></translation>
+        <translation>谱面文件</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="40"/>
         <source>select project directory</source>
-        <translation type="unfinished">选择项目目录</translation>
+        <translation>选择项目目录</translation>
     </message>
 </context>
 <context>
@@ -225,22 +225,22 @@
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="11"/>
         <source>New File...(&amp;n)</source>
-        <translation type="unfinished"></translation>
+        <translation>新建文件...(&amp;N)</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="13"/>
         <source>Open File...(&amp;o)</source>
-        <translation type="unfinished"></translation>
+        <translation>打开文件/项目...(&amp;O)</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="16"/>
         <source>Open Directory...(&amp;O)</source>
-        <translation type="unfinished"></translation>
+        <translation>打开项目目录(&amp;O)</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="19"/>
         <source>Save(&amp;s)</source>
-        <translation type="unfinished"></translation>
+        <translation>保存(&amp;S)</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/file/FileActions.cpp" line="21"/>
@@ -277,20 +277,63 @@
     </message>
     <message>
         <location filename="../src/ui/mainwindow.ui" line="62"/>
-        <location filename="../src/ui/mainwindow.ui" line="100"/>
+        <location filename="../src/ui/mainwindow.ui" line="109"/>
         <source>Project Manager</source>
         <translation>项目管理器</translation>
     </message>
     <message>
         <location filename="../src/ui/mainwindow.ui" line="74"/>
-        <location filename="../src/ui/mainwindow.ui" line="89"/>
+        <location filename="../src/ui/mainwindow.ui" line="98"/>
         <source>Track Manager</source>
         <translation>音轨管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="106"/>
+        <location filename="../src/ui/mainwindow.ui" line="83"/>
+        <source>Timing Manager</source>
+        <translation>时间点管理器</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.cpp" line="116"/>
         <source>MusicMapMaker--&gt;</source>
         <translation>谱面编辑器--&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>MapCanvas</name>
+    <message>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="47"/>
+        <source>save as file</source>
+        <translation>另存为文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="48"/>
+        <source>MMM Map File</source>
+        <translation>MMM谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="67"/>
+        <source>mmm mapfile</source>
+        <translation>MMM谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="68"/>
+        <source>imd mapfile</source>
+        <translation>IMD谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="69"/>
+        <source>osu mapfile</source>
+        <translation>OSU谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="92"/>
+        <source>Export As</source>
+        <translation>导出为</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="92"/>
+        <source>File Formats:</source>
+        <translation>文件格式:</translation>
     </message>
 </context>
 <context>
@@ -320,7 +363,7 @@
     <message>
         <location filename="../src/ui/project/projectconfig.ui" line="14"/>
         <source>Project Preference</source>
-        <translation type="unfinished"></translation>
+        <translation>项目偏好</translation>
     </message>
     <message>
         <location filename="../src/ui/project/projectconfig.ui" line="72"/>
@@ -437,6 +480,29 @@
     <message>
         <source>select project directory</source>
         <translation type="vanished">选择项目目录</translation>
+    </message>
+</context>
+<context>
+    <name>TimingManager</name>
+    <message>
+        <location filename="../src/ui/edit/timingmanager.cpp" line="8"/>
+        <source>time</source>
+        <translation>时间戳</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/timingmanager.cpp" line="8"/>
+        <source>uninherited</source>
+        <translation>是否为非继承</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/timingmanager.cpp" line="8"/>
+        <source>parameter</source>
+        <translation>参数</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/timingmanager.cpp" line="8"/>
+        <source>setting</source>
+        <translation>设置</translation>
     </message>
 </context>
 <context>

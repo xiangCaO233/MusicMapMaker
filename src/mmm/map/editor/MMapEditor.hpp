@@ -4,6 +4,7 @@
 #include <memory>
 #include <mmm/OperationManager.hpp>
 #include <mmm/map/MMap.hpp>
+#include <tool/ToolInteractionState.hpp>
 #include <unordered_set>
 
 class MMapEditor : public QObject {
@@ -18,7 +19,11 @@ class MMapEditor : public QObject {
     // 创建长键音符
     void createHoldAt(int64_t timestamp, int track, int64_t duration);
 
-    // void createCompositeAt(int64_t timestamp, );
+    // 创建滑键音符
+    void createFlickAt(int64_t timestamp, int track, int32_t delta_track);
+
+    // 创建复合键音符
+    void createCompositeWithAxis(std::list<MapAxis>& axis);
 
     // 删除多个物件
     void deleteNotes(const std::unordered_set<NoteUUID>& uuids);

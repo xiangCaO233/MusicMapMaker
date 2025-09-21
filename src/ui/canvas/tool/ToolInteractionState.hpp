@@ -7,7 +7,6 @@
 #include <glm/glm.hpp>
 #include <info/NotePart.hpp>
 #include <list>
-#include <memory>
 #include <mmm/obj/Note.hpp>
 #include <vector>
 

@@ -37,10 +37,9 @@ class TimingParameterEditor : public QWidget {
    public:
     TimingParameterEditor(Timing *&timing, QTableWidget *parent,
                           QDoubleValidator *validator);
-    QHBoxLayout *layout;
-    QString speedTitle = tr("speed:");
-    QString bpmTitle = "bpm:";
-    QLabel *title;
+    QHBoxLayout *mainLayout;
+    QLabel *bpmTitle;
+    QLabel *speedTitle;
     QLineEdit *bpmEdit;
     QDoubleSpinBox *speedSpinBox;
 };
