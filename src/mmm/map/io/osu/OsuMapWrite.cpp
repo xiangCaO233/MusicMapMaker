@@ -1,3 +1,3 @@
 #include <mmm/map/MMap.hpp>
 
-void MMap::writeOsu() {}
+void MMap::writeOsu(const std::string& desfile) {}

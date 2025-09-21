@@ -90,16 +90,16 @@ class MMap : public QObject {
 
     // 谱面io操作
     void readOsu();
-    void writeOsu();
+    void writeOsu(const std::string& desfile);
 
     void readImd();
-    void writeImd();
+    void writeImd(const std::string& desfile);
 
-    void readMc() {};
-    void writeMc() {};
+    void readMc();
+    void writeMc(const std::string& desfile);
 
-    void readMMM() {};
-    void writeMMM() {};
+    void readMMM();
+    void writeMMM(const std::string& desfile);
 };
 
 #endif  // MMM_MMAP_HPP

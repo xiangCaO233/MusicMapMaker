@@ -73,6 +73,8 @@ set(MMM_SOURCES
     src/mmm/timing/osu/OsuTiming.cpp
     src/mmm/map/MMap.cpp
     src/mmm/map/editor/MMapEditor.cpp
+    src/mmm/map/io/malody/MalodyMapRead.cpp
+    src/mmm/map/io/malody/MalodyMapWrite.cpp
     src/mmm/map/io/osu/OsuMapRead.cpp
     src/mmm/map/io/osu/OsuMapWrite.cpp
     src/mmm/map/io/mmm/MMapRead.cpp
