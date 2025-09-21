@@ -145,7 +145,9 @@ class OsuNoteMetadata : public NoteMetadata {
         const std::vector<std::string>& description, int32_t orbit_count) {};
 
     // 转化为osu描述
-    virtual std::string to_osu_description(int32_t orbit_count) { return ""; };
+    virtual std::string to_osu_description(int32_t orbit_count) const {
+        return "";
+    };
 
    private:
     // note采样

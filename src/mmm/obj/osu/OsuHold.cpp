@@ -102,7 +102,7 @@ void OsuHold::from_osu_description(const std::vector<std::string>& description,
 }
 
 // 转化为osu描述
-std::string OsuHold::to_osu_description(int32_t orbit_count) {
+std::string OsuHold::to_osu_description(int32_t orbit_count) const {
     /*
      * 长键格式:
      * x,y,开始时间,物件类型,长键音效,结束时间:音效组:附加音效组:音效参数:音量:[自定义音效文件]
