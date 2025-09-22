@@ -40,14 +40,14 @@ class OsuTimingMetadata : public TimingMetadata {
     // 音效组（整型）：
     // 物件使用的默认音效组（0 = 谱面默认设置（SampleSet），1 = normal，2 =
     // soft，3 = *drum）。
-    SampleSet sample_set{SampleSet::NORMAL};
+    SampleSet sample_set{SampleSet::SOFT};
 
     // 音效参数（整型）： 物件使用的自定义音效参数。 0 表示使用 osu!
     // 默认的音效。
     int32_t sample_parameter{0};
 
     // *音量（整型）： 击打物件的音量（0 - 100）。
-    int32_t volume{100};
+    int32_t volume{50};
 
     // *是否为非继承时间点（红线）（布尔值）： 字面意思。
     bool is_inherit_timing{false};

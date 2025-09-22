@@ -8,6 +8,7 @@ class OsuTiming : public Timing, public OsuTimingMetadata {
    public:
     // 构造OsuTiming
     OsuTiming() = default;
+    OsuTiming(Timing* source);
     // 析构OsuTiming
     ~OsuTiming() override = default;
 

@@ -62,6 +62,9 @@ class MMap : public QObject {
     // 更新拍信息(智能识别分拍)
     void analyzeBeatInfo();
 
+    // 写出到文件
+    void writeOut(const std::string& file);
+
    private:
     // (实际持有)
     // 谱面元数据集

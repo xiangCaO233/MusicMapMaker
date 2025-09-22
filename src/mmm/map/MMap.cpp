@@ -22,6 +22,18 @@ MMap::MMap(std::string_view file) {
 
 MMap::~MMap() = default;
 
+// 写出到文件
+void MMap::writeOut(const std::string& file) {
+    if (file.ends_with(".osu")) {
+        // 写出为osu
+        writeOsu(file);
+    } else if (file.ends_with(".imd")) {
+        writeImd(file);
+    } else if (file.ends_with(".mmm")) {
+        writeMMM(file);
+    }
+}
+
 // 注册编辑器
 void MMap::register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue) {
     if (!mapeditor) {

@@ -93,6 +93,7 @@ void MapCanvas::connectActions() {
                     defaultNames, mmmf);
 
                 if (selected_file != "") {
+                    thiscp->map->writeOut(selected_file.toStdString());
                     qDebug() << "尝试导出到:" << selected_file;
                     // map->write_to_file(selected_file.toStdString().c_str());
                 }

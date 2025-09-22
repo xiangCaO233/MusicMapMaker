@@ -4,6 +4,17 @@
 #include <memory>
 #include <mmm/info/osu/OsuNoteInfo.hpp>
 #include <mmm/obj/osu/OsuNote.hpp>
+#include <mmm/obj/rm/Slide.hpp>
+#include <utility>
+
+OsuNote::OsuNote(const MMap* map, const Note* note) : Note(map) {
+    set_notetype(note->type);
+    // 位置
+    set_trackpos(note->trackpos());
+
+    // 时间戳
+    set_timestamp(note->timestamp());
+}
 
 // 打印用
 std::string OsuNote::toString() const {
@@ -31,6 +42,28 @@ std::string OsuNote::toString() const {
         static_cast<int>(note_samplegroup().normalSet),
         static_cast<int>(note_samplegroup().additionalSet));
     return parent + "\n" + sampleStr;
+}
+
+// 从滑键转换
+std::list<std::unique_ptr<OsuNote>> OsuNote::from_slide(const Slide* slide) {
+    // 在滑动轨迹上生成note
+    if (!slide) return {};
+    std::list<std::unique_ptr<OsuNote>> res;
+    // 从哪个轨道
+    auto from = slide->delta_track() < 0 ? slide->track + slide->delta_track()
+                                         : slide->track;
+    // 到哪个轨道
+    auto to = slide->delta_track() < 0 ? slide->track
+                                       : slide->track + slide->delta_track();
+    for (auto i{from}; i <= to; ++i) {
+        // 构造osunote
+        auto generated_note = std::make_unique<OsuNote>(slide->map());
+        generated_note->set_timestamp(slide->timestamp());
+        generated_note->set_trackpos(i);
+        // 添加到结果集
+        res.push_back(std::move(generated_note));
+    }
+    return res;
 }
 
 // 从osu描述加载

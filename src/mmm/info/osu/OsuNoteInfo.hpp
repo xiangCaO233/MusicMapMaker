@@ -116,6 +116,8 @@ struct NoteSampleGroup {
     // 自定义音效文件>谱面文件夹内音效文件>玩家皮肤内音效文件>osu默认音效文件
 };
 
+class Note;
+
 // osu物件元数据类
 class OsuNoteMetadata : public NoteMetadata {
    public:

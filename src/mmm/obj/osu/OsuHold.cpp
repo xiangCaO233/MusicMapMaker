@@ -2,6 +2,18 @@
 
 #include <mmm/obj/osu/OsuHold.hpp>
 
+OsuHold::OsuHold(const MMap* map, const Note* note) : Hold(map) {
+    set_notetype(NoteType::HOLD);
+    // 位置
+    set_trackpos(note->trackpos());
+
+    // 时间戳
+    set_timestamp(note->timestamp());
+
+    // 持续时间
+    set_duration(static_cast<const Hold*>(note)->duration());
+}
+
 // 打印用
 std::string OsuHold::toString() const {
     return Hold::toString();

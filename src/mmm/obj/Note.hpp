@@ -2,19 +2,19 @@
 #define MMM_NOTE_HPP
 
 #include <cstdint>
+#include <list>
 #include <memory>
 #include <mmm/MetaData.hpp>
-#include <vector>
 
-enum class NoteType {
+enum class NoteType : uint8_t {
     // 普通物件
-    NORMAL,
-    // 长条
-    HOLD,
+    NORMAL = 0,
     // 滑键
-    SLIDE,
+    SLIDE = 1,
+    // 长条
+    HOLD = 2,
     // 组合键
-    COMPOSITE,
+    COMPOSITE = 3,
 };
 
 inline std::string to_string(NoteType type) {
@@ -65,8 +65,8 @@ class Note {
         return metadatas;
     }
 
-    // 从滑键转化
-    static std::vector<Note> from_slide(std::shared_ptr<Slide> slide);
+    // 从滑键转换
+    static std::list<std::unique_ptr<Note>> from_slide(const Slide* slide);
 
     // 克隆物件
     virtual std::unique_ptr<Note> clone(const MMap* ref) const;

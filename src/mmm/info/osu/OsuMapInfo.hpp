@@ -5,11 +5,11 @@
 #include <memory>
 #include <mmm/MetaData.hpp>
 #include <mmm/info/osu/OsuNoteInfo.hpp>
+#include <mmm/map/BaseMapMeta.hpp>
 #include <string>
 #include <unordered_map>
+#include <util/StringHash.hpp>
 #include <vector>
-
-#include "util/StringHash.hpp"
 
 /*
  *.osu (文件格式)
@@ -188,22 +188,22 @@ struct OsuMapChapterEditor : public OsuMapChapter {
     /*
      ***DistanceSpacing	Decimal（精准小数）	间距锁定倍率
      */
-    double DistanceSpacing{};
+    double DistanceSpacing{1.2};
 
     /*
      ***BeatDivisor	Integer（整型）	节拍细分
      */
-    int32_t BeatDivisor{};
+    int32_t BeatDivisor{4};
 
     /*
      ***GridSize	Integer（整型）	网格大小
      */
-    int32_t GridSize{};
+    int32_t GridSize{4};
 
     /*
      ***TimelineZoom	Decimal（精准小数）	物件时间轴的缩放倍率
      */
-    double TimelineZoom{1.};
+    double TimelineZoom{2.5};
 };
 
 struct OsuMapChapterMetadata : public OsuMapChapter {
@@ -301,7 +301,7 @@ struct OsuMapChapterDifficulty : public OsuMapChapter {
      ***ApproachRate	Decimal（精准小数）	AR 值（0-10）
      * 似乎om模式里没卵用
      */
-    double ApproachRate;
+    double ApproachRate{5};
 
     /*
      ***SliderMultiplier	Decimal（精准小数）	基础滑条速度倍率，乘以
@@ -415,6 +415,8 @@ struct OsuMapChapterColour : public OsuMapChapter {
 class OsuMapMetadata : public MapMetadata {
    public:
     OsuMapMetadata();
+    OsuMapMetadata(BaseMapMeta& basemetadata,
+                   const std::filesystem::path& project_path);
     ~OsuMapMetadata() override;
 
     // osu格式默认的元数据

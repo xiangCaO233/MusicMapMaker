@@ -1,6 +1,16 @@
 #include <iomanip>
 #include <mmm/timing/osu/OsuTiming.hpp>
 
+OsuTiming::OsuTiming(Timing* source) {
+    if (source) {
+        type = TimingType::OSUTIMING;
+        timestamp = source->timestamp;
+        beat_length = source->beat_length;
+        bpm = source->bpm;
+        is_inherit_timing = !source->is_base_timing;
+        is_base_timing = source->is_base_timing;
+    }
+}
 // 转换为osu的字符串
 std::string OsuTiming::to_osu_description() {
     /*
@@ -18,8 +28,8 @@ std::string OsuTiming::to_osu_description() {
     if (is_inherit_timing) {
         // 继承时间点(绿线): 拍长为负值，表示滑条速度倍数
         double slider_velocity_multiplier = 100.0 / bpm;
-        oss << std::fixed << std::setprecision(2)
-            << std::to_string(-slider_velocity_multiplier) << ",";
+        oss << std::fixed << std::setprecision(2) << std::to_string(beat_length)
+            << ",";
     } else {
         // 非继承时间点(红线): 拍长为正，表示毫秒每拍
         double ms_per_beat = 60000.0 / bpm;

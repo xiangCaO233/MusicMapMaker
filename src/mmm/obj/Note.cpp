@@ -1,4 +1,5 @@
 #include <mmm/obj/Note.hpp>
+#include <mmm/obj/rm/Slide.hpp>
 
 // 打印用
 std::string Note::toString() const {
@@ -10,9 +11,26 @@ std::string Note::toString() const {
     return ss.str();
 }
 
-std::vector<Note> Note::from_slide(std::shared_ptr<Slide> slide) {
-    // TODO(xiang 2025-08-08): 实现滑键转多个物件
-    return {};
+// 从滑键转换
+std::list<std::unique_ptr<Note>> Note::from_slide(const Slide* slide) {
+    // 在滑动轨迹上生成note
+    if (!slide) return {};
+    std::list<std::unique_ptr<Note>> res;
+    // 从哪个轨道
+    auto from = slide->delta_track() < 0 ? slide->track + slide->delta_track()
+                                         : slide->track;
+    // 到哪个轨道
+    auto to = slide->delta_track() < 0 ? slide->track
+                                       : slide->track + slide->delta_track();
+    for (auto i{from}; i <= to; ++i) {
+        // 构造osunote
+        auto generated_note = std::make_unique<Note>(slide->map());
+        generated_note->set_timestamp(slide->timestamp());
+        generated_note->set_trackpos(i);
+        // 添加到结果集
+        res.push_back(std::move(generated_note));
+    }
+    return res;
 }
 
 std::unique_ptr<Note> Note::clone(const MMap* ref) const {

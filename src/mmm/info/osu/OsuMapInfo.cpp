@@ -10,7 +10,54 @@ OsuMapMetadata::OsuMapMetadata() {
                          std::make_unique<OsuMapChapterDifficulty>());
     chapters.try_emplace("Events", std::make_unique<OsuMapChapterEvents>());
     chapters.try_emplace("Colour", std::make_unique<OsuMapChapterColour>());
-};
+}
+
+OsuMapMetadata::OsuMapMetadata(BaseMapMeta& basemetadata,
+                               const std::filesystem::path& project_path) {
+    type = MapMetadataType::OSU;
+    // 添加章节
+    auto general_chapter = static_cast<OsuMapChapterGeneral*>(
+        chapters
+            .try_emplace("General", std::make_unique<OsuMapChapterGeneral>())
+            .first->second.get());
+    general_chapter->AudioFilename =
+        std::filesystem::relative(basemetadata.main_audio_path, project_path)
+            .generic_string();
+    general_chapter->PreviewTime = basemetadata.map_length / 2.f;
+    general_chapter->Mode = 3;
+
+    auto editor_chapter = static_cast<OsuMapChapterEditor*>(
+        chapters.try_emplace("Editor", std::make_unique<OsuMapChapterEditor>())
+            .first->second.get());
+
+    auto metadata_chapter = static_cast<OsuMapChapterMetadata*>(
+        chapters
+            .try_emplace("Metadata", std::make_unique<OsuMapChapterMetadata>())
+            .first->second.get());
+    metadata_chapter->Title = basemetadata.title;
+    metadata_chapter->TitleUnicode = basemetadata.title_unicode;
+    metadata_chapter->Artist = basemetadata.artist;
+    metadata_chapter->ArtistUnicode = basemetadata.artist_unicode;
+    metadata_chapter->Creator = basemetadata.author;
+    metadata_chapter->Version = basemetadata.version;
+
+    auto difficulty_chapter = static_cast<OsuMapChapterDifficulty*>(
+        chapters
+            .try_emplace("Difficulty",
+                         std::make_unique<OsuMapChapterDifficulty>())
+            .first->second.get());
+
+    auto event_chapter = static_cast<OsuMapChapterEvents*>(
+        chapters.try_emplace("Events", std::make_unique<OsuMapChapterEvents>())
+            .first->second.get());
+    event_chapter->bg_file_name =
+        std::filesystem::relative(basemetadata.main_cover_path, project_path)
+            .generic_string();
+
+    auto colour_chapter =
+        chapters.try_emplace("Colour", std::make_unique<OsuMapChapterColour>())
+            .first->second.get();
+}
 
 OsuMapMetadata::~OsuMapMetadata() = default;
 

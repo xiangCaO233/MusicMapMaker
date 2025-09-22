@@ -8,6 +8,7 @@ class OsuHold : public Hold, public OsuNoteMetadata {
    public:
     // 构造OsuHold
     using Hold::Hold;
+    OsuHold(const MMap* map, const Note* note);
 
     // 析构OsuHold
     ~OsuHold() override = default;
