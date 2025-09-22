@@ -38,6 +38,10 @@ class TimeLineSystem {
             const auto y = converter2.timeToPixel(
                 time, realtime_info.current_time_info.presentation_canvas_time,
                 info);
+            // 可见性检测
+            if (y < all_tracks_rect.y ||
+                y > all_tracks_rect.y + all_tracks_rect.w)
+                continue;
 
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
@@ -164,49 +168,58 @@ class TimeLineSystem {
                 time + beat_length,
                 realtime_info.current_time_info.presentation_canvas_time, info);
 
-            // 生成拍头线
-            PrimitiveCommand cmd;
-            cmd.cmdType = CommandType::PRIMITIVE;
-            cmd.primitive = PrimitiveType::QUAD;
-            cmd.baseInfo.pos = {all_tracks_rect.x, y - 3};
-            cmd.baseInfo.size = {all_tracks_rect.z, 6};
-            cmd.baseInfo.color = {1, 1, 1, 1};
-            // 拍头时间戳字符串
-            auto head_time = QString("%1").arg(time).toStdU32String();
-            auto head_time_metric = layer->stringMetrics(
-                "ComicShannsMono Nerd Font", 24, head_time);
-            auto head_time_pos =
-                glm::vec2{all_tracks_rect.x - head_time_metric.x - 4,
-                          cmd.baseInfo.pos.y - head_time_metric.y / 2.f + 18};
-            auto head_time_cmds = layer->generateStringCommands(
-                "ComicShannsMono Nerd Font", 24, head_time, head_time_pos,
-                {1.f, 1.f, 1.f, 1.f});
-            str_cmds.insert(str_cmds.end(), head_time_cmds.begin(),
-                            head_time_cmds.end());
+            // 可见性检测
+            if (y < all_tracks_rect.y ||
+                y > all_tracks_rect.y + all_tracks_rect.w) {
+            } else {
+                // 生成拍头线
+                PrimitiveCommand cmd;
+                cmd.cmdType = CommandType::PRIMITIVE;
+                cmd.primitive = PrimitiveType::QUAD;
+                cmd.baseInfo.pos = {all_tracks_rect.x, y - 3};
+                cmd.baseInfo.size = {all_tracks_rect.z, 6};
+                cmd.baseInfo.color = {1, 1, 1, 1};
+                // 拍头时间戳字符串
+                auto head_time = QString("%1").arg(time).toStdU32String();
+                auto head_time_metric = layer->stringMetrics(
+                    "ComicShannsMono Nerd Font", 24, head_time);
+                auto head_time_pos = glm::vec2{
+                    all_tracks_rect.x - head_time_metric.x - 4,
+                    cmd.baseInfo.pos.y - head_time_metric.y / 2.f + 18};
+                auto head_time_cmds = layer->generateStringCommands(
+                    "ComicShannsMono Nerd Font", 24, head_time, head_time_pos,
+                    {1.f, 1.f, 1.f, 1.f});
+                str_cmds.insert(str_cmds.end(), head_time_cmds.begin(),
+                                head_time_cmds.end());
 
-            // 本拍拍号字符串
-            auto index_str = QString("#%1").arg(beat_index).toStdU32String();
-            auto index_metric = layer->stringMetrics(
-                "ComicShannsMono Nerd Font", 32, index_str);
-            auto index_str_pos = glm::vec2{4, y - index_metric.y / 2.f + 24};
-            auto index_cmds = layer->generateStringCommands(
-                "ComicShannsMono Nerd Font", 32, index_str, index_str_pos,
-                {.85f, .35f, .35f, 1.f});
-            str_cmds.insert(str_cmds.end(), index_cmds.begin(),
-                            index_cmds.end());
+                // 本拍拍号字符串
+                auto index_str =
+                    QString("#%1").arg(beat_index).toStdU32String();
+                auto index_metric = layer->stringMetrics(
+                    "ComicShannsMono Nerd Font", 32, index_str);
+                auto index_str_pos =
+                    glm::vec2{4, y - index_metric.y / 2.f + 24};
+                auto index_cmds = layer->generateStringCommands(
+                    "ComicShannsMono Nerd Font", 32, index_str, index_str_pos,
+                    {.85f, .35f, .35f, 1.f});
+                str_cmds.insert(str_cmds.end(), index_cmds.begin(),
+                                index_cmds.end());
 
-            // 本拍分拍策略字符串(画在拍号上面)
-            auto div_stratergy = QString("1/%1").arg(divisors).toStdU32String();
-            auto div_metric = layer->stringMetrics("ComicShannsMono Nerd Font",
-                                                   24, div_stratergy);
-            auto div_str_pos =
-                glm::vec2{index_str_pos.x, index_str_pos.y - div_metric.y - 4};
-            auto div_cmds = layer->generateStringCommands(
-                "ComicShannsMono Nerd Font", 24, div_stratergy, div_str_pos,
-                {.85f, .85f, .85f, 1.f});
-            str_cmds.insert(str_cmds.end(), div_cmds.begin(), div_cmds.end());
+                // 本拍分拍策略字符串(画在拍号上面)
+                auto div_stratergy =
+                    QString("1/%1").arg(divisors).toStdU32String();
+                auto div_metric = layer->stringMetrics(
+                    "ComicShannsMono Nerd Font", 24, div_stratergy);
+                auto div_str_pos = glm::vec2{
+                    index_str_pos.x, index_str_pos.y - div_metric.y - 4};
+                auto div_cmds = layer->generateStringCommands(
+                    "ComicShannsMono Nerd Font", 24, div_stratergy, div_str_pos,
+                    {.85f, .85f, .85f, 1.f});
+                str_cmds.insert(str_cmds.end(), div_cmds.begin(),
+                                div_cmds.end());
 
-            buffer.add_PrimitiveCommand(cmd);
+                buffer.add_PrimitiveCommand(cmd);
+            }
             if (std::abs(y_endbeat - y) < 2) {
                 // 拍像素距离过小/跳过分拍线绘制
                 continue;
@@ -233,6 +246,10 @@ class TimeLineSystem {
                                                realtime_info.current_time_info
                                                    .presentation_canvas_time,
                                                info);
+                    // 可见性检测
+                    if (divy < all_tracks_rect.y ||
+                        divy > all_tracks_rect.y + all_tracks_rect.w)
+                        continue;
 
                     PrimitiveCommand sub_cmd;
                     sub_cmd.cmdType = CommandType::PRIMITIVE;

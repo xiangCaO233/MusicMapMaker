@@ -224,10 +224,15 @@ class MeshGenerateSystem {
                     : TexType::NORMAL_NOTE);
 
         // 物件整体缩放计算(统一放大1.25x)
-        const auto obj_scale =
-            single_track_width / head_texinfo.origin_size.x * 1.25f;
+        const auto obj_scale_width =
+            single_track_width / head_texinfo.origin_size.x * 1.25f *
+            info->editorInfo.project_config->canvas_config.object_width_scale;
+        const auto obj_scale_height =
+            single_track_width / head_texinfo.origin_size.x * 1.25f *
+            info->editorInfo.project_config->canvas_config.object_height_scale;
 
-        glm::vec2 head_size = obj_scale * head_texinfo.origin_size;
+        glm::vec2 head_size = {head_texinfo.origin_size.x * obj_scale_width,
+                               head_texinfo.origin_size.y * obj_scale_height};
 
         // 共同的头网格(head在层级2(最上层))
         auto head_pos = glm::vec2(x - head_size.x / 2.f, y - head_size.y / 2.f);
@@ -255,8 +260,9 @@ class MeshGenerateSystem {
                 }
             }
             // 生成面条网格
-            holdMeshGenerator.generateHoldMesh(e, entity_mesh, time, obj_scale,
-                                               x, y, tail);
+            holdMeshGenerator.generateHoldMesh(e, entity_mesh, time,
+                                               obj_scale_width,
+                                               obj_scale_height, x, y, tail);
         } else if (registry->all_of<FlickComponent>(e)) {
             SlideMeshGenerator slideMeshGenerator(
                 all_tracks_rect, track_count, judgeline_absolute_y,
@@ -274,7 +280,8 @@ class MeshGenerateSystem {
             }
             // 生成滑键网格
             slideMeshGenerator.generateSlideMesh(e, entity_mesh, track_index,
-                                                 obj_scale, x, y, tail);
+                                                 obj_scale_width,
+                                                 obj_scale_height, x, y, tail);
         } else if (registry->all_of<CompositeRootComponent>(e)) {
             auto& [children] = registry->get<CompositeRootComponent>(e);
             // 组合键-二级遍历

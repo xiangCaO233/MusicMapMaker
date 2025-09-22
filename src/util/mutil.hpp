@@ -29,6 +29,7 @@
 #include <QWidget>
 #include <QtSvgWidgets/QSvgWidget>
 #include <TimingTableUsefulWidgets.hpp>
+#include <glm/glm.hpp>
 #include <mmm/DataStructures.hpp>
 #include <mmm/timing/Beat.hpp>
 #include <string>
@@ -781,6 +782,49 @@ inline void set_action_svgcolor(QAction* action, const char* svgpath,
 
     // 设置图标
     action->setIcon(QIcon(pixmap));
+}
+
+/**
+ * @brief 检查两个轴对齐的矩形是否重叠。
+ *
+ * @param rectA 第一个矩形，格式为 glm::vec4(x, y, width, height)。
+ * @param rectB 第二个矩形，格式为 glm::vec4(x, y, width, height)。
+ * @return 如果重叠则返回 true，否则返回 false。
+ *
+ * @note 此函数假设坐标系中 Y 轴向下增长（常见的屏幕/UI坐标系）。
+ */
+inline bool checkOverlap(const glm::vec4& rectA, const glm::vec4& rectB) {
+    // 为了代码清晰，我们先计算出每个矩形的左右上下边界
+    float a_left = rectA.x;
+    float a_right = rectA.x + rectA.z;  // x + width
+    float a_top = rectA.y;
+    float a_bottom = rectA.y + rectA.w;  // y + height
+
+    float b_left = rectB.x;
+    float b_right = rectB.x + rectB.z;  // x + width
+    float b_top = rectB.y;
+    float b_bottom = rectB.y + rectB.w;  // y + height
+
+    // 检查所有不重叠的情况
+    // 1. A 在 B 的右侧
+    if (a_left >= b_right) {
+        return false;
+    }
+    // 2. A 在 B 的左侧
+    if (a_right <= b_left) {
+        return false;
+    }
+    // 3. A 在 B 的下方
+    if (a_top >= b_bottom) {
+        return false;
+    }
+    // 4. A 在 B 的上方
+    if (a_bottom <= b_top) {
+        return false;
+    }
+
+    // 如果以上所有“不重叠”的情况都不成立，那么它们必然重叠
+    return true;
 }
 
 }  // namespace mutil

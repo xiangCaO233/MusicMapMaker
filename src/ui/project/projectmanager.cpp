@@ -1,5 +1,5 @@
 #include <audio/track/trackmanager.h>
-#include <project/projectconfig.h>
+#include <config/project/projectconfig.h>
 #include <project/projectmanager.h>
 #include <qlogging.h>
 #include <ui_projectmanager.h>
@@ -13,7 +13,7 @@ ProjectManager::ProjectManager(QWidget* parent)
     : QWidget(parent), ui(new Ui::ProjectManager) {
     ui->setupUi(this);
     // ui->main_splitter->setSizes({0, 300});
-    ui->project_content_splitter->setSizes({220, 300});
+    // ui->project_content_splitter->setSizes({220, 300});
 
     // 项目列表模型
     // auto project_list_model = new QStandardItemModel(ui->project_list);
@@ -34,10 +34,6 @@ ProjectManager::ProjectManager(QWidget* parent)
     // 视频列表模型
     auto video_list_model = new QStandardItemModel(ui->video_listView);
     ui->video_listView->setModel(video_list_model);
-
-    // 初始化项目配置ui
-    config_ui = new ProjectConfig();
-    config_ui->hide();
 }
 
 ProjectManager::~ProjectManager() {
@@ -60,24 +56,6 @@ void ProjectManager::initService(MapCanvas* canvas,
 }
 
 ProjectService* ProjectManager::get_service() { return service; }
-
-// void ProjectManager::onUpdateProjectListView(
-//     const std::unordered_map<std::string, std::unique_ptr<MProject>,
-//     StringHash,
-//                              std::equal_to<>>* projects) const {
-//     auto model =
-//     qobject_cast<QStandardItemModel*>(ui->project_list->model());
-//     model->clear();
-//     for (const auto& [name, project] : *projects) {
-//         // 新建列表项
-//         auto project_item = new QStandardItem(QString::fromStdString(name));
-//         project_item->setData(QVariant::fromValue(name));
-//         project_item->setEditable(false);
-//
-//         // 添加列表项
-//         model->appendRow(project_item);
-//     }
-// }
 
 // 激活项目
 void ProjectManager::onActivateProject(MProject* activated_project) {
@@ -139,8 +117,6 @@ void ProjectManager::onActivateProject(MProject* activated_project) {
             video_item->setEditable(false);
             video_model->appendRow(video_item);
         }
-        // 绑定配置ui的配置内容
-        config_ui->bind_config(&activated_project->project_config);
     }
 }
 
@@ -152,6 +128,4 @@ void ProjectManager::onMapCanvasThreadStopped() {
 
 void ProjectManager::closeEvent(QCloseEvent* e) {
     service->selectMap("", nullptr);
-    qDebug() << "ProjectManager: delete configui";
-    delete config_ui;
 }

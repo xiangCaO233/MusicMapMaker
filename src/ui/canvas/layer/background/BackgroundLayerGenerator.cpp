@@ -23,6 +23,7 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
 
         // 获取轨道布局信息
         const glm::vec4& all_tracks_rect = info->editorInfo.track_layout;
+
         const int track_count =
             info->editorInfo.map->base_metadata().track_count;
         if (track_count == 0) return;
@@ -52,8 +53,9 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
             cmd.primitive = PrimitiveType::QUAD;
-            cmd.baseInfo = {{all_tracks_rect.x + i * single_track_width, 0.f},
-                            {single_track_width, canvas_size.y}};
+            cmd.baseInfo = {
+                {all_tracks_rect.x + i * single_track_width, all_tracks_rect.y},
+                {single_track_width, all_tracks_rect.w}};
             cmd.texturesInfo.texture = oribit_bg_texture;
             cmd.texturesInfo.tscale = TexScaleMode::TILE_BASEWIDTH_REPEAT;
             buffer.add_PrimitiveCommand(cmd);
@@ -75,6 +77,24 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
             jcmd.texturesInfo.texture = oribit_judge_texture;
             buffer.add_PrimitiveCommand(jcmd);
         }
+        // 上下边界线
+        PrimitiveCommand topBoundCmd;
+        topBoundCmd.cmdType = CommandType::PRIMITIVE;
+        topBoundCmd.primitive = PrimitiveType::QUAD;
+        topBoundCmd.baseInfo = {{all_tracks_rect.x, all_tracks_rect.y - 1},
+                                {all_tracks_rect.z, 2},
+                                0,
+                                {.9, .9, .9, .9}};
+        buffer.add_PrimitiveCommand(topBoundCmd);
+        PrimitiveCommand bottomBoundCmd;
+        bottomBoundCmd.cmdType = CommandType::PRIMITIVE;
+        bottomBoundCmd.primitive = PrimitiveType::QUAD;
+        bottomBoundCmd.baseInfo = {
+            {all_tracks_rect.x, all_tracks_rect.y + all_tracks_rect.w - 1},
+            {all_tracks_rect.z, 2},
+            0,
+            {.9, .9, .9, .9}};
+        buffer.add_PrimitiveCommand(bottomBoundCmd);
     }
     // qDebug() << "bg layer done";
 }

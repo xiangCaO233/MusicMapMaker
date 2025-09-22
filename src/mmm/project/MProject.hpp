@@ -28,7 +28,7 @@ class MProject {
     void close();
 
     // 只读配置
-    const MProjectConfig* cfg() const { return &project_config; }
+    MProjectConfig* cfg() { return &project_config; }
 
     const std::filesystem::path& getPath() const { return project_path; }
 

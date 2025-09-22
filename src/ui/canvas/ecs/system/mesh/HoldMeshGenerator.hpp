@@ -92,9 +92,10 @@ class HoldMeshGenerator {
 
     // 生成面条网格
     void generateHoldMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
-                          const uint32_t& src_time, const float& obj_scale,
-                          const float& src_x, const float& src_y,
-                          HoldTailType tailType) const {
+                          const uint32_t& src_time,
+                          const float& obj_scale_width,
+                          const float& obj_scale_height, const float& src_x,
+                          const float& src_y, HoldTailType tailType) const {
         if (!entity_mesh.mesh.empty()) {
             // 更新物件头部位为更精确的内部位置
             entity_mesh.mesh.back().part = NotePart::HOLD_HEAD;
@@ -160,7 +161,7 @@ class HoldMeshGenerator {
         // 获取面身纹理
         TextureInfo hold_body_texinfo = tex(TexType::HOLD_BODY_VERTICAL);
 
-        auto body_width = hold_body_texinfo.origin_size.x * obj_scale;
+        auto body_width = hold_body_texinfo.origin_size.x * obj_scale_width;
 
         // 绘制面身(画在面条结束的位置)
         // 面身网格(在层级0(最下层))
@@ -177,12 +178,14 @@ class HoldMeshGenerator {
         // 尾部
         switch (tailType) {
             case HoldTailType::GENERAL: {
-                generateHoldTailMesh(e, entity_mesh, obj_scale, thisx, thisy,
+                generateHoldTailMesh(e, entity_mesh, obj_scale_width,
+                                     obj_scale_height, thisx, thisy,
                                      body_height);
                 break;
             }
             case HoldTailType::NODE: {
-                generateHoldNodeMesh(e, entity_mesh, obj_scale, thisx, thisy,
+                generateHoldNodeMesh(e, entity_mesh, obj_scale_width,
+                                     obj_scale_height, thisx, thisy,
                                      body_height);
                 break;
             }
@@ -191,7 +194,8 @@ class HoldMeshGenerator {
 
     // 生成面条尾网格
     void generateHoldTailMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
-                              const float& obj_scale, const float& thisx,
+                              const float& obj_scale_width,
+                              const float& obj_scale_height, const float& thisx,
                               const float& thisy, float& body_height) const {
         // 判断悬浮情况
         auto hovered_entity =
@@ -203,7 +207,9 @@ class HoldMeshGenerator {
         // 面尾网格(在层级1)
         // 获取面尾纹理
         TextureInfo hold_end_texinfo = tex(TexType::HOLD_END);
-        auto end_size = hold_end_texinfo.origin_size * obj_scale;
+        auto end_size =
+            glm::vec2{hold_end_texinfo.origin_size.x * obj_scale_width,
+                      hold_end_texinfo.origin_size.y * obj_scale_height};
         auto end_pos = glm::vec2(thisx - end_size.x / 2.f,
                                  thisy - body_height - end_size.y / 2.f);
         entity_mesh.mesh.emplace_back(
@@ -213,7 +219,8 @@ class HoldMeshGenerator {
 
     // 生成面条尾节点网格
     void generateHoldNodeMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
-                              const float& obj_scale, const float& thisx,
+                              const float& obj_scale_width,
+                              const float& obj_scale_height, const float& thisx,
                               const float& thisy, float& body_height) const {
         // 判断悬浮情况(仅可能为子实体)
         auto hovered_entity =
@@ -225,7 +232,9 @@ class HoldMeshGenerator {
         // 面尾网格(在层级1)
         // 获取面尾纹理
         TextureInfo node_texinfo = tex(TexType::NODE);
-        auto end_size = node_texinfo.origin_size * obj_scale;
+        auto end_size =
+            glm::vec2{node_texinfo.origin_size.x * obj_scale_width,
+                      node_texinfo.origin_size.y * obj_scale_height};
         auto end_pos = glm::vec2(thisx - end_size.x / 2.f,
                                  thisy - body_height - end_size.y / 2.f);
         entity_mesh.mesh.emplace_back(

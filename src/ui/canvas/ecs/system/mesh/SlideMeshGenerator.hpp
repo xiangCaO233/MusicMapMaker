@@ -94,9 +94,10 @@ class SlideMeshGenerator {
 
     // 生成滑键网格
     void generateSlideMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
-                           const uint32_t& src_track, const float& obj_scale,
-                           const float& src_x, const float& src_y,
-                           SlideTailType tailType) const {
+                           const uint32_t& src_track,
+                           const float& obj_scale_width,
+                           const float& obj_scale_height, const float& src_x,
+                           const float& src_y, SlideTailType tailType) const {
         if (!entity_mesh.mesh.empty()) {
             // 更新物件头部位为更精确的内部位置
             entity_mesh.mesh.back().part = NotePart::SLIDE_HEAD;
@@ -159,7 +160,7 @@ class SlideMeshGenerator {
         // 获取滑身纹理
         TextureInfo slide_body_texinfo = tex(TexType::HOLD_BODY_HORIZONTAL);
 
-        auto body_height = slide_body_texinfo.origin_size.y * obj_scale;
+        auto body_height = slide_body_texinfo.origin_size.y * obj_scale_height;
 
         // 绘制滑身(画在滑键的位置或(若delta为负数画左向width处))
         // 面身网格(在层级0(最下层))
@@ -178,24 +179,25 @@ class SlideMeshGenerator {
         switch (tailType) {
             case SlideTailType::GENERAL: {
                 generateSlideTailMesh(e, entity_mesh, thistrack, delta_width,
-                                      obj_scale, thisx, thisy, body_height);
+                                      obj_scale_width, obj_scale_height, thisx,
+                                      thisy, body_height);
                 break;
             }
             case SlideTailType::NODE: {
                 generateSlideNodeMesh(e, entity_mesh, src_track, delta_width,
-                                      obj_scale, thisx, thisy, body_height);
+                                      obj_scale_width, obj_scale_height, thisx,
+                                      thisy, body_height);
                 break;
             }
         }
     }
 
     // 生成滑键尾部网格
-    void generateSlideTailMesh(const entt::entity& e,
-                               GeneratedMesh& entity_mesh,
-                               const uint32_t& srctrack,
-                               const float& delta_width, const float& obj_scale,
-                               const float& thisx, const float& thisy,
-                               float& body_height) const {
+    void generateSlideTailMesh(
+        const entt::entity& e, GeneratedMesh& entity_mesh,
+        const uint32_t& srctrack, const float& delta_width,
+        const float& obj_scale_width, const float& obj_scale_height,
+        const float& thisx, const float& thisy, float& body_height) const {
         // 判断悬浮情况
         auto hovered_entity =
             hovered_info.has_value() && hovered_info.value().source_entity == e;
@@ -208,7 +210,9 @@ class SlideMeshGenerator {
         TextureInfo slide_end_texinfo =
             tex(delta_width < 0 ? TexType::SLIDE_END_LEFT
                                 : TexType::SLIDE_END_RIGHT);
-        auto end_size = slide_end_texinfo.origin_size * obj_scale;
+        auto end_size =
+            glm::vec2{slide_end_texinfo.origin_size.x * obj_scale_width,
+                      slide_end_texinfo.origin_size.y * obj_scale_height};
         auto end_pos = glm::vec2(thisx - end_size.x / 2.f + delta_width,
                                  thisy - end_size.y / 2.f);
         entity_mesh.mesh.emplace_back(
@@ -217,12 +221,11 @@ class SlideMeshGenerator {
     }
 
     // 生成滑键尾节点网格
-    void generateSlideNodeMesh(const entt::entity& e,
-                               GeneratedMesh& entity_mesh,
-                               const uint32_t& srctrack,
-                               const float& delta_width, const float& obj_scale,
-                               const float& thisx, const float& thisy,
-                               float& body_height) const {
+    void generateSlideNodeMesh(
+        const entt::entity& e, GeneratedMesh& entity_mesh,
+        const uint32_t& srctrack, const float& delta_width,
+        const float& obj_scale_width, const float& obj_scale_height,
+        const float& thisx, const float& thisy, float& body_height) const {
         // 判断悬浮情况
         auto hovered_entity = hovered_info.has_value() &&
                               (hovered_info.value().source_entity == e ||
@@ -234,7 +237,9 @@ class SlideMeshGenerator {
         // 滑尾节点网格(在层级1)
         // 获取节点纹理
         TextureInfo node_texinfo = tex(TexType::NODE);
-        auto end_size = node_texinfo.origin_size * obj_scale;
+        auto end_size =
+            glm::vec2{node_texinfo.origin_size.x * obj_scale_width,
+                      node_texinfo.origin_size.y * obj_scale_height};
         auto end_pos = glm::vec2(thisx - end_size.x / 2.f + delta_width,
                                  thisy - end_size.y / 2.f);
         entity_mesh.mesh.emplace_back(

@@ -9,6 +9,7 @@
 #include <info/MapCanvasInfo.hpp>
 #include <layer/ILayer.hpp>
 #include <mmm/map/MMap.hpp>
+#include <util/mutil.hpp>
 #include <vector>
 
 class NormalRenderSystem {
@@ -48,6 +49,11 @@ class NormalRenderSystem {
         // 生成网格的渲染指令
         for (int i{0}; i < all_mesh.size(); ++i) {
             auto& rquad = all_mesh[i];
+            // 可见性检测
+            if (!mutil::checkOverlap(
+                    info->editorInfo.track_layout,
+                    glm::vec4(rquad.quad.pos, rquad.quad.size)))
+                continue;
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
             cmd.baseInfo.pos = rquad.quad.pos;

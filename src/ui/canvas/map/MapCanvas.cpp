@@ -105,6 +105,11 @@ void MapCanvas::gotoTiming(Timing* timing) {
     // timing->timestamp;
 }
 
+void MapCanvas::onLayoutUpdated() {
+    auto mapcanvasInfo = info<MapCanvasInfo>();
+    mapcanvasInfo->update_trackLayout();
+}
+
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {
     map = smap;

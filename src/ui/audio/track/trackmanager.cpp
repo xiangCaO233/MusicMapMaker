@@ -133,8 +133,10 @@ void TrackManager::closeEvent(QCloseEvent* event) {
 
 std::weak_ptr<ice::AudioTrack> TrackManager::loadBack(
     std::string_view audio_path, bool is_maintrack) {
-    return loadin_audio(QString::fromStdString(std::string(audio_path)),
-                        is_maintrack);
+    auto res = loadin_audio(QString::fromStdString(std::string(audio_path)),
+                            is_maintrack);
+    getController(audio_path);
+    return res;
 }
 
 AudioController* TrackManager::getController(std::string_view audio_name) {
@@ -244,8 +246,9 @@ void TrackManager::set_maintrack(const QString& name) {
 }
 
 // 播放一次指定音轨
-void TrackManager::play_oneshot(std::string_view audio_name, float volume) {
+void TrackManager::play_oneshot(std::string_view audio_name) {
     QString q_audio_name = QString::fromStdString(std::string(audio_name));
+    auto controller = getController(audio_name);
 
     // 获取对应的音轨
     std::shared_ptr<ice::AudioTrack> track = audio_tracks.value(q_audio_name);
@@ -275,7 +278,7 @@ void TrackManager::play_oneshot(std::string_view audio_name, float volume) {
     }
 
     node->set_playpos(0);
-    node->setvolume(volume);
+    node->setvolume(controller->node().lock()->getvolume());
 
     // 开始播放
     node->play();

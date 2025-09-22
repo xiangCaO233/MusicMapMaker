@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <mmm/project/MProject.hpp>
 #include <mmm/project/TextureLoadCallback.hpp>
-#include <vector>
 
 // 构造MProject
 MProject::MProject(TextureLoadCallback* texloadcbk,

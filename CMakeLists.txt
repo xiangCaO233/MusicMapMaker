@@ -180,9 +180,10 @@ set(PROJECT_SOURCES
     src/ui/project/ProjectService.hpp
     src/ui/project/ProjectService.cpp
     src/ui/project/projectmanager.ui
-    src/ui/project/projectconfig.h
-    src/ui/project/projectconfig.cpp
-    src/ui/project/projectconfig.ui
+    src/ui/config/project/projectconfig.h
+    src/ui/config/project/projectconfig.cpp
+    src/ui/config/project/projectconfigcontrolls.cpp
+    src/ui/config/project/projectconfig.ui
     src/ui/audio/track/trackmanager.h
     src/ui/audio/track/trackmanager.cpp
     src/ui/audio/track/trackcontrols.cpp
@@ -217,6 +218,7 @@ include_directories(
   ./src/ui/template
   ./src/ui/project
   ./src/ui/edit
+  ./src/ui/config/project
   ./src/ui/audio/track
   ./src/ui/audio/graphic)
 

@@ -88,9 +88,6 @@ struct RealTimeInfo {
     // 同样，它可能由UI线程修改，所以使用原子类型
     std::atomic<double> audio_playback_rate{1.0};
 
-    // 效果音量
-    float effect_volume{.5f};
-
     // --- 播放状态 ---
     bool is_playing{false};
 

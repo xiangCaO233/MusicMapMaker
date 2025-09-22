@@ -30,9 +30,9 @@ class MainWindow : public QMainWindow {
     void use_theme(GlobalTheme theme);
 
    private slots:
-    void on_actionTrack_Manager_toggled(bool arg1);
+    // void on_actionTrack_Manager_toggled(bool arg1);
 
-    void on_actionProject_Manager_toggled(bool arg1);
+    // void on_actionProject_Manager_toggled(bool arg1);
 
     // 更新标题后缀
     void update_title_suffix(const QString &suffix);
@@ -45,6 +45,9 @@ class MainWindow : public QMainWindow {
 
    private:
     Ui::MainWindow *ui;
+
+    // 初始化所有信号连接
+    void connectAll();
 
     // 初始化所有的action
     void initActions();
