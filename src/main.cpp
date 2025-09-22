@@ -79,6 +79,17 @@ int main(int argc, char* argv[]) {
         w.use_theme(GlobalTheme::COLIN_LIGHT);
     }
     w.show();
+    // TODO
+    /*
+     * 1: 实现选择框和实时更新选中物件,选中效果为发光
+     * 2: 实现预览区和点击跳转功能
+     * 3: 实现复制/剪切/粘贴/取消操作
+     * 4: 实现多工具切换
+     * 5: 实现滚动吸附拍线模式切换和timing特效影响时间线的模式切换
+     * 6: 实现mmm文件格式和直接保存操作(c-s保存为mmm)
+     * 7: 实现项目配置文件格式和对应序列化与反序列化
+     * 8: 实现直接打开谱面/音频文件的项目引导ui和交互
+     * */
 
     return QApplication::exec();
 }
