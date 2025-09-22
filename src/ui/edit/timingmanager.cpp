@@ -25,6 +25,7 @@ TimingManager::TimingManager(QWidget *parent)
 }
 
 TimingManager::~TimingManager() { delete ui; }
+
 void TimingManager::bind_toolcmdq(
     ThreadSafeQueue<ToolCommand> *tool_cmd_queue) {
     this->tool_cmd_queue = tool_cmd_queue;

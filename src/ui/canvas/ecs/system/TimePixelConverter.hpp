@@ -4,6 +4,7 @@
 #include <info/MapCanvasInfo.hpp>
 #include <info/SharedCanvasInfo.hpp>
 #include <mmm/DataStructures.hpp>
+#include <mutex>
 
 class TimePixelConverter {
    public:

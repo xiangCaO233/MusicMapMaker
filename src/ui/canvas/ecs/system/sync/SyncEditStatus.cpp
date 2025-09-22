@@ -27,6 +27,7 @@ void SyncSystem::updateEditStatus(ECSCore& core,
                 qDebug() << "接收到Timing更新编辑事件:目标timing[" << timing
                          << "]";
                 if (timing->is_base_timing) {
+                    std::lock_guard<std::mutex> lock(beatanalyze_mtx);
                     // 重新生成拍信息
                     layer_manager->map()->beat_timeline().clear();
                     layer_manager->map()->beat_info().clear();

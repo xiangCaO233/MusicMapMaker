@@ -44,6 +44,9 @@ class SyncSystem {
                         const BeatTimeline& beatTimeLine,
                         const BeatInfo& beatInfo, const MapCanvasInfo* info,
                         const TimePixelConverter& converter) const;
+
+   private:
+    std::mutex beatanalyze_mtx;
 };
 
 #endif  // MMM_SYNCSYSTEM_HPP

@@ -95,7 +95,7 @@ void TimingManager::addNewTimingRowItem(MMap *map, Timing *newTiming) {
 
 // 从map刷新timing表
 void TimingManager::refreshTableFromMap() {
-    qDebug() << "步骤 1/3: 开始从 Map 刷新...";
+    qDebug() << "1/3: 开始从 Map 刷新...";
 
     // --- 清理所有旧的UI状态 ---
     qDeleteAll(allTimingRowItems);
@@ -143,11 +143,11 @@ void TimingManager::refreshTableFromMap() {
     ui->timing_table_widget->setHorizontalHeaderLabels(timing_metaNames());
     ui->timing_table_widget->blockSignals(false);
 
-    qDebug() << "步骤 3/3: 刷新全部完成。";
+    qDebug() << "3/3: 刷新全部完成。";
 }
 
 void TimingManager::sortAndRebuildTable() {
-    qDebug() << "步骤 2/3: 正在排序并渲染 Timing 表...";
+    qDebug() << "2/3: 正在排序并渲染 Timing 表...";
 
     // 对“UI组件管理器”列表进行排序
     std::sort(allTimingRowItems.begin(), allTimingRowItems.end(),

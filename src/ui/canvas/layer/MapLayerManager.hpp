@@ -21,6 +21,7 @@ class TimePixelConverterManager {
         // 检查TimingMap的版本号是否已更新
         if (!m_cached_converter || m_cached_version != timings.getVersion() ||
             !current_status_version || status != *current_status_version) {
+            std::lock_guard<std::mutex> lock(build_newconverter_mtx);
             // 版本不匹配或首次创建，需要重建
             m_cached_converter =
                 std::make_unique<TimePixelConverter>(timings, status, prebpm);
@@ -34,6 +35,7 @@ class TimePixelConverterManager {
 
    private:
     const BaseCanvasStatus* current_status_version{nullptr};
+    std::mutex build_newconverter_mtx;
     std::unique_ptr<TimePixelConverter> m_cached_converter{nullptr};
     uint64_t m_cached_version{0};
 };
