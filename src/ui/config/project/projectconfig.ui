@@ -372,6 +372,102 @@
           </widget>
          </item>
          <item>
+          <widget class="QWidget" name="judgelineposconfig_widget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">#judgelineposconfig_widget{
+            border: 2px solid #FFD1DC;
+            border-radius: 6px;
+            padding: 2px;
+}</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="leftMargin">
+             <number>4</number>
+            </property>
+            <property name="topMargin">
+             <number>4</number>
+            </property>
+            <property name="rightMargin">
+             <number>4</number>
+            </property>
+            <property name="bottomMargin">
+             <number>4</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,1,0,0">
+              <item>
+               <widget class="QLabel" name="judgeline_pos_label">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Judgeline Pos:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QSlider" name="judgeline_pos_slider">
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="pageStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>80</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="judgeline_pos_value_label">
+                <property name="text">
+                 <string>80%</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_9">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <widget class="QWidget" name="objectscaleconfig_widget" native="true">
            <property name="styleSheet">
             <string notr="true">#objectscaleconfig_widget{
@@ -419,9 +515,30 @@
              </spacer>
             </item>
             <item>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="1">
-               <widget class="QSlider" name="object_width_scale_slider">
+             <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,0" columnminimumwidth="0,1,0,0">
+              <item row="1" column="3">
+               <widget class="QLabel" name="object_height_scale_value_label">
+                <property name="text">
+                 <string>100%</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLabel" name="object_width_scale_value_label">
+                <property name="text">
+                 <string>100%</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="object_width_scale_label">
+                <property name="text">
+                 <string>width:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSlider" name="object_height_scale_slider">
                 <property name="minimum">
                  <number>25</number>
                 </property>
@@ -446,8 +563,8 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="QSlider" name="object_height_scale_slider">
+              <item row="0" column="1">
+               <widget class="QSlider" name="object_width_scale_slider">
                 <property name="minimum">
                  <number>25</number>
                 </property>
@@ -465,26 +582,31 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="object_width_scale_label">
-                <property name="text">
-                 <string>width:</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="2">
-               <widget class="QLabel" name="object_width_scale_value_label">
-                <property name="text">
-                 <string>100%</string>
+               <spacer name="horizontalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
-               </widget>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
               <item row="1" column="2">
-               <widget class="QLabel" name="object_height_scale_value_label">
-                <property name="text">
-                 <string>100%</string>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
-               </widget>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>

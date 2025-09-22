@@ -35,6 +35,8 @@ struct MapConfig {
 struct CanvasConfig {
     // top,right,bottom,left
     glm::vec4 canvas_layout{.05f, .75f, .95f, .25f};
+    // 判定线位置
+    float judgeline_pos{.8f};
     // 物件缩放
     float object_width_scale{1.f};
     float object_height_scale{1.f};

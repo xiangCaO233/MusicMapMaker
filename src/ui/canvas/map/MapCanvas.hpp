@@ -41,6 +41,7 @@ class MapCanvas : public GLCanvas {
     void onUpdateTexinfo() override;
     void gotoTiming(Timing *timing) override;
     void onLayoutUpdated();
+    void onJudgelinePosUpdated(float pos);
 
    signals:
     void skinInitialized();

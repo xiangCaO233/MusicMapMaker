@@ -110,6 +110,11 @@ void MapCanvas::onLayoutUpdated() {
     mapcanvasInfo->update_trackLayout();
 }
 
+void MapCanvas::onJudgelinePosUpdated(float pos) {
+    auto mapcanvasInfo = info<MapCanvasInfo>();
+    mapcanvasInfo->baseInfo.judgeline_pos = 1.f - pos;
+}
+
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {
     map = smap;

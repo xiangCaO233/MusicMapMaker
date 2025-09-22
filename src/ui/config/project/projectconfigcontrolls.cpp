@@ -25,10 +25,16 @@ void ProjectConfig::on_leftpos_spinner_valueChanged(double arg1) {
 
 void ProjectConfig::on_object_width_scale_slider_valueChanged(int value) {
     config->canvas_config.object_width_scale = double(value) / 100.0;
-    ui->object_width_scale_value_label->setText(QString("%1%%").arg(value));
+    ui->object_width_scale_value_label->setText(QString("%1%").arg(value));
 }
 
 void ProjectConfig::on_object_height_scale_slider_valueChanged(int value) {
     config->canvas_config.object_height_scale = double(value) / 100.0;
-    ui->object_height_scale_value_label->setText(QString("%1%%").arg(value));
+    ui->object_height_scale_value_label->setText(QString("%1%").arg(value));
+}
+
+void ProjectConfig::on_judgeline_pos_slider_valueChanged(int value) {
+    config->canvas_config.judgeline_pos = double(value) / 100.0;
+    ui->judgeline_pos_value_label->setText(QString("%1%").arg(value));
+    emit judgeline_changed(config->canvas_config.judgeline_pos);
 }
