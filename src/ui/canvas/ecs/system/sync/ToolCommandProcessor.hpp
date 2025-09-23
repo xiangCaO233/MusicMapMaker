@@ -48,10 +48,15 @@ class ToolCommandProcessor {
             overloaded{
                 // 选中相关
                 [&](const StartSelectCommand& arg) {
-                    // interactionState.endDrag();
+                    interactionState.startNewSelectArea(
+                        arg.append, arg.trigger_button,
+                        arg.common_info.start_mouse_pos);
+                },
+                [&](const UpdateSelectAreaCommand& arg) {
+                    interactionState.updateSelectArea(arg.current_buttons);
                 },
                 [&](const EndSelectCommand& arg) {
-                    // interactionState.endDrag();
+                    interactionState.endNewSelectArea(arg.end_button);
                 },
                 // 清理拖动实体状态
                 [&](const ClearDragStateCommand& arg) {
@@ -60,11 +65,17 @@ class ToolCommandProcessor {
                 // 放置物件
                 // 放置单物件
                 [&](const StartCreateNewNormalNoteCommand& arg) {
-                    startCreateNewNormalNote();
+                    // 开始创建新单键物件
+                    interactionState.startCreate(CreateMode::Normal);
+                    // 立即更新一次创建节点
+                    updateCreateNode();
                 },
                 // 放置复合物件
                 [&](const StartCreateNewCompositeNoteCommand& arg) {
-                    startCreateNewCompositeNote();
+                    // 开始创建新复合键物件
+                    interactionState.startCreate(CreateMode::Composite);
+                    // 立即更新一次创建节点
+                    updateCreateNode();
                 },
                 // 更新创建节点
                 [&](const UpdateCreateNodeCommand& arg) { updateCreateNode(); },
@@ -91,13 +102,11 @@ class ToolCommandProcessor {
                 // 删除相关
                 // 标记删除命令
                 [&](const MarkDeleteCommand& arg) {
-                    //
                     markDeleteEntities(arg.selection, arg.hit_info);
                 },
 
                 // 确认删除命令
                 [&](const ConfirmDeleteCommand& arg) {
-                    //
                     confirmDeleteEntities(arg.confirm);
                 },
 
@@ -199,20 +208,6 @@ class ToolCommandProcessor {
         interactionState.endDeleteCheck();
     }
 
-    void startCreateNewNormalNote() {
-        // 开始创建新单键物件
-        interactionState.startCreate(CreateMode::Normal);
-        // 立即更新一次创建节点
-        updateCreateNode();
-    }
-
-    void startCreateNewCompositeNote() {
-        // 开始创建新复合键物件
-        interactionState.startCreate(CreateMode::Composite);
-        // 立即更新一次创建节点
-        updateCreateNode();
-    }
-
     void updateCreateNode() {
         // interactionState.startCreate(CreateMode::Composite);
         auto mousePos = interactionState.getMouseState().current_pos;
@@ -298,62 +293,39 @@ class ToolCommandProcessor {
             // NoteCollection 例如:
             if (drag_info.mode == DragMode::Entity) {
                 if (drag_info.dragged_entitiesWithRes.size() == 1) {
+                    // 获取新的位置
+                    auto entity =
+                        drag_info.dragged_entitiesWithRes.begin()->first;
+                    auto [track, uuid] = registry.get<NoteComponent>(entity);
+                    auto [time] = registry.get<TimeComponent>(entity);
+                    auto mapAxisRes =
+                        drag_info.dragged_entitiesWithRes.begin()->second;
                     if (drag_info.drag_start_hit.part == NotePart::NONE ||
                         drag_info.drag_start_hit.part == NotePart::HEAD ||
                         drag_info.drag_start_hit.part == NotePart::HOLD_HEAD ||
                         drag_info.drag_start_hit.part == NotePart::SLIDE_HEAD) {
-                        // 应用新的位置
-                        auto entity =
-                            drag_info.dragged_entitiesWithRes.begin()->first;
-                        auto [track, uuid] =
-                            registry.get<NoteComponent>(entity);
-                        auto mapAxisRes =
-                            drag_info.dragged_entitiesWithRes.begin()->second;
-
                         // 向编辑器应用修改
                         mapEditor.moveNote(uuid, mapAxisRes.time,
                                            mapAxisRes.track);
 
-                        // 附加脏组件
-                        registry.emplace<DirtyMarkComponent>(entity);
-
                     } else if (drag_info.drag_start_hit.part ==
                                NotePart::HOLD_END) {
                         // ... 计算并应用新的 duration ...
-                        // 应用新的位置
-                        auto entity =
-                            drag_info.dragged_entitiesWithRes.begin()->first;
-                        auto [track, uuid] =
-                            registry.get<NoteComponent>(entity);
-                        auto [time] = registry.get<TimeComponent>(entity);
-                        auto mapAxisRes =
-                            drag_info.dragged_entitiesWithRes.begin()->second;
                         auto duration = mapAxisRes.time - time;
                         // 向编辑器应用修改
                         mapEditor.updateHold(uuid, duration);
-                        // 附加脏组件
-                        registry.emplace<DirtyMarkComponent>(entity);
                     } else if (drag_info.drag_start_hit.part ==
                                NotePart::SLIDE_END) {
                         // ... 计算并应用新的 delta track ...
-                        // 应用新的位置
-                        auto entity =
-                            drag_info.dragged_entitiesWithRes.begin()->first;
-                        auto [track, uuid] =
-                            registry.get<NoteComponent>(entity);
-                        auto mapAxisRes =
-                            drag_info.dragged_entitiesWithRes.begin()->second;
                         auto delta_track = mapAxisRes.track - track;
-
                         // 向编辑器应用修改
                         mapEditor.updateSlide(uuid, delta_track);
-
-                        // 附加脏组件
-                        registry.emplace<DirtyMarkComponent>(entity);
                     }
                     // else if () {
                     //
                     // }
+                    // 附加脏组件(下一帧更新)
+                    registry.emplace<DirtyMarkComponent>(entity);
                 } else {
                     // 拖拽多个
                 }

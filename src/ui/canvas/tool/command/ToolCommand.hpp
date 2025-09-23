@@ -13,12 +13,20 @@ struct StartDragCommand {
 // 开始选择指令
 struct StartSelectCommand {
     DragStartInfo common_info;
+    Qt::MouseButton trigger_button;
     // 追加模式(不清空已有选择项)
     bool append{false};
 };
 
+// 更新选择区域指令
+struct UpdateSelectAreaCommand {
+    QFlags<Qt::MouseButton> current_buttons;
+};
+
 // 结束选择指令
-struct EndSelectCommand {};
+struct EndSelectCommand {
+    Qt::MouseButton end_button;
+};
 
 struct StartDragSelectionCommand {
     DragStartInfo common_info;
@@ -58,8 +66,8 @@ struct ConfirmDeleteCommand {
 
 // 用 std::variant 将所有命令类型聚合到一个类型中
 using ToolCommand =
-    std::variant<StartDragCommand, StartSelectCommand, EndSelectCommand,
-                 StartDragSelectionCommand, EndDragCommand,
+    std::variant<StartDragCommand, StartSelectCommand, UpdateSelectAreaCommand,
+                 EndSelectCommand, StartDragSelectionCommand, EndDragCommand,
                  ClearDragStateCommand, StartCreateNewNormalNoteCommand,
                  StartCreateNewCompositeNoteCommand, UpdateCreateNodeCommand,
                  ConfirmCreateNewNoteCommand, MarkDeleteCommand,

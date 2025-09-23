@@ -6,6 +6,7 @@ BaseEditTool::~BaseEditTool() {}
 
 // 从Canvas转发过来的事件
 void BaseEditTool::mousePressEvent(QMouseEvent* e) {
+    BaseTool::mousePressEvent(e);
     auto hoveredinfo_opt = tool_interaction_state()->getHover();
 
     // 如果没有悬浮在任何物件上，则由子类处理（如创建或框选）
@@ -56,6 +57,7 @@ void BaseEditTool::mousePressEvent(QMouseEvent* e) {
 }
 
 void BaseEditTool::mouseReleaseEvent(QMouseEvent* e) {
+    BaseTool::mouseReleaseEvent(e);
     auto button = e->button();
     auto pos = e->pos();
 

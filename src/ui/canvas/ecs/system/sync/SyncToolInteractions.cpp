@@ -94,6 +94,7 @@ void updateHover(ToolSystem* toolSystem,
     }
 }
 
+// 处理所有工具指令
 void processToolCommands(entt::registry& registry,
                          ThreadSafeQueue<ToolCommand>* toolCmdQ,
                          ToolSystem* system, MMapEditor* editor,

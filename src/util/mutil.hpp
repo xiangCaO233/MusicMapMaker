@@ -827,6 +827,36 @@ inline bool checkOverlap(const glm::vec4& rectA, const glm::vec4& rectB) {
     return true;
 }
 
+// 1. 实现一个自定义的哈希组合函数
+//    这个函数用于将多个哈希值组合成一个
+inline void hash_combine(std::size_t& seed, std::size_t hash) {
+    seed ^= hash + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
+// 2. 为 glm::vec4 提供一个哈希函数
+struct Vec4Hash {
+    std::size_t operator()(const glm::vec4& v) const {
+        std::size_t seed = 0;
+
+        // 对每个分量（x, y, z, w）分别计算哈希值，然后组合
+        // 注意：这里我们使用 std::hash<float>，因为 glm::vec4 的分量是 float
+        hash_combine(seed, std::hash<float>()(v.x));
+        hash_combine(seed, std::hash<float>()(v.y));
+        hash_combine(seed, std::hash<float>()(v.z));
+        hash_combine(seed, std::hash<float>()(v.w));
+
+        return seed;
+    }
+};
+
+// 3. 为 glm::vec4 提供一个相等比较函数
+//    unordered_set 不仅需要哈希，还需要一个相等比较来处理哈希冲突
+struct Vec4Equal {
+    bool operator()(const glm::vec4& a, const glm::vec4& b) const {
+        return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+    }
+};
+
 }  // namespace mutil
 
 #endif  // MMM_MUTIL_HPP

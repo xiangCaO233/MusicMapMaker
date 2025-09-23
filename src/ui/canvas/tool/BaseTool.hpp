@@ -33,9 +33,9 @@ class BaseTool {
     virtual ~BaseTool() = default;
 
     // 从Canvas转发过来的事件
-    virtual void mousePressEvent(QMouseEvent* e) = 0;
+    virtual void mousePressEvent(QMouseEvent* e);
     virtual void mouseMoveEvent(QMouseEvent* e);
-    virtual void mouseReleaseEvent(QMouseEvent* e) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent* e);
     virtual void wheelEvent(QWheelEvent* e);
 
     virtual void keyPressEvent(QKeyEvent* e);

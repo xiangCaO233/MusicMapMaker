@@ -8,14 +8,16 @@
 #include <info/NotePart.hpp>
 #include <list>
 #include <mmm/obj/Note.hpp>
+#include <unordered_map>
+#include <util/mutil.hpp>
 #include <vector>
 
 // --- 子结构：鼠标状态 ---
 struct MouseState {
     // 当前光标位置 (高频更新)
     glm::vec2 current_pos;
-    // 上次按下的位置
-    glm::vec2 press_pos;
+    // 鼠标按下的位置
+    std::unordered_map<Qt::MouseButton, glm::vec2> press_pos;
     // 鼠标轨迹 (用于特效)
     std::vector<glm::vec2> trail;
     // 当前按下的按钮
@@ -24,7 +26,17 @@ struct MouseState {
 
 // --- 子结构：选择状态 ---
 struct SelectionState {
-    std::unordered_set<entt::entity> selected_entities;
+    std::vector<glm::vec4> selection_areas;
+
+    struct ActiveSession {
+        glm::vec2 start_pos;
+        size_t area_index;
+    };
+
+    // 用一个 map 跟踪所有活动的会话
+    std::map<Qt::MouseButton, ActiveSession> active_sessions;
+    std::map<Qt::MouseButton, std::unordered_set<entt::entity>>
+        all_selected_entities;
 };
 
 // --- 子结构：删除标记状态 ---
@@ -92,7 +104,13 @@ class ToolInteractionState {
     // 线程安全的公共接口
 
     // 鼠标相关 (由UI线程写入, 所有线程读取)
-    void updateMouse(const glm::vec2& pos, QFlags<Qt::MouseButton> buttons);
+    void updateMousePress(const glm::vec2& pos, Qt::MouseButton button,
+                          QFlags<Qt::MouseButton> allButtons);
+    void updateMouseMove(const glm::vec2& pos,
+                         QFlags<Qt::MouseButton> allButtons);
+    void updateMouseRelease(const glm::vec2& pos, Qt::MouseButton button,
+                            QFlags<Qt::MouseButton> allButtons);
+
     MouseState getMouseState() const;
 
     // 悬浮相关 (由 pretick 写入, 工作线程读取)
@@ -118,14 +136,17 @@ class ToolInteractionState {
 
     // 删除相关
     void startDeleteCheck(const std::unordered_set<entt::entity>& selection);
-
     void endDeleteCheck();
-
     DeleteMarkStates getDeleteMarkStates() const;
 
     // 选择相关 (由 pretick 写入, 所有线程读取)
+    void startNewSelectArea(bool append, Qt::MouseButton button,
+                            const glm::vec2& start_pos);
+    void updateSelectArea(QFlags<Qt::MouseButton> current_buttons);
+    void endNewSelectArea(Qt::MouseButton released_button);
     void setSelection(const std::unordered_set<entt::entity>& entities);
-    std::unordered_set<entt::entity> getSelection() const;
+    std::unordered_set<entt::entity> getSelection();
+    SelectionState getSelectionState() const;
 
     // 操作/快捷键相关 (由UI/Action系统写入, pretick读取)
     // 这个可以用一个更简单的命令队列，或者一个原子标志位

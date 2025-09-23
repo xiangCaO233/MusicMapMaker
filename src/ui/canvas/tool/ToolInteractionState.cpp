@@ -3,10 +3,36 @@
 // 线程安全的公共接口
 
 // 鼠标相关 (由UI线程写入, 所有线程读取)
-void ToolInteractionState::updateMouse(const glm::vec2& pos,
-                                       QFlags<Qt::MouseButton> buttons) {
-    m_mouseState.pressed_buttons = buttons;
+// 鼠标相关 (由UI线程写入, 所有线程读取)
+void ToolInteractionState::updateMousePress(
+    const glm::vec2& pos, Qt::MouseButton button,
+    QFlags<Qt::MouseButton> allButtons) {
     m_mouseState.current_pos = pos;
+    m_mouseState.pressed_buttons = allButtons;
+    m_mouseState.press_pos[button] = pos;  // 记录按下位置
+}
+
+void ToolInteractionState::updateMouseMove(const glm::vec2& pos,
+                                           QFlags<Qt::MouseButton> allButtons) {
+    m_mouseState.current_pos = pos;
+    m_mouseState.pressed_buttons = allButtons;  // 移动时也可能伴随按键状态变化
+
+    // 添加到轨迹
+    m_mouseState.trail.push_back(pos);
+
+    // 可选：为了防止轨迹无限增长，可以限制其大小
+    // constexpr size_t MAX_TRAIL_SIZE = 100;
+    // if (m_mouseState.trail.size() > MAX_TRAIL_SIZE) {
+    //     m_mouseState.trail.erase(m_mouseState.trail.begin());
+    // }
+}
+
+void ToolInteractionState::updateMouseRelease(
+    const glm::vec2& pos, Qt::MouseButton button,
+    QFlags<Qt::MouseButton> allButtons) {
+    m_mouseState.current_pos = pos;
+    m_mouseState.pressed_buttons = allButtons;
+    m_mouseState.press_pos.erase(button);  // 移除释放按钮的按下记录
 }
 
 MouseState ToolInteractionState::getMouseState() const { return m_mouseState; }
@@ -199,15 +225,55 @@ DeleteMarkStates ToolInteractionState::getDeleteMarkStates() const {
 }
 
 // 选择相关 (由 pretick 写入, 所有线程读取)
+void ToolInteractionState::startNewSelectArea(bool append,
+                                              Qt::MouseButton button,
+                                              const glm::vec2& start_pos) {
+    // 如果不是追加模式，且这是第一个按下的按钮，则清空所有旧状态
+    if (!append && m_selectionState.active_sessions.empty()) {
+        m_selectionState.selection_areas.clear();
+    }
+
+    // 创建新会话和新选择框
+    m_selectionState.selection_areas.emplace_back(glm::vec4(start_pos, 0, 0));
+    const size_t new_area_index = m_selectionState.selection_areas.size() - 1;
+    m_selectionState.active_sessions[button] = {start_pos, new_area_index};
+}
+
+void ToolInteractionState::updateSelectArea(
+    QFlags<Qt::MouseButton> current_buttons) {
+    // 遍历所有当前正在进行的会话
+    for (auto const& [button, session] : m_selectionState.active_sessions) {
+        // [关键] 检查这个会话的按钮是否仍在被按下
+        if (current_buttons.testFlag(button)) {
+            auto& area_to_update =
+                m_selectionState.selection_areas[session.area_index];
+            area_to_update = {session.start_pos,
+                              m_mouseState.current_pos - session.start_pos};
+            qDebug() << "button:" << button << "'s area update to "
+                     << QString("[%1,%2,%3,%4]")
+                            .arg(area_to_update.x, 'f', 2)
+                            .arg(area_to_update.y, 'f', 2)
+                            .arg(area_to_update.z, 'f', 2)
+                            .arg(area_to_update.w, 'f', 2);
+        }
+    }
+}
+
+void ToolInteractionState::endNewSelectArea(Qt::MouseButton released_button) {
+    // 当一个按钮被释放，只从活动会话中移除它
+    // 它所创建的选择框被保留下来，但不再更新
+    m_selectionState.active_sessions.erase(released_button);
+}
+
 void ToolInteractionState::setSelection(
     const std::unordered_set<entt::entity>& entities) {
-    m_selectionState.selected_entities = entities;
+    m_selectionState.all_selected_entities[Qt::LeftButton] = entities;
 }
 
-std::unordered_set<entt::entity> ToolInteractionState::getSelection() const {
-    return m_selectionState.selected_entities;
+std::unordered_set<entt::entity> ToolInteractionState::getSelection() {
+    return m_selectionState.all_selected_entities[Qt::LeftButton];
 }
 
-// 操作/快捷键相关 (由UI/Action系统写入, pretick读取)
-// 这个可以用一个更简单的命令队列，或者一个原子标志位
-// void triggerAction(ActionType action);
+SelectionState ToolInteractionState::getSelectionState() const {
+    return m_selectionState;
+}

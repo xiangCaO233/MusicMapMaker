@@ -9,12 +9,23 @@ void SelectTool::mousePressEvent(QMouseEvent* e) {
     BaseEditTool::mousePressEvent(e);
 
     // 如果没有悬浮在物件上，则开始框选
-    if (!tool_interaction_state()->getHover().has_value() &&
-        e->button() == Qt::LeftButton) {
+    if (!tool_interaction_state()->getHover().has_value()) {
         tool_command_queue()->push(StartSelectCommand{
             {glm::vec2{e->pos().x(), e->pos().y()}, e->modifiers()},
+            e->button(),
             e->modifiers().testFlag(Qt::ControlModifier)});
     }
+}
+
+void SelectTool::mouseMoveEvent(QMouseEvent* e) {
+    BaseTool::mouseMoveEvent(e);
+    // 发送更新选中区域命令
+    tool_command_queue()->push(UpdateSelectAreaCommand{e->buttons()});
+}
+
+void SelectTool::mouseReleaseEvent(QMouseEvent* e) {
+    BaseEditTool::mouseReleaseEvent(e);
+    tool_command_queue()->push(EndSelectCommand{e->button()});
 }
 
 // SelectTool 的专属实现
