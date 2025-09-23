@@ -7,22 +7,118 @@
 #include <QWidgetAction>
 #include <canvas/info/MapCanvasInfo.hpp>
 
-void MapEditor::initializeMenus() const {
+void MapEditor::initializeMenus() {
     initializeToolsMenu();
     initializeBgMenu();
 }
 
-void MapEditor::initializeToolsMenu() const {}
+enum class ToolType : int32_t {
+    HAND = 0,
+    NOTE = 1,
+};
+
+//
+//
+// 工具选择按钮
+//
+//
+void MapEditor::initializeToolsMenu() {
+    // 创建菜单
+    auto c = canvas();
+    auto mapinfo = c->info<MapCanvasInfo>();
+
+    // 模式选择按钮
+    auto modemenu = new QMenu(ui->edit_toolsbutton);
+    auto custommodemenuwidget = new QWidget();
+
+    // 创建按钮组
+    modesbuttonGroup = new QButtonGroup(this);
+    // 设置独占模式（单选）
+    modesbuttonGroup->setExclusive(true);
+
+    // 创建子模式按钮
+    hand_mode_button = new QPushButton;
+    note_mode_button = new QPushButton;
+
+    // 初始化按钮类型尺寸
+    hand_mode_button->setFlat(true);
+    hand_mode_button->setCheckable(true);
+    hand_mode_button->setMinimumSize(QSize(24, 24));
+    hand_mode_button->setMaximumSize(QSize(24, 24));
+    hand_mode_button->setToolTip(tr("Hand Tool"));
+
+    note_mode_button->setFlat(true);
+    note_mode_button->setCheckable(true);
+    note_mode_button->setMinimumSize(QSize(24, 24));
+    note_mode_button->setMaximumSize(QSize(24, 24));
+    note_mode_button->setToolTip(tr("Note Tool"));
+
+    // 将按钮添加到按钮组
+    // 第二个参数是按钮ID
+    modesbuttonGroup->addButton(hand_mode_button,
+                                static_cast<int32_t>(ToolType::HAND));
+    modesbuttonGroup->addButton(note_mode_button,
+                                static_cast<int32_t>(ToolType::NOTE));
+
+    // 布局
+    QVBoxLayout *modemenulayout = new QVBoxLayout;
+    modemenulayout->setContentsMargins(0, 0, 0, 0);
+    modemenulayout->setSpacing(0);
+    modemenulayout->addWidget(hand_mode_button);
+    modemenulayout->addWidget(note_mode_button);
+
+    custommodemenuwidget->setLayout(modemenulayout);
+
+    // 默认选中无模式按钮
+    hand_mode_button->setChecked(true);
+
+    auto mode_toolbutton = ui->edit_toolsbutton;
+    auto group = modesbuttonGroup;
+
+    // 监听选中按钮变化
+    connect(modesbuttonGroup,
+            QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
+            [=](QAbstractButton *button) {
+                // 切换工具按钮的图标
+                mode_toolbutton->setIcon(button->icon());
+                // 切换当前编辑器的模式
+                if (c->map) {
+                    auto mode = static_cast<ToolType>(group->id(button));
+                    switch (mode) {
+                        case ToolType::HAND: {
+                            c->use_tool("Hand");
+                            break;
+                        }
+                        case ToolType::NOTE: {
+                            c->use_tool("Note");
+                            break;
+                        }
+                    }
+                }
+            });
+
+    // 将自定义 Widget 包装成 QWidgetAction
+    auto *modewidgetAction = new QWidgetAction(modemenu);
+    modewidgetAction->setDefaultWidget(custommodemenuwidget);
+    modemenu->setContentsMargins(0, 0, 0, 0);
+
+    // 添加到菜单
+    modemenu->addAction(modewidgetAction);
+    // 设置模式按钮菜单
+    ui->edit_toolsbutton->setMenu(modemenu);
+}
 
 //
 //
 // 背景透明度调节按钮
 //
 //
-void MapEditor::initializeBgMenu() const {
+void MapEditor::initializeBgMenu() {
     // 创建菜单
     auto c = canvas();
     auto mapinfo = c->info<MapCanvasInfo>();
+
+    // 背景控制工具按钮
     auto bgmenu = new QMenu(ui->bg_adjust_toolbutton);
     auto custombgsliderWidget = new QWidget();
 

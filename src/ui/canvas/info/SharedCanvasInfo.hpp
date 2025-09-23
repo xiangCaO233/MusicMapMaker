@@ -9,12 +9,28 @@
 #include <info/NotePart.hpp>
 #include <unordered_set>
 
+enum class TimeLineMappingType {
+    // 纯线性映射(无变速效果)
+    LINEAR,
+    // 有变速效果
+    EFFECTED,
+};
+
 struct BaseCanvasStatus {
     // 画布尺寸
     QSizeF canvasSize;
 
     // 范围稍大以预加载(预留50ms)
-    uint32_t view_timeMargin{100};
+    uint32_t view_timeMargin{50};
+
+    // 时间线映射策略
+    TimeLineMappingType timeline_mapping_type{TimeLineMappingType::EFFECTED};
+
+    // 滚动是否吸附到分拍线
+    bool magnet_to_divisor{false};
+
+    // 自然滚动
+    bool scroll_natural{false};
 
     // 滚动速度
     float scroll_speed{1.f};

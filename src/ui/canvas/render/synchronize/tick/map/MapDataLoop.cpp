@@ -1,4 +1,4 @@
-#include <ecs/system/TimePixelConverter.hpp>
+#include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
@@ -17,10 +17,19 @@ void MapDataLoop::pre_tickEvent() {
     }
 
     // 初始化时间映射器 (自动构造/构造函数自动执行预计算)
-    auto converter = map_layermgr->get_time_converter_manager()->getConverter(
-        map->timing_set(), mapinfo->baseInfo,
+    auto& converter = map_layermgr->get_time_converter_manager()->getConverter(
+        map->timing_set(), mapinfo->baseInfo, mapinfo,
         mapinfo->editorInfo.map->base_metadata().preference_bpm);
     auto& ecore = map_layermgr->core();
+
+    // auto& linearConverter =
+    //     map_layermgr->get_time_converter_manager()->getConverterLinear(
+    //         map->timing_set(), mapinfo->baseInfo, mapinfo,
+    //         mapinfo->editorInfo.map->base_metadata().preference_bpm);
+    // auto& effectedConverter =
+    //     map_layermgr->get_time_converter_manager()->getConverterEffected(
+    //         map->timing_set(), mapinfo->baseInfo, mapinfo,
+    //         mapinfo->editorInfo.map->base_metadata().preference_bpm);
 
     // qDebug() << "同步系统(at pretick)开始";
     // 同步编辑事件
@@ -33,7 +42,9 @@ void MapDataLoop::pre_tickEvent() {
     sync_system.updateEntities(ecore, map->note_set(), map->note_uuids(),
                                map_layermgr, map->timing_set(),
                                map->beat_timeline(), map->beat_info(), mapinfo,
-                               converter);
+                               converter
+                               // , effectedConverter
+    );
     // qDebug() << "时间转换系统(at pretick)开始";
     // 计算有时间属性的逻辑y轴位置
     time_system.update(ecore, mapinfo, converter);

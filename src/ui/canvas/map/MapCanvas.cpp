@@ -8,8 +8,8 @@
 #include <mmm/map/MMap.hpp>
 #include <mmm/project/MProject.hpp>
 #include <render/synchronize/tick/map/MapDataLoop.hpp>
+#include <tool/hand/HandTool.hpp>
 #include <tool/note/NoteTool.hpp>
-#include <tool/select/SelectTool.hpp>
 
 // 构造MapCanvas
 MapCanvas::MapCanvas() : GLCanvas() {
@@ -159,11 +159,10 @@ void MapCanvas::creatTools(ToolSystem* toolsystem,
                            ThreadSafeQueue<ToolCommand>* const cmdq,
                            ToolInteractionState* const toolIntState) {
     // 默认使用选择工具
-    current_tool =
-        tools
-            .try_emplace("Select",
-                         new SelectTool(this, toolsystem, cmdq, toolIntState))
-            .first->second;
+    current_tool = tools
+                       .try_emplace("Hand", new HandTool(this, toolsystem, cmdq,
+                                                         toolIntState))
+                       .first->second;
     // 创建物件工具
     tools.try_emplace("Note",
                       new NoteTool(this, toolsystem, cmdq, toolIntState));

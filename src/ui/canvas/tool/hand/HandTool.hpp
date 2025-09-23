@@ -3,12 +3,12 @@
 
 #include <tool/BaseEditTool.hpp>
 
-class SelectTool : public BaseEditTool {
+class HandTool : public BaseEditTool {
    public:
     // 构造SelectTool
     using BaseEditTool::BaseEditTool;
     // 析构SelectTool
-    ~SelectTool() override;
+    ~HandTool() override;
 
    protected:
     // 从Canvas转发过来的事件

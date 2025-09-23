@@ -1,16 +1,16 @@
-#ifndef MMM_TIMEPIXELCONVERTER_HPP
-#define MMM_TIMEPIXELCONVERTER_HPP
+#ifndef MMM_EFFECTEDTIMECONVERTER_HPP
+#define MMM_EFFECTEDTIMECONVERTER_HPP
 
+#include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
-#include <info/SharedCanvasInfo.hpp>
 #include <mmm/DataStructures.hpp>
 
-class TimePixelConverter {
+class EffectedTimeConverter : public TimePixelConverter {
    public:
     static constexpr double BASE_PIXELS_PER_MS = 1.0;
 
-    TimePixelConverter(const TimingMap& timings, const BaseCanvasStatus& status,
-                       double prebpm)
+    EffectedTimeConverter(const TimingMap& timings,
+                          const BaseCanvasStatus& status, double prebpm)
         : m_status(status) {
         buildLookupTable(timings, prebpm);
     }
@@ -43,6 +43,7 @@ class TimePixelConverter {
         double accumulated_pixels;
         double pixels_per_ms;
     };
+
     std::vector<LookupNode> m_lookup_table;
 
     const BaseCanvasStatus& m_status;
@@ -208,4 +209,4 @@ class TimePixelConverter {
     }
 };
 
-#endif  // MMM_TIMEPIXELCONVERTER_HPP
+#endif  // MMM_EFFECTEDTIMECONVERTER_HPP

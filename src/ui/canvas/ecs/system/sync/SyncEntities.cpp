@@ -525,7 +525,10 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
                                 const BeatTimeline& beatTimeLine,
                                 const BeatInfo& beatInfo,
                                 const MapCanvasInfo* info,
-                                const TimePixelConverter& converter) const {
+                                const TimePixelConverter& converter
+                                // debug
+                                // ,const TimePixelConverter& converter2
+) const {
     if (!info->editorInfo.map) return;
 
     // 获取计算所需的上下文信息
@@ -552,6 +555,28 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
     const auto time_at_top = converter.pixelToTime(pixel_y_top, current_time);
     const auto time_at_bottom =
         converter.pixelToTime(pixel_y_bottom, current_time);
+
+    // const auto time_at_top2 = converter2.pixelToTime(pixel_y_top,
+    // current_time); const auto time_at_bottom2 =
+    //     converter2.pixelToTime(pixel_y_bottom, current_time);
+
+    // === 打印结果 ===
+    // qDebug() << "============ DEBUG FRAME ============";
+    // qDebug() << "Current Time: " << current_time;
+    // qDebug() << "Canvas Height: " << info->baseInfo.canvasSize.height();
+    // qDebug() << "Judgeline Pos: " << info->baseInfo.judgeline_pos;
+
+    // // qDebug() << "Effected Logic Y (untranslated_y): " << effected_logic_y;
+    // qDebug() << "Effected Time at Top (Screen Coord to Time): " <<
+    // time_at_top2; qDebug() << "Effected Time at Bottom (Screen Coord to
+    // Time): "
+    //          << time_at_bottom2;
+
+    // // qDebug() << "Linear Logic Y (untranslated_y): " << linear_logic_y;
+    // qDebug() << "Linear Time at Top (Screen Coord to Time): " << time_at_top;
+    // qDebug() << "Linear Time at Bottom (Screen Coord to Time): "
+    //          << time_at_bottom;
+    // qDebug() << "=====================================";
 
     // qDebug() << "Render target time range:[" << time_at_bottom << "~"
     //          << time_at_top << "]";

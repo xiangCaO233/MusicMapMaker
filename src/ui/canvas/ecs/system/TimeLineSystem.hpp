@@ -7,8 +7,8 @@
 #include <ecs/component/TimeLineComponents.hpp>
 #include <ecs/component/TimingComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
-#include <ecs/system/LinearTimeConverter.hpp>
-#include <ecs/system/TimePixelConverter.hpp>
+#include <ecs/system/time2pixel/LinearTimeConverter.hpp>
+#include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <iterator>
 #include <layer/ILayer.hpp>

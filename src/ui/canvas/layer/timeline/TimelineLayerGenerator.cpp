@@ -1,6 +1,6 @@
 #include <QDebug>
 #include <ecs/component/TransformComponents.hpp>
-#include <ecs/system/LinearTimeConverter.hpp>
+#include <ecs/system/time2pixel/LinearTimeConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <layer/timeline/TimelineLayerGenerator.hpp>
@@ -22,9 +22,9 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     auto& ecore = maplayer_manager->core();
 
     // 从管理器获取时间转换器
-    auto converter =
+    auto& converter =
         maplayer_manager->get_time_converter_manager()->getConverter(
-            map->timing_set(), mapinfo->baseInfo,
+            map->timing_set(), mapinfo->baseInfo, mapinfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
     auto liner_converter = LinearTimeConverter(mapinfo);
 

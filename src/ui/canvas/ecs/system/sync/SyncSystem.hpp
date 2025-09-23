@@ -9,7 +9,7 @@
 #include <ecs/component/TimeLineComponents.hpp>
 #include <ecs/component/TimingComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
-#include <ecs/system/TimePixelConverter.hpp>
+#include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <entt.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <mmm/DataStructures.hpp>
@@ -28,7 +28,7 @@ class SyncSystem {
     // 同步工具交互
     void updateToolInteractions(ECSCore& core, const MapCanvasInfo* info,
                                 MapLayerManager* layer_manager,
-                                TimePixelConverter& converter) const;
+                                const TimePixelConverter& converter) const;
 
     // 同步特效实体
     void updateEffects(ECSCore& core, const NoteCollection& notes,
@@ -43,7 +43,10 @@ class SyncSystem {
                         const TimingMap& timings,
                         const BeatTimeline& beatTimeLine,
                         const BeatInfo& beatInfo, const MapCanvasInfo* info,
-                        const TimePixelConverter& converter) const;
+                        const TimePixelConverter& converter
+                        // debug
+                        // ,const TimePixelConverter& converter2
+    ) const;
 
    private:
     std::mutex beatanalyze_mtx;

@@ -118,7 +118,7 @@ set(CANVAS_SOURCES
     src/ui/canvas/tool/BaseTool.cpp
     src/ui/canvas/tool/BaseEditTool.cpp
     src/ui/canvas/tool/ToolInteractionState.cpp
-    src/ui/canvas/tool/select/SelectTool.cpp
+    src/ui/canvas/tool/hand/HandTool.cpp
     src/ui/canvas/tool/note/NoteTool.cpp
     src/ui/canvas/ecs/ECSCore.cpp
     src/ui/canvas/ecs/system/sync/SyncEditStatus.cpp

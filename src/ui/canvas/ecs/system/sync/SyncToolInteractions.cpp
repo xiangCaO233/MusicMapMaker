@@ -100,7 +100,7 @@ void processToolCommands(entt::registry& registry,
                          ToolSystem* system, MMapEditor* editor,
                          ToolInteractionState* toolInteractionState, MMap* map,
                          const MapCanvasInfo* info,
-                         TimePixelConverter& converter) {
+                         const TimePixelConverter& converter) {
     auto cmds = toolCmdQ->drain();
     if (cmds.empty()) return;
 
@@ -113,10 +113,9 @@ void processToolCommands(entt::registry& registry,
 }
 
 // 同步工具交互
-void SyncSystem::updateToolInteractions(ECSCore& core,
-                                        const MapCanvasInfo* info,
-                                        MapLayerManager* layer_manager,
-                                        TimePixelConverter& converter) const {
+void SyncSystem::updateToolInteractions(
+    ECSCore& core, const MapCanvasInfo* info, MapLayerManager* layer_manager,
+    const TimePixelConverter& converter) const {
     // qDebug() << "同步系统->同步工具状态(at pretick)开始";
     auto toolSystem = layer_manager->get_tool_system();
     auto toolCmdQ = layer_manager->get_tool_cmdq();

@@ -2,8 +2,8 @@
 #define MMM_TOOLCOMMANDPROCESSOR_HPP
 
 #include <ecs/component/CoreComponents.hpp>
-#include <ecs/system/TimePixelConverter.hpp>
 #include <ecs/system/ToolSystem.hpp>
+#include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/NotePart.hpp>
 #include <mmm/map/editor/MMapEditor.hpp>
 #include <tool/ToolInteractionState.hpp>
@@ -24,7 +24,7 @@ class ToolCommandProcessor {
     ToolCommandProcessor(entt::registry& r, ToolSystem& s, MMapEditor& e,
                          ToolInteractionState& i, MMap* m,
                          const MapCanvasInfo* info,
-                         TimePixelConverter* converter)
+                         const TimePixelConverter* converter)
         : registry(r),
           system(s),
           interactionState(i),
@@ -121,7 +121,7 @@ class ToolCommandProcessor {
     MMapEditor& mapEditor;
     MMap* map;
 
-    TimePixelConverter* converter;
+    const TimePixelConverter* converter;
     const MapCanvasInfo* info;
     glm::vec4 all_tracks_rect;
     int track_count;

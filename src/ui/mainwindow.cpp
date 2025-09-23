@@ -129,6 +129,7 @@ void MainWindow::use_theme(GlobalTheme theme) {
             break;
         }
     }
+    ui->editor->use_theme(theme);
 }
 
 // 更新标题后缀

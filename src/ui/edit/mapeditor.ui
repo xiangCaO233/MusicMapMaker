@@ -56,6 +56,9 @@
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Switch tool</string>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -81,6 +84,9 @@
        <widget class="QToolButton" name="bg_adjust_toolbutton">
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>background settings</string>
         </property>
         <property name="text">
          <string/>
@@ -117,7 +123,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="timeline_effect_button">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -127,8 +133,53 @@
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Enable Time Point Effect Mapping</string>
+        </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/effect.svg</normaloff>:/icons/effect.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="magnet_to_divisor_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>Snap to beat lines when scrolling</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/magnet.svg</normaloff>:/icons/magnet.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -145,7 +196,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="scroll_direction_button">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -155,8 +206,15 @@
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>Make the canvas scroll with the mouse</string>
+        </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/glsrcs.qrc">
+          <normaloff>:/icons/long-arrow-alt-up.svg</normaloff>:/icons/long-arrow-alt-up.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
