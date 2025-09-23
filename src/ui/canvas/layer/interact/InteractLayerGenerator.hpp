@@ -8,7 +8,12 @@
 class InteractLayerGenerator : public LayerComputerBase {
    public:
     // 构造InteractLayerGenerator
-    using LayerComputerBase::LayerComputerBase;
+    InteractLayerGenerator(LayerManager* manager, ILayer* layer,
+                           FrameSynchronizer* sync,
+                           ToolInteractionState* toolinteractionstate,
+                           QObject* parent = nullptr)
+        : LayerComputerBase(manager, layer, sync, parent),
+          tool_interaction_state(toolinteractionstate) {}
 
     InteractLayerGenerator();
 
@@ -23,6 +28,7 @@ class InteractLayerGenerator : public LayerComputerBase {
 
    private:
     InteractSystem interact_system;
+    ToolInteractionState* tool_interaction_state;
 };
 
 #endif  // MMM_INTERACTLAYERGENERATOR_HPP

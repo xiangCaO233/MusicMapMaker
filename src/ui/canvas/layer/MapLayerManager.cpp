@@ -68,7 +68,8 @@ void MapLayerManager::initializeLayers() {
     auto interact_generator =
         layer_generators()
             .try_emplace(INTERACT, std::make_unique<InteractLayerGenerator>(
-                                       this, interact_layer, &sync()))
+                                       this, interact_layer, &sync(),
+                                       get_tool_interaction_state()))
             .first->second.get();
 
     // 启动图层生成器

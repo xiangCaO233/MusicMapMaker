@@ -26,11 +26,13 @@ struct MouseState {
 
 // --- 子结构：选择状态 ---
 struct SelectionState {
-    std::vector<glm::vec4> selection_areas;
+    // [核心升级] 按按钮类型对选择区域进行分组存储
+    // Key: 鼠标按钮, Value: 该按钮创建的所有选择框的列表
+    std::map<Qt::MouseButton, std::vector<glm::vec4>> per_button_areas;
 
     struct ActiveSession {
         glm::vec2 start_pos;
-        size_t area_index;
+        size_t area_index_in_button_vector;
     };
 
     // 用一个 map 跟踪所有活动的会话

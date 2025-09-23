@@ -19,6 +19,6 @@ void InteractLayerGenerator::generateLayer(LayerManager* manager,
     auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
     auto& ecore = maplayer_manager->core();
 
-    interact_system.update(ecore, mapinfo, l, buffer);
+    interact_system.update(ecore, mapinfo, l, tool_interaction_state, buffer);
     // qDebug() << "interact layer done";
 }

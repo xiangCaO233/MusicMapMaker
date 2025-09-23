@@ -228,33 +228,44 @@ DeleteMarkStates ToolInteractionState::getDeleteMarkStates() const {
 void ToolInteractionState::startNewSelectArea(bool append,
                                               Qt::MouseButton button,
                                               const glm::vec2& start_pos) {
-    // 如果不是追加模式，且这是第一个按下的按钮，则清空所有旧状态
-    if (!append && m_selectionState.active_sessions.empty()) {
-        m_selectionState.selection_areas.clear();
+    // [关键逻辑] 如果不是追加模式，则只清空“当前”按钮的专属区域列表
+    // 其他按钮（如图层）的选择区域将保持不变。
+    if (!append) {
+        m_selectionState.per_button_areas[button].clear();
     }
 
-    // 创建新会话和新选择框
-    m_selectionState.selection_areas.emplace_back(glm::vec4(start_pos, 0, 0));
-    const size_t new_area_index = m_selectionState.selection_areas.size() - 1;
+    // 获取当前按钮的区域列表（如果不存在，map 会自动创建）
+    auto& button_specific_areas = m_selectionState.per_button_areas[button];
+
+    // 在这个专属列表中添加一个新的选择框
+    button_specific_areas.emplace_back(glm::vec4(start_pos, 0, 0));
+    const size_t new_area_index = button_specific_areas.size() - 1;
+
+    // 创建活动会话，记录它正在更新其专属列表中的最后一个元素
     m_selectionState.active_sessions[button] = {start_pos, new_area_index};
 }
 
 void ToolInteractionState::updateSelectArea(
     QFlags<Qt::MouseButton> current_buttons) {
-    // 遍历所有当前正在进行的会话
+    // 遍历所有当前正在拖动的会话
     for (auto const& [button, session] : m_selectionState.active_sessions) {
-        // [关键] 检查这个会话的按钮是否仍在被按下
+        // 检查这个会话对应的按钮是否仍被按下
         if (current_buttons.testFlag(button)) {
+            // 定位到该按钮的专属区域列表
+            auto& button_specific_areas =
+                m_selectionState.per_button_areas[button];
+            // 从列表中找到并更新该会话对应的那个选择框
             auto& area_to_update =
-                m_selectionState.selection_areas[session.area_index];
+                button_specific_areas[session.area_index_in_button_vector];
+
             area_to_update = {session.start_pos,
                               m_mouseState.current_pos - session.start_pos};
-            qDebug() << "button:" << button << "'s area update to "
-                     << QString("[%1,%2,%3,%4]")
-                            .arg(area_to_update.x, 'f', 2)
-                            .arg(area_to_update.y, 'f', 2)
-                            .arg(area_to_update.z, 'f', 2)
-                            .arg(area_to_update.w, 'f', 2);
+            // qDebug() << "button:" << button << "'s area update to "
+            //          << QString("[%1,%2,%3,%4]")
+            //                 .arg(area_to_update.x, 'f', 2)
+            //                 .arg(area_to_update.y, 'f', 2)
+            //                 .arg(area_to_update.z, 'f', 2)
+            //                 .arg(area_to_update.w, 'f', 2);
         }
     }
 }
