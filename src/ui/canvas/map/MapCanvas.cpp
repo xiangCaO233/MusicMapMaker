@@ -34,7 +34,7 @@ void MapCanvas::initializeGL() {
     // 初始化渲染数据循环
     dataloop() = std::make_unique<MapDataLoop>(renderer().get());
     dataloop()->initializeLayerManager();
-    dataloop()->set_targetFPS(desired_fps());
+    dataloop()->set_targetFPS(desired_fps() * 2);
     connect(dataloop().get(), &RenderDataLoop::renderUpdate, this,
             qOverload<>(&QOpenGLWindow::update));
 
@@ -167,6 +167,5 @@ void MapCanvas::creatTools(ToolSystem* toolsystem,
     // 创建物件工具
     tools.try_emplace("Note",
                       new NoteTool(this, toolsystem, cmdq, toolIntState));
-
-    current_tool = tools["Note"];
+    // current_tool = tools["Note"];
 }

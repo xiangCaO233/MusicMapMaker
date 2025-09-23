@@ -46,6 +46,13 @@ class ToolCommandProcessor {
     void process(const ToolCommand& command) {
         std::visit(
             overloaded{
+                // 选中相关
+                [&](const StartSelectCommand& arg) {
+                    // interactionState.endDrag();
+                },
+                [&](const EndSelectCommand& arg) {
+                    // interactionState.endDrag();
+                },
                 // 清理拖动实体状态
                 [&](const ClearDragStateCommand& arg) {
                     interactionState.endDrag();
@@ -291,7 +298,8 @@ class ToolCommandProcessor {
             // NoteCollection 例如:
             if (drag_info.mode == DragMode::Entity) {
                 if (drag_info.dragged_entitiesWithRes.size() == 1) {
-                    if (drag_info.drag_start_hit.part == NotePart::HEAD ||
+                    if (drag_info.drag_start_hit.part == NotePart::NONE ||
+                        drag_info.drag_start_hit.part == NotePart::HEAD ||
                         drag_info.drag_start_hit.part == NotePart::HOLD_HEAD ||
                         drag_info.drag_start_hit.part == NotePart::SLIDE_HEAD) {
                         // 应用新的位置

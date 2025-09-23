@@ -1,12 +1,12 @@
 #ifndef MMM_NOTETOOL_HPP
 #define MMM_NOTETOOL_HPP
 
-#include <tool/BaseTool.hpp>
+#include <tool/BaseEditTool.hpp>
 
-class NoteTool : public BaseTool {
+class NoteTool : public BaseEditTool {
    public:
     // 构造NoteTool
-    using BaseTool::BaseTool;
+    using BaseEditTool::BaseEditTool;
     // 析构NoteTool
     ~NoteTool() override;
 
@@ -15,8 +15,11 @@ class NoteTool : public BaseTool {
     void mousePressEvent(QMouseEvent* e) override;
     void mouseMoveEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
-    void keyPressEvent(QKeyEvent* e) override;
-    void keyReleaseEvent(QKeyEvent* e) override;
+
+    // 实现基类的纯虚函数，提供 NoteTool 专属的拖拽（编辑/移动）逻辑
+    virtual void handleSingleObjectDragStart(
+        QMouseEvent* e,
+        const std::optional<MeshPartInfo>& hoveredInfo) override;
 };
 
 #endif  // MMM_NOTETOOL_HPP

@@ -35,11 +35,7 @@ void ToolInteractionState::startDrag(
     for (auto e : selection) {
         m_dragState.dragged_entitiesWithRes.emplace(e, MapAxis{});
     }
-    if (hit.part != NotePart::NONE) {
-        m_dragState.mode = DragMode::Entity;
-    } else {
-        m_dragState.mode = DragMode::Marquee;
-    }
+    m_dragState.mode = mode;
 }
 
 void ToolInteractionState::endDrag() {

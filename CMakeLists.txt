@@ -116,6 +116,7 @@ set(CANVAS_SOURCES
     src/ui/canvas/FrameRateCounter.cpp
     src/ui/canvas/GLCanvas.cpp
     src/ui/canvas/tool/BaseTool.cpp
+    src/ui/canvas/tool/BaseEditTool.cpp
     src/ui/canvas/tool/ToolInteractionState.cpp
     src/ui/canvas/tool/select/SelectTool.cpp
     src/ui/canvas/tool/note/NoteTool.cpp

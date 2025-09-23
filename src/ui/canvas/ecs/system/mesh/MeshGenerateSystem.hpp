@@ -147,7 +147,7 @@ class MeshGenerateSystem {
                 //                               judgeline_absolute_y,
                 //                           info->realTimeInfo.current_time_info
                 //                               .presentation_canvas_time);
-                if (dragpart == NotePart::HEAD ||
+                if (dragpart == NotePart::NONE || dragpart == NotePart::HEAD ||
                     dragpart == NotePart::HOLD_HEAD ||
                     dragpart == NotePart::SLIDE_HEAD) {
                     // 若为头则计算此时鼠标最近的分拍线时间作为物件时间
@@ -170,6 +170,7 @@ class MeshGenerateSystem {
                 generateMesh(track_index, e, entity_mesh, time, y);
             } else {
                 // 非虚影或即将删除方式渲染
+
                 // 区分是否为即将创建
                 if (uuid == InvalidNoteUUID) {
                     // 无uuid,是即将创建的物件-跟随创建状态中的创建节点

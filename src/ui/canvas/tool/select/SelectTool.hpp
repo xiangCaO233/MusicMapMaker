@@ -1,21 +1,22 @@
 #ifndef MMM_SELECTTOOL_HPP
 #define MMM_SELECTTOOL_HPP
 
-#include <tool/BaseTool.hpp>
+#include <tool/BaseEditTool.hpp>
 
-class SelectTool : public BaseTool {
+class SelectTool : public BaseEditTool {
    public:
     // 构造SelectTool
-    using BaseTool::BaseTool;
+    using BaseEditTool::BaseEditTool;
     // 析构SelectTool
     ~SelectTool() override;
 
    protected:
     // 从Canvas转发过来的事件
     void mousePressEvent(QMouseEvent* e) override;
-    void mouseMoveEvent(QMouseEvent* e) override;
-    void mouseReleaseEvent(QMouseEvent* e) override;
-    void keyPressEvent(QKeyEvent* e) override;
-    void keyReleaseEvent(QKeyEvent* e) override;
+
+    // 实现基类的纯虚函数，提供 SelectTool 的强制移动逻辑
+    virtual void handleSingleObjectDragStart(
+        QMouseEvent* e,
+        const std::optional<MeshPartInfo>& hoveredInfo) override;
 };
 #endif  // MMM_SELECTTOOL_HPP

@@ -7,7 +7,18 @@
 struct StartDragCommand {
     DragStartInfo common_info;
     const MeshPartInfo hit_info;
+    bool move_only{false};
 };
+
+// 开始选择指令
+struct StartSelectCommand {
+    DragStartInfo common_info;
+    // 追加模式(不清空已有选择项)
+    bool append{false};
+};
+
+// 结束选择指令
+struct EndSelectCommand {};
 
 struct StartDragSelectionCommand {
     DragStartInfo common_info;
@@ -47,7 +58,8 @@ struct ConfirmDeleteCommand {
 
 // 用 std::variant 将所有命令类型聚合到一个类型中
 using ToolCommand =
-    std::variant<StartDragCommand, StartDragSelectionCommand, EndDragCommand,
+    std::variant<StartDragCommand, StartSelectCommand, EndSelectCommand,
+                 StartDragSelectionCommand, EndDragCommand,
                  ClearDragStateCommand, StartCreateNewNormalNoteCommand,
                  StartCreateNewCompositeNoteCommand, UpdateCreateNodeCommand,
                  ConfirmCreateNewNoteCommand, MarkDeleteCommand,
