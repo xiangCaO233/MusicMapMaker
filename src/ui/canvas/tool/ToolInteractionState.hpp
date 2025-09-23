@@ -2,6 +2,7 @@
 #define MMM_TOOLINTERACTIONSTATE_HPP
 
 #include <qnamespace.h>
+#include <qreadwritelock.h>
 
 #include <entt.hpp>
 #include <glm/glm.hpp>
@@ -115,6 +116,9 @@ class ToolInteractionState {
 
     MouseState getMouseState() const;
 
+    glm::vec2 getCurrentMousePos() const;
+    glm::vec2 getMousePressPos(const Qt::MouseButton button) const;
+
     // 悬浮相关 (由 pretick 写入, 工作线程读取)
     void setHover(const std::optional<MeshPartInfo> hover);
     std::optional<MeshPartInfo> getHover() const;
@@ -161,6 +165,8 @@ class ToolInteractionState {
 
     // 私有状态变量
     MouseState m_mouseState;
+    // mutable是关键, 它允许在const成员函数中锁定和解锁非const的锁
+    mutable QReadWriteLock m_mouseStateLock;
     // 当前悬浮的对象
     std::optional<MeshPartInfo> m_hovered;
     DragState m_dragState;

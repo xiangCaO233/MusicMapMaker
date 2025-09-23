@@ -14,9 +14,12 @@ InteractLayerGenerator::~InteractLayerGenerator() {
 void InteractLayerGenerator::generateLayer(LayerManager* manager,
                                            RenderDataBuffer& buffer) {
     // qDebug() << "生成交互图层";
-    auto maplayer_manager = static_cast<MapLayerManager*>(manager);
     auto l = layer<RealTimeInteractLayer>();
     auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
+    if (!mapinfo->editorInfo.map) {
+        return;
+    }
+    auto maplayer_manager = static_cast<MapLayerManager*>(manager);
     auto& ecore = maplayer_manager->core();
 
     interact_system.update(ecore, mapinfo, l, tool_interaction_state, buffer);

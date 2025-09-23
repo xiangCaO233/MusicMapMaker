@@ -136,10 +136,10 @@ class MeshGenerateSystem {
                 // --------------------物件头拖动交互--------------------------
                 entity_mesh.state = MeshState::GHOST;
                 auto drag_info = tool_interaction_state->getDragState();
-                auto mouseState = tool_interaction_state->getMouseState();
                 auto& dragpart = drag_info.drag_start_hit.part;
-                auto& mousePressPos = mouseState.press_pos;
-                auto& mousePos = mouseState.current_pos;
+                auto mousePressPos =
+                    tool_interaction_state->getMousePressPos(Qt::LeftButton);
+                auto mousePos = tool_interaction_state->getCurrentMousePos();
                 // auto mouse_time =
                 //     converter.pixelToTime(info->baseInfo.canvasSize.height()
                 //     -

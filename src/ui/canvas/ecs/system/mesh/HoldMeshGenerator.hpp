@@ -133,8 +133,8 @@ class HoldMeshGenerator {
         if (drag_info.dragged_entitiesWithRes.contains(e) &&
             drag_info.drag_start_hit.part == NotePart::HOLD_END) {
             auto mousePressPos =
-                tool_interaction_state->getMouseState().press_pos;
-            auto mousePos = tool_interaction_state->getMouseState().current_pos;
+                tool_interaction_state->getMousePressPos(Qt::LeftButton);
+            auto mousePos = tool_interaction_state->getCurrentMousePos();
             auto end_axis = getPixelMapAxis(mousePos);
             // 验证合法性
             auto validity = end_axis.time >= thistime;

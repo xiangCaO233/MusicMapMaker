@@ -161,6 +161,9 @@
        </item>
        <item>
         <layout class="QVBoxLayout" name="canvasconfig_layout">
+         <property name="spacing">
+          <number>6</number>
+         </property>
          <property name="bottomMargin">
           <number>6</number>
          </property>

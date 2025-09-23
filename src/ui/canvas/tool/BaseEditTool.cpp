@@ -49,7 +49,7 @@ void BaseEditTool::mousePressEvent(QMouseEvent* e) {
             return;  // 多选拖拽逻辑已处理完毕
         }
 
-        // --- 委托逻辑: 左键拖拽单个物件 ---
+        // 左键拖拽单个物件
         // 此时，一定是拖拽单个物件（无论它之前是否被选中）
         // 调用虚函数，让子类决定具体行为
         handleSingleObjectDragStart(e, hoveredinfo);

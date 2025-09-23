@@ -1,3 +1,4 @@
+
 #include <QDebug>
 #include <tool/ToolInteractionState.hpp>
 // 线程安全的公共接口
@@ -7,6 +8,8 @@
 void ToolInteractionState::updateMousePress(
     const glm::vec2& pos, Qt::MouseButton button,
     QFlags<Qt::MouseButton> allButtons) {
+    // 使用写入锁，确保在更新期间没有其他线程可以读取
+    const QWriteLocker locker(&m_mouseStateLock);
     m_mouseState.current_pos = pos;
     m_mouseState.pressed_buttons = allButtons;
     m_mouseState.press_pos[button] = pos;  // 记录按下位置
@@ -14,6 +17,8 @@ void ToolInteractionState::updateMousePress(
 
 void ToolInteractionState::updateMouseMove(const glm::vec2& pos,
                                            QFlags<Qt::MouseButton> allButtons) {
+    // 使用写入锁，确保在更新期间没有其他线程可以读取
+    const QWriteLocker locker(&m_mouseStateLock);
     m_mouseState.current_pos = pos;
     m_mouseState.pressed_buttons = allButtons;  // 移动时也可能伴随按键状态变化
 
@@ -30,12 +35,34 @@ void ToolInteractionState::updateMouseMove(const glm::vec2& pos,
 void ToolInteractionState::updateMouseRelease(
     const glm::vec2& pos, Qt::MouseButton button,
     QFlags<Qt::MouseButton> allButtons) {
+    // 使用写入锁，确保在更新期间没有其他线程可以读取
+    const QWriteLocker locker(&m_mouseStateLock);
     m_mouseState.current_pos = pos;
     m_mouseState.pressed_buttons = allButtons;
     m_mouseState.press_pos.erase(button);  // 移除释放按钮的按下记录
 }
 
-MouseState ToolInteractionState::getMouseState() const { return m_mouseState; }
+MouseState ToolInteractionState::getMouseState() const {
+    // 使用读取锁，允许多个读取者并发
+    const QReadLocker locker(&m_mouseStateLock);
+    return m_mouseState;  // 返回一个深拷贝
+}
+
+// 如果只需要某个字段，可以提供专门的getter以提高效率
+glm::vec2 ToolInteractionState::getCurrentMousePos() const {
+    const QReadLocker locker(&m_mouseStateLock);
+    return m_mouseState.current_pos;
+}
+
+glm::vec2 ToolInteractionState::getMousePressPos(
+    const Qt::MouseButton button) const {
+    const QReadLocker locker(&m_mouseStateLock);
+    auto it = m_mouseState.press_pos.find(button);
+    if (it != m_mouseState.press_pos.end()) {
+        return it->second;
+    }
+    return glm::vec2{0};
+}
 
 // 悬浮相关 (由 pretick 写入, 工作线程读取)
 void ToolInteractionState::setHover(const std::optional<MeshPartInfo> hover) {
@@ -246,6 +273,7 @@ void ToolInteractionState::startNewSelectArea(bool append,
 }
 
 void ToolInteractionState::updateSelectArea(
+    // QReadLocker locker();
     QFlags<Qt::MouseButton> current_buttons) {
     // 遍历所有当前正在拖动的会话
     for (auto const& [button, session] : m_selectionState.active_sessions) {
