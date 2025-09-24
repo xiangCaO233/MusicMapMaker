@@ -33,8 +33,9 @@ void HandTool::handleSingleObjectDragStart(
     QMouseEvent* e, const std::optional<MeshPartInfo>& hoveredInfo) {
     // SelectTool 的职责是选择和移动。当拖拽单个物件时：
     // 发送一个明确的“拖拽选中项”命令，而不是可能触发编辑的 StartDragCommand
-    tool_command_queue()->push(
-        StartDragSelectionCommand{glm::vec2{e->pos().x(), e->pos().y()},
-                                  e->modifiers(),
-                                  {hoveredInfo.value().source_entity}});
+    tool_command_queue()->push(StartDragSelectionCommand{
+        glm::vec2{e->pos().x(), e->pos().y()},
+        e->modifiers(),
+        {hoveredInfo.has_value() ? hoveredInfo.value() : MeshPartInfo{}},
+        {hoveredInfo.value().source_entity}});
 }

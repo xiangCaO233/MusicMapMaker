@@ -30,6 +30,7 @@ struct EndSelectCommand {
 
 struct StartDragSelectionCommand {
     DragStartInfo common_info;
+    const MeshPartInfo hit_info;
     std::unordered_set<entt::entity> selection;
 };
 

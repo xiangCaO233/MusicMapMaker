@@ -101,7 +101,7 @@ class ToolCommandProcessor {
 
                 // 拖拽选择集
                 [&](const StartDragSelectionCommand& arg) {
-                    startDragEntities(arg.selection);
+                    startDragEntities(arg.selection, arg.hit_info);
                 },
 
                 // 结束拖拽命令
@@ -269,6 +269,20 @@ class ToolCommandProcessor {
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,
                            MeshPartInfo part = {}) {
+        std::unordered_map<entt::entity, MapAxis> selections_with_ress;
+        // 获取所有选中物件的原始位置
+        for (const auto& selected_entity : selections) {
+            auto& [track, uuid] = registry.get<NoteComponent>(selected_entity);
+            auto& [time] = registry.get<TimeComponent>(selected_entity);
+            MapAxis source_axis{time, time, track};
+            source_axis.y = converter->timeToPixel(
+                source_axis.time, presentation_canvas_time, info);
+            source_axis.x =
+                all_tracks_rect.x +
+                (float(source_axis.track) + 0.5f) * single_track_width;
+            selections_with_ress.try_emplace(selected_entity, source_axis);
+        }
+
         // 更新 TIS 的选择集
         interactionState.setSelection(Qt::LeftButton, selections);
 
@@ -278,7 +292,7 @@ class ToolCommandProcessor {
             // 多选时没有单一的命中部位(不传入part参数/使用none)
             part,
             // 选中列表
-            selections);
+            selections_with_ress);
         // qDebug() << "startDrag:" << to_string(part.part);
 
         // 为所有被拖拽的实体附加虚影组件

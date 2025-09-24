@@ -82,12 +82,9 @@ std::optional<MeshPartInfo> ToolInteractionState::getHover() const {
 // 拖拽相关 (由 pretick 写入, 工作线程读取)
 void ToolInteractionState::startDrag(
     DragMode mode, MeshPartInfo hit,
-    const std::unordered_set<entt::entity>& selection) {
+    const std::unordered_map<entt::entity, MapAxis>& selection) {
     m_dragState.drag_start_hit = hit;
-    m_dragState.dragged_entitiesWithRes.clear();
-    for (auto e : selection) {
-        m_dragState.dragged_entitiesWithRes.emplace(e, MapAxis{});
-    }
+    m_dragState.dragged_entitiesWithRes = selection;
     m_dragState.mode = mode;
 }
 

@@ -6,7 +6,7 @@ layout(location = 0) out vec4 out_SceneColor;
 // layout(location = 1) 画到当前FBO的 GL_COLOR_ATTACHMENT1
 layout(location = 1) out vec4 out_GlowMask;
 // Uniform 投影矩阵
-uniform mat4 projection;
+// uniform mat4 projection;
 
 // 是否绘制线框
 uniform bool u_IsDrawingWireframe;
@@ -15,7 +15,7 @@ uniform bool u_IsDrawingWireframe;
 uniform sampler2DArray u_samplerarray;
 
 // 原始的发光纹理遮罩
-uniform sampler2D glowmask;
+// uniform sampler2D glowmask;
 
 // --- 输入：从几何着色器接收的接口块 ---
 in GS_OUT {
@@ -377,16 +377,12 @@ void main() {
 
     if (fs_in.f_TexScaleStratergy == CHARACTER) {
         out_SceneColor = finalColor;
-        vec4 source_glow_mask = texture(glowmask, (projection * vec4(fs_in.v_TexCoord, 0.0, 1.0)).xy);
-        vec4 new_glow_mask;
         if (fs_in.f_RadiusEffect == GLOWING) {
-            new_glow_mask =
+            out_GlowMask =
                 vec4(finalColor.rgb * fs_in.f_RadiusEffectParam, 1.);
         } else {
-            new_glow_mask = vec4(0., 0., 0., 1.);
+            out_GlowMask = vec4(0., 0., 0., 1.);
         }
-        out_GlowMask =
-            1.0 - (1.0 - source_glow_mask) * (1.0 - new_glow_mask);
         return;
     }
 
@@ -462,14 +458,11 @@ void main() {
     }
     out_SceneColor = finalColor;
 
-    vec4 source_glow_mask = texture(glowmask, (projection * vec4(fs_in.v_TexCoord, 0.0, 1.0)).xy);
-    vec4 new_glow_mask;
+    // vec4 source_glow_mask = texture(glowmask, (vec4(fs_in.v_TexCoord, 0.0, 1.0)).xy);
     if (fs_in.f_RadiusEffect == GLOWING) {
-        new_glow_mask =
+        out_GlowMask =
             finalColor * fs_in.f_RadiusEffectParam;
     } else {
-        new_glow_mask = vec4(0., 0., 0., 1.);
+        out_GlowMask = vec4(0., 0., 0., 1.);
     }
-    out_GlowMask =
-        source_glow_mask + new_glow_mask;
 }

@@ -369,6 +369,12 @@ void Renderer2D::render() {
            cvs);  // 清空 attachment 1
 
     // GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
+    // 在渲染循环前开启并设置混合
+    GLCALL(cvs->glEnable(GL_BLEND), cvs);
+    // 为颜色附件1 (glowmask) 设置加法混合
+    // 公式: Result = SrcColor * 1 + DstColor * 1
+    GLCALL(cvs->glBlendEquationi(1, GL_FUNC_ADD), cvs);
+    GLCALL(cvs->glBlendFunci(1, GL_ONE, GL_ONE), cvs);
 
     // === 2. 在单个循环中通过状态追踪进行渲染 ===
     QOpenGLShaderProgram* current_shader{nullptr};
@@ -401,10 +407,10 @@ void Renderer2D::render() {
         GLCALL(cvs->glActiveTexture(GL_TEXTURE0), cvs);
         GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, batch.texture_array_id),
                cvs);
-        GLCALL(cvs->glActiveTexture(GL_TEXTURE1), cvs);
-        GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]), cvs);
         current_shader->setUniformValue("u_samplerarray", 0);
-        current_shader->setUniformValue("glowmask", 1);
+        // GLCALL(cvs->glActiveTexture(GL_TEXTURE1), cvs);
+        // GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]),
+        // cvs); current_shader->setUniformValue("glowmask", 1);
 
         // --- 发起绘制调用 ---
         drawBatch(batch, current_shader, draw_wireframe);

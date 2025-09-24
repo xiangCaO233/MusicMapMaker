@@ -74,6 +74,7 @@ enum class CreateMode {
     // 复合
     Composite,
 };
+
 struct MapAxis {
     int64_t time{0};
     int64_t mousetime{0};
@@ -83,6 +84,16 @@ struct MapAxis {
 
     bool operator==(const MapAxis& other) const {
         return time == other.time && track == other.track;
+    }
+
+    MapAxis operator-(const MapAxis& other) const {
+        return {time - other.time, mousetime - other.mousetime,
+                track - other.track, x - other.x, y - other.y};
+    }
+
+    MapAxis operator+(const MapAxis& other) const {
+        return {time + other.time, mousetime + other.mousetime,
+                track + other.track, x + other.x, y + other.y};
     }
 };
 
@@ -134,7 +145,7 @@ class ToolInteractionState {
 
     // 拖拽相关 (由 pretick 写入, 工作线程读取)
     void startDrag(DragMode mode, MeshPartInfo hit,
-                   const std::unordered_set<entt::entity>& selection);
+                   const std::unordered_map<entt::entity, MapAxis>& selection);
     void endDrag();
 
     void setDragValidity(bool isValid);

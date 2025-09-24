@@ -66,6 +66,15 @@ class NormalRenderSystem {
                     cmd.baseInfo.color = {1.f, 1.f, 1.f, .4f};
                     break;
                 }
+                case MeshState::GLOW: {
+                    rquad.quad.state = PartState::GLOW;
+                    break;
+                }
+                case MeshState::GLOW_AND_EMPHASIZE: {
+                    cmd.baseInfo.color = {1.f, 1.f, .0f, .4f};
+                    rquad.quad.state = PartState::GLOW;
+                    break;
+                }
                 case MeshState::MARKDELETE: {
                     cmd.baseInfo.color = {1.f, .1f, .1f, .8f};
                 }

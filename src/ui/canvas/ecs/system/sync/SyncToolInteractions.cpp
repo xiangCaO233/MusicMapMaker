@@ -1,7 +1,7 @@
 #include <ecs/system/sync/SyncSystem.hpp>
 #include <ecs/system/sync/ToolCommandProcessor.hpp>
 #include <info/NotePart.hpp>
-#include <iostream>
+// #include <iostream>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
 #include <tool/ThreadSafeQueue.hpp>
@@ -181,18 +181,23 @@ void updateSelections(entt::registry& registry, ToolSystem* toolSystem,
                                    note.track_index <= area.end_track);
 
             if (time_overlaps && track_overlaps) {
-                selected_entities.insert(entity);
+                if (registry.all_of<ChildOfComponent>(entity)) {
+                    auto& [parent, index] =
+                        registry.get<ChildOfComponent>(entity);
+                    if (!selected_entities.contains(parent)) {
+                        selected_entities.insert(parent);
+                    }
+                } else {
+                    if (!selected_entities.contains(entity)) {
+                        selected_entities.insert(entity);
+                    }
+                }
                 // 一旦被选中，就无需再检查其他选择框了
                 break;
             }
         }
     }
 
-    // qDebug() << "选中区内物件";
-    // for (const auto& e : selected_entities) {
-    //     std::cout << static_cast<uint32_t>(e) << ",";
-    // }
-    // std::cout << std::endl;
     // 更新最终的选择状态
     toolInteractionState->setSelection(Qt::LeftButton, selected_entities);
 }

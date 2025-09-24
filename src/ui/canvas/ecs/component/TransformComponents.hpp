@@ -18,6 +18,8 @@ struct TransformComponent {
 enum class MeshState {
     NONE,
     GHOST,
+    GLOW,
+    GLOW_AND_EMPHASIZE,
     MARKDELETE,
 };
 

@@ -25,6 +25,23 @@ void BaseEditTool::mousePressEvent(QMouseEvent* e) {
     //     selections.insert(entity);
     // }
 
+    // 左键拖拽多选物件
+    if (buttons.testFlag(Qt::LeftButton)) {
+        // 确保悬浮物件在选区内，且选区大于1
+        if (selections.size() > 1 && selections.contains(entity)) {
+            tool_command_queue()->push(StartDragSelectionCommand{
+                glm::vec2{e->pos().x(), e->pos().y()}, e->modifiers(),
+                hoveredinfo, selections});
+            return;  // 多选拖拽逻辑已处理完毕
+        }
+
+        // 左键拖拽单个物件
+        // 此时，一定是拖拽单个物件（无论它之前是否被选中）
+        // 调用虚函数，让子类决定具体行为
+        handleSingleObjectDragStart(e, hoveredinfo);
+        return;
+    }
+
     // 右键标记删除
     if (buttons.testFlag(Qt::RightButton)) {
         // 如果是多选，则标记整个选区
@@ -37,22 +54,6 @@ void BaseEditTool::mousePressEvent(QMouseEvent* e) {
         }
         // 右键逻辑已处理完毕
         return;
-    }
-
-    // 左键拖拽多选物件
-    if (buttons.testFlag(Qt::LeftButton)) {
-        // 确保悬浮物件在选区内，且选区大于1
-        if (selections.size() > 1 && selections.contains(entity)) {
-            tool_command_queue()->push(
-                StartDragSelectionCommand{glm::vec2{e->pos().x(), e->pos().y()},
-                                          e->modifiers(), selections});
-            return;  // 多选拖拽逻辑已处理完毕
-        }
-
-        // 左键拖拽单个物件
-        // 此时，一定是拖拽单个物件（无论它之前是否被选中）
-        // 调用虚函数，让子类决定具体行为
-        handleSingleObjectDragStart(e, hoveredinfo);
     }
 }
 
