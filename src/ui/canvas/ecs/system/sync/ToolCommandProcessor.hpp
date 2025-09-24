@@ -350,6 +350,20 @@ class ToolCommandProcessor {
                     registry.emplace<DirtyMarkComponent>(entity);
                 } else {
                     // 拖拽多个
+                    std::unordered_map<NoteUUID, std::pair<int64_t, int>>
+                        notes_to_move;
+                    for (const auto& [e, axis] :
+                         drag_info.dragged_entitiesWithRes) {
+                        // 获取新的位置
+                        auto [track, uuid] = registry.get<NoteComponent>(e);
+                        auto [time] = registry.get<TimeComponent>(e);
+                        notes_to_move.try_emplace(
+                            uuid,
+                            std::pair<int64_t, int>(axis.time, axis.track));
+                        // 附加脏组件(下一帧更新)
+                        registry.emplace<DirtyMarkComponent>(e);
+                    }
+                    mapEditor.moveNotes(notes_to_move);
                 }
             }
         }

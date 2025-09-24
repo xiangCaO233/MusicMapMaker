@@ -448,7 +448,7 @@
               <item>
                <widget class="QLabel" name="judgeline_pos_value_label">
                 <property name="text">
-                 <string>80%</string>
+                 <string notr="true">80%</string>
                 </property>
                </widget>
               </item>
@@ -522,14 +522,14 @@
               <item row="1" column="3">
                <widget class="QLabel" name="object_height_scale_value_label">
                 <property name="text">
-                 <string>100%</string>
+                 <string notr="true">100%</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="3">
                <widget class="QLabel" name="object_width_scale_value_label">
                 <property name="text">
-                 <string>100%</string>
+                 <string notr="true">100%</string>
                 </property>
                </widget>
               </item>

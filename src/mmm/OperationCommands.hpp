@@ -245,63 +245,143 @@ class RemoveTimingsAtPointCommand : public OperationCommand {
     std::vector<std::unique_ptr<Timing>> m_removed_timings_backup;
 };
 
+// 存储单个Note的更新状态
+struct NoteUpdateState {
+    NoteUUID id;
+    std::unique_ptr<Note> old_data;
+    std::unique_ptr<Note> new_data;
+};
+
+class UpdateMultipleNotesCommand : public OperationCommand {
+   public:
+    UpdateMultipleNotesCommand(NoteCollection& collection,
+                               NoteIDManager& id_manager,
+                               std::vector<NoteUpdateState> update_states)
+        : m_collection(collection),
+          m_id_manager(id_manager),
+          m_update_states(std::move(update_states)) {}
+
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
+        bool success = true;
+        NoteUUIDS updated_uuids;
+        // 正向遍历，执行所有更新
+        for (auto& state : m_update_states) {
+            NoteHandle handle = m_id_manager.get_handle(state.id);
+            if (!handle.isValid() || !state.new_data) {
+                success = false;
+                continue;  // 跳过无效的
+            }
+
+            // 使用 update_note，并将返回的旧数据存起来，以备 undo
+            auto returned_old =
+                m_collection.update_note(handle, std::move(state.new_data));
+
+            if (returned_old) {
+                // 将 new_data "换回来"，以便 redo 时使用
+                state.new_data = std::move(returned_old);
+                updated_uuids.push_back(state.id);
+            } else {
+                success = false;
+            }
+        }
+        editEventQueue.push({MMapEditEventType::NotesUpdated, updated_uuids});
+        return success;
+    }
+
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
+        // 反向遍历，以正确的顺序撤销操作
+        // 这在某些依赖顺序的操作中很重要，这里保持这个好习惯
+        NoteUUIDS updated_uuids;
+        for (auto it = m_update_states.rbegin(); it != m_update_states.rend();
+             ++it) {
+            auto& state = *it;
+            NoteHandle handle = m_id_manager.get_handle(state.id);
+            if (!handle.isValid() || !state.old_data) {
+                continue;
+            }
+
+            // 使用 update_note，将旧数据写回去
+            auto returned_new =
+                m_collection.update_note(handle, std::move(state.old_data));
+
+            if (returned_new) {
+                // 将 old_data "换回来"，以便再次 undo
+                state.old_data = std::move(returned_new);
+                updated_uuids.push_back(state.id);
+            }
+        }
+        editEventQueue.push({MMapEditEventType::NotesUpdated, updated_uuids});
+    }
+
+   private:
+    NoteCollection& m_collection;
+    NoteIDManager& m_id_manager;
+
+    // 存储所有需要更新的Note的状态
+    // 注意：我们将 new_data 和 old_data 在 execute/undo 之间来回交换
+    std::vector<NoteUpdateState> m_update_states;
+};
+
 class UpdateNoteCommand : public OperationCommand {
    public:
     UpdateNoteCommand(NoteCollection& collection, NoteIDManager& id_manager,
                       NoteUUID id, std::unique_ptr<Note> new_data)
         : m_collection(collection),
           m_id_manager(id_manager),
-          m_id(id),
-          m_new_data(std::move(new_data)) {
-        // 在构造时捕获“之前”的状态
-        NoteHandle handle = m_id_manager.get_handle(m_id);
+          m_state({id, nullptr,
+                   std::move(new_data)})  // 直接在初始化列表中构造 state
+    {
+        // 在构造时捕获“之前”的状态，并存入 state
+        NoteHandle handle = m_id_manager.get_handle(m_state.id);
         const Note* old_note_ptr = m_collection.get_note(handle);
         if (old_note_ptr) {
-            m_old_data = old_note_ptr->clone(old_note_ptr->map());
+            m_state.old_data = old_note_ptr->clone(old_note_ptr->map());
         }
     }
 
     bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
-        if (!m_new_data || !m_old_data) return false;
+        if (!m_state.new_data || !m_state.old_data) return false;
 
-        NoteHandle handle = m_id_manager.get_handle(m_id);
+        NoteHandle handle = m_id_manager.get_handle(m_state.id);
         if (!handle.isValid()) return false;
 
-        // update_note 现在应该返回被替换的旧数据的 unique_ptr
-        auto returned_old =
-            m_collection.update_note(handle, std::move(m_new_data));
-
-        if (returned_old) {
-            m_new_data = returned_old->clone(
-                returned_old->map());  // 更新 new_data 为实际应用的状态
-            editEventQueue.push({MMapEditEventType::NoteUpdated, m_id});
+        // 使用 update_note，并将返回的数据进行“乒乓交换”
+        auto returned_data =
+            m_collection.update_note(handle, std::move(m_state.new_data));
+        if (returned_data) {
+            m_state.new_data = std::move(returned_data);  // 换回来
+            editEventQueue.push({MMapEditEventType::NoteUpdated, m_state.id});
             return true;
         }
         return false;
     }
 
     void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
-        if (!m_old_data || !m_new_data) return;
+        if (!m_state.old_data || !m_state.new_data) return;
 
-        NoteHandle handle = m_id_manager.get_handle(m_id);
+        NoteHandle handle = m_id_manager.get_handle(m_state.id);
         if (!handle.isValid()) return;
 
-        auto returned_new =
-            m_collection.update_note(handle, std::move(m_old_data));
-
-        if (returned_new) {
-            m_old_data =
-                returned_new->clone(returned_new->map());  // 更新 old_data
-            editEventQueue.push({MMapEditEventType::NoteUpdated, m_id});
+        // 使用 update_note，并将返回的数据进行“乒乓交换”
+        auto returned_data =
+            m_collection.update_note(handle, std::move(m_state.old_data));
+        if (returned_data) {
+            m_state.old_data = std::move(returned_data);  // 换回来
+            editEventQueue.push({MMapEditEventType::NoteUpdated, m_state.id});
         }
     }
 
    private:
     NoteCollection& m_collection;
-    NoteIDManager& m_id_manager;  // 增加了对 ID 管理器的引用
-    NoteUUID m_id;                // 存储稳定ID，而不是 NoteHandle
-    std::unique_ptr<Note> m_old_data;
-    std::unique_ptr<Note> m_new_data;
+    NoteIDManager& m_id_manager;
+
+    NoteUpdateState m_state;
+};
+
+// 用于存储单个 Note 添加操作的状态
+struct NoteAddState {
+    std::unique_ptr<Note> note_data;
+    NoteUUID generated_id = InvalidNoteUUID;  // 在 execute 时生成
 };
 
 class AddNoteCommand : public OperationCommand {
@@ -357,6 +437,73 @@ class AddNoteCommand : public OperationCommand {
     std::unique_ptr<Note> m_note_to_add;
     std::unique_ptr<Note> m_note_backup_for_redo;
     NoteUUID m_id;  // 存储稳定 ID
+};
+
+class AddMultipleNotesCommand : public OperationCommand {
+   public:
+    AddMultipleNotesCommand(NoteCollection& collection,
+                            NoteIDManager& id_manager,
+                            std::vector<std::unique_ptr<Note>> notes_to_add)
+        : m_collection(collection), m_id_manager(id_manager) {
+        // 将传入的 note 数据转换为内部状态结构
+        for (auto& note : notes_to_add) {
+            m_add_states.push_back({std::move(note), InvalidNoteUUID});
+        }
+    }
+
+    bool execute(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
+        bool success = true;
+        // 正向遍历，执行所有添加操作
+        for (auto& state : m_add_states) {
+            if (!state.note_data) {
+                success = false;
+                continue;
+            }
+
+            NoteHandle new_handle =
+                m_collection.add_note(std::move(state.note_data));
+            if (!new_handle.isValid()) {
+                success = false;
+                continue;
+            }
+
+            // 首次执行时，注册新ID；重做时，更新旧ID对应的句柄
+            if (state.generated_id == InvalidNoteUUID) {
+                state.generated_id = m_id_manager.register_new_note(new_handle);
+            } else {
+                m_id_manager.update_handle(state.generated_id, new_handle);
+            }
+
+            editEventQueue.push(
+                {MMapEditEventType::NoteAdded, state.generated_id});
+        }
+        return success;
+    }
+
+    void undo(ThreadSafeQueue<MMapEditEvent>& editEventQueue) override {
+        // 反向遍历，移除所有本次添加的 Note
+        for (auto it = m_add_states.rbegin(); it != m_add_states.rend(); ++it) {
+            auto& state = *it;
+            if (state.generated_id == InvalidNoteUUID) continue;
+
+            NoteHandle handle = m_id_manager.get_handle(state.generated_id);
+            if (!handle.isValid()) continue;
+
+            // 移除 Note 并将数据备份回来，以便 Redo
+            state.note_data = m_collection.remove_note(handle);
+
+            if (state.note_data) {
+                m_id_manager.remove_note(state.generated_id);
+                editEventQueue.push(
+                    {MMapEditEventType::NoteRemoved, state.generated_id});
+            }
+        }
+    }
+
+   private:
+    NoteCollection& m_collection;
+    NoteIDManager& m_id_manager;
+    std::vector<NoteAddState> m_add_states;
 };
 
 class RemoveNoteCommand : public OperationCommand {

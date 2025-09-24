@@ -125,6 +125,102 @@ void MMapEditor::moveNote(NoteUUID uuid, int64_t timestamp, int track) {
     updateNoteData(uuid, std::move(new_note_data));
 }
 
+// 移动多个物件到指定位置
+void MMapEditor::moveNotes(
+    const std::unordered_map<NoteUUID, std::pair<int64_t, int>>&
+        notes_to_move) {
+    if (notes_to_move.empty()) {
+        return;
+    }
+
+    // 1. 准备一个 vector 来存储所有 Note 的更新状态
+    std::vector<NoteUpdateState> update_states;
+    update_states.reserve(notes_to_move.size());
+
+    // 2. 遍历输入的 map，为每个要移动的 Note 生成新旧数据
+    for (const auto& [uuid, new_pos] : notes_to_move) {
+        NoteHandle handle = map->note_uuids().get_handle(uuid);
+        const Note* old_note_ptr = map->note_set().get_note(handle);
+
+        if (!old_note_ptr) {
+            // 如果找不到原始Note，就跳过
+            continue;
+        }
+
+        // a. 克隆旧数据，用于 undo
+        std::unique_ptr<Note> old_data = old_note_ptr->clone(map);
+
+        // b. 克隆并修改，生成新数据，用于 execute
+        std::unique_ptr<Note> new_data = old_note_ptr->clone(map);
+        new_data->set_timestamp(new_pos.first);  // a.k.a. timestamp
+        new_data->set_trackpos(new_pos.second);  // a.k.a. track
+
+        // c. 将这一对新旧状态存入 vector
+        update_states.push_back(
+            {uuid, std::move(old_data), std::move(new_data)});
+    }
+
+    // 如果没有任何有效的 Note 被处理，则不创建 Command
+    if (update_states.empty()) {
+        return;
+    }
+
+    // 3. 创建并执行宏命令
+    auto command = std::make_unique<UpdateMultipleNotesCommand>(
+        map->note_set(), map->note_uuids(), std::move(update_states));
+
+    operationManager.executeCommand(std::move(command));
+}
+
+// 拷贝到指定时间位置
+void MMapEditor::copyNotesTo(const std::unordered_set<NoteUUID>& uuids_to_copy,
+                             NoteUUID referenceUUID, int64_t des_time) {
+    if (uuids_to_copy.empty() || referenceUUID == InvalidNoteUUID) {
+        return;
+    }
+
+    // 找到参考 Note，并计算时间偏移量
+    NoteHandle ref_handle = map->note_uuids().get_handle(referenceUUID);
+    const Note* ref_note = map->note_set().get_note(ref_handle);
+    if (!ref_note) {
+        // 如果参考Note不存在，则无法计算偏移，操作失败
+        return;
+    }
+    const int64_t time_offset = des_time - ref_note->timestamp();
+
+    // 准备一个 vector 来存储所有新创建的 Note 的数据
+    std::vector<std::unique_ptr<Note>> new_notes_data;
+    new_notes_data.reserve(uuids_to_copy.size());
+
+    // 遍历所有待拷贝的 UUID
+    for (const auto& uuid : uuids_to_copy) {
+        NoteHandle handle = map->note_uuids().get_handle(uuid);
+        const Note* note_to_copy = map->note_set().get_note(handle);
+
+        if (!note_to_copy) {
+            continue;
+        }
+
+        // 克隆 Note 的完整数据
+        std::unique_ptr<Note> new_note = note_to_copy->clone(map);
+
+        // 应用时间偏移量，计算新的时间戳
+        new_note->set_timestamp(note_to_copy->timestamp() + time_offset);
+
+        new_notes_data.push_back(std::move(new_note));
+    }
+
+    if (new_notes_data.empty()) {
+        return;
+    }
+
+    // 创建并执行批量添加命令
+    auto command = std::make_unique<AddMultipleNotesCommand>(
+        map->note_set(), map->note_uuids(), std::move(new_notes_data));
+
+    operationManager.executeCommand(std::move(command));
+}
+
 // 移动物件到指定位置
 void MMapEditor::updateHold(NoteUUID uuid, int64_t duration) {
     auto old = map->note_set().get_note(map->note_uuids().get_handle(uuid));

@@ -31,11 +31,19 @@ class MMapEditor : public QObject {
     // 移动物件到指定位置
     void moveNote(NoteUUID uuid, int64_t timestamp, int track);
 
+    // 移动多个物件到指定位置
+    void moveNotes(const std::unordered_map<NoteUUID, std::pair<int64_t, int>>&
+                       notes_to_move);
+
     // 更新面条
     void updateHold(NoteUUID uuid, int64_t duration);
 
     // 更新滑键
     void updateSlide(NoteUUID uuid, int64_t delta_track);
+
+    // 拷贝到指定时间位置
+    void copyNotesTo(const std::unordered_set<NoteUUID>& uuids,
+                     NoteUUID referenceUUID, int64_t des_time);
 
     // 创建timing
     void creatTiming(std::unique_ptr<Timing> timingData);

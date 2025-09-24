@@ -22,6 +22,20 @@ void SyncSystem::updateEditStatus(ECSCore& core,
 
                 break;
             }
+            case MMapEditEventType::NotesUpdated: {
+                auto updated_note_uuids = std::get<NoteUUIDS>(e.editData);
+                for (auto& uuid : updated_note_uuids) {
+                    auto updated_e_it = core.uuid_to_entity_map().find(uuid);
+                    if (updated_e_it != core.uuid_to_entity_map().end()) {
+                        registry.emplace<DirtyMarkComponent>(
+                            updated_e_it->second);
+                    } else {
+                        qDebug() << "已不可见的更新:NoteUUID:" << uuid;
+                    }
+                }
+
+                break;
+            }
             case MMapEditEventType::TimingUpdated: {
                 auto timing = std::get<Timing*>(e.editData);
                 qDebug() << "接收到Timing更新编辑事件:目标timing[" << timing

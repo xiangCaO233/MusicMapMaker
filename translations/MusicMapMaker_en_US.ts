@@ -250,38 +250,38 @@
     </message>
     <message>
         <location filename="../src/ui/mainwindow.ui" line="34"/>
-        <source>View(&amp;V)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/mainwindow.ui" line="41"/>
         <source>File(&amp;F)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="46"/>
+        <location filename="../src/ui/mainwindow.ui" line="39"/>
         <source>Edit(&amp;E)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="62"/>
-        <location filename="../src/ui/mainwindow.ui" line="109"/>
+        <location filename="../src/ui/mainwindow.ui" line="54"/>
+        <location filename="../src/ui/mainwindow.ui" line="119"/>
         <source>Project Manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="74"/>
-        <location filename="../src/ui/mainwindow.ui" line="98"/>
+        <location filename="../src/ui/mainwindow.ui" line="66"/>
+        <location filename="../src/ui/mainwindow.ui" line="108"/>
         <source>Track Manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="83"/>
+        <location filename="../src/ui/mainwindow.ui" line="78"/>
         <source>Timing Manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="116"/>
+        <location filename="../src/ui/mainwindow.ui" line="90"/>
+        <source>Project Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.cpp" line="137"/>
         <source>MusicMapMaker--&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -332,12 +332,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="30"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="60"/>
+        <source>Switch tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="89"/>
+        <source>background settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="137"/>
+        <source>Enable Time Point Effect Mapping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="175"/>
+        <source>Snap to beat lines when scrolling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="210"/>
+        <source>Make the canvas scroll with the mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="48"/>
+        <source>Hand Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="54"/>
+        <source>Note Tool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="126"/>
         <source>darken</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="57"/>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="153"/>
         <source>alpha</source>
         <translation type="unfinished"></translation>
     </message>
@@ -345,67 +380,78 @@
 <context>
     <name>ProjectConfig</name>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="14"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="14"/>
         <source>Project Preference</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="72"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="72"/>
         <source>Project Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="97"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="97"/>
         <source>Editor Config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="128"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="128"/>
         <source>Edit Mode Preference:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="166"/>
-        <source>Audio Config</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="143"/>
+        <source>more edit mode are in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="212"/>
-        <source>Global Volume</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="178"/>
+        <source>Canvas Config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="247"/>
-        <source>Main Track</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="215"/>
+        <source>Track Layout:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="277"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="434"/>
-        <source>Output Device:</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="237"/>
+        <source>top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="289"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="446"/>
-        <source>Defalut</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="267"/>
+        <source>right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="318"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="475"/>
-        <source>Volume:</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="300"/>
+        <source>bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="365"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="522"/>
-        <source>Stretch:</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="333"/>
+        <source>left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="404"/>
-        <source>Effect Track</source>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="415"/>
+        <source>Judgeline Pos:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="503"/>
+        <source>Object Scale:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
+        <source>width:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="565"/>
+        <source>height:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -417,28 +463,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="49"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="44"/>
         <source>Maps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="74"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="69"/>
         <source>Audios</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="99"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="94"/>
         <source>Images</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="124"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="119"/>
         <source>Videos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="183"/>
-        <source>preferrence</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -466,6 +507,14 @@
     </message>
 </context>
 <context>
+    <name>TimingParameterEditor</name>
+    <message>
+        <location filename="../src/ui/edit/TimingTableUsefulWidgets.cpp" line="52"/>
+        <source>speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TrackManager</name>
     <message>
         <location filename="../src/ui/audio/track/trackmanager.ui" line="14"/>
@@ -473,42 +522,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="59"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="65"/>
         <source>Tracks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="101"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="114"/>
         <source>select output device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="134"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="147"/>
         <source>add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="146"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="159"/>
         <source>remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="158"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="171"/>
         <source>open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="183"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="196"/>
         <source>Metadata</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="211"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="224"/>
         <source>MainTrack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="248"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="261"/>
         <source>album cover</source>
         <translation type="unfinished"></translation>
     </message>

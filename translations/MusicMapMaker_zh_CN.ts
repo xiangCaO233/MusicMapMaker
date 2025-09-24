@@ -261,39 +261,43 @@
         <translation>音乐谱面制作器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="34"/>
         <source>View(&amp;V)</source>
-        <translation>视图(&amp;V)</translation>
+        <translation type="vanished">视图(&amp;V)</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="41"/>
+        <location filename="../src/ui/mainwindow.ui" line="34"/>
         <source>File(&amp;F)</source>
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="46"/>
+        <location filename="../src/ui/mainwindow.ui" line="39"/>
         <source>Edit(&amp;E)</source>
         <translation>编辑(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="62"/>
-        <location filename="../src/ui/mainwindow.ui" line="109"/>
+        <location filename="../src/ui/mainwindow.ui" line="54"/>
+        <location filename="../src/ui/mainwindow.ui" line="119"/>
         <source>Project Manager</source>
         <translation>项目管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="74"/>
-        <location filename="../src/ui/mainwindow.ui" line="98"/>
+        <location filename="../src/ui/mainwindow.ui" line="66"/>
+        <location filename="../src/ui/mainwindow.ui" line="108"/>
         <source>Track Manager</source>
         <translation>音轨管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="83"/>
+        <location filename="../src/ui/mainwindow.ui" line="78"/>
         <source>Timing Manager</source>
         <translation>时间点管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="116"/>
+        <location filename="../src/ui/mainwindow.ui" line="90"/>
+        <source>Project Settings</source>
+        <translation>项目设置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.cpp" line="137"/>
         <source>MusicMapMaker--&gt;</source>
         <translation>谱面编辑器--&gt;</translation>
     </message>
@@ -344,12 +348,47 @@
         <translation>编辑器</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="30"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="60"/>
+        <source>Switch tool</source>
+        <translation>切换工具</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="89"/>
+        <source>background settings</source>
+        <translation>背景设置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="137"/>
+        <source>Enable Time Point Effect Mapping</source>
+        <translation>启用时间点映射效果</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="175"/>
+        <source>Snap to beat lines when scrolling</source>
+        <translation>滚动时吸附到分拍线</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="210"/>
+        <source>Make the canvas scroll with the mouse</source>
+        <translation>令画布随滚轮自然滚动</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="48"/>
+        <source>Hand Tool</source>
+        <translation>工具手</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="54"/>
+        <source>Note Tool</source>
+        <translation>编辑工具</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="126"/>
         <source>darken</source>
         <translation>暗化</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="57"/>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="153"/>
         <source>alpha</source>
         <translation>透明</translation>
     </message>
@@ -361,68 +400,111 @@
         <translation type="vanished">项目配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="14"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="14"/>
         <source>Project Preference</source>
         <translation>项目偏好</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="72"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="72"/>
         <source>Project Name:</source>
         <translation>项目名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="97"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="97"/>
         <source>Editor Config</source>
         <translation>编辑器配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="128"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="128"/>
         <source>Edit Mode Preference:</source>
         <translation>偏好的编辑模式:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="166"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="143"/>
+        <source>more edit mode are in progress</source>
+        <translation>⚡更多编辑模式开发中⚡</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="178"/>
+        <source>Canvas Config</source>
+        <translation>画布配置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="215"/>
+        <source>Track Layout:</source>
+        <translation>轨道布局:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="237"/>
+        <source>top</source>
+        <translation>顶部</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="267"/>
+        <source>right</source>
+        <translation>右侧</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="300"/>
+        <source>bottom</source>
+        <translation>底部</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="333"/>
+        <source>left</source>
+        <translation>左侧</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="415"/>
+        <source>Judgeline Pos:</source>
+        <translation>判定线位置:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="503"/>
+        <source>Object Scale:</source>
+        <translation>物件缩放:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
+        <source>width:</source>
+        <translation>宽:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="565"/>
+        <source>height:</source>
+        <translation>高:</translation>
+    </message>
+    <message>
         <source>Audio Config</source>
-        <translation>音频配置</translation>
+        <translation type="vanished">音频配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="212"/>
         <source>Global Volume</source>
-        <translation>全局音量</translation>
+        <translation type="vanished">全局音量</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="247"/>
         <source>Main Track</source>
-        <translation>主音轨</translation>
+        <translation type="vanished">主音轨</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="277"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="434"/>
         <source>Output Device:</source>
-        <translation>输出设备:</translation>
+        <translation type="vanished">输出设备:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="289"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="446"/>
         <source>Defalut</source>
-        <translation>默认</translation>
+        <translation type="vanished">默认</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="318"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="475"/>
         <source>Volume:</source>
-        <translation>音量:</translation>
+        <translation type="vanished">音量:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="365"/>
-        <location filename="../src/ui/project/projectconfig.ui" line="522"/>
         <source>Stretch:</source>
-        <translation>拉伸倍率:</translation>
+        <translation type="vanished">拉伸倍率:</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectconfig.ui" line="404"/>
         <source>Effect Track</source>
-        <translation>效果轨道</translation>
+        <translation type="vanished">效果轨道</translation>
     </message>
 </context>
 <context>
@@ -453,29 +535,28 @@
         <translation type="vanished">关闭</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="49"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="44"/>
         <source>Maps</source>
         <translation>谱面</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="74"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="69"/>
         <source>Audios</source>
         <translation>音频</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="99"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="94"/>
         <source>Images</source>
         <translation>图像</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="124"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="119"/>
         <source>Videos</source>
         <translation>视频</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="183"/>
         <source>preferrence</source>
-        <translation>偏好</translation>
+        <translation type="vanished">偏好</translation>
     </message>
     <message>
         <source>select project directory</source>
@@ -506,6 +587,14 @@
     </message>
 </context>
 <context>
+    <name>TimingParameterEditor</name>
+    <message>
+        <location filename="../src/ui/edit/TimingTableUsefulWidgets.cpp" line="52"/>
+        <source>speed:</source>
+        <translation>速度:</translation>
+    </message>
+</context>
+<context>
     <name>TrackManager</name>
     <message>
         <location filename="../src/ui/audio/track/trackmanager.ui" line="14"/>
@@ -513,42 +602,42 @@
         <translation>音轨管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="59"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="65"/>
         <source>Tracks</source>
         <translation>音轨列表</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="101"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="114"/>
         <source>select output device</source>
         <translation>选择输出设备</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="134"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="147"/>
         <source>add</source>
         <translation>添加</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="146"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="159"/>
         <source>remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="158"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="171"/>
         <source>open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="183"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="196"/>
         <source>Metadata</source>
         <translation>元数据</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="211"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="224"/>
         <source>MainTrack</source>
         <translation>主音轨</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.ui" line="248"/>
+        <location filename="../src/ui/audio/track/trackmanager.ui" line="261"/>
         <source>album cover</source>
         <translation>专辑封面</translation>
     </message>

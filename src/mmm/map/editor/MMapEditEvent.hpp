@@ -1,6 +1,7 @@
 #ifndef MMM_MMAPEDITEVENT_HPP
 #define MMM_MMAPEDITEVENT_HPP
 
+#include <list>
 #include <mmm/ObjectHandle.hpp>
 #include <variant>
 
@@ -13,6 +14,8 @@ enum class MMapEditEventType {
     NoteRemoved,
     // 物件更新
     NoteUpdated,
+    // 多个物件更新
+    NotesUpdated,
     // timing添加
     TimingAdded,
     // timing移除
@@ -21,7 +24,8 @@ enum class MMapEditEventType {
     TimingUpdated,
 };
 
-using MapEditData = std::variant<NoteUUID, Timing*>;
+using NoteUUIDS = std::list<NoteUUID>;
+using MapEditData = std::variant<NoteUUID, NoteUUIDS, Timing*>;
 
 // 编辑事件
 struct MMapEditEvent {
