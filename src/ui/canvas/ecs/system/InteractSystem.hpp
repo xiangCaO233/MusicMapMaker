@@ -16,6 +16,7 @@ class InteractSystem {
     InteractSystem() = default;
 
     void update(const ECSCore& core, const MapCanvasInfo* info, ILayer* layer,
+                const TimePixelConverter& converter,
                 ToolInteractionState* toolInteractionState,
                 RenderDataBuffer& buffer) const {
         auto selection_state = toolInteractionState->getSelectionState();
@@ -32,19 +33,47 @@ class InteractSystem {
             skin->get_selected_border_texture(SelectBorderDirection::BOTTOM);
 
         // 绘制左键选择框
+        // --- 核心改动：我们现在使用 per_button_areas (逻辑区域) ---
         auto left_it = selection_state.per_button_areas.find(Qt::LeftButton);
         if (left_it != selection_state.per_button_areas.end()) {
-            for (const auto& area : left_it->second) {
-                // 规范化矩形，处理负数宽高
-                float norm_x = (area.z < 0) ? area.x + area.z : area.x;
-                float norm_y = (area.w < 0) ? area.y + area.w : area.y;
-                float norm_w = std::abs(area.z);
-                float norm_h = std::abs(area.w);
+            for (const auto& time_area : left_it->second) {
+                // a. 转换起始点的 Y 坐标
+                const int64_t start_time = time_area.y;
+                const float start_y_screen =
+                    converter.timeToPixel(start_time,
+                                          info->realTimeInfo.current_time_info
+                                              .presentation_canvas_time,
+                                          info);
 
-                // 如果宽高过小，可以不绘制，避免出现渲染问题
+                // b. 计算结束点的 Y 坐标
+                const int64_t end_time =
+                    start_time + static_cast<int64_t>(time_area.w);
+                const float end_y_screen =
+                    converter.timeToPixel(end_time,
+                                          info->realTimeInfo.current_time_info
+                                              .presentation_canvas_time,
+                                          info);
+
+                // c. 确定当前帧的屏幕像素矩形
+                const float start_x_screen = time_area.x;
+                const float width_screen = time_area.z;
+                const float height_screen = end_y_screen - start_y_screen;
+
+                // --- 步骤 2: 规范化矩形 (逻辑和之前完全一样) ---
+                float norm_x = (width_screen < 0)
+                                   ? start_x_screen + width_screen
+                                   : start_x_screen;
+                float norm_y = (height_screen < 0)
+                                   ? start_y_screen + height_screen
+                                   : start_y_screen;
+                float norm_w = std::abs(width_screen);
+                float norm_h = std::abs(height_screen);
+
+                // 如果宽高过小，可以不绘制
                 if (norm_w < border_width * 2 || norm_h < border_width * 2) {
                     continue;
                 }
+
                 // 绘制半透明的粉红色填充背景
                 // 这一步必须在绘制边框之前，以确保背景在下层
                 PrimitiveCommand fillCmd;

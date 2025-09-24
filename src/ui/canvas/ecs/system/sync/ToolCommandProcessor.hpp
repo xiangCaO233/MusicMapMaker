@@ -48,12 +48,20 @@ class ToolCommandProcessor {
             overloaded{
                 // 选中相关
                 [&](const StartSelectCommand& arg) {
+                    auto timepos = glm::vec2{
+                        arg.common_info.start_mouse_pos.x,
+                        converter->distanceToTime(
+                            canvas_height - arg.common_info.start_mouse_pos.y -
+                                judgeline_absolute_y,
+                            presentation_canvas_time)};
                     interactionState.startNewSelectArea(
                         arg.append, arg.trigger_button,
-                        arg.common_info.start_mouse_pos);
+                        arg.common_info.start_mouse_pos, timepos);
                 },
                 [&](const UpdateSelectAreaCommand& arg) {
-                    interactionState.updateSelectArea(arg.current_buttons);
+                    interactionState.updateSelectArea(
+                        arg.current_buttons, *converter, canvas_height,
+                        judgeline_absolute_y, presentation_canvas_time);
                 },
                 [&](const EndSelectCommand& arg) {
                     interactionState.endNewSelectArea(arg.end_button);
@@ -136,7 +144,7 @@ class ToolCommandProcessor {
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
         auto& beat_info = map->beat_info();
-        axis.time = converter->pixelToTime(
+        axis.time = converter->distanceToTime(
             canvas_height - pixel.y - judgeline_absolute_y,
             presentation_canvas_time);
         axis.mousetime = axis.time;

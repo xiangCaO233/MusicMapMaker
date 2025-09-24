@@ -4,6 +4,7 @@
 #include <qnamespace.h>
 #include <qreadwritelock.h>
 
+#include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <entt.hpp>
 #include <glm/glm.hpp>
 #include <info/NotePart.hpp>
@@ -27,11 +28,19 @@ struct MouseState {
 
 // --- 子结构：选择状态 ---
 struct SelectionState {
-    // [核心升级] 按按钮类型对选择区域进行分组存储
+    // 按按钮类型对选择区域进行分组存储
     // Key: 鼠标按钮, Value: 该按钮创建的所有选择框的列表
+    std::map<Qt::MouseButton, std::vector<glm::vec4>> per_button_absolute_areas;
+
+    // Key: 鼠标按钮, Value: 该按钮创建的所有选择框的时间区域列表
+    // vec4:xstart,starttime,width,duration
     std::map<Qt::MouseButton, std::vector<glm::vec4>> per_button_areas;
 
     struct ActiveSession {
+        // 绝对的鼠标按下时的像素坐标
+        glm::vec2 start_absolute_pos;
+        // 鼠标按下时的时间坐标
+        // vec2:xstart,starttime
         glm::vec2 start_pos;
         size_t area_index_in_button_vector;
     };
@@ -147,8 +156,12 @@ class ToolInteractionState {
 
     // 选择相关 (由 pretick 写入, 所有线程读取)
     void startNewSelectArea(bool append, Qt::MouseButton button,
-                            const glm::vec2& start_pos);
-    void updateSelectArea(QFlags<Qt::MouseButton> current_buttons);
+                            const glm::vec2& start_absolute_pos,
+                            const glm::vec2& start_time_pos);
+    void updateSelectArea(QFlags<Qt::MouseButton> current_buttons,
+                          const TimePixelConverter& converter,
+                          float canvas_height, float judgeline_abspos,
+                          float current_canvas_time);
     void endNewSelectArea(Qt::MouseButton released_button);
     void setSelection(const std::unordered_set<entt::entity>& entities);
     std::unordered_set<entt::entity> getSelection();

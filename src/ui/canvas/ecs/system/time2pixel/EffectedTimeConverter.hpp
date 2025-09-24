@@ -29,7 +29,7 @@ class EffectedTimeConverter : public TimePixelConverter {
                     (1.f - info->baseInfo.judgeline_pos));
     }
 
-    int64_t pixelToTime(float pixel_y, int64_t current_canvas_time) const {
+    int64_t distanceToTime(float pixel_y, int64_t current_canvas_time) const {
         if (std::abs(m_status.timeline_zoom) < 1e-9) return current_canvas_time;
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double target_absolute_pixel =

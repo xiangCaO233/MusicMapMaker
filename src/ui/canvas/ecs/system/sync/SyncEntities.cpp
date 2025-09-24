@@ -552,9 +552,10 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
     const auto pixel_y_bottom = 0.0f - judgeline_absolute_y;
 
     // 使用转换器计算时间边界
-    const auto time_at_top = converter.pixelToTime(pixel_y_top, current_time);
+    const auto time_at_top =
+        converter.distanceToTime(pixel_y_top, current_time);
     const auto time_at_bottom =
-        converter.pixelToTime(pixel_y_bottom, current_time);
+        converter.distanceToTime(pixel_y_bottom, current_time);
 
     // const auto time_at_top2 = converter2.pixelToTime(pixel_y_top,
     // current_time); const auto time_at_bottom2 =

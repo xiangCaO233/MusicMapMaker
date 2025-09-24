@@ -252,48 +252,79 @@ DeleteMarkStates ToolInteractionState::getDeleteMarkStates() const {
 }
 
 // 选择相关 (由 pretick 写入, 所有线程读取)
-void ToolInteractionState::startNewSelectArea(bool append,
-                                              Qt::MouseButton button,
-                                              const glm::vec2& start_pos) {
+void ToolInteractionState::startNewSelectArea(
+    bool append, Qt::MouseButton button, const glm::vec2& start_absolute_pos,
+    const glm::vec2& start_time_pos) {
     // [关键逻辑] 如果不是追加模式，则只清空“当前”按钮的专属区域列表
     // 其他按钮（如图层）的选择区域将保持不变。
     if (!append) {
+        m_selectionState.per_button_absolute_areas[button].clear();
         m_selectionState.per_button_areas[button].clear();
     }
 
     // 获取当前按钮的区域列表（如果不存在，map 会自动创建）
-    auto& button_specific_areas = m_selectionState.per_button_areas[button];
+    auto& button_specific_abs_areas =
+        m_selectionState.per_button_absolute_areas[button];
+    auto& button_specific_time_areas =
+        m_selectionState.per_button_areas[button];
 
     // 在这个专属列表中添加一个新的选择框
-    button_specific_areas.emplace_back(glm::vec4(start_pos, 0, 0));
-    const size_t new_area_index = button_specific_areas.size() - 1;
+    button_specific_abs_areas.emplace_back(glm::vec4(start_absolute_pos, 0, 0));
+    button_specific_time_areas.emplace_back(glm::vec4(start_time_pos, 0, 0));
+    const size_t new_area_index = button_specific_abs_areas.size() - 1;
 
     // 创建活动会话，记录它正在更新其专属列表中的最后一个元素
-    m_selectionState.active_sessions[button] = {start_pos, new_area_index};
+    m_selectionState.active_sessions[button] = {start_absolute_pos,
+                                                start_time_pos, new_area_index};
 }
 
 void ToolInteractionState::updateSelectArea(
-    // QReadLocker locker();
-    QFlags<Qt::MouseButton> current_buttons) {
+    QFlags<Qt::MouseButton> current_buttons,
+    const TimePixelConverter& converter, float canvas_height,
+    float judgeline_abspos, float current_canvas_time) {
     // 遍历所有当前正在拖动的会话
     for (auto const& [button, session] : m_selectionState.active_sessions) {
         // 检查这个会话对应的按钮是否仍被按下
         if (current_buttons.testFlag(button)) {
             // 定位到该按钮的专属区域列表
-            auto& button_specific_areas =
+            auto& button_specific_abs_areas =
+                m_selectionState.per_button_absolute_areas[button];
+            auto& button_specific_time_areas =
                 m_selectionState.per_button_areas[button];
             // 从列表中找到并更新该会话对应的那个选择框
-            auto& area_to_update =
-                button_specific_areas[session.area_index_in_button_vector];
+            auto& abs_area_to_update =
+                button_specific_abs_areas[session.area_index_in_button_vector];
+            auto& time_area_to_update =
+                button_specific_time_areas[session.area_index_in_button_vector];
 
-            area_to_update = {session.start_pos,
-                              m_mouseState.current_pos - session.start_pos};
-            // qDebug() << "button:" << button << "'s area update to "
-            //          << QString("[%1,%2,%3,%4]")
-            //                 .arg(area_to_update.x, 'f', 2)
-            //                 .arg(area_to_update.y, 'f', 2)
-            //                 .arg(area_to_update.z, 'f', 2)
-            //                 .arg(area_to_update.w, 'f', 2);
+            abs_area_to_update = {
+                session.start_absolute_pos,
+                m_mouseState.current_pos - session.start_absolute_pos};
+
+            auto width = m_mouseState.current_pos.x - session.start_pos.x;
+
+            auto current_mouse_time = converter.distanceToTime(
+                canvas_height - m_mouseState.current_pos.y - judgeline_abspos,
+                current_canvas_time);
+            auto duration = current_mouse_time - session.start_pos.y;
+            time_area_to_update = {session.start_pos,
+                                   glm::vec2{width, duration}};
+            // 先构建格式化字符串
+            // QString log_message =
+            //     QString("[xstart:%1,timestart:%2,width:%3,duration:%4]")
+            //         .arg(time_area_to_update.x, 0, 'f', 2)
+            //         .arg(time_area_to_update.y, 0, 'f', 2)
+            //         .arg(time_area_to_update.z, 0, 'f', 2)
+            //         .arg(time_area_to_update.w, 0, 'f', 2);
+            // qDebug() << "current mouse y:" << m_mouseState.current_pos.y;
+            // qDebug() << "current mouse time:" << current_mouse_time;
+            // // 然后将所有部分用 + 拼接成一个 QString
+            // qDebug().noquote()
+            //     << QString("button: %1 's time area update to %2")
+            //            .arg(
+            //                static_cast<int>(button))  // 将 QFlags 转为 int
+            //                打印
+            //            .arg(log_message);
         }
     }
 }

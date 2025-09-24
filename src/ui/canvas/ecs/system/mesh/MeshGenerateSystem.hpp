@@ -37,7 +37,7 @@ class MeshGenerateSystem {
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
         auto& beat_info = map->beat_info();
-        axis.time = converter->pixelToTime(
+        axis.time = converter->distanceToTime(
             canvas_height - pixel.y - judgeline_absolute_y,
             presentation_canvas_time);
         axis.mousetime = axis.time;

@@ -61,8 +61,8 @@ class LinearTimeConverter : public TimePixelConverter {
      * @param current_canvas_time 当前画布中心（判定线）的时间。
      * @return 计算出的时间戳。
      */
-    int64_t pixelToTime(float pixel_y,
-                        int64_t current_canvas_time) const override {
+    int64_t distanceToTime(float pixel_y,
+                           int64_t current_canvas_time) const override {
         const auto& base_info = m_info->baseInfo;
         if (std::abs(base_info.timeline_zoom) < 1e-9) {
             return current_canvas_time;

@@ -44,8 +44,8 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     const auto& time =
         mapinfo->realTimeInfo.current_time_info.presentation_canvas_time;
     // 使用转换器计算时间边界
-    const auto time_at_top = converter.pixelToTime(pixel_y_top, time);
-    const auto time_at_bottom = converter.pixelToTime(pixel_y_bottom, time);
+    const auto time_at_top = converter.distanceToTime(pixel_y_top, time);
+    const auto time_at_bottom = converter.distanceToTime(pixel_y_bottom, time);
 
     // 应用预加载缓冲
     const auto query_start_time =
