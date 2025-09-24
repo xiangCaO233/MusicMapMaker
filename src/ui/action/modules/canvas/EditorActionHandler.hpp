@@ -17,6 +17,10 @@ class EditorActionHandler : public QObject {
 
    signals:
     void pause_or_resume_canvas();
+    void cut();
+    void copy();
+    void paste();
+    void delete_signal();
     void undo();
     void redo();
 

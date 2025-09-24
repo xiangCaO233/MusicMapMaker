@@ -133,11 +133,11 @@ void MMapEditor::moveNotes(
         return;
     }
 
-    // 1. 准备一个 vector 来存储所有 Note 的更新状态
+    // 准备一个 vector 来存储所有 Note 的更新状态
     std::vector<NoteUpdateState> update_states;
     update_states.reserve(notes_to_move.size());
 
-    // 2. 遍历输入的 map，为每个要移动的 Note 生成新旧数据
+    // 遍历输入的 map，为每个要移动的 Note 生成新旧数据
     for (const auto& [uuid, new_pos] : notes_to_move) {
         NoteHandle handle = map->note_uuids().get_handle(uuid);
         const Note* old_note_ptr = map->note_set().get_note(handle);
@@ -147,15 +147,15 @@ void MMapEditor::moveNotes(
             continue;
         }
 
-        // a. 克隆旧数据，用于 undo
+        // 克隆旧数据，用于 undo
         std::unique_ptr<Note> old_data = old_note_ptr->clone(map);
 
-        // b. 克隆并修改，生成新数据，用于 execute
+        // 克隆并修改，生成新数据，用于 execute
         std::unique_ptr<Note> new_data = old_note_ptr->clone(map);
         new_data->set_timestamp(new_pos.first);  // a.k.a. timestamp
         new_data->set_trackpos(new_pos.second);  // a.k.a. track
 
-        // c. 将这一对新旧状态存入 vector
+        // 将这一对新旧状态存入 vector
         update_states.push_back(
             {uuid, std::move(old_data), std::move(new_data)});
     }
@@ -165,7 +165,7 @@ void MMapEditor::moveNotes(
         return;
     }
 
-    // 3. 创建并执行宏命令
+    // 创建并执行宏命令
     auto command = std::make_unique<UpdateMultipleNotesCommand>(
         map->note_set(), map->note_uuids(), std::move(update_states));
 

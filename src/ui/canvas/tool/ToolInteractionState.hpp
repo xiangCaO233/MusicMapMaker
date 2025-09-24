@@ -14,7 +14,7 @@
 #include <util/mutil.hpp>
 #include <vector>
 
-// --- 子结构：鼠标状态 ---
+// 鼠标状态
 struct MouseState {
     // 当前光标位置 (高频更新)
     glm::vec2 current_pos;
@@ -26,7 +26,7 @@ struct MouseState {
     QFlags<Qt::MouseButton> pressed_buttons;
 };
 
-// --- 子结构：选择状态 ---
+// 选择状态
 struct SelectionState {
     // 按按钮类型对选择区域进行分组存储
     // Key: 鼠标按钮, Value: 该按钮创建的所有选择框的列表
@@ -51,7 +51,13 @@ struct SelectionState {
         all_selected_entities;
 };
 
-// --- 子结构：删除标记状态 ---
+// 剪切板
+struct NoteClipboard {
+    bool is_copy;
+    std::unordered_set<NoteUUID> uuids;
+};
+
+// 删除标记状态
 struct DeleteMarkStates {
     std::unordered_set<entt::entity> marked_entities;
 };
@@ -177,8 +183,14 @@ class ToolInteractionState {
     void setSelection(Qt::MouseButton button,
                       const std::unordered_set<entt::entity>& entities);
     std::unordered_set<entt::entity> getSelection(Qt::MouseButton button);
+
     bool isSelected(entt::entity entity_to_check) const;
+    bool hasSelected() const;
     SelectionState getSelectionState() const;
+
+    // 剪切板相关
+    void setClipBoard(const std::unordered_set<NoteUUID>& uuids, bool is_copy);
+    NoteClipboard getClipBoard() const;
 
     // 操作/快捷键相关 (由UI/Action系统写入, pretick读取)
     // 这个可以用一个更简单的命令队列，或者一个原子标志位
@@ -200,8 +212,11 @@ class ToolInteractionState {
     SelectionState m_selectionState;
     DeleteMarkStates m_deleteMarkState;
 
+    // 剪切板
+    NoteClipboard m_noteClipboard;
+
     // 聚合选中区
-    std::unordered_set<entt::entity> aggregated_selection;
+    std::unordered_set<entt::entity> m_aggregated_selection;
 
     // 重建聚合选中区
     void rebuildAggregatedSelection();

@@ -46,6 +46,32 @@ class ToolCommandProcessor {
     void process(const ToolCommand& command) {
         std::visit(
             overloaded{
+                // 编辑相关
+                // 复制
+                [&](const CopyCommand& arg) {
+                    std::unordered_set<NoteUUID> uuids;
+                    for (const auto& e : arg.entities) {
+                        auto& [track, uuid] = registry.get<NoteComponent>(e);
+                        uuids.insert(uuid);
+                    }
+                    interactionState.setClipBoard(uuids, true);
+                    qDebug() << "已复制";
+                },
+                // 剪切
+                [&](const CutCommand& arg) {
+                    std::unordered_set<NoteUUID> uuids;
+                    for (const auto& e : arg.entities) {
+                        auto& [track, uuid] = registry.get<NoteComponent>(e);
+                        uuids.insert(uuid);
+                    }
+                    interactionState.setClipBoard(uuids, false);
+                    qDebug() << "已剪切";
+                },
+                // 粘贴
+                [&](const PasteCommand& arg) {
+                    pasteEntities();
+                    // interactionState.endDrag();
+                },
                 // 选中相关
                 [&](const StartSelectCommand& arg) {
                     auto timepos = glm::vec2{
@@ -265,6 +291,59 @@ class ToolCommandProcessor {
                 }
             }
         }
+    }
+
+    void pasteEntities() {
+        auto clipboard = interactionState.getClipBoard();
+        NoteUUID referenceUUID{InvalidNoteUUID};
+        auto min_time = INT32_MAX;
+        for (const auto& uuid : clipboard.uuids) {
+            auto note = info->editorInfo.map->note_set().get_note(
+                info->editorInfo.map->note_uuids().get_handle(uuid));
+            if (note->timestamp() < min_time) {
+                min_time = note->timestamp();
+                referenceUUID = uuid;
+            }
+        }
+        // 如果找不到任何有效的 Note，则无法操作
+        if (referenceUUID == InvalidNoteUUID) {
+            return;
+        }
+        if (clipboard.is_copy) {
+            // 是复制
+            mapEditor.copyNotesTo(clipboard.uuids, referenceUUID,
+                                  presentation_canvas_time);
+        } else {
+            // 是剪切
+
+            // 计算时间偏移量：目标时间 - 参考Note的原始时间
+            const int64_t time_offset = presentation_canvas_time - min_time;
+
+            // 准备 moveNotes 函数需要的参数
+            std::unordered_map<NoteUUID, std::pair<int64_t, int>> notes_to_move;
+            notes_to_move.reserve(clipboard.uuids.size());
+
+            for (const auto& uuid : clipboard.uuids) {
+                auto handle =
+                    info->editorInfo.map->note_uuids().get_handle(uuid);
+                auto note = info->editorInfo.map->note_set().get_note(handle);
+                if (!note) continue;
+
+                // 计算每个 Note 的新时间戳
+                auto new_timestamp = note->timestamp() + time_offset;
+                // 轨道位置保持不变
+                int track = note->trackpos();
+
+                notes_to_move[uuid] = {new_timestamp, track};
+            }
+
+            // 调用 moveNotes
+            mapEditor.moveNotes(notes_to_move);
+
+            // 清空剪贴板，剪切是一次性操作
+            interactionState.setClipBoard({}, true);
+        }
+        qDebug() << "已粘贴";
     }
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,

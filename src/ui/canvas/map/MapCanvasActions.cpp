@@ -2,6 +2,7 @@
 
 #include <action/modules/canvas/EditorActionHandler.hpp>
 #include <action/modules/file/FileActionHandler.hpp>
+#include <layer/MapLayerManager.hpp>
 #include <map/MapCanvas.hpp>
 #include <util/mutil.hpp>
 
@@ -22,6 +23,63 @@ void MapCanvas::connectActions() {
                     mapinfo->realTimeInfo.is_playing = node->isplaying();
                 }
             });
+    // 复制action
+    connect(EditorActionHandler::instance(), &EditorActionHandler::copy,
+            [thiscp]() {
+                auto layermanager = static_cast<MapLayerManager*>(
+                    thiscp->dataloop()->layermanager());
+                auto toolInteractionState =
+                    layermanager->get_tool_interaction_state();
+                if (toolInteractionState->hasSelected()) {
+                    // 发送copy指令
+                    layermanager->get_tool_cmdq()->push(CopyCommand{
+                        toolInteractionState->getSelection(Qt::LeftButton)});
+                } else {
+                    qDebug() << "未选中任何物件";
+                }
+            });
+    // 剪切action
+    connect(EditorActionHandler::instance(), &EditorActionHandler::cut,
+            [thiscp]() {
+                auto layermanager = static_cast<MapLayerManager*>(
+                    thiscp->dataloop()->layermanager());
+                auto toolInteractionState =
+                    layermanager->get_tool_interaction_state();
+                if (toolInteractionState->hasSelected()) {
+                    // 发送cut指令
+                    layermanager->get_tool_cmdq()->push(CutCommand{
+                        toolInteractionState->getSelection(Qt::LeftButton)});
+                } else {
+                    qDebug() << "未选中任何物件";
+                }
+            });
+
+    // 粘贴action
+    connect(EditorActionHandler::instance(), &EditorActionHandler::paste,
+            [thiscp]() {
+                auto layermanager = static_cast<MapLayerManager*>(
+                    thiscp->dataloop()->layermanager());
+                // 发送paste指令
+                layermanager->get_tool_cmdq()->push(PasteCommand{});
+            });
+
+    // 删除action
+    connect(
+        EditorActionHandler::instance(), &EditorActionHandler::delete_signal,
+        [thiscp]() {
+            auto layermanager = static_cast<MapLayerManager*>(
+                thiscp->dataloop()->layermanager());
+            auto toolInteractionState =
+                layermanager->get_tool_interaction_state();
+            if (toolInteractionState->hasSelected()) {
+                // 连续发送delete标记和确认指令
+                layermanager->get_tool_cmdq()->push(MarkDeleteCommand{
+                    {}, toolInteractionState->getSelection(Qt::LeftButton)});
+                layermanager->get_tool_cmdq()->push(ConfirmDeleteCommand{true});
+            } else {
+                qDebug() << "未选中任何物件";
+            }
+        });
 
     // 保存action
     connect(

@@ -122,7 +122,7 @@ class Note;
 class OsuNoteMetadata : public NoteMetadata {
    public:
     using NoteMetadata::NoteMetadata;
-    ~OsuNoteMetadata() = default;
+    virtual ~OsuNoteMetadata() = default;
     // 获取osu物件采样
     inline const NoteSample& notesample() const { return sample; }
 

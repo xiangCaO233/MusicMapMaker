@@ -27,18 +27,22 @@ void EditorActionHandler::onSelectAll() {
 }
 void EditorActionHandler::onCut() {
     //
+    emit cut();
     qDebug() << "触发剪切";
 }
 void EditorActionHandler::onCopy() {
     //
+    emit copy();
     qDebug() << "触发拷贝";
 }
 void EditorActionHandler::onPaste() {
     //
+    emit paste();
     qDebug() << "触发粘贴";
 }
 void EditorActionHandler::onDelete() {
     //
+    emit delete_signal();
     qDebug() << "触发删除";
 }
 void EditorActionHandler::onUndo() {

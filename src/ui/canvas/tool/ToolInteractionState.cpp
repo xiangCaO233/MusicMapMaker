@@ -348,15 +348,30 @@ SelectionState ToolInteractionState::getSelectionState() const {
     return m_selectionState;
 }
 
+// 剪切板相关
+void ToolInteractionState::setClipBoard(
+    const std::unordered_set<NoteUUID>& uuids, bool is_copy) {
+    m_noteClipboard.is_copy = is_copy;
+    m_noteClipboard.uuids = uuids;
+}
+
+NoteClipboard ToolInteractionState::getClipBoard() const {
+    return m_noteClipboard;
+}
+
 // 重建聚合选中区
 void ToolInteractionState::rebuildAggregatedSelection() {
-    aggregated_selection.clear();
+    m_aggregated_selection.clear();
     for (const auto& [button, selected_set] :
          m_selectionState.all_selected_entities) {
-        aggregated_selection.insert(selected_set.begin(), selected_set.end());
+        m_aggregated_selection.insert(selected_set.begin(), selected_set.end());
     }
 }
 
 bool ToolInteractionState::isSelected(entt::entity entity_to_check) const {
-    return aggregated_selection.contains(entity_to_check);
+    return m_aggregated_selection.contains(entity_to_check);
+}
+
+bool ToolInteractionState::hasSelected() const {
+    return !m_aggregated_selection.empty();
 }

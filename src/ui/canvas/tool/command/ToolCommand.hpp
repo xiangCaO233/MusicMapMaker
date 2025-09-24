@@ -49,6 +49,19 @@ struct UpdateCreateNodeCommand {};
 // 确认创建新物件指令
 struct ConfirmCreateNewNoteCommand {};
 
+// 复制指令
+struct CopyCommand {
+    std::unordered_set<entt::entity> entities;
+};
+
+// 剪切指令
+struct CutCommand {
+    std::unordered_set<entt::entity> entities;
+};
+
+// 粘贴指令
+struct PasteCommand {};
+
 // 标记删除指令
 struct MarkDeleteCommand {
     const MeshPartInfo hit_info;
@@ -71,7 +84,7 @@ using ToolCommand =
                  EndSelectCommand, StartDragSelectionCommand, EndDragCommand,
                  ClearDragStateCommand, StartCreateNewNormalNoteCommand,
                  StartCreateNewCompositeNoteCommand, UpdateCreateNodeCommand,
-                 ConfirmCreateNewNoteCommand, MarkDeleteCommand,
-                 ConfirmDeleteCommand>;
+                 ConfirmCreateNewNoteCommand, CopyCommand, CutCommand,
+                 PasteCommand, MarkDeleteCommand, ConfirmDeleteCommand>;
 
 #endif  // MMM_TOOLCOMMAND_HPP

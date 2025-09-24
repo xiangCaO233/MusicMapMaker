@@ -289,37 +289,37 @@
 <context>
     <name>MapCanvas</name>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="47"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="105"/>
         <source>save as file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="48"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="106"/>
         <source>MMM Map File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="67"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="125"/>
         <source>mmm mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="68"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="126"/>
         <source>imd mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="69"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="127"/>
         <source>osu mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="92"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="150"/>
         <source>Export As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="92"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="150"/>
         <source>File Formats:</source>
         <translation type="unfinished"></translation>
     </message>
