@@ -411,61 +411,62 @@ class NoteCollection {
     std::unique_ptr<Note> update_note(NoteHandle handle,
                                       std::unique_ptr<Note> new_note_data) {
         if (!m_storage.is_valid(handle) || !new_note_data) return nullptr;
-        // 先执行核心数据的替换操作
-        // 唯一的“危险”操作，放在最前面。
-        // replace返回后，old_note_data 就拥有了旧数据的唯一所有权。
+
+        // --- 步骤 1: 原子性地替换核心数据，并获得旧数据的唯一所有权 ---
+        // 这一步之后，m_storage
+        // 中已经是新数据了，而我们手里有旧数据的完整所有权。
+        // 不再有任何指向旧数据的裸指针会悬垂。
         std::unique_ptr<Note> old_note_data =
             m_storage.replace(handle, std::move(new_note_data));
 
-        // 如果替换失败（例如，因为并发修改导致句柄失效），旧数据会是 nullptr。
+        // 如果替换失败（比如并发时句柄失效），立即返回
         if (!old_note_data) {
+            // new_note_data 的所有权在 std::move
+            // 后已经丢失，这里不需要把它放回去
             return nullptr;
         }
 
-        // 现在，使用所有权明确的指针来进行后续操作。
-        // 不再需要从 m_storage 中 get 旧指针。
-        const Note* old_note = old_note_data.get();
-        // new_note 指针需要从 storage 中重新获取，
-        // 因为 new_note_data 的所有权已经转移。
-        const Note* new_note = m_storage.get(handle);
+        // --- 步骤 2: 使用安全的指针来更新辅助索引 ---
+        const Note* old_note_ptr = old_note_data.get();
+        const Note* new_note_ptr =
+            m_storage.get(handle);  // 从 storage 中获取新数据的安全裸指针
 
-        // 防御性检查，确保新Note已成功放入
-        if (!new_note) {
-            // 如果发生这种情况，意味着状态已损坏。
-            // 理想情况下，应该回滚操作，但至少我们能阻止进一步的错误。
-            // 把旧数据放回去
+        // 防御性编程：确保新数据真的进去了
+        if (!new_note_ptr) {
+            // 这是一个灾难性失败，状态已损坏。我们尝试回滚。
             m_storage.replace(handle, std::move(old_note_data));
             return nullptr;
         }
 
-        // 使用安全的指针更新辅助数据结构。
-        bool timestamp_changed =
-            (old_note->timestamp() != new_note->timestamp());
-        bool interval_changed =
-            (get_interval(old_note) != get_interval(new_note));
-
-        if (timestamp_changed) {
-            auto& old_notes_at_ts = m_timeline.at(old_note->timestamp());
+        // a. 更新时间线索引 (m_timeline)
+        if (old_note_ptr->timestamp() != new_note_ptr->timestamp()) {
+            auto& old_notes_at_ts = m_timeline.at(old_note_ptr->timestamp());
             old_notes_at_ts.erase(std::remove(old_notes_at_ts.begin(),
                                               old_notes_at_ts.end(), handle),
                                   old_notes_at_ts.end());
-            if (old_notes_at_ts.empty())
-                m_timeline.erase(old_note->timestamp());
-            m_timeline[new_note->timestamp()].push_back(handle);
+            if (old_notes_at_ts.empty()) {
+                m_timeline.erase(old_note_ptr->timestamp());
+            }
+            m_timeline[new_note_ptr->timestamp()].push_back(handle);
         }
 
-        if (interval_changed) {
+        // b. 更新区间树索引 (m_interval_tree)
+        if (get_interval(old_note_ptr) != get_interval(new_note_ptr)) {
             auto it = m_handle_to_interval_node.find(handle);
             if (it != m_handle_to_interval_node.end()) {
-                m_interval_tree.remove(it->second);
-                m_handle_to_interval_node.erase(it);
+                // 先从 map 中移除，再删除节点，避免悬垂指针
+                IntervalTree::Node* node_to_remove = it->second;
+                m_handle_to_interval_node.erase(it);  // <--  crucial fix!
+                m_interval_tree.remove(node_to_remove);
+
+                // 插入新的节点并更新 map
                 auto* new_node_ptr =
-                    m_interval_tree.insert(get_interval(new_note), handle);
+                    m_interval_tree.insert(get_interval(new_note_ptr), handle);
                 m_handle_to_interval_node[handle] = new_node_ptr;
             }
         }
 
-        // 返回旧数据。
+        // --- 步骤 3: 返回旧数据的所有权 ---
         return old_note_data;
     }
 

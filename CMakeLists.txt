@@ -260,6 +260,16 @@ target_link_libraries(
           pugixml::pugixml
           IonCachyEngin-dev)
 
+# 检查编译器是否支持 ASan
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  # 为 Debug 模式添加 ASan 编译和链接选项
+  target_compile_options(
+    MusicMapMaker PRIVATE $<$<CONFIG:Debug>:-g -fsanitize=address
+                          -fno-omit-frame-pointer>)
+  target_link_options(MusicMapMaker PRIVATE
+                      $<$<CONFIG:Debug>:-fsanitize=address>)
+endif()
+
 # 设置翻译系统 Qt6 使用现代翻译工具
 qt_add_lupdate(MusicMapMaker SOURCES ${PROJECT_SOURCES} TS_FILES ${TS_FILES})
 
