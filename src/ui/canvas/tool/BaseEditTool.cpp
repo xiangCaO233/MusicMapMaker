@@ -15,7 +15,7 @@ void BaseEditTool::mousePressEvent(QMouseEvent* e) {
     }
 
     // 处理悬浮在物件上的情况
-    auto selections = tool_interaction_state()->getSelection();
+    auto selections = tool_interaction_state()->getSelection(Qt::LeftButton);
     auto buttons = e->buttons();
     auto hoveredinfo = hoveredinfo_opt.value();
     auto entity = hoveredinfo.source_entity;

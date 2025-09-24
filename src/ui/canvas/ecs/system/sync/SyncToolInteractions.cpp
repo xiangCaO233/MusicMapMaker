@@ -1,6 +1,7 @@
 #include <ecs/system/sync/SyncSystem.hpp>
 #include <ecs/system/sync/ToolCommandProcessor.hpp>
 #include <info/NotePart.hpp>
+#include <iostream>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
 #include <tool/ThreadSafeQueue.hpp>
@@ -94,6 +95,108 @@ void updateHover(ToolSystem* toolSystem,
     }
 }
 
+// 将像素X坐标转换为轨道索引
+int pixelToTrackIndex(float pixel_x, const glm::vec4& all_tracks_rect,
+                      int track_count) {
+    if (track_count == 0) return -1;
+    // 检查是否在轨道区域外
+    if (pixel_x < all_tracks_rect.x) {
+        return 0;
+    }
+    if (pixel_x > all_tracks_rect.x + all_tracks_rect.z) {
+        return track_count - 1;
+    }
+    // 计算相对位置并转换为索引
+    float relative_x = pixel_x - all_tracks_rect.x;
+    float single_track_width = all_tracks_rect.z / track_count;
+    return static_cast<int>(relative_x / single_track_width);
+}
+
+void updateSelections(entt::registry& registry, ToolSystem* toolSystem,
+                      ToolInteractionState* toolInteractionState,
+                      const MapCanvasInfo* info) {
+    auto selectState = toolInteractionState->getSelectionState();
+    auto& left_select_time_areas = selectState.per_button_areas[Qt::LeftButton];
+
+    // 最终所有被选中的实体的集合
+    std::unordered_set<entt::entity> selected_entities{};
+
+    // 如果没有选择框，则清空选择并直接返回
+    if (left_select_time_areas.empty()) {
+        toolInteractionState->setSelection(Qt::LeftButton, selected_entities);
+        return;
+    }
+
+    auto& all_tracks_rect = info->editorInfo.track_layout;
+    auto track_count = info->editorInfo.map->base_metadata().track_count;
+    if (track_count == 0) return;
+
+    // 当前帧画布的逻辑时间，用于坐标转换
+    const int64_t current_canvas_time =
+        info->realTimeInfo.current_time_info.presentation_canvas_time;
+
+    // 将所有选择框的逻辑区域预先计算好
+    struct LogicalArea {
+        int64_t start_time;
+        int64_t end_time;
+        int start_track;
+        int end_track;
+    };
+    std::vector<LogicalArea> logical_selection_areas;
+
+    for (const auto& time_area : left_select_time_areas) {
+        // 转换时间范围
+        int64_t time1 = time_area.y;
+        int64_t time2 = time1 + static_cast<int64_t>(time_area.w);
+
+        // 转换轨道范围
+        int track1 =
+            pixelToTrackIndex(time_area.x, all_tracks_rect, track_count);
+        int track2 = pixelToTrackIndex(time_area.x + time_area.z,
+                                       all_tracks_rect, track_count);
+
+        // qDebug() << "area track[" << track1 << "]to[" << track2 << "]";
+        // qDebug() << "area time[" << time1 << "]to[" << time2 << "]";
+
+        // 检查轨道索引是否有效
+        if (track1 < 0 || track2 < 0) continue;
+
+        // 规范化范围，确保 start <= end
+        logical_selection_areas.push_back(
+            {std::min(time1, time2), std::max(time1, time2),
+             std::min(track1, track2), std::max(track1, track2)});
+    }
+
+    // 遍历所有 Note 实体，进行碰撞检测
+    auto view = registry.view<const NoteComponent, const TimeComponent>();
+    for (auto entity : view) {
+        const auto& note = registry.get<NoteComponent>(entity);
+        const auto& time = registry.get<TimeComponent>(entity);
+
+        // 检查这个 Note 是否落在任何一个逻辑选择框内
+        for (const auto& area : logical_selection_areas) {
+            bool time_overlaps = (time.timestamp >= area.start_time &&
+                                  time.timestamp <= area.end_time);
+            bool track_overlaps = (note.track_index >= area.start_track &&
+                                   note.track_index <= area.end_track);
+
+            if (time_overlaps && track_overlaps) {
+                selected_entities.insert(entity);
+                // 一旦被选中，就无需再检查其他选择框了
+                break;
+            }
+        }
+    }
+
+    // qDebug() << "选中区内物件";
+    // for (const auto& e : selected_entities) {
+    //     std::cout << static_cast<uint32_t>(e) << ",";
+    // }
+    // std::cout << std::endl;
+    // 更新最终的选择状态
+    toolInteractionState->setSelection(Qt::LeftButton, selected_entities);
+}
+
 // 处理所有工具指令
 void processToolCommands(entt::registry& registry,
                          ThreadSafeQueue<ToolCommand>* toolCmdQ,
@@ -127,6 +230,10 @@ void SyncSystem::updateToolInteractions(
                         info->editorInfo.map->editor(), toolInteractionState,
                         info->editorInfo.map, info, converter);
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)结束";
+
+    // 更新选中内容
+    updateSelections(core.ecs_registry(), toolSystem, toolInteractionState,
+                     info);
 
     // qDebug() << "同步系统->同步工具状态->处理实时悬浮检测(at pretick)开始";
     updateHover(toolSystem, toolInteractionState, info);

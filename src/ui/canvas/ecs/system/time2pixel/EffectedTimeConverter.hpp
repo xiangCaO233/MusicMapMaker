@@ -5,6 +5,11 @@
 #include <info/MapCanvasInfo.hpp>
 #include <mmm/DataStructures.hpp>
 
+/*
+ * @class EffectedTimeConverter
+ *        *****严重逻辑问题,我也不知道具体的逻辑了*****
+ *        *****但是各种减来减去最后干活了,而且与渲染系统强接口耦合*****
+ */
 class EffectedTimeConverter : public TimePixelConverter {
    public:
     static constexpr double BASE_PIXELS_PER_MS = 1.0;
@@ -56,7 +61,7 @@ class EffectedTimeConverter : public TimePixelConverter {
 
         const auto& all_points = timings.get_all_timing_points();
 
-        // 1. 初始化状态变量
+        // 初始化状态变量
         double current_accumulated_pixels = 0.0;
         int64_t last_timestamp = 0;
 
@@ -78,7 +83,7 @@ class EffectedTimeConverter : public TimePixelConverter {
 
         m_lookup_table.push_back({0, 0.0, last_pixels_per_ms});
 
-        // 2. 遍历所有时间点
+        // 遍历所有时间点
         for (const auto& [timestamp, timing_list] : all_points) {
             if (timestamp > last_timestamp) {
                 // 计算并累加上一个区段的像素距离
@@ -91,7 +96,7 @@ class EffectedTimeConverter : public TimePixelConverter {
                 m_lookup_table.pop_back();
             }
 
-            // 3. 更新当前生效的红线和绿线状态
+            // 更新当前生效的红线和绿线状态
             for (const auto& timing : timing_list) {
                 if (timing->is_base_timing) {
                     current_base_timing = *timing;
@@ -99,7 +104,7 @@ class EffectedTimeConverter : public TimePixelConverter {
                     current_inherited_timing = *timing;
                 }
             }
-            // 重要：绿线的生效时间点如果早于红线，它会继承旧的红线BPM
+            // 绿线的生效时间点如果早于红线，它会继承旧的红线BPM
             // 但如果同一时间点同时有红线和绿线，绿线应继承这个新的红线BPM
             if (current_inherited_timing.timestamp <
                 current_base_timing.timestamp) {
@@ -107,10 +112,10 @@ class EffectedTimeConverter : public TimePixelConverter {
                 current_inherited_timing.beat_length = -100.0;
             }
 
-            // 4. 根据最新的红线和绿线状态，计算新的速度
+            // 根据最新的红线和绿线状态，计算新的速度
             double bpm_multiplier{1.0};
             static double last_bpm_multiplier{1.0};
-            // 防御：确保红线的 beat_length 是一个有效的正数
+            // 确保红线的 beat_length 是一个有效的正数
             if (current_base_timing.beat_length > 1e-2) {
                 // 使用epsilon比较
                 bpm_multiplier =
@@ -127,17 +132,15 @@ class EffectedTimeConverter : public TimePixelConverter {
 
             double velocity_multiplier{1.0};
             static double last_velocity_multiplier{1.0};
-            // 防御：确保绿线的 beat_length 是一个有效的、远离零的负数
+            // 确保绿线的 beat_length 是一个有效的、远离零的负数
             if (current_inherited_timing.beat_length < -1e-2) {
                 velocity_multiplier =
                     -100.0 / current_inherited_timing.beat_length;
             } else if (current_inherited_timing.beat_length != -100.0) {
-                // 如果它不是默认值-100，但又不符合 < -epsilon
-                // 的条件，说明它可能是0或一个无效值
                 qWarning() << "在时间点" << timestamp
                            << "检测到无效的绿线 beat_length:"
                            << current_inherited_timing.beat_length;
-                // 在这种情况下，强制它为 1.0x 速度
+                // 强制为 1.0x 速度
                 velocity_multiplier = last_velocity_multiplier;
             }
             last_velocity_multiplier = velocity_multiplier;
@@ -146,7 +149,7 @@ class EffectedTimeConverter : public TimePixelConverter {
                                        m_status.scroll_speed * bpm_multiplier *
                                        velocity_multiplier;
 
-            // 确保速度不会是零或接近零，也非无穷大或NaN
+            // 确保速度不为零或接近零，也非无穷大或NaN
             if (std::abs(new_pixels_per_ms) < 1e-2) {
                 qWarning()
                     << "在时间点" << timestamp
@@ -158,11 +161,11 @@ class EffectedTimeConverter : public TimePixelConverter {
                 qWarning()
                     << "在时间点" << timestamp
                     << "计算出的像素速度为无穷大或NaN，强制重置为默认值。";
-                // 如果计算结果是 inf 或 NaN，回退到一个安全的速度
+                // 若计算结果是 inf 或 NaN，回退到一个安全的速度
                 new_pixels_per_ms = last_pixels_per_ms;
             }
 
-            // 5. 添加新节点到查找表
+            // 添加新节点到查找表
             m_lookup_table.push_back(
                 {timestamp, current_accumulated_pixels, new_pixels_per_ms});
 

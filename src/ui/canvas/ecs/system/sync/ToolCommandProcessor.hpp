@@ -270,7 +270,7 @@ class ToolCommandProcessor {
     void startDragEntities(const std::unordered_set<entt::entity>& selections,
                            MeshPartInfo part = {}) {
         // 更新 TIS 的选择集
-        interactionState.setSelection(selections);
+        interactionState.setSelection(Qt::LeftButton, selections);
 
         // 更新 TIS 的拖拽状态
         interactionState.startDrag(

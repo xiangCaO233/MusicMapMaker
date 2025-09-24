@@ -310,25 +310,28 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     // qDebug() << "当前可见实体数量:" << visible_handles.size();
     // ----------debug------------
 
-    auto drag_info =
-        layer_manager->get_tool_interaction_state()->getDragState();
+    auto toolInteractionState = layer_manager->get_tool_interaction_state();
+    auto drag_info = toolInteractionState->getDragState();
     // 销毁不再可见的物件实体
     for (auto it = uuid_map.begin(); it != uuid_map.end();) {
-        // 不处于当前可见实体集合中/且不处于拖动集合中
-        if (!current_visible_uuidset.contains(it->first) &&
-            !drag_info.dragged_entitiesWithRes.contains(it->second)) {
-            if (registry.valid(it->second)) {
+        // 不处于当前可见实体集合中/且不处于拖动集合中/且不处于聚合选中区内
+        auto uuid = it->first;
+        auto entity = it->second;
+        if (!current_visible_uuidset.contains(uuid) &&
+            !drag_info.dragged_entitiesWithRes.contains(entity) &&
+            !toolInteractionState->isSelected(entity)) {
+            if (registry.valid(entity)) {
                 // 若为组合物件实体/递归移除所有子实体
-                if (registry.all_of<CompositeRootComponent>(it->second)) {
+                if (registry.all_of<CompositeRootComponent>(entity)) {
                     auto& [children] =
-                        registry.get<CompositeRootComponent>(it->second);
+                        registry.get<CompositeRootComponent>(entity);
                     for (const auto& child_e : children) {
                         if (registry.valid(child_e)) {
                             registry.destroy(child_e);
                         }
                     }
                 }
-                registry.destroy(it->second);
+                registry.destroy(entity);
             }
             it = uuid_map.erase(it);
         } else {

@@ -11,9 +11,8 @@ void NoteTool::mousePressEvent(QMouseEvent* e) {
     // 首先调用基类，让它处理所有在物件上的通用交互
     BaseEditTool::mousePressEvent(e);
 
-    // 如果鼠标没有悬浮在任何物件上，执行 NoteTool 的核心职责：创建 Note
+    // 如果鼠标没有悬浮在任何物件上，执行 NoteTool 职责：创建 Note
     if (!tool_interaction_state()->getHover().has_value()) {
-        tool_interaction_state()->setSelection({});
         tool_command_queue()->push(ClearDragStateCommand{});
 
         if (e->button() == Qt::LeftButton) {

@@ -163,8 +163,10 @@ class ToolInteractionState {
                           float canvas_height, float judgeline_abspos,
                           float current_canvas_time);
     void endNewSelectArea(Qt::MouseButton released_button);
-    void setSelection(const std::unordered_set<entt::entity>& entities);
-    std::unordered_set<entt::entity> getSelection();
+    void setSelection(Qt::MouseButton button,
+                      const std::unordered_set<entt::entity>& entities);
+    std::unordered_set<entt::entity> getSelection(Qt::MouseButton button);
+    bool isSelected(entt::entity entity_to_check) const;
     SelectionState getSelectionState() const;
 
     // 操作/快捷键相关 (由UI/Action系统写入, pretick读取)
@@ -186,6 +188,12 @@ class ToolInteractionState {
     CreateState m_createState;
     SelectionState m_selectionState;
     DeleteMarkStates m_deleteMarkState;
+
+    // 聚合选中区
+    std::unordered_set<entt::entity> aggregated_selection;
+
+    // 重建聚合选中区
+    void rebuildAggregatedSelection();
 };
 
 #endif  // MMM_TOOLINTERACTIONSTATE_HPP

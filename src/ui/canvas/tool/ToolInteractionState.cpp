@@ -224,6 +224,7 @@ void ToolInteractionState::updateCreateNode(const MapAxis& axis) {
         }
     }
 }
+
 void ToolInteractionState::setCreateValidity(bool isValid) {
     m_createState.is_valid = isValid;
 }
@@ -336,14 +337,29 @@ void ToolInteractionState::endNewSelectArea(Qt::MouseButton released_button) {
 }
 
 void ToolInteractionState::setSelection(
-    const std::unordered_set<entt::entity>& entities) {
-    m_selectionState.all_selected_entities[Qt::LeftButton] = entities;
+    Qt::MouseButton button, const std::unordered_set<entt::entity>& entities) {
+    m_selectionState.all_selected_entities[button] = entities;
+    rebuildAggregatedSelection();
 }
 
-std::unordered_set<entt::entity> ToolInteractionState::getSelection() {
-    return m_selectionState.all_selected_entities[Qt::LeftButton];
+std::unordered_set<entt::entity> ToolInteractionState::getSelection(
+    Qt::MouseButton button) {
+    return m_selectionState.all_selected_entities[button];
 }
 
 SelectionState ToolInteractionState::getSelectionState() const {
     return m_selectionState;
+}
+
+// 重建聚合选中区
+void ToolInteractionState::rebuildAggregatedSelection() {
+    aggregated_selection.clear();
+    for (const auto& [button, selected_set] :
+         m_selectionState.all_selected_entities) {
+        aggregated_selection.insert(selected_set.begin(), selected_set.end());
+    }
+}
+
+bool ToolInteractionState::isSelected(entt::entity entity_to_check) const {
+    return aggregated_selection.contains(entity_to_check);
 }
