@@ -10,6 +10,7 @@
 #include <info/NotePart.hpp>
 #include <list>
 #include <mmm/obj/Note.hpp>
+#include <mutex>
 #include <unordered_map>
 #include <util/mutil.hpp>
 #include <vector>
