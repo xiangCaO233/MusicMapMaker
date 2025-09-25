@@ -17,6 +17,7 @@ class ProjectService : public QObject {
     void onOpenProject(std::string_view project_path);
     void onCloseProject(std::string_view project_name);
 
+   public:
    signals:
     void updateProjectList(
         const std::unordered_map<std::string, std::unique_ptr<MProject>,
