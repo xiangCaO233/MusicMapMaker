@@ -7,6 +7,7 @@ namespace Ui {
 class ProjectConfig;
 }
 
+class MProject;
 class MProjectConfig;
 
 class ProjectConfig : public QWidget {
@@ -24,7 +25,7 @@ class ProjectConfig : public QWidget {
 
    public slots:
     // 绑定配置
-    void bind_config(MProjectConfig *cfg) const;
+    void bind_config(MProject *cfg) const;
 
    signals:
     void layout_changed();

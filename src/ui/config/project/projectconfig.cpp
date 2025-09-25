@@ -1,6 +1,8 @@
 #include <config/project/projectconfig.h>
 #include <ui_projectconfig.h>
 
+#include <mmm/project/MProject.hpp>
+
 ProjectConfig::ProjectConfig(QWidget *parent)
     : QWidget(parent), ui(new Ui::ProjectConfig) {
     ui->setupUi(this);
@@ -18,7 +20,7 @@ void ProjectConfig::showConfigs() const {
 }
 
 // 绑定配置
-void ProjectConfig::bind_config(MProjectConfig *cfg) const {
-    config = cfg;
+void ProjectConfig::bind_config(MProject *project) const {
+    config = project->cfg();
     showConfigs();
 }
