@@ -33,20 +33,20 @@ auto glCallImpl(Func func, const char* funcStr,
 }
 
 // 用于包装 OpenGL 调用并检查错误
-#define GLCALL(func, f)       \
-    glCallImpl(               \
-        [&]() {               \
-            stat::gl_calls++; \
-            return func;      \
-        },                    \
+#define GLCALL(func, f)        \
+    glCallImpl(                \
+        [&]() {                \
+            mstat::gl_calls++; \
+            return func;       \
+        },                     \
         #func, f)
-#define DRAWCALL(func, f)       \
-    glCallImpl(                 \
-        [&]() {                 \
-            stat::draw_calls++; \
-            stat::gl_calls++;   \
-            return func;        \
-        },                      \
+#define DRAWCALL(func, f)        \
+    glCallImpl(                  \
+        [&]() {                  \
+            mstat::draw_calls++; \
+            mstat::gl_calls++;   \
+            return func;         \
+        },                       \
         #func, f)
 
 #endif  // !MMM_GLCHECK_HPP
