@@ -20,11 +20,11 @@ class ProjectConfig : public QWidget {
     void hideConfigs();
 
     // 显示配置组件
-    void showConfigs();
+    void showConfigs() const;
 
    public slots:
     // 绑定配置
-    void bind_config(MProjectConfig *cfg);
+    void bind_config(MProjectConfig *cfg) const;
 
    signals:
     void layout_changed();
@@ -49,7 +49,7 @@ class ProjectConfig : public QWidget {
     Ui::ProjectConfig *ui;
 
     // 绑定的配置
-    MProjectConfig *config;
+    mutable MProjectConfig *config;
 };
 
 #endif  // PROJECTCONFIG_H

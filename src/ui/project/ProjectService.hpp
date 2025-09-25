@@ -22,7 +22,7 @@ class ProjectService : public QObject {
     void updateProjectList(
         const std::unordered_map<std::string, std::unique_ptr<MProject>,
                                  StringHash, std::equal_to<>>* projects) const;
-    void activateProject(MProject* activated_project);
+    void activateProject(MProject* activated_project) const;
     void activateMap(MProject* activated_project, MMap* map);
 
    public:

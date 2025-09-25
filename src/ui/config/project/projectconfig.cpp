@@ -13,10 +13,12 @@ ProjectConfig::~ProjectConfig() { delete ui; }
 void ProjectConfig::hideConfigs() { ui->scrollAreaWidgetContents->hide(); }
 
 // 显示配置组件
-void ProjectConfig::showConfigs() { ui->scrollAreaWidgetContents->show(); }
+void ProjectConfig::showConfigs() const {
+    ui->scrollAreaWidgetContents->show();
+}
 
 // 绑定配置
-void ProjectConfig::bind_config(MProjectConfig *cfg) {
+void ProjectConfig::bind_config(MProjectConfig *cfg) const {
     config = cfg;
     showConfigs();
 }
