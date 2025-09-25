@@ -49,6 +49,8 @@ find_package(glm REQUIRED)
 
 if(APPLE)
   set(FFTLIB /opt/homebrew/lib/libfftw3f.dylib /opt/homebrew/lib/libfftw3f.a)
+elseif(WIN32)
+  set(FFTLIB "G:\\coding\\vcpkg\\installed\\x64-windows\\lib\\fftw3f.lib")
 else()
   set(FFTLIB fftw3f)
 endif()
@@ -61,6 +63,8 @@ find_package(pugixml REQUIRED)
 
 # 字符编码包
 find_package(ICU REQUIRED COMPONENTS uc i18n data)
+
+find_package(OpenGL REQUIRED)
 
 # 设置mmm相关文件
 set(MMM_SOURCES
@@ -250,6 +254,7 @@ target_link_libraries(
           Qt6::Widgets
           Qt6::OpenGLWidgets
           Qt6::OpenGL
+          OpenGL::GL
           Qt6::Svg
           Qt6::SvgWidgets
           ICU::uc
