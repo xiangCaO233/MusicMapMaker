@@ -21,7 +21,7 @@ class ProjectConfig : public QWidget {
 
     // 显示配置组件
     void showConfigs();
-
+   public slots:
     // 绑定配置
     void bind_config(MProjectConfig *cfg);
 
