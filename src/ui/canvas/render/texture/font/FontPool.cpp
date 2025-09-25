@@ -11,7 +11,7 @@
 FontPool::FontPool(QOpenGLFunctions_4_1_Core* gl_functions)
     : glf(gl_functions) {
     // 查询硬件支持
-    GLCALL(
+    GLCALL_V(
         glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_texture_array_layers),
         glf);
 }
@@ -31,7 +31,7 @@ void FontPool::clear() {
 
     // 1. 清理GPU资源
     for (const auto& [id, group] : groups) {
-        GLCALL(glf->glDeleteTextures(1, &group.gl_id), glf);
+        GLCALL_V(glf->glDeleteTextures(1, &group.gl_id), glf);
     }
 
     // 2. 清理所有CPU端的数据结构
@@ -208,28 +208,28 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
     if (current_atlas_id == 0) {
         // 这是上传的第一个字形，需要创建第一个图集数组
         uint32_t new_atlas_id;
-        GLCALL(glf->glGenTextures(1, &new_atlas_id), glf);
-        GLCALL(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, new_atlas_id), glf);
-        GLCALL(glf->glPixelStorei(GL_UNPACK_ALIGNMENT, 1), glf);
+        GLCALL_V(glf->glGenTextures(1, &new_atlas_id), glf);
+        GLCALL_V(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, new_atlas_id), glf);
+        GLCALL_V(glf->glPixelStorei(GL_UNPACK_ALIGNMENT, 1), glf);
         // 使用单通道格式 GL_R8
-        GLCALL(glf->glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, LAYER_SIZE.x,
-                                 LAYER_SIZE.y, max_texture_array_layers, 0,
-                                 GL_RED, GL_UNSIGNED_BYTE, nullptr),
-               glf);
+        GLCALL_V(glf->glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, LAYER_SIZE.x,
+                                   LAYER_SIZE.y, max_texture_array_layers, 0,
+                                   GL_RED, GL_UNSIGNED_BYTE, nullptr),
+                 glf);
 
         // 设置纹理参数
-        GLCALL(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
-                                    GL_LINEAR),
-               glf);
-        GLCALL(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER,
-                                    GL_LINEAR),
-               glf);
-        GLCALL(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
-                                    GL_CLAMP_TO_EDGE),
-               glf);
-        GLCALL(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
-                                    GL_CLAMP_TO_EDGE),
-               glf);
+        GLCALL_V(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY,
+                                      GL_TEXTURE_MIN_FILTER, GL_LINEAR),
+                 glf);
+        GLCALL_V(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY,
+                                      GL_TEXTURE_MAG_FILTER, GL_LINEAR),
+                 glf);
+        GLCALL_V(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
+                                      GL_CLAMP_TO_EDGE),
+                 glf);
+        GLCALL_V(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
+                                      GL_CLAMP_TO_EDGE),
+                 glf);
 
         current_atlas_id = new_atlas_id;
 
@@ -266,13 +266,13 @@ void FontPool::uploadToGpu(const LoadedImageData& data) {
     }
 
     // 上传字形位图到GPU
-    GLCALL(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, current_atlas_id), glf);
+    GLCALL_V(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, current_atlas_id), glf);
     // 上传数据时，源格式为 GL_RED
     // 因为数据源 (single_channel_data) 只有一个通道
-    GLCALL(glf->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, cursor_x, cursor_y,
-                                current_layer_index, data.width, data.height, 1,
-                                GL_RED, GL_UNSIGNED_BYTE, data.data),
-           glf);
+    GLCALL_V(glf->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, cursor_x, cursor_y,
+                                  current_layer_index, data.width, data.height,
+                                  1, GL_RED, GL_UNSIGNED_BYTE, data.data),
+             glf);
 
     // 计算并存储该字形的完整信息
     CharacterGlyph glyph;

@@ -86,14 +86,15 @@ void GLCanvas::update_sharedInfo() const {
 void GLCanvas::initializeGL() {
     initializeOpenGLFunctions();
     // 查询opengl版本
-    auto version = GLCALL(glGetString(GL_VERSION), this);
+    auto version = GLCALL_R(glGetString(GL_VERSION), this);
     qDebug() << "OpenGL 版本: "
              << std::string(reinterpret_cast<const char*>(version));
 
     GLint maxVertices, maxComponents;
-    GLCALL(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxVertices), this);
+    GLCALL_V(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxVertices),
+             this);
     qDebug() << "几何着色器最大输出顶点数: " << std::to_string(maxVertices);
-    GLCALL(
+    GLCALL_V(
         glGetIntegerv(GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS, &maxComponents),
         this);
     qDebug() << "几何着色器最大输出顶点分量数: "
@@ -101,7 +102,7 @@ void GLCanvas::initializeGL() {
 
     // 查询最大支持抗锯齿MSAA倍率
     GLint maxSamples;
-    GLCALL(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples), this);
+    GLCALL_V(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples), this);
 
     // 初始化驱动信息
     qDebug() << "启用最大抗锯齿倍率: " << std::to_string(maxSamples);
@@ -110,12 +111,12 @@ void GLCanvas::initializeGL() {
 
     // 检查最大ubo size
     int maxUBOSize;
-    GLCALL(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize), this);
+    GLCALL_V(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize), this);
     qDebug() << "最大UBO块容量: " << std::to_string(maxUBOSize);
 
     // 标准混合模式
-    GLCALL(glEnable(GL_BLEND), this);
-    GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), this);
+    GLCALL_V(glEnable(GL_BLEND), this);
+    GLCALL_V(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), this);
 
     // 关闭深度测试，否则全屏矩形可能因为深度测试失败而被丢弃
     // GLCALL(glDisable(GL_DEPTH_TEST), this);
@@ -155,7 +156,7 @@ void GLCanvas::initializeGL() {
 }
 
 void GLCanvas::resizeGL(int w, int h) {
-    GLCALL(glViewport(0, 0, w, h), this);
+    GLCALL_V(glViewport(0, 0, w, h), this);
     glm::vec2 viewport = {w, h};
     render->update_viewport(viewport, viewport * float(devicePixelRatio()));
 }

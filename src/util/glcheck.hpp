@@ -33,14 +33,35 @@ auto glCallImpl(Func func, const char* funcStr,
 }
 
 // 用于包装 OpenGL 调用并检查错误
-#define GLCALL(func, f)        \
-    glCallImpl(                \
-        [&]() {                \
-            mstat::gl_calls++; \
-            return func;       \
-        },                     \
-        #func, f)
-#define DRAWCALL(func, f)        \
+// 新宏 1: 用于调用返回 void 的 OpenGL 函数
+#define GLCALL_V(function_call, gl_functions_ptr)        \
+    glCallImpl(                                          \
+        [&]() {                                          \
+            mstat::gl_calls++;                           \
+            (function_call); /* 直接执行，没有 return */ \
+        },                                               \
+        #function_call, gl_functions_ptr)
+
+// 新宏 2: 用于调用有返回值的 OpenGL 函数
+#define GLCALL_R(function_call, gl_functions_ptr)        \
+    glCallImpl(                                          \
+        [&]() {                                          \
+            mstat::gl_calls++;                           \
+            return (function_call); /* 执行并返回结果 */ \
+        },                                               \
+        #function_call, gl_functions_ptr)
+
+// DRAWCALL 也做类似修改
+#define DRAWCALL_V(function_call, gl_functions_ptr) \
+    glCallImpl(                                     \
+        [&]() {                                     \
+            mstat::draw_calls++;                    \
+            mstat::gl_calls++;                      \
+            (function_call);                        \
+        },                                          \
+        #function_call, gl_functions_ptr)
+
+#define DRAWCALL_R(func, f)      \
     glCallImpl(                  \
         [&]() {                  \
             mstat::draw_calls++; \

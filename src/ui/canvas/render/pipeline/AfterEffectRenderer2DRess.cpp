@@ -15,5 +15,5 @@ void Renderer2D::initAfterEffectShaders() {
 }
 
 void Renderer2D::initAfterEffectObjectBuffers() {
-    GLCALL(cvs->glGenVertexArrays(1, &fullScreenAO), cvs);
+    GLCALL_V(cvs->glGenVertexArrays(1, &fullScreenAO), cvs);
 }

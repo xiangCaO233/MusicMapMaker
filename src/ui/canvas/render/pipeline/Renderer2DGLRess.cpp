@@ -79,14 +79,14 @@ void Renderer2D::initShaderUBO(QOpenGLShaderProgram*& shader,
                                const char* debug_name,
                                const char* name_in_shader, uint32_t ubo_index) {
     // 检查是否找到了UBO块（如果拼写错误或被优化掉，可能找不到）
-    if (GLuint mask_ubo_index = GLCALL(
+    if (GLuint mask_ubo_index = GLCALL_R(
             cvs->glGetUniformBlockIndex(shader->programId(), name_in_shader),
             cvs);
         mask_ubo_index != GL_INVALID_INDEX) {
         // 将 uniform block 索引，绑定到绑定点 0
-        GLCALL(cvs->glUniformBlockBinding(shader->programId(), mask_ubo_index,
-                                          ubo_index),
-               cvs);
+        GLCALL_V(cvs->glUniformBlockBinding(shader->programId(), mask_ubo_index,
+                                            ubo_index),
+                 cvs);
     } else {
         qWarning() << "Could not find uniform block '" << name_in_shader
                    << "' in " << debug_name << " shader program.";
@@ -95,13 +95,13 @@ void Renderer2D::initShaderUBO(QOpenGLShaderProgram*& shader,
 
 void Renderer2D::initMaskUBO() {
     // 初始化ubo
-    GLCALL(cvs->glGenBuffers(1, &mask_uBO), cvs);
+    GLCALL_V(cvs->glGenBuffers(1, &mask_uBO), cvs);
     // 绑定ubo
-    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
+    GLCALL_V(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
     // 将UBO缓冲对象，也连接到绑定点 0
     // 这一步确保了绑定点0实际连接的是我们创建的 m_mask_ubo 这个GPU缓冲区
-    GLCALL(cvs->glBindBufferBase(GL_UNIFORM_BUFFER, 0, mask_uBO), cvs);
-    GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
+    GLCALL_V(cvs->glBindBufferBase(GL_UNIFORM_BUFFER, 0, mask_uBO), cvs);
+    GLCALL_V(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
 }
 
 // 更新fbo
@@ -152,12 +152,12 @@ void Renderer2D::update() {
     if (update_ubo) {
         // 更新ubo
         // 将CPU端的蒙版堆栈数据上传到UBO
-        GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
-        GLCALL(cvs->glBufferData(GL_UNIFORM_BUFFER,
-                                 MAX_MASK_LAYERS * sizeof(MaskLayer_STD140),
-                                 mask_stack_cpu.data(), GL_STATIC_DRAW),
-               cvs);
-        GLCALL(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
+        GLCALL_V(cvs->glBindBuffer(GL_UNIFORM_BUFFER, mask_uBO), cvs);
+        GLCALL_V(cvs->glBufferData(GL_UNIFORM_BUFFER,
+                                   MAX_MASK_LAYERS * sizeof(MaskLayer_STD140),
+                                   mask_stack_cpu.data(), GL_STATIC_DRAW),
+                 cvs);
+        GLCALL_V(cvs->glBindBuffer(GL_UNIFORM_BUFFER, 0), cvs);
 
         // 需要一个uniform告诉着色器当前有多少个活跃的蒙版层
         quad_shader_program->bind();
@@ -232,41 +232,41 @@ void Renderer2D::drawBatch(const RenderBatch& batch,
             // 更新矩形实例数组指针
             updateQuadAttribptrFromInstance(batch.startIndex);
             shader->setUniformValue("u_IsDrawingWireframe", false);
-            DRAWCALL(cvs->glDrawArraysInstanced(GL_TRIANGLES, 0, 6,
-                                                batch.elementCount),
-                     cvs);
+            DRAWCALL_V(cvs->glDrawArraysInstanced(GL_TRIANGLES, 0, 6,
+                                                  batch.elementCount),
+                       cvs);
             if (wireframe) {
                 shader->setUniformValue("u_IsDrawingWireframe", true);
-                DRAWCALL(cvs->glDrawArraysInstanced(GL_LINE_LOOP, 0, 6,
-                                                    batch.elementCount),
-                         cvs);
+                DRAWCALL_V(cvs->glDrawArraysInstanced(GL_LINE_LOOP, 0, 6,
+                                                      batch.elementCount),
+                           cvs);
             }
             break;
         }
         case PRIMITIVE: {
             shader->setUniformValue("u_IsDrawingWireframe", false);
-            DRAWCALL(cvs->glDrawArrays(GL_POINTS, batch.startIndex,
-                                       batch.elementCount),
-                     cvs);
+            DRAWCALL_V(cvs->glDrawArrays(GL_POINTS, batch.startIndex,
+                                         batch.elementCount),
+                       cvs);
             if (wireframe) {
                 shader->setUniformValue("u_IsDrawingWireframe", true);
-                DRAWCALL(cvs->glDrawArrays(GL_LINE_LOOP, batch.startIndex,
-                                           batch.elementCount),
-                         cvs);
+                DRAWCALL_V(cvs->glDrawArrays(GL_LINE_LOOP, batch.startIndex,
+                                             batch.elementCount),
+                           cvs);
             }
             break;
         }
         case MESH:
         case CURVE: {
             shader->setUniformValue("u_IsDrawingWireframe", false);
-            DRAWCALL(cvs->glDrawArrays(GL_TRIANGLES, batch.startIndex,
-                                       batch.elementCount),
-                     cvs);
+            DRAWCALL_V(cvs->glDrawArrays(GL_TRIANGLES, batch.startIndex,
+                                         batch.elementCount),
+                       cvs);
             if (wireframe) {
                 shader->setUniformValue("u_IsDrawingWireframe", true);
-                DRAWCALL(cvs->glDrawArrays(GL_LINE_LOOP, batch.startIndex,
-                                           batch.elementCount),
-                         cvs);
+                DRAWCALL_V(cvs->glDrawArrays(GL_LINE_LOOP, batch.startIndex,
+                                             batch.elementCount),
+                           cvs);
             }
             break;
         }
@@ -279,18 +279,18 @@ void Renderer2D::update_gpudata() {
     // 矩形数据
     if (!quad_datas.empty()) {
         // 绑定矩形实例缓冲区
-        GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, quad_instance_dataBO), cvs);
+        GLCALL_V(cvs->glBindBuffer(GL_ARRAY_BUFFER, quad_instance_dataBO), cvs);
         // 一次性上传所有矩形实例数据
-        GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
-                                 quad_datas.size() * sizeof(PrimitiveData),
-                                 quad_datas.data(), GL_DYNAMIC_DRAW),
-               cvs);
+        GLCALL_V(cvs->glBufferData(GL_ARRAY_BUFFER,
+                                   quad_datas.size() * sizeof(PrimitiveData),
+                                   quad_datas.data(), GL_DYNAMIC_DRAW),
+                 cvs);
     }
 
     // 网格数据
     if (!mesh_datas.empty()) {
         // 绑定网格缓冲区
-        GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, mesh_dataBO), cvs);
+        GLCALL_V(cvs->glBindBuffer(GL_ARRAY_BUFFER, mesh_dataBO), cvs);
 
         // 规范网格数据
         std::vector<CustomVertex> stagingVertexBuffer;
@@ -302,7 +302,7 @@ void Renderer2D::update_gpudata() {
         }
 
         // 一次性上传所有网格数据
-        GLCALL(
+        GLCALL_V(
             cvs->glBufferData(GL_ARRAY_BUFFER,
                               stagingVertexBuffer.size() * sizeof(CustomVertex),
                               stagingVertexBuffer.data(), GL_DYNAMIC_DRAW),
@@ -312,12 +312,13 @@ void Renderer2D::update_gpudata() {
     // 图元数据
     if (!primitive_datas.empty()) {
         // 绑定图元实例缓冲区
-        GLCALL(cvs->glBindBuffer(GL_ARRAY_BUFFER, primitive_dataBO), cvs);
+        GLCALL_V(cvs->glBindBuffer(GL_ARRAY_BUFFER, primitive_dataBO), cvs);
         // 一次性上传所有矩形实例数据
-        GLCALL(cvs->glBufferData(GL_ARRAY_BUFFER,
-                                 primitive_datas.size() * sizeof(PrimitiveData),
-                                 primitive_datas.data(), GL_DYNAMIC_DRAW),
-               cvs);
+        GLCALL_V(
+            cvs->glBufferData(GL_ARRAY_BUFFER,
+                              primitive_datas.size() * sizeof(PrimitiveData),
+                              primitive_datas.data(), GL_DYNAMIC_DRAW),
+            cvs);
     }
 
     // 曲线数据
@@ -355,7 +356,7 @@ void Renderer2D::render() {
     // 告诉OpenGL，接下来的绘制操作，片元着色器的 location=0
     // 的输出去附件0，location=1 的输出去附件1
     // 2是附件的数量
-    GLCALL(cvs->glDrawBuffers(2, drawBuffers), cvs);
+    GLCALL_V(cvs->glDrawBuffers(2, drawBuffers), cvs);
     // 定义场景附件的背景色 (例如灰色)
     const float sceneClearColor[] = {0.23f, 0.23f, 0.23f, 1.0f};
     // ✨️ 定义辉光附件的背景色 (必须是纯黑！) ✨️
@@ -363,18 +364,18 @@ void Renderer2D::render() {
 
     // 分别清空两个颜色附件
     // cvs->glClearBufferfv(buffer_type, drawbuffer_index, value_pointer);
-    GLCALL(cvs->glClearBufferfv(GL_COLOR, 0, sceneClearColor),
-           cvs);  // 清空 attachment 0
-    GLCALL(cvs->glClearBufferfv(GL_COLOR, 1, bloomClearColor),
-           cvs);  // 清空 attachment 1
+    GLCALL_V(cvs->glClearBufferfv(GL_COLOR, 0, sceneClearColor),
+             cvs);  // 清空 attachment 0
+    GLCALL_V(cvs->glClearBufferfv(GL_COLOR, 1, bloomClearColor),
+             cvs);  // 清空 attachment 1
 
     // GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
     // 在渲染循环前开启并设置混合
-    GLCALL(cvs->glEnable(GL_BLEND), cvs);
+    GLCALL_V(cvs->glEnable(GL_BLEND), cvs);
     // 为颜色附件1 (glowmask) 设置加法混合
     // 公式: Result = SrcColor * 1 + DstColor * 1
-    GLCALL(cvs->glBlendEquationi(1, GL_FUNC_ADD), cvs);
-    GLCALL(cvs->glBlendFunci(1, GL_ONE, GL_ONE), cvs);
+    GLCALL_V(cvs->glBlendEquationi(1, GL_FUNC_ADD), cvs);
+    GLCALL_V(cvs->glBlendFunci(1, GL_ONE, GL_ONE), cvs);
 
     // === 2. 在单个循环中通过状态追踪进行渲染 ===
     QOpenGLShaderProgram* current_shader{nullptr};
@@ -400,13 +401,14 @@ void Renderer2D::render() {
         }
         if (current_vao != required_vao) {
             current_vao = required_vao;
-            GLCALL(cvs->glBindVertexArray(current_vao), cvs);
+            GLCALL_V(cvs->glBindVertexArray(current_vao), cvs);
         }
 
         // 设置通用状态 (纹理)
-        GLCALL(cvs->glActiveTexture(GL_TEXTURE0), cvs);
-        GLCALL(cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, batch.texture_array_id),
-               cvs);
+        GLCALL_V(cvs->glActiveTexture(GL_TEXTURE0), cvs);
+        GLCALL_V(
+            cvs->glBindTexture(GL_TEXTURE_2D_ARRAY, batch.texture_array_id),
+            cvs);
         current_shader->setUniformValue("u_samplerarray", 0);
         // GLCALL(cvs->glActiveTexture(GL_TEXTURE1), cvs);
         // GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]),
@@ -417,7 +419,7 @@ void Renderer2D::render() {
     }
 
     // === 3. 最终清理 ===
-    GLCALL(cvs->glBindVertexArray(0), cvs);
+    GLCALL_V(cvs->glBindVertexArray(0), cvs);
     if (current_shader) {
         current_shader->release();
     }
@@ -446,7 +448,7 @@ void Renderer2D::render() {
 // 后期处理
 void Renderer2D::afterEffect() {
     gaussian_blur_shader->bind();
-    GLCALL(cvs->glBindVertexArray(fullScreenAO), cvs);
+    GLCALL_V(cvs->glBindVertexArray(fullScreenAO), cvs);
     bool horizontal = true;
     bool first_iteration = true;
 
@@ -462,19 +464,19 @@ void Renderer2D::afterEffect() {
         // 绑定源纹理
         if (first_iteration) {
             // 第一次读取辉光遮罩
-            GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
-            GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]),
-                   cvs);
+            GLCALL_V(cvs->glActiveTexture(GL_TEXTURE2), cvs);
+            GLCALL_V(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[1]),
+                     cvs);
         } else {
             // 后续读取A的结果
-            GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
-            GLCALL(cvs->glBindTexture(GL_TEXTURE_2D,
-                                      gaussianBlurFBOA->textures()[0]),
-                   cvs);
+            GLCALL_V(cvs->glActiveTexture(GL_TEXTURE2), cvs);
+            GLCALL_V(cvs->glBindTexture(GL_TEXTURE_2D,
+                                        gaussianBlurFBOA->textures()[0]),
+                     cvs);
         }
         gaussian_blur_shader->setUniformValue("horizontal", true);
         // 绘制全屏矩形
-        GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
+        DRAWCALL_V(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
         gaussianBlurFBOB->release();
 
         // --- Pass 2: 纵向模糊 ---
@@ -482,36 +484,36 @@ void Renderer2D::afterEffect() {
         gaussianBlurFBOA->bind();
 
         // 绑定源纹理 (现在是B)
-        GLCALL(cvs->glActiveTexture(GL_TEXTURE2), cvs);
-        GLCALL(
+        GLCALL_V(cvs->glActiveTexture(GL_TEXTURE2), cvs);
+        GLCALL_V(
             cvs->glBindTexture(GL_TEXTURE_2D, gaussianBlurFBOB->textures()[0]),
             cvs);
         gaussian_blur_shader->setUniformValue("horizontal", false);
-        GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
+        DRAWCALL_V(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
         gaussianBlurFBOA->release();
 
         first_iteration = false;
     }
     gaussian_blur_shader->release();
-    GLCALL(cvs->glBindVertexArray(0), cvs);
+    GLCALL_V(cvs->glBindVertexArray(0), cvs);
 }
 
 // 混合着色
 void Renderer2D::composite() {
     composite_shader->bind();
-    GLCALL(cvs->glBindVertexArray(fullScreenAO), cvs);
+    GLCALL_V(cvs->glBindVertexArray(fullScreenAO), cvs);
     // 绑定混成fbo
     compositeFBO->bind();
 
     // 设置纹理槽0为mainfbo的原始纹理
-    GLCALL(cvs->glActiveTexture(GL_TEXTURE0), cvs);
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[0]), cvs);
+    GLCALL_V(cvs->glActiveTexture(GL_TEXTURE0), cvs);
+    GLCALL_V(cvs->glBindTexture(GL_TEXTURE_2D, mainFBO->textures()[0]), cvs);
     composite_shader->setUniformValue("sources[0]", 0);
 
     // 纹理槽1为模糊处理结果
-    GLCALL(cvs->glActiveTexture(GL_TEXTURE1), cvs);
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, gaussianBlurFBOA->textures()[0]),
-           cvs);
+    GLCALL_V(cvs->glActiveTexture(GL_TEXTURE1), cvs);
+    GLCALL_V(cvs->glBindTexture(GL_TEXTURE_2D, gaussianBlurFBOA->textures()[0]),
+             cvs);
     composite_shader->setUniformValue("sources[1]", 1);
 
     // 设置混成强度值
@@ -520,11 +522,11 @@ void Renderer2D::composite() {
     composite_shader->setUniformValue("active_sources", 2);
 
     // 执行绘制
-    GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
+    DRAWCALL_V(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
 
     // 释放
     compositeFBO->release();
-    GLCALL(cvs->glBindVertexArray(0), cvs);
+    GLCALL_V(cvs->glBindVertexArray(0), cvs);
     composite_shader->release();
 }
 
@@ -533,27 +535,28 @@ void Renderer2D::swap() {
     composite_shader->bind();
     // 场景背景色
     const float sceneClearColor[] = {0.23f, 0.23f, 0.23f, 1.0f};
-    GLCALL(cvs->glClearColor(sceneClearColor[0], sceneClearColor[1],
-                             sceneClearColor[2], sceneClearColor[3]),
-           cvs);
-    GLCALL(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
-    GLCALL(cvs->glBindVertexArray(fullScreenAO), cvs);
-    GLCALL(
+    GLCALL_V(cvs->glClearColor(sceneClearColor[0], sceneClearColor[1],
+                               sceneClearColor[2], sceneClearColor[3]),
+             cvs);
+    GLCALL_V(cvs->glClear(GL_COLOR_BUFFER_BIT), cvs);
+    GLCALL_V(cvs->glBindVertexArray(fullScreenAO), cvs);
+    GLCALL_V(
         cvs->glBindFramebuffer(GL_FRAMEBUFFER, cvs->defaultFramebufferObject()),
         cvs);
     // 恢复视口到窗口物理大小
-    GLCALL(cvs->glViewport(0, 0, phisical_viewport.x, phisical_viewport.y),
-           cvs);
+    GLCALL_V(cvs->glViewport(0, 0, phisical_viewport.x, phisical_viewport.y),
+             cvs);
 
     // 设置纹理槽0为混成结果纹理
-    GLCALL(cvs->glActiveTexture(GL_TEXTURE0), cvs);
-    GLCALL(cvs->glBindTexture(GL_TEXTURE_2D, compositeFBO->textures()[0]), cvs);
+    GLCALL_V(cvs->glActiveTexture(GL_TEXTURE0), cvs);
+    GLCALL_V(cvs->glBindTexture(GL_TEXTURE_2D, compositeFBO->textures()[0]),
+             cvs);
     composite_shader->setUniformValue("sources[0]", 0);
     // 设置激活的混成源纹理数量
     composite_shader->setUniformValue("active_sources", 1);
     // 执行绘制
-    GLCALL(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
+    DRAWCALL_V(cvs->glDrawArrays(GL_TRIANGLES, 0, 6), cvs);
 
-    GLCALL(cvs->glBindVertexArray(0), cvs);
+    GLCALL_V(cvs->glBindVertexArray(0), cvs);
     composite_shader->release();
 }
