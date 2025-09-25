@@ -245,6 +245,7 @@ class MeshGenerateSystem {
                     // 节点需在同步系统中完成InvalidNoteUUID的实体创建和附件更新
                     // 使用虚影渲染
                     entity_mesh.state = MeshState::GHOST;
+                    generateMesh(track_index, e, entity_mesh, time, y);
                 } else {
                     // 有uuid,是真实在谱面中存在的物件-正常渲染
                     // 判断是否在选中集合内

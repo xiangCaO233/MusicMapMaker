@@ -36,10 +36,6 @@ inline std::pair<int64_t, int64_t> get_interval(const Note* note) {
 }
 
 /**
- * @brief 一个支持高效增删和稳定引用的对象存储容器。
- */
-
-/**
  * @class SlottedArray
  * @brief 使用空闲列表管理的槽位数组，实现O(1)的增删，并提供稳定的句柄。
  * @tparam T 存储的对象类型（基类）。
@@ -221,7 +217,7 @@ class SlottedArray {
         return const_reverse_iterator(end());
     }
     const_reverse_iterator rend() const {
-        return const_reverse_iterator(end());
+        return const_reverse_iterator(begin());
     }
     const_reverse_iterator crbegin() const {
         return const_reverse_iterator(cend());
@@ -290,31 +286,69 @@ class IntervalTree {
         return new_node;
     }
 
-    void remove(Node* node_to_delete) {
-        if (!node_to_delete) return;
-        Node *y, *x;
-        if (!node_to_delete->left || !node_to_delete->right)
-            y = node_to_delete;
-        else
-            y = successor(node_to_delete);
-        if (y->left)
-            x = y->left;
-        else
-            x = y->right;
-        if (x) x->parent = y->parent;
-        if (!y->parent)
-            m_root = x;
-        else if (y == y->parent->left)
-            y->parent->left = x;
-        else
-            y->parent->right = x;
-        if (y != node_to_delete) {
-            node_to_delete->interval = y->interval;
-            node_to_delete->handle = y->handle;
-        }
-        update_max_end_upwards(y->parent);
-        delete y;
+    // ================== [MODIFIED START] ==================
+    // 更改1：将 successor 设为 public，以便 NoteCollection 可以调用它
+    Node* successor(Node* x) {
+        if (!x || !x->right) return nullptr;
+        Node* current = x->right;
+        while (current->left) current = current->left;
+        return current;
     }
+
+    // 更改2：使用更健壮的 remove 实现
+    void remove(Node* node_to_delete) {
+        if (!node_to_delete) {
+            return;
+        }
+
+        Node* node_to_unlink;  // 这是将要被物理上从树中移除的节点。
+        Node* child;  // 这是 node_to_unlink 的单个子节点（或 nullptr）。
+
+        // 步骤 1: 确定哪个节点需要被物理上摘除。
+        if (node_to_delete->left == nullptr ||
+            node_to_delete->right == nullptr) {
+            node_to_unlink = node_to_delete;
+        } else {
+            node_to_unlink = successor(node_to_delete);
+        }
+
+        // 步骤 2: 找到 node_to_unlink 的子节点（最多只有一个）。
+        if (node_to_unlink->left != nullptr) {
+            child = node_to_unlink->left;
+        } else {
+            child = node_to_unlink->right;
+        }
+
+        // 步骤 3: 在修改任何指针之前，安全地获取将要开始更新 max_end 的父节点。
+        Node* update_start_node = node_to_unlink->parent;
+
+        // 步骤 4: 将 child 连接到 node_to_unlink 的父节点。
+        if (child != nullptr) {
+            child->parent = node_to_unlink->parent;
+        }
+
+        if (node_to_unlink->parent == nullptr) {
+            m_root = child;
+        } else if (node_to_unlink == node_to_unlink->parent->left) {
+            node_to_unlink->parent->left = child;
+        } else {
+            node_to_unlink->parent->right = child;
+        }
+
+        // 步骤 5:
+        // 如果我们摘除的是后继者节点，需要将其数据复制回最初请求删除的节点。
+        if (node_to_unlink != node_to_delete) {
+            node_to_delete->interval = node_to_unlink->interval;
+            node_to_delete->handle = node_to_unlink->handle;
+        }
+
+        // 步骤 6: 从受影响的父节点开始，向上更新 max_end 属性。
+        update_max_end_upwards(update_start_node);
+
+        // 步骤 7: 现在可以安全地删除被摘除的节点了。
+        delete node_to_unlink;
+    }
+    // ================== [MODIFIED END] ==================
 
     void find_overlapping(Interval query,
                           std::vector<NoteHandle>& result) const {
@@ -323,13 +357,6 @@ class IntervalTree {
     }
 
    private:
-    Node* successor(Node* x) {
-        if (!x || !x->right) return nullptr;
-        Node* current = x->right;
-        while (current->left) current = current->left;
-        return current;
-    }
-
     int64_t calculate_max_end(Node* node) {
         if (!node) return -1;
         int64_t max_val = node->interval.second;
@@ -377,6 +404,7 @@ class IntervalTree {
 class NoteCollection {
    public:
     using TimelineIndex = std::map<int64_t, std::vector<NoteHandle>>;
+    using Node = IntervalTree::Node;  // 方便使用
 
     NoteCollection() = default;
 
@@ -392,48 +420,77 @@ class NoteCollection {
         return handle;
     }
 
+    // ================== [MODIFIED START] ==================
+    // 更改3：重写 remove_note 以正确同步 m_handle_to_interval_node
     std::unique_ptr<Note> remove_note(NoteHandle handle) {
         if (!m_storage.is_valid(handle)) return nullptr;
-        const Note* note_to_remove = m_storage.get(handle);
-        auto& notes_at_ts = m_timeline.at(note_to_remove->timestamp());
+        const Note* note_ptr = m_storage.get(handle);
+
+        // a. 更新时间线索引
+        auto& notes_at_ts = m_timeline.at(note_ptr->timestamp());
         notes_at_ts.erase(
             std::remove(notes_at_ts.begin(), notes_at_ts.end(), handle),
             notes_at_ts.end());
-        if (notes_at_ts.empty()) m_timeline.erase(note_to_remove->timestamp());
+        if (notes_at_ts.empty()) m_timeline.erase(note_ptr->timestamp());
+
+        // b. 更新区间树和反向映射索引
         auto it = m_handle_to_interval_node.find(handle);
         if (it != m_handle_to_interval_node.end()) {
-            m_interval_tree.remove(it->second);
-            m_handle_to_interval_node.erase(it);
+            Node* node_to_delete = it->second;
+
+            // 1. 预判：检查是否会发生复杂的“后继节点替换”情况。
+            bool successor_swap_will_occur = false;
+            NoteHandle successor_handle;
+            if (node_to_delete->left && node_to_delete->right) {
+                Node* successor_node =
+                    m_interval_tree.successor(node_to_delete);
+                if (successor_node) {
+                    successor_handle = successor_node->handle;
+                    successor_swap_will_occur = true;
+                }
+            }
+
+            // 2. 执行树的删除操作。
+            m_interval_tree.remove(node_to_delete);
+
+            // 3. 同步 map！这是最关键的一步。
+            if (successor_swap_will_occur) {
+                // a. 后继节点的物理内存已被释放，其在 map
+                // 中的条目现在是悬垂指针！必须移除。
+                m_handle_to_interval_node.erase(successor_handle);
+
+                // b. 我们请求删除的 handle 对应的节点 `node_to_delete`
+                // 仍然存在，
+                //    但现在包含的是后继节点的数据。因此，必须将后继节点的句柄
+                //    重新映射到这个“幸存”的节点上。
+                m_handle_to_interval_node[successor_handle] = node_to_delete;
+            }
+
+            // 4. 无论如何，最初请求删除的句柄在逻辑上已经不存在于树中，从 map
+            // 中移除它。
+            m_handle_to_interval_node.erase(handle);
         }
+
+        // c. 最后从存储层移除
         return std::move(m_storage.remove(handle));
     }
 
+    // 更改4：重写 update_note 以正确同步 m_handle_to_interval_node
     std::unique_ptr<Note> update_note(NoteHandle handle,
                                       std::unique_ptr<Note> new_note_data) {
         if (!m_storage.is_valid(handle) || !new_note_data) return nullptr;
 
-        // --- 步骤 1: 原子性地替换核心数据，并获得旧数据的唯一所有权 ---
-        // 这一步之后，m_storage
-        // 中已经是新数据了，而我们手里有旧数据的完整所有权。
-        // 不再有任何指向旧数据的裸指针会悬垂。
         std::unique_ptr<Note> old_note_data =
             m_storage.replace(handle, std::move(new_note_data));
 
-        // 如果替换失败（比如并发时句柄失效），立即返回
         if (!old_note_data) {
-            // new_note_data 的所有权在 std::move
-            // 后已经丢失，这里不需要把它放回去
             return nullptr;
         }
 
-        // --- 步骤 2: 使用安全的指针来更新辅助索引 ---
         const Note* old_note_ptr = old_note_data.get();
-        const Note* new_note_ptr =
-            m_storage.get(handle);  // 从 storage 中获取新数据的安全裸指针
+        const Note* new_note_ptr = m_storage.get(handle);
 
-        // 防御性编程：确保新数据真的进去了
         if (!new_note_ptr) {
-            // 这是一个灾难性失败，状态已损坏。我们尝试回滚。
             m_storage.replace(handle, std::move(old_note_data));
             return nullptr;
         }
@@ -454,21 +511,40 @@ class NoteCollection {
         if (get_interval(old_note_ptr) != get_interval(new_note_ptr)) {
             auto it = m_handle_to_interval_node.find(handle);
             if (it != m_handle_to_interval_node.end()) {
-                // 先从 map 中移除，再删除节点，避免悬垂指针
-                IntervalTree::Node* node_to_remove = it->second;
-                m_handle_to_interval_node.erase(it);  // <--  crucial fix!
-                m_interval_tree.remove(node_to_remove);
+                Node* node_to_delete = it->second;
 
-                // 插入新的节点并更新 map
+                // 1. 预判是否会发生“后继节点替换”。
+                bool successor_swap_will_occur = false;
+                NoteHandle successor_handle;
+                if (node_to_delete->left && node_to_delete->right) {
+                    Node* successor_node =
+                        m_interval_tree.successor(node_to_delete);
+                    if (successor_node) {
+                        successor_handle = successor_node->handle;
+                        successor_swap_will_occur = true;
+                    }
+                }
+
+                // 2. 从树中删除旧的区间。
+                m_interval_tree.remove(node_to_delete);
+
+                // 3. 同步 map 以清理旧状态。
+                if (successor_swap_will_occur) {
+                    m_handle_to_interval_node.erase(successor_handle);
+                    m_handle_to_interval_node[successor_handle] =
+                        node_to_delete;
+                }
+                m_handle_to_interval_node.erase(handle);
+
+                // 4. 为新数据插入新的区间节点。
                 auto* new_node_ptr =
                     m_interval_tree.insert(get_interval(new_note_ptr), handle);
                 m_handle_to_interval_node[handle] = new_node_ptr;
             }
         }
-
-        // --- 步骤 3: 返回旧数据的所有权 ---
         return old_note_data;
     }
+    // ================== [MODIFIED END] ==================
 
     // --- 读取/查询 API ---
     const Note* get_note(NoteHandle handle) const {
@@ -549,35 +625,23 @@ class NoteCollection {
         }
 
         // lower_bound 找到第一个不小于 timestamp 的元素。
-        // 这可能是要找的“大于等于”的最近者。
         auto it_after = m_timeline.lower_bound(timestamp);
 
-        // 情况1：正好找到一个完全匹配的。
         if (it_after != m_timeline.end() && it_after->first == timestamp) {
-            return it_after->second;  // 直接返回该时间戳下的所有音符句柄。
-        }
-
-        // 情况2：没有完全匹配的，需要在前一个和后一个之间选择。
-
-        // 查找前一个元素 "it_before"
-        auto it_before = it_after;
-        if (it_before != m_timeline.begin()) {
-            --it_before;  // it_after 不是 begin()，所以可以安全地递减。
-        } else {
-            // 如果 it_after 就是 begin()，说明所有元素都大于或等于 timestamp，
-            // 那么最近的只能是 it_after 指向的。
             return it_after->second;
         }
 
-        // 此时 it_after 指向 "大于" 的最近者，it_before 指向 "小于" 的最近者。
+        if (it_after == m_timeline.begin()) {
+            return it_after != m_timeline.end() ? it_after->second
+                                                : std::vector<NoteHandle>{};
+        }
 
-        // 如果 it_after 已经是 end()，说明所有元素都小于 timestamp，
-        // 那么最近的只能是 it_before 指向的 (即最后一个元素)。
+        auto it_before = std::prev(it_after);
+
         if (it_after == m_timeline.end()) {
             return it_before->second;
         }
 
-        // 比较两者与 timestamp 的距离
         int64_t dist_before = timestamp - it_before->first;
         int64_t dist_after = it_after->first - timestamp;
 
@@ -586,7 +650,6 @@ class NoteCollection {
         } else if (dist_after < dist_before) {
             return it_after->second;
         } else {
-            // 距离相等，一种合理的做法是返回两者的并集。
             std::vector<NoteHandle> result = it_before->second;
             result.insert(result.end(), it_after->second.begin(),
                           it_after->second.end());
@@ -603,18 +666,10 @@ class NoteCollection {
         if (m_timeline.empty()) {
             return {};
         }
-
-        // lower_bound 找到第一个不小于 timestamp 的元素。
         auto it = m_timeline.lower_bound(timestamp);
-
-        // 我们要找的是严格小于的，所以需要看 lower_bound 找到的元素的前一个。
         if (it == m_timeline.begin()) {
-            // 如果 lower_bound 返回的是 begin()，说明集合中没有元素小于
-            // timestamp。
             return {};
         }
-
-        // 安全地递减迭代器，it 现在指向的就是我们想要的结果。
         --it;
         return it->second;
     }
@@ -628,16 +683,10 @@ class NoteCollection {
         if (m_timeline.empty()) {
             return {};
         }
-
-        // upper_bound 找到第一个严格大于 timestamp 的元素。
         auto it = m_timeline.upper_bound(timestamp);
-
         if (it == m_timeline.end()) {
-            // 如果 upper_bound 返回的是 end()，说明集合中没有元素大于
-            // timestamp。
             return {};
         }
-
         return it->second;
     };
 
@@ -652,7 +701,7 @@ class NoteCollection {
     IntervalTree m_interval_tree;
 
     /// @brief 反向映射：从句柄快速定位到其在区间树中的节点，实现O(log N)更新。
-    std::unordered_map<NoteHandle, IntervalTree::Node*, NoteHandle::Hash>
+    std::unordered_map<NoteHandle, Node*, NoteHandle::Hash>
         m_handle_to_interval_node;
 };
 

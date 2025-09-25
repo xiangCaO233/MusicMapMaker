@@ -48,6 +48,8 @@ struct EditorInfo {
 };
 
 struct MapCanvasInfo : public SharedCanvasInfo {
+    ~MapCanvasInfo() override = default;
+
     // map信息
     MapInfo mapInfo;
     // 编辑信息

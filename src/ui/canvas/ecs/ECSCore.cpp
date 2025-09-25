@@ -1,10 +1,13 @@
 #include <ecs/ECSCore.hpp>
+#include <ecs/component/ComponentInspector.hpp>
 #include <ecs/component/EffectComponents.hpp>
 #include <mmm/map/MMap.hpp>
 
 // 构造ECSCore
 ECSCore::ECSCore()
-    : beat_group(registry.group<TimeComponent, BeatComponent>()) {};
+    : beat_group(registry.group<TimeComponent, BeatComponent>()) {
+    ComponentInspector::registerAllComponentsForInspector();
+};
 
 // 析构ECSCore
 ECSCore::~ECSCore() = default;

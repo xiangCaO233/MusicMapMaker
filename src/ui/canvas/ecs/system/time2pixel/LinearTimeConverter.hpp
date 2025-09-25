@@ -22,6 +22,7 @@ class LinearTimeConverter : public TimePixelConverter {
      * @param status 包含画布状态，主要使用 timeline_zoom。
      */
     explicit LinearTimeConverter(const MapCanvasInfo* info) : m_info(info) {}
+    ~LinearTimeConverter() override = default;
 
     /**
      * @brief [核心] 将时间戳转换为相对于判定线的屏幕像素位置 (线性)。

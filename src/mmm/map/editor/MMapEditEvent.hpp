@@ -10,11 +10,12 @@ class Timing;
 enum class MMapEditEventType {
     // 物件添加
     NoteAdded,
+    NotesAdded,
     // 物件移除
     NoteRemoved,
+    NotesRemoved,
     // 物件更新
     NoteUpdated,
-    // 多个物件更新
     NotesUpdated,
     // timing添加
     TimingAdded,

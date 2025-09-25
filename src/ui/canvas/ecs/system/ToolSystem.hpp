@@ -63,7 +63,8 @@ class ToolSystem {
         }
         return {};
     }
-    const entt::registry& get_registry() { return registry; }
+
+    entt::registry& get_registry() { return registry; }
 
     /**
      * @brief [线程安全] UI 线程可以调用此函数进行交互查询.

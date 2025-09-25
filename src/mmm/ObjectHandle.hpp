@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <string>
 
 // --- 稳定的句柄 (Stable Handle) ---
 
@@ -64,5 +65,7 @@ struct NoteHandle {
 using NoteUUID = uint64_t;
 // 定义一个常量来表示无效的稳定ID。
 constexpr NoteUUID InvalidNoteUUID = 0;
+
+inline std::string to_string(const NoteUUID& id) { return std::to_string(id); }
 
 #endif  // MMM_NOTEHANDLE_HPP

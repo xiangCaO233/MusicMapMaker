@@ -118,6 +118,7 @@ struct RealTimeInfo {
 };
 
 struct SharedCanvasInfo {
+    virtual ~SharedCanvasInfo() = default;
     // 基本信息
     BaseCanvasStatus baseInfo;
     // 实时信息

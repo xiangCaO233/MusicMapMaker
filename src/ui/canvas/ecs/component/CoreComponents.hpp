@@ -3,7 +3,14 @@
 
 #include <cstdint>
 #include <glm/glm.hpp>
+#include <sstream>
 #include <string>
+
+inline std::string to_string(const glm::vec4& v) {
+    std::stringstream ss;
+    ss << "{" << v.x << ", " << v.y << ", " << v.z << ", " << v.w << "}";
+    return ss.str();
+}
 
 // 音乐时间属性
 struct TimeComponent {

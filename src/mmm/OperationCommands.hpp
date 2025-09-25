@@ -271,6 +271,8 @@ class UpdateMultipleNotesCommand : public OperationCommand {
                 success = false;
                 continue;  // 跳过无效的
             }
+            qDebug() << "update handle:[index:" << handle.index
+                     << ",generation:" << handle.generation << "]";
 
             // 使用 update_note，并将返回的旧数据存起来，以备 undo
             auto returned_old =

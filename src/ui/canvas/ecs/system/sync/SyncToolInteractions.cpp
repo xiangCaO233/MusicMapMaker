@@ -7,6 +7,8 @@
 #include <tool/ThreadSafeQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
 
+#include "ecs/component/ComponentInspector.hpp"
+
 void updateHover(ToolSystem* toolSystem,
                  ToolInteractionState* toolInteractionState,
                  const MapCanvasInfo* info) {
@@ -68,15 +70,21 @@ void updateHover(ToolSystem* toolSystem,
 
             // toolSystem->get_mesh_info_tree().print_tree();
 
-            qDebug() << "更新hover到uuid:" << hit_info.uuid;
-            qDebug() << "检测到悬浮于最终来源实体:"
+            qDebug() << "source_entity:"
                      << static_cast<uint32_t>(hit_info.source_entity);
-            qDebug() << "检测到悬浮于子实体:"
-                     << static_cast<uint32_t>(hit_info.child_entity);
-
-            qDebug() << "更新悬浮物件为"
-                     << (note ? note->toString() : "创建中的物件");
-            qDebug() << "悬浮的部位:" << to_string(hit_info.part);
+            std::cout << ComponentInspector::inspect<
+                             TimeComponent, NoteComponent, TransformComponent>(
+                             toolSystem->get_registry(), hit_info.source_entity)
+                      << std::endl;
+            if (toolSystem->get_registry().valid(hit_info.child_entity)) {
+                qDebug() << "source_entity:"
+                         << static_cast<uint32_t>(hit_info.child_entity);
+                std::cout
+                    << ComponentInspector::inspect<TimeComponent, NoteComponent,
+                                                   TransformComponent>(
+                           toolSystem->get_registry(), hit_info.child_entity)
+                    << std::endl;
+            }
         }
 
         // qDebug() << "当前hover到id:" << hit_info.handle.index;

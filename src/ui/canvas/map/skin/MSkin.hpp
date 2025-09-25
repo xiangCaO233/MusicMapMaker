@@ -18,18 +18,46 @@ enum class EffectTextureType : int32_t {
     SLIDE_END,
 };
 
+inline std::string to_string(const EffectTextureType& type) {
+    switch (type) {
+        case EffectTextureType::NONE:
+            return "NONE";
+        case EffectTextureType::NORMAL:
+            return "NORMAL";
+        case EffectTextureType::SLIDE_END:
+            return "SLIDE_END";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 // 音效类型
 enum class SoundEffectType : int32_t {
-    NONE,
+    NONE = 0,
     // 正常击中
-    COMMON_HIT = 0,
+    COMMON_HIT = 1,
     // 滑动
-    SLIDE = 1,
+    SLIDE = 2,
     // 长条按住
-    HOLDING = 2,
+    HOLDING = 3,
     // 长条释放
-    HOLD_RELEASE = 3,
+    HOLD_RELEASE = 4,
 };
+
+inline std::string to_string(const SoundEffectType& type) {
+    switch (type) {
+        case SoundEffectType::NONE:
+            return "NONE";
+        case SoundEffectType::COMMON_HIT:
+            return "COMMON_HIT";
+        case SoundEffectType::SLIDE:
+            return "SLIDE";
+        case SoundEffectType::HOLDING:
+            return "HOLDING";
+        case SoundEffectType::HOLD_RELEASE:
+            return "HOLD_RELEASE";
+    }
+}
 
 // 物件状态
 enum class ObjectStatus : int32_t {

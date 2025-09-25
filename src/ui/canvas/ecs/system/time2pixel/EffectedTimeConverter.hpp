@@ -20,8 +20,10 @@ class EffectedTimeConverter : public TimePixelConverter {
         buildLookupTable(timings, prebpm);
     }
 
+    ~EffectedTimeConverter() override = default;
+
     float timeToPixel(int64_t timestamp, int64_t current_canvas_time,
-                      const MapCanvasInfo* info) const {
+                      const MapCanvasInfo* info) const override {
         double pixel_at_timestamp = getAbsolutePixelAt(timestamp);
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double relative_pixel_offset =
@@ -34,7 +36,8 @@ class EffectedTimeConverter : public TimePixelConverter {
                     (1.f - info->baseInfo.judgeline_pos));
     }
 
-    int64_t distanceToTime(float pixel_y, int64_t current_canvas_time) const {
+    int64_t distanceToTime(float pixel_y,
+                           int64_t current_canvas_time) const override {
         if (std::abs(m_status.timeline_zoom) < 1e-9) return current_canvas_time;
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double target_absolute_pixel =
