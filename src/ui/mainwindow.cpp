@@ -45,11 +45,8 @@ void MainWindow::connectAll() {
     // 连接激活项目时的信号-项目配置dock的初始化
     auto project_setting_dock_content = ui->project_config;
     connect(ui->project_manager->get_service(),
-            &ProjectService::activateProject,
-            [project_setting_dock_content](MProject* project) {
-                // 绑定配置到配置ui
-                project_setting_dock_content->bind_config(project->cfg());
-            });
+            &ProjectService::activateProject, project_setting_dock_content,
+            &ProjectConfig::bind_config);
     // 连接项目配置更新的信号-轨道布局
     connect(ui->project_config, &ProjectConfig::layout_changed, canvas,
             &MapCanvas::onLayoutUpdated);
