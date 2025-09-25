@@ -14,7 +14,7 @@ void MMap::writeOsu(const std::string& desfile) {
 
     std::string backslashn;
 #ifdef _WIN32
-    slashn = "\r\n";
+    backslashn = "\r\n";
 #else
     backslashn = "\n";
 #endif  //_WIN32

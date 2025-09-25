@@ -49,23 +49,11 @@ class ToolCommandProcessor {
                 // 编辑相关
                 // 复制
                 [&](const CopyCommand& arg) {
-                    std::unordered_set<NoteUUID> uuids;
-                    for (const auto& e : arg.entities) {
-                        auto& [track, uuid] = registry.get<NoteComponent>(e);
-                        uuids.insert(uuid);
-                    }
-                    interactionState.setClipBoard(uuids, true);
-                    qDebug() << "已复制";
+                    setClipBoard(arg.entities, true);
                 },
                 // 剪切
                 [&](const CutCommand& arg) {
-                    std::unordered_set<NoteUUID> uuids;
-                    for (const auto& e : arg.entities) {
-                        auto& [track, uuid] = registry.get<NoteComponent>(e);
-                        uuids.insert(uuid);
-                    }
-                    interactionState.setClipBoard(uuids, false);
-                    qDebug() << "已剪切";
+                    setClipBoard(arg.entities, false);
                 },
                 // 粘贴
                 [&](const PasteCommand& arg) {
@@ -291,6 +279,18 @@ class ToolCommandProcessor {
                 }
             }
         }
+    }
+
+    void setClipBoard(std::unordered_set<entt::entity> entities, bool is_copy) {
+        std::unordered_set<NoteUUID> uuids;
+        for (const auto& e : entities) {
+            if (registry.valid(e)) {
+                auto& [track, uuid] = registry.get<NoteComponent>(e);
+                uuids.insert(uuid);
+            }
+        }
+        interactionState.setClipBoard(uuids, is_copy);
+        qDebug() << (is_copy ? "已复制" : "已剪切");
     }
 
     void pasteEntities() {
