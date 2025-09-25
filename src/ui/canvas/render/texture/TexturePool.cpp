@@ -11,16 +11,17 @@ TexturePool::TexturePool(QOpenGLFunctions_4_1_Core* gl_functions)
     : glf(gl_functions) {
     // 查询最大支持多层纹理的最大层数
     // 查询硬件支持
-    GLCALL_V(
-        glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &max_texture_array_layers),
-        glf);
+    GLCALL_V(glf->glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS,
+                                &max_texture_array_layers),
+             glf);
     qDebug() << "多层纹理最大层数: "
              << std::to_string(max_texture_array_layers);
 
     // 查询纹理采样器最大连续数量
     int32_t max_fragment_samplers;
-    GLCALL_V(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fragment_samplers),
-             glf);
+    GLCALL_V(
+        glf->glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fragment_samplers),
+        glf);
     qDebug() << "纹理采样器最大连续数量: "
              << std::to_string(max_fragment_samplers);
     if (max_fragment_samplers > 16) {
@@ -29,8 +30,8 @@ TexturePool::TexturePool(QOpenGLFunctions_4_1_Core* gl_functions)
 
     // 查询纹理采样器最大数量
     int32_t max_combined_samplers;
-    GLCALL_V(glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
-                           &max_combined_samplers),
+    GLCALL_V(glf->glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+                                &max_combined_samplers),
              glf);
     qDebug() << "纹理采样器最大数量: " << std::to_string(max_combined_samplers);
 }
@@ -75,7 +76,7 @@ void TexturePool::clear() {
     std::unordered_set<uint32_t> deleted_ids;
     for (const auto& [path, info] : texture_infos) {
         if (!deleted_ids.contains(info.gl_texture_array_id)) {
-            GLCALL_V(glDeleteTextures(1, &info.gl_texture_array_id), glf);
+            GLCALL_V(glf->glDeleteTextures(1, &info.gl_texture_array_id), glf);
             deleted_ids.insert(info.gl_texture_array_id);
         }
     }
@@ -262,27 +263,29 @@ void TexturePool::buildFromManifest(
             group.layer_count = chunk_paths.size();
 
             // 在主线程创建GPU资源
-            GLCALL_V(glGenTextures(1, &group.gl_id), glf);
-            GLCALL_V(glBindTexture(GL_TEXTURE_2D_ARRAY, group.gl_id), glf);
-            GLCALL_V(glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8,
-                                  group.bucket_width, group.bucket_height,
-                                  group.layer_count, 0, GL_RGBA,
-                                  GL_UNSIGNED_BYTE, nullptr),
+            GLCALL_V(glf->glGenTextures(1, &group.gl_id), glf);
+            GLCALL_V(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, group.gl_id), glf);
+            GLCALL_V(glf->glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8,
+                                       group.bucket_width, group.bucket_height,
+                                       group.layer_count, 0, GL_RGBA,
+                                       GL_UNSIGNED_BYTE, nullptr),
                      glf);
 
             // 设置纹理参数
-            GLCALL_V(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
-                                     GL_LINEAR),
+            GLCALL_V(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY,
+                                          GL_TEXTURE_MIN_FILTER, GL_LINEAR),
                      glf);
-            GLCALL_V(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER,
-                                     GL_LINEAR),
+            GLCALL_V(glf->glTexParameteri(GL_TEXTURE_2D_ARRAY,
+                                          GL_TEXTURE_MAG_FILTER, GL_LINEAR),
                      glf);
-            GLCALL_V(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
+            GLCALL_V(
+                glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
                                      GL_MIRRORED_REPEAT),
-                     glf);
-            GLCALL_V(glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
+                glf);
+            GLCALL_V(
+                glf->glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
                                      GL_MIRRORED_REPEAT),
-                     glf);
+                glf);
 
             // 预计算TextureInfo并派发异步加载任务
             for (size_t layer_idx = 0; layer_idx < chunk_paths.size();
@@ -384,11 +387,13 @@ void TexturePool::uploadToGpu(const LoadedImageData& data) {
     const TextureInfo& info = *info_opt;
 
     // 绑定对应的图集数组
-    GLCALL_V(glBindTexture(GL_TEXTURE_2D_ARRAY, info.gl_texture_array_id), glf);
+    GLCALL_V(glf->glBindTexture(GL_TEXTURE_2D_ARRAY, info.gl_texture_array_id),
+             glf);
 
     // 将数据上传到指定的层
     // 因为是RGBA8，所以对齐是4字节，通常不需要特殊处理glPixelStorei
-    GLCALL_V(glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
+    GLCALL_V(
+        glf->glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
                              0,     // Mipmap level
                              0, 0,  // xoffset, yoffset (总是放在左上角)
                              info.layer_index,  // zoffset (the layer index)
@@ -399,7 +404,7 @@ void TexturePool::uploadToGpu(const LoadedImageData& data) {
                              GL_UNSIGNED_BYTE,  // type of the pixel data
                              data.data          // pointer to the data
                              ),
-             glf);
+        glf);
 
     qDebug() << "Uploaded" << QString::fromStdString(data.path) << "["
              << data.width << "x" << data.height << "]" << "to array"
