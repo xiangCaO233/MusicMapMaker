@@ -1,6 +1,8 @@
 #ifndef MMM_LAYERMANAGER_HPP
 #define MMM_LAYERMANAGER_HPP
 
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <QMetaObject>
 #include <QThread>
@@ -32,8 +34,8 @@ class LayerManager {
     virtual ~LayerManager() {
         // 先发送停止线程信号
         for (const auto& [type, generator] : generators) {
-            qDebug() << "生成器[" << static_cast<uint32_t>(type)
-                     << "]发送停止信号";
+            XINFO("生成器[" + std::to_string(static_cast<uint32_t>(type)) +
+                  "]发送停止信号");
             generator->stop();
         }
 
@@ -42,7 +44,8 @@ class LayerManager {
         // 等待所有线程退出
         for (const auto& [type, thread] : threads) {
             thread->quit();
-            qDebug() << "线程[" << static_cast<uint32_t>(type) << "]等待停止";
+            XINFO("线程[" + std::to_string(static_cast<uint32_t>(type)) +
+                  "]等待停止");
             thread->wait();
         }
         // 先清理生成器(内部有个图层指针)

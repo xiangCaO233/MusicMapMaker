@@ -1,3 +1,5 @@
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <QDir>
 #include <fstream>
@@ -116,9 +118,9 @@ MSkin::MSkin(std::string_view skin_path, AudioLoadCallback* audioLoadcbk,
     // 载入默认皮肤的全部纹理
     textureLoadcbk->need_loadtexture_dir(skin_path);
 
-    qDebug() << "配置路径:" << cfgPath;
-    qDebug() << "载入皮肤:[" << name << "]";
-    qDebug() << "皮肤作者:[" << author << "]";
+    XINFO("配置路径:" + cfgPath.generic_string());
+    XINFO("载入皮肤:[" + name + "]");
+    XINFO("皮肤作者:[" + author + "]");
 }
 
 // 析构MSkin

@@ -1,5 +1,6 @@
 #include <audio/track/trackmanager.h>
 #include <config/project/projectconfig.h>
+#include <log/colorful-log.h>
 #include <project/projectmanager.h>
 #include <qlogging.h>
 #include <ui_projectmanager.h>
@@ -38,7 +39,7 @@ ProjectManager::ProjectManager(QWidget* parent)
 
 ProjectManager::~ProjectManager() {
     delete ui;
-    qDebug() << "ProjectManager deleted";
+    XINFO("项目管理器释放");
 }
 
 // 初始化管理器
@@ -122,7 +123,7 @@ void ProjectManager::onActivateProject(MProject* activated_project) {
 
 void ProjectManager::onMapCanvasThreadStopped() {
     // 在画布的线程完全停止后才释放项目资源
-    qDebug() << "ProjectManager: delete service";
+    XINFO("项目管理服务释放");
     delete service;
 }
 

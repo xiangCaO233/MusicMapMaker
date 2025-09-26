@@ -1,4 +1,5 @@
 #include <ft2build.h>
+#include <log/colorful-log.h>
 
 #include <QFile>
 #include <render/texture/font/FontPool.hpp>
@@ -45,7 +46,7 @@ void FontPool::clear() {
     cursor_y = 0;
     current_line_height = 0;
 
-    qDebug() << "FontPool: All resources cleared.";
+    XINFO("字体池: 已清理全部字体位图资源.");
 }
 
 // 载入字体
@@ -62,8 +63,7 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
             if (!is_running) return;
             FT_Library thread_local_library;
             if (FT_Init_FreeType(&thread_local_library)) {
-                qWarning() << "FontPool: Could not initialize FreeType library "
-                              "in thread.";
+                XWARN("字体池: 无法初始化Freetype库");
                 return;
             }
             // --- FreeType 工作线程逻辑 ---
@@ -98,9 +98,9 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
 
             // --- 检查加载结果并继续 ---
             if (!success) {
-                qWarning() << "FontPool: Failed to load font:"
-                           << (is_qrc ? "(qrc) " : "(file) ")
-                           << QString::fromStdString(font_path_str);
+                XWARN("字体池: 加载字体:" +
+                      std::string(is_qrc ? "(qrc) " : "(file) ") +
+                      font_path_str + "失败");
                 return;
             } else {
                 // qDebug() << "读取字体文件成功";
@@ -113,8 +113,8 @@ void FontPool::load_font(std::string_view font_path, bool is_qrc) {
             for (char32_t c : cjkstr) {
                 // 3. 加载字符字形
                 if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-                    qWarning() << "FontPool: Failed to load glyph for char:"
-                               << (uint)c;
+                    XWARN(std::string("字体池: 加载字形[") +
+                          std::to_string((uint)c) + "]" + "失败");
                     continue;
                 } else {
                     // 成功加载了字形

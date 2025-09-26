@@ -1,4 +1,5 @@
 #include <CanvasContainer.h>
+#include <log/colorful-log.h>
 
 #include <QVBoxLayout>
 
@@ -19,4 +20,4 @@ CanvasContainer::CanvasContainer(QWidget* parent) : QWidget(parent) {
 }
 
 // 析构CanvasContainer
-CanvasContainer::~CanvasContainer() { qDebug() << "Canvas deleted"; }
+CanvasContainer::~CanvasContainer() { XINFO("删除画布"); }

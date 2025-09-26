@@ -49,7 +49,7 @@ class ComponentInspector {
 
     static inline void print_component_details(std::stringstream& ss,
                                                const TransformComponent& comp) {
-        ss << "      - y: " << comp.y << "\n";
+        ss << "      - y: " << comp.main_y << "\n";
     }
 
     // --- 为 Tag (标签) 组件编写的重载 ---

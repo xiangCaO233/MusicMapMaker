@@ -17,9 +17,12 @@ void MapDataLoop::pre_tickEvent() {
     }
 
     // 初始化时间映射器 (自动构造/构造函数自动执行预计算)
-    auto& converter = map_layermgr->get_time_converter_manager()->getConverter(
+    auto converter = map_layermgr->get_time_converter_manager()->getConverter(
         map->timing_set(), mapinfo->baseInfo, mapinfo->editorInfo.scrollInfo,
         mapinfo, mapinfo->editorInfo.map->base_metadata().preference_bpm);
+    auto pconverter = map_layermgr->get_time_converter_manager()->getConverter(
+        map->timing_set(), mapinfo->baseInfo, mapinfo->editorInfo.scrollInfo,
+        mapinfo, mapinfo->editorInfo.map->base_metadata().preference_bpm, true);
     auto& ecore = map_layermgr->core();
 
     // auto& linearConverter =
@@ -36,23 +39,24 @@ void MapDataLoop::pre_tickEvent() {
     sync_system.updateEditStatus(ecore, map_layermgr);
 
     // 同步工具交互状态
-    sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr, converter);
+    sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr,
+                                       *converter);
 
     // 与源物件集合同步可见的物件和timing
     sync_system.updateEntities(ecore, map->note_set(), map->note_uuids(),
                                map_layermgr, map->timing_set(),
                                map->beat_timeline(), map->beat_info(), mapinfo,
-                               converter
+                               *converter
                                // , effectedConverter
     );
     // qDebug() << "时间转换系统(at pretick)开始";
     // 计算有时间属性的逻辑y轴位置
-    time_system.update(ecore, mapinfo, converter);
+    time_system.update(ecore, mapinfo, *converter, *pconverter);
     // qDebug() << "时间转换系统(at pretick)结束";
 
     // 同步特效
     sync_system.updateEffects(ecore, map->note_set(), map->note_uuids(),
-                              mapinfo, converter);
+                              mapinfo, *converter);
     // qDebug() << "同步系统(at pretick)结束";
 
     // qDebug() << "pretick结束";

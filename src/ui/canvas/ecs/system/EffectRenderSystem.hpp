@@ -42,6 +42,7 @@ class EffectRenderSystem {
                             (effect.frame_index + 1) % effectframes + 1);
 
             auto texture = layer->get(texture_path);
+            if (!texture.has_value()) continue;
             auto texsize =
                 glm::vec2{single_track_width, single_track_width /
                                                   texture->origin_size.x *

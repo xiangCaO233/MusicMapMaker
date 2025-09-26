@@ -1,3 +1,5 @@
+#include <log/colorful-log.h>
+
 #include <canvas/render/texture/TexturePool.hpp>
 #include <filesystem>
 #include <format>
@@ -14,16 +16,14 @@ TexturePool::TexturePool(QOpenGLFunctions_4_1_Core* gl_functions)
     GLCALL_V(glf->glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS,
                                 &max_texture_array_layers),
              glf);
-    qDebug() << "多层纹理最大层数: "
-             << std::to_string(max_texture_array_layers);
+    XINFO("多层纹理最大层数: " + std::to_string(max_texture_array_layers));
 
     // 查询纹理采样器最大连续数量
     int32_t max_fragment_samplers;
     GLCALL_V(
         glf->glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fragment_samplers),
         glf);
-    qDebug() << "纹理采样器最大连续数量: "
-             << std::to_string(max_fragment_samplers);
+    XINFO("纹理采样器最大连续数量: " + std::to_string(max_fragment_samplers));
     if (max_fragment_samplers > 16) {
         max_fragment_samplers = 16;
     }
@@ -33,7 +33,7 @@ TexturePool::TexturePool(QOpenGLFunctions_4_1_Core* gl_functions)
     GLCALL_V(glf->glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
                                 &max_combined_samplers),
              glf);
-    qDebug() << "纹理采样器最大数量: " << std::to_string(max_combined_samplers);
+    XINFO("纹理采样器最大数量: " + std::to_string(max_combined_samplers));
 }
 
 // 析构TexturePool
@@ -88,14 +88,14 @@ void TexturePool::clear() {
     std::queue<LoadedImageData> empty_queue;
     upload_queue.swap(empty_queue);
 
-    qDebug() << "TexturePool: All resources cleared.";
+    XINFO("纹理池: 已清理全部纹理资源.");
 }
 
 // 其他线程调用来请求添加新路径纹理
 void TexturePool::request_new_directory(const std::string& dir) {
     auto path = std::filesystem::path(dir);
     if (!std::filesystem::exists(path)) {
-        qDebug() << "[" << dir << "] 不存在";
+        XINFO("[" + dir + "] 不存在");
         return;
     } else {
         std::lock_guard<std::mutex> lock(rebuild_mutex);
@@ -108,7 +108,7 @@ void TexturePool::request_new_directory(const std::string& dir) {
             auto filename = it->path().generic_string();
             if (!new_texture_paths.contains(filename) &&
                 (filename.ends_with("png") || filename.ends_with("jpg"))) {
-                qDebug() << "查到需要加载的纹理[" << filename << "]";
+                XINFO("查到需要加载的纹理[" + filename + "]");
                 new_texture_paths.insert(filename);
             }
         }
@@ -121,7 +121,7 @@ void TexturePool::request_new_directory(const std::string& dir) {
 void TexturePool::request_remove_directory(const std::string& dir) {
     auto path = std::filesystem::path(dir);
     if (!std::filesystem::exists(path)) {
-        qDebug() << "[" << dir << "] 不存在";
+        XINFO("[" + dir + "] 不存在");
         return;
     } else {
         std::lock_guard<std::mutex> lock(rebuild_mutex);
@@ -164,7 +164,7 @@ void TexturePool::processUpdateDirRequest() {
 void TexturePool::remove_directory(const std::string& dir) {
     auto path = std::filesystem::path(dir);
     if (!std::filesystem::exists(path)) {
-        qDebug() << "[" << dir << "] 不存在";
+        XINFO("[" + dir + "] 不存在");
         return;
     } else {
         std::unordered_set<std::string, StringHash, std::equal_to<>> paths;
@@ -186,7 +186,7 @@ void TexturePool::remove_directory(const std::string& dir) {
 void TexturePool::add_directory(const std::string& dir) {
     auto path = std::filesystem::path(dir);
     if (!std::filesystem::exists(path)) {
-        qDebug() << "[" << dir << "] 不存在";
+        XINFO("[" + dir + "] 不存在");
         return;
     } else {
         std::unordered_set<std::string, StringHash, std::equal_to<>> paths;
@@ -198,7 +198,7 @@ void TexturePool::add_directory(const std::string& dir) {
             auto filename = it->path().generic_string();
             if (!paths.contains(filename) && filename.ends_with("png") ||
                 filename.ends_with("jpg")) {
-                qDebug() << "查到需要加载的纹理[" << filename << "]";
+                XINFO("查到需要加载的纹理[" + filename + "]");
                 paths.insert(filename);
             }
         }
@@ -228,8 +228,7 @@ void TexturePool::buildFromManifest(
                 std::format("Bucket_{}x{}", bucket_w, bucket_h);
             buckets[bucket_key].push_back(path);
         } else {
-            qWarning() << "TexturePool: stbi_info failed for path:"
-                       << QString::fromStdString(path);
+            XWARN("TexturePool: stbi_info failed for path:" + path);
         }
     }
 
@@ -330,8 +329,7 @@ void TexturePool::buildFromManifest(
                         }
                         cv.notify_one();
                     } else {
-                        qWarning() << "TexturePool: stbi_load failed for path:"
-                                   << QString::fromStdString(path);
+                        XWARN("纹理池: " + path + "stbi载入失败");
                     }
                 });
             }
@@ -379,8 +377,7 @@ void TexturePool::uploadToGpu(const LoadedImageData& data) {
     // 从已存储的info中获取GPU ID和层索引
     auto info_opt = get(data.path);
     if (!info_opt) {
-        qWarning() << "TexturePool: No texture info found for uploading path:"
-                   << QString::fromStdString(data.path);
+        XWARN("纹理池: 找不到纹理[" + data.path + "]的信息");
         return;
     }
 
@@ -406,11 +403,12 @@ void TexturePool::uploadToGpu(const LoadedImageData& data) {
                              ),
         glf);
 
-    qDebug() << "Uploaded" << QString::fromStdString(data.path) << "["
-             << data.width << "x" << data.height << "]" << "to array"
-             << info.gl_texture_array_id << "layer" << info.layer_index
-             << ", layersize:[" << groups[info.gl_texture_array_id].bucket_width
-             << "x" << groups[info.gl_texture_array_id].bucket_height << "]";
+    // qDebug() << "Uploaded" << QString::fromStdString(data.path) << "["
+    //          << data.width << "x" << data.height << "]" << "to array"
+    //          << info.gl_texture_array_id << "layer" << info.layer_index
+    //          << ", layersize:[" <<
+    //          groups[info.gl_texture_array_id].bucket_width
+    //          << "x" << groups[info.gl_texture_array_id].bucket_height << "]";
 }
 
 // 获取纹理信息以供渲染器使用

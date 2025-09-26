@@ -1,4 +1,5 @@
 #include <audio/control/audiocontroller.h>
+#include <log/colorful-log.h>
 #include <qalgorithms.h>
 
 #include <GLCanvas.hpp>
@@ -61,6 +62,9 @@ void MapCanvas::initializeGL() {
                layermanager->get_tool_interaction_state());
     // 发送cmdq绑定信号
     emit toolcmdqInitialized(layermanager->get_tool_cmdq());
+
+    // 启动全部图层工作线程
+    // layermanager->initializeLayers();
 }
 
 // 绑定音频载入回调
@@ -90,7 +94,7 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
 
 void MapCanvas::onUpdateTexinfo() {
     // 清理皮肤缓存
-    qDebug() << "纹理重组,清理皮肤缓存";
+    XINFO("纹理重组,清理皮肤缓存");
     skin->clear_buffer();
 }
 void MapCanvas::gotoTiming(Timing* timing) {

@@ -1,3 +1,4 @@
+#include <log/colorful-log.h>
 #include <qcombobox.h>
 #include <qpushbutton.h>
 #include <qwidget.h>
@@ -95,7 +96,7 @@ void TimingManager::addNewTimingRowItem(MMap *map, Timing *newTiming) {
 
 // 从map刷新timing表
 void TimingManager::refreshTableFromMap() {
-    qDebug() << "1/3: 开始从 Map 刷新...";
+    XINFO("1/3: 开始从 Map 刷新...");
 
     // --- 清理所有旧的UI状态 ---
     qDeleteAll(allTimingRowItems);
@@ -106,7 +107,7 @@ void TimingManager::refreshTableFromMap() {
     ui->timing_table_widget->setRowCount(0);
 
     if (!map_ref) {
-        qDebug() << "刷新中止，因为没有 map。";
+        XWARN("刷新中止，因为没有 map。");
         ui->timing_table_widget->blockSignals(false);
         return;
     }
@@ -143,11 +144,11 @@ void TimingManager::refreshTableFromMap() {
     ui->timing_table_widget->setHorizontalHeaderLabels(timing_metaNames());
     ui->timing_table_widget->blockSignals(false);
 
-    qDebug() << "3/3: 刷新全部完成。";
+    XINFO("3/3: 刷新全部完成。");
 }
 
 void TimingManager::sortAndRebuildTable() {
-    qDebug() << "2/3: 正在排序并渲染 Timing 表...";
+    XINFO("2/3: 正在排序并渲染 Timing 表...");
 
     // 对“UI组件管理器”列表进行排序
     std::sort(allTimingRowItems.begin(), allTimingRowItems.end(),
@@ -190,5 +191,5 @@ void TimingManager::sortAndRebuildTable() {
     // 设置表头的职责也可以移交给 refreshTableFromMap，以保持单一职责
     // ui->timing_table_widget->setHorizontalHeaderLabels(timing_metaNames());
 
-    qDebug() << "排序和渲染完成。";
+    XINFO("排序和渲染完成。");
 }

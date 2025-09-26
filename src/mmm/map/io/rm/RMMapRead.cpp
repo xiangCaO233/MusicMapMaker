@@ -1,3 +1,5 @@
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <fstream>
 #include <mmm/map/MMap.hpp>
@@ -155,14 +157,14 @@ void MMap::readImd() {
         // 谱面时长
         basemeta.map_length = reader.read_value<int32_t>(data_pos);
         data_pos += 4;
-        qDebug() << "谱面时长:[" << std::to_string(basemeta.map_length) << "]";
+        XINFO("谱面时长:[" + std::to_string(basemeta.map_length) + "]");
 
         // 5~8字节:int32 图时间点数
         auto timing_point_amount =
             reader.read_value<int32_t>(buffer_data.data() + 4);
         data_pos += 4;
-        qDebug() << "读取到imd文件时间点数:[" +
-                        std::to_string(timing_point_amount) + "]";
+        XINFO("读取到imd文件时间点数:[" + std::to_string(timing_point_amount) +
+              "]");
 
         std::vector<std::unique_ptr<Timing>> temp_timings;
         // 接下来每12字节按4字节int32+8字节float64(double)组合为一个时间点
@@ -326,7 +328,7 @@ void MMap::readImd() {
         }
 
         // orbits = max_orbits;
-        qDebug() << "读取到物件:" << std::to_string(obj_count);
+        XINFO("读取到物件:" + std::to_string(obj_count));
         // qDebug() << "table_rows:" << std::to_string(table_rows);
 
         // 生成图名
@@ -341,13 +343,13 @@ void MMap::readImd() {
         // 最后生成全部拍
         analyzeBeatInfo();
 
-        std::map<uint32_t, Beat> sorted_beats(beatInfo.begin(), beatInfo.end());
-        for (const auto& pair : sorted_beats) {
-            const Beat& b = pair.second;
-            qDebug() << "Beat at " << b.beat_start << "ms "
-                     << "(length: " << b.beat_length << "ms): "
-                     << "Best division found -> 1/" << b.divisors;
-        }
+        // std::map<uint32_t, Beat> sorted_beats(beatInfo.begin(),
+        // beatInfo.end()); for (const auto& pair : sorted_beats) {
+        //     const Beat& b = pair.second;
+        //     qDebug() << "Beat at " << b.beat_start << "ms "
+        //              << "(length: " << b.beat_length << "ms): "
+        //              << "Best division found -> 1/" << b.divisors;
+        // }
 
         // debugmap
         auto note_handles = note_set().get_all_notes_ordered();
@@ -355,6 +357,6 @@ void MMap::readImd() {
             qDebug() << note_set().get_note(handle)->toString();
         }
     } else {
-        qDebug() << "非.imd格式,读取失败";
+        XWARN("非.imd格式,读取失败");
     }
 }

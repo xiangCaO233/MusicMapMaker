@@ -11,7 +11,8 @@
 
 // 转换组件1-指示此物件在画布中的逻辑中心位置
 struct TransformComponent {
-    float y;
+    float main_y;
+    float preview_y;
 };
 
 // 整个网格的状态

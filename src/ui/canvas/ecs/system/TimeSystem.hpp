@@ -12,7 +12,8 @@ class TimeSystem {
    public:
     // 根据时间组件 附加 TransformComponent_1属性组件(仅计算出y位置)
     void update(ECSCore& core, const MapCanvasInfo* info,
-                const TimePixelConverter& converter) const {
+                const TimePixelConverter& converter,
+                const TimePixelConverter& preview_converter) const {
         auto& registry = core.ecs_registry();
         const auto& realtime_info = info->realTimeInfo;
 
@@ -26,9 +27,12 @@ class TimeSystem {
             const float y = converter.timeToPixel(
                 time, realtime_info.current_time_info.presentation_canvas_time,
                 info);
+            const float py = preview_converter.timeToPixel(
+                time, realtime_info.current_time_info.presentation_canvas_time,
+                info);
 
             // 附加或更新 TransformComponent
-            registry.emplace_or_replace<TransformComponent>(entity, y);
+            registry.emplace_or_replace<TransformComponent>(entity, y, py);
             // ++count;
         }
         // qDebug() << "共更新" << view->size() << "个实体时间转换组件";

@@ -98,6 +98,7 @@ class MeshGenerateSystem {
         converter = &converter_ref;
         presentation_canvas_time =
             info->realTimeInfo.current_time_info.presentation_canvas_time;
+        maplength = info->editorInfo.map->base_metadata().map_length;
 
         // 生成物件的网格组件
         // const auto& realtime_info = info->realTimeInfo;
@@ -111,8 +112,8 @@ class MeshGenerateSystem {
         } else {
             all_tracks_rect = info->editorInfo.track_layout;
         }
+
         track_count = info->editorInfo.map->base_metadata().track_count;
-        maplength = info->editorInfo.map->base_metadata().map_length;
         if (track_count == 0) return;
         single_track_width = all_tracks_rect.z / float(track_count);
         // 获取悬浮信息
@@ -121,7 +122,7 @@ class MeshGenerateSystem {
 
         if (is_preview) {
             // 是在生成预览区域的网格
-            // generatePreviewAreaMesh();
+            generatePreviewAreaMesh();
         } else {
             // 在生成主轨道区的网格
             generateMainAreaMesh();
@@ -147,118 +148,18 @@ class MeshGenerateSystem {
             // 获取note原始详细信息
             auto [time] = registry->get<TimeComponent>(e);
             auto [track_index, uuid] = registry->get<NoteComponent>(e);
-            auto [y] = registry->get<TransformComponent>(e);
+            auto [y, ty] = registry->get<TransformComponent>(e);
 
             auto* ghost = registry->try_get<GhostComponent>(e);
             auto* delmark = registry->try_get<DeleteMarkComponent>(e);
             if (delmark) {
                 // 标记删除方式渲染
                 entity_mesh.state = MeshState::MARKDELETE;
-                generateMesh(track_index, e, entity_mesh, time, y);
+                generateMesh(track_index, e, entity_mesh, time, y, false, true);
             } else if (ghost) {
-                // 虚影方式渲染-根据工具交互状态确定如何渲染
-
-                // --------------------物件头拖动交互--------------------------
+                // 虚影方式渲染直接渲染
                 entity_mesh.state = MeshState::GHOST;
-                auto drag_info = tool_interaction_state->getDragState();
-                auto& dragpart = drag_info.drag_start_hit.part;
-                auto mousePressPos =
-                    tool_interaction_state->getMousePressPos(Qt::LeftButton);
-                auto mousePos = tool_interaction_state->getCurrentMousePos();
-                auto buttons =
-                    tool_interaction_state->getMouseState().pressed_buttons;
-                // auto mouse_time =
-                //     converter.pixelToTime(info->baseInfo.canvasSize.height()
-                //     -
-                //                               mousePos.y -
-                //                               judgeline_absolute_y,
-                //                           info->realTimeInfo.current_time_info
-                //                               .presentation_canvas_time);
-                auto& drageed_entities = drag_info.dragged_entitiesWithRes;
-                if (drageed_entities.size() > 1) {
-                    // 拖动多个时无论何部位均为移动
-                    // 计算此时鼠标最近的轨道
-                    auto current_mouse_axis = getPixelMapAxis(mousePos);
-
-                    // 验证目标鼠标位置更新
-                    auto validity = current_mouse_axis.time >= 0 &&
-                                    current_mouse_axis.time <= maplength &&
-                                    current_mouse_axis.track >= 0 &&
-                                    current_mouse_axis.track < track_count;
-                    tool_interaction_state->setDragValidity(validity);
-                    drag_info = tool_interaction_state->getDragState();
-                    // 覆盖为发光强调
-                    if (e == drag_info.drag_start_hit.source_entity)
-                        entity_mesh.state = MeshState::GLOW_AND_EMPHASIZE;
-                    // 计算焦点物件移动的变化
-                    if (drag_info.is_valid &&
-                        !buttons.testFlag(Qt::RightButton)) {
-                        // 可同时按住右键暂时不应用拖动效果
-
-                        if (e == drag_info.drag_start_hit.source_entity) {
-                            auto& src_axis = drageed_entities[e];
-                            relative_delta_axis = current_mouse_axis - src_axis;
-                        }
-
-                        auto& src_axis = drageed_entities[e];
-                        auto res_axis = src_axis + relative_delta_axis;
-
-                        // 安全限制检查
-                        if (res_axis.time < 0) res_axis.time = 0;
-                        if (res_axis.track < 0) res_axis.track = 0;
-                        if (res_axis.track >= track_count)
-                            res_axis.track = track_count - 1;
-
-                        // 应用位置变化到当前实体
-                        time = res_axis.time;
-                        track_index = res_axis.track;
-                        y = res_axis.y;
-
-                        // 更新当前实体拖动结果
-                        tool_interaction_state->setDragValidRes(e, res_axis);
-                    } else {
-                        // 按住右键或非法则恢复当前实体拖动结果
-                        tool_interaction_state->setDragValidRes(
-                            e, MapAxis{time, time, track_index, 0, int64_t(y)});
-                        // 恢复相对移动位置
-                        relative_delta_axis = MapAxis{};
-                        qDebug() << "restore dragpos";
-                    }
-
-                } else {
-                    if ((dragpart == NotePart::NONE ||
-                         dragpart == NotePart::HEAD ||
-                         dragpart == NotePart::HOLD_HEAD ||
-                         dragpart == NotePart::SLIDE_HEAD) &&
-                        !buttons.testFlag(Qt::RightButton)) {
-                        // 若为头则计算此时鼠标最近的分拍线时间作为物件时间
-                        // 计算此时鼠标最近的轨道
-                        auto current_mouse_axis = getPixelMapAxis(mousePos);
-
-                        // 验证更新
-                        auto validity = current_mouse_axis.time >= 0 &&
-                                        current_mouse_axis.time <= maplength &&
-                                        current_mouse_axis.track >= 0 &&
-                                        current_mouse_axis.track < track_count;
-                        tool_interaction_state->setDragValidity(validity);
-                        drag_info = tool_interaction_state->getDragState();
-                        if (drag_info.is_valid) {
-                            time = current_mouse_axis.time;
-                            track_index = current_mouse_axis.track;
-                            y = current_mouse_axis.y;
-                            tool_interaction_state->setDragValidRes(
-                                e, current_mouse_axis);
-                        } else {
-                            // 按住右键或非法则恢复当前实体拖动结果
-                            tool_interaction_state->setDragValidRes(
-                                e, MapAxis{time, time, track_index, 0,
-                                           int64_t(y)});
-                            qDebug() << "restore dragpos";
-                        }
-                    }
-                }
-
-                generateMesh(track_index, e, entity_mesh, time, y);
+                generateMesh(track_index, e, entity_mesh, time, y, false, true);
             } else {
                 // 非虚影或即将删除方式渲染
 
@@ -268,7 +169,8 @@ class MeshGenerateSystem {
                     // 节点需在同步系统中完成InvalidNoteUUID的实体创建和附件更新
                     // 使用虚影渲染
                     entity_mesh.state = MeshState::GHOST;
-                    generateMesh(track_index, e, entity_mesh, time, y);
+                    generateMesh(track_index, e, entity_mesh, time, y, false,
+                                 true);
                 } else {
                     // 有uuid,是真实在谱面中存在的物件-正常渲染
                     // 判断是否在选中集合内
@@ -279,7 +181,8 @@ class MeshGenerateSystem {
                         else
                             entity_mesh.state = MeshState::GLOW;
                     }
-                    generateMesh(track_index, e, entity_mesh, time, y);
+                    generateMesh(track_index, e, entity_mesh, time, y, false,
+                                 true);
                 }
             }
         }
@@ -303,7 +206,7 @@ class MeshGenerateSystem {
             // 获取note原始详细信息
             auto [time] = registry->get<TimeComponent>(e);
             auto [track_index, uuid] = registry->get<NoteComponent>(e);
-            auto [y] = registry->get<TransformComponent>(e);
+            auto [y, py] = registry->get<TransformComponent>(e);
 
             auto* ghost = registry->try_get<GhostComponent>(e);
             auto* delmark = registry->try_get<DeleteMarkComponent>(e);
@@ -314,7 +217,7 @@ class MeshGenerateSystem {
             } else if (ghost) {
                 // 虚影方式渲染-根据工具交互状态确定如何渲染
 
-                // --------------------物件头拖动交互--------------------------
+                // --------------------物件拖动移动交互--------------------------
                 entity_mesh.state = MeshState::GHOST;
                 auto drag_info = tool_interaction_state->getDragState();
                 auto& dragpart = drag_info.drag_start_hit.part;
@@ -413,6 +316,7 @@ class MeshGenerateSystem {
                         }
                     }
                 }
+                // --------------------物件拖动移动交互--------------------------
 
                 generateMesh(track_index, e, entity_mesh, time, y);
             } else {
@@ -517,9 +421,9 @@ class MeshGenerateSystem {
                 }
             }
             // 生成面条网格
-            holdMeshGenerator.generateHoldMesh(e, entity_mesh, time,
-                                               obj_scale_width,
-                                               obj_scale_height, x, y, tail);
+            holdMeshGenerator.generateHoldMesh(
+                e, entity_mesh, time, obj_scale_width, obj_scale_height, x, y,
+                tail, is_preview);
         } else if (registry->all_of<FlickComponent>(e)) {
             SlideMeshGenerator slideMeshGenerator(
                 all_tracks_rect, track_count, judgeline_absolute_y,
@@ -536,9 +440,9 @@ class MeshGenerateSystem {
                 }
             }
             // 生成滑键网格
-            slideMeshGenerator.generateSlideMesh(e, entity_mesh, track_index,
-                                                 obj_scale_width,
-                                                 obj_scale_height, x, y, tail);
+            slideMeshGenerator.generateSlideMesh(
+                e, entity_mesh, track_index, obj_scale_width, obj_scale_height,
+                x, y, tail, is_preview);
         } else if (registry->all_of<CompositeRootComponent>(e)) {
             const auto& [children, total_duration] =
                 registry->get<CompositeRootComponent>(e);
@@ -549,7 +453,14 @@ class MeshGenerateSystem {
                 auto [child_time] = registry->get<TimeComponent>(child_e);
                 auto [child_track_index, handle] =
                     registry->get<NoteComponent>(child_e);
-                auto [child_y] = registry->get<TransformComponent>(child_e);
+                float y;
+                auto [m_childy, p_childy] =
+                    registry->get<TransformComponent>(child_e);
+                if (is_preview)
+                    y = p_childy;
+                else
+                    y = m_childy;
+
                 // qDebug() << "父物件实体:" << static_cast<uint32_t>(e)
                 //          << "递归生成子物件实体网格:"
                 //          << static_cast<uint32_t>(child_e);
@@ -562,7 +473,7 @@ class MeshGenerateSystem {
                 // 跟随父物件的网格状态(如虚影)
                 child_mesh.state = entity_mesh.state;
                 generateMesh(child_track_index, child_e, child_mesh, child_time,
-                             child_y,
+                             y,
                              // 是否为末尾
                              ++count == children.size());
             }

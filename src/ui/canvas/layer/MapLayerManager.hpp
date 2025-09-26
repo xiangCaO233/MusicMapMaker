@@ -2,8 +2,10 @@
 #define MMM_MAPLAYERMANAGER_HPP
 
 #include <ecs/system/ToolSystem.hpp>
-#include <ecs/system/time2pixel/EffectedTimeConverter.hpp>
-#include <ecs/system/time2pixel/LinearTimeConverter.hpp>
+#include <ecs/system/time2pixel/maintrack/EffectedTimeConverter.hpp>
+#include <ecs/system/time2pixel/maintrack/LinearTimeConverter.hpp>
+#include <ecs/system/time2pixel/preview/PreviewEffectedTimeConverter.hpp>
+#include <ecs/system/time2pixel/preview/PreviewLinearTimeConverter.hpp>
 #include <layer/LayerManager.hpp>
 #include <layer/note/NoteLayerGenerator.hpp>
 #include <tool/ThreadSafeQueue.hpp>
@@ -17,37 +19,55 @@ class TimePixelConverterManager {
      * @brief 获取一个最新的、可用的TimePixelConverter实例。
      * @details 内部处理缓存和重建逻辑。
      */
-    const TimePixelConverter& getConverter(const TimingMap& timings,
-                                           const BaseCanvasStatus& status,
-                                           const ScrollInfo& scrollInfo,
-                                           const MapCanvasInfo* info,
-                                           double prebpm) {
-        // 检查TimingMap的版本号是否已更新
-        if (!m_effected_cached_converter || !m_linear_cached_converter ||
-            m_cached_version != timings.getVersion() ||
-            !current_status_version || status != *current_status_version ||
-            !current_scrollInfo_version ||
-            scrollInfo != *current_scrollInfo_version) {
-            std::lock_guard<std::mutex> lock(build_newconverter_mtx);
+    // 返回值改为 std::shared_ptr
+    std::shared_ptr<const TimePixelConverter> getConverter(
+        const TimingMap& timings, const BaseCanvasStatus& status,
+        const ScrollInfo& scrollInfo, const MapCanvasInfo* info, double prebpm,
+        bool is_preview = false) {
+        // 锁住整个函数
+        std::lock_guard<std::mutex> lock(build_newconverter_mtx);
 
-            // 版本不匹配或首次创建，需要重建
+        // 检查条件时，使用拷贝后的成员变量进行比较
+        if (!m_effected_cached_converter ||  // 首次创建
+            m_cached_version != timings.getVersion() || !m_cached_status ||
+            status != *m_cached_status || !m_cached_scrollInfo ||
+            scrollInfo != *m_cached_scrollInfo || !m_cached_previewInfo ||
+            info->editorInfo.previewAreaInfo != *m_cached_previewInfo) {
+            // 重建 effected 转换器
             m_effected_cached_converter =
-                std::make_unique<EffectedTimeConverter>(timings, status,
+                std::make_shared<EffectedTimeConverter>(timings, status,
                                                         scrollInfo, prebpm);
-            // 重建线性映射转换器
+            // 重建 linear 转换器
             m_linear_cached_converter =
-                std::make_unique<LinearTimeConverter>(info);
+                std::make_shared<LinearTimeConverter>(info);
 
-            current_status_version = &status;
-            current_scrollInfo_version = &scrollInfo;
+            m_preview_effected_cached_converter =
+                std::make_shared<PreviewEffectedTimeConverter>(
+                    timings, info, status, scrollInfo, prebpm);
+
+            m_preview_linear_cached_converter =
+                std::make_shared<PreviewLinearTimeConverter>(info);
+
+            // 拷贝状态，而不是保存指针
+            m_cached_status = status;
+            m_cached_scrollInfo = scrollInfo;
+            m_cached_previewInfo = info->editorInfo.previewAreaInfo;
             m_cached_version = timings.getVersion();
-            // std::cout << "TimePixelConverter Rebuilt! Version: " <<
-            // m_cached_version << std::endl;
         }
 
-        return status.timeline_mapping_type == TimeLineMappingType::LINEAR
-                   ? *m_linear_cached_converter
-                   : *m_effected_cached_converter;
+        std::shared_ptr<const TimePixelConverter> result;
+        if (is_preview) {
+            result =
+                (status.timeline_mapping_type == TimeLineMappingType::LINEAR)
+                    ? m_preview_linear_cached_converter
+                    : m_preview_effected_cached_converter;
+        } else {
+            result =
+                (status.timeline_mapping_type == TimeLineMappingType::LINEAR)
+                    ? m_linear_cached_converter
+                    : m_effected_cached_converter;
+        }
+        return result;  // 返回 shared_ptr，调用者会获得对象的一个共享所有权
     }
 
     // debug
@@ -105,12 +125,18 @@ class TimePixelConverterManager {
     // }
 
    private:
-    const BaseCanvasStatus* current_status_version{nullptr};
-    const ScrollInfo* current_scrollInfo_version{nullptr};
     std::mutex build_newconverter_mtx;
-    std::unique_ptr<TimePixelConverter> m_effected_cached_converter{nullptr};
-    std::unique_ptr<TimePixelConverter> m_linear_cached_converter{nullptr};
+    // 使用 optional 存储可拷贝的对象，而不是裸指针
+    std::optional<BaseCanvasStatus> m_cached_status;
+    std::optional<ScrollInfo> m_cached_scrollInfo;
+    std::optional<PreviewAreaInfo> m_cached_previewInfo;
     uint64_t m_cached_version{0};
+
+    // 成员变量改为 shared_ptr
+    std::shared_ptr<TimePixelConverter> m_effected_cached_converter;
+    std::shared_ptr<TimePixelConverter> m_linear_cached_converter;
+    std::shared_ptr<TimePixelConverter> m_preview_effected_cached_converter;
+    std::shared_ptr<TimePixelConverter> m_preview_linear_cached_converter;
 };
 
 class MapLayerManager : public LayerManager {

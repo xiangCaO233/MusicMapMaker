@@ -2,6 +2,8 @@
 #include <ecs/system/sync/ToolCommandProcessor.hpp>
 #include <info/NotePart.hpp>
 // #include <iostream>
+#include <log/colorful-log.h>
+
 #include <ecs/component/ComponentInspector.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
@@ -71,20 +73,19 @@ void updateHover(ToolSystem* toolSystem,
 
             // toolSystem->get_mesh_info_tree().print_tree();
 
-            qDebug() << "source_entity:"
-                     << static_cast<uint32_t>(hit_info.source_entity);
-            std::cout << ComponentInspector::inspect<
-                             TimeComponent, NoteComponent, TransformComponent>(
-                             toolSystem->get_registry(), hit_info.source_entity)
-                      << std::endl;
-            if (toolSystem->get_registry().valid(hit_info.child_entity)) {
-                qDebug() << "source_entity:"
-                         << static_cast<uint32_t>(hit_info.child_entity);
-                std::cout
-                    << ComponentInspector::inspect<TimeComponent, NoteComponent,
+            XINFO("source_entity:" + std::to_string(static_cast<uint32_t>(
+                                         hit_info.source_entity)));
+            auto ins = ComponentInspector::inspect<TimeComponent, NoteComponent,
                                                    TransformComponent>(
-                           toolSystem->get_registry(), hit_info.child_entity)
-                    << std::endl;
+                toolSystem->get_registry(), hit_info.source_entity);
+            XINFO(ins);
+            if (toolSystem->get_registry().valid(hit_info.child_entity)) {
+                XINFO("child_entity:" + std::to_string(static_cast<uint32_t>(
+                                            hit_info.child_entity)));
+                ins = ComponentInspector::inspect<TimeComponent, NoteComponent,
+                                                  TransformComponent>(
+                    toolSystem->get_registry(), hit_info.child_entity);
+                XINFO(ins);
             }
         }
 

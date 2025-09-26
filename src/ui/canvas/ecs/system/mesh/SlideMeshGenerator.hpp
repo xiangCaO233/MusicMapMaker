@@ -120,7 +120,7 @@ class SlideMeshGenerator {
                              : registry->get<NoteComponent>(e).track_index;
         auto thisy = tailType == SlideTailType::GENERAL
                          ? src_y
-                         : registry->get<TransformComponent>(e).y;
+                         : registry->get<TransformComponent>(e).main_y;
         auto thisx =
             tailType == SlideTailType::GENERAL
                 ? src_x

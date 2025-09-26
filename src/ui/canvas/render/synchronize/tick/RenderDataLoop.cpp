@@ -72,7 +72,6 @@ void RenderDataLoop::after_tickEvent() {}
 void RenderDataLoop::initializeLayerManager() {
     // 初始化图层管理器
     layer_manager = std::make_unique<LayerManager>(render);
-    layer_manager->initializeLayers();
 }
 
 void RenderDataLoop::updateMap(MMap* map) { layer_manager->updateMap(map); }

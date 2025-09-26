@@ -27,7 +27,7 @@ class PreviewLayerGenerator : public LayerComputerBase {
 
    private:
     [[no_unique_address]] MeshGenerateSystem mesh_system;
-    [[no_unique_address]] RenderSystem normalRender_system;
+    [[no_unique_address]] RenderSystem render_system;
     ToolSystem* tool_system;
     ToolInteractionState* tool_interaction_state;
 };

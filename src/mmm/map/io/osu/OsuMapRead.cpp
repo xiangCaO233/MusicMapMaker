@@ -1,3 +1,5 @@
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <algorithm>
 #include <fstream>
@@ -479,13 +481,13 @@ void MMap::readOsu() {
         // 最后生成全部拍
         analyzeBeatInfo();
 
-        std::map<uint32_t, Beat> sorted_beats(beatInfo.begin(), beatInfo.end());
-        for (const auto& pair : sorted_beats) {
-            const Beat& b = pair.second;
-            qDebug() << "Beat at " << b.beat_start << "ms "
-                     << "(length: " << b.beat_length << "ms): "
-                     << "Best division found -> 1/" << b.divisors;
-        }
+        // std::map<uint32_t, Beat> sorted_beats(beatInfo.begin(),
+        // beatInfo.end()); for (const auto& pair : sorted_beats) {
+        //     const Beat& b = pair.second;
+        //     qDebug() << "Beat at " << b.beat_start << "ms "
+        //              << "(length: " << b.beat_length << "ms): "
+        //              << "Best division found -> 1/" << b.divisors;
+        // }
 
         // 填充元数据
         // general
@@ -629,6 +631,6 @@ void MMap::readOsu() {
         // breaks
 
     } else {
-        qDebug() << "非.osu格式,读取失败";
+        XWARN("非.osu格式,读取失败");
     }
 }

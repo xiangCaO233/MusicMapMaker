@@ -1,6 +1,8 @@
 #ifndef MMM_MAPCANVASCLOCK_HPP
 #define MMM_MAPCANVASCLOCK_HPP
 
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <info/SharedCanvasInfo.hpp>
 
@@ -352,7 +354,7 @@ class MapCanvasClock {
 
     void force_sync(RealTimeInfo& info) {
         // 强制同步一次,允许“跳变”
-        qDebug() << "force_sync";
+        XINFO("强制同步时钟");
         info.current_time_info.logic_canvas_time =
             info.current_time_info.raw_audio_time_ms.load();
         m_clock_rate = info.audio_playback_rate.load();

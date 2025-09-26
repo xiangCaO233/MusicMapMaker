@@ -1,3 +1,5 @@
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <info/MapCanvasInfo.hpp>
 #include <info/SharedCanvasInfo.hpp>
@@ -9,7 +11,7 @@
 
 // 析构BackgroundLayerGenerator
 BackgroundLayerGenerator::~BackgroundLayerGenerator() {
-    qDebug() << "背景图层生成线程释放";
+    XINFO("背景图层生成线程释放");
 }
 
 // 生成图层

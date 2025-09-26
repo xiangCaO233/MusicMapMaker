@@ -1,13 +1,15 @@
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <ecs/component/TransformComponents.hpp>
-#include <ecs/system/time2pixel/LinearTimeConverter.hpp>
+#include <ecs/system/time2pixel/maintrack/LinearTimeConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <layer/timeline/TimelineLayerGenerator.hpp>
 
 // 析构TimelineLayerGenerator
 TimelineLayerGenerator::~TimelineLayerGenerator() {
-    qDebug() << "时间线图层生成线程释放";
+    XINFO("时间线图层生成线程释放");
 }
 
 // 生成交互层的数据
@@ -22,7 +24,7 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     auto& ecore = maplayer_manager->core();
 
     // 从管理器获取时间转换器
-    auto& converter =
+    auto converter =
         maplayer_manager->get_time_converter_manager()->getConverter(
             map->timing_set(), mapinfo->baseInfo,
             mapinfo->editorInfo.scrollInfo, mapinfo,
@@ -45,8 +47,8 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     const auto& time =
         mapinfo->realTimeInfo.current_time_info.presentation_canvas_time;
     // 使用转换器计算时间边界
-    const auto time_at_top = converter.distanceToTime(pixel_y_top, time);
-    const auto time_at_bottom = converter.distanceToTime(pixel_y_bottom, time);
+    const auto time_at_top = converter->distanceToTime(pixel_y_top, time);
+    const auto time_at_bottom = converter->distanceToTime(pixel_y_bottom, time);
 
     // 应用预加载缓冲
     const auto query_start_time =
@@ -54,8 +56,8 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     const auto query_end_time = time_at_top + mapinfo->baseInfo.view_timeMargin;
     // 使用转换器计算Y坐标
     const float start_y =
-        converter.timeToPixel(query_start_time, time, mapinfo);
-    const float end_y = converter.timeToPixel(query_end_time, time, mapinfo);
+        converter->timeToPixel(query_start_time, time, mapinfo);
+    const float end_y = converter->timeToPixel(query_end_time, time, mapinfo);
 
     // 绘制读取时间区间线(红色)
     PrimitiveCommand start_cmd;
@@ -75,7 +77,7 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     buffer.add_PrimitiveCommand(end_cmd);
 
     // 生成时间线(拍线/识别分拍/小节线)
-    timeline_system.update(ecore, mapinfo, liner_converter, converter, l,
+    timeline_system.update(ecore, mapinfo, liner_converter, *converter, l,
                            buffer);
 
     // qDebug() << "timeline layer done";

@@ -216,6 +216,8 @@ set(PROJECT_SOURCES
     src/ui/mainwindow.cpp
     src/ui/mainwindowcontrols.cpp
     src/ui/mainwindow.ui
+    src/log/colorful-log.h
+    src/log/colorful-log.cpp
     src/main.cpp)
 
 # ui需要包含的路径

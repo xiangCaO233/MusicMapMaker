@@ -68,13 +68,13 @@ class EffectedTimeConverter : public TimePixelConverter {
         const auto& all_points = timings.get_all_timing_points();
 
         // 初始化状态变量
-        double current_accumulated_pixels = 0.0;
-        int64_t last_timestamp = 0;
+        double current_accumulated_pixels{.0};
+        int64_t last_timestamp{0};
 
         // 初始速度由 prebpm 决定
-        const double preference_beat_length =
+        const auto preference_beat_length =
             (prebpm > 0) ? 60000.0 / prebpm : 0.0;
-        double last_pixels_per_ms =
+        auto last_pixels_per_ms =
             (preference_beat_length > 0)
                 ? (BASE_PIXELS_PER_MS * m_scrollInfo.scroll_speed *
                    (preference_beat_length / preference_beat_length))

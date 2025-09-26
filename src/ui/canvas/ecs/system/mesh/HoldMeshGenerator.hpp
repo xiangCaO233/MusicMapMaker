@@ -117,9 +117,16 @@ class HoldMeshGenerator {
                             ? src_time
                             : registry->get<TimeComponent>(e).timestamp;
 
-        auto thisy = tailType == HoldTailType::GENERAL
-                         ? src_y
-                         : registry->get<TransformComponent>(e).y;
+        auto transform = registry->get<TransformComponent>(e);
+        float thisy;
+        if (is_preview) {
+            thisy =
+                tailType == HoldTailType::GENERAL ? src_y : transform.preview_y;
+
+        } else {
+            thisy =
+                tailType == HoldTailType::GENERAL ? src_y : transform.main_y;
+        }
         auto thisx =
             tailType == HoldTailType::GENERAL
                 ? src_x
@@ -150,6 +157,7 @@ class HoldMeshGenerator {
                 tool_interaction_state->setDragValidRes(e, end_axis);
             }
         }
+        // --------------------面条尾拖动交互--------------------------
 
         // 根据面条持续时间计算面身高度
         auto body_height =
@@ -158,6 +166,16 @@ class HoldMeshGenerator {
                 thistime + duration,
                 info->realTimeInfo.current_time_info.presentation_canvas_time,
                 info);
+
+        // if (is_preview) {
+        //     qDebug() << "preview 中 hold实体[" << static_cast<uint32_t>(e)
+        //              << "]计算高度为[" << body_height << "],thisy = " <<
+        //              thisy;
+        // } else {
+        //     qDebug() << "maintrack 中 hold实体[" << static_cast<uint32_t>(e)
+        //              << "]计算高度为[" << body_height << "],thisy = " <<
+        //              thisy;
+        // }
 
         // 获取面身纹理
         TextureInfo hold_body_texinfo = tex(TexType::HOLD_BODY_VERTICAL);

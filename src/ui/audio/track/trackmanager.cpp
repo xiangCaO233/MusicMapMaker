@@ -1,5 +1,6 @@
 #include <SDL3/SDL_audio.h>
 #include <audio/control/audiocontroller.h>
+#include <log/colorful-log.h>
 #include <qlogging.h>
 #include <qnamespace.h>
 #include <qobject.h>
@@ -122,7 +123,7 @@ TrackManager::~TrackManager() {
     ice::SDLPlayer::quit_backend();
 
     delete ui;
-    qDebug() << "TrackManager deleted";
+    XINFO("音轨管理器释放");
 }
 void TrackManager::closeEvent(QCloseEvent* event) {
     for (auto controller : audio_controllers) {
@@ -187,7 +188,7 @@ std::weak_ptr<ice::AudioTrack> TrackManager::loadin_audio(
     const QString& audio_file, bool is_maintrack) {
     auto track_it = audio_tracks.find(audio_file);
     if (track_it == audio_tracks.end()) {
-        qDebug() << "lodin audio:" << audio_file;
+        XINFO("载入音频:" + audio_file.toStdString());
         track_it = audio_tracks.insert(
             audio_file,
             audio_pool.get_or_load(threadpool, audio_file.toStdString()));

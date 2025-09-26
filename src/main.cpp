@@ -5,6 +5,7 @@
 #endif  //_WIN32
 #include <qfontdatabase.h>
 #include <qsurfaceformat.h>
+#include <src/log/colorful-log.h>
 
 #include <QApplication>
 #include <QDir>
@@ -18,6 +19,8 @@ int main(int argc, char* argv[]) {
     SetConsoleCP(65001);
 #endif  //_WIN32
     std::setlocale(LC_ALL, ".UTF-8");
+
+    XLogger::init("MMM");
 
     // 自动共享gl上下文
     // QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
@@ -53,10 +56,10 @@ int main(int argc, char* argv[]) {
 
     if (loaded) {
         QApplication::installTranslator(&appTranslator);
-        qDebug() << "Loaded translation for:" + languageCode.toStdString();
+        XINFO("Loaded translation for:" + languageCode.toStdString());
     } else {
-        qDebug() << "Using default language (translation not found for" +
-                        languageCode.toStdString() + ")";
+        XINFO("Using default language (translation not found for" +
+              languageCode.toStdString() + ")");
     }
 
     // 初始化gl版本
@@ -83,13 +86,11 @@ int main(int argc, char* argv[]) {
     // TODO
     /*
      * 1: 修复windows进程残留
-     * 2: 修复音频多次加载和图标丢失
-     * 3: 集成完整日志系统,qDebug屁用没有
-     * 4: 实现预览区和点击跳转功能
-     * 5: 实现滚动吸附拍线模式切换
-     * 6: 实现mmm文件格式和直接保存操作(c-s保存为mmm)
-     * 7: 实现项目配置文件格式和对应序列化与反序列化
-     * 8: 实现直接打开谱面/音频文件的项目引导ui和交互[依赖todo5,6的完整架构]
+     * 2: 继续实现预览区和点击跳转功能
+     * 3: 实现滚动吸附拍线模式切换
+     * 4: 实现mmm文件格式和直接保存操作(c-s保存为mmm)
+     * 5: 实现项目配置文件格式和对应序列化与反序列化
+     * 6: 实现直接打开谱面/音频文件的项目引导ui和交互[依赖todo5,6的完整架构]
      * */
 
     return QApplication::exec();

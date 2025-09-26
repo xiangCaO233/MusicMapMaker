@@ -1,3 +1,5 @@
+#include <log/colorful-log.h>
+
 #include <QDebug>
 #include <action/modules/canvas/EditorActionHandler.hpp>
 
@@ -10,53 +12,53 @@ EditorActionHandler::~EditorActionHandler() = default;
 void EditorActionHandler::onPause_Resume() {
     //
     emit pause_or_resume_canvas();
-    qDebug() << "触发暂停/恢复";
+    XINFO("触发暂停/恢复");
 }
 void EditorActionHandler::onCancel() {
     //
-    qDebug() << "触发取消";
+    XINFO("触发取消");
 }
 
 void EditorActionHandler::onSelectPage() {
     //
-    qDebug() << "触发选择页";
+    XINFO("触发选择页");
 }
 void EditorActionHandler::onSelectAll() {
     //
-    qDebug() << "触发全选";
+    XINFO("触发全选");
 }
 void EditorActionHandler::onCut() {
     //
     emit cut();
-    qDebug() << "触发剪切";
+    XINFO("触发剪切");
 }
 void EditorActionHandler::onCopy() {
     //
     emit copy();
-    qDebug() << "触发拷贝";
+    XINFO("触发拷贝");
 }
 void EditorActionHandler::onPaste() {
     //
     emit paste();
-    qDebug() << "触发粘贴";
+    XINFO("触发粘贴");
 }
 void EditorActionHandler::onDelete() {
     //
     emit delete_signal();
-    qDebug() << "触发删除";
+    XINFO("触发删除");
 }
 void EditorActionHandler::onUndo() {
     //
     emit undo();
-    qDebug() << "触发撤销";
+    XINFO("触发撤销");
 }
 void EditorActionHandler::onRedo() {
     //
     emit redo();
-    qDebug() << "触发重做";
+    XINFO("触发重做");
 }
 
 void EditorActionHandler::onFind() {
     //
-    qDebug() << "触发查找";
+    XINFO("触发查找");
 }

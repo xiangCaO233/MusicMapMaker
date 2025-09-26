@@ -48,6 +48,8 @@ struct PreviewAreaInfo {
     // 主区域在预览区的位置
     // 0.0f ~ 1.0f
     float mainAreaPos{.5f};
+
+    bool operator==(const PreviewAreaInfo& other) const = default;
 };
 
 class MSkin;

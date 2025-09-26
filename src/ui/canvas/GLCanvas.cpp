@@ -1,3 +1,5 @@
+#include <log/colorful-log.h>
+
 #include <QGuiApplication>
 #include <QOpenGLFunctions>
 #include <QScreen>
@@ -23,7 +25,7 @@ GLCanvas::GLCanvas() {
             &GLCanvas::updateFpsDisplay);
 
     desiredFps = QGuiApplication::primaryScreen()->refreshRate();
-    qDebug() << "显示器刷新率 : " << desiredFps;
+    XINFO("显示器刷新率 : " + std::to_string(desiredFps));
 
     // 帧间隔
     // auto des_update_time = 1000.0 / desiredFps;
@@ -87,32 +89,32 @@ void GLCanvas::initializeGL() {
     initializeOpenGLFunctions();
     // 查询opengl版本
     auto version = GLCALL_R(glGetString(GL_VERSION), this);
-    qDebug() << "OpenGL 版本: "
-             << std::string(reinterpret_cast<const char*>(version));
+
+    XINFO("OpenGL 版本: " +
+          std::string(reinterpret_cast<const char*>(version)));
 
     GLint maxVertices, maxComponents;
     GLCALL_V(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxVertices),
              this);
-    qDebug() << "几何着色器最大输出顶点数: " << std::to_string(maxVertices);
+    XINFO("几何着色器最大输出顶点数: " + std::to_string(maxVertices));
     GLCALL_V(
         glGetIntegerv(GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS, &maxComponents),
         this);
-    qDebug() << "几何着色器最大输出顶点分量数: "
-             << std::to_string(maxComponents);
+    XINFO("几何着色器最大输出顶点分量数: " + std::to_string(maxComponents));
 
     // 查询最大支持抗锯齿MSAA倍率
     GLint maxSamples;
     GLCALL_V(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples), this);
 
     // 初始化驱动信息
-    qDebug() << "启用最大抗锯齿倍率: " << std::to_string(maxSamples);
+    XINFO("启用最大抗锯齿倍率: " + std::to_string(maxSamples));
     // 启用 最大 MSAA
     context()->format().setSamples(maxSamples);
 
     // 检查最大ubo size
     int maxUBOSize;
     GLCALL_V(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUBOSize), this);
-    qDebug() << "最大UBO块容量: " << std::to_string(maxUBOSize);
+    XINFO("最大UBO块容量: " + std::to_string(maxUBOSize));
 
     // 标准混合模式
     GLCALL_V(glEnable(GL_BLEND), this);
