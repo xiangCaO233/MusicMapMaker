@@ -43,7 +43,7 @@ entt::entity updateNoteEntity(entt::registry& registry,
         }
         case NoteType::COMPOSITE: {
             auto composed_note = static_cast<const Composite*>(note);
-            auto& [children] =
+            auto& [children, total_duration] =
                 registry.get<CompositeRootComponent>(note_entity);
             for (int i{0}; i < children.size(); ++i) {
                 updateNoteEntity(registry, children[i],
@@ -92,7 +92,8 @@ entt::entity createNoteEntity(entt::registry& registry, const Note* note,
                 children.push_back(child_note_entity);
             }
             // 父实体附加子实体列表组件
-            registry.emplace<CompositeRootComponent>(note_entity, children);
+            registry.emplace<CompositeRootComponent>(
+                note_entity, children, composed_note->total_duration());
             break;
         }
         default:
@@ -114,8 +115,9 @@ entt::entity createTimingEntity(entt::registry& registry,
     return timing_entity;
 }
 void sync_timings(ECSCore& core, const TimingMap& timings,
-                  const int64_t query_start_time,
-                  const int64_t query_end_time) {
+                  const int64_t query_start_time, const int64_t query_end_time,
+                  const int64_t maintrack_start_time,
+                  const int64_t maintrack_end_time) {
     auto& registry = core.ecs_registry();
     // Timing 实体同步逻辑
     auto& timing_handle_map = core.handle_to_timingentity_map();
@@ -142,8 +144,8 @@ void sync_timings(ECSCore& core, const TimingMap& timings,
     }
     // --- 2. 第二阶段：根据数量决定是否应用密度限制 ---
     std::unordered_set<TimingHandle, TimingHandle::Hash> final_visible_handles;
-    const size_t DENSITY_LIMIT_THRESHOLD = 200;      // 定义阈值
-    const size_t DENSITY_LIMIT_TIME_THRESHOLD = 20;  // 定义密度限制值
+    const size_t DENSITY_LIMIT_THRESHOLD = 200;     // 定义阈值
+    const size_t DENSITY_LIMIT_TIME_THRESHOLD = 8;  // 定义密度限制值
 
     if (all_visible_handles.size() > DENSITY_LIMIT_THRESHOLD) {
         // 数量超过阈值，需要进行密度限制
@@ -205,11 +207,24 @@ void sync_timings(ECSCore& core, const TimingMap& timings,
             }
         }
     }
+
+    // 为处于Maintrack时间范围内的timing实体添加InMaintrick组件
+    auto timings_view = registry.view<TimingComponent, TimeComponent>();
+    for (const auto& e : timings_view) {
+        const auto& time = timings_view.get<TimeComponent>(e);
+        if (time.timestamp >= maintrack_start_time &&
+            time.timestamp <= maintrack_end_time) {
+            // 直接添加
+            registry.emplace<InMaintrackComponent>(e);
+        }
+    }
 }
 
 void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
                 const BeatInfo& beatInfo, const MapCanvasInfo* info,
-                const int64_t query_start_time, const int64_t query_end_time) {
+                const int64_t query_start_time, const int64_t query_end_time,
+                const int64_t maintrack_start_time,
+                const int64_t maintrack_end_time) {
     auto& registry = core.ecs_registry();
     auto& beat_handle_map = core.handle_to_beatentity_map();
 
@@ -282,12 +297,22 @@ void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
             }
         }
     }
+
+    for (const auto& e : core.get_beat_group()) {
+        auto [time] = registry.get<TimeComponent>(e);
+        auto [div, beat_length, index] = registry.get<BeatComponent>(e);
+        if (time + beat_length >= maintrack_start_time) {
+            registry.emplace<InMaintrackComponent>(e);
+        }
+    }
 }
 
 void sync_notes(ECSCore& core, const NoteCollection& notes,
                 const NoteIDManager& uuidManager,
                 MapLayerManager* layer_manager, const MapCanvasInfo* info,
-                const int64_t query_start_time, const int64_t query_end_time) {
+                const int64_t query_start_time, const int64_t query_end_time,
+                const int64_t maintrack_start_time,
+                const int64_t maintrack_end_time) {
     auto& registry = core.ecs_registry();
     auto& uuid_map = core.uuid_to_entity_map();
 
@@ -323,7 +348,7 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
             if (registry.valid(entity)) {
                 // 若为组合物件实体/递归移除所有子实体
                 if (registry.all_of<CompositeRootComponent>(entity)) {
-                    auto& [children] =
+                    auto& [children, total_duration] =
                         registry.get<CompositeRootComponent>(entity);
                     for (const auto& child_e : children) {
                         if (registry.valid(child_e)) {
@@ -364,6 +389,35 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
         updateNoteEntity(registry, e, note_data);
     }
     registry.clear<DirtyMarkComponent>();
+
+    // 更新InMainTrackComponent
+    auto notes_view = registry.view<NoteComponent, TimeComponent>();
+    for (const auto& e : notes_view) {
+        bool should_have_component = false;
+        const auto& time = notes_view.get<TimeComponent>(e);
+        if (time.timestamp >= maintrack_start_time &&
+            time.timestamp <= maintrack_end_time) {
+            should_have_component = true;
+        }
+        // 对于长条Note，还需要检查它的结束时间
+        if (const auto* hold = registry.try_get<HoldComponent>(e)) {
+            if (time.timestamp + hold->duration >= maintrack_start_time) {
+                // 如果长条的尾部在主轨道区内，应该标记它
+                should_have_component = true;
+            }
+        } else if (const auto* comp_root =
+                       registry.try_get<CompositeRootComponent>(e)) {
+            if (time.timestamp + comp_root->total_duration >=
+                maintrack_start_time) {
+                // 如果组合物件的尾部在主轨道区内，应该标记它
+                should_have_component = true;
+            }
+        }
+        // 在所有判断都结束后，根据最终的标志位，只执行一次 emplace
+        if (should_have_component) {
+            registry.emplace<InMaintrackComponent>(e);
+        }
+    }
 
     // ----------debug------------
     // auto new_entities = handle_map.size();
@@ -552,63 +606,81 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
     // 这些相对值将作为 converter 的输入。
     // 正值代表“未来”方向（在屏幕上是向上的）。
     // 负值代表“过去”方向（在屏幕上是向下的）。
-    const auto pixel_y_top = canvas_height - judgeline_absolute_y;
-    const auto pixel_y_bottom = 0.0f - judgeline_absolute_y;
+    const auto maintrack_pixel_y_top = canvas_height - judgeline_absolute_y;
+    const auto maintrack_pixel_y_bottom = 0.0f - judgeline_absolute_y;
 
-    // 使用转换器计算时间边界
-    const auto time_at_top =
-        converter.distanceToTime(pixel_y_top, current_time);
-    const auto time_at_bottom =
-        converter.distanceToTime(pixel_y_bottom, current_time);
+    // 使用转换器计算主轨道时间边界
+    const auto maintrack_time_at_top =
+        converter.distanceToTime(maintrack_pixel_y_top, current_time);
+    const auto maintrack_time_at_bottom =
+        converter.distanceToTime(maintrack_pixel_y_bottom, current_time);
 
-    // const auto time_at_top2 = converter2.pixelToTime(pixel_y_top,
-    // current_time); const auto time_at_bottom2 =
-    //     converter2.pixelToTime(pixel_y_bottom, current_time);
+    // 主轨道时间跨度
+    const auto maintrack_duration =
+        maintrack_time_at_top - maintrack_time_at_bottom;
 
-    // === 打印结果 ===
-    // qDebug() << "============ DEBUG FRAME ============";
-    // qDebug() << "Current Time: " << current_time;
-    // qDebug() << "Canvas Height: " << info->baseInfo.canvasSize.height();
-    // qDebug() << "Judgeline Pos: " << info->baseInfo.judgeline_pos;
+    // 根据主轨道区推算预览区的时间范围
+    const auto& preview_info = info->editorInfo.previewAreaInfo;
 
-    // // qDebug() << "Effected Logic Y (untranslated_y): " << effected_logic_y;
-    // qDebug() << "Effected Time at Top (Screen Coord to Time): " <<
-    // time_at_top2; qDebug() << "Effected Time at Bottom (Screen Coord to
-    // Time): "
-    //          << time_at_bottom2;
+    // 预览区的总时间长度
+    const auto& preview_duration = maintrack_duration * preview_info.areaRatio;
 
-    // // qDebug() << "Linear Logic Y (untranslated_y): " << linear_logic_y;
-    // qDebug() << "Linear Time at Top (Screen Coord to Time): " << time_at_top;
-    // qDebug() << "Linear Time at Bottom (Screen Coord to Time): "
-    //          << time_at_bottom;
-    // qDebug() << "=====================================";
+    // 主轨道区的时间中心点
+    const auto maintrack_center_time =
+        maintrack_time_at_bottom + maintrack_duration / 2.0;
 
-    // qDebug() << "Render target time range:[" << time_at_bottom << "~"
-    //          << time_at_top << "]";
+    // 计算预览区的起始和结束时间
+    // maintrack_pos_in_previewarea (0.0=底部, 1.0=顶部)
+    const auto preview_time_at_bottom =
+        maintrack_center_time - preview_duration * preview_info.mainAreaPos;
+    const auto preview_time_at_top =
+        maintrack_center_time +
+        preview_duration * (1.0 - preview_info.mainAreaPos);
 
-    // 应用预加载缓冲
-    const auto query_start_time = time_at_bottom - base_info.view_timeMargin;
-    const auto query_end_time = time_at_top + base_info.view_timeMargin;
+    // 为查询应用缓冲 (Margin)
+    const auto maintrack_query_start_time =
+        maintrack_time_at_bottom - base_info.view_timeMargin;
+    const auto maintrack_query_end_time =
+        maintrack_time_at_top + base_info.view_timeMargin;
+
+    const auto preview_query_start_time =
+        preview_time_at_bottom - base_info.view_timeMargin;
+    const auto preview_query_end_time =
+        preview_time_at_top + base_info.view_timeMargin;
+
     // qDebug() << "Render absolute(append margin) time range:["
     //          << query_start_time << "~" << query_end_time << "]";
 
-    // qDebug() << "当前查询开始:" << query_start_time;
-    // qDebug() << "当前查询结束:" << query_end_time;
+    // qDebug() << "当前主轨道查询开始:" << maintrack_query_start_time;
+    // qDebug() << "当前主轨道查询结束:" << maintrack_query_end_time;
+    // qDebug() << "当前预览查询开始:" << preview_query_start_time;
+    // qDebug() << "当前预览查询结束:" << preview_query_end_time;
+
+    // 先移除所有上一帧的标签，确保状态干净
+    core.ecs_registry().clear<InMaintrackComponent>();
 
     // 执行ECS同步逻辑
     // 同步创建中的Note实体
     sync_creating_noteEntity(core, layer_manager, info);
 
-    // 同步已有的Note实体
-    sync_notes(core, notes, uuidManager, layer_manager, info, query_start_time,
-               query_end_time);
+    // 同步当前帧的所有Note实体
+    sync_notes(core, notes, uuidManager, layer_manager, info,
+               preview_query_start_time, preview_query_end_time,
+               maintrack_query_start_time, maintrack_query_end_time);
 
     // 同步Timing 实体
-    sync_timings(core, timings, query_start_time, query_end_time);
+    sync_timings(core, timings, preview_query_start_time,
+                 preview_query_end_time, maintrack_query_start_time,
+                 maintrack_query_end_time);
 
     // 同步拍实体
-    sync_beats(core, beatTimeLine, beatInfo, info, query_start_time,
-               query_end_time);
+    sync_beats(core, beatTimeLine, beatInfo, info, preview_query_start_time,
+               preview_query_end_time, maintrack_query_start_time,
+               maintrack_query_end_time);
+
+    // 同步主轨道实体的组件
+    // sync_maintrack_component(core, maintrack_query_start_time,
+    //                          maintrack_query_end_time);
 
     // 排序beat实体
     auto& beat_group_to_sort = core.get_beat_group();

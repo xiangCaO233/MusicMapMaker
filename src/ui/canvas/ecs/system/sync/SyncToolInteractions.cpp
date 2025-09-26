@@ -2,12 +2,11 @@
 #include <ecs/system/sync/ToolCommandProcessor.hpp>
 #include <info/NotePart.hpp>
 // #include <iostream>
+#include <ecs/component/ComponentInspector.hpp>
 #include <layer/MapLayerManager.hpp>
 #include <mmm/map/MMap.hpp>
 #include <tool/ThreadSafeQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
-
-#include "ecs/component/ComponentInspector.hpp"
 
 void updateHover(ToolSystem* toolSystem,
                  ToolInteractionState* toolInteractionState,

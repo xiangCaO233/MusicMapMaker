@@ -10,6 +10,7 @@ class MMap;
 class Note;
 
 #include <ecs/component/CoreComponents.hpp>
+#include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/TimeLineComponents.hpp>
 
 class ECSCore {
@@ -45,7 +46,8 @@ class ECSCore {
     entt::registry registry;
 
     // 拥有 TimeComponent 和 BeatComponent 的 group
-    decltype(registry.group<TimeComponent, BeatComponent>()) beat_group;
+    decltype(registry.group<BeatComponent>(
+        entt::get<TimeComponent>)) beat_group;
 
     // NoteUUID -> entt::entity 的映射
     std::unordered_map<NoteUUID, entt::entity> uuid_to_entity;

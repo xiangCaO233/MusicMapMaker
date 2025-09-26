@@ -5,7 +5,7 @@
 
 // 构造ECSCore
 ECSCore::ECSCore()
-    : beat_group(registry.group<TimeComponent, BeatComponent>()) {
+    : beat_group(registry.group<BeatComponent>(entt::get<TimeComponent>)) {
     ComponentInspector::registerAllComponentsForInspector();
 };
 

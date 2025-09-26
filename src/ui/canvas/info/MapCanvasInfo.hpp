@@ -31,8 +31,8 @@ struct ScrollInfo {
     // 滑轮自然滚动
     bool scroll_natural{false};
 
-    // 滑轮页滚动步长
-    float pageScrollStep{120.f};
+    // 滑轮页滚动步长倍率
+    float pageScrollStepRatio{1.f};
 
     // 滑轮时间线缩放滚动步长
     float timelineScrollStep{.03f};

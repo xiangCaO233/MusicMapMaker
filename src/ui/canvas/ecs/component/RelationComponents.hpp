@@ -7,6 +7,8 @@
 struct CompositeRootComponent {
     // 存储子Note实体的ID
     std::vector<entt::entity> children;
+    // 总时间跨度
+    uint32_t total_duration;
 };
 
 // 用于Composite Note的子节点，指向其父节点

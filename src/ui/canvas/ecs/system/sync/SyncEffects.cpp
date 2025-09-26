@@ -7,6 +7,7 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                                const NoteIDManager& uuidManager,
                                const MapCanvasInfo* info,
                                const TimePixelConverter& converter) const {
+    if (!info->realTimeInfo.is_playing) return;
     auto& registry = core.ecs_registry();
 
     // --- 1. 计算本帧流逝的逻辑时间 (delta_time) ---

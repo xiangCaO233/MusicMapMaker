@@ -68,7 +68,7 @@ class RenderDataLoop : public QObject {
     // --- 您的应用程序对象 (保留) ---
     Renderer2D* render;
     MapCanvasClock canvas_clock;
-    std::unique_ptr<LayerManager> layer_manager;
+    std::unique_ptr<LayerManager> layer_manager{nullptr};
     // ... getinfo() 和 pre/tick/after_tickEvent() 的声明 ...
 
     // --- 循环控制 (保留) ---

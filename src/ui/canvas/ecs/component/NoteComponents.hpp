@@ -11,6 +11,9 @@ struct NoteComponent {
     NoteUUID sourceUUID{InvalidNoteUUID};
 };
 
+// 标记这是一个位于可见主轨道内的Note
+struct InMaintrackComponent {};
+
 // 标记这是一个即将创建的Note(用于同步系统筛选和更新)
 struct CreatingNoteComponent {};
 

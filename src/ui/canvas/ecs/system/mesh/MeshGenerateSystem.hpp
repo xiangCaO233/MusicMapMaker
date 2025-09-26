@@ -21,6 +21,7 @@ class MeshGenerateSystem {
     uint32_t maplength;
     float judgeline_absolute_y;
     float single_track_width;
+    QSizeF canvas_size;
     float canvas_height;
     double presentation_canvas_time;
     std::optional<MeshPartInfo> hovered_info;
@@ -90,7 +91,8 @@ class MeshGenerateSystem {
         realtime_info = &info->realTimeInfo;
         current_mouse_pos =
             glm::vec2{realtime_info->mousePos.x(), realtime_info->mousePos.y()};
-        canvas_height = info->baseInfo.canvasSize.height();
+        canvas_size = info->baseInfo.canvasSize;
+        canvas_height = canvas_size.height();
         judgeline_absolute_y = canvas_height * info->editorInfo.judgeline_pos;
         tool_interaction_state = toolInteractionState;
         converter = &converter_ref;
@@ -100,7 +102,15 @@ class MeshGenerateSystem {
         // 生成物件的网格组件
         // const auto& realtime_info = info->realTimeInfo;
         // 获取轨道布局信息
-        all_tracks_rect = info->editorInfo.track_layout;
+        if (is_preview) {
+            auto& main_track_layout = info->editorInfo.track_layout;
+            // 移动轨道布局到预览区
+            auto xpos = main_track_layout.x + main_track_layout.z;
+            all_tracks_rect = {xpos, 0, canvas_size.width() - xpos,
+                               canvas_height};
+        } else {
+            all_tracks_rect = info->editorInfo.track_layout;
+        }
         track_count = info->editorInfo.map->base_metadata().track_count;
         maplength = info->editorInfo.map->base_metadata().map_length;
         if (track_count == 0) return;
@@ -111,7 +121,7 @@ class MeshGenerateSystem {
 
         if (is_preview) {
             // 是在生成预览区域的网格
-            generatePreviewAreaMesh();
+            // generatePreviewAreaMesh();
         } else {
             // 在生成主轨道区的网格
             generateMainAreaMesh();
@@ -119,15 +129,169 @@ class MeshGenerateSystem {
     }
 
    private:
-    void generatePreviewAreaMesh() {}
-
-    void generateMainAreaMesh() {
+    void generatePreviewAreaMesh() {
         // 遍历所有需要生成网格的实体(除去组合物件的子键)
         auto view =
             registry->view<TimeComponent, NoteComponent, TransformComponent>(
                 entt::exclude<ChildOfComponent>);
 
-        for (auto& e : view) {
+        for (const auto& e : view) {
+            // assert(registry->valid(e) &&
+            //        "FATAL: Invalid entity handle detected!");
+            // 填充目标网格属性
+            auto& entity_mesh = (*generated_meshes)[e];
+
+            // 最终来源实体
+            entity_mesh.source_entity = e;
+
+            // 获取note原始详细信息
+            auto [time] = registry->get<TimeComponent>(e);
+            auto [track_index, uuid] = registry->get<NoteComponent>(e);
+            auto [y] = registry->get<TransformComponent>(e);
+
+            auto* ghost = registry->try_get<GhostComponent>(e);
+            auto* delmark = registry->try_get<DeleteMarkComponent>(e);
+            if (delmark) {
+                // 标记删除方式渲染
+                entity_mesh.state = MeshState::MARKDELETE;
+                generateMesh(track_index, e, entity_mesh, time, y);
+            } else if (ghost) {
+                // 虚影方式渲染-根据工具交互状态确定如何渲染
+
+                // --------------------物件头拖动交互--------------------------
+                entity_mesh.state = MeshState::GHOST;
+                auto drag_info = tool_interaction_state->getDragState();
+                auto& dragpart = drag_info.drag_start_hit.part;
+                auto mousePressPos =
+                    tool_interaction_state->getMousePressPos(Qt::LeftButton);
+                auto mousePos = tool_interaction_state->getCurrentMousePos();
+                auto buttons =
+                    tool_interaction_state->getMouseState().pressed_buttons;
+                // auto mouse_time =
+                //     converter.pixelToTime(info->baseInfo.canvasSize.height()
+                //     -
+                //                               mousePos.y -
+                //                               judgeline_absolute_y,
+                //                           info->realTimeInfo.current_time_info
+                //                               .presentation_canvas_time);
+                auto& drageed_entities = drag_info.dragged_entitiesWithRes;
+                if (drageed_entities.size() > 1) {
+                    // 拖动多个时无论何部位均为移动
+                    // 计算此时鼠标最近的轨道
+                    auto current_mouse_axis = getPixelMapAxis(mousePos);
+
+                    // 验证目标鼠标位置更新
+                    auto validity = current_mouse_axis.time >= 0 &&
+                                    current_mouse_axis.time <= maplength &&
+                                    current_mouse_axis.track >= 0 &&
+                                    current_mouse_axis.track < track_count;
+                    tool_interaction_state->setDragValidity(validity);
+                    drag_info = tool_interaction_state->getDragState();
+                    // 覆盖为发光强调
+                    if (e == drag_info.drag_start_hit.source_entity)
+                        entity_mesh.state = MeshState::GLOW_AND_EMPHASIZE;
+                    // 计算焦点物件移动的变化
+                    if (drag_info.is_valid &&
+                        !buttons.testFlag(Qt::RightButton)) {
+                        // 可同时按住右键暂时不应用拖动效果
+
+                        if (e == drag_info.drag_start_hit.source_entity) {
+                            auto& src_axis = drageed_entities[e];
+                            relative_delta_axis = current_mouse_axis - src_axis;
+                        }
+
+                        auto& src_axis = drageed_entities[e];
+                        auto res_axis = src_axis + relative_delta_axis;
+
+                        // 安全限制检查
+                        if (res_axis.time < 0) res_axis.time = 0;
+                        if (res_axis.track < 0) res_axis.track = 0;
+                        if (res_axis.track >= track_count)
+                            res_axis.track = track_count - 1;
+
+                        // 应用位置变化到当前实体
+                        time = res_axis.time;
+                        track_index = res_axis.track;
+                        y = res_axis.y;
+
+                        // 更新当前实体拖动结果
+                        tool_interaction_state->setDragValidRes(e, res_axis);
+                    } else {
+                        // 按住右键或非法则恢复当前实体拖动结果
+                        tool_interaction_state->setDragValidRes(
+                            e, MapAxis{time, time, track_index, 0, int64_t(y)});
+                        // 恢复相对移动位置
+                        relative_delta_axis = MapAxis{};
+                        qDebug() << "restore dragpos";
+                    }
+
+                } else {
+                    if ((dragpart == NotePart::NONE ||
+                         dragpart == NotePart::HEAD ||
+                         dragpart == NotePart::HOLD_HEAD ||
+                         dragpart == NotePart::SLIDE_HEAD) &&
+                        !buttons.testFlag(Qt::RightButton)) {
+                        // 若为头则计算此时鼠标最近的分拍线时间作为物件时间
+                        // 计算此时鼠标最近的轨道
+                        auto current_mouse_axis = getPixelMapAxis(mousePos);
+
+                        // 验证更新
+                        auto validity = current_mouse_axis.time >= 0 &&
+                                        current_mouse_axis.time <= maplength &&
+                                        current_mouse_axis.track >= 0 &&
+                                        current_mouse_axis.track < track_count;
+                        tool_interaction_state->setDragValidity(validity);
+                        drag_info = tool_interaction_state->getDragState();
+                        if (drag_info.is_valid) {
+                            time = current_mouse_axis.time;
+                            track_index = current_mouse_axis.track;
+                            y = current_mouse_axis.y;
+                            tool_interaction_state->setDragValidRes(
+                                e, current_mouse_axis);
+                        } else {
+                            // 按住右键或非法则恢复当前实体拖动结果
+                            tool_interaction_state->setDragValidRes(
+                                e, MapAxis{time, time, track_index, 0,
+                                           int64_t(y)});
+                            qDebug() << "restore dragpos";
+                        }
+                    }
+                }
+
+                generateMesh(track_index, e, entity_mesh, time, y);
+            } else {
+                // 非虚影或即将删除方式渲染
+
+                // 区分是否为即将创建
+                if (uuid == InvalidNoteUUID) {
+                    // 无uuid,是即将创建的物件-跟随创建状态中的创建节点
+                    // 节点需在同步系统中完成InvalidNoteUUID的实体创建和附件更新
+                    // 使用虚影渲染
+                    entity_mesh.state = MeshState::GHOST;
+                    generateMesh(track_index, e, entity_mesh, time, y);
+                } else {
+                    // 有uuid,是真实在谱面中存在的物件-正常渲染
+                    // 判断是否在选中集合内
+                    if (tool_interaction_state->isSelected(e)) {
+                        auto drag_info = tool_interaction_state->getDragState();
+                        if (e == drag_info.drag_start_hit.source_entity)
+                            entity_mesh.state = MeshState::GLOW_AND_EMPHASIZE;
+                        else
+                            entity_mesh.state = MeshState::GLOW;
+                    }
+                    generateMesh(track_index, e, entity_mesh, time, y);
+                }
+            }
+        }
+    }
+
+    void generateMainAreaMesh() {
+        // 遍历所有需要生成网格的实体(除去组合物件的子键)
+        auto view = registry->view<TimeComponent, NoteComponent,
+                                   TransformComponent, InMaintrackComponent>(
+            entt::exclude<ChildOfComponent>);
+
+        for (const auto& e : view) {
             // assert(registry->valid(e) &&
             //        "FATAL: Invalid entity handle detected!");
             // 填充目标网格属性
@@ -376,7 +540,8 @@ class MeshGenerateSystem {
                                                  obj_scale_width,
                                                  obj_scale_height, x, y, tail);
         } else if (registry->all_of<CompositeRootComponent>(e)) {
-            auto& [children] = registry->get<CompositeRootComponent>(e);
+            const auto& [children, total_duration] =
+                registry->get<CompositeRootComponent>(e);
             // 组合键-二级遍历
             auto count{0};
             for (const auto& child_e : children) {

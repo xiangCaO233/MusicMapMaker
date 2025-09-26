@@ -53,27 +53,11 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
 
     auto &editor_info = mapinfo->editorInfo;
 
-    if (editor_info.scrollInfo.scroll_natural) {
-        dy = -dy;
-    }
     auto &scrollInfo = editor_info.scrollInfo;
 
     if (map) {
-        if (modifiers.testFlag(Qt::ShiftModifier)) {
-            if (dy > 0) {
-                mapinfo->realTimeInfo.current_time_info +=
-                    (scrollInfo.pageScrollStep * 3);
-            }
-            if (dy < 0) {
-                mapinfo->realTimeInfo.current_time_info +=
-                    -(scrollInfo.pageScrollStep * 3);
-            }
-            audio_callback->set_playpos_for(
-                map->base_metadata().main_audio_path.generic_string(),
-                std::chrono::milliseconds(
-                    mapinfo->realTimeInfo.current_time_info.raw_audio_time_ms));
-        } else if (modifiers.testFlag(Qt::ControlModifier)) {
-            // 修改缩放
+        if (modifiers.testFlag(Qt::ControlModifier)) {
+            // 按住controll修改缩放
             if (dy > 0) {
                 scrollInfo.timeline_zoom += scrollInfo.timelineScrollStep;
                 if (scrollInfo.timeline_zoom > 5.f) {
@@ -87,14 +71,18 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
                 }
             }
         } else {
-            if (dy > 0) {
-                mapinfo->realTimeInfo.current_time_info +=
-                    scrollInfo.pageScrollStep;
+            if (editor_info.scrollInfo.scroll_natural) {
+                // 自然滚动反转dy
+                dy = -dy;
             }
-            if (dy < 0) {
-                mapinfo->realTimeInfo.current_time_info +=
-                    -scrollInfo.pageScrollStep;
+            if (modifiers.testFlag(Qt::ShiftModifier)) {
+                // 按住shift倍乘dy
+                dy *= 3.f;
             }
+
+            // 更新画布位置和音频位置
+            mapinfo->realTimeInfo.current_time_info +=
+                scrollInfo.pageScrollStepRatio * dy;
             audio_callback->set_playpos_for(
                 map->base_metadata().main_audio_path.generic_string(),
                 std::chrono::milliseconds(

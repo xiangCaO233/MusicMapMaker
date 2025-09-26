@@ -261,6 +261,10 @@ TextureInfo MSkin::get_object_texture(TexType type, ObjectStatus status) {
             config = &right_slide_end_texture_config;
             break;
         }
+        default: {
+            config = &note_texture_config;
+            break;
+        }
     }
 
     switch (status) {

@@ -28,6 +28,23 @@ void PreviewLayerGenerator::generateLayer(LayerManager* manager,
             mapinfo->editorInfo.scrollInfo, mapinfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
 
+    auto& main_track_layout = mapinfo->editorInfo.track_layout;
+    // 移动轨道布局到预览区
+    auto xpos = main_track_layout.x + main_track_layout.z;
+    auto preview_track_layout =
+        glm::vec4{xpos, 0.f, mapinfo->baseInfo.canvasSize.width() - xpos,
+                  mapinfo->baseInfo.canvasSize.height()};
+    // 绘制预览区遮罩
+    PrimitiveCommand previewAreaMaskCmd;
+    previewAreaMaskCmd.cmdType = CommandType::PRIMITIVE;
+    previewAreaMaskCmd.primitive = PrimitiveType::QUAD;
+    previewAreaMaskCmd.baseInfo.pos = {preview_track_layout.x,
+                                       preview_track_layout.y};
+    previewAreaMaskCmd.baseInfo.size = {preview_track_layout.z,
+                                        preview_track_layout.w};
+    previewAreaMaskCmd.baseInfo.color = {0.2f, 0.2f, 0.2f, 0.4f};
+    buffer.add_PrimitiveCommand(previewAreaMaskCmd);
+
     // 生成预览物件网格
     std::unordered_map<entt::entity, GeneratedMesh> preview_meshs;
     mesh_system.update(ecore.ecs_registry(), mapinfo, converter,

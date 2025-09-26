@@ -9,10 +9,10 @@ void MapDataLoop::pre_tickEvent() {
     // qDebug() << "pretick开始";
     // 先筛选可见物件
     auto map_layermgr = static_cast<MapLayerManager*>(manager().get());
+    if (!map_layermgr) return;
     auto map = map_layermgr->map();
     auto mapinfo = static_cast<MapCanvasInfo*>(getinfo());
     if (!map) {
-        // qDebug() << "pretick结束";
         return;
     }
 
