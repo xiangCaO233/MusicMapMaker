@@ -95,7 +95,8 @@ class HoldMeshGenerator {
                           const uint32_t& src_time,
                           const float& obj_scale_width,
                           const float& obj_scale_height, const float& src_x,
-                          const float& src_y, HoldTailType tailType) const {
+                          const float& src_y, HoldTailType tailType,
+                          bool is_preview = false) const {
         if (!entity_mesh.mesh.empty()) {
             // 更新物件头部位为更精确的内部位置
             entity_mesh.mesh.back().part = NotePart::HOLD_HEAD;
@@ -196,7 +197,8 @@ class HoldMeshGenerator {
     void generateHoldTailMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
                               const float& obj_scale_width,
                               const float& obj_scale_height, const float& thisx,
-                              const float& thisy, float& body_height) const {
+                              const float& thisy, float& body_height,
+                              bool is_preview = false) const {
         // 判断悬浮情况
         auto hovered_entity =
             hovered_info.has_value() && hovered_info.value().source_entity == e;
@@ -221,7 +223,8 @@ class HoldMeshGenerator {
     void generateHoldNodeMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
                               const float& obj_scale_width,
                               const float& obj_scale_height, const float& thisx,
-                              const float& thisy, float& body_height) const {
+                              const float& thisy, float& body_height,
+                              bool is_preview = false) const {
         // 判断悬浮情况(仅可能为子实体)
         auto hovered_entity =
             hovered_info.has_value() && hovered_info.value().child_entity == e;

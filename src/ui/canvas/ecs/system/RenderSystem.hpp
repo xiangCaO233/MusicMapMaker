@@ -12,7 +12,7 @@
 #include <util/mutil.hpp>
 #include <vector>
 
-class NormalRenderSystem {
+class RenderSystem {
     struct RenderableQuad {
         GeneratedMesh::Quad quad;
         MeshState state;

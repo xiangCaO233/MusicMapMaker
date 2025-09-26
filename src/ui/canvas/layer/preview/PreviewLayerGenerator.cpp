@@ -2,18 +2,18 @@
 #include <ecs/component/TransformComponents.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <layer/MapLayerManager.hpp>
-#include <layer/note/NoteLayer.hpp>
-#include <layer/note/NoteLayerGenerator.hpp>
+#include <layer/preview/PreviewLayer.hpp>
+#include <layer/preview/PreviewLayerGenerator.hpp>
 #include <unordered_map>
 
-// 析构NoteLayerGenerator
-NoteLayerGenerator::~NoteLayerGenerator() {
-    qDebug() << "物件图层生成线程释放";
+// 析构PreviewLayerGenerator
+PreviewLayerGenerator::~PreviewLayerGenerator() {
+    qDebug() << "预览图层生成线程释放";
 }
 
 // 生成物件层的数据
-void NoteLayerGenerator::generateLayer(LayerManager* manager,
-                                       RenderDataBuffer& buffer) {
+void PreviewLayerGenerator::generateLayer(LayerManager* manager,
+                                          RenderDataBuffer& buffer) {
     // 数据准备
     auto maplayer_manager = static_cast<MapLayerManager*>(manager);
     auto map = maplayer_manager->map();
@@ -27,17 +27,14 @@ void NoteLayerGenerator::generateLayer(LayerManager* manager,
             map->timing_set(), mapinfo->baseInfo, mapinfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
 
-    // 生成物件网格
-    std::unordered_map<entt::entity, GeneratedMesh> meshs;
+    // 生成预览物件网格
+    std::unordered_map<entt::entity, GeneratedMesh> preview_meshs;
     mesh_system.update(ecore.ecs_registry(), mapinfo, converter,
-                       tool_interaction_state, meshs, false);
+                       tool_interaction_state, preview_meshs, true);
 
-    // 更新工具系统
-    tool_system->update(meshs, mapinfo);
+    // 渲染预览区可见物件
+    normalRender_system.update(ecore.ecs_registry(), preview_meshs, mapinfo,
+                               converter, l, buffer);
 
-    // 渲染一般可见物件
-    normalRender_system.update(ecore.ecs_registry(), meshs, mapinfo, converter,
-                               l, buffer);
-
-    // qDebug() << "note layer done";
+    // qDebug() << "preview layer done";
 }

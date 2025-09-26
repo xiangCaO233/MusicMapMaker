@@ -126,7 +126,8 @@ class LayerManager {
     std::unordered_map<LayerType, std::unique_ptr<QThread>> threads;
 
     // 持有帧同步器
-    FrameSynchronizer synchronizer{5};
+    FrameSynchronizer synchronizer{static_cast<uint32_t>(LayerType::INTERACT) +
+                                   1};
 
     friend class RenderDataLoop;
 };

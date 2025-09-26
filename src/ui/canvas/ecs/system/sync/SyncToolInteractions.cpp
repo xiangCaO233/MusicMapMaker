@@ -38,24 +38,26 @@ void updateHover(ToolSystem* toolSystem,
                 // 仅sourceentity有效
 
             } else {
-                // 组合键子键
-                auto& [parent, child_index] =
-                    toolSystem->get_registry().get<ChildOfComponent>(
-                        hit_info.child_entity);
-                // 父实体失效
-                if (!toolSystem->get_registry().valid(parent)) return;
-                auto& [parent_track, parent_uuid] =
-                    toolSystem->get_registry().get<NoteComponent>(parent);
-                auto parent_note =
-                    notes.get_note(uuidManager.get_handle(parent_uuid));
-                if (!parent_note) {
+                if (registry.valid(hit_info.child_entity)) {
+                    // 组合键子键
+                    auto& [parent, child_index] =
+                        toolSystem->get_registry().get<ChildOfComponent>(
+                            hit_info.child_entity);
                     // 父实体失效
-                    return;
-                } else {
-                    // 获取到此子物件
-                    note = static_cast<const Composite*>(parent_note)
-                               ->children()[child_index]
-                               .get();
+                    if (!toolSystem->get_registry().valid(parent)) return;
+                    auto& [parent_track, parent_uuid] =
+                        toolSystem->get_registry().get<NoteComponent>(parent);
+                    auto parent_note =
+                        notes.get_note(uuidManager.get_handle(parent_uuid));
+                    if (!parent_note) {
+                        // 父实体失效
+                        return;
+                    } else {
+                        // 获取到此子物件
+                        note = static_cast<const Composite*>(parent_note)
+                                   ->children()[child_index]
+                                   .get();
+                    }
                 }
             }
         }

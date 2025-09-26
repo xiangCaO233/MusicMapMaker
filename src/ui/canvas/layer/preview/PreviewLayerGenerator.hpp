@@ -1,5 +1,5 @@
-#ifndef MMM_NOTELAYERGENERATOR_HPP
-#define MMM_NOTELAYERGENERATOR_HPP
+#ifndef MMM_PREVIEWLAYERGENERATOR_HPP
+#define MMM_PREVIEWLAYERGENERATOR_HPP
 
 #include <ecs/system/RenderSystem.hpp>
 #include <ecs/system/TimeSystem.hpp>
@@ -8,17 +8,17 @@
 #include <entt.hpp>
 #include <layer/LayerComputerBase.hpp>
 
-class NoteLayerGenerator : public LayerComputerBase {
+class PreviewLayerGenerator : public LayerComputerBase {
    public:
-    NoteLayerGenerator(LayerManager* manager, ILayer* layer,
-                       FrameSynchronizer* sync, ToolSystem* toolsystem,
-                       ToolInteractionState* toolinteractionstate,
-                       QObject* parent = nullptr)
+    PreviewLayerGenerator(LayerManager* manager, ILayer* layer,
+                          FrameSynchronizer* sync, ToolSystem* toolsystem,
+                          ToolInteractionState* toolinteractionstate,
+                          QObject* parent = nullptr)
         : LayerComputerBase(manager, layer, sync, parent),
           tool_system(toolsystem),
           tool_interaction_state(toolinteractionstate) {}
-    // 析构NoteLayerGenerator
-    ~NoteLayerGenerator() override;
+    // 析构PreviewLayerGenerator
+    ~PreviewLayerGenerator() override;
 
    protected:
     // 生成交互层的数据
@@ -31,4 +31,4 @@ class NoteLayerGenerator : public LayerComputerBase {
     ToolSystem* tool_system;
     ToolInteractionState* tool_interaction_state;
 };
-#endif  // MMM_NOTELAYERGENERATOR_HPP
+#endif  // MMM_PREVIEWLAYERGENERATOR_HPP

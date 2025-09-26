@@ -97,7 +97,8 @@ class SlideMeshGenerator {
                            const uint32_t& src_track,
                            const float& obj_scale_width,
                            const float& obj_scale_height, const float& src_x,
-                           const float& src_y, SlideTailType tailType) const {
+                           const float& src_y, SlideTailType tailType,
+                           bool is_preview = false) const {
         if (!entity_mesh.mesh.empty()) {
             // 更新物件头部位为更精确的内部位置
             entity_mesh.mesh.back().part = NotePart::SLIDE_HEAD;
@@ -197,7 +198,8 @@ class SlideMeshGenerator {
         const entt::entity& e, GeneratedMesh& entity_mesh,
         const uint32_t& srctrack, const float& delta_width,
         const float& obj_scale_width, const float& obj_scale_height,
-        const float& thisx, const float& thisy, float& body_height) const {
+        const float& thisx, const float& thisy, float& body_height,
+        bool is_preview = false) const {
         // 判断悬浮情况
         auto hovered_entity =
             hovered_info.has_value() && hovered_info.value().source_entity == e;

@@ -140,6 +140,8 @@ set(CANVAS_SOURCES
     src/ui/canvas/layer/interact/RealTimeInteractLayer.cpp
     src/ui/canvas/layer/note/NoteLayer.cpp
     src/ui/canvas/layer/note/NoteLayerGenerator.cpp
+    src/ui/canvas/layer/preview/PreviewLayer.cpp
+    src/ui/canvas/layer/preview/PreviewLayerGenerator.cpp
     src/ui/canvas/layer/timeline/TimelineLayer.cpp
     src/ui/canvas/layer/timeline/TimelineLayerGenerator.cpp
     src/ui/canvas/map/MapCanvas.cpp

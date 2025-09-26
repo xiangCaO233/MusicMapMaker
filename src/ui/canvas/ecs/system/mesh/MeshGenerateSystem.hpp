@@ -82,7 +82,8 @@ class MeshGenerateSystem {
         const entt::registry& registry_ref, MapCanvasInfo* mapinfo,
         const TimePixelConverter& converter_ref,
         ToolInteractionState* toolInteractionState,
-        std::unordered_map<entt::entity, GeneratedMesh>& out_generated_meshes) {
+        std::unordered_map<entt::entity, GeneratedMesh>& out_generated_meshes,
+        bool is_preview) {
         // 更新缓存信息
         registry = &registry_ref;
         info = mapinfo;
@@ -108,15 +109,29 @@ class MeshGenerateSystem {
         hovered_info = tool_interaction_state->getHover();
         generated_meshes = &out_generated_meshes;
 
+        if (is_preview) {
+            // 是在生成预览区域的网格
+            generatePreviewAreaMesh();
+        } else {
+            // 在生成主轨道区的网格
+            generateMainAreaMesh();
+        }
+    }
+
+   private:
+    void generatePreviewAreaMesh() {}
+
+    void generateMainAreaMesh() {
         // 遍历所有需要生成网格的实体(除去组合物件的子键)
         auto view =
             registry->view<TimeComponent, NoteComponent, TransformComponent>(
                 entt::exclude<ChildOfComponent>);
+
         for (auto& e : view) {
             // assert(registry->valid(e) &&
             //        "FATAL: Invalid entity handle detected!");
             // 填充目标网格属性
-            auto& entity_mesh = out_generated_meshes[e];
+            auto& entity_mesh = (*generated_meshes)[e];
 
             // 最终来源实体
             entity_mesh.source_entity = e;
@@ -143,7 +158,7 @@ class MeshGenerateSystem {
                     tool_interaction_state->getMousePressPos(Qt::LeftButton);
                 auto mousePos = tool_interaction_state->getCurrentMousePos();
                 auto buttons =
-                    toolInteractionState->getMouseState().pressed_buttons;
+                    tool_interaction_state->getMouseState().pressed_buttons;
                 // auto mouse_time =
                 //     converter.pixelToTime(info->baseInfo.canvasSize.height()
                 //     -
@@ -262,7 +277,6 @@ class MeshGenerateSystem {
         }
     }
 
-   private:
     // 生成头网格
     void generateHeadMesh(const entt::entity& e, GeneratedMesh& entity_mesh,
                           const float& x, const float& y,
@@ -286,7 +300,8 @@ class MeshGenerateSystem {
 
     void generateMesh(int32_t track_index, const entt::entity& e,
                       GeneratedMesh& entity_mesh, const uint32_t& time,
-                      const float& y, bool child_and_end = false) const {
+                      const float& y, bool child_and_end = false,
+                      bool is_preview = false) const {
         // 根据note信息生成网格
 
         // 物件头的x轴位置(中心)

@@ -1,5 +1,8 @@
 #include <layer/MapLayerManager.hpp>
 
+#include "layer/preview/PreviewLayer.hpp"
+#include "layer/preview/PreviewLayerGenerator.hpp"
+
 // 析构MapLayerManager
 MapLayerManager::~MapLayerManager() = default;
 
@@ -29,6 +32,12 @@ void MapLayerManager::initializeLayers() {
                           .try_emplace(NOTE, std::make_unique<NoteLayer>(
                                                  render(), &map_ecs_core))
                           .first->second.get();
+    auto preview_layer =
+        layer_data()
+            .try_emplace(PREVIEW, std::make_unique<PreviewLayer>(render(),
+                                                                 &map_ecs_core))
+            .first->second.get();
+
     auto effect_layer = layer_data()
                             .try_emplace(EFFECT, std::make_unique<EffectLayer>(
                                                      render(), &map_ecs_core))
@@ -59,6 +68,14 @@ void MapLayerManager::initializeLayers() {
                                    get_tool_interaction_state()))
             .first->second.get();
 
+    auto preview_generator =
+        layer_generators()
+            .try_emplace(PREVIEW,
+                         std::make_unique<PreviewLayerGenerator>(
+                             this, preview_layer, &sync(), get_tool_system(),
+                             get_tool_interaction_state()))
+            .first->second.get();
+
     auto effect_generator =
         layer_generators()
             .try_emplace(EFFECT, std::make_unique<EffectLayerGenerator>(
@@ -76,6 +93,7 @@ void MapLayerManager::initializeLayers() {
     startGenerator(BACKGROUND, background_generator);
     startGenerator(TIMELINE, timeline_generator);
     startGenerator(NOTE, note_generator);
+    startGenerator(PREVIEW, preview_generator);
     startGenerator(EFFECT, effect_generator);
     startGenerator(INTERACT, interact_generator);
 }

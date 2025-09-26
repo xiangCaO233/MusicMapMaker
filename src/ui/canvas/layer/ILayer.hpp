@@ -14,10 +14,12 @@ enum class LayerType : uint32_t {
     TIMELINE = 1,
     // 物件图层
     NOTE = 2,
+    // 预览图层
+    PREVIEW = 3,
     // 特效图层
-    EFFECT = 3,
+    EFFECT = 4,
     // 交互图层
-    INTERACT = 4,
+    INTERACT = 5,
 };
 
 class SharedCanvasInfo;
