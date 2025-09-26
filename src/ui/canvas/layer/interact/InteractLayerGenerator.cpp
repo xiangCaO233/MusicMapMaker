@@ -21,7 +21,8 @@ void InteractLayerGenerator::generateLayer(LayerManager* manager,
     if (!map) return;
     auto& converter =
         maplayer_manager->get_time_converter_manager()->getConverter(
-            map->timing_set(), mapinfo->baseInfo, mapinfo,
+            map->timing_set(), mapinfo->baseInfo,
+            mapinfo->editorInfo.scrollInfo, mapinfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
     auto& ecore = maplayer_manager->core();
 

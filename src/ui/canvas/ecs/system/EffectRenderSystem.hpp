@@ -52,7 +52,7 @@ class EffectRenderSystem {
             auto center_x = track_layout.x + single_track_width * effect.track +
                             single_track_width / 2.f;
             auto center_y = info->baseInfo.canvasSize.height() *
-                            (1.f - info->baseInfo.judgeline_pos);
+                            (1.f - info->editorInfo.judgeline_pos);
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
             cmd.primitive = PrimitiveType::QUAD;

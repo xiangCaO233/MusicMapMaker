@@ -36,7 +36,7 @@ class ToolCommandProcessor {
         track_count = info->editorInfo.map->base_metadata().track_count;
         single_track_width = all_tracks_rect.z / float(track_count);
         canvas_height = info->baseInfo.canvasSize.height();
-        judgeline_absolute_y = canvas_height * info->baseInfo.judgeline_pos;
+        judgeline_absolute_y = canvas_height * info->editorInfo.judgeline_pos;
         presentation_canvas_time =
             info->realTimeInfo.current_time_info.presentation_canvas_time;
     }

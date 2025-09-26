@@ -91,7 +91,7 @@ class MeshGenerateSystem {
         current_mouse_pos =
             glm::vec2{realtime_info->mousePos.x(), realtime_info->mousePos.y()};
         canvas_height = info->baseInfo.canvasSize.height();
-        judgeline_absolute_y = canvas_height * info->baseInfo.judgeline_pos;
+        judgeline_absolute_y = canvas_height * info->editorInfo.judgeline_pos;
         tool_interaction_state = toolInteractionState;
         converter = &converter_ref;
         presentation_canvas_time =

@@ -18,8 +18,8 @@ void MapDataLoop::pre_tickEvent() {
 
     // 初始化时间映射器 (自动构造/构造函数自动执行预计算)
     auto& converter = map_layermgr->get_time_converter_manager()->getConverter(
-        map->timing_set(), mapinfo->baseInfo, mapinfo,
-        mapinfo->editorInfo.map->base_metadata().preference_bpm);
+        map->timing_set(), mapinfo->baseInfo, mapinfo->editorInfo.scrollInfo,
+        mapinfo, mapinfo->editorInfo.map->base_metadata().preference_bpm);
     auto& ecore = map_layermgr->core();
 
     // auto& linearConverter =

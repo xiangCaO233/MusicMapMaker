@@ -536,6 +536,7 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
 
     // 获取计算所需的上下文信息
     const auto& base_info = info->baseInfo;
+    const auto& editoe_info = info->editorInfo;
     const auto& realtime_info = info->realTimeInfo;
     const auto& current_time =
         realtime_info.current_time_info.presentation_canvas_time;
@@ -545,7 +546,7 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
 
     // 根据设定的坐标系 (Y=0在底部)，计算判定线的绝对像素位置。
     // 如果 judgeline_pos = 0.2f，意味着判定线在从下往上20%的高度。
-    const auto judgeline_absolute_y = canvas_height * base_info.judgeline_pos;
+    const auto judgeline_absolute_y = canvas_height * editoe_info.judgeline_pos;
 
     // 计算屏幕顶部和底部到判定线的“相对像素距离”。
     // 这些相对值将作为 converter 的输入。

@@ -15,8 +15,9 @@ class EffectedTimeConverter : public TimePixelConverter {
     static constexpr double BASE_PIXELS_PER_MS = 1.0;
 
     EffectedTimeConverter(const TimingMap& timings,
-                          const BaseCanvasStatus& status, double prebpm)
-        : m_status(status) {
+                          const BaseCanvasStatus& status,
+                          const ScrollInfo& scrollInfo, double prebpm)
+        : m_status(status), m_scrollInfo(scrollInfo) {
         buildLookupTable(timings, prebpm);
     }
 
@@ -28,20 +29,21 @@ class EffectedTimeConverter : public TimePixelConverter {
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double relative_pixel_offset =
             pixel_at_timestamp - pixel_at_current_time;
-        auto untranslated_y =
-            static_cast<float>(relative_pixel_offset * m_status.timeline_zoom);
+        auto untranslated_y = static_cast<float>(relative_pixel_offset *
+                                                 m_scrollInfo.timeline_zoom);
         return info->baseInfo.canvasSize.height() - untranslated_y -
                (float(info->baseInfo.canvasSize.height()) -
                 info->baseInfo.canvasSize.height() *
-                    (1.f - info->baseInfo.judgeline_pos));
+                    (1.f - info->editorInfo.judgeline_pos));
     }
 
     int64_t distanceToTime(float pixel_y,
                            int64_t current_canvas_time) const override {
-        if (std::abs(m_status.timeline_zoom) < 1e-9) return current_canvas_time;
+        if (std::abs(m_scrollInfo.timeline_zoom) < 1e-9)
+            return current_canvas_time;
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double target_absolute_pixel =
-            pixel_at_current_time + (pixel_y / m_status.timeline_zoom);
+            pixel_at_current_time + (pixel_y / m_scrollInfo.timeline_zoom);
         return getTimeAtAbsolutePixel(target_absolute_pixel);
     }
 
@@ -55,6 +57,7 @@ class EffectedTimeConverter : public TimePixelConverter {
     std::vector<LookupNode> m_lookup_table;
 
     const BaseCanvasStatus& m_status;
+    const ScrollInfo& m_scrollInfo;
 
     /**
      * @brief 构造函数的核心：构建累积像素距离的查找表。
@@ -73,9 +76,9 @@ class EffectedTimeConverter : public TimePixelConverter {
             (prebpm > 0) ? 60000.0 / prebpm : 0.0;
         double last_pixels_per_ms =
             (preference_beat_length > 0)
-                ? (BASE_PIXELS_PER_MS * m_status.scroll_speed *
+                ? (BASE_PIXELS_PER_MS * m_scrollInfo.scroll_speed *
                    (preference_beat_length / preference_beat_length))
-                : (BASE_PIXELS_PER_MS * m_status.scroll_speed);
+                : (BASE_PIXELS_PER_MS * m_scrollInfo.scroll_speed);
 
         // 维护当前生效的红线和绿线状态
         Timing current_base_timing;
@@ -149,8 +152,8 @@ class EffectedTimeConverter : public TimePixelConverter {
             last_velocity_multiplier = velocity_multiplier;
 
             double new_pixels_per_ms = BASE_PIXELS_PER_MS *
-                                       m_status.scroll_speed * bpm_multiplier *
-                                       velocity_multiplier;
+                                       m_scrollInfo.scroll_speed *
+                                       bpm_multiplier * velocity_multiplier;
 
             // 确保速度不为零或接近零，也非无穷大或NaN
             if (std::abs(new_pixels_per_ms) < 1e-2) {
@@ -179,8 +182,8 @@ class EffectedTimeConverter : public TimePixelConverter {
 
     double getAbsolutePixelAt(int64_t timestamp) const {
         if (m_lookup_table.empty())
-            return -timestamp * BASE_PIXELS_PER_MS * m_status.scroll_speed *
-                   m_status.timeline_zoom;
+            return -timestamp * BASE_PIXELS_PER_MS * m_scrollInfo.scroll_speed *
+                   m_scrollInfo.timeline_zoom;
 
         auto it =
             std::upper_bound(m_lookup_table.begin(), m_lookup_table.end(),
@@ -197,7 +200,8 @@ class EffectedTimeConverter : public TimePixelConverter {
     int64_t getTimeAtAbsolutePixel(double absolute_pixel) const {
         if (m_lookup_table.empty())
             return static_cast<int64_t>(
-                absolute_pixel / (BASE_PIXELS_PER_MS * m_status.scroll_speed));
+                absolute_pixel /
+                (BASE_PIXELS_PER_MS * m_scrollInfo.scroll_speed));
 
         auto it = std::upper_bound(m_lookup_table.begin(), m_lookup_table.end(),
                                    absolute_pixel,

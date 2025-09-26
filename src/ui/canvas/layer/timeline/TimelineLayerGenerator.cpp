@@ -24,14 +24,15 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     // 从管理器获取时间转换器
     auto& converter =
         maplayer_manager->get_time_converter_manager()->getConverter(
-            map->timing_set(), mapinfo->baseInfo, mapinfo,
+            map->timing_set(), mapinfo->baseInfo,
+            mapinfo->editorInfo.scrollInfo, mapinfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
     auto liner_converter = LinearTimeConverter(mapinfo);
 
     // 根据设定的坐标系 (Y=0在底部)，计算判定线的绝对像素位置。
     // 如果 judgeline_pos = 0.2f，意味着判定线在从下往上20%的高度。
-    const auto judgeline_absolute_y =
-        mapinfo->baseInfo.canvasSize.height() * mapinfo->baseInfo.judgeline_pos;
+    const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
+                                      mapinfo->editorInfo.judgeline_pos;
 
     // 计算屏幕顶部和底部到判定线的“相对像素距离”。
     // 这些相对值将作为 converter 的输入。

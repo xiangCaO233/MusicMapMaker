@@ -26,27 +26,7 @@ struct BaseCanvasStatus {
     // 时间线映射策略
     TimeLineMappingType timeline_mapping_type{TimeLineMappingType::EFFECTED};
 
-    // 滚动是否吸附到分拍线
-    bool magnet_to_divisor{false};
-
-    // 自然滚动
-    bool scroll_natural{false};
-
-    // 滚动速度
-    float scroll_speed{1.f};
-
-    // 时间线缩放
-    float timeline_zoom{.8f};
-
-    // 判定线位置
-    float judgeline_pos{.2f};
-
     bool operator==(const BaseCanvasStatus& _) const = default;
-};
-
-struct SelectFrame {
-    glm::vec2 pos{0};
-    glm::vec2 size{0};
 };
 
 struct TimeInfo {
@@ -112,9 +92,6 @@ struct RealTimeInfo {
 
     // 正在按下的鼠标按钮
     std::unordered_set<Qt::MouseButton> mButtons;
-
-    // 选中框
-    SelectFrame frame;
 };
 
 struct SharedCanvasInfo {

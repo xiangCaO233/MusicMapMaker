@@ -51,15 +51,22 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
     auto d = e->angleDelta();
     auto dy = d.y();
 
+    auto &editor_info = mapinfo->editorInfo;
+
+    if (editor_info.scrollInfo.scroll_natural) {
+        dy = -dy;
+    }
+    auto &scrollInfo = editor_info.scrollInfo;
+
     if (map) {
         if (modifiers.testFlag(Qt::ShiftModifier)) {
             if (dy > 0) {
                 mapinfo->realTimeInfo.current_time_info +=
-                    (mapinfo->editorInfo.pageScrollStep * 3);
+                    (scrollInfo.pageScrollStep * 3);
             }
             if (dy < 0) {
                 mapinfo->realTimeInfo.current_time_info +=
-                    -(mapinfo->editorInfo.pageScrollStep * 3);
+                    -(scrollInfo.pageScrollStep * 3);
             }
             audio_callback->set_playpos_for(
                 map->base_metadata().main_audio_path.generic_string(),
@@ -68,27 +75,25 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
         } else if (modifiers.testFlag(Qt::ControlModifier)) {
             // 修改缩放
             if (dy > 0) {
-                mapinfo->baseInfo.timeline_zoom +=
-                    mapinfo->editorInfo.timelineScrollStep;
-                if (mapinfo->baseInfo.timeline_zoom > 5.f) {
-                    mapinfo->baseInfo.timeline_zoom = 5.f;
+                scrollInfo.timeline_zoom += scrollInfo.timelineScrollStep;
+                if (scrollInfo.timeline_zoom > 5.f) {
+                    scrollInfo.timeline_zoom = 5.f;
                 }
             }
             if (dy < 0) {
-                mapinfo->baseInfo.timeline_zoom -=
-                    mapinfo->editorInfo.timelineScrollStep;
-                if (mapinfo->baseInfo.timeline_zoom < .1f) {
-                    mapinfo->baseInfo.timeline_zoom = .1f;
+                scrollInfo.timeline_zoom -= scrollInfo.timelineScrollStep;
+                if (scrollInfo.timeline_zoom < .1f) {
+                    scrollInfo.timeline_zoom = .1f;
                 }
             }
         } else {
             if (dy > 0) {
                 mapinfo->realTimeInfo.current_time_info +=
-                    mapinfo->editorInfo.pageScrollStep;
+                    scrollInfo.pageScrollStep;
             }
             if (dy < 0) {
                 mapinfo->realTimeInfo.current_time_info +=
-                    -mapinfo->editorInfo.pageScrollStep;
+                    -scrollInfo.pageScrollStep;
             }
             audio_callback->set_playpos_for(
                 map->base_metadata().main_audio_path.generic_string(),

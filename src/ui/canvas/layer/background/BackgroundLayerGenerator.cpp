@@ -71,7 +71,7 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
             jcmd.baseInfo = {
                 {all_tracks_rect.x + (float(i) + .5f) * single_track_width -
                      judgeline_size.x / 2.f,
-                 (1.f - info->baseInfo.judgeline_pos) * canvas_size.y -
+                 (1.f - info->editorInfo.judgeline_pos) * canvas_size.y -
                      judgeline_size.y / 2.f},
                 judgeline_size};
             jcmd.texturesInfo.texture = oribit_judge_texture;

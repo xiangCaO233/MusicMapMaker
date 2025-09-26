@@ -112,7 +112,7 @@ void MapCanvas::onLayoutUpdated() {
 
 void MapCanvas::onJudgelinePosUpdated(float pos) {
     auto mapcanvasInfo = info<MapCanvasInfo>();
-    mapcanvasInfo->baseInfo.judgeline_pos = 1.f - pos;
+    mapcanvasInfo->editorInfo.judgeline_pos = 1.f - pos;
 }
 
 // 切换到图

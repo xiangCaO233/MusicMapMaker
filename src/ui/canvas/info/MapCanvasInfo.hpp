@@ -20,22 +20,55 @@ struct MapInfo {
     float alpha{1.f};
 };
 
+// 滚动行为信息
+struct ScrollInfo {
+    // 播放滚动速度
+    float scroll_speed{1.f};
+
+    // 时间线缩放
+    float timeline_zoom{.8f};
+
+    // 滑轮自然滚动
+    bool scroll_natural{false};
+
+    // 滑轮页滚动步长
+    float pageScrollStep{120.f};
+
+    // 滑轮时间线缩放滚动步长
+    float timelineScrollStep{.03f};
+
+    bool operator==(const ScrollInfo& other) const = default;
+};
+
+// 预览区信息
+struct PreviewAreaInfo {
+    // 区域相对主区域的范围倍率
+    // 2.0f ~ 7.5f
+    float areaRatio{3.f};
+    // 主区域在预览区的位置
+    // 0.0f ~ 1.0f
+    float mainAreaPos{.5f};
+};
+
 class MSkin;
 struct EditorInfo {
     // 绑定的项目配置
     const MProjectConfig* project_config{nullptr};
 
-    // 当前的编辑模式
-    EditMode currentMode;
-
     // 工具选择
     EditToolType currentEditTool;
 
-    // 页滚动步长
-    float pageScrollStep{120.f};
+    // 判定线位置
+    float judgeline_pos{.2f};
 
-    // 时间线缩放滚动步长
-    float timelineScrollStep{.03f};
+    // 滚动是否吸附到分拍线
+    bool magnet_to_divisor{false};
+
+    // 滚动行为信息
+    ScrollInfo scrollInfo;
+
+    // 预览区信息
+    PreviewAreaInfo previewAreaInfo;
 
     // 当前的map指针
     MMap* map;

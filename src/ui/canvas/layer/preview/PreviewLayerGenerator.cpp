@@ -24,7 +24,8 @@ void PreviewLayerGenerator::generateLayer(LayerManager* manager,
     // 从管理器获取时间转换器
     auto& converter =
         maplayer_manager->get_time_converter_manager()->getConverter(
-            map->timing_set(), mapinfo->baseInfo, mapinfo,
+            map->timing_set(), mapinfo->baseInfo,
+            mapinfo->editorInfo.scrollInfo, mapinfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
 
     // 生成预览物件网格

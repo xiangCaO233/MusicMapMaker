@@ -15,12 +15,12 @@ void MapEditor::on_timeline_effect_button_toggled(bool checked) {
 void MapEditor::on_magnet_to_divisor_button_toggled(bool checked) {
     // 切换吸附到分拍线
     auto info = canvas()->info<MapCanvasInfo>();
-    info->baseInfo.magnet_to_divisor = checked;
+    info->editorInfo.magnet_to_divisor = checked;
 }
 
 void MapEditor::on_scroll_direction_button_toggled(bool checked) {
     auto info = canvas()->info<MapCanvasInfo>();
-    info->baseInfo.scroll_natural = checked;
+    info->editorInfo.scrollInfo.scroll_natural = checked;
 
     QColor color = Qt::white;
     auto iconres = checked ? "://icons/long-arrow-alt-down.svg"

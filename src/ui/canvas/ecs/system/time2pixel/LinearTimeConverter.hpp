@@ -38,15 +38,16 @@ class LinearTimeConverter : public TimePixelConverter {
 
         double untranslated_y =
             (pixel_at_timestamp_abs - pixel_at_current_time_abs) *
-            info->baseInfo.timeline_zoom;
+            info->editorInfo.scrollInfo.timeline_zoom;
 
-        const auto& base_info = info->baseInfo;
+        const auto& base_info = m_info->baseInfo;
+        const auto& editor_info = info->editorInfo;
         const float canvas_height = base_info.canvasSize.height();
-        const float judgeline_y_abs = canvas_height * base_info.judgeline_pos;
+        const float judgeline_y_abs = canvas_height * editor_info.judgeline_pos;
 
         return canvas_height - static_cast<float>(untranslated_y) -
                (canvas_height -
-                canvas_height * (1.f - base_info.judgeline_pos));
+                canvas_height * (1.f - editor_info.judgeline_pos));
     }
 
     /**
@@ -58,16 +59,17 @@ class LinearTimeConverter : public TimePixelConverter {
     int64_t distanceToTime(float pixel_y,
                            int64_t current_canvas_time) const override {
         const auto& base_info = m_info->baseInfo;
-        if (std::abs(base_info.timeline_zoom) < 1e-9) {
+        const auto& editor_info = m_info->editorInfo;
+        if (std::abs(editor_info.scrollInfo.timeline_zoom) < 1e-9) {
             return current_canvas_time;
         }
 
         const float judgeline_y_abs =
-            base_info.canvasSize.height() * base_info.judgeline_pos;
+            base_info.canvasSize.height() * editor_info.judgeline_pos;
         double untranslated_y_with_zoom = static_cast<double>(-pixel_y);
 
         double relative_pixel_offset =
-            untranslated_y_with_zoom / base_info.timeline_zoom;
+            untranslated_y_with_zoom / editor_info.scrollInfo.timeline_zoom;
 
         double time_delta_ms =
             relative_pixel_offset / BASE_PIXELS_PER_MS_LINEAR;

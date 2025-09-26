@@ -19,23 +19,27 @@ class TimePixelConverterManager {
      */
     const TimePixelConverter& getConverter(const TimingMap& timings,
                                            const BaseCanvasStatus& status,
+                                           const ScrollInfo& scrollInfo,
                                            const MapCanvasInfo* info,
                                            double prebpm) {
         // 检查TimingMap的版本号是否已更新
         if (!m_effected_cached_converter || !m_linear_cached_converter ||
             m_cached_version != timings.getVersion() ||
-            !current_status_version || status != *current_status_version) {
+            !current_status_version || status != *current_status_version ||
+            !current_scrollInfo_version ||
+            scrollInfo != *current_scrollInfo_version) {
             std::lock_guard<std::mutex> lock(build_newconverter_mtx);
 
             // 版本不匹配或首次创建，需要重建
             m_effected_cached_converter =
                 std::make_unique<EffectedTimeConverter>(timings, status,
-                                                        prebpm);
+                                                        scrollInfo, prebpm);
             // 重建线性映射转换器
             m_linear_cached_converter =
                 std::make_unique<LinearTimeConverter>(info);
 
             current_status_version = &status;
+            current_scrollInfo_version = &scrollInfo;
             m_cached_version = timings.getVersion();
             // std::cout << "TimePixelConverter Rebuilt! Version: " <<
             // m_cached_version << std::endl;
@@ -48,60 +52,61 @@ class TimePixelConverterManager {
 
     // debug
 
-    const TimePixelConverter& getConverterEffected(
-        const TimingMap& timings, const BaseCanvasStatus& status,
-        const MapCanvasInfo* info, double prebpm) {
-        // 检查TimingMap的版本号是否已更新
-        if (!m_effected_cached_converter || !m_linear_cached_converter ||
-            m_cached_version != timings.getVersion() ||
-            !current_status_version || status != *current_status_version) {
-            std::lock_guard<std::mutex> lock(build_newconverter_mtx);
+    // const TimePixelConverter& getConverterEffected(
+    //     const TimingMap& timings, const BaseCanvasStatus& status,
+    //     const MapCanvasInfo* info, double prebpm) {
+    //     // 检查TimingMap的版本号是否已更新
+    //     if (!m_effected_cached_converter || !m_linear_cached_converter ||
+    //         m_cached_version != timings.getVersion() ||
+    //         !current_status_version || status != *current_status_version) {
+    //         std::lock_guard<std::mutex> lock(build_newconverter_mtx);
 
-            // 版本不匹配或首次创建，需要重建
-            m_effected_cached_converter =
-                std::make_unique<EffectedTimeConverter>(timings, status,
-                                                        prebpm);
-            // 重建线性映射转换器
-            m_linear_cached_converter =
-                std::make_unique<LinearTimeConverter>(info);
+    //         // 版本不匹配或首次创建，需要重建
+    //         m_effected_cached_converter =
+    //             std::make_unique<EffectedTimeConverter>(timings, status,
+    //                                                     prebpm);
+    //         // 重建线性映射转换器
+    //         m_linear_cached_converter =
+    //             std::make_unique<LinearTimeConverter>(info);
 
-            current_status_version = &status;
-            m_cached_version = timings.getVersion();
-            // std::cout << "TimePixelConverter Rebuilt! Version: " <<
-            // m_cached_version << std::endl;
-        }
+    //         current_status_version = &status;
+    //         m_cached_version = timings.getVersion();
+    //         // std::cout << "TimePixelConverter Rebuilt! Version: " <<
+    //         // m_cached_version << std::endl;
+    //     }
 
-        return *m_effected_cached_converter;
-    }
-    const TimePixelConverter& getConverterLinear(const TimingMap& timings,
-                                                 const BaseCanvasStatus& status,
-                                                 const MapCanvasInfo* info,
-                                                 double prebpm) {
-        // 检查TimingMap的版本号是否已更新
-        if (!m_effected_cached_converter || !m_linear_cached_converter ||
-            m_cached_version != timings.getVersion() ||
-            !current_status_version || status != *current_status_version) {
-            std::lock_guard<std::mutex> lock(build_newconverter_mtx);
+    //     return *m_effected_cached_converter;
+    // }
+    // const TimePixelConverter& getConverterLinear(const TimingMap& timings,
+    //                                              const BaseCanvasStatus&
+    //                                              status, const MapCanvasInfo*
+    //                                              info, double prebpm) {
+    //     // 检查TimingMap的版本号是否已更新
+    //     if (!m_effected_cached_converter || !m_linear_cached_converter ||
+    //         m_cached_version != timings.getVersion() ||
+    //         !current_status_version || status != *current_status_version) {
+    //         std::lock_guard<std::mutex> lock(build_newconverter_mtx);
 
-            // 版本不匹配或首次创建，需要重建
-            m_effected_cached_converter =
-                std::make_unique<EffectedTimeConverter>(timings, status,
-                                                        prebpm);
-            // 重建线性映射转换器
-            m_linear_cached_converter =
-                std::make_unique<LinearTimeConverter>(info);
+    //         // 版本不匹配或首次创建，需要重建
+    //         m_effected_cached_converter =
+    //             std::make_unique<EffectedTimeConverter>(timings, status,
+    //                                                     prebpm);
+    //         // 重建线性映射转换器
+    //         m_linear_cached_converter =
+    //             std::make_unique<LinearTimeConverter>(info);
 
-            current_status_version = &status;
-            m_cached_version = timings.getVersion();
-            // std::cout << "TimePixelConverter Rebuilt! Version: " <<
-            // m_cached_version << std::endl;
-        }
+    //         current_status_version = &status;
+    //         m_cached_version = timings.getVersion();
+    //         // std::cout << "TimePixelConverter Rebuilt! Version: " <<
+    //         // m_cached_version << std::endl;
+    //     }
 
-        return *m_linear_cached_converter;
-    }
+    //     return *m_linear_cached_converter;
+    // }
 
    private:
     const BaseCanvasStatus* current_status_version{nullptr};
+    const ScrollInfo* current_scrollInfo_version{nullptr};
     std::mutex build_newconverter_mtx;
     std::unique_ptr<TimePixelConverter> m_effected_cached_converter{nullptr};
     std::unique_ptr<TimePixelConverter> m_linear_cached_converter{nullptr};
