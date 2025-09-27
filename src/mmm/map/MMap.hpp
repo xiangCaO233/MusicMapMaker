@@ -91,6 +91,9 @@ class MMap : public QObject {
     // 项目引用
     MProject* project_ref;
 
+    // 根据timing数据更新全图参考bpm
+    void update_preferenceBPM();
+
     // 谱面io操作
     void readOsu();
     void writeOsu(const std::string& desfile);

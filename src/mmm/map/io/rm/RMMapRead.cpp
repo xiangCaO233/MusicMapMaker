@@ -340,6 +340,8 @@ void MMap::readImd() {
             timing_set().add_timing_point(std::move(timing));
         }
 
+        update_preferenceBPM();
+
         // 最后生成全部拍
         analyzeBeatInfo();
 

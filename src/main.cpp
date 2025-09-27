@@ -3,9 +3,9 @@
 #define NOMINMAX
 #include <windows.h>
 #endif  //_WIN32
+#include <colorful-log.h>
 #include <qfontdatabase.h>
 #include <qsurfaceformat.h>
-#include <src/log/colorful-log.h>
 
 #include <QApplication>
 #include <QDir>

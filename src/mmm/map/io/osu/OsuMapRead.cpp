@@ -447,36 +447,7 @@ void MMap::readOsu() {
             timing_set().add_timing_point(std::move(osu_timing));
         }
 
-        bool finded{false};
-        // 读取全图参考bpm
-        for (const auto& [time, timings] :
-             timing_set().get_all_timing_points()) {
-            for (const auto& timing : timings) {
-                // 使用第一个不带变速的绝对bpm
-                if (timing->is_base_timing) {
-                    basemeta.preference_bpm = timing->bpm;
-                    finded = true;
-                    break;
-                }
-            }
-            if (finded) {
-                break;
-            }
-        }
-
-        // 再没找到就用第一个timing的绝对bpm-没有用200
-        if (!finded) {
-            if (timing_set().get_all_timing_points().empty()) {
-                basemeta.preference_bpm = 200;
-            } else {
-                basemeta.preference_bpm = timing_set()
-                                              .get_all_timing_points()
-                                              .begin()
-                                              ->second.begin()
-                                              ->get()
-                                              ->bpm;
-            }
-        }
+        update_preferenceBPM();
 
         // 最后生成全部拍
         analyzeBeatInfo();

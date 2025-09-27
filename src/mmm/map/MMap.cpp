@@ -1,3 +1,5 @@
+#include <colorful-log.h>
+
 #include <QDebug>
 #include <action/modules/canvas/EditorActionHandler.hpp>
 #include <algorithm>
@@ -58,6 +60,39 @@ std::weak_ptr<MapMetadata> MMap::map_metadata(MapMetadataType type) {
     return metaptr_it->second;
 }
 
+// 根据timing数据更新全图参考bpm
+void MMap::update_preferenceBPM() {
+    bool finded{false};
+    // 读取全图参考bpm
+    for (const auto& [time, timings] : timing_set().get_all_timing_points()) {
+        for (const auto& timing : timings) {
+            // 使用第一个不带变速的绝对bpm
+            if (timing->is_base_timing) {
+                basemeta.preference_bpm = timing->bpm;
+                finded = true;
+                break;
+            }
+        }
+        if (finded) {
+            break;
+        }
+    }
+
+    // 再没找到就用第一个timing的绝对bpm-没有用200
+    if (!finded) {
+        if (timing_set().get_all_timing_points().empty()) {
+            basemeta.preference_bpm = 200;
+        } else {
+            basemeta.preference_bpm = timing_set()
+                                          .get_all_timing_points()
+                                          .begin()
+                                          ->second.begin()
+                                          ->get()
+                                          ->bpm;
+        }
+    }
+}
+
 // 更新拍信息(智能识别分拍)
 void MMap::analyzeBeatInfo() {
     // 从 TimingMap 筛选出所有基础Timing点(红线)
@@ -75,7 +110,7 @@ void MMap::analyzeBeatInfo() {
     }
     if (base_timings.empty()) {
         // 如果需要，可以在此输出警告
-        qDebug() << "无红线/分析结束";
+        XWARN("无红线/分析结束");
         return;
     }
 
@@ -93,12 +128,12 @@ void MMap::analyzeBeatInfo() {
 
         // --- 安全保护：检查 beat_length 是否在合理范围内 ---
         if (original_beat_length < 50) {
-            qDebug() << "timing的bpm过大/鉴定为特效timing,跳过(防止炸内存)";
+            XWARN("timing的bpm过大/鉴定为特效timing,跳过(防止炸内存)");
             continue;  // 跳过此 timing 点控制的整个区段
         }
         if (original_beat_length > 5000.0) {
-            qDebug() << "timing的bpm过小[" << current_timing->bpm
-                     << "]/鉴定为特效timing,限定到5000ms,等效bpm:[12]分析";
+            XWARN("timing的bpm过小[" + std::to_string(current_timing->bpm) +
+                  "]/鉴定为特效timing,限定到5000ms,等效bpm:[12]分析");
         }
 
         auto generation_beat_length = std::min(original_beat_length, 5000.0);

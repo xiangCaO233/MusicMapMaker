@@ -148,7 +148,7 @@ class MeshGenerateSystem {
             // 获取note原始详细信息
             auto [time] = registry->get<TimeComponent>(e);
             auto [track_index, uuid] = registry->get<NoteComponent>(e);
-            auto [y, ty] = registry->get<TransformComponent>(e);
+            auto [sy, y] = registry->get<TransformComponent>(e);
 
             auto* ghost = registry->try_get<GhostComponent>(e);
             auto* delmark = registry->try_get<DeleteMarkComponent>(e);

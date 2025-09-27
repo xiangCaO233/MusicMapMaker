@@ -63,7 +63,7 @@ class PreviewLinearTimeConverter : public TimePixelConverter {
         const auto& editor_info = info->editorInfo;
         double untranslated_y =
             (pixel_at_timestamp_abs - pixel_at_current_time_abs) *
-            editor_info.scrollInfo.timeline_zoom *
+            editor_info.scrollInfo.timeline_zoom /
             editor_info.previewAreaInfo.areaRatio;
 
         const auto& base_info = m_info->baseInfo;
@@ -83,7 +83,7 @@ class PreviewLinearTimeConverter : public TimePixelConverter {
                            int64_t current_canvas_time) const override {
         const auto& base_info = m_info->baseInfo;
         const auto& editor_info = m_info->editorInfo;
-        if (std::abs(editor_info.scrollInfo.timeline_zoom *
+        if (std::abs(editor_info.scrollInfo.timeline_zoom /
                      editor_info.previewAreaInfo.areaRatio) < 1e-9) {
             return current_canvas_time;
         }
@@ -91,7 +91,7 @@ class PreviewLinearTimeConverter : public TimePixelConverter {
         double untranslated_y_with_zoom = static_cast<double>(-pixel_y);
 
         double relative_pixel_offset =
-            untranslated_y_with_zoom / (editor_info.scrollInfo.timeline_zoom *
+            untranslated_y_with_zoom / (editor_info.scrollInfo.timeline_zoom /
                                         editor_info.previewAreaInfo.areaRatio);
 
         double time_delta_ms =

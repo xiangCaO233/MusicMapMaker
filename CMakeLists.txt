@@ -223,6 +223,7 @@ set(PROJECT_SOURCES
 # ui需要包含的路径
 include_directories(
   ./src
+  ./src/log
   ./src/ui
   ./src/ui/canvas
   ./src/ui/template

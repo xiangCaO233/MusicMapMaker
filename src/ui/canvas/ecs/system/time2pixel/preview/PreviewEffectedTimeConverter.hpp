@@ -54,7 +54,7 @@ class PreviewEffectedTimeConverter : public TimePixelConverter {
         double relative_pixel_offset =
             pixel_at_timestamp - pixel_at_current_time;
         auto untranslated_y = static_cast<float>(
-            relative_pixel_offset * m_scrollInfo.timeline_zoom *
+            relative_pixel_offset * m_scrollInfo.timeline_zoom /
             info->editorInfo.previewAreaInfo.areaRatio);
         return info->baseInfo.canvasSize.height() - untranslated_y -
                (float(info->baseInfo.canvasSize.height()) -
@@ -68,7 +68,7 @@ class PreviewEffectedTimeConverter : public TimePixelConverter {
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double target_absolute_pixel =
             pixel_at_current_time +
-            (pixel_y / (m_scrollInfo.timeline_zoom *
+            (pixel_y / (m_scrollInfo.timeline_zoom /
                         m_info->editorInfo.previewAreaInfo.areaRatio));
         return getTimeAtAbsolutePixel(target_absolute_pixel);
     }
@@ -211,7 +211,8 @@ class PreviewEffectedTimeConverter : public TimePixelConverter {
     double getAbsolutePixelAt(int64_t timestamp) const {
         if (m_lookup_table.empty())
             return -timestamp * BASE_PIXELS_PER_MS * m_scrollInfo.scroll_speed *
-                   m_scrollInfo.timeline_zoom;
+                   m_scrollInfo.timeline_zoom /
+                   m_info->editorInfo.previewAreaInfo.areaRatio;
 
         auto it =
             std::upper_bound(m_lookup_table.begin(), m_lookup_table.end(),

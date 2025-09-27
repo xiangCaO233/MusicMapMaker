@@ -66,8 +66,8 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
             }
             if (dy < 0) {
                 scrollInfo.timeline_zoom -= scrollInfo.timelineScrollStep;
-                if (scrollInfo.timeline_zoom < .1f) {
-                    scrollInfo.timeline_zoom = .1f;
+                if (scrollInfo.timeline_zoom < .25f) {
+                    scrollInfo.timeline_zoom = .25f;
                 }
             }
         } else {
