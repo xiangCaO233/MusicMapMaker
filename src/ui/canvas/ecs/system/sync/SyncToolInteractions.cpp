@@ -9,6 +9,7 @@
 #include <mmm/map/MMap.hpp>
 #include <tool/ThreadSafeQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
+#include <util/mutil.hpp>
 
 void updateHover(ToolSystem* toolSystem,
                  ToolInteractionState* toolInteractionState,
@@ -16,6 +17,17 @@ void updateHover(ToolSystem* toolSystem,
     // 获取最新的鼠标位置状态 (由UI线程持续更新)
     MouseState mouse = toolInteractionState->getMouseState();
     glm::vec2 current_mouse_pos = mouse.current_pos;
+    auto& main_track_layout = info->editorInfo.track_layout;
+    // 更新鼠标的区域信息
+    auto xpos = main_track_layout.x + main_track_layout.z;
+    auto preview_tracks_rect =
+        glm::vec4{xpos, 0, info->baseInfo.canvasSize.width() - xpos,
+                  info->baseInfo.canvasSize.height()};
+    if (mutil::checkPointInRect(current_mouse_pos, preview_tracks_rect)) {
+        toolInteractionState->setMouseArea(MouseArea::PREVIEW);
+    } else if (mutil::checkPointInRect(current_mouse_pos, main_track_layout)) {
+        toolInteractionState->setMouseArea(MouseArea::EDIT);
+    }
     auto& notes = info->editorInfo.map->note_set();
     auto& uuidManager = info->editorInfo.map->note_uuids();
     // 使用 ToolSystem (四叉树) 在当前世界状态下重新查询
@@ -217,23 +229,25 @@ void processToolCommands(entt::registry& registry,
                          ThreadSafeQueue<ToolCommand>* toolCmdQ,
                          ToolSystem* system, MMapEditor* editor,
                          ToolInteractionState* toolInteractionState, MMap* map,
-                         const MapCanvasInfo* info,
-                         const TimePixelConverter& converter) {
+                         MapCanvasInfo* info,
+                         const TimePixelConverter& maintrack_converter,
+                         const TimePixelConverter& preview_converter) {
     auto cmds = toolCmdQ->drain();
     if (cmds.empty()) return;
 
     for (const auto& command : cmds) {
-        ToolCommandProcessor processor(registry, *system, *editor,
-                                       *toolInteractionState, map, info,
-                                       &converter);
+        ToolCommandProcessor processor(
+            registry, *system, *editor, *toolInteractionState, map, info,
+            &maintrack_converter, &preview_converter);
         processor.process(command);
     }
 }
 
 // 同步工具交互
 void SyncSystem::updateToolInteractions(
-    ECSCore& core, const MapCanvasInfo* info, MapLayerManager* layer_manager,
-    const TimePixelConverter& converter) const {
+    ECSCore& core, MapCanvasInfo* info, MapLayerManager* layer_manager,
+    const TimePixelConverter& maintrack_converter,
+    const TimePixelConverter& preview_converter) const {
     // qDebug() << "同步系统->同步工具状态(at pretick)开始";
     auto toolSystem = layer_manager->get_tool_system();
     auto toolCmdQ = layer_manager->get_tool_cmdq();
@@ -243,7 +257,8 @@ void SyncSystem::updateToolInteractions(
     // 更新悬浮状态
     processToolCommands(core.ecs_registry(), toolCmdQ, toolSystem,
                         info->editorInfo.map->editor(), toolInteractionState,
-                        info->editorInfo.map, info, converter);
+                        info->editorInfo.map, info, maintrack_converter,
+                        preview_converter);
     // qDebug() << "同步系统->同步工具状态->处理工具指令(at pretick)结束";
 
     // 更新选中内容

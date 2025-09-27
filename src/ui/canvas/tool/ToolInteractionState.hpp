@@ -15,16 +15,39 @@
 #include <util/mutil.hpp>
 #include <vector>
 
+enum class MouseArea {
+    UNKNOWN,
+    EDIT,
+    PREVIEW,
+};
+
+inline std::string to_string(MouseArea area) {
+    switch (area) {
+        case MouseArea::UNKNOWN: {
+            return "UNKNOWN";
+        }
+        case MouseArea::EDIT: {
+            return "EDIT";
+        }
+        case MouseArea::PREVIEW: {
+            return "PREVIEW";
+        }
+    }
+}
+
 // 鼠标状态
 struct MouseState {
     // 当前光标位置 (高频更新)
     glm::vec2 current_pos;
+    Qt::MouseButton last_pressed_button;
     // 鼠标按下的位置
     std::unordered_map<Qt::MouseButton, glm::vec2> press_pos;
     // 鼠标轨迹 (用于特效)
     std::vector<glm::vec2> trail;
     // 当前按下的按钮
     QFlags<Qt::MouseButton> pressed_buttons;
+    // 位于的区域
+    MouseArea area;
 };
 
 // 选择状态
@@ -147,6 +170,7 @@ class ToolInteractionState {
     glm::vec2 getMousePressPos(const Qt::MouseButton button) const;
 
     // 悬浮相关 (由 pretick 写入, 工作线程读取)
+    void setMouseArea(MouseArea area);
     void setHover(const std::optional<MeshPartInfo> hover);
     std::optional<MeshPartInfo> getHover() const;
 

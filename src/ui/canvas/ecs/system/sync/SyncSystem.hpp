@@ -26,9 +26,10 @@ class SyncSystem {
     void updateEditStatus(ECSCore& core, MapLayerManager* layer_manager);
 
     // 同步工具交互
-    void updateToolInteractions(ECSCore& core, const MapCanvasInfo* info,
-                                MapLayerManager* layer_manager,
-                                const TimePixelConverter& converter) const;
+    void updateToolInteractions(
+        ECSCore& core, MapCanvasInfo* info, MapLayerManager* layer_manager,
+        const TimePixelConverter& maintrack_converter,
+        const TimePixelConverter& preview_converter) const;
 
     // 同步特效实体
     void updateEffects(ECSCore& core, const NoteCollection& notes,

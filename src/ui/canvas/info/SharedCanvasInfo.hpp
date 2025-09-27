@@ -41,6 +41,16 @@ struct TimeInfo {
     // 音频播放器报告的、未经偏移修正的原始播放时间
     std::atomic<double> raw_audio_time_ms{0.0};
 
+    void operator=(double des_time) {
+        logic_canvas_time = des_time;
+        raw_audio_time_ms = des_time;
+        if (logic_canvas_time < 0 || raw_audio_time_ms < 0) {
+            logic_canvas_time = 0;
+            raw_audio_time_ms = 0;
+        } else {
+            presentation_canvas_time = des_time;
+        }
+    }
     void operator+=(double delta_time) {
         logic_canvas_time += delta_time;
         raw_audio_time_ms += delta_time;

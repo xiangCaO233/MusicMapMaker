@@ -45,7 +45,7 @@ struct ScrollInfo {
 struct PreviewAreaInfo {
     // 区域相对主区域的范围倍率
     // 2.0f ~ 7.5f
-    float areaRatio{3.f};
+    float areaRatio{7.5f};
     // 主区域在预览区的位置
     // 0.0f ~ 1.0f
     float mainAreaPos{.5f};

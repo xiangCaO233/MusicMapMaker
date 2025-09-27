@@ -592,24 +592,28 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
 
     // 获取计算所需的上下文信息
     const auto& base_info = info->baseInfo;
-    const auto& editoe_info = info->editorInfo;
+    const auto& editor_info = info->editorInfo;
     const auto& realtime_info = info->realTimeInfo;
     const auto& current_time =
         realtime_info.current_time_info.presentation_canvas_time;
     const auto canvas_height = base_info.canvasSize.height();
+    const auto& maintrack_layout = editor_info.track_layout;
 
     // 定义屏幕边界
 
     // 根据设定的坐标系 (Y=0在底部)，计算判定线的绝对像素位置。
     // 如果 judgeline_pos = 0.2f，意味着判定线在从下往上20%的高度。
-    const auto judgeline_absolute_y = canvas_height * editoe_info.judgeline_pos;
+    const auto judgeline_absolute_y = canvas_height * editor_info.judgeline_pos;
 
     // 计算屏幕顶部和底部到判定线的“相对像素距离”。
     // 这些相对值将作为 converter 的输入。
     // 正值代表“未来”方向（在屏幕上是向上的）。
     // 负值代表“过去”方向（在屏幕上是向下的）。
-    const auto maintrack_pixel_y_top = canvas_height - judgeline_absolute_y;
-    const auto maintrack_pixel_y_bottom = 0.0f - judgeline_absolute_y;
+    const auto maintrack_pixel_y_top =
+        (canvas_height - maintrack_layout.y) - judgeline_absolute_y;
+    const auto maintrack_pixel_y_bottom =
+        (canvas_height - (maintrack_layout.y + maintrack_layout.w)) -
+        judgeline_absolute_y;
 
     // 使用转换器计算主轨道时间边界
     const auto maintrack_time_at_top =

@@ -12,6 +12,7 @@ void ToolInteractionState::updateMousePress(
     const QWriteLocker locker(&m_mouseStateLock);
     m_mouseState.current_pos = pos;
     m_mouseState.pressed_buttons = allButtons;
+    m_mouseState.last_pressed_button = button;
     m_mouseState.press_pos[button] = pos;  // 记录按下位置
 }
 
@@ -30,6 +31,12 @@ void ToolInteractionState::updateMouseMove(const glm::vec2& pos,
     // if (m_mouseState.trail.size() > MAX_TRAIL_SIZE) {
     //     m_mouseState.trail.erase(m_mouseState.trail.begin());
     // }
+}
+
+void ToolInteractionState::setMouseArea(MouseArea area) {
+    // 使用写入锁，确保在更新期间没有其他线程可以读取
+    const QWriteLocker locker(&m_mouseStateLock);
+    m_mouseState.area = area;
 }
 
 void ToolInteractionState::updateMouseRelease(
@@ -66,12 +73,6 @@ glm::vec2 ToolInteractionState::getMousePressPos(
 
 // 悬浮相关 (由 pretick 写入, 工作线程读取)
 void ToolInteractionState::setHover(const std::optional<MeshPartInfo> hover) {
-    // if (hover.has_value()) {
-    //     auto id = hover.value().handle.index;
-    //     // qDebug() << "设置更新悬浮位置:" << id;
-    // } else {
-    //     // qDebug() << "清除悬浮位置";
-    // }
     m_hovered = hover;
 }
 

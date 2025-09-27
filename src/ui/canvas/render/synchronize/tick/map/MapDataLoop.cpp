@@ -41,8 +41,8 @@ void MapDataLoop::pre_tickEvent() {
     sync_system.updateEditStatus(ecore, map_layermgr);
 
     // 同步工具交互状态
-    sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr,
-                                       *converter);
+    sync_system.updateToolInteractions(ecore, mapinfo, map_layermgr, *converter,
+                                       *pconverter);
 
     // 与源物件集合同步可见的物件和timing
     sync_system.updateEntities(ecore, map->note_set(), map->note_uuids(),

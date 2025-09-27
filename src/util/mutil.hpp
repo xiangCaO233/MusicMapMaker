@@ -827,6 +827,29 @@ inline bool checkOverlap(const glm::vec4& rectA, const glm::vec4& rectB) {
     return true;
 }
 
+/**
+ * @brief 检查一个点是否在一个轴对齐的矩形内部。
+ *
+ * @param point 要检查的点，格式为 glm::vec2(x, y)。
+ * @param rect 矩形区域，格式为 glm::vec4(x, y, width, height)。
+ * @return 如果点在矩形内则返回 true，否则返回 false。
+ *
+ * @note 此函数同样假设 Y 轴向下增长。
+ *       边界条件为：包含左上边界，不包含右下边界。
+ *       即 point.x >= rect.x 且 point.x < rect.x + rect.width。
+ *       这对处理基于网格或像素的UI元素非常有用。
+ */
+inline bool checkPointInRect(const glm::vec2& point, const glm::vec4& rect) {
+    // 检查点的 X 坐标是否在矩形的水平范围内
+    bool inHorizontal = (point.x >= rect.x) && (point.x < rect.x + rect.z);
+
+    // 检查点的 Y 坐标是否在矩形的垂直范围内
+    bool inVertical = (point.y >= rect.y) && (point.y < rect.y + rect.w);
+
+    // 只有当两个方向都在范围内时，点才在矩形内
+    return inHorizontal && inVertical;
+}
+
 // 1. 实现一个自定义的哈希组合函数
 //    这个函数用于将多个哈希值组合成一个
 inline void hash_combine(std::size_t& seed, std::size_t hash) {

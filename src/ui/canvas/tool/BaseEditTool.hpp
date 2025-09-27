@@ -14,6 +14,7 @@ class BaseEditTool : public BaseTool {
    protected:
     // 从Canvas转发过来的事件
     void mousePressEvent(QMouseEvent* e) override;
+    void mouseMoveEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
 
     // 模板方法：由子类定义如何开始拖拽单个物件

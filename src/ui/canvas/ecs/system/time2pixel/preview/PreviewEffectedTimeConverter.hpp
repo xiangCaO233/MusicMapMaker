@@ -63,13 +63,14 @@ class PreviewEffectedTimeConverter : public TimePixelConverter {
 
     int64_t distanceToTime(float pixel_y,
                            int64_t current_canvas_time) const override {
-        if (std::abs(m_scrollInfo.timeline_zoom) < 1e-9)
+        if (std::abs(m_scrollInfo.timeline_zoom *
+                     m_info->editorInfo.previewAreaInfo.areaRatio) < 1e-9)
             return current_canvas_time;
         double pixel_at_current_time = getAbsolutePixelAt(current_canvas_time);
         double target_absolute_pixel =
             pixel_at_current_time +
-            (pixel_y / (m_scrollInfo.timeline_zoom /
-                        m_info->editorInfo.previewAreaInfo.areaRatio));
+            (pixel_y / m_scrollInfo.timeline_zoom *
+             m_info->editorInfo.previewAreaInfo.areaRatio);
         return getTimeAtAbsolutePixel(target_absolute_pixel);
     }
 

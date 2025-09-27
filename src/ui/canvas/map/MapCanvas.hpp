@@ -35,6 +35,9 @@ class MapCanvas : public GLCanvas {
     // 获取map
     MMap *get_map() { return map; }
 
+    // 设置主音轨位置
+    void set_maintrack_pos(std::chrono::milliseconds time);
+
     // 绑定音频载入回调
    public slots:
     void onAudioLoadcbkInitialized(AudioLoadCallback *cbk) override;

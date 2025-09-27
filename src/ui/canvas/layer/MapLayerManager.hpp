@@ -195,6 +195,7 @@ class MapLayerManager : public LayerManager {
 
     // 工具命令队列
     ThreadSafeQueue<ToolCommand> toolCommandQueue;
+
     // 编辑事件队列
     ThreadSafeQueue<MMapEditEvent> editEventQueue;
 

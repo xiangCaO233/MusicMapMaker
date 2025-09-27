@@ -92,21 +92,24 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
     info<MapCanvasInfo>()->audio_callback = cbk;
 }
 
+// 设置主音轨位置
+void MapCanvas::set_maintrack_pos(std::chrono::milliseconds time) {
+    auto mapcanvasInfo = info<MapCanvasInfo>();
+    mapcanvasInfo->realTimeInfo.current_time_info.logic_canvas_time =
+        time.count() - mapcanvasInfo->realTimeInfo.offset_info.global_offset_ms;
+    audio_callback->set_playpos_for(
+        map->base_metadata().main_audio_path.generic_string(),
+        std::chrono::milliseconds(
+            mapcanvasInfo->realTimeInfo.current_time_info.raw_audio_time_ms));
+}
+
 void MapCanvas::onUpdateTexinfo() {
     // 清理皮肤缓存
     XINFO("纹理重组,清理皮肤缓存");
     skin->clear_buffer();
 }
 void MapCanvas::gotoTiming(Timing* timing) {
-    auto mapcanvasInfo = info<MapCanvasInfo>();
-    audio_callback->set_playpos_for(
-        map->base_metadata().main_audio_path.generic_string(),
-        std::chrono::milliseconds(timing->timestamp));
-    mapcanvasInfo->realTimeInfo.current_time_info.logic_canvas_time =
-        timing->timestamp -
-        mapcanvasInfo->realTimeInfo.offset_info.global_offset_ms;
-    // mapcanvasInfo->realTimeInfo.current_time_info.presentation_canvas_time =
-    // timing->timestamp;
+    set_maintrack_pos(std::chrono::milliseconds(timing->timestamp));
 }
 
 void MapCanvas::onLayoutUpdated() {

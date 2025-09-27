@@ -1,11 +1,14 @@
 #ifndef MMM_TOOLCOMMANDPROCESSOR_HPP
 #define MMM_TOOLCOMMANDPROCESSOR_HPP
 
+#include <colorful-log.h>
+
 #include <ecs/component/CoreComponents.hpp>
 #include <ecs/system/ToolSystem.hpp>
 #include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/NotePart.hpp>
 #include <mmm/map/editor/MMapEditor.hpp>
+#include <mmm/project/AudioLoadCallback.hpp>
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
 #include <vector>
@@ -22,15 +25,16 @@ overloaded(Ts...) -> overloaded<Ts...>;
 class ToolCommandProcessor {
    public:
     ToolCommandProcessor(entt::registry& r, ToolSystem& s, MMapEditor& e,
-                         ToolInteractionState& i, MMap* m,
-                         const MapCanvasInfo* info,
-                         const TimePixelConverter* converter)
+                         ToolInteractionState& i, MMap* m, MapCanvasInfo* info,
+                         const TimePixelConverter* maintrack_converter,
+                         const TimePixelConverter* preview_converter)
         : registry(r),
           system(s),
           interactionState(i),
           mapEditor(e),
           map(m),
-          converter(converter),
+          maintrack_converter(maintrack_converter),
+          preview_converter(preview_converter),
           info(info) {
         all_tracks_rect = info->editorInfo.track_layout;
         track_count = info->editorInfo.map->base_metadata().track_count;
@@ -39,6 +43,29 @@ class ToolCommandProcessor {
         judgeline_absolute_y = canvas_height * info->editorInfo.judgeline_pos;
         presentation_canvas_time =
             info->realTimeInfo.current_time_info.presentation_canvas_time;
+        const auto& editor_info = info->editorInfo;
+        const auto& base_info = info->baseInfo;
+        const float canvas_height = base_info.canvasSize.height();
+
+        // 预览区相对主轨道的倍率
+        auto maintrackpos_inpreview_area_ratio =
+            editor_info.previewAreaInfo.areaRatio;
+        // 主轨道在预览区中的高度
+        auto maintrack_size_inpreview =
+            canvas_height / maintrackpos_inpreview_area_ratio;
+        // 主轨道中心在预览区中的倍率
+        auto maintrackpos_inpreview_area =
+            editor_info.previewAreaInfo.mainAreaPos;
+        // 主轨道中心在预览区中的位置
+        auto maintrack_center_inpreview =
+            maintrackpos_inpreview_area * canvas_height;
+        // 主轨道顶部在预览区中的位置
+        auto maintrack_top_inpreview =
+            maintrack_center_inpreview - maintrack_size_inpreview / 2.f;
+        // 主轨道判定线在预览区中的位置
+        judgeline_pos_in_previewarea =
+            maintrack_top_inpreview +
+            (1.f - editor_info.judgeline_pos) * maintrack_size_inpreview;
     }
 
     ~ToolCommandProcessor() = default;
@@ -46,6 +73,59 @@ class ToolCommandProcessor {
     void process(const ToolCommand& command) {
         std::visit(
             overloaded{
+                // 预览相关
+                // 开始拖动预览区
+                [&](const StartDragPreviewCommand& arg) {
+                    if (arg.start_button == Qt::LeftButton) {
+                        auto time = preview_converter->distanceToTime(
+                            judgeline_pos_in_previewarea -
+                                arg.common_info.start_mouse_pos.y,
+                            presentation_canvas_time);
+                        // 先直接跳转
+                        info->realTimeInfo.current_time_info =
+                            time -
+                            info->realTimeInfo.offset_info
+                                .global_static_offset_ms -
+                            info->realTimeInfo.offset_info.global_offset_ms;
+                        // 更新音频位置
+                        info->audio_callback->set_playpos_for(
+                            map->base_metadata()
+                                .main_audio_path.generic_string(),
+                            std::chrono::milliseconds(
+                                info->realTimeInfo.current_time_info
+                                    .raw_audio_time_ms));
+                    }
+                },
+                // 更新拖动预览区位置
+                [&](const DragPreviewUpdateCommand& arg) {
+                    //
+                    if (arg.start_button == Qt::LeftButton) {
+                        // 更改预览区内主轨道位置并更新当前时间戳
+                        // 获取当前鼠标y位置在预览区对应时间
+                        // auto time = preview_converter->distanceToTime(
+                        //     judgeline_pos_in_previewarea -
+                        //     arg.dragging_pos.y, presentation_canvas_time);
+                        // XINFO("预览区内判定线像素y位置:" +
+                        //       std::to_string(judgeline_pos_in_previewarea));
+                        // XINFO("当前拖拽预览鼠标像素y位置:" +
+                        //       std::to_string(arg.dragging_pos.y));
+                        // XINFO("拖拽预览转换的时间位置:" +
+                        // std::to_string(time));
+
+                        // 获取当前鼠标y位置在预览区对应比例位置
+                        // auto height_ratio = arg.dragging_pos.y /
+                        // canvas_height;
+                        // info->editorInfo.previewAreaInfo.mainAreaPos =
+                        //     height_ratio;
+
+                    } else if (arg.start_button == Qt::RightButton) {
+                        // 不更改预览区内主轨道位置,仅更新整体当前时间戳
+                    }
+                },
+                // 结束拖动预览区
+                [&](const EndDragPreviewCommand& arg) {
+                    //
+                },
                 // 编辑相关
                 // 复制
                 [&](const CopyCommand& arg) {
@@ -56,15 +136,12 @@ class ToolCommandProcessor {
                     setClipBoard(arg.entities, false);
                 },
                 // 粘贴
-                [&](const PasteCommand& arg) {
-                    pasteEntities();
-                    // interactionState.endDrag();
-                },
+                [&](const PasteCommand& arg) { pasteEntities(); },
                 // 选中相关
                 [&](const StartSelectCommand& arg) {
                     auto timepos = glm::vec2{
                         arg.common_info.start_mouse_pos.x,
-                        converter->distanceToTime(
+                        maintrack_converter->distanceToTime(
                             canvas_height - arg.common_info.start_mouse_pos.y -
                                 judgeline_absolute_y,
                             presentation_canvas_time)};
@@ -74,8 +151,9 @@ class ToolCommandProcessor {
                 },
                 [&](const UpdateSelectAreaCommand& arg) {
                     interactionState.updateSelectArea(
-                        arg.current_buttons, *converter, canvas_height,
-                        judgeline_absolute_y, presentation_canvas_time);
+                        arg.current_buttons, *maintrack_converter,
+                        canvas_height, judgeline_absolute_y,
+                        presentation_canvas_time);
                 },
                 [&](const EndSelectCommand& arg) {
                     interactionState.endNewSelectArea(arg.end_button);
@@ -143,11 +221,13 @@ class ToolCommandProcessor {
     MMapEditor& mapEditor;
     MMap* map;
 
-    const TimePixelConverter* converter;
-    const MapCanvasInfo* info;
+    const TimePixelConverter* maintrack_converter;
+    const TimePixelConverter* preview_converter;
+    MapCanvasInfo* info;
     glm::vec4 all_tracks_rect;
     int track_count;
     float judgeline_absolute_y;
+    float judgeline_pos_in_previewarea;
     float single_track_width;
     float canvas_height;
     double presentation_canvas_time;
@@ -158,20 +238,20 @@ class ToolCommandProcessor {
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
         auto& beat_info = map->beat_info();
-        axis.time = converter->distanceToTime(
+        axis.time = maintrack_converter->distanceToTime(
             canvas_height - pixel.y - judgeline_absolute_y,
             presentation_canvas_time);
         axis.mousetime = axis.time;
-        axis.y =
-            converter->timeToPixel(axis.time, presentation_canvas_time, info);
+        axis.y = maintrack_converter->timeToPixel(
+            axis.time, presentation_canvas_time, info);
         // 查询最近的分拍
         auto divinfo =
             findNearestDivisorLine(axis.time, beat_timeline, beat_info);
         if (divinfo.is_valid()) {
             // 更新吸附到最近的分拍
             axis.time = divinfo.divisor_time;
-            axis.y = converter->timeToPixel(axis.time, presentation_canvas_time,
-                                            info);
+            axis.y = maintrack_converter->timeToPixel(
+                axis.time, presentation_canvas_time, info);
         } else {
             axis.time = -1;
         }
@@ -354,7 +434,7 @@ class ToolCommandProcessor {
             auto& [track, uuid] = registry.get<NoteComponent>(selected_entity);
             auto& [time] = registry.get<TimeComponent>(selected_entity);
             MapAxis source_axis{time, time, track};
-            source_axis.y = converter->timeToPixel(
+            source_axis.y = maintrack_converter->timeToPixel(
                 source_axis.time, presentation_canvas_time, info);
             source_axis.x =
                 all_tracks_rect.x +

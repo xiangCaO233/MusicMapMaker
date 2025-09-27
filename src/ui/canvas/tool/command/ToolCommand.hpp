@@ -4,6 +4,24 @@
 #include <tool/command/DragCommand.hpp>
 #include <variant>
 
+// 开始拖拽预览区指令
+struct StartDragPreviewCommand {
+    DragStartInfo common_info;
+    Qt::MouseButton start_button;
+};
+
+// 拖拽预览区位置更新指令
+struct DragPreviewUpdateCommand {
+    Qt::MouseButton start_button;
+    glm::vec2 dragging_pos;
+};
+
+// 结束拖拽预览区指令
+struct EndDragPreviewCommand {
+    Qt::MouseButton trigger_button;
+};
+
+// 开始拖拽指令
 struct StartDragCommand {
     DragStartInfo common_info;
     const MeshPartInfo hit_info;
@@ -28,6 +46,7 @@ struct EndSelectCommand {
     Qt::MouseButton end_button;
 };
 
+// 开始拖拽选择区域指令
 struct StartDragSelectionCommand {
     DragStartInfo common_info;
     const MeshPartInfo hit_info;
@@ -80,8 +99,10 @@ struct ConfirmDeleteCommand {
 
 // 用 std::variant 将所有命令类型聚合到一个类型中
 using ToolCommand =
-    std::variant<StartDragCommand, StartSelectCommand, UpdateSelectAreaCommand,
-                 EndSelectCommand, StartDragSelectionCommand, EndDragCommand,
+    std::variant<StartDragPreviewCommand, DragPreviewUpdateCommand,
+                 EndDragPreviewCommand, StartDragCommand, StartSelectCommand,
+                 UpdateSelectAreaCommand, EndSelectCommand,
+                 StartDragSelectionCommand, EndDragCommand,
                  ClearDragStateCommand, StartCreateNewNormalNoteCommand,
                  StartCreateNewCompositeNoteCommand, UpdateCreateNodeCommand,
                  ConfirmCreateNewNoteCommand, CopyCommand, CutCommand,

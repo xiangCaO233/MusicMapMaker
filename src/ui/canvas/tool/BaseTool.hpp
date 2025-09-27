@@ -43,20 +43,22 @@ class BaseTool {
 
    protected:
     // 访问画布
-    inline MapCanvas* canvas() { return m_canvas; }
+    MapCanvas* canvas() { return m_canvas; }
 
     // 访问工具系统
-    inline ToolSystem* tool_system() { return toolSystem; }
+    ToolSystem* tool_system() { return toolSystem; }
 
     // 访问工具指令队列
-    inline ThreadSafeQueue<ToolCommand>* tool_command_queue() {
+    ThreadSafeQueue<ToolCommand>* tool_command_queue() {
         return toolCommandQueue;
     }
 
     // 访问交互管理器
-    inline ToolInteractionState* tool_interaction_state() {
+    ToolInteractionState* tool_interaction_state() {
         return toolInteractionState;
     }
+
+    MouseArea get_pressArea() const { return pressArea; }
 
    private:
     // 画布指针
@@ -67,6 +69,7 @@ class BaseTool {
     ThreadSafeQueue<ToolCommand>* const toolCommandQueue;
     // 工具交互状态管理器指针
     ToolInteractionState* const toolInteractionState;
+    MouseArea pressArea{MouseArea::UNKNOWN};
 };
 
 #endif  // MMM_BASETOOL_HPP

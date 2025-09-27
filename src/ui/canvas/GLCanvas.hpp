@@ -119,6 +119,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     long long last_update_time_us{0};
 
     friend class ProjectService;
+    friend class BaseTool;
 };
 
 #endif  // MMM_GLCANVAS_HPP
