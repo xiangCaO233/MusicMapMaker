@@ -393,29 +393,31 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     // 更新InMainTrackComponent
     auto notes_view = registry.view<NoteComponent, TimeComponent>();
     for (const auto& e : notes_view) {
-        bool should_have_component = false;
+        if (toolInteractionState->isSelected(e)) {
+            registry.emplace<InMaintrackComponent>(e);
+            continue;
+        }
         const auto& time = notes_view.get<TimeComponent>(e);
         if (time.timestamp >= maintrack_start_time &&
             time.timestamp <= maintrack_end_time) {
-            should_have_component = true;
+            registry.emplace<InMaintrackComponent>(e);
+            continue;
         }
         // 对于长条Note，还需要检查它的结束时间
         if (const auto* hold = registry.try_get<HoldComponent>(e)) {
             if (time.timestamp + hold->duration >= maintrack_start_time) {
                 // 如果长条的尾部在主轨道区内，应该标记它
-                should_have_component = true;
+                registry.emplace<InMaintrackComponent>(e);
+                continue;
             }
         } else if (const auto* comp_root =
                        registry.try_get<CompositeRootComponent>(e)) {
             if (time.timestamp + comp_root->total_duration >=
                 maintrack_start_time) {
                 // 如果组合物件的尾部在主轨道区内，应该标记它
-                should_have_component = true;
+                registry.emplace<InMaintrackComponent>(e);
+                continue;
             }
-        }
-        // 在所有判断都结束后，根据最终的标志位，只执行一次 emplace
-        if (should_have_component) {
-            registry.emplace<InMaintrackComponent>(e);
         }
     }
 

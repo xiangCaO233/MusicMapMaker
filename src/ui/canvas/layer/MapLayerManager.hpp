@@ -8,6 +8,7 @@
 #include <ecs/system/time2pixel/preview/PreviewLinearTimeConverter.hpp>
 #include <layer/LayerManager.hpp>
 #include <layer/note/NoteLayerGenerator.hpp>
+#include <memory>
 #include <tool/ThreadSafeQueue.hpp>
 #include <tool/ToolInteractionState.hpp>
 

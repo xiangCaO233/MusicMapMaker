@@ -1,4 +1,5 @@
 #include <layer/MapLayerManager.hpp>
+#include <memory>
 
 #include "layer/preview/PreviewLayer.hpp"
 #include "layer/preview/PreviewLayerGenerator.hpp"

@@ -5,7 +5,7 @@
 #include <ecs/component/CoreComponents.hpp>
 #include <ecs/component/NoteComponents.hpp>
 #include <ecs/component/TransformComponents.hpp>
-#include <ecs/system/QuadTree.hpp>
+#include <ecs/system/space/QuadTree.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <mmm/ObjectHandle.hpp>
 #include <mutex>

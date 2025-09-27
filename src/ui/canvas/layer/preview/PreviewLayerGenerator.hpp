@@ -2,6 +2,7 @@
 #define MMM_PREVIEWLAYERGENERATOR_HPP
 
 #include <ecs/system/RenderSystem.hpp>
+#include <ecs/system/TimeLineSystem.hpp>
 #include <ecs/system/TimeSystem.hpp>
 #include <ecs/system/ToolSystem.hpp>
 #include <ecs/system/mesh/MeshGenerateSystem.hpp>
@@ -28,6 +29,7 @@ class PreviewLayerGenerator : public LayerComputerBase {
    private:
     [[no_unique_address]] MeshGenerateSystem mesh_system;
     [[no_unique_address]] RenderSystem render_system;
+    [[no_unique_address]] TimeLineSystem timeline_system;
     ToolSystem* tool_system;
     ToolInteractionState* tool_interaction_state;
 };

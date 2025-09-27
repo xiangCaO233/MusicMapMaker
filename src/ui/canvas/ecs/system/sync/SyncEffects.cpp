@@ -7,8 +7,22 @@ void SyncSystem::updateEffects(ECSCore& core, const NoteCollection& notes,
                                const NoteIDManager& uuidManager,
                                const MapCanvasInfo* info,
                                const TimePixelConverter& converter) const {
-    if (!info->realTimeInfo.is_playing) return;
     auto& registry = core.ecs_registry();
+    if (!info->realTimeInfo.is_playing) {
+        // 清除所有特效参数
+        auto effect_view = registry.view<EffectComponent, SoundStateComponent,
+                                         TrackIdentifierComponent>();
+        for (auto effect_entity : effect_view) {
+            auto& effect_comp = registry.get<EffectComponent>(effect_entity);
+            effect_comp.texture_type = EffectTextureType::NONE;
+            effect_comp.duration = 0;
+            effect_comp.frame_index = -1;
+            auto& soundstate_comp =
+                registry.get<SoundStateComponent>(effect_entity);
+            soundstate_comp = SoundStateComponent{};
+        }
+        return;
+    }
 
     // --- 1. 计算本帧流逝的逻辑时间 (delta_time) ---
     const double delta_time_ms = static_cast<double>(

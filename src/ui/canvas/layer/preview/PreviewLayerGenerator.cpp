@@ -38,6 +38,9 @@ void PreviewLayerGenerator::generateLayer(LayerManager* manager,
         glm::vec4{xpos, 0.f, mapinfo->baseInfo.canvasSize.width() - xpos,
                   mapinfo->baseInfo.canvasSize.height()};
 
+    // 绘制时间线和timing
+    timeline_system.update(ecore, mapinfo, *converter, l, buffer, true);
+
     // 生成预览物件网格
     std::unordered_map<entt::entity, GeneratedMesh> preview_meshs;
     mesh_system.update(ecore.ecs_registry(), mapinfo, *converter,

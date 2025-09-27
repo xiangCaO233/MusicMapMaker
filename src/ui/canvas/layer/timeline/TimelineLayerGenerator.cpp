@@ -29,7 +29,6 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
             map->timing_set(), mapinfo->baseInfo,
             mapinfo->editorInfo.scrollInfo, mapinfo,
             mapinfo->editorInfo.map->base_metadata().preference_bpm);
-    auto liner_converter = LinearTimeConverter(mapinfo);
 
     // 根据设定的坐标系 (Y=0在底部)，计算判定线的绝对像素位置。
     // 如果 judgeline_pos = 0.2f，意味着判定线在从下往上20%的高度。
@@ -77,8 +76,7 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     buffer.add_PrimitiveCommand(end_cmd);
 
     // 生成时间线(拍线/识别分拍/小节线)
-    timeline_system.update(ecore, mapinfo, liner_converter, *converter, l,
-                           buffer);
+    timeline_system.update(ecore, mapinfo, *converter, l, buffer);
 
     // qDebug() << "timeline layer done";
 }

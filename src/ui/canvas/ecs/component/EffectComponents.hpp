@@ -26,7 +26,7 @@ struct SoundStateComponent {
     // 使用 map 来存储每种音效类型对应的待播放次数（强度）
     // key: SoundEffectType
     // value: uint32_t (count)
-    std::map<SoundEffectType, uint32_t> pending_sounds;
+    std::map<SoundEffectType, uint32_t> pending_sounds{};
 };
 
 // 轨道标签，便于查找

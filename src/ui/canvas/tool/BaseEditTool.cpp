@@ -20,10 +20,10 @@ void BaseEditTool::mousePressEvent(QMouseEvent* e) {
     auto hoveredinfo = hoveredinfo_opt.value();
     auto entity = hoveredinfo.source_entity;
 
-    // if (!selections.contains(entity)) {
-    //     // 立即选中此物件
-    //     selections.insert(entity);
-    // }
+    if (!selections.contains(entity)) {
+        // 立即选中此物件
+        selections.insert(entity);
+    }
 
     // 左键拖拽多选物件
     if (buttons.testFlag(Qt::LeftButton)) {
