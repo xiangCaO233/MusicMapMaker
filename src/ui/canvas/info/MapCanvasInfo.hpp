@@ -35,7 +35,8 @@ struct ScrollInfo {
     float pageScrollStepRatio{1.f};
 
     // 滑轮时间线缩放滚动步长
-    float timelineScrollStep{.03f};
+    float staticTimelineScrollRatio{8.333e-5f};
+    float timelineScrollRatio{1.f};
 
     bool operator==(const ScrollInfo& other) const = default;
 };

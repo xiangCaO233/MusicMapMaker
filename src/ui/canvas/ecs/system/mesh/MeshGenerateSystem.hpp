@@ -475,7 +475,7 @@ class MeshGenerateSystem {
                 generateMesh(child_track_index, child_e, child_mesh, child_time,
                              y,
                              // 是否为末尾
-                             ++count == children.size());
+                             ++count == children.size(), is_preview);
             }
             // qDebug() << "共" << children.size() << "个子实体";
         }

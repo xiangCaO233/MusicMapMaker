@@ -61,13 +61,13 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     // 初始化共享信息
     template <typename CanvasInfoType>
     void initSharedInfo() {
-        canvas_info = std::make_unique<CanvasInfoType>();
+        canvas_info = std::make_shared<CanvasInfoType>();
     }
 
     // 共享信息
     template <typename CanvasInfoType>
-    CanvasInfoType* info() {
-        return static_cast<CanvasInfoType*>(canvas_info.get());
+    std::shared_ptr<CanvasInfoType> info() {
+        return std::static_pointer_cast<CanvasInfoType>(canvas_info);
     }
 
     // 更新共享信息
@@ -102,7 +102,7 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     std::unique_ptr<RenderDataLoop> render_dataloop;
 
     // 持有共享画布信息(子类自己初始化)
-    std::unique_ptr<SharedCanvasInfo> canvas_info{nullptr};
+    std::shared_ptr<SharedCanvasInfo> canvas_info{nullptr};
 
     // 音频加载回调指针
     AudioLoadCallback* audioLoadcbk;

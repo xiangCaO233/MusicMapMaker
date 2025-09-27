@@ -65,7 +65,7 @@ void MMap::readImd() {
         basemeta.map_path = std::filesystem::absolute(basemeta.map_path);
     }
     auto fname = basemeta.map_path.filename();
-    qDebug() << "路径:" << basemeta.map_path.string();
+    XINFO("路径:" + basemeta.map_path.string());
     if (basemeta.map_path.extension() == ".imd") {
         auto fnamestr = fname.string();
 
@@ -75,7 +75,7 @@ void MMap::readImd() {
         try {
             basemeta.track_count = std::stoi(fnamestr.substr(first_pos + 1, 1));
         } catch (std::exception& e) {
-            qDebug() << "读取文件名key数失败-" << std::string(e.what());
+            XWARN("读取文件名key数失败-" + std::string(e.what()));
         }
         auto last_pos = fnamestr.rfind(".");
 
@@ -108,7 +108,7 @@ void MMap::readImd() {
         }
         if (!has_audio) {
             basemeta.main_audio_path.clear();
-            qDebug() << "未找到imd对应音频文件";
+            XWARN("未找到imd对应音频文件");
         }
 
         // 检查前缀+.png 或.jpg .jpeg有哪个用哪个作为bg
@@ -128,13 +128,13 @@ void MMap::readImd() {
         }
         if (!has_bg) {
             basemeta.main_cover_path.clear();
-            qDebug() << "未找到imd对应背景图片";
+            XWARN("未找到imd对应背景图片");
         }
 
         std::ifstream file(basemeta.map_path, std::ios::binary);
 
         if (!file) {
-            qDebug() << "无法打开文件" << basemeta.map_path;
+            XWARN("无法打开文件" + basemeta.map_path.generic_string());
             return;
         }
 
@@ -189,9 +189,9 @@ void MMap::readImd() {
                 timing = read_timing.get();
                 // 加入缓存timing列表
                 temp_timings.emplace_back(std::move(read_timing));
-                qDebug() << "读取到timing:[time:"
-                         << std::to_string(timing->timestamp)
-                         << ",bpm:" << std::to_string(timing->bpm) << "]";
+                XINFO(
+                    "读取到timing:[time:" + std::to_string(timing->timestamp) +
+                    ",bpm:" + std::to_string(timing->bpm) + "]");
             }
         }
 
@@ -202,7 +202,7 @@ void MMap::readImd() {
         // 接下来一个int32:表格行数
         auto table_rows = reader.read_value<int32_t>(data_pos);
         data_pos += 4;
-        qDebug() << "读取到表格行数:[" + std::to_string(table_rows) + "]";
+        XINFO("读取到表格行数:[" + std::to_string(table_rows) + "]");
 
         // 后面全是物件的数据
         // 11字节为一组
@@ -354,9 +354,10 @@ void MMap::readImd() {
         // }
 
         // debugmap
+        XINFO("-------全部物件-------");
         auto note_handles = note_set().get_all_notes_ordered();
         for (const auto& handle : note_handles) {
-            qDebug() << note_set().get_note(handle)->toString();
+            XINFO(note_set().get_note(handle)->toString());
         }
     } else {
         XWARN("非.imd格式,读取失败");

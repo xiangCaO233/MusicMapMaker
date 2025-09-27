@@ -4,6 +4,7 @@
 #include <QDir>
 #include <fstream>
 #include <map/skin/MSkin.hpp>
+#include <mutex>
 
 // 统计目录下的文件数
 int count_files_recursive(const std::filesystem::path& dir_path) {
@@ -128,6 +129,7 @@ MSkin::~MSkin() {}
 
 // 清除缓存
 void MSkin::clear_buffer() {
+    std::lock_guard<std::mutex> lock(texturebuffer_mtx);
     bg_texture_buffer.clear();
     object_texture_buffer.clear();
 }
@@ -140,6 +142,7 @@ std::string_view MSkin::fontFamilyUTF8() { return fontu8; }
 
 // 获取轨道判定纹理
 TextureInfo MSkin::get_orbit_judge_texture() {
+    std::lock_guard<std::mutex> lock(texturebuffer_mtx);
     auto ojudge_texit = bg_texture_buffer.find(TexType::JUDGE_ORBIT);
     if (ojudge_texit == bg_texture_buffer.end()) {
         auto rpath =
@@ -157,6 +160,7 @@ TextureInfo MSkin::get_orbit_judge_texture() {
 
 // 获取轨道底板纹理
 TextureInfo MSkin::get_orbit_bg_texture() {
+    std::lock_guard<std::mutex> lock(texturebuffer_mtx);
     auto obg_texit = bg_texture_buffer.find(TexType::ORBIT_BG);
     if (obg_texit == bg_texture_buffer.end()) {
         auto rpath =
@@ -175,6 +179,7 @@ TextureInfo MSkin::get_orbit_bg_texture() {
 // 获取选择框纹理
 TextureInfo MSkin::get_selected_border_texture(
     SelectBorderDirection direction) {
+    std::lock_guard<std::mutex> lock(texturebuffer_mtx);
     switch (direction) {
         case SelectBorderDirection::LEFT: {
             return texcallback->getTextureInfo(
@@ -203,12 +208,14 @@ TextureInfo MSkin::get_selected_border_texture(
 
 // 获取判定线的纹理
 TextureInfo MSkin::get_judgeline_texture() {
+    std::lock_guard<std::mutex> lock(texturebuffer_mtx);
     return texcallback->getTextureInfo(
         bg_texture_config.value<std::string>("judgeline", "none"));
 }
 
 // 获取物件的纹理
 TextureInfo MSkin::get_object_texture(TexType type, ObjectStatus status) {
+    std::lock_guard<std::mutex> lock(texturebuffer_mtx);
     // TODO(xiang 2025-05-07): 优化性能-缓存json结果防止一直读取json
     json* config = nullptr;
     std::string key;

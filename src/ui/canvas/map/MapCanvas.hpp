@@ -71,7 +71,7 @@ class MapCanvas : public GLCanvas {
         // 时间基
         void timeplaypos_updated(std::chrono::nanoseconds time_pos) override {
             // 只报告原始音频时间
-            if (auto *mapinfo = canvas->info<MapCanvasInfo>()) {
+            if (auto mapinfo = canvas->info<MapCanvasInfo>()) {
                 double timems =
                     std::chrono::duration<double, std::milli>(time_pos).count();
                 mapinfo->realTimeInfo.current_time_info.raw_audio_time_ms.store(

@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <mmm/project/AudioLoadCallback.hpp>
 #include <mmm/project/TextureLoadCallback.hpp>
+#include <mutex>
 #include <nlohmann/json.hpp>
 #include <render/texture/TextureInfo.hpp>
 
@@ -139,6 +140,7 @@ class MSkin {
     int32_t slide_hit_effect_frame_count;
 
    private:
+    std::mutex texturebuffer_mtx;
     TextureLoadCallback* texcallback;
     std::filesystem::path skinPath;
     // 基本信息

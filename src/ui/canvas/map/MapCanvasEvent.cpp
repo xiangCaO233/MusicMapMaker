@@ -55,29 +55,28 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
 
     auto &scrollInfo = editor_info.scrollInfo;
 
+    if (modifiers.testFlag(Qt::ShiftModifier)) {
+        // 按住shift倍乘dy
+        dy *= 3.f;
+    }
+
     if (map) {
         if (modifiers.testFlag(Qt::ControlModifier)) {
             // 按住controll修改缩放
-            if (dy > 0) {
-                scrollInfo.timeline_zoom += scrollInfo.timelineScrollStep;
-                if (scrollInfo.timeline_zoom > 5.f) {
-                    scrollInfo.timeline_zoom = 5.f;
-                }
+            scrollInfo.timeline_zoom += dy *
+                                        scrollInfo.staticTimelineScrollRatio *
+                                        scrollInfo.timelineScrollRatio;
+            // 边缘限制
+            if (scrollInfo.timeline_zoom > 10.f) {
+                scrollInfo.timeline_zoom = 10.f;
             }
-            if (dy < 0) {
-                scrollInfo.timeline_zoom -= scrollInfo.timelineScrollStep;
-                if (scrollInfo.timeline_zoom < .25f) {
-                    scrollInfo.timeline_zoom = .25f;
-                }
+            if (scrollInfo.timeline_zoom < .25f) {
+                scrollInfo.timeline_zoom = .25f;
             }
         } else {
             if (editor_info.scrollInfo.scroll_natural) {
                 // 自然滚动反转dy
                 dy = -dy;
-            }
-            if (modifiers.testFlag(Qt::ShiftModifier)) {
-                // 按住shift倍乘dy
-                dy *= 3.f;
             }
 
             // 更新画布位置和音频位置

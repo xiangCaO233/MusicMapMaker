@@ -118,9 +118,17 @@ class SlideMeshGenerator {
         auto thistrack = tailType == SlideTailType::GENERAL
                              ? src_track
                              : registry->get<NoteComponent>(e).track_index;
-        auto thisy = tailType == SlideTailType::GENERAL
-                         ? src_y
-                         : registry->get<TransformComponent>(e).main_y;
+        auto transform = registry->get<TransformComponent>(e);
+        float thisy;
+        if (is_preview) {
+            thisy = tailType == SlideTailType::GENERAL ? src_y
+                                                       : transform.preview_y;
+
+        } else {
+            thisy =
+                tailType == SlideTailType::GENERAL ? src_y : transform.main_y;
+        }
+
         auto thisx =
             tailType == SlideTailType::GENERAL
                 ? src_x
