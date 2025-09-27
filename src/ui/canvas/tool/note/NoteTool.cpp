@@ -44,7 +44,9 @@ void NoteTool::mouseMoveEvent(QMouseEvent* e) {
     BaseEditTool::mouseMoveEvent(e);
     if (get_pressArea() == MouseArea::EDIT) {
         // 根据是否正在创建新物件发送更新创建坐标指令
-        tool_command_queue()->push(UpdateCreateNodeCommand{});
+        if (!tool_interaction_state()->hasSelected()) {
+            tool_command_queue()->push(UpdateCreateNodeCommand{});
+        }
     }
 }
 
@@ -59,4 +61,5 @@ void NoteTool::mouseReleaseEvent(QMouseEvent* e) {
             tool_command_queue()->push(ConfirmCreateNewNoteCommand{});
         }
     }
+    clear_pressArea();
 }

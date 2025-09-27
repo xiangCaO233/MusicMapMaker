@@ -33,10 +33,11 @@ void BaseEditTool::mousePressEvent(QMouseEvent* e) {
         // 左键拖拽多选物件
         if (buttons.testFlag(Qt::LeftButton)) {
             // 确保悬浮物件在选区内，且选区大于1
+            // 多个物件拖动时仅移动
             if (selections.size() > 1 && selections.contains(entity)) {
                 tool_command_queue()->push(StartDragSelectionCommand{
                     glm::vec2{e->pos().x(), e->pos().y()}, e->modifiers(),
-                    hoveredinfo, selections});
+                    hoveredinfo, selections, true});
                 return;  // 多选拖拽逻辑已处理完毕
             }
 

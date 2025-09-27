@@ -179,6 +179,7 @@ class ToolCommandProcessor {
                 },
                 // 更新创建节点
                 [&](const UpdateCreateNodeCommand& arg) { updateCreateNode(); },
+
                 // 确认放置物件
                 [&](const ConfirmCreateNewNoteCommand& arg) {
                     endCreateNewNote();
@@ -193,7 +194,8 @@ class ToolCommandProcessor {
 
                 // 拖拽选择集
                 [&](const StartDragSelectionCommand& arg) {
-                    startDragEntities(arg.selection, arg.hit_info);
+                    startDragEntities(arg.selection, arg.hit_info,
+                                      arg.move_only);
                 },
 
                 // 结束拖拽命令
@@ -427,7 +429,7 @@ class ToolCommandProcessor {
     }
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,
-                           MeshPartInfo part = {}) {
+                           MeshPartInfo part = {}, bool move_only = false) {
         std::unordered_map<entt::entity, MapAxis> selections_with_ress;
         // 获取所有选中物件的原始位置
         for (const auto& selected_entity : selections) {
@@ -445,14 +447,14 @@ class ToolCommandProcessor {
         // 更新 TIS 的选择集
         interactionState.setSelection(Qt::LeftButton, selections);
 
+        if (move_only) {
+            // 仅移动时移除部位信息防止触发编辑渲染
+            part.part = NotePart::NONE;
+        }
         // 更新 TIS 的拖拽状态
-        interactionState.startDrag(
-            DragMode::Entity,
-            // 多选时没有单一的命中部位(不传入part参数/使用none)
-            part,
-            // 选中列表
-            selections_with_ress);
-        // qDebug() << "startDrag:" << to_string(part.part);
+        interactionState.startDrag(DragMode::Entity, part,
+                                   // 选中列表
+                                   selections_with_ress);
 
         // 为所有被拖拽的实体附加虚影组件
         for (auto& entity : selections) {

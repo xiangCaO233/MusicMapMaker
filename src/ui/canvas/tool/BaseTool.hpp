@@ -59,6 +59,7 @@ class BaseTool {
     }
 
     MouseArea get_pressArea() const { return pressArea; }
+    void clear_pressArea() { pressArea = MouseArea::UNKNOWN; }
 
    private:
     // 画布指针

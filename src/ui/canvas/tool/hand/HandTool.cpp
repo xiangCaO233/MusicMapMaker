@@ -32,6 +32,7 @@ void HandTool::mouseReleaseEvent(QMouseEvent* e) {
         // 发送结束更新选中区域命令
         tool_command_queue()->push(EndSelectCommand{e->button()});
     }
+    clear_pressArea();
 }
 
 // SelectTool 的专属实现
@@ -39,9 +40,11 @@ void HandTool::handleSingleObjectDragStart(
     QMouseEvent* e, const std::optional<MeshPartInfo>& hoveredInfo) {
     // SelectTool 的职责是选择和移动。当拖拽单个物件时：
     // 发送一个明确的“拖拽选中项”命令，而不是可能触发编辑的 StartDragCommand
+    // 传递仅移动清除部位信息
     tool_command_queue()->push(StartDragSelectionCommand{
         glm::vec2{e->pos().x(), e->pos().y()},
         e->modifiers(),
         {hoveredInfo.has_value() ? hoveredInfo.value() : MeshPartInfo{}},
-        {hoveredInfo.value().source_entity}});
+        {hoveredInfo.value().source_entity},
+        true});
 }

@@ -51,6 +51,7 @@ struct StartDragSelectionCommand {
     DragStartInfo common_info;
     const MeshPartInfo hit_info;
     std::unordered_set<entt::entity> selection;
+    bool move_only{false};
 };
 
 // 清理拖动实体状态
