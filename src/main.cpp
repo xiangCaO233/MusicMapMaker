@@ -1,6 +1,9 @@
 #include <mainwindow.h>
 #ifdef _WIN32
 #define NOMINMAX
+#include <fcntl.h>
+#include <io.h>
+#include <stdio.h>
 #include <windows.h>
 #endif  //_WIN32
 #include <colorful-log.h>
@@ -13,10 +16,29 @@
 #include <QLocale>
 #include <QTranslator>
 
+void attachConsole() {
+#if defined _WIN32
+    // 1. 分配一个新的控制台
+    if (AllocConsole()) {
+        // 2. 将标准输出重定向到新的控制台
+        FILE* fp;
+        freopen_s(&fp, "CONOUT$", "w", stdout);
+        freopen_s(&fp, "CONOUT$", "w", stderr);
+        freopen_s(&fp, "CONIN$", "r", stdin);
+
+        // 3. （可选）如果你也想使用 iostream
+        std::cout.clear();
+        std::cerr.clear();
+        std::cin.clear();
+    }
+#endif  //_WIN32
+}
+
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(65001);
+    attachConsole();
 #endif  //_WIN32
     std::setlocale(LC_ALL, ".UTF-8");
 
