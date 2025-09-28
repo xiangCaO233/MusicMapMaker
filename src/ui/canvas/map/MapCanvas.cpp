@@ -95,8 +95,10 @@ void MapCanvas::onAudioLoadcbkInitialized(AudioLoadCallback* cbk) {
 // 设置主音轨位置
 void MapCanvas::set_maintrack_pos(std::chrono::milliseconds time) {
     auto mapcanvasInfo = info<MapCanvasInfo>();
-    mapcanvasInfo->realTimeInfo.current_time_info.logic_canvas_time =
-        time.count() - mapcanvasInfo->realTimeInfo.offset_info.global_offset_ms;
+    mapcanvasInfo->realTimeInfo.current_time_info =
+        time.count() -
+        (mapcanvasInfo->realTimeInfo.offset_info.global_static_offset_ms +
+         mapcanvasInfo->realTimeInfo.offset_info.global_offset_ms);
     audio_callback->set_playpos_for(
         map->base_metadata().main_audio_path.generic_string(),
         std::chrono::milliseconds(

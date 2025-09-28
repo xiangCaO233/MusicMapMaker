@@ -59,7 +59,7 @@ void attachConsole() {
 
 int main(int argc, char *argv[]) {
 #ifdef _WIN32
-    attachConsole();
+    // attachConsole();
 #endif  //_WIN32
     std::setlocale(LC_ALL, ".UTF-8");
 
@@ -130,22 +130,27 @@ int main(int argc, char *argv[]) {
 
     // TODO
     /*
-     * 1: 实现直接打开谱面/音频文件的项目引导ui和交互
+     // * 1: win退不干净的bug
+     * 2: timing编辑过程的段错误
+     // * 3: 小轨道布局丢失特效渲染(InMaintrack组件丢失)
+     * 4: 0x倍速的错误时间线映射
+     *
+     * 6: 实现直接打开谱面/音频文件的项目引导ui和交互
      */
     // 执行Qt事件循环，并将退出码保存起来
     int exitCode = a.exec();
 
     // 只在Windows，程序退出前执行以下暂停操作
 #if defined _WIN32
-    if (exitCode == 0) {
-        XINFO("程序正常退出.");
-    } else {
-        XERROR("程序非正常退出,错误码: " + std::to_string(exitCode));
-    }
-    std::cout << "按任意键关闭终端..." << std::endl;
+    // if (exitCode == 0) {
+    //     XINFO("程序正常退出.");
+    // } else {
+    //     XERROR("程序非正常退出,错误码: " + std::to_string(exitCode));
+    // }
+    // std::cout << "按任意键关闭终端..." << std::endl;
 
-    // 等待用户按回车键
-    getchar();
+    // // 等待用户按回车键
+    // getchar();
 #endif  //_WIN32
 
     return exitCode;

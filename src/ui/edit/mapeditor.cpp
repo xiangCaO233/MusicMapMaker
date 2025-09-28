@@ -12,6 +12,7 @@ MapEditor::~MapEditor() { delete ui; }
 
 // 使用主题
 void MapEditor::use_theme(GlobalTheme theme) {
+    current_theme = theme;
     QColor color;
     switch (theme) {
         case GlobalTheme::OPEN_DARK:

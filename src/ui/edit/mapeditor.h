@@ -24,6 +24,8 @@ class MapEditor : public QWidget {
     // 获取画布实例
     MapCanvas *canvas() const;
 
+    GlobalTheme current_theme;
+
     // 使用主题
     void use_theme(GlobalTheme theme);
 
