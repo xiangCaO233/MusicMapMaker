@@ -285,6 +285,7 @@ void MMap::readImd() {
                     temp_complex_note->set_notetype(NoteType::COMPOSITE);
                     temp_complex_note->set_timestamp(note_timestamp);
                     temp_complex_note->set_trackpos(note_orbit);
+                    comp_done = false;
                     break;
                 }
                 case 0x20: {
@@ -320,7 +321,6 @@ void MMap::readImd() {
                     auto handle =
                         note_set().add_note(std::move(temp_complex_note));
                     noteUUIDManager.register_new_note(handle);
-                    comp_done = false;
                 }
             } else {
                 // 把物件加入集合(物件在此之后失效)

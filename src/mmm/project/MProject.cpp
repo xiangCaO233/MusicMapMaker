@@ -120,14 +120,15 @@ void MProject::update_configdoc(bool from_config) {
     }
 
     // 画布配置节点
-    auto canvas_layout_node = config_doc.child("canvas-layout");
+    auto canvas_layout_node = root_node.child("canvas-layout");
     if (!canvas_layout_node)
-        canvas_layout_node = config_doc.append_child("canvas-layout");
+        canvas_layout_node = root_node.append_child("canvas-layout");
 
     // 主轨道布局配置子节点
     auto maintrack_lauout_node = canvas_layout_node.child("maintrack-layout");
     if (!maintrack_lauout_node)
-        maintrack_lauout_node = config_doc.append_child("maintrack-layout");
+        maintrack_lauout_node =
+            canvas_layout_node.append_child("maintrack-layout");
     auto topratio_attr = maintrack_lauout_node.attribute("top");
     auto rightratio_attr = maintrack_lauout_node.attribute("right");
     auto bottomratio_attr = maintrack_lauout_node.attribute("bottom");

@@ -125,6 +125,7 @@ void MapCanvas::onJudgelinePosUpdated(float pos) {
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {
     map = smap;
+    if (!map) return;
     static_cast<MapLayerManager*>(dataloop()->layermanager())->updateMap(smap);
     auto mapcanvasInfo = info<MapCanvasInfo>();
     mapcanvasInfo->bindProjectConfig(smap->project()->cfg());
@@ -132,6 +133,9 @@ void MapCanvas::switch_map(MMap* smap) {
     mapcanvasInfo->mapInfo.cover_path =
         smap->base_metadata().main_cover_path.generic_string();
     mapcanvasInfo->editorInfo.map = smap;
+
+    mapcanvasInfo->editorInfo.judgeline_pos =
+        1.f - map->project()->cfg()->canvas_config.judgeline_pos;
 
     // 绑定播放回调
     auto controller = audioLoadCallback()->getController(

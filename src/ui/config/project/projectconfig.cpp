@@ -40,10 +40,16 @@ void ProjectConfig::bind_config(MProject *project) {
     ui->leftpos_spinner->setValue(config->canvas_config.canvas_layout.w);
     ui->object_width_scale_slider->setValue(
         config->canvas_config.object_width_scale * 100.0);
+    ui->object_width_scale_value_label->setText(
+        QString("%1%").arg(ui->object_width_scale_slider->value()));
     ui->object_height_scale_slider->setValue(
         config->canvas_config.object_height_scale * 100.0);
+    ui->object_height_scale_value_label->setText(
+        QString("%1%").arg(ui->object_height_scale_slider->value()));
     ui->judgeline_pos_slider->setValue(config->canvas_config.judgeline_pos *
                                        100.0);
+    ui->judgeline_pos_value_label->setText(
+        QString("%1%").arg(ui->judgeline_pos_slider->value()));
     emit layout_changed();
 
     showConfigs();
