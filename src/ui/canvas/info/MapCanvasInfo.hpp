@@ -34,9 +34,13 @@ struct ScrollInfo {
     // 滑轮页滚动步长倍率
     float pageScrollStepRatio{1.f};
 
-    // 滑轮时间线缩放滚动步长
+    // 滑轮时间线缩放滚动步长倍率
     float staticTimelineScrollRatio{8.333e-5f};
-    float timelineScrollRatio{1.f};
+    float timelineScrollRatio{2.5f};
+
+    // 滑轮预览缩放滚动步长倍率
+    float staticPreviewScrollRatio{8.333e-5f};
+    float previewScrollRatio{2.5f};
 
     bool operator==(const ScrollInfo& other) const = default;
 };

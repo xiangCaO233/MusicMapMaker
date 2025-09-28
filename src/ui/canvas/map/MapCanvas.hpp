@@ -108,6 +108,9 @@ class MapCanvas : public GLCanvas {
     // 当前工具
     BaseTool *current_tool{nullptr};
 
+    // 滚动累积量
+    float wheelDyAccumulator{0.f};
+
     // 创建工具
     void creatTools(ToolSystem *const toolsystem,
                     ThreadSafeQueue<ToolCommand> *const cmdq,

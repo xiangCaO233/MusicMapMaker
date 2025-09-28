@@ -47,8 +47,6 @@ enum class SoundEffectType : int32_t {
 
 inline std::string to_string(const SoundEffectType& type) {
     switch (type) {
-        case SoundEffectType::NONE:
-            return "NONE";
         case SoundEffectType::COMMON_HIT:
             return "COMMON_HIT";
         case SoundEffectType::SLIDE:
@@ -57,6 +55,8 @@ inline std::string to_string(const SoundEffectType& type) {
             return "HOLDING";
         case SoundEffectType::HOLD_RELEASE:
             return "HOLD_RELEASE";
+        default:
+            return "NONE";
     }
 }
 

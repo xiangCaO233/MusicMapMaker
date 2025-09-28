@@ -23,14 +23,14 @@ enum class MouseArea {
 
 inline std::string to_string(MouseArea area) {
     switch (area) {
-        case MouseArea::UNKNOWN: {
-            return "UNKNOWN";
-        }
         case MouseArea::EDIT: {
             return "EDIT";
         }
         case MouseArea::PREVIEW: {
             return "PREVIEW";
+        }
+        default: {
+            return "UNKNOWN";
         }
     }
 }

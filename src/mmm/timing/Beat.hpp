@@ -30,7 +30,8 @@ struct DivisorLineInfo {
     int64_t beat_start;
     double divisor_time;    // 分拍线的时间
     int64_t divisor_index;  // 第几个分拍线 (0 到 divisors-1)
-    double distance;        // 查询时间与分拍线的距离
+    double distance{
+        std::numeric_limits<double>::infinity()};  // 查询时间与分拍线的距离
     bool is_valid() const {
         return distance != std::numeric_limits<double>::infinity();
     }
@@ -115,6 +116,98 @@ inline DivisorLineInfo findNearestDivisorLine(int64_t query_time,
     }
 
     return nearest_line;
+}
+
+// 用于指定查询方向的枚举
+enum class SearchDirection {
+    PREVIOUS,  // 向前查找（时间值更小的方向）
+    AFTER      // 向后查找（时间值更大的方向）
+};
+
+/**
+ * @brief 在指定时间位置的指定方向查找最近的分拍线(包括拍头线)
+ *
+ * @param query_time  查询的参考时间点
+ * @param direction   查询方向 (PREVIOUS 或 AFTER)
+ * @param beat_info   包含所有 Beat 信息的数据集合
+ * @param tolerance_ms 一个小的容差值(毫秒), 用于判断两个时间点是否"足够接近"
+ * @return DivisorLineInfo 找到的分拍线信息, 如果找不到则返回一个
+ * is_valid()=false 的对象
+ */
+inline DivisorLineInfo findNearestDivisorLineInDirection(
+    int64_t query_time, SearchDirection direction, const BeatInfo& beat_info,
+    double tolerance_ms = 5.0) {  // 新增 tolerance_ms 参数
+
+    if (query_time < 0 || beat_info.empty()) {
+        return {-1, -1.0, -1, std::numeric_limits<double>::infinity()};
+    }
+
+    DivisorLineInfo result = {-1, -1.0, -1,
+                              std::numeric_limits<double>::infinity()};
+    const double query_time_d = static_cast<double>(query_time);
+
+    if (direction == SearchDirection::AFTER) {
+        double min_time_after = std::numeric_limits<double>::infinity();
+
+        for (const auto& pair : beat_info) {
+            const Beat& beat = pair.second;
+            const auto divisor_times = getDivisorTimesForBeat(beat);
+
+            for (uint32_t i = 0; i < divisor_times.size(); ++i) {
+                const double line_time = divisor_times[i];
+                // 核心修改点: 寻找第一个严格大于 (查询时间 + 容差) 的线
+                if (line_time > query_time_d + tolerance_ms) {
+                    if (line_time < min_time_after) {
+                        min_time_after = line_time;
+                        result = {static_cast<int64_t>(beat.beat_start),
+                                  line_time, static_cast<int64_t>(i),
+                                  std::abs(line_time - query_time_d)};
+                    }
+                }
+            }
+        }
+    } else {  // SearchDirection::PREVIOUS
+        DivisorLineInfo strictly_before_result = {
+            -1, -1.0, -1, std::numeric_limits<double>::infinity()};
+        DivisorLineInfo approx_equal_result = {
+            -1, -1.0, -1, std::numeric_limits<double>::infinity()};
+        double max_time_before = -1.0;
+
+        for (const auto& pair : beat_info) {
+            const Beat& beat = pair.second;
+            const auto divisor_times = getDivisorTimesForBeat(beat);
+
+            for (uint32_t i = 0; i < divisor_times.size(); ++i) {
+                const double line_time = divisor_times[i];
+
+                // 核心修改点 1: 寻找严格小于 (查询时间 - 容差) 的线
+                if (line_time < query_time_d - tolerance_ms) {
+                    if (line_time > max_time_before) {
+                        max_time_before = line_time;
+                        strictly_before_result = {
+                            static_cast<int64_t>(beat.beat_start), line_time,
+                            static_cast<int64_t>(i),
+                            std::abs(line_time - query_time_d)};
+                    }
+                }
+                // 核心修改点 2: 将 "等于" 的判断扩展为一个容差范围
+                else if (std::abs(line_time - query_time_d) <= tolerance_ms) {
+                    approx_equal_result = {
+                        static_cast<int64_t>(beat.beat_start), line_time,
+                        static_cast<int64_t>(i),
+                        std::abs(line_time - query_time_d)};
+                }
+            }
+        }
+
+        // 优先返回严格小于的结果, 其次返回在容差范围内的结果
+        if (strictly_before_result.is_valid()) {
+            return strictly_before_result;
+        }
+        return approx_equal_result;
+    }
+
+    return result;
 }
 
 #endif  // !MMM_BEAT_HPP
