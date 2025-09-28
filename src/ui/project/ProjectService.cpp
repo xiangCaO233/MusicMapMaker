@@ -56,37 +56,17 @@ void ProjectService::onOpenProject(std::string_view path) {
     } else {
         // 打开的项目是否是mproject
         bool is_mproject{false};
-
-        // 目标项目名称(作为项目集合的key)
-        std::string project_name = project_path.filename().generic_string();
-
-        // 寻找项目配置(仅在项目根目录下)
-        for (auto it = std::filesystem::directory_iterator(project_path);
-             it != std::filesystem::directory_iterator(); ++it) {
-            auto filename_full = it->path().filename().generic_string();
-            if (filename_full.ends_with(".mproject")) {
-                // 读取项目配置
-
-                // 顺利读取项目配置-确认这是mproject
-                is_mproject = true;
-            }
-        }
-        if (is_mproject) {
-            // 并非mproject-询问是否初始化该目录为mproject目录
-
-            // 重新获得project_name
-        }
-
-        // 创建项目加入集合
-        auto project =
-            projects
-                .try_emplace(project_name,
-                             std::make_unique<MProject>(
-                                 map_canvas->textureCallback(), track_manager))
-                .first->second.get();
-
+        auto project = std::make_unique<MProject>(map_canvas->textureCallback(),
+                                                  track_manager);
         // 打开项目
         project->open(project_path.generic_string());
+
+        // 目标项目名称(作为项目集合的key)
+        auto project_name = project->cfg()->project_name;
+
+        // 将项目加入集合
+        projects.try_emplace(project_name, std::move(project))
+            .first->second.get();
     }
     // 发送更新项目列表信号
     emit updateProjectList(&projects);

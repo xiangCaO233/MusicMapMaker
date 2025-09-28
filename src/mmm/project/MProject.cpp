@@ -29,7 +29,7 @@ void MProject::open(std::string_view project_path_str) {
     } else {
         // 在这直接调用纹理池回调载入文件夹内全部纹理
         texcallback->need_loadtexture_dir(project_path.generic_string());
-
+        // 载入项目目录
         for (auto it = std::filesystem::directory_iterator(project_path);
              it != std::filesystem::directory_iterator(); ++it) {
             auto filename = it->path().generic_string();
@@ -72,9 +72,131 @@ void MProject::open(std::string_view project_path_str) {
                        filename.ends_with(".mkv")) {
                 XINFO("需要载入视频[" + filename + "]");
                 project_video_table.insert(filename);
+            } else if (filename.ends_with(".mproject")) {
+                XINFO("发现配置文件[" + filename + "]");
+                auto result = config_doc.load_file(filename.c_str());
+                if (!result) {
+                    XWARN("项目配置解析失败: " +
+                          std::string(result.description()));
+                }
             }
         }
+        update_configdoc(false);
         is_opened.store(true);
+    }
+}
+
+// 更新配置文档
+void MProject::update_configdoc(bool from_config) {
+    XINFO("开始更新项目配置");
+    // 根节点
+    auto root_node = config_doc.child("mproject");
+    if (!root_node) root_node = config_doc.append_child("mproject");
+
+    // 项目名称节点
+    auto project_name_node = root_node.child("name");
+    if (!project_name_node) {
+        // 如果节点不存在// 则创建它
+        project_name_node = root_node.append_child("name");
+        if (!from_config) {
+            // 首次加载使用文件夹名作为项目名
+            project_name_node.text().set(
+                project_path.filename().generic_string());
+        }
+    } else {
+        XINFO("项目名称:" + std::string(project_name_node.text().as_string()));
+        if (from_config) {
+            XINFO("正在保存配置");
+        } else {
+            XINFO("正在读取配置");
+        }
+    }
+    if (from_config) {
+        // 更新为实时配置中的值
+        project_name_node.text().set(project_config.project_name);
+    } else {
+        // 在读取-从节点中获取值用于更新配置结构
+        project_config.project_name = project_name_node.text().as_string();
+    }
+
+    // 画布配置节点
+    auto canvas_layout_node = config_doc.child("canvas-layout");
+    if (!canvas_layout_node)
+        canvas_layout_node = config_doc.append_child("canvas-layout");
+
+    // 主轨道布局配置子节点
+    auto maintrack_lauout_node = canvas_layout_node.child("maintrack-layout");
+    if (!maintrack_lauout_node)
+        maintrack_lauout_node = config_doc.append_child("maintrack-layout");
+    auto topratio_attr = maintrack_lauout_node.attribute("top");
+    auto rightratio_attr = maintrack_lauout_node.attribute("right");
+    auto bottomratio_attr = maintrack_lauout_node.attribute("bottom");
+    auto leftratio_attr = maintrack_lauout_node.attribute("left");
+    if (!topratio_attr) {
+        topratio_attr = maintrack_lauout_node.append_attribute("top");
+        topratio_attr = .05f;
+    }
+    if (!rightratio_attr) {
+        rightratio_attr = maintrack_lauout_node.append_attribute("right");
+        rightratio_attr = .75f;
+    }
+    if (!bottomratio_attr) {
+        bottomratio_attr = maintrack_lauout_node.append_attribute("bottom");
+        bottomratio_attr = .95f;
+    }
+    if (!leftratio_attr) {
+        leftratio_attr = maintrack_lauout_node.append_attribute("left");
+        leftratio_attr = .25f;
+    }
+    if (from_config) {
+        topratio_attr = project_config.canvas_config.canvas_layout.x;
+        rightratio_attr = project_config.canvas_config.canvas_layout.y;
+        bottomratio_attr = project_config.canvas_config.canvas_layout.z;
+        leftratio_attr = project_config.canvas_config.canvas_layout.w;
+    } else {
+        project_config.canvas_config.canvas_layout.x = topratio_attr.as_float();
+        project_config.canvas_config.canvas_layout.y =
+            rightratio_attr.as_float();
+        project_config.canvas_config.canvas_layout.z =
+            bottomratio_attr.as_float();
+        project_config.canvas_config.canvas_layout.w =
+            leftratio_attr.as_float();
+    }
+    // 判定线位置配置子节点
+    auto judgeline_pos_node = canvas_layout_node.child("judgeline");
+    if (!judgeline_pos_node) {
+        judgeline_pos_node = canvas_layout_node.append_child("judgeline");
+        judgeline_pos_node.text().set(.8f);
+    }
+    if (from_config)
+        judgeline_pos_node.text().set(
+            project_config.canvas_config.judgeline_pos);
+    else
+        project_config.canvas_config.judgeline_pos =
+            judgeline_pos_node.text().as_float();
+
+    // 物件缩放配置子节点
+    auto object_scale_node = canvas_layout_node.child("object-scales");
+    if (!object_scale_node)
+        object_scale_node = canvas_layout_node.append_child("object-scales");
+    auto object_wscale_attrib = object_scale_node.attribute("width");
+    auto object_hscale_attrib = object_scale_node.attribute("height");
+    if (!object_wscale_attrib) {
+        object_wscale_attrib = object_scale_node.append_attribute("width");
+        object_wscale_attrib = 1.f;
+    }
+    if (!object_hscale_attrib) {
+        object_hscale_attrib = object_scale_node.append_attribute("height");
+        object_hscale_attrib = 1.f;
+    }
+    if (from_config) {
+        object_wscale_attrib = project_config.canvas_config.object_width_scale;
+        object_hscale_attrib = project_config.canvas_config.object_height_scale;
+    } else {
+        project_config.canvas_config.object_width_scale =
+            object_wscale_attrib.as_float();
+        project_config.canvas_config.object_height_scale =
+            object_hscale_attrib.as_float();
     }
 }
 
@@ -85,4 +207,12 @@ void MProject::close() {
     texcallback->need_unloadtexture_dir(project_path.generic_string());
     // 通知音频池卸载音轨
     is_closed.store(true);
+    // 写出项目配置文件
+    // 根据当前配置更新配置文档
+    update_configdoc(true);
+    // 保存到文件
+    auto configdoc_filepath =
+        (project_path / (project_config.project_name + ".mproject"))
+            .generic_string();
+    config_doc.save_file(configdoc_filepath.c_str());
 }

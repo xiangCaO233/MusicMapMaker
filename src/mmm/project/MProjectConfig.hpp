@@ -38,7 +38,7 @@ struct CanvasConfig {
     // 判定线位置
     float judgeline_pos{.8f};
     // 选择框宽度
-    float select_border_width{6.f};
+    float select_border_width{4.f};
     // 物件缩放
     float object_width_scale{1.f};
     float object_height_scale{1.f};

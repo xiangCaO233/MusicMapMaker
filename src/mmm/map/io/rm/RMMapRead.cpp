@@ -282,7 +282,6 @@ void MMap::readImd() {
                 case 0x60: {
                     // 组合键头(开始键)
                     temp_complex_note = std::make_unique<Composite>(this);
-                    comp_done = false;
                     temp_complex_note->set_notetype(NoteType::COMPOSITE);
                     temp_complex_note->set_timestamp(note_timestamp);
                     temp_complex_note->set_trackpos(note_orbit);
@@ -311,12 +310,17 @@ void MMap::readImd() {
             temp_note->set_trackpos(note_orbit);
             if (temp_complex_note) {
                 // 添加当前物件到缓存组合键
-                temp_complex_note->add_child(std::move(temp_note));
+                auto tempnoteptr = temp_note->clone(temp_note->map_ref);
+                if (!temp_complex_note->add_child(std::move(temp_note))) {
+                    XWARN("添加组合键子键失败");
+                    XWARN("物件信息:" + tempnoteptr->toString());
+                }
                 if (comp_done) {
                     // 把组合物件加入集合(组合在此之后失效)
                     auto handle =
                         note_set().add_note(std::move(temp_complex_note));
                     noteUUIDManager.register_new_note(handle);
+                    comp_done = false;
                 }
             } else {
                 // 把物件加入集合(物件在此之后失效)
@@ -354,11 +358,11 @@ void MMap::readImd() {
         // }
 
         // debugmap
-        XINFO("-------全部物件-------");
-        auto note_handles = note_set().get_all_notes_ordered();
-        for (const auto& handle : note_handles) {
-            XINFO(note_set().get_note(handle)->toString());
-        }
+        // XINFO("-------全部物件-------");
+        // auto note_handles = note_set().get_all_notes_ordered();
+        // for (const auto& handle : note_handles) {
+        //     XINFO(note_set().get_note(handle)->toString());
+        // }
     } else {
         XWARN("非.imd格式,读取失败");
     }

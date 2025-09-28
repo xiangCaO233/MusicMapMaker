@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <memory>
 #include <mmm/obj/Hold.hpp>
 #include <mmm/obj/Note.hpp>
@@ -87,7 +88,8 @@ bool Composite::add_child(std::unique_ptr<Note> note) {
                 // 当前组合键结尾是面条
                 if (auto hold = static_cast<Hold*>(end);
                     note->notetype() == NoteType::SLIDE &&
-                    hold->timestamp() + hold->duration() == note->timestamp()) {
+                    std::abs(int64_t(hold->timestamp() + hold->duration()) -
+                             note->timestamp()) < 3) {
                     // 新添加的必须是滑键且时间戳在末尾面条的结尾处
                     success = true;
                 }
@@ -99,7 +101,8 @@ bool Composite::add_child(std::unique_ptr<Note> note) {
                     note->notetype() == NoteType::HOLD &&
                     slide->trackpos() + slide->delta_track() ==
                         note->trackpos() &&
-                    slide->timestamp() == note->timestamp()) {
+                    std::abs(int64_t(slide->timestamp()) - note->timestamp()) <
+                        3) {
                     // 新添加的必须是面条且轨道在滑键的结尾轨道处且时间必须相同
                     success = true;
                 }

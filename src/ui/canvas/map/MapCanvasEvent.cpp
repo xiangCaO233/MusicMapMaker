@@ -157,7 +157,8 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
             }
         } else if (mouseState.area == MouseArea::PREVIEW) {
             // 在预览区内滚动-直接修改预览缩放倍率
-            previewInfo.areaRatio += dy * scrollInfo.staticPreviewScrollRatio *
+            // 反向使向上滑动为放大
+            previewInfo.areaRatio -= dy * scrollInfo.staticPreviewScrollRatio *
                                      scrollInfo.previewScrollRatio;
             // 边缘限制
             if (previewInfo.areaRatio > 10.f) {

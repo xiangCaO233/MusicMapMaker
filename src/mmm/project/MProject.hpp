@@ -8,6 +8,7 @@
 #include <mmm/map/MMap.hpp>
 #include <mmm/project/AudioLoadCallback.hpp>
 #include <mmm/project/MProjectConfig.hpp>
+#include <pugixml.hpp>
 #include <set>
 #include <string>
 
@@ -42,6 +43,12 @@ class MProject {
 
     // 项目配置
     MProjectConfig project_config;
+
+    // 配置文档
+    pugi::xml_document config_doc;
+
+    // 更新配置文档
+    void update_configdoc(bool from_config);
 
     // 项目谱面表(谱面资源持有)
     std::map<std::string, std::unique_ptr<MMap>, std::less<>>
