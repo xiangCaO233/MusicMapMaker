@@ -138,7 +138,7 @@ inline DivisorLineInfo findNearestDivisorLineInDirection(
     int64_t query_time, SearchDirection direction, const BeatInfo& beat_info,
     double tolerance_ms = 5.0) {  // 新增 tolerance_ms 参数
 
-    if (query_time < 0 || beat_info.empty()) {
+    if (beat_info.empty()) {
         return {-1, -1.0, -1, std::numeric_limits<double>::infinity()};
     }
 
