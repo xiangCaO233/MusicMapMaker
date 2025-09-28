@@ -82,17 +82,27 @@ void MapCanvas::connectActions() {
         });
 
     // 保存action
-    connect(
-        FileActionHandler::instance(), &FileActionHandler::save, [thiscp]() {
-            // 直接保存为.mmm
-            if (thiscp->map) {
-                auto defaultName = QString::fromStdString(
-                    thiscp->map->base_metadata().title_unicode + "-" +
-                    std::to_string(thiscp->map->base_metadata().track_count) +
-                    "k-" + thiscp->map->base_metadata().version);
-                qDebug() << "保存文件:" << defaultName;
-            }
-        });
+    connect(FileActionHandler::instance(), &FileActionHandler::save,
+            [thiscp]() {
+                // 直接保存为.mmm
+                if (thiscp->map) {
+                    auto defaultName =
+                        QString::fromStdString(
+                            thiscp->map->base_metadata().title_unicode + "-" +
+                            std::to_string(
+                                thiscp->map->base_metadata().track_count) +
+                            "k-" + thiscp->map->base_metadata().version) +
+                        ".mmm";
+                    auto file =
+                        thiscp->map->base_metadata().map_path.parent_path() /
+                        defaultName.toStdString();
+                    auto fpath = file.generic_string();
+
+                    thiscp->map->writeOut(fpath);
+                    XINFO("保存文件到:" + fpath);
+                }
+            });
+
     // 另存为action
     connect(
         FileActionHandler::instance(), &FileActionHandler::save_as, [thiscp]() {
@@ -107,11 +117,12 @@ void MapCanvas::connectActions() {
                                                  defaultName);
                 if (!file.isEmpty()) {
                     auto fpath = file.toStdString();
+                    thiscp->map->writeOut(fpath);
                     // 保存为文件
-                    qDebug() << "另存为:" << fpath;
+                    XINFO("另存为:" + fpath);
                 } else {
                     // 取消打开
-                    qDebug() << "取消另存为";
+                    XINFO("取消另存为");
                 }
             }
         });
@@ -152,8 +163,7 @@ void MapCanvas::connectActions() {
 
                 if (selected_file != "") {
                     thiscp->map->writeOut(selected_file.toStdString());
-                    qDebug() << "尝试导出到:" << selected_file;
-                    // map->write_to_file(selected_file.toStdString().c_str());
+                    XINFO("尝试导出到:" + selected_file.toStdString());
                 }
             }
         });

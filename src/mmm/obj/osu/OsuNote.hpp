@@ -30,6 +30,11 @@ class OsuNote : public Note, public OsuNoteMetadata {
     // 转化为osu描述
     std::string to_osu_description(int32_t orbit_count) const override;
 
+    // json转换
+    nlohmann::json toJson() const override;
+
+    void fromJson(nlohmann::json& data) override;
+
     // 克隆物件
     std::unique_ptr<Note> clone(const MMap* ref) const override;
 };

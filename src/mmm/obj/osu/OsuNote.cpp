@@ -211,6 +211,20 @@ std::string OsuNote::to_osu_description(int32_t orbit_count) const {
     return oss.str();
 }
 
+// json转换
+nlohmann::json OsuNote::toJson() const {
+    nlohmann::json data;
+    data["type"] = to_string(type);
+    data["time"] = time;
+    data["track"] = track;
+    return data;
+}
+
+void OsuNote::fromJson(nlohmann::json& data) {
+    time = data["time"].get<uint32_t>();
+    track = data["track"].get<uint32_t>();
+}
+
 // 克隆物件
 std::unique_ptr<Note> OsuNote::clone(const MMap* ref) const {
     auto newnote = std::make_unique<OsuNote>(ref);

@@ -5,6 +5,7 @@
 #include <list>
 #include <memory>
 #include <mmm/MetaData.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 enum class NoteType : uint8_t {
     // 普通物件
@@ -70,6 +71,10 @@ class Note {
 
     // 克隆物件
     virtual std::unique_ptr<Note> clone(const MMap* ref) const;
+    // json转换
+    virtual nlohmann::json toJson() const;
+
+    virtual void fromJson(nlohmann::json& data);
 
    protected:
     // 设置类型

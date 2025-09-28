@@ -161,6 +161,25 @@ std::string OsuHold::to_osu_description(int32_t orbit_count) const {
     return oss.str();
 }
 
+// json转换
+nlohmann::json OsuHold::toJson() const {
+    nlohmann::json data;
+    data["type"] = to_string(notetype());
+    data["time"] = timestamp();
+    data["track"] = trackpos();
+    auto& notedata = data["data"];
+    notedata["duration"] = duration_time;
+    return data;
+}
+
+void OsuHold::fromJson(nlohmann::json& data) {
+    set_notetype(NoteType::HOLD);
+    set_timestamp(data["time"].get<uint32_t>());
+    set_trackpos(data["track"].get<uint32_t>());
+    auto& notedata = data["data"];
+    duration_time = notedata["duration"];
+}
+
 // 克隆物件
 std::unique_ptr<Note> OsuHold::clone(const MMap* ref) const {
     auto new_note_data = std::make_unique<OsuHold>(ref);

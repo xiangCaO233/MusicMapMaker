@@ -125,7 +125,7 @@ void MMap::readOsu() {
         basemeta.map_path = std::filesystem::absolute(basemeta.map_path);
     }
     auto fname = basemeta.map_path.filename();
-    qDebug() << "路径:" << basemeta.map_path.string();
+    XINFO("路径:" + basemeta.map_path.string());
     if (basemeta.map_path.extension() == ".osu") {
         // XINFO("load_osu:" + p.extension().string());
         std::ifstream ifs(basemeta.map_path);

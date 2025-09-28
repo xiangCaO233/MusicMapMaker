@@ -2,6 +2,7 @@
 #define MMM_SLIDE_HPP
 
 #include <mmm/obj/Note.hpp>
+#include <nlohmann/json.hpp>
 
 class Slide : public Note {
    public:
@@ -25,6 +26,25 @@ class Slide : public Note {
 
     // 设置dtrack
     inline void set_track_orbit(int64_t delta_track) { dtrack = delta_track; }
+
+    // json转换
+    nlohmann::json toJson() const override {
+        nlohmann::json data;
+        data["type"] = to_string(notetype());
+        data["time"] = timestamp();
+        data["track"] = trackpos();
+        auto& notedata = data["data"];
+        notedata["delta-track"] = dtrack;
+        return data;
+    };
+
+    void fromJson(nlohmann::json& data) override {
+        set_notetype(NoteType::SLIDE);
+        set_timestamp(data["time"].get<uint32_t>());
+        set_trackpos(data["track"].get<uint32_t>());
+        auto& notedata = data["data"];
+        set_track_orbit(notedata["delta-track"]);
+    };
 
     // 克隆物件
     std::unique_ptr<Note> clone(const MMap* ref) const override {

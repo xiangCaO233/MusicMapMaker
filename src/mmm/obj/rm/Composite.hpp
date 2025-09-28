@@ -37,6 +37,11 @@ class Composite : public Note {
     // 设置轨道
     void set_trackpos(uint32_t o) override;
 
+    // json转换
+    virtual nlohmann::json toJson() const override;
+
+    virtual void fromJson(nlohmann::json& data) override;
+
     // 克隆物件
     std::unique_ptr<Note> clone(const MMap* ref) const override;
 

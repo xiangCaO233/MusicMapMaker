@@ -30,15 +30,14 @@ void MProject::open(std::string_view project_path_str) {
         // 在这直接调用纹理池回调载入文件夹内全部纹理
         texcallback->need_loadtexture_dir(project_path.generic_string());
 
-        for (auto it =
-                 std::filesystem::recursive_directory_iterator(project_path);
-             it != std::filesystem::recursive_directory_iterator(); ++it) {
+        for (auto it = std::filesystem::directory_iterator(project_path);
+             it != std::filesystem::directory_iterator(); ++it) {
             auto filename = it->path().generic_string();
             if (filename.ends_with(".png") || filename.ends_with(".jpg")) {
                 project_image_table.insert(filename);
-            } else if (
-                // filename.ends_with(".mmm") ||
-                filename.ends_with(".imd") || filename.ends_with(".osu")) {
+            } else if (filename.ends_with(".mmm") ||
+                       filename.ends_with(".imd") ||
+                       filename.ends_with(".osu")) {
                 // 载入谱面
                 XINFO("需要载入谱面[" + filename + "]");
                 auto map = std::make_unique<MMap>(filename);

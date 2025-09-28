@@ -25,7 +25,7 @@ class ProjectConfig : public QWidget {
 
    public slots:
     // 绑定配置
-    void bind_config(MProject *cfg) const;
+    void bind_config(MProject *cfg);
 
    signals:
     void layout_changed();
@@ -45,6 +45,8 @@ class ProjectConfig : public QWidget {
     void on_object_height_scale_slider_valueChanged(int value);
 
     void on_judgeline_pos_slider_valueChanged(int value);
+
+    void on_project_name_edit_textEdited(const QString &arg1);
 
    private:
     Ui::ProjectConfig *ui;

@@ -61,7 +61,7 @@ class NoteMetadata {
     virtual ~NoteMetadata() = default;
 
     // 元数据类型
-    NoteMetadataType type;
+    NoteMetadataType meta_type;
 
     // 统一通用属性表(来源-[属性名-属性值])
     std::unordered_map<NoteMetadataType,

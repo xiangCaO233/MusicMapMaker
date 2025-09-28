@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 
 enum class TimingType {
@@ -39,6 +40,25 @@ class Timing {
 
     ///< 拍长(ms)或滑条速度倍率(负值)
     double beat_length{0};
+
+    // json转换
+    virtual nlohmann::json toJson() const {
+        nlohmann::json timing_json;
+        timing_json["time"] = timestamp;
+        timing_json["bpm"] = bpm;
+        timing_json["isbase"] = is_base_timing;
+        timing_json["beatlength"] = beat_length;
+        // TODO(xiang 2025-05-19): timing的元数据实现和保存
+        return timing_json;
+    };
+
+    virtual void toJson(nlohmann::json& data) {
+        timestamp = data["time"].get<uint32_t>();
+        bpm = data["bpm"].get<double>();
+        beat_length = data["beatlength"].get<double>();
+        is_base_timing = data["isbase"].get<bool>();
+        // TODO(xiang 2025-05-19): timing的元数据实现和保存
+    };
 
     virtual std::unique_ptr<Timing> clone() const {
         auto newTiming = std::make_unique<Timing>();

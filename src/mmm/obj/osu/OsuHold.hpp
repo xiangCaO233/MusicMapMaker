@@ -23,6 +23,11 @@ class OsuHold : public Hold, public OsuNoteMetadata {
     void from_osu_description(const std::vector<std::string>& description,
                               int32_t orbit_count) override;
 
+    // json转换
+    nlohmann::json toJson() const override;
+
+    void fromJson(nlohmann::json& data) override;
+
     // 转化为osu描述
     std::string to_osu_description(int32_t orbit_count) const override;
 };

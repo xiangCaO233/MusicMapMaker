@@ -1,5 +1,7 @@
+#include <cstdint>
 #include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Slide.hpp>
+#include <nlohmann/json.hpp>
 
 // 打印用
 std::string Note::toString() const {
@@ -9,6 +11,20 @@ std::string Note::toString() const {
     ss << "  Time: " << time << "\n";
     ss << "  Track: " << track << "\n";
     return ss.str();
+}
+
+// json转换
+nlohmann::json Note::toJson() const {
+    nlohmann::json data;
+    data["type"] = to_string(type);
+    data["time"] = time;
+    data["track"] = track;
+    return data;
+}
+
+void Note::fromJson(nlohmann::json& data) {
+    time = data["time"].get<uint32_t>();
+    track = data["track"].get<uint32_t>();
 }
 
 // 从滑键转换

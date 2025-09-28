@@ -1,7 +1,11 @@
+#include <memory>
 #include <mmm/obj/Hold.hpp>
 #include <mmm/obj/Note.hpp>
 #include <mmm/obj/rm/Composite.hpp>
 #include <mmm/obj/rm/Slide.hpp>
+#include <nlohmann/json_fwd.hpp>
+#include <string>
+#include <utility>
 
 // 打印用
 std::string Composite::toString() const {
@@ -31,6 +35,40 @@ std::string Composite::toString() const {
     }
 
     return ss.str();
+}
+
+// json转换
+nlohmann::json Composite::toJson() const {
+    nlohmann::json data;
+    data["type"] = to_string(type);
+    data["time"] = time;
+    data["track"] = track;
+    auto& notedata = data["data"];
+    auto index{0};
+    for (const auto& child : child_notes) {
+        notedata[index] = child->toJson();
+        ++index;
+    }
+    return data;
+}
+
+void Composite::fromJson(nlohmann::json& data) {
+    type = NoteType::COMPOSITE;
+    time = data["time"].get<uint32_t>();
+    track = data["track"].get<uint32_t>();
+    auto& notedata = data["data"];
+    for (auto& child_data : notedata) {
+        auto child_type = child_data["type"].get<std::string>();
+        if (child_type == "SLIDE") {
+            auto child_note = std::make_unique<Slide>(map_ref);
+            child_note->fromJson(child_data);
+            add_child(std::move(child_note));
+        } else if (child_type == "HOLD") {
+            auto child_note = std::make_unique<Hold>(map_ref);
+            child_note->fromJson(child_data);
+            add_child(std::move(child_note));
+        }
+    }
 }
 
 // 添加子物件

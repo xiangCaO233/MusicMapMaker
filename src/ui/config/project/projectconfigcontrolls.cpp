@@ -3,6 +3,11 @@
 
 #include <mmm/project/MProjectConfig.hpp>
 
+void ProjectConfig::on_project_name_edit_textEdited(const QString &arg1) {
+    // 更新项目名
+    config->project_name = arg1.toStdString();
+}
+
 void ProjectConfig::on_toppos_spinner_valueChanged(double arg1) {
     config->canvas_config.canvas_layout.x = arg1;
     emit layout_changed();
