@@ -11,6 +11,15 @@ void EditorActions::createActions() {
                                  {QKeySequence::fromString("Space"),
                                   QKeySequence::fromString("Shift+Space")});
 
+    action_manager->createAction("canvas.switchhandtool", tr("HandTool"),
+                                 {QKeySequence::fromString("1")});
+
+    action_manager->createAction("canvas.switchnotetool", tr("NoteTool"),
+                                 {QKeySequence::fromString("2")});
+    // mutil::set_toolbutton_svgcolor(note_mode_button, "://icons/edit.svg",
+    // color,
+    //                                16, 16);
+
     action_manager->createAction("canvas.cancel", tr("Cancel"),
                                  QKeySequence::Cancel);
 

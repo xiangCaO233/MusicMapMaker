@@ -17,12 +17,13 @@
 #include <util/mutil.hpp>
 #include <utility>
 
-void TimingManager::onMapUpdated(MProject *project, MMap *map) {
+void TimingManager::onMapUpdated(MProject* project, MMap* map) {
     if (map_ref == map) return;
 
     // 如果存在旧的map，断开与其编辑器的连接
     if (map_ref) {
-        disconnect(map_ref->editor(), &MMapEditor::timingMapUpdated, this,
+        auto editor = map_ref->editor();
+        disconnect(editor.get(), &MMapEditor::timingMapUpdated, this,
                    &TimingManager::refreshTableFromMap);
     }
 
@@ -30,7 +31,8 @@ void TimingManager::onMapUpdated(MProject *project, MMap *map) {
 
     // 连接到新map的编辑器
     if (map_ref) {
-        connect(map_ref->editor(), &MMapEditor::timingMapUpdated, this,
+        auto editor = map_ref->editor();
+        connect(editor.get(), &MMapEditor::timingMapUpdated, this,
                 &TimingManager::refreshTableFromMap);
     }
 
@@ -39,7 +41,7 @@ void TimingManager::onMapUpdated(MProject *project, MMap *map) {
 }
 
 // 添加一个新timing行
-void TimingManager::addNewTimingRowItem(MMap *map, Timing *newTiming) {
+void TimingManager::addNewTimingRowItem(MMap* map, Timing* newTiming) {
     // 创建行
     auto item = new TimingRowItem(map, newTiming, ui->timing_table_widget,
                                   timeInputValidator, parameterInputValidator);
@@ -49,7 +51,7 @@ void TimingManager::addNewTimingRowItem(MMap *map, Timing *newTiming) {
     // 跳转到timing点按钮
     connect(
         item->timeEditWgt, &TimeEditWidget::gotoTiming,
-        [this_cp](Timing *timing) { emit this_cp->navigateToTiming(timing); });
+        [this_cp](Timing* timing) { emit this_cp->navigateToTiming(timing); });
 
     // 完成编辑按钮和删除按钮
     connect(
@@ -113,9 +115,9 @@ void TimingManager::refreshTableFromMap() {
     }
 
     // --- 从 MMap 重新加载数据到 allTimingRowItems ---
-    auto &timings = map_ref->timing_set().get_all_timing_points();
-    for (const auto &[time, timing_vec] : timings) {
-        for (const auto &timing : timing_vec) {
+    auto& timings = map_ref->timing_set().get_all_timing_points();
+    for (const auto& [time, timing_vec] : timings) {
+        for (const auto& timing : timing_vec) {
             addNewTimingRowItem(map_ref, timing.get());
         }
     }
@@ -152,7 +154,7 @@ void TimingManager::sortAndRebuildTable() {
 
     // 对“UI组件管理器”列表进行排序
     std::sort(allTimingRowItems.begin(), allTimingRowItems.end(),
-              [](const TimingRowItem *a, const TimingRowItem *b) {
+              [](const TimingRowItem* a, const TimingRowItem* b) {
                   // --- 优先级 1: 按时间戳升序排序 ---
                   if (a->timing->timestamp != b->timing->timestamp) {
                       return a->timing->timestamp < b->timing->timestamp;
@@ -173,7 +175,7 @@ void TimingManager::sortAndRebuildTable() {
     // 我们也不需要 blockSignals，因为 refreshTableFromMap 也可以处理。
 
     for (int i = 0; i < allTimingRowItems.size(); ++i) {
-        TimingRowItem *item = allTimingRowItems.at(i);
+        TimingRowItem* item = allTimingRowItems.at(i);
 
         // 插入新行
         ui->timing_table_widget->insertRow(i);

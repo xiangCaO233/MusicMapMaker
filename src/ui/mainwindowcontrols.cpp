@@ -1,14 +1,17 @@
 #include <audio/track/trackmanager.h>
+#include <colorful-log.h>
 #include <mainwindow.h>
 #include <project/projectmanager.h>
 #include <qobjectdefs.h>
 #include <ui_mainwindow.h>
 
+#include <QActionGroup>
 #include <action/ActionManager.hpp>
 #include <action/modules/canvas/EditorActionHandler.hpp>
 #include <action/modules/canvas/EditorActions.hpp>
 #include <action/modules/file/FileActionHandler.hpp>
 #include <action/modules/file/FileActions.hpp>
+#include <map/MapCanvas.hpp>
 
 // 初始化所有的action
 void MainWindow::initActions() {
@@ -40,6 +43,10 @@ void MainWindow::initActions() {
     auto editHandler = EditorActionHandler::instance();
     am->connectCommand("canvas.pause_or_resume", editHandler,
                        SLOT(onPause_Resume()));
+    am->connectCommand("canvas.switchhandtool", editHandler,
+                       SLOT(onSwitch_Handtool()));
+    am->connectCommand("canvas.switchnotetool", editHandler,
+                       SLOT(onSwitch_Notetool()));
     am->connectCommand("canvas.cancel", editHandler, SLOT(onCancel()));
     am->connectCommand("canvas.selectpage", editHandler, SLOT(onSelectPage()));
     am->connectCommand("canvas.selectall", editHandler, SLOT(onSelectAll()));
@@ -52,6 +59,43 @@ void MainWindow::initActions() {
     am->connectCommand("canvas.find", editHandler, SLOT(onFind()));
 
     ui->menuEdit_E->addAction(am->getAction("canvas.pause_or_resume"));
+
+    // 创建并填充 "切换工具" 子菜单
+    // 给子菜单指定一个父对象(ui->menuEdit_E)，Qt会负责它的内存管理
+    QMenu *toolsMenu = new QMenu(tr("Switch Tool"), ui->menuEdit_E);
+    auto handToolAction = am->getAction("canvas.switchhandtool");
+    auto noteToolAction = am->getAction("canvas.switchnotetool");
+    // 切换工具action
+    MapCanvas *canvas = ui->editor->canvas();
+    auto editui = ui->editor;
+    connect(editHandler, &EditorActionHandler::switch_handtool,
+            [canvas, editui]() {
+                canvas->use_tool("Hand");
+                editui->updateModeMenuIcon("canvas.switchhandtool");
+                XINFO("切换hand工具");
+            });
+    connect(editHandler, &EditorActionHandler::switch_notetool,
+            [canvas, editui]() {
+                canvas->use_tool("Note");
+                editui->updateModeMenuIcon("canvas.switchnotetool");
+                XINFO("切换note工具");
+            });
+
+    // 使用 Action Group 来管理工具的互斥状态
+    QActionGroup *toolActionGroup = new QActionGroup(toolsMenu);
+    toolActionGroup->setExclusive(true);
+    handToolAction->setCheckable(true);
+    noteToolAction->setCheckable(true);
+    toolActionGroup->addAction(handToolAction);
+    toolActionGroup->addAction(noteToolAction);
+    handToolAction->setChecked(true);  // 设置一个默认选中的工具
+
+    toolsMenu->addAction(handToolAction);
+    toolsMenu->addAction(noteToolAction);
+
+    // 将子菜单添加到主菜单中
+    ui->menuEdit_E->addMenu(toolsMenu);
+
     ui->menuEdit_E->addAction(am->getAction("canvas.cancel"));
     ui->menuEdit_E->addSeparator();
     ui->menuEdit_E->addAction(am->getAction("canvas.selectpage"));

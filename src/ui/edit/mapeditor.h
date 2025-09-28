@@ -1,9 +1,10 @@
 #ifndef MAPEDITOR_H
 #define MAPEDITOR_H
 
+#include <qtoolbutton.h>
+
 #include <GlobalSettings.hpp>
 #include <QButtonGroup>
-#include <QPushButton>
 #include <QWidget>
 
 namespace Ui {
@@ -26,6 +27,10 @@ class MapEditor : public QWidget {
     // 使用主题
     void use_theme(GlobalTheme theme);
 
+    void bindToolActions();
+
+    void updateModeMenuIcon(const QString &actionname);
+
    protected:
     void keyPressEvent(QKeyEvent *e) override;
     void keyReleaseEvent(QKeyEvent *e) override;
@@ -40,10 +45,9 @@ class MapEditor : public QWidget {
    private:
     Ui::MapEditor *ui;
 
-    // 模式按钮组
-    QButtonGroup *modesbuttonGroup;
-    QPushButton *hand_mode_button;
-    QPushButton *note_mode_button;
+    // 模式按钮
+    QToolButton *hand_mode_button;
+    QToolButton *note_mode_button;
 
     void initializeMenus();
     void initializeToolsMenu();

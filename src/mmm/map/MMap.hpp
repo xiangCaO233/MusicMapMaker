@@ -54,7 +54,7 @@ class MMap : public QObject {
     void register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue);
 
     // 访问对应的谱面编辑器
-    MMapEditor* editor() { return mapeditor.get(); }
+    std::shared_ptr<MMapEditor> editor() { return mapeditor; }
 
     // 设置主音轨
     void set_maintrack(const std::shared_ptr<ice::AudioTrack>& track);
@@ -86,7 +86,7 @@ class MMap : public QObject {
     BaseMapMeta basemeta;
 
     // 一对一编辑器
-    std::unique_ptr<MMapEditor> mapeditor{nullptr};
+    std::shared_ptr<MMapEditor> mapeditor{nullptr};
 
     // 项目引用
     MProject* project_ref;

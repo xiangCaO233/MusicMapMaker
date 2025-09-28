@@ -20,6 +20,7 @@ class MeshGenerateSystem {
     int track_count;
     uint32_t maplength;
     float judgeline_absolute_y;
+    float judgeline_pos_in_previewarea;
     float single_track_width;
     QSizeF canvas_size;
     float canvas_height;
@@ -31,11 +32,10 @@ class MeshGenerateSystem {
     const TimePixelConverter* converter;
     const entt::registry* registry;
     std::unordered_map<entt::entity, GeneratedMesh>* generated_meshes;
-
     MapAxis relative_delta_axis;
 
     // 转化像素位置到谱面坐标系
-    MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
+    MapAxis getPixelMapAxis(const glm::vec2& pixel, bool is_preview) const {
         MapAxis axis;
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
@@ -99,6 +99,29 @@ class MeshGenerateSystem {
         presentation_canvas_time =
             info->realTimeInfo.current_time_info.presentation_canvas_time;
         maplength = info->editorInfo.map->base_metadata().map_length;
+        const auto& editor_info = info->editorInfo;
+        const auto& base_info = info->baseInfo;
+        const float canvas_height = base_info.canvasSize.height();
+
+        // 预览区相对主轨道的倍率
+        auto maintrackpos_inpreview_area_ratio =
+            editor_info.previewAreaInfo.areaRatio;
+        // 主轨道在预览区中的高度
+        auto maintrack_size_inpreview =
+            canvas_height / maintrackpos_inpreview_area_ratio;
+        // 主轨道中心在预览区中的倍率
+        auto maintrackpos_inpreview_area =
+            editor_info.previewAreaInfo.mainAreaPos;
+        // 主轨道中心在预览区中的位置
+        auto maintrack_center_inpreview =
+            maintrackpos_inpreview_area * canvas_height;
+        // 主轨道顶部在预览区中的位置
+        auto maintrack_top_inpreview =
+            maintrack_center_inpreview - maintrack_size_inpreview / 2.f;
+        // 主轨道判定线在预览区中的位置
+        judgeline_pos_in_previewarea =
+            maintrack_top_inpreview +
+            (1.f - editor_info.judgeline_pos) * maintrack_size_inpreview;
 
         // 生成物件的网格组件
         // const auto& realtime_info = info->realTimeInfo;
@@ -237,7 +260,7 @@ class MeshGenerateSystem {
                 if (drageed_entities.size() > 1) {
                     // 拖动多个时无论何部位均为移动
                     // 计算此时鼠标最近的轨道
-                    auto current_mouse_axis = getPixelMapAxis(mousePos);
+                    auto current_mouse_axis = getPixelMapAxis(mousePos, false);
 
                     // 验证目标鼠标位置更新
                     auto validity = current_mouse_axis.time >= 0 &&
@@ -292,7 +315,8 @@ class MeshGenerateSystem {
                         !buttons.testFlag(Qt::RightButton)) {
                         // 若为头则计算此时鼠标最近的分拍线时间作为物件时间
                         // 计算此时鼠标最近的轨道
-                        auto current_mouse_axis = getPixelMapAxis(mousePos);
+                        auto current_mouse_axis =
+                            getPixelMapAxis(mousePos, false);
 
                         // 验证更新
                         auto validity = current_mouse_axis.time >= 0 &&
@@ -406,9 +430,9 @@ class MeshGenerateSystem {
         if (registry->all_of<HoldComponent>(e)) {
             HoldMeshGenerator holdMeshGenerator(
                 all_tracks_rect, track_count, judgeline_absolute_y,
-                single_track_width, canvas_height, presentation_canvas_time,
-                hovered_info, info, tool_interaction_state, converter,
-                registry);
+                judgeline_pos_in_previewarea, single_track_width, canvas_height,
+                presentation_canvas_time, hovered_info, info,
+                tool_interaction_state, converter, registry);
             // 检查是否为子物件-区分尾部绘制的是节点还是面尾
             // 默认使用面尾渲染
             auto tail = HoldMeshGenerator::HoldTailType::GENERAL;
@@ -427,9 +451,9 @@ class MeshGenerateSystem {
         } else if (registry->all_of<FlickComponent>(e)) {
             SlideMeshGenerator slideMeshGenerator(
                 all_tracks_rect, track_count, judgeline_absolute_y,
-                single_track_width, canvas_height, presentation_canvas_time,
-                hovered_info, info, tool_interaction_state, converter,
-                registry);
+                judgeline_pos_in_previewarea, single_track_width, canvas_height,
+                presentation_canvas_time, hovered_info, info,
+                tool_interaction_state, converter, registry);
             auto tail = SlideMeshGenerator::SlideTailType::GENERAL;
             if (registry->all_of<ChildOfComponent>(e)) {
                 // 若滑键是组合键中的子物件-切换为节点作为滑尾渲染

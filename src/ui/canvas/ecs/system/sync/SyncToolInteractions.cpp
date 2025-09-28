@@ -227,7 +227,7 @@ void updateSelections(entt::registry& registry, ToolSystem* toolSystem,
 // 处理所有工具指令
 void processToolCommands(entt::registry& registry,
                          ThreadSafeQueue<ToolCommand>* toolCmdQ,
-                         ToolSystem* system, MMapEditor* editor,
+                         ToolSystem* system, std::shared_ptr<MMapEditor> editor,
                          ToolInteractionState* toolInteractionState, MMap* map,
                          MapCanvasInfo* info,
                          const TimePixelConverter& maintrack_converter,

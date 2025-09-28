@@ -14,6 +14,19 @@ void EditorActionHandler::onPause_Resume() {
     emit pause_or_resume_canvas();
     XINFO("触发暂停/恢复");
 }
+
+void EditorActionHandler::onSwitch_Handtool() {
+    //
+    emit switch_handtool();
+    XINFO("触发切换到Hand工具");
+}
+
+void EditorActionHandler::onSwitch_Notetool() {
+    //
+    emit switch_notetool();
+    XINFO("触发切换到Note工具");
+}
+
 void EditorActionHandler::onCancel() {
     //
     XINFO("触发取消");

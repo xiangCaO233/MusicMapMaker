@@ -17,6 +17,8 @@ class EditorActionHandler : public QObject {
 
    signals:
     void pause_or_resume_canvas();
+    void switch_handtool();
+    void switch_notetool();
     void cut();
     void copy();
     void paste();
@@ -26,6 +28,8 @@ class EditorActionHandler : public QObject {
 
    public slots:
     void onPause_Resume();
+    void onSwitch_Handtool();
+    void onSwitch_Notetool();
     void onCancel();
 
     void onSelectPage();

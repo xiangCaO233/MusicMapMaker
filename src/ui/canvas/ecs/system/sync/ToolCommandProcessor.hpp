@@ -527,6 +527,8 @@ class ToolCommandProcessor {
                     mapEditor.moveNotes(notes_to_move);
                 }
             }
+        } else {
+            // 恢复位置-不做修改
         }
 
         // 无论如何，都结束拖拽状态

@@ -774,10 +774,10 @@ inline void set_toolbutton_svgcolor(QToolButton* button, const char* svgpath,
 }
 
 inline void set_action_svgcolor(QAction* action, const char* svgpath,
-                                QColor& color) {
+                                QColor& color, int32_t w, int32_t h) {
     // 创建QPixmap
     QPixmap pixmap;
-    QSize size(28, 28);
+    QSize size(w, h);
     get_colored_icon_pixmap(pixmap, svgpath, color, size);
 
     // 设置图标

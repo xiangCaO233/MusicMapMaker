@@ -40,7 +40,7 @@ void MMap::writeOut(const std::string& file) {
 void MMap::register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue) {
     if (!mapeditor) {
         // 初始化对应编辑器
-        mapeditor = std::make_unique<MMapEditor>(this, editEventQueue);
+        mapeditor = std::make_shared<MMapEditor>(this, editEventQueue);
     }
 
     auto mapeditor_ref = mapeditor.get();

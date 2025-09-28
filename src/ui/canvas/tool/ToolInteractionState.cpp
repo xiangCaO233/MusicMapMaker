@@ -93,6 +93,7 @@ void ToolInteractionState::endDrag() {
     m_dragState.mode = DragMode::None;
     m_dragState.drag_start_hit = {};
     m_dragState.dragged_entitiesWithRes.clear();
+    rebuildAggregatedSelection();
 }
 
 void ToolInteractionState::setDragValidity(bool isValid) {

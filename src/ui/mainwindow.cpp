@@ -6,6 +6,7 @@
 #include <ui_mainwindow.h>
 
 #include <QFile>
+#include <action/ActionManager.hpp>
 #include <canvas/map/MapCanvas.hpp>
 #include <mmm/map/MMap.hpp>
 #include <mmm/obj/Note.hpp>
@@ -31,6 +32,10 @@ MainWindow::MainWindow(QWidget* parent)
     connectAll();
 
     initActions();
+
+    use_theme(GlobalTheme::COLIN_DARK);
+
+    ui->editor->bindToolActions();
 }
 
 MainWindow::~MainWindow() {
@@ -85,8 +90,8 @@ void MainWindow::connectAll() {
 
 // 使用主题
 void MainWindow::use_theme(GlobalTheme theme) {
-    // current_theme = theme;
-    // settings.global_theme = theme;
+    current_theme = theme;
+    settings.theme = theme;
     QColor button_icon_color;
     switch (theme) {
         case GlobalTheme::OPEN_DARK: {
@@ -127,6 +132,15 @@ void MainWindow::use_theme(GlobalTheme theme) {
         }
     }
     ui->editor->use_theme(theme);
+
+    // actions 的图标
+    auto am = ActionManager::instance();
+
+    mutil::set_action_svgcolor(am->getAction("canvas.switchhandtool"),
+                               "://icons/hand-rock.svg", button_icon_color, 16,
+                               16);
+    mutil::set_action_svgcolor(am->getAction("canvas.switchnotetool"),
+                               "://icons/edit.svg", button_icon_color, 16, 16);
 }
 
 // 更新标题后缀

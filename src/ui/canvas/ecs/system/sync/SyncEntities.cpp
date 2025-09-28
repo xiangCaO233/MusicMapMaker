@@ -1,6 +1,7 @@
 #include <ecs/component/RelationComponents.hpp>
 #include <ecs/system/sync/SyncSystem.hpp>
 #include <layer/MapLayerManager.hpp>
+#include <string>
 
 // 创建拍实体
 entt::entity createBeatEntity(entt::registry& registry, const Beat* beat) {
@@ -393,8 +394,11 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     // 更新InMainTrackComponent
     auto notes_view = registry.view<NoteComponent, TimeComponent>();
     for (const auto& e : notes_view) {
-        if (toolInteractionState->isSelected(e)) {
+        if (toolInteractionState->isSelected(e) ||
+            drag_info.dragged_entitiesWithRes.contains(e)) {
             registry.emplace<InMaintrackComponent>(e);
+            XINFO("[" + std::to_string(static_cast<uint32_t>(e)) +
+                  "]为选中或拖动中实体/保持标记");
             continue;
         }
         const auto& time = notes_view.get<TimeComponent>(e);

@@ -15,6 +15,7 @@ class SlideMeshGenerator {
     glm::vec4 all_tracks_rect;
     int track_count;
     float judgeline_absolute_y;
+    float judgeline_absolute_y_in_preview;
     float single_track_width;
     float canvas_height;
     double presentation_canvas_time;
@@ -26,8 +27,10 @@ class SlideMeshGenerator {
 
    public:
     SlideMeshGenerator(const glm::vec4& all_tracks_rect, int track_count,
-                       float judgeline_absolute_y, float single_track_width,
-                       float canvas_height, double presentation_canvas_time,
+                       float judgeline_absolute_y,
+                       float judgeline_absolute_y_in_preview,
+                       float single_track_width, float canvas_height,
+                       double presentation_canvas_time,
                        std::optional<MeshPartInfo> hovered_info,
                        MapCanvasInfo* info,
                        ToolInteractionState* tool_interaction_state,
@@ -36,6 +39,7 @@ class SlideMeshGenerator {
         : all_tracks_rect(all_tracks_rect),
           track_count(track_count),
           judgeline_absolute_y(judgeline_absolute_y),
+          judgeline_absolute_y_in_preview(judgeline_absolute_y_in_preview),
           single_track_width(single_track_width),
           canvas_height(canvas_height),
           presentation_canvas_time(presentation_canvas_time),
@@ -58,7 +62,7 @@ class SlideMeshGenerator {
         return texinfo;
     }
     // 转化像素位置到谱面坐标系
-    MapAxis getPixelMapAxis(const glm::vec2& pixel) const {
+    MapAxis getPixelMapAxis(const glm::vec2& pixel, bool is_preview) const {
         MapAxis axis;
         auto map = info->editorInfo.map;
         auto& beat_timeline = map->beat_timeline();
@@ -137,29 +141,31 @@ class SlideMeshGenerator {
                        0.5f) *
                           single_track_width;
 
-        // --------------------滑尾拖动交互--------------------------
-        // 判断是否在拖动滑动尾-更新滑键轨道差值
-        auto drag_info = tool_interaction_state->getDragState();
-        if (drag_info.dragged_entitiesWithRes.contains(e) &&
-            drag_info.drag_start_hit.part == NotePart::SLIDE_END) {
-            auto mousePressPos =
-                tool_interaction_state->getMousePressPos(Qt::LeftButton);
-            auto mousePos = tool_interaction_state->getCurrentMousePos();
-            auto end_axis = getPixelMapAxis(mousePos);
-            // 验证合法性
-            auto validity =
-                end_axis.track <
-                    info->editorInfo.map->base_metadata().track_count &&
-                end_axis.track != thistrack && end_axis.track >= 0;
-            // qDebug() << "headtime:" << time;
-            // qDebug() << "endtime:" << end_axis.time;
+        if (!is_preview) {
+            // --------------------滑尾拖动交互--------------------------
+            // 判断是否在拖动滑动尾-更新滑键轨道差值
+            auto drag_info = tool_interaction_state->getDragState();
+            if (drag_info.dragged_entitiesWithRes.contains(e) &&
+                drag_info.drag_start_hit.part == NotePart::SLIDE_END) {
+                auto mousePressPos =
+                    tool_interaction_state->getMousePressPos(Qt::LeftButton);
+                auto mousePos = tool_interaction_state->getCurrentMousePos();
+                auto end_axis = getPixelMapAxis(mousePos, is_preview);
+                // 验证合法性
+                auto validity =
+                    end_axis.track <
+                        info->editorInfo.map->base_metadata().track_count &&
+                    end_axis.track != thistrack && end_axis.track >= 0;
+                // qDebug() << "headtime:" << time;
+                // qDebug() << "endtime:" << end_axis.time;
 
-            tool_interaction_state->setDragValidity(validity);
-            drag_info = tool_interaction_state->getDragState();
-            if (drag_info.is_valid) {
-                // 使用实时鼠标位置计算面条持续时间
-                delta_track = end_axis.track - thistrack;
-                tool_interaction_state->setDragValidRes(e, end_axis);
+                tool_interaction_state->setDragValidity(validity);
+                drag_info = tool_interaction_state->getDragState();
+                if (drag_info.is_valid) {
+                    // 使用实时鼠标位置计算面条持续时间
+                    delta_track = end_axis.track - thistrack;
+                    tool_interaction_state->setDragValidRes(e, end_axis);
+                }
             }
         }
 

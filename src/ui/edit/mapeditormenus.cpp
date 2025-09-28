@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QSlider>
 #include <QWidgetAction>
+#include <action/ActionManager.hpp>
 #include <canvas/info/MapCanvasInfo.hpp>
 
 void MapEditor::initializeMenus() {
@@ -12,53 +13,44 @@ void MapEditor::initializeMenus() {
     initializeBgMenu();
 }
 
-enum class ToolType : int32_t {
-    HAND = 0,
-    NOTE = 1,
-};
+void MapEditor::bindToolActions() {
+    // 获取action
+    auto am = ActionManager::instance();
+    QAction *handToolAction = am->getAction("canvas.switchhandtool");
+    QAction *noteToolAction = am->getAction("canvas.switchnotetool");
+    hand_mode_button->setDefaultAction(handToolAction);
+    note_mode_button->setDefaultAction(noteToolAction);
+}
 
+void MapEditor::updateModeMenuIcon(const QString &actionname) {
+    auto am = ActionManager::instance();
+    QAction *action = am->getAction(actionname);
+    ui->edit_toolsbutton->setIcon(action->icon());
+}
 //
 //
 // 工具选择按钮
 //
 //
 void MapEditor::initializeToolsMenu() {
-    // 创建菜单
-    auto c = canvas();
-    auto mapinfo = c->info<MapCanvasInfo>();
-
     // 模式选择按钮
     auto modemenu = new QMenu(ui->edit_toolsbutton);
     auto custommodemenuwidget = new QWidget();
 
-    // 创建按钮组
-    modesbuttonGroup = new QButtonGroup(this);
-    // 设置独占模式（单选）
-    modesbuttonGroup->setExclusive(true);
-
     // 创建子模式按钮
-    hand_mode_button = new QPushButton;
-    note_mode_button = new QPushButton;
+    hand_mode_button = new QToolButton();
+    note_mode_button = new QToolButton();
 
     // 初始化按钮类型尺寸
-    hand_mode_button->setFlat(true);
+    hand_mode_button->setAutoRaise(true);
     hand_mode_button->setCheckable(true);
     hand_mode_button->setMinimumSize(QSize(24, 24));
     hand_mode_button->setMaximumSize(QSize(24, 24));
-    hand_mode_button->setToolTip(tr("Hand Tool"));
 
-    note_mode_button->setFlat(true);
+    note_mode_button->setAutoRaise(true);
     note_mode_button->setCheckable(true);
     note_mode_button->setMinimumSize(QSize(24, 24));
     note_mode_button->setMaximumSize(QSize(24, 24));
-    note_mode_button->setToolTip(tr("Note Tool"));
-
-    // 将按钮添加到按钮组
-    // 第二个参数是按钮ID
-    modesbuttonGroup->addButton(hand_mode_button,
-                                static_cast<int32_t>(ToolType::HAND));
-    modesbuttonGroup->addButton(note_mode_button,
-                                static_cast<int32_t>(ToolType::NOTE));
 
     // 布局
     QVBoxLayout *modemenulayout = new QVBoxLayout;
@@ -73,29 +65,28 @@ void MapEditor::initializeToolsMenu() {
     hand_mode_button->setChecked(true);
 
     auto mode_toolbutton = ui->edit_toolsbutton;
-    auto group = modesbuttonGroup;
 
     // 监听选中按钮变化
-    connect(modesbuttonGroup,
-            QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
-            [=](QAbstractButton *button) {
-                // 切换工具按钮的图标
-                mode_toolbutton->setIcon(button->icon());
-                // 切换当前编辑器的模式
-                if (c->map) {
-                    auto mode = static_cast<ToolType>(group->id(button));
-                    switch (mode) {
-                        case ToolType::HAND: {
-                            c->use_tool("Hand");
-                            break;
-                        }
-                        case ToolType::NOTE: {
-                            c->use_tool("Note");
-                            break;
-                        }
-                    }
-                }
-            });
+    // connect(modesbuttonGroup,
+    //         QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
+    //         [=](QAbstractButton *button) {
+    //             // 切换工具按钮的图标
+    //             mode_toolbutton->setIcon(button->icon());
+    //             // 切换当前编辑器的模式
+    //             if (c->map) {
+    //                 auto mode = static_cast<ToolType>(group->id(button));
+    //                 switch (mode) {
+    //                     case ToolType::HAND: {
+    //                         c->use_tool("Hand");
+    //                         break;
+    //                     }
+    //                     case ToolType::NOTE: {
+    //                         c->use_tool("Note");
+    //                         break;
+    //                     }
+    //                 }
+    //             }
+    //         });
 
     // 将自定义 Widget 包装成 QWidgetAction
     auto *modewidgetAction = new QWidgetAction(modemenu);
