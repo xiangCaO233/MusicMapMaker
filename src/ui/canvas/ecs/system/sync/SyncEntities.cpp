@@ -397,8 +397,8 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
         if (toolInteractionState->isSelected(e) ||
             drag_info.dragged_entitiesWithRes.contains(e)) {
             registry.emplace<InMaintrackComponent>(e);
-            XINFO("[" + std::to_string(static_cast<uint32_t>(e)) +
-                  "]为选中或拖动中实体/保持标记");
+            // XINFO("[" + std::to_string(static_cast<uint32_t>(e)) +
+            //       "]为选中或拖动中实体/保持标记");
             continue;
         }
         const auto& time = notes_view.get<TimeComponent>(e);
