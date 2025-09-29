@@ -21,6 +21,7 @@ struct Beat {
     // 最近的生效timing
     const Timing* timing;
 };
+
 using BeatHandle = int32_t;
 using BeatInfo = std::unordered_map<uint32_t, Beat>;
 using BeatTimeline = std::vector<uint32_t>;

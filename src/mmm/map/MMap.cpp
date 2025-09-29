@@ -38,6 +38,7 @@ void MMap::writeOut(const std::string& file) {
 
 // 注册编辑器
 void MMap::register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue) {
+    std::lock_guard<std::mutex> lock(editor_mutex);
     if (!mapeditor) {
         // 初始化对应编辑器
         mapeditor = std::make_shared<MMapEditor>(this, editEventQueue);
@@ -160,10 +161,17 @@ void MMap::analyzeBeatInfo() {
             // notes.query_range 调用是正确的
             int division =
                 mutil::calculateDivisionStrategy(notes, current_beat, 5);
+            if (division == -1) {
+                // 分析失败,不算
+                division = 2;
+                current_beat.is_manual = false;
+            } else {
+                // 分析出来的-算固定分拍
+                current_beat.is_manual = true;
+            }
 
             // 填充 BeatInfo
             current_beat.divisors = division;
-            current_beat.is_manual = false;
             current_beat.timing = current_timing;
             current_beat.beat_index = beatTimeline.size();
             beatInfo[current_beat.beat_start] = current_beat;

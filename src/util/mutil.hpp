@@ -620,7 +620,7 @@ inline int calculateDivisionStrategy(const NoteCollection& notes, Beat& beat,
                                      double tolerance) {
     double beat_length = beat.beat_length;
     const auto& hitobjects = notes.get_all_notes_unordered();
-    if (beat_length <= 0) return 2;
+    if (beat_length <= 0) return -1;
 
     // 收集当前拍内的所有物件(包括重复时间戳的) [beat_start, beat_end)
     std::vector<NoteHandle> current_beat_object_handles =
@@ -680,7 +680,9 @@ inline int calculateDivisionStrategy(const NoteCollection& notes, Beat& beat,
             }
         }
     }
-    if (current_beat_object_times.empty()) return 2;
+
+    // 拍内无物件-不算分析结果
+    if (current_beat_object_times.empty()) return -1;
 
     // 从最小分音数开始检查（2到64）
     for (int n{2}; n <= 64; ++n) {
@@ -713,7 +715,7 @@ inline int calculateDivisionStrategy(const NoteCollection& notes, Beat& beat,
         }
     }
 
-    return 2;  // 无有效分音策略-返回默认2
+    return -1;  // 无有效分音策略
 }
 
 inline void get_colored_icon_pixmap(QPixmap& pixmap, const char* svgPath,

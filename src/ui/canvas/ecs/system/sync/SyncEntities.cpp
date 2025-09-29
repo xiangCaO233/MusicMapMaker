@@ -12,8 +12,8 @@ entt::entity createBeatEntity(entt::registry& registry, const Beat* beat) {
 
     // 附加 BeatComponent，存储分拍数等特有信息
     registry.emplace<BeatComponent>(beat_entity, beat->divisors,
-                                    beat->beat_length, beat->beat_index);
-
+                                    beat->beat_length, beat->beat_index,
+                                    beat->is_manual);
     return beat_entity;
 }
 
@@ -222,7 +222,7 @@ void sync_timings(ECSCore& core, const TimingMap& timings,
 }
 
 void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
-                const BeatInfo& beatInfo, const MapCanvasInfo* info,
+                BeatInfo& beatInfo, const MapCanvasInfo* info,
                 const int64_t query_start_time, const int64_t query_end_time,
                 const int64_t maintrack_start_time,
                 const int64_t maintrack_end_time) {
@@ -302,21 +302,35 @@ void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
     // 更新脏beat实体
     auto dirty_view = registry.view<BeatComponent, DirtyBeatMarkComponent>();
     for (const auto& e : dirty_view) {
-        auto& [div, beat_length, index] = registry.get<BeatComponent>(e);
+        auto& [div, beat_length, index, manual] =
+            registry.get<BeatComponent>(e);
         auto& [data] = registry.get<DirtyBeatMarkComponent>(e);
 
         if (data) {
             div = data->divisors;
+            manual = data->is_manual;
         }
 
         // updateNoteEntity(registry, e, note_data);
     }
     registry.clear<DirtyBeatMarkComponent>();
 
+    // 更新非手动生成的拍的分拍数
     // 检查附加inmaintrack组件
     for (const auto& e : core.get_beat_group()) {
         auto [time] = registry.get<TimeComponent>(e);
-        auto [div, beat_length, index] = registry.get<BeatComponent>(e);
+        auto& [div, beat_length, index, manual] =
+            registry.get<BeatComponent>(e);
+        if (!manual) {
+            // 当场更新为生成的分拍数
+            auto beatit = beatInfo.find(time);
+            if (beatit != beatInfo.end()) {
+                beatit->second.divisors =
+                    info->editorInfo.generated_beat_divisors;
+                div = info->editorInfo.generated_beat_divisors;
+            }
+        }
+
         if (time + beat_length >= maintrack_start_time) {
             registry.emplace<InMaintrackComponent>(e);
         }
@@ -601,8 +615,7 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
                                 MapLayerManager* layer_manager,
                                 const TimingMap& timings,
                                 const BeatTimeline& beatTimeLine,
-                                const BeatInfo& beatInfo,
-                                const MapCanvasInfo* info,
+                                BeatInfo& beatInfo, const MapCanvasInfo* info,
                                 const TimePixelConverter& converter
                                 // debug
                                 // ,const TimePixelConverter& converter2

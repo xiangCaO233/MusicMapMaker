@@ -4,9 +4,8 @@
 #include <fstream>
 #include <memory>
 #include <mmm/map/MMap.hpp>
+#include <mmm/timing/Timing.hpp>
 #include <nlohmann/json.hpp>
-
-#include "mmm/timing/Timing.hpp"
 
 using json = nlohmann::json;
 

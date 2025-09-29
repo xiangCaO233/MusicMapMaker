@@ -217,6 +217,11 @@ class ToolInteractionState {
     void setClipBoard(const std::unordered_set<NoteUUID>& uuids, bool is_copy);
     NoteClipboard getClipBoard() const;
 
+    // 预览相关
+    void startGlobalDragPreview() { isGlobalDragPreview = true; };
+    void endGlobalDragPreview() { isGlobalDragPreview = false; };
+    bool isDraggingGlobalPreview() const { return isGlobalDragPreview; };
+
     // 操作/快捷键相关 (由UI/Action系统写入, pretick读取)
     // 这个可以用一个更简单的命令队列，或者一个原子标志位
     // void triggerAction(ActionType action);
@@ -236,6 +241,8 @@ class ToolInteractionState {
     CreateState m_createState;
     SelectionState m_selectionState;
     DeleteMarkStates m_deleteMarkState;
+
+    bool isGlobalDragPreview{false};
 
     // 剪切板
     NoteClipboard m_noteClipboard;

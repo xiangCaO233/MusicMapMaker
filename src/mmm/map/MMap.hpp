@@ -10,6 +10,7 @@
 #include <mmm/map/BaseMapMeta.hpp>
 #include <mmm/map/editor/MMapEditEvent.hpp>
 #include <mmm/timing/Beat.hpp>
+#include <mutex>
 #include <tool/ThreadSafeQueue.hpp>
 #include <unordered_map>
 
@@ -54,7 +55,10 @@ class MMap : public QObject {
     void register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue);
 
     // 访问对应的谱面编辑器
-    std::shared_ptr<MMapEditor> editor() { return mapeditor; }
+    std::shared_ptr<MMapEditor> editor() {
+        std::lock_guard<std::mutex> lock(editor_mutex);
+        return mapeditor;
+    }
 
     // 设置主音轨
     void set_maintrack(const std::shared_ptr<ice::AudioTrack>& track);
@@ -86,6 +90,7 @@ class MMap : public QObject {
     BaseMapMeta basemeta;
 
     // 一对一编辑器
+    std::mutex editor_mutex;
     std::shared_ptr<MMapEditor> mapeditor{nullptr};
 
     // 项目引用

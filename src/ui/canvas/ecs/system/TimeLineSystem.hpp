@@ -70,7 +70,7 @@ class TimeLineSystem {
                     realtime_info.current_time_info.presentation_canvas_time,
                     info);
             }
-            const auto& [divisors, beat_length, beat_index] =
+            const auto& [divisors, beat_length, beat_index, is_manual] =
                 registry.get<BeatComponent>(current_beat_entity);
             // 转换时间线所处y位置
             const auto y = converter.timeToPixel(

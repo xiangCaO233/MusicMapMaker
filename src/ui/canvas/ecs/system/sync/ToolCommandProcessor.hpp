@@ -94,6 +94,9 @@ class ToolCommandProcessor {
                             std::chrono::milliseconds(
                                 info->realTimeInfo.current_time_info
                                     .raw_audio_time_ms));
+                    } else if (arg.start_button == Qt::RightButton) {
+                        // 开始宏观拖动
+                        interactionState.startGlobalDragPreview();
                     }
                 },
                 // 更新拖动预览区位置
@@ -119,12 +122,33 @@ class ToolCommandProcessor {
                         //     height_ratio;
 
                     } else if (arg.start_button == Qt::RightButton) {
-                        // 不更改预览区内主轨道位置,仅更新整体当前时间戳
+                        if (interactionState.isDraggingGlobalPreview()) {
+                            float ratio =
+                                1.f - (arg.dragging_pos.y / canvas_height);
+                            auto time = map->base_metadata().map_length * ratio;
+                            // 先直接跳转
+                            info->realTimeInfo.current_time_info =
+                                time -
+                                info->realTimeInfo.offset_info
+                                    .global_static_offset_ms -
+                                info->realTimeInfo.offset_info.global_offset_ms;
+                            // 更新音频位置
+                            info->audio_callback->set_playpos_for(
+                                map->base_metadata()
+                                    .main_audio_path.generic_string(),
+                                std::chrono::milliseconds(
+                                    info->realTimeInfo.current_time_info
+                                        .raw_audio_time_ms));
+                        }
+                        // 仅更新整体当前时间戳
                     }
                 },
                 // 结束拖动预览区
                 [&](const EndDragPreviewCommand& arg) {
                     //
+                    if (arg.trigger_button == Qt::RightButton) {
+                        interactionState.endGlobalDragPreview();
+                    }
                 },
                 // 编辑相关
                 // 复制

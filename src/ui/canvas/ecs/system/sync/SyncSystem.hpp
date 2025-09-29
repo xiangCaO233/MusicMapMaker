@@ -42,8 +42,8 @@ class SyncSystem {
                         const NoteIDManager& uuidManager,
                         MapLayerManager* layer_manager,
                         const TimingMap& timings,
-                        const BeatTimeline& beatTimeLine,
-                        const BeatInfo& beatInfo, const MapCanvasInfo* info,
+                        const BeatTimeline& beatTimeLine, BeatInfo& beatInfo,
+                        const MapCanvasInfo* info,
                         const TimePixelConverter& converter
                         // debug
                         // ,const TimePixelConverter& converter2

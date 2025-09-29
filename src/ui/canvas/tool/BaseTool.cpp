@@ -42,7 +42,7 @@ void BaseTool::mouseReleaseEvent(QMouseEvent* e) {
                                              e->button(), e->buttons());
     if (pressArea == MouseArea::PREVIEW) {
         // 触发按下的区域是预览区/触发结束预览区拖拽指令
-        tool_command_queue()->push(EndDragPreviewCommand{});
+        tool_command_queue()->push(EndDragPreviewCommand{e->button()});
     }
 }
 
