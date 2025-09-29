@@ -508,7 +508,7 @@ class ToolCommandProcessor {
                     //
                     // }
                     // 附加脏组件(下一帧更新)
-                    registry.emplace<DirtyMarkComponent>(entity);
+                    registry.emplace<DirtyNoteMarkComponent>(entity);
                 } else {
                     // 拖拽多个
                     std::unordered_map<NoteUUID, std::pair<int64_t, int>>
@@ -522,7 +522,7 @@ class ToolCommandProcessor {
                             uuid,
                             std::pair<int64_t, int>(axis.time, axis.track));
                         // 附加脏组件(下一帧更新)
-                        registry.emplace<DirtyMarkComponent>(e);
+                        registry.emplace<DirtyNoteMarkComponent>(e);
                     }
                     mapEditor.moveNotes(notes_to_move);
                 }

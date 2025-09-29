@@ -14,6 +14,7 @@
 #include <mmm/map/MMap.hpp>
 #include <mmm/map/editor/MMapEditor.hpp>
 #include <mmm/timing/Timing.hpp>
+#include <mutex>
 #include <util/mutil.hpp>
 #include <utility>
 
@@ -69,6 +70,7 @@ void TimingManager::addNewTimingRowItem(MMap* map, Timing* newTiming) {
                 item->timing->is_base_timing
                     ? item->timing->bpm == des_param
                     : 100.0 / std::abs(item->timing->beat_length) == des_param;
+
             if (desTime == item->timing->timestamp &&
                 des_is_base_timing == item->timing->is_base_timing &&
                 param_same) {
@@ -98,8 +100,10 @@ void TimingManager::addNewTimingRowItem(MMap* map, Timing* newTiming) {
 
 // 从map刷新timing表
 void TimingManager::refreshTableFromMap() {
+    XINFO("获取重建timing表锁");
+    std::lock_guard<std::mutex> lock(rebuild_mtx);
+    XINFO("获取成功");
     XINFO("1/3: 开始从 Map 刷新...");
-
     // --- 清理所有旧的UI状态 ---
     qDeleteAll(allTimingRowItems);
     allTimingRowItems.clear();

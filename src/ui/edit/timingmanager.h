@@ -34,10 +34,12 @@ class TimingManager : public QWidget {
 
    private:
     Ui::TimingEditor *ui;
+    std::mutex rebuild_mtx;
     MMap *map_ref{nullptr};
     ThreadSafeQueue<ToolCommand> *tool_cmd_queue;
     QIntValidator *timeInputValidator;
     QDoubleValidator *parameterInputValidator;
+
     // 这个列表是核心！它按视觉顺序存储了每一行的控制器。
     QList<TimingRowItem *> allTimingRowItems;
 

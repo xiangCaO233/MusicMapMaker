@@ -6,6 +6,7 @@
 #include <layer/MapLayerManager.hpp>
 #include <mmm/project/MProject.hpp>
 #include <mmm/timing/Beat.hpp>
+#include <string>
 
 void MapCanvas::resizeEvent(QResizeEvent *e) {
     GLCanvas::resizeEvent(e);
@@ -47,10 +48,25 @@ void MapCanvas::mouseReleaseEvent(QMouseEvent *e) {
 void MapCanvas::wheelEvent(QWheelEvent *e) {
     GLCanvas::wheelEvent(e);
     auto mapinfo = info<MapCanvasInfo>();
+    auto layermanager =
+        static_cast<MapLayerManager *>(dataloop()->layermanager());
+
+    // --- 添加这些调试信息 ---
+    qDebug() << "--- Wheel Event ---";
+    qDebug() << "angleDelta:"
+             << e->angleDelta();  // 经典鼠标滚轮的步进值 (通常是 +/- 120)
+    qDebug() << "pixelDelta:" << e->pixelDelta();  // 触控板或高精度鼠标的像素值
+    qDebug() << "Modifiers:"
+             << e->modifiers();          // 按下的修饰键 (Ctrl, Shift, Alt)
+    qDebug() << "Phase:" << e->phase();  // 滚动阶段 (开始、更新、结束)
+
     // 先响应map滚动
     auto modifiers = e->modifiers();
     auto d = e->angleDelta();
     auto dy = d.y();
+    if (dy == 0) {
+        dy = d.x();
+    }
 
     auto &editor_info = mapinfo->editorInfo;
 
@@ -73,7 +89,67 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
         auto mouseState =
             maplayermananger->get_tool_interaction_state()->getMouseState();
         if (mouseState.area == MouseArea::EDIT) {
-            if (modifiers.testFlag(Qt::ControlModifier)) {
+            if (modifiers.testFlag(Qt::AltModifier)) {
+                if (modifiers.testFlag(Qt::ControlModifier)) {
+                    // 修改分拍时按住ctrl倍乘dy
+                    dy *= 2.f;
+                }
+                // 调整分拍
+                auto converter =
+                    maplayermananger->get_time_converter_manager()
+                        ->getConverter(map->timing_set(), mapinfo->baseInfo,
+                                       mapinfo->editorInfo.scrollInfo,
+                                       mapinfo.get(),
+                                       map->base_metadata().preference_bpm);
+                auto &beat_timeline = map->beat_timeline();
+                auto &beat_info = map->beat_info();
+                auto mousePos = maplayermananger->get_tool_interaction_state()
+                                    ->getMouseState()
+                                    .current_pos;
+                auto mouseTime = converter->distanceToTime(
+                    height() - mousePos.y -
+                        height() * mapinfo->editorInfo.judgeline_pos,
+                    mapinfo->realTimeInfo.current_time_info
+                        .presentation_canvas_time);
+                auto beat = findBeatAtTime(mouseTime, beat_timeline, beat_info);
+                XINFO("当前滚动分拍时间:[" + std::to_string(mouseTime) + "]");
+                if (beat) {
+                    wheelDyAccumulator += dy;
+                    // 设置一个阈值，通常 angleDelta 的一格是 120
+                    const int SNAP_THRESHOLD{120};
+                    bool continuous_back{false};
+                    while (std::abs(wheelDyAccumulator) >= SNAP_THRESHOLD) {
+                        if (dy > 0) {
+                            // 增加分拍数
+                            beat->divisors++;
+                            beat->is_manual = true;
+                            layermanager->get_edit_eventq()->push(
+                                {MMapEditEventType::BeatUpdated, beat});
+                        } else {
+                            // 减少分拍数
+                            beat->divisors--;
+                            beat->is_manual = true;
+                            layermanager->get_edit_eventq()->push(
+                                {MMapEditEventType::BeatUpdated, beat});
+                        }
+                        // 从累加器中减去已处理的部分，而不是直接清零
+                        // 这可以保留用户快速滚动时的“多余”滚动量
+                        if (wheelDyAccumulator != 0) {
+                            if (wheelDyAccumulator > 0) {
+                                wheelDyAccumulator -= SNAP_THRESHOLD;
+                                if (wheelDyAccumulator > SNAP_THRESHOLD) {
+                                    continuous_back = true;
+                                }
+                            } else {
+                                wheelDyAccumulator += SNAP_THRESHOLD;
+                                if (wheelDyAccumulator < -SNAP_THRESHOLD) {
+                                    continuous_back = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (modifiers.testFlag(Qt::ControlModifier)) {
                 // 按住controll修改缩放
                 scrollInfo.timeline_zoom +=
                     dy * scrollInfo.staticTimelineScrollRatio *
@@ -86,15 +162,13 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
                     scrollInfo.timeline_zoom = .25f;
                 }
             } else {
-                wheelDyAccumulator += dy;
-                // 设置一个阈值，通常 angleDelta 的一格是 120
-                const int SNAP_THRESHOLD{120};
-
-                bool continuous_back{false};
-
-                while (std::abs(wheelDyAccumulator) >= SNAP_THRESHOLD) {
-                    // 更新画布位置和音频位置
-                    if (editor_info.magnet_to_divisor) {
+                if (mapinfo->editorInfo.magnet_to_divisor) {
+                    wheelDyAccumulator += dy;
+                    // 设置一个阈值，通常 angleDelta 的一格是 120
+                    const int SNAP_THRESHOLD{120};
+                    bool continuous_back{false};
+                    while (std::abs(wheelDyAccumulator) >= SNAP_THRESHOLD) {
+                        // 更新画布位置和音频位置
                         auto &beat_timeline = map->beat_timeline();
                         auto &beat_info = map->beat_info();
                         // static auto total_deltay{0};
@@ -121,40 +195,40 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
                         }
                         if (divinfo.is_valid()) {
                             mapinfo->realTimeInfo.current_time_info =
-                                divinfo.divisor_time -
-                                (mapinfo->realTimeInfo.offset_info
-                                     .global_static_offset_ms +
-                                 mapinfo->realTimeInfo.offset_info
-                                     .global_offset_ms);
+                                divinfo.divisor_time;
                             set_maintrack_pos(std::chrono::milliseconds(
                                 mapinfo->realTimeInfo.current_time_info
                                     .raw_audio_time_ms));
                         }
-                    } else {
-                        // 非吸附拍线-按dy值步长移动
-                        mapinfo->realTimeInfo.current_time_info +=
-                            scrollInfo.pageScrollStepRatio * dy;
-                        set_maintrack_pos(std::chrono::milliseconds(
-                            mapinfo->realTimeInfo.current_time_info
-                                .raw_audio_time_ms));
-                    }
-                    // 从累加器中减去已处理的部分，而不是直接清零
-                    // 这可以保留用户快速滚动时的“多余”滚动量
-                    if (wheelDyAccumulator != 0) {
-                        if (wheelDyAccumulator > 0) {
-                            wheelDyAccumulator -= SNAP_THRESHOLD;
-                            if (wheelDyAccumulator > SNAP_THRESHOLD) {
-                                continuous_back = true;
-                            }
-                        } else {
-                            wheelDyAccumulator += SNAP_THRESHOLD;
-                            if (wheelDyAccumulator < -SNAP_THRESHOLD) {
-                                continuous_back = true;
+                        // 从累加器中减去已处理的部分，而不是直接清零
+                        // 这可以保留用户快速滚动时的“多余”滚动量
+                        if (wheelDyAccumulator != 0) {
+                            if (wheelDyAccumulator > 0) {
+                                wheelDyAccumulator -= SNAP_THRESHOLD;
+                                if (wheelDyAccumulator > SNAP_THRESHOLD) {
+                                    continuous_back = true;
+                                }
+                            } else {
+                                wheelDyAccumulator += SNAP_THRESHOLD;
+                                if (wheelDyAccumulator < -SNAP_THRESHOLD) {
+                                    continuous_back = true;
+                                }
                             }
                         }
                     }
+                } else {
+                    auto step = scrollInfo.pageScrollStepRatio * dy;
+                    // XINFO(std::format("移动画布,步长:[{}]", step));
+                    // 非吸附拍线-按dy值步长移动
+
+                    auto res = int64_t(mapinfo->realTimeInfo.current_time_info
+                                           .presentation_canvas_time +
+                                       step);
+
+                    set_maintrack_pos(std::chrono::milliseconds(res));
                 }
             }
+
         } else if (mouseState.area == MouseArea::PREVIEW) {
             // 在预览区内滚动-直接修改预览缩放倍率
             // 反向使向上滑动为放大

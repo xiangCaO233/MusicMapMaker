@@ -54,8 +54,8 @@ class ComponentInspector {
 
     // --- 为 Tag (标签) 组件编写的重载 ---
 
-    static inline void print_component_details(std::stringstream& ss,
-                                               const DirtyMarkComponent& comp) {
+    static inline void print_component_details(
+        std::stringstream& ss, const DirtyNoteMarkComponent& comp) {
         ss << "      (Tag Component)\n";
     }
 

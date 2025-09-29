@@ -210,4 +210,48 @@ inline DivisorLineInfo findNearestDivisorLineInDirection(
     return result;
 }
 
+/**
+ * @brief 根据时间点查找其所在的 Beat (左闭右开区间)
+ * @param query_time      要查询的时间点
+ * @param beat_timeline   一个存储所有 Beat 开始时间的、已排序的向量
+ * @param beat_info       一个从 Beat 开始时间到 Beat 详细信息的映射
+ * @return const Beat*    如果找到, 返回指向 Beat 对象的常量指针; 否则返回
+ * nullptr
+ */
+inline Beat* findBeatAtTime(int64_t query_time,
+                            const BeatTimeline& beat_timeline,
+                            BeatInfo& beat_info) {
+    // 1. 处理无效输入和边界情况
+    // 如果时间为负数，或时间线/信息为空，则无法查找
+    if (query_time < 0 || beat_timeline.empty()) {
+        return nullptr;
+    }
+    // 如果查询时间在第一个 Beat 开始之前，它不属于任何 Beat
+    if (query_time < beat_timeline.front()) {
+        return nullptr;
+    }
+
+    // 2. 使用 std::upper_bound 高效查找
+    // a. upper_bound 会找到 timeline 中第一个 > query_time 的元素
+    auto it = std::upper_bound(beat_timeline.begin(), beat_timeline.end(),
+                               static_cast<uint32_t>(query_time));
+
+    // b. 我们要找的 Beat 是这个元素之前的那个。
+    //    由于我们已经排除了 query_time < timeline.front() 的情况,
+    //    这里的 it 绝不会是 begin(), 所以向前移动一位是安全的。
+    it--;
+
+    // 3. 使用找到的 beat_start 时间戳从 map 中获取 Beat 对象
+    //    *it 现在就是 query_time 所在区间的起始时间
+    uint32_t beat_start_time = *it;
+
+    // 使用 .find() 来安全地获取值, 避免在 map 和 timeline 不一致时崩溃
+    auto map_it = beat_info.find(beat_start_time);
+    if (map_it != beat_info.end()) {
+        return &map_it->second;
+    }
+
+    return nullptr;  // 如果 timeline 和 map 数据不一致, 返回空指针
+}
+
 #endif  // !MMM_BEAT_HPP

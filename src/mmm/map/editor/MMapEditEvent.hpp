@@ -3,6 +3,7 @@
 
 #include <list>
 #include <mmm/ObjectHandle.hpp>
+#include <mmm/timing/Beat.hpp>
 #include <variant>
 
 class Timing;
@@ -23,10 +24,12 @@ enum class MMapEditEventType {
     TimingRemoved,
     // timing更新
     TimingUpdated,
+    // 拍更新
+    BeatUpdated,
 };
 
 using NoteUUIDS = std::list<NoteUUID>;
-using MapEditData = std::variant<NoteUUID, NoteUUIDS, Timing*>;
+using MapEditData = std::variant<NoteUUID, NoteUUIDS, Timing*, Beat*>;
 
 // 编辑事件
 struct MMapEditEvent {

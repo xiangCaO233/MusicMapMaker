@@ -14,7 +14,8 @@ void SyncSystem::updateEditStatus(ECSCore& core,
                 auto updated_e_it = core.uuid_to_entity_map().find(
                     std::get<NoteUUID>(e.editData));
                 if (updated_e_it != core.uuid_to_entity_map().end()) {
-                    registry.emplace<DirtyMarkComponent>(updated_e_it->second);
+                    registry.emplace<DirtyNoteMarkComponent>(
+                        updated_e_it->second);
                 } else {
                     qDebug() << "未知更新:NoteUUID:"
                              << std::get<NoteUUID>(e.editData);
@@ -27,7 +28,7 @@ void SyncSystem::updateEditStatus(ECSCore& core,
                 for (auto& uuid : updated_note_uuids) {
                     auto updated_e_it = core.uuid_to_entity_map().find(uuid);
                     if (updated_e_it != core.uuid_to_entity_map().end()) {
-                        registry.emplace<DirtyMarkComponent>(
+                        registry.emplace<DirtyNoteMarkComponent>(
                             updated_e_it->second);
                     } else {
                         qDebug() << "已不可见的更新:NoteUUID:" << uuid;
@@ -38,8 +39,8 @@ void SyncSystem::updateEditStatus(ECSCore& core,
             }
             case MMapEditEventType::TimingUpdated: {
                 auto timing = std::get<Timing*>(e.editData);
-                qDebug() << "接收到Timing更新编辑事件:目标timing[" << timing
-                         << "]";
+                XINFO(std::format("接收到Timing更新编辑事件:目标timing时间[{}]",
+                                  timing->timestamp));
                 if (timing->is_base_timing) {
                     std::lock_guard<std::mutex> lock(beatanalyze_mtx);
                     // 重新生成拍信息
@@ -47,6 +48,33 @@ void SyncSystem::updateEditStatus(ECSCore& core,
                     layer_manager->map()->beat_info().clear();
                     layer_manager->map()->analyzeBeatInfo();
                 }
+
+                break;
+            }
+            case MMapEditEventType::BeatUpdated: {
+                auto beat = std::get<Beat*>(e.editData);
+                XINFO(std::format("接收到Beat更新编辑事件:目标beattime[{}]",
+                                  beat->beat_start));
+                auto beatetit =
+                    core.handle_to_beatentity_map().find(beat->beat_start);
+                if (beatetit != core.handle_to_beatentity_map().end()) {
+                    if (registry.valid(beatetit->second)) {
+                        // 附加dirty组件
+                        registry.emplace_or_replace<DirtyBeatMarkComponent>(
+                            beatetit->second, beat);
+                    } else {
+                        XINFO(std::format(
+                            "未知更新BeatEntity:[{}]",
+                            static_cast<uint32_t>(beatetit->second)));
+                    }
+                }
+                // if (timing->is_base_timing) {
+                //     std::lock_guard<std::mutex> lock(beatanalyze_mtx);
+                //     // 重新生成拍信息
+                //     layer_manager->map()->beat_timeline().clear();
+                //     layer_manager->map()->beat_info().clear();
+                //     layer_manager->map()->analyzeBeatInfo();
+                // }
 
                 break;
             }

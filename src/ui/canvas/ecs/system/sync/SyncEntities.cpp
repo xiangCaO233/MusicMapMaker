@@ -299,6 +299,21 @@ void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
         }
     }
 
+    // 更新脏beat实体
+    auto dirty_view = registry.view<BeatComponent, DirtyBeatMarkComponent>();
+    for (const auto& e : dirty_view) {
+        auto& [div, beat_length, index] = registry.get<BeatComponent>(e);
+        auto& [data] = registry.get<DirtyBeatMarkComponent>(e);
+
+        if (data) {
+            div = data->divisors;
+        }
+
+        // updateNoteEntity(registry, e, note_data);
+    }
+    registry.clear<DirtyBeatMarkComponent>();
+
+    // 检查附加inmaintrack组件
     for (const auto& e : core.get_beat_group()) {
         auto [time] = registry.get<TimeComponent>(e);
         auto [div, beat_length, index] = registry.get<BeatComponent>(e);
@@ -382,14 +397,14 @@ void sync_notes(ECSCore& core, const NoteCollection& notes,
     }
 
     // 更新脏物件
-    auto dirty_view = registry.view<NoteComponent, DirtyMarkComponent>();
+    auto dirty_view = registry.view<NoteComponent, DirtyNoteMarkComponent>();
     for (const auto& e : dirty_view) {
         auto& [track, uuid] = registry.get<NoteComponent>(e);
         auto handle = uuidManager.get_handle(uuid);
         auto note_data = notes.get_note(handle);
         updateNoteEntity(registry, e, note_data);
     }
-    registry.clear<DirtyMarkComponent>();
+    registry.clear<DirtyNoteMarkComponent>();
 
     // 更新InMainTrackComponent
     auto notes_view = registry.view<NoteComponent, TimeComponent>();

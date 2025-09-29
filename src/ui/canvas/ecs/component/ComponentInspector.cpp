@@ -141,7 +141,7 @@ void ComponentInspector::registerAllComponentsForInspector() {
     entt::meta_factory<DeleteMarkComponent>()
         .type("DeleteMarkComponent"_hs)
         .data<&DeleteMarkComponent::confirm>("confirm"_hs);
-    entt::meta_factory<DirtyMarkComponent>().type("DirtyMarkComponent"_hs);
+    entt::meta_factory<DirtyNoteMarkComponent>().type("DirtyMarkComponent"_hs);
     entt::meta_factory<EffectComponent>()
         .type("EffectComponent"_hs)
         .data<&EffectComponent::track>("track"_hs)

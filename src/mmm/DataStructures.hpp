@@ -785,7 +785,7 @@ class TimingMap {
         auto& timings_vec = map_it->second;
         auto vec_it =
             std::find_if(timings_vec.begin(), timings_vec.end(),
-                         [&](const auto& p) { return p.get() == timing_ptr; });
+                         [&](const auto& p) { return *p == *timing_ptr; });
 
         if (vec_it != timings_vec.end()) {
             // 从 vector 中“取出”unique_ptr 的所有权
@@ -846,9 +846,9 @@ class TimingMap {
             return {false, std::move(new_timing_data)};
         }
         auto& vec_old = map_it_old->second;
-        auto vec_it_old = std::find_if(
-            vec_old.begin(), vec_old.end(),
-            [&](const auto& p) { return p.get() == old_timing_ptr; });
+        auto vec_it_old =
+            std::find_if(vec_old.begin(), vec_old.end(),
+                         [&](const auto& p) { return *p == *old_timing_ptr; });
         if (vec_it_old == vec_old.end()) {
             return {false, std::move(new_timing_data)};
         }

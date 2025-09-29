@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <glm/glm.hpp>
+#include <mmm/timing/Beat.hpp>
 #include <sstream>
 #include <string>
 
@@ -35,6 +36,9 @@ struct DeleteMarkComponent {
 };
 
 // 脏标记组件
-struct DirtyMarkComponent {};
+struct DirtyNoteMarkComponent {};
+struct DirtyBeatMarkComponent {
+    Beat* updated_beat_data{nullptr};
+};
 
 #endif  // MMM_CORECOMPONENTS_HPP

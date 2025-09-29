@@ -44,6 +44,7 @@ void MMap::register_editor(ThreadSafeQueue<MMapEditEvent>& editEventQueue) {
     }
 
     auto mapeditor_ref = mapeditor.get();
+    // todo:断开之前的编辑器信号
     // 连接编辑器信号
     connect(EditorActionHandler::instance(), &EditorActionHandler::undo,
             [mapeditor_ref]() { mapeditor_ref->undo(); });
