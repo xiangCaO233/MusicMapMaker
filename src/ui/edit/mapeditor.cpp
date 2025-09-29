@@ -48,6 +48,7 @@ void MapEditor::use_theme(GlobalTheme theme) {
                                "://icons/magnet.svg", color, 16, 16);
     mutil::set_button_svgcolor(ui->scroll_direction_button,
                                "://icons/long-arrow-alt-up.svg", color, 16, 16);
+    canvas()->use_theme(theme);
 }
 
 MapCanvas* MapEditor::canvas() const {

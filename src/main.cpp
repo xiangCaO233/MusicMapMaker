@@ -118,14 +118,6 @@ int main(int argc, char *argv[]) {
     QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
-    // 跟随系统主题
-    XINFO("System theme lightness:" +
-          std::to_string(QApplication::palette().window().color().lightness()));
-    if (QApplication::palette().window().color().lightness() < 128) {
-        w.use_theme(GlobalTheme::COLIN_DARK);
-    } else {
-        w.use_theme(GlobalTheme::COLIN_LIGHT);
-    }
     w.show();
 
     // TODO

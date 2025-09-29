@@ -9,6 +9,8 @@
 #include <render/Renderer2D.hpp>
 #include <render/synchronize/tick/RenderDataLoop.hpp>
 
+#include "GlobalSettings.hpp"
+
 class TexturePool;
 class LayerManager;
 class AudioLoadCallback;
@@ -21,6 +23,12 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
     GLCanvas();
     // 析构GLCanvas
     ~GLCanvas() override;
+
+    void use_theme(GlobalTheme theme);
+
+    const std::array<float, 4>& get_glclear_color() const {
+        return clear_color;
+    }
 
     // 绑定音频载入回调
    public slots:
@@ -109,6 +117,8 @@ class GLCanvas : public QOpenGLWindow, public QOpenGLFunctions_4_1_Core {
 
     // 上一帧的时间
     std::chrono::high_resolution_clock::duration pre_frame_time;
+
+    std::array<float, 4> clear_color{0};
 
     // 目标帧率
     qreal desiredFps;

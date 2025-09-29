@@ -51,14 +51,13 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
     auto layermanager =
         static_cast<MapLayerManager *>(dataloop()->layermanager());
 
-    // --- 添加这些调试信息 ---
-    qDebug() << "--- Wheel Event ---";
-    qDebug() << "angleDelta:"
-             << e->angleDelta();  // 经典鼠标滚轮的步进值 (通常是 +/- 120)
-    qDebug() << "pixelDelta:" << e->pixelDelta();  // 触控板或高精度鼠标的像素值
-    qDebug() << "Modifiers:"
-             << e->modifiers();          // 按下的修饰键 (Ctrl, Shift, Alt)
-    qDebug() << "Phase:" << e->phase();  // 滚动阶段 (开始、更新、结束)
+    // qDebug() << "--- Wheel Event ---";
+    // qDebug() << "angleDelta:"
+    //          << e->angleDelta();  // 经典鼠标滚轮的步进值 (通常是 +/- 120)
+    // qDebug() << "pixelDelta:" << e->pixelDelta();  //
+    // 触控板或高精度鼠标的像素值 qDebug() << "Modifiers:"
+    //          << e->modifiers();          // 按下的修饰键 (Ctrl, Shift, Alt)
+    // qDebug() << "Phase:" << e->phase();  // 滚动阶段 (开始、更新、结束)
 
     // 先响应map滚动
     auto modifiers = e->modifiers();

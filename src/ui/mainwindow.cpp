@@ -33,9 +33,18 @@ MainWindow::MainWindow(QWidget* parent)
 
     initActions();
 
-    use_theme(GlobalTheme::COLIN_DARK);
-
     ui->editor->bindToolActions();
+
+    // 跟随系统主题
+    XINFO("System theme lightness:" +
+          std::to_string(QApplication::palette().window().color().lightness()));
+    if (QApplication::palette().window().color().lightness() < 128) {
+        use_theme(GlobalTheme::COLIN_DARK);
+        ui->actionColin_Dark->setChecked(true);
+    } else {
+        use_theme(GlobalTheme::COLIN_LIGHT);
+        ui->actionColin_Light->setChecked(true);
+    }
 }
 
 MainWindow::~MainWindow() {
@@ -93,43 +102,34 @@ void MainWindow::use_theme(GlobalTheme theme) {
     current_theme = theme;
     settings.theme = theme;
     QColor button_icon_color;
+    QFile file;
     switch (theme) {
         case GlobalTheme::OPEN_DARK: {
-            button_icon_color = QColor(255, 255, 255);
-            QFile file(":/QtThemeDark/theme/Flat/Dark/Pink/Orange.qss");
-            file.open(QFile::ReadOnly);
-            global_style_sheet = file.readAll();
-            setStyleSheet(global_style_sheet);
-            // ui->actionDark->setChecked(true);
+            button_icon_color = QColor(225, 225, 225);
+            file.setFileName(":/QtThemeDark/theme/Flat/Dark/Pink/Orange.qss");
             break;
         }
         case GlobalTheme::OPEN_LIGHT: {
-            button_icon_color = QColor(0, 0, 0);
-            QFile file(":/QtThemeLight/theme/Flat/Light/Brown/DeepOrange.qss");
-            file.open(QFile::ReadOnly);
-            global_style_sheet = file.readAll();
-            setStyleSheet(global_style_sheet);
-            // ui->actionLight->setChecked(true);
+            button_icon_color = QColor(23, 23, 23);
+            file.setFileName(
+                ":/QtThemeLight/theme/Flat/Light/Brown/DeepOrange.qss");
             break;
         }
         case GlobalTheme::COLIN_DARK: {
-            button_icon_color = QColor(255, 255, 255);
-            QFile file(":/qdarkstyle/dark/darkstyle.qss");
-            file.open(QFile::ReadOnly);
-            global_style_sheet = file.readAll();
-            setStyleSheet(global_style_sheet);
-            // ui->actionDark->setChecked(true);
+            button_icon_color = QColor(225, 225, 225);
+            file.setFileName(":/qdarkstyle/dark/darkstyle.qss");
             break;
         }
         case GlobalTheme::COLIN_LIGHT: {
-            button_icon_color = QColor(0, 0, 0);
-            QFile file(":/qdarkstyle/light/lightstyle.qss");
-            file.open(QFile::ReadOnly);
-            global_style_sheet = file.readAll();
-            setStyleSheet(global_style_sheet);
-            // ui->actionLight->setChecked(true);
+            button_icon_color = QColor(23, 23, 23);
+            file.setFileName(":/qdarkstyle/light/lightstyle.qss");
             break;
         }
+    }
+    if (file.open(QFile::ReadOnly)) {
+        global_style_sheet = file.readAll();
+        setStyleSheet(global_style_sheet);
+        file.close();
     }
     ui->editor->use_theme(theme);
 

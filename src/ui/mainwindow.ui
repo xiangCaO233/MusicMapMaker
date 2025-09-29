@@ -39,8 +39,18 @@
      <string>Edit(&amp;E)</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuTheme_T">
+    <property name="title">
+     <string>Theme(&amp;T)</string>
+    </property>
+    <addaction name="actionOpen_Source_Dark"/>
+    <addaction name="actionOpen_Source_Light"/>
+    <addaction name="actionColin_Dark"/>
+    <addaction name="actionColin_Light"/>
+   </widget>
    <addaction name="menuFile_F"/>
    <addaction name="menuEdit_E"/>
+   <addaction name="menuTheme_T"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="project_dock">
@@ -82,26 +92,24 @@
    </attribute>
    <widget class="ProjectConfig" name="project_config"/>
   </widget>
-  <action name="actionTrack_Manager">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
+  <action name="actionOpen_Source_Dark">
    <property name="text">
-    <string>Track Manager</string>
+    <string>Open Source Dark</string>
    </property>
   </action>
-  <action name="actionProject_Manager">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
+  <action name="actionOpen_Source_Light">
    <property name="text">
-    <string>Project Manager</string>
+    <string>Open Source Light</string>
+   </property>
+  </action>
+  <action name="actionColin_Dark">
+   <property name="text">
+    <string>Colin Dark</string>
+   </property>
+  </action>
+  <action name="actionColin_Light">
+   <property name="text">
+    <string>Colin Light</string>
    </property>
   </action>
   <zorder>timingManager</zorder>

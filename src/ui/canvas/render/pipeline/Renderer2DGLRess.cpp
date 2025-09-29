@@ -357,14 +357,12 @@ void Renderer2D::render() {
     // 的输出去附件0，location=1 的输出去附件1
     // 2是附件的数量
     GLCALL_V(cvs->glDrawBuffers(2, drawBuffers), cvs);
-    // 定义场景附件的背景色 (例如灰色)
-    const float sceneClearColor[] = {0.23f, 0.23f, 0.23f, 1.0f};
     // ✨️ 定义辉光附件的背景色 (必须是纯黑！) ✨️
     const float bloomClearColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
 
     // 分别清空两个颜色附件
     // cvs->glClearBufferfv(buffer_type, drawbuffer_index, value_pointer);
-    GLCALL_V(cvs->glClearBufferfv(GL_COLOR, 0, sceneClearColor),
+    GLCALL_V(cvs->glClearBufferfv(GL_COLOR, 0, cvs->get_glclear_color().data()),
              cvs);  // 清空 attachment 0
     GLCALL_V(cvs->glClearBufferfv(GL_COLOR, 1, bloomClearColor),
              cvs);  // 清空 attachment 1
@@ -534,7 +532,7 @@ void Renderer2D::composite() {
 void Renderer2D::swap() {
     composite_shader->bind();
     // 场景背景色
-    const float sceneClearColor[] = {0.23f, 0.23f, 0.23f, 1.0f};
+    const auto& sceneClearColor = cvs->get_glclear_color();
     GLCALL_V(cvs->glClearColor(sceneClearColor[0], sceneClearColor[1],
                                sceneClearColor[2], sceneClearColor[3]),
              cvs);

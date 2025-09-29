@@ -110,13 +110,61 @@ void MainWindow::initActions() {
     ui->menuEdit_E->addAction(am->getAction("canvas.redo"));
     ui->menuEdit_E->addSeparator();
     ui->menuEdit_E->addAction(am->getAction("canvas.find"));
-}
 
-// 菜单项槽函数 - 控制显示和隐藏
-// void MainWindow::on_actionTrack_Manager_toggled(bool checked) {
-//     ui->track_manager_dock->setVisible(checked);
-// }
-//
-// void MainWindow::on_actionProject_Manager_toggled(bool checked) {
-//     ui->project_dock->setVisible(checked);
-// }
+    // 将主题选项action包裹一下
+    QActionGroup *themeActionGroup = new QActionGroup(ui->menuTheme_T);
+    themeActionGroup->setExclusive(true);
+    themeActionGroup->addAction(ui->actionOpen_Source_Dark);
+    themeActionGroup->addAction(ui->actionOpen_Source_Light);
+    themeActionGroup->addAction(ui->actionColin_Dark);
+    themeActionGroup->addAction(ui->actionColin_Light);
+    ui->actionOpen_Source_Dark->setCheckable(true);
+    ui->actionOpen_Source_Light->setCheckable(true);
+    ui->actionColin_Dark->setCheckable(true);
+    ui->actionColin_Light->setCheckable(true);
+
+    auto this_cp = this;
+
+    // 处理用户点击，防止取消选中
+    connect(ui->actionOpen_Source_Dark, &QAction::triggered, [this_cp]() {
+        if (this_cp->ui->actionOpen_Source_Dark->isChecked())
+            return;  // 如果已经选中，就什么都不做
+        this_cp->ui->actionOpen_Source_Dark->setChecked(
+            true);  // 否则，设为选中
+    });
+    connect(ui->actionOpen_Source_Light, &QAction::triggered, [this_cp]() {
+        if (this_cp->ui->actionOpen_Source_Light->isChecked()) return;
+        this_cp->ui->actionOpen_Source_Light->setChecked(true);
+    });
+    connect(ui->actionColin_Dark, &QAction::triggered, [this_cp]() {
+        if (this_cp->ui->actionColin_Dark->isChecked()) return;
+        this_cp->ui->actionColin_Dark->setChecked(true);
+    });
+    connect(ui->actionColin_Light, &QAction::triggered, [this_cp]() {
+        if (this_cp->ui->actionColin_Light->isChecked()) return;
+        this_cp->ui->actionColin_Light->setChecked(true);
+    });
+
+    connect(ui->actionOpen_Source_Dark, &QAction::toggled,
+            [this_cp](bool checked) {
+                if (checked) {
+                    this_cp->use_theme(GlobalTheme::OPEN_DARK);
+                }
+            });
+    connect(ui->actionOpen_Source_Light, &QAction::toggled,
+            [this_cp](bool checked) {
+                if (checked) {
+                    this_cp->use_theme(GlobalTheme::OPEN_LIGHT);
+                }
+            });
+    connect(ui->actionColin_Dark, &QAction::toggled, [this_cp](bool checked) {
+        if (checked) {
+            this_cp->use_theme(GlobalTheme::COLIN_DARK);
+        }
+    });
+    connect(ui->actionColin_Light, &QAction::toggled, [this_cp](bool checked) {
+        if (checked) {
+            this_cp->use_theme(GlobalTheme::COLIN_LIGHT);
+        }
+    });
+}

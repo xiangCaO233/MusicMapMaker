@@ -35,6 +35,36 @@ GLCanvas::GLCanvas() {
 // 析构GLCanvas
 GLCanvas::~GLCanvas() { delete fpsCounter; }
 
+void GLCanvas::use_theme(GlobalTheme theme) {
+    switch (theme) {
+        case GlobalTheme::OPEN_DARK: {
+            // #212121 -> (33, 33, 33)
+            clear_color = {33.0f / 255.0f, 33.0f / 255.0f, 33.0f / 255.0f,
+                           1.0f};
+            break;
+        }
+        case GlobalTheme::OPEN_LIGHT: {
+            // #fafafa -> (250, 250, 250)
+            clear_color = {250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f,
+                           1.0f};
+            break;
+        }
+        case GlobalTheme::COLIN_DARK: {
+            // #19232D -> (25, 35, 45)
+            clear_color = {25.0f / 255.0f, 35.0f / 255.0f, 45.0f / 255.0f,
+                           1.0f};
+            break;
+        }
+        case GlobalTheme::COLIN_LIGHT: {
+            // #FAFAFA -> (250, 250, 250)
+            clear_color = {250.0f / 255.0f, 250.0f / 255.0f, 250.0f / 255.0f,
+                           1.0f};
+            break;
+        }
+    }
+    update();
+}
+
 // 释放活动线程
 void GLCanvas::release_threads() {
     render_dataloop.reset();
