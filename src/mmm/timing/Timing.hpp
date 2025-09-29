@@ -52,7 +52,7 @@ class Timing {
         return timing_json;
     };
 
-    virtual void toJson(nlohmann::json& data) {
+    virtual void fromJson(nlohmann::json& data) {
         timestamp = data["time"].get<uint32_t>();
         bpm = data["bpm"].get<double>();
         beat_length = data["beatlength"].get<double>();
