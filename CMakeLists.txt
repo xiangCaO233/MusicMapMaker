@@ -192,6 +192,9 @@ set(PROJECT_SOURCES
     src/ui/config/project/projectconfig.cpp
     src/ui/config/project/projectconfigcontrolls.cpp
     src/ui/config/project/projectconfig.ui
+    src/ui/config/map/mapconfig.h
+    src/ui/config/map/mapconfig.cpp
+    src/ui/config/map/mapconfig.ui
     src/ui/audio/track/trackmanager.h
     src/ui/audio/track/trackmanager.cpp
     src/ui/audio/track/trackcontrols.cpp

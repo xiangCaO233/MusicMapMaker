@@ -19,6 +19,7 @@ void FileActionHandler::onNewFile() {
     //
     XINFO("触发新建文件");
 }
+
 void FileActionHandler::onOpen() {
     //
     XINFO("触发打开文件");
@@ -36,6 +37,7 @@ void FileActionHandler::onOpen() {
         XINFO("取消打开文件");
     }
 }
+
 void FileActionHandler::onOpenDirectory() {
     XINFO("触发打开文件夹");
     // 使用文件夹选择器选择项目的目录

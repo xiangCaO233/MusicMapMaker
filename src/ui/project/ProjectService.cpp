@@ -14,6 +14,14 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
     track_manager = trackmanager;
     auto service = this;
 
+    // 连接action的打开文件操作到此
+    connect(FileActionHandler::instance(), &FileActionHandler::open,
+            [service](std::string_view dir) {
+                // service->onOpenProject(dir);
+                // service->selectProject(
+                //     std::filesystem::path(dir).filename().generic_string());
+            });
+
     // 连接action的打开文件夹操作到此
     connect(FileActionHandler::instance(), &FileActionHandler::open_directory,
             [service](std::string dir) {

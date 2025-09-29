@@ -70,10 +70,15 @@ void MMap::readMMM() {
         timing_set().add_timing_point(std::move(reading_timing));
     }
 
-    basemeta.name = "[mmm] " + basemeta.artist_unicode + "-" +
-                    basemeta.title_unicode + "(" + basemeta.author + ") [" +
-                    std::to_string(basemeta.track_count) + "k] - " +
-                    basemeta.version;
+    auto dataname = map_data_json["name"].get<std::string>();
+    if (dataname == "") {
+        basemeta.name = "[mmm] " + basemeta.artist_unicode + "-" +
+                        basemeta.title_unicode + "(" + basemeta.author + ") [" +
+                        std::to_string(basemeta.track_count) + "k] - " +
+                        basemeta.version;
+    } else {
+        basemeta.name = dataname;
+    }
 
     update_preferenceBPM();
 

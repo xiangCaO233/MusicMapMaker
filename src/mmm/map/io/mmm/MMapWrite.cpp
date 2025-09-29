@@ -32,6 +32,7 @@ void MMap::writeMMM(const std::string& desfile) {
         std::filesystem::relative(basemeta.main_cover_path,
                                   basemeta.map_path.parent_path())
             .generic_string();
+    mapdata_json["name"] = basemeta.name;
 
     // 时间点数据
     auto& timings_json = mapdata_json["timings"];
