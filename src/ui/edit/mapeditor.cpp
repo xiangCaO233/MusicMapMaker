@@ -28,6 +28,8 @@ void MapEditor::use_theme(GlobalTheme theme) {
     }
     mutil::set_toolbutton_svgcolor(ui->edit_toolsbutton,
                                    "://icons/hand-rock.svg", color, 16, 16);
+    mutil::set_toolbutton_svgcolor(ui->generate_divisors_toolbutton,
+                                   "://icons/lines.svg", color, 16, 16);
     mutil::set_toolbutton_svgcolor(ui->bg_adjust_toolbutton,
                                    "://icons/background.svg", color, 16, 16);
 

@@ -66,6 +66,9 @@ void MainWindow::connectAll() {
     // 初始化画布后为timing编辑器绑定编辑命令队列
     connect(canvas, &MapCanvas::toolcmdqInitialized, ui->timing_editor,
             &TimingManager::bind_toolcmdq);
+    // 绑定默认分拍控制信号
+    connect(ui->editor, &MapEditor::updateGeneratedDivisors, canvas,
+            &MapCanvas::onUpdateDivs);
 
     // 绑定画布的渲染信号-显示帧率
     connect(canvas, &GLCanvas::update_window_suffix, this,

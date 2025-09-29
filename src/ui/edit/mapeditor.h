@@ -33,6 +33,9 @@ class MapEditor : public QWidget {
 
     void updateModeMenuIcon(const QString &actionname);
 
+   signals:
+    void updateGeneratedDivisors(uint32_t divs);
+
    protected:
     void keyPressEvent(QKeyEvent *e) override;
     void keyReleaseEvent(QKeyEvent *e) override;
@@ -54,6 +57,7 @@ class MapEditor : public QWidget {
     void initializeMenus();
     void initializeToolsMenu();
     void initializeBgMenu();
+    void initializeGenBeatDivisorsMenu();
 };
 
 #endif  // MAPEDITOR_H

@@ -123,6 +123,10 @@ void MapCanvas::onJudgelinePosUpdated(float pos) {
     auto mapcanvasInfo = info<MapCanvasInfo>();
     mapcanvasInfo->editorInfo.judgeline_pos = 1.f - pos;
 }
+void MapCanvas::onUpdateDivs(uint32_t divs) {
+    auto mapcanvasInfo = info<MapCanvasInfo>();
+    mapcanvasInfo->editorInfo.generated_beat_divisors = divs;
+}
 
 // 切换到图
 void MapCanvas::switch_map(MMap* smap) {

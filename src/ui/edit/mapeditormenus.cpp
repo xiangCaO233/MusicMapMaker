@@ -11,6 +11,7 @@
 void MapEditor::initializeMenus() {
     initializeToolsMenu();
     initializeBgMenu();
+    initializeGenBeatDivisorsMenu();
 }
 
 void MapEditor::bindToolActions() {
@@ -65,28 +66,6 @@ void MapEditor::initializeToolsMenu() {
     hand_mode_button->setChecked(true);
 
     auto mode_toolbutton = ui->edit_toolsbutton;
-
-    // 监听选中按钮变化
-    // connect(modesbuttonGroup,
-    //         QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked),
-    //         [=](QAbstractButton *button) {
-    //             // 切换工具按钮的图标
-    //             mode_toolbutton->setIcon(button->icon());
-    //             // 切换当前编辑器的模式
-    //             if (c->map) {
-    //                 auto mode = static_cast<ToolType>(group->id(button));
-    //                 switch (mode) {
-    //                     case ToolType::HAND: {
-    //                         c->use_tool("Hand");
-    //                         break;
-    //                     }
-    //                     case ToolType::NOTE: {
-    //                         c->use_tool("Note");
-    //                         break;
-    //                     }
-    //                 }
-    //             }
-    //         });
 
     // 将自定义 Widget 包装成 QWidgetAction
     auto *modewidgetAction = new QWidgetAction(modemenu);
@@ -181,4 +160,91 @@ void MapEditor::initializeBgMenu() {
     bgmenu->addAction(bgwidgetAction);
     // 设置背景按钮菜单
     ui->bg_adjust_toolbutton->setMenu(bgmenu);
+}
+
+void MapEditor::initializeGenBeatDivisorsMenu() {
+    // 分拍生成按钮
+    auto divmenu = new QMenu(ui->generate_divisors_toolbutton);
+    auto divmenuwidget = new QWidget();
+
+    // 创建倍率按钮
+    auto divratioButton = new QPushButton(divmenu);
+    divratioButton->setSizePolicy(QSizePolicy::Expanding,
+                                  QSizePolicy::Expanding);
+    divratioButton->setText("2x2");
+    divratioButton->setToolTip(tr("change div ration"));
+    // 分拍乘率滑条
+    auto div_multiplier_slider = new QSlider(Qt::Horizontal, divmenuwidget);
+    auto div_res_label = new QLabel(tr("4"));
+    div_res_label->setAlignment(Qt::AlignmentFlag::AlignCenter);
+    div_multiplier_slider->setRange(1, 24);
+    div_multiplier_slider->setSingleStep(1);
+    div_multiplier_slider->setPageStep(2);
+    div_multiplier_slider->setValue(2);
+
+    // 初始化按钮类型尺寸
+    divratioButton->setFlat(true);
+    divratioButton->setCheckable(true);
+    // divratioButton->setMinimumSize(QSize(24, 24));
+    // divratioButton->setMaximumSize(QSize(, 24));
+
+    // 布局
+    auto *divmenulayout = new QHBoxLayout;
+    divmenulayout->setContentsMargins(2, 2, 2, 2);
+    divmenulayout->setSpacing(2);
+    divmenulayout->addWidget(divratioButton);
+    divmenulayout->addWidget(div_multiplier_slider);
+    divmenulayout->addWidget(div_res_label);
+
+    divmenuwidget->setLayout(divmenulayout);
+    divmenulayout->setStretch(0, 1);
+    divmenulayout->setStretch(1, 2);
+    divmenulayout->setStretch(2, 1);
+
+    // 默认选中无模式按钮
+    divratioButton->setChecked(false);
+    divmenu->setContentsMargins(0, 0, 0, 0);
+
+    // 连接信号
+    auto this_cp = this;
+    connect(divratioButton, &QPushButton::toggled,
+            [this_cp, divratioButton, div_multiplier_slider,
+             div_res_label](bool checked) {
+                int res{0};
+                if (checked) {
+                    divratioButton->setText(
+                        QString("3x%1").arg(div_multiplier_slider->value()));
+                    res = 3 * div_multiplier_slider->value();
+                } else {
+                    divratioButton->setText(
+                        QString("2x%1").arg(div_multiplier_slider->value()));
+                    res = 2 * div_multiplier_slider->value();
+                }
+                emit this_cp->updateGeneratedDivisors(res);
+                div_res_label->setText(QString::number(res));
+            });
+    connect(div_multiplier_slider, &QSlider::valueChanged,
+            [this_cp, divratioButton, div_multiplier_slider,
+             div_res_label](int value) {
+                int res{0};
+                if (divratioButton->isChecked()) {
+                    res = 3 * value;
+                    divratioButton->setText(QString("3x%1").arg(value));
+                } else {
+                    res = 2 * value;
+                    divratioButton->setText(QString("2x%1").arg(value));
+                }
+                emit this_cp->updateGeneratedDivisors(res);
+                div_res_label->setText(QString::number(res));
+            });
+
+    // 将自定义 Widget 包装成 QWidgetAction
+    auto *divwidgetAction = new QWidgetAction(divmenu);
+    divwidgetAction->setDefaultWidget(divmenuwidget);
+
+    // 添加到菜单
+    divmenu->addAction(divwidgetAction);
+
+    // 设置模式按钮菜单
+    ui->generate_divisors_toolbutton->setMenu(divmenu);
 }

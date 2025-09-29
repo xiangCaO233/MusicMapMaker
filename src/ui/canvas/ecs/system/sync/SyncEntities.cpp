@@ -305,13 +305,10 @@ void sync_beats(ECSCore& core, const BeatTimeline& beatTimeLine,
         auto& [div, beat_length, index, manual] =
             registry.get<BeatComponent>(e);
         auto& [data] = registry.get<DirtyBeatMarkComponent>(e);
-
         if (data) {
             div = data->divisors;
             manual = data->is_manual;
         }
-
-        // updateNoteEntity(registry, e, note_data);
     }
     registry.clear<DirtyBeatMarkComponent>();
 
