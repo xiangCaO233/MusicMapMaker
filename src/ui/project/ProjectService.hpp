@@ -15,13 +15,9 @@ class ProjectService : public QObject {
     Q_OBJECT
    public slots:
     void onOpenProject(std::string_view project_path);
-    void onCloseProject(std::string_view project_name);
 
    public:
    signals:
-    void updateProjectList(
-        const std::unordered_map<std::string, std::unique_ptr<MProject>,
-                                 StringHash, std::equal_to<>>* projects) const;
     void activateProject(MProject* activated_project) const;
     void activateMap(MProject* activated_project, MMap* map);
 
@@ -32,9 +28,10 @@ class ProjectService : public QObject {
     // 析构ProjectService
     ~ProjectService() override;
 
-    void selectProject(std::string_view project_name);
+    void selectProject(std::string_view project_path);
+    void selectMap(std::string_view project_path, MMap* map);
+
     MProject* currentPorject();
-    void selectMap(std::string_view current_project_name, MMap* map);
 
    private:
     // 管理所有项目的内存-因为项目释放时需要使用gl上下文释放纹理

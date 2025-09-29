@@ -1,6 +1,8 @@
 #ifndef MMM_MMAP_HPP
 #define MMM_MMAP_HPP
 
+#include <config/map/mapconfig.h>
+
 #include <QObject>
 #include <ice/manage/AudioTrack.hpp>
 #include <memory>
@@ -21,8 +23,8 @@ class MMapEditor;
 class MMap : public QObject {
     Q_OBJECT
    public:
-    MMap();
-    explicit MMap(std::string_view file);
+    explicit MMap(TrackManager* trackmanager);
+    MMap(TrackManager* trackmanager, std::string_view file);
 
     virtual ~MMap();
 
@@ -60,14 +62,17 @@ class MMap : public QObject {
         return mapeditor;
     }
 
-    // 设置主音轨
-    void set_maintrack(const std::shared_ptr<ice::AudioTrack>& track);
-
     // 更新拍信息(智能识别分拍)
     void analyzeBeatInfo();
 
     // 写出到文件
     void writeOut(const std::string& file);
+
+    // 刷新配置ui
+    void update_configui();
+
+    // 显示配置ui
+    void show_configui();
 
    private:
     // (实际持有)
@@ -88,6 +93,12 @@ class MMap : public QObject {
 
     // 基础谱面信息
     BaseMapMeta basemeta;
+
+    // 一对一基本配置ui
+    std::unique_ptr<MapConfig> config_ui;
+
+    // 音轨管理器引用
+    TrackManager* trackmanager{nullptr};
 
     // 一对一编辑器
     std::mutex editor_mutex;

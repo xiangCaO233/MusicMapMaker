@@ -1,4 +1,5 @@
 #include <log/colorful-log.h>
+#include <trackmanager.h>
 
 #include <QDebug>
 #include <filesystem>
@@ -29,6 +30,8 @@ void MProject::open(std::string_view project_path_str) {
     } else {
         // 在这直接调用纹理池回调载入文件夹内全部纹理
         texcallback->need_loadtexture_dir(project_path.generic_string());
+        std::unordered_set<std::filesystem::path> maps;
+        std::unordered_set<std::filesystem::path> audios;
         // 载入项目目录
         for (auto it = std::filesystem::directory_iterator(project_path);
              it != std::filesystem::directory_iterator(); ++it) {
@@ -40,34 +43,12 @@ void MProject::open(std::string_view project_path_str) {
                        filename.ends_with(".osu")) {
                 // 载入谱面
                 XINFO("需要载入谱面[" + filename + "]");
-                auto map = std::make_unique<MMap>(filename);
-                map->bind_project(this);
-                // 添加谱面到表中
-                auto mapit =
-                    project_maps_table
-                        .try_emplace(map->base_metadata().name, std::move(map))
-                        .first;
-                auto map_maintrack = mapit->second->base_metadata()
-                                         .main_audio_path.generic_string();
+                if (!maps.contains(it->path())) maps.insert(it->path());
 
-                if (!project_main_audios_table.contains(map_maintrack)) {
-                    // 添加谱面的主音轨
-                    XINFO("map加载需要载入音频[" + map_maintrack + "]");
-                    project_main_audios_table.try_emplace(map_maintrack);
-                    auto map_track =
-                        audiocallback->loadBack(map_maintrack, true);
-                    project_main_audios_table[map_maintrack] = map_track;
-                }
             } else if (filename.ends_with(".mp3") ||
                        filename.ends_with(".ogg") ||
                        filename.ends_with(".wav")) {
-                if (!project_main_audios_table.contains(filename)) {
-                    XINFO("目录加载需要载入音频[" + filename + "]");
-                    project_normal_audios_table.try_emplace(filename);
-                    // 直接通过音频轨道管理器回调载入音轨
-                    auto track_weakptr = audiocallback->loadBack(filename);
-                    project_main_audios_table[filename] = track_weakptr;
-                }
+                if (audios.contains(it->path())) audios.insert(it->path());
             } else if (filename.ends_with(".mp4") ||
                        filename.ends_with(".mkv")) {
                 XINFO("需要载入视频[" + filename + "]");
@@ -80,6 +61,46 @@ void MProject::open(std::string_view project_path_str) {
                           std::string(result.description()));
                 }
             }
+        }
+
+        // 先加载所有map
+        for (const auto& mappath : maps) {
+            auto filename = mappath.generic_string();
+            auto map = std::make_unique<MMap>(
+                static_cast<TrackManager*>(audiocallback), filename);
+            map->bind_project(this);
+            // 添加谱面到表中
+            auto mapit =
+                project_maps_table
+                    .try_emplace(map->base_metadata().name, std::move(map))
+                    .first;
+            auto map_maintrack =
+                mapit->second->base_metadata().main_audio_path.generic_string();
+
+            if (!project_main_audios_table.contains(map_maintrack)) {
+                // 添加谱面的主音轨
+                XINFO("map加载需要载入音频[" + map_maintrack + "]");
+                project_main_audios_table.try_emplace(map_maintrack);
+                auto map_track = audiocallback->loadBack(map_maintrack, true);
+                project_main_audios_table[map_maintrack] = map_track;
+            }
+        }
+
+        // 再筛选加载剩余的音频
+        for (const auto& audiopath : audios) {
+            auto filename = audiopath.generic_string();
+            if (!project_main_audios_table.contains(filename)) {
+                XINFO("目录加载需要载入其他音频[" + filename + "]");
+                project_normal_audios_table.try_emplace(filename);
+                // 直接通过音频轨道管理器回调载入音轨
+                auto track_weakptr = audiocallback->loadBack(filename);
+                project_main_audios_table[filename] = track_weakptr;
+            }
+        }
+
+        // 更新所有map的配置ui
+        for (const auto& [name, map] : project_maps_table) {
+            map->update_configui();
         }
         update_configdoc(false);
         is_opened.store(true);

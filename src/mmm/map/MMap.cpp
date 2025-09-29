@@ -8,9 +8,17 @@
 #include <mmm/map/editor/MMapEditor.hpp>
 #include <util/mutil.hpp>
 
-MMap::MMap() {}
+MMap::MMap(TrackManager* trackmanager) : trackmanager(trackmanager) {
+    // 初始化配置ui
+    config_ui = std::make_unique<MapConfig>(this);
+    // 更新音轨表
+    config_ui->update_audio_tracklist(trackmanager);
+    // 新建谱面时立马显示配置
+    config_ui->show();
+}
 
-MMap::MMap(std::string_view file) {
+MMap::MMap(TrackManager* trackmanager, std::string_view file)
+    : trackmanager(trackmanager) {
     basemeta.map_path = std::string(file);
     if (file.ends_with(".osu")) {
         // 读取osu
@@ -20,12 +28,36 @@ MMap::MMap(std::string_view file) {
     } else if (file.ends_with(".mmm")) {
         readMMM();
     }
+    config_ui = std::make_unique<MapConfig>(this);
+    config_ui->update_ifcompeleted();
+    if (!config_ui->isCompelete()) {
+        // 有缺失元数据时显示配置
+        config_ui->show();
+    }
 }
 
-MMap::~MMap() = default;
+MMap::~MMap() {
+    if (!config_ui->isHidden()) {
+        config_ui->hide();
+    }
+    config_ui.reset();
+}
+
+// 刷新配置ui
+void MMap::update_configui() {
+    config_ui->update_audio_tracklist(trackmanager);
+}
+
+// 显示配置ui
+void MMap::show_configui() {
+    update_configui();
+    config_ui->show();
+}
 
 // 写出到文件
 void MMap::writeOut(const std::string& file) {
+    // 新谱面第一次保存直接设置元数据的谱面文件路径
+    if (basemeta.map_path.empty()) basemeta.map_path = file;
     if (file.ends_with(".osu")) {
         // 写出为osu
         writeOsu(file);

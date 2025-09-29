@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>490</width>
-    <height>377</height>
+    <width>503</width>
+    <height>502</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string notr="true"/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,2">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,2,0">
    <property name="spacing">
     <number>2</number>
    </property>
@@ -123,6 +123,9 @@
             </property>
             <item row="1" column="1">
              <widget class="QComboBox" name="audio_track_selectbox">
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::WheelFocus</enum>
+              </property>
               <property name="placeholderText">
                <string>No Audio</string>
               </property>
@@ -150,6 +153,9 @@
                 <widget class="QLineEdit" name="audio_path_lineedit">
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                 <property name="placeholderText">
+                  <string>*</string>
                  </property>
                 </widget>
                </item>
@@ -189,6 +195,26 @@
         </layout>
        </widget>
       </item>
+      <item row="11" column="2">
+       <widget class="QLineEdit" name="version_lineedit">
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>*</string>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="2">
+       <widget class="QLineEdit" name="mapname_lineedit">
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>Auto Generate</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="0">
        <widget class="QLabel" name="artist_ascii_label">
         <property name="text">
@@ -222,6 +248,9 @@
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
+           <property name="placeholderText">
+            <string>*</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -242,12 +271,18 @@
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
+        <property name="placeholderText">
+         <string>*</string>
+        </property>
        </widget>
       </item>
       <item row="5" column="2">
        <widget class="QLineEdit" name="artist_ascii_lineedit">
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>*</string>
         </property>
        </widget>
       </item>
@@ -261,7 +296,7 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0">
+      <item row="10" column="0">
        <widget class="QLabel" name="author_label">
         <property name="text">
          <string>Author:</string>
@@ -271,7 +306,7 @@
         </property>
        </widget>
       </item>
-      <item row="11" column="0">
+      <item row="12" column="0">
        <widget class="QLabel" name="mapname_label">
         <property name="text">
          <string>Map Name:</string>
@@ -281,10 +316,13 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="2">
+      <item row="10" column="2">
        <widget class="QLineEdit" name="author_lineedit">
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>*</string>
         </property>
        </widget>
       </item>
@@ -321,6 +359,9 @@
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
+           <property name="placeholderText">
+            <string>*</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -336,10 +377,13 @@
         </layout>
        </widget>
       </item>
-      <item row="8" column="2">
+      <item row="9" column="2">
        <widget class="QLineEdit" name="cover_lineedit">
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>*</string>
         </property>
        </widget>
       </item>
@@ -353,14 +397,27 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="2">
-       <widget class="QLineEdit" name="preferencebpm_lineedit">
+      <item row="11" column="0">
+       <widget class="QLabel" name="version_label">
+        <property name="text">
+         <string>Version:</string>
+        </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
+      <item row="6" column="2">
+       <widget class="QLineEdit" name="preferencebpm_lineedit">
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="placeholderText">
+         <string>*</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
        <widget class="QLabel" name="cover_label">
         <property name="text">
          <string>Cover:</string>
@@ -375,33 +432,60 @@
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
-       </widget>
-      </item>
-      <item row="10" column="0">
-       <widget class="QLabel" name="version_label">
-        <property name="text">
-         <string>Version:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="10" column="2">
-       <widget class="QLineEdit" name="lineEdit">
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="11" column="2">
-       <widget class="QLineEdit" name="lineEdit_2">
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
         <property name="placeholderText">
-         <string>Auto Generate</string>
+         <string>*</string>
         </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="audio_length_label">
+        <property name="text">
+         <string>Map Legnth:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="2">
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="map_length_lineedit">
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string>*</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="probe_audio_length_button">
+           <property name="text">
+            <string>Probe Audio</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -419,6 +503,60 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>330</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="confirm_button">
+        <property name="text">
+         <string>Confirm</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cancel_button">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

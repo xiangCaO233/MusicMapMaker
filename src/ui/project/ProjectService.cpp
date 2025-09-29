@@ -16,23 +16,28 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
     auto service = this;
 
     // 连接action的打开文件操作到此
-    connect(FileActionHandler::instance(), &FileActionHandler::open,
-            [service, parent]() {
-                // 使用文件夹选择器选择项目的目录
-                auto file = mutil::getOpenFile(
-                    qobject_cast<ProjectManager*>(parent), tr("select file"),
-                    {{tr("Audio File"), ".ogg .mp3 .wav"},
-                     {tr("Map File"), ".imd .mmm .osu .mc"}},
-                    QDir::homePath());
-                if (!file.isEmpty()) {
-                    auto fpath = file.toStdString();
-                    XINFO(std::format("打开文件:[{}]", fpath));
-                    // 打开文件
-                } else {
-                    // 取消打开
-                    XINFO("取消打开文件");
-                }
-            });
+    connect(
+        FileActionHandler::instance(), &FileActionHandler::open,
+        [service, parent]() {
+            // 使用文件夹选择器选择项目的目录
+            auto file = mutil::getOpenFile(
+                qobject_cast<ProjectManager*>(parent), tr("select file"),
+                {{tr("Audio File"), ".ogg .mp3 .wav"},
+                 {tr("Map File"), ".imd .mmm .osu"}},
+                QDir::homePath());
+            if (!file.isEmpty()) {
+                auto file_path = std::filesystem::path(file.toStdString());
+                XINFO(std::format("打开文件:[{}]", file_path.generic_string()));
+                auto parent_dir_path = file_path.parent_path();
+                // 将父目录作为项目打开
+                service->onOpenProject(parent_dir_path.generic_string());
+                service->selectProject(
+                    parent_dir_path.filename().generic_string());
+            } else {
+                // 取消打开
+                XINFO("取消打开文件");
+            }
+        });
 
     // 连接action的打开文件夹操作到此
     connect(
@@ -63,8 +68,8 @@ ProjectService::~ProjectService() {
     }
 }
 
-void ProjectService::selectProject(std::string_view project_name) {
-    auto it = projects.find(project_name);
+void ProjectService::selectProject(std::string_view project_path) {
+    auto it = projects.find(project_path);
     if (it != projects.end()) {
         current_selected_porject = it->second.get();
         emit activateProject(current_selected_porject);
@@ -87,31 +92,23 @@ void ProjectService::onOpenProject(std::string_view path) {
         !std::filesystem::is_directory(project_path)) {
         return;
     } else {
-        // 打开的项目是否是mproject
-        bool is_mproject{false};
-        auto project = std::make_unique<MProject>(map_canvas->textureCallback(),
-                                                  track_manager);
+        // 项目是否已打开过
+        MProject* project;
+        if (auto it = projects.find(project_path.generic_string());
+            it != projects.end()) {
+            project = it->second.get();
+        } else {
+            // 创建并将项目加入集合
+            project = projects
+                          .try_emplace(
+                              project_path.generic_string(),
+                              std::make_unique<MProject>(
+                                  map_canvas->textureCallback(), track_manager))
+                          .first->second.get();
+        }
         // 打开项目
         project->open(project_path.generic_string());
-
-        // 目标项目名称(作为项目集合的key)
-        auto project_name = project->cfg()->project_name;
-
-        // 将项目加入集合
-        projects.try_emplace(project_name, std::move(project))
-            .first->second.get();
+        // 立马选中
+        selectProject(project_path.generic_string());
     }
-    // 发送更新项目列表信号
-    emit updateProjectList(&projects);
-}
-
-void ProjectService::onCloseProject(std::string_view project_name) {
-    auto it = projects.find(project_name);
-    if (it == projects.end()) {
-        qDebug() << "不存在项目[" << project_name << "]";
-        return;
-    }
-    projects.erase(it);
-    // 发送更新列表信号
-    emit updateProjectList(&projects);
 }

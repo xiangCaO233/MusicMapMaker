@@ -194,6 +194,7 @@ set(PROJECT_SOURCES
     src/ui/config/project/projectconfig.ui
     src/ui/config/map/mapconfig.h
     src/ui/config/map/mapconfig.cpp
+    src/ui/config/map/mapconfigcontrolls.cpp
     src/ui/config/map/mapconfig.ui
     src/ui/audio/track/trackmanager.h
     src/ui/audio/track/trackmanager.cpp
@@ -233,6 +234,7 @@ include_directories(
   ./src/ui/project
   ./src/ui/edit
   ./src/ui/config/project
+  ./src/ui/config/map
   ./src/ui/audio/track
   ./src/ui/audio/graphic)
 

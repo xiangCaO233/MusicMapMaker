@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->editor->bindToolActions();
 
-    // 跟随系统主题
+    // 跟随系统主题应用默认主题
     XINFO("System theme lightness:" +
           std::to_string(QApplication::palette().window().color().lightness()));
     if (QApplication::palette().window().color().lightness() < 128) {
@@ -128,7 +128,7 @@ void MainWindow::use_theme(GlobalTheme theme) {
     }
     if (file.open(QFile::ReadOnly)) {
         global_style_sheet = file.readAll();
-        setStyleSheet(global_style_sheet);
+        qApp->setStyleSheet(global_style_sheet);
         file.close();
     }
     ui->editor->use_theme(theme);

@@ -29,11 +29,11 @@ struct BaseMapMeta {
     std::string author;
 
     // 谱面参考bpm
-    double preference_bpm{100.};
+    double preference_bpm{-1.};
     // 谱面轨道数
-    uint32_t track_count{4};
+    int32_t track_count{-1};
     // 谱面总时长
-    uint32_t map_length{0};
+    int32_t map_length{-1};
 };
 
 #endif  // MMM_BASEMAPMETA_HPP

@@ -43,13 +43,8 @@ void ProjectManager::initService(MapCanvas* canvas) {
     service = new ProjectService(canvas, ui->audios_tab, this);
     connect(this, &ProjectManager::openProject, service,
             &ProjectService::onOpenProject);
-    connect(this, &ProjectManager::closeProject, service,
-            &ProjectService::onCloseProject);
-    // connect(service, &ProjectService::updateProjectListView, this,
-    //         &ProjectManager::onUpdateProjectListView);
     connect(service, &ProjectService::activateProject, this,
             &ProjectManager::onActivateProject);
-
     connect(ui->audios_tab, &TrackManager::audioLoadcbk_initialized, canvas,
             &MapCanvas::onAudioLoadcbkInitialized);
 }
@@ -113,5 +108,3 @@ void ProjectManager::onMapCanvasThreadStopped() {
 void ProjectManager::closeEvent(QCloseEvent* e) {
     service->selectMap("", nullptr);
 }
-
-void ProjectManager::on_map_listView_clicked(const QModelIndex& index) {}
