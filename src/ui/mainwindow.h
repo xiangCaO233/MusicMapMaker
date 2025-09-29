@@ -37,9 +37,6 @@ class MainWindow : public QMainWindow {
     // 更新标题后缀
     void update_title_suffix(const QString &suffix);
 
-    // 默认皮肤初始化完成
-    void onDefSkinInitialized();
-
    protected:
     void closeEvent(QCloseEvent *e) override;
 

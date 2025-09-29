@@ -22,7 +22,7 @@ class ProjectManager : public QWidget {
     ~ProjectManager() override;
 
     // 初始化管理器
-    void initService(MapCanvas *canvas, TrackManager *trackmanager);
+    void initService(MapCanvas *canvas);
 
     ProjectService *get_service();
 
@@ -35,11 +35,15 @@ class ProjectManager : public QWidget {
 
    public slots:
     void onMapCanvasThreadStopped();
+    // 默认皮肤初始化完成
+    void onDefSkinInitialized();
    private slots:
 
     void on_map_listView_doubleClicked(const QModelIndex &index);
 
     void onActivateProject(MProject *activated_project);
+
+    void on_map_listView_clicked(const QModelIndex &index);
 
    private:
     // 项目服务

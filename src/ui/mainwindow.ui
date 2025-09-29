@@ -58,21 +58,6 @@
    </attribute>
    <widget class="ProjectManager" name="project_manager"/>
   </widget>
-  <widget class="QDockWidget" name="track_manager_dock">
-   <property name="allowedAreas">
-    <set>Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle">
-    <string>Track Manager</string>
-   </property>
-   <property name="dockLocation">
-    <enum>Qt::DockWidgetArea::RightDockWidgetArea</enum>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="TrackManager" name="track_manager"/>
-  </widget>
   <widget class="QDockWidget" name="timingManager">
    <property name="windowTitle">
     <string>Timing Manager</string>
@@ -132,12 +117,6 @@
    <class>ProjectManager</class>
    <extends>QWidget</extends>
    <header location="global">projectmanager.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>TrackManager</class>
-   <extends>QWidget</extends>
-   <header location="global">trackmanager.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

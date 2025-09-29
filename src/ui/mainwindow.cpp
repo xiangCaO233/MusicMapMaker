@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget* parent)
     qRegisterMetaType<MMap*>("MMap*");
 
     // 初始化项目服务
-    ui->project_manager->initService(ui->editor->canvas(), ui->track_manager);
+    ui->project_manager->initService(ui->editor->canvas());
 
     connectAll();
 
@@ -84,11 +84,8 @@ void MainWindow::connectAll() {
             &ProjectManager::onMapCanvasThreadStopped);
 
     // 确保在音频系统初始化后载入默认皮肤需要载入的所有音频
-    connect(canvas, &MapCanvas::skinInitialized, this,
-            &MainWindow::onDefSkinInitialized);
-
-    connect(ui->track_manager, &TrackManager::audioLoadcbk_initialized, canvas,
-            &MapCanvas::onAudioLoadcbkInitialized);
+    connect(canvas, &MapCanvas::skinInitialized, ui->project_manager,
+            &ProjectManager::onDefSkinInitialized);
 }
 
 // 使用主题
@@ -151,13 +148,4 @@ void MainWindow::update_title_suffix(const QString& suffix) {
     setWindowTitle(tr("MusicMapMaker-->") + suffix);
 }
 
-// 默认皮肤初始化完成
-void MainWindow::onDefSkinInitialized() {
-    // 触发音效加载回调
-    emit ui->track_manager->audioLoadcbk_initialized(ui->track_manager);
-}
-
-void MainWindow::closeEvent(QCloseEvent* e) {
-    ui->track_manager->close();
-    ui->project_manager->close();
-}
+void MainWindow::closeEvent(QCloseEvent* e) { ui->project_manager->close(); }

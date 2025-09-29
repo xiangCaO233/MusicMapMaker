@@ -19,7 +19,7 @@ TimeEditWidget::TimeEditWidget(Timing *&timing, QTableWidget *parent,
     layout->addWidget(timeEdit);
     layout->addWidget(gotoButton);
     layout->setSpacing(2);
-    layout->setContentsMargins(2, 0, 0, 4);
+    layout->setContentsMargins(2, 0, 2, 0);
     layout->setStretch(0, 0);
     layout->setStretch(1, 1);
     layout->setStretch(2, 0);
@@ -98,6 +98,8 @@ TimingSettingWidget::TimingSettingWidget(Timing *&timing, QTableWidget *parent)
     layout->addItem(spacer);
     layout->addWidget(doneButton);
     layout->addWidget(deleteButton);
+    layout->setSpacing(2);
+    layout->setContentsMargins(0, 0, 2, 0);
     setLayout(layout);
 }
 

@@ -24,10 +24,6 @@ ProjectManager::ProjectManager(QWidget* parent)
     auto map_list_model = new QStandardItemModel(ui->map_listView);
     ui->map_listView->setModel(map_list_model);
 
-    // 音频列表模型
-    auto audio_list_model = new QStandardItemModel(ui->audio_listView);
-    ui->audio_listView->setModel(audio_list_model);
-
     // 图片列表模型
     auto image_list_model = new QStandardItemModel(ui->image_listView);
     ui->image_listView->setModel(image_list_model);
@@ -43,9 +39,8 @@ ProjectManager::~ProjectManager() {
 }
 
 // 初始化管理器
-void ProjectManager::initService(MapCanvas* canvas,
-                                 TrackManager* trackmanager) {
-    service = new ProjectService(canvas, trackmanager, this);
+void ProjectManager::initService(MapCanvas* canvas) {
+    service = new ProjectService(canvas, ui->audios_tab, this);
     connect(this, &ProjectManager::openProject, service,
             &ProjectService::onOpenProject);
     connect(this, &ProjectManager::closeProject, service,
@@ -54,9 +49,18 @@ void ProjectManager::initService(MapCanvas* canvas,
     //         &ProjectManager::onUpdateProjectListView);
     connect(service, &ProjectService::activateProject, this,
             &ProjectManager::onActivateProject);
+
+    connect(ui->audios_tab, &TrackManager::audioLoadcbk_initialized, canvas,
+            &MapCanvas::onAudioLoadcbkInitialized);
 }
 
 ProjectService* ProjectManager::get_service() { return service; }
+
+// 默认皮肤初始化完成
+void ProjectManager::onDefSkinInitialized() {
+    // 触发音效加载回调
+    emit ui->audios_tab->audioLoadcbk_initialized(ui->audios_tab);
+}
 
 // 激活项目
 void ProjectManager::onActivateProject(MProject* activated_project) {
@@ -72,27 +76,6 @@ void ProjectManager::onActivateProject(MProject* activated_project) {
             map_item->setData(QVariant::fromValue(map.get()));
             map_item->setEditable(false);
             map_model->appendRow(map_item);
-        }
-
-        // 更新音频表
-        auto audio_model =
-            qobject_cast<QStandardItemModel*>(ui->audio_listView->model());
-        audio_model->clear();
-        for (const auto& [audio_name, track] :
-             activated_project->project_main_audios_table) {
-            auto audio_item =
-                new QStandardItem(QString::fromStdString(audio_name));
-            audio_item->setData(QVariant::fromValue(track));
-            audio_item->setEditable(false);
-            audio_model->appendRow(audio_item);
-        }
-        for (const auto& [audio_name, track] :
-             activated_project->project_normal_audios_table) {
-            auto audio_item =
-                new QStandardItem(QString::fromStdString(audio_name));
-            audio_item->setData(QVariant::fromValue(track));
-            audio_item->setEditable(false);
-            audio_model->appendRow(audio_item);
         }
 
         // 更新图片表
@@ -130,3 +113,5 @@ void ProjectManager::onMapCanvasThreadStopped() {
 void ProjectManager::closeEvent(QCloseEvent* e) {
     service->selectMap("", nullptr);
 }
+
+void ProjectManager::on_map_listView_clicked(const QModelIndex& index) {}

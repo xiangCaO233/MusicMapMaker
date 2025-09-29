@@ -64,7 +64,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="audios_tab">
+       <widget class="TrackManager" name="audios_tab">
         <attribute name="title">
          <string>Audios</string>
         </attribute>
@@ -84,9 +84,6 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QListView" name="audio_listView"/>
-         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="images_tab">
@@ -145,6 +142,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TrackManager</class>
+   <extends>QWidget</extends>
+   <header location="global">trackmanager.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

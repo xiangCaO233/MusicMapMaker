@@ -24,7 +24,7 @@ struct AudioConfig {
 };
 
 // 谱面内配置
-struct MapConfig {
+struct ProjectMapConfig {
     // 背景暗化比例
     float darken{.2f};
     // 背景不透明度
