@@ -18,8 +18,8 @@ class FileActionHandler : public QObject {
     ~FileActionHandler() override;
 
    signals:
-    void open(std::string file);
-    void open_directory(std::string dir);
+    void open();
+    void open_directory();
     void save();
 
     // 需要默认名称

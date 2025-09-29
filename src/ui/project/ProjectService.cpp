@@ -1,4 +1,5 @@
 #include <audio/track/trackmanager.h>
+#include <project/projectmanager.h>
 
 #include <action/modules/file/FileActionHandler.hpp>
 #include <canvas/map/MapCanvas.hpp>
@@ -16,19 +17,43 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
 
     // 连接action的打开文件操作到此
     connect(FileActionHandler::instance(), &FileActionHandler::open,
-            [service](std::string_view dir) {
-                // service->onOpenProject(dir);
-                // service->selectProject(
-                //     std::filesystem::path(dir).filename().generic_string());
+            [service, parent]() {
+                // 使用文件夹选择器选择项目的目录
+                auto file = mutil::getOpenFile(
+                    qobject_cast<ProjectManager*>(parent), tr("select file"),
+                    {{tr("Audio File"), ".ogg .mp3 .wav"},
+                     {tr("Map File"), ".imd .mmm .osu .mc"}},
+                    QDir::homePath());
+                if (!file.isEmpty()) {
+                    auto fpath = file.toStdString();
+                    XINFO(std::format("打开文件:[{}]", fpath));
+                    // 打开文件
+                } else {
+                    // 取消打开
+                    XINFO("取消打开文件");
+                }
             });
 
     // 连接action的打开文件夹操作到此
-    connect(FileActionHandler::instance(), &FileActionHandler::open_directory,
-            [service](std::string dir) {
-                service->onOpenProject(dir);
+    connect(
+        FileActionHandler::instance(), &FileActionHandler::open_directory,
+        [service, parent]() {
+            // 使用文件夹选择器选择项目的目录
+            auto dir = mutil::getDirectory(
+                qobject_cast<ProjectManager*>(parent),
+                tr("select project directory"), QDir::homePath());
+            if (!dir.isEmpty()) {
+                auto ppath = dir.toStdString();
+                XINFO(std::format("打开路径:[{}]", ppath));
+                // 打开项目
+                service->onOpenProject(ppath);
                 service->selectProject(
-                    std::filesystem::path(dir).filename().generic_string());
-            });
+                    std::filesystem::path(ppath).filename().generic_string());
+            } else {
+                // 取消打开
+                XINFO("取消打开文件夹");
+            }
+        });
 }
 
 // 析构ProjectService

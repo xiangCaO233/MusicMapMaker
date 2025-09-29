@@ -47,11 +47,11 @@ TimingParameterEditor::TimingParameterEditor(Timing *&timing,
     bpmEdit = new QLineEdit(this);
 
     bpmEdit->setValidator(validator);
-    bpmEdit->setText(QString::number(timing->bpm, 'f', 5));
+    bpmEdit->setText(QString::number(timing->bpm, 'f', 3));
 
     speedTitle = new QLabel(tr("speed:"), this);
     speedSpinBox = new QDoubleSpinBox(this);
-    speedSpinBox->setDecimals(5);
+    speedSpinBox->setDecimals(3);
     speedSpinBox->setSuffix("x");
 
     // 3. 将所有控件都添加到主布局中
