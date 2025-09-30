@@ -1,6 +1,7 @@
 #include <log/colorful-log.h>
 
 #include <QDebug>
+#include <cstdint>
 #include <fstream>
 #include <mmm/map/MMap.hpp>
 #include <mmm/obj/rm/Composite.hpp>
@@ -244,7 +245,7 @@ void MMap::readImd() {
                 basemeta.track_count = note_orbit + 1;
 
             // 更新谱面长度
-            if (note_timestamp > basemeta.map_length)
+            if (int64_t(note_timestamp) > basemeta.map_length)
                 basemeta.map_length = note_timestamp;
 
             // 初始化物件
@@ -269,7 +270,7 @@ void MMap::readImd() {
                     auto hold = static_cast<Hold*>(temp_note.get());
                     hold->set_duration(note_parameter);
                     // 需要更新谱面长度
-                    if (hold->timestamp() + hold->duration() >
+                    if (int64_t(hold->timestamp() + hold->duration()) >
                         basemeta.map_length)
                         basemeta.map_length =
                             hold->timestamp() + hold->duration();

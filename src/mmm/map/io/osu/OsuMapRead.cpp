@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <mmm/info/osu/OsuMapInfo.hpp>
 #include <mmm/map/MMap.hpp>
@@ -419,7 +420,7 @@ void MMap::readOsu() {
                 // 使用读取出的参数初始化物件
                 note->from_osu_description(note_paras, difficulty->CircleSize);
                 // 更新谱面时长
-                if (note->timestamp() > basemeta.map_length)
+                if (int64_t(note->timestamp()) > basemeta.map_length)
                     basemeta.map_length = note->timestamp();
 
                 // 加入物件列表
