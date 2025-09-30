@@ -1,7 +1,6 @@
 #include <ecs/component/RelationComponents.hpp>
 #include <ecs/system/sync/SyncSystem.hpp>
 #include <layer/MapLayerManager.hpp>
-#include <string>
 
 // 创建拍实体
 entt::entity createBeatEntity(entt::registry& registry, const Beat* beat) {
@@ -601,6 +600,15 @@ void sync_creating_noteEntity(ECSCore& core, MapLayerManager* layer_manager,
         for (size_t i = child_count; i < existing_children.size(); ++i) {
             registry.destroy(existing_children[i]);
         }
+
+        // 更新当前复合实体的总持续时间
+        uint32_t total_duration{0};
+        for (const auto& childe : root.children) {
+            if (auto holdcomponent = registry.try_get<HoldComponent>(childe)) {
+                total_duration += holdcomponent->duration;
+            }
+        }
+        root.total_duration = total_duration;
 
         return;
     }
