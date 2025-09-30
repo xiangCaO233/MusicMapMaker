@@ -131,75 +131,62 @@
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="14"/>
-        <source>Cancel</source>
+        <source>HandTool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="17"/>
-        <source>Select Page</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="19"/>
-        <source>Select All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="22"/>
-        <source>Cut</source>
+        <source>NoteTool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="23"/>
-        <source>Copy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="24"/>
-        <source>Paste</source>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="26"/>
-        <source>Delete</source>
+        <source>Select Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="29"/>
-        <source>Undo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="30"/>
-        <source>Redo</source>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="28"/>
+        <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="31"/>
+        <source>Cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="32"/>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="33"/>
+        <source>Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="35"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="38"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="39"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="40"/>
         <source>Find</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>FileActionHandler</name>
-    <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="24"/>
-        <source>select file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="25"/>
-        <source>Audio File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="26"/>
-        <source>Map File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="40"/>
-        <source>select project directory</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -259,68 +246,263 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="54"/>
-        <location filename="../src/ui/mainwindow.ui" line="119"/>
+        <location filename="../src/ui/mainwindow.ui" line="44"/>
+        <source>Theme(&amp;T)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="64"/>
         <source>Project Manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="66"/>
-        <location filename="../src/ui/mainwindow.ui" line="108"/>
-        <source>Track Manager</source>
+        <location filename="../src/ui/mainwindow.ui" line="97"/>
+        <source>Open Source Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="78"/>
+        <location filename="../src/ui/mainwindow.ui" line="102"/>
+        <source>Open Source Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="107"/>
+        <source>Colin Dark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="112"/>
+        <source>Colin Light</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="73"/>
         <source>Timing Manager</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="90"/>
+        <location filename="../src/ui/mainwindow.ui" line="85"/>
         <source>Project Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="137"/>
+        <location filename="../src/ui/mainwindow.cpp" line="148"/>
         <source>MusicMapMaker--&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindowcontrols.cpp" line="65"/>
+        <source>Switch Tool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MapCanvas</name>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="105"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="115"/>
         <source>save as file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="106"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="116"/>
         <source>MMM Map File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="125"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="136"/>
         <source>mmm mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="126"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="137"/>
         <source>imd mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="127"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="138"/>
         <source>osu mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="150"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
         <source>Export As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="150"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
         <source>File Formats:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MapConfig</name>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="40"/>
+        <source>Map Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="56"/>
+        <source>Preference BPM:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="71"/>
+        <source>Audio:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="81"/>
+        <source>Artist(Unicode):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="130"/>
+        <source>No Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="158"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="230"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="278"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="301"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="311"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="351"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="389"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="432"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="452"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="490"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="531"/>
+        <source>*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="191"/>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="204"/>
+        <source>Tracks:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="211"/>
+        <source>Path:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="240"/>
+        <source>Keep Blank To Auto Generate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="247"/>
+        <source>Artist(ASCII):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="285"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="396"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="497"/>
+        <source>Probe Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="318"/>
+        <source>Title(Unicode):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="328"/>
+        <source>Author:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="338"/>
+        <source>Map Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="358"/>
+        <source>Title(ASCII):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="409"/>
+        <source>Track Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="419"/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="439"/>
+        <source>Cover:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="459"/>
+        <source>Map Legnth:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="614"/>
+        <source>Confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="624"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="94"/>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="102"/>
+        <source>Only integers are allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="112"/>
+        <source>Only decimal numbers are allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="122"/>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="132"/>
+        <source>Only ASCII characters are allowed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="189"/>
+        <source>input not compelete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="194"/>
+        <source>input illegal character</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="149"/>
+        <source>Select Audio File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="150"/>
+        <source>Audio File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="164"/>
+        <source>Select Image File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="165"/>
+        <source>Image File</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -342,38 +524,43 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditor.ui" line="137"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="115"/>
+        <source>change default generated divisors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="163"/>
         <source>Enable Time Point Effect Mapping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditor.ui" line="175"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="201"/>
         <source>Snap to beat lines when scrolling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditor.ui" line="210"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="236"/>
         <source>Make the canvas scroll with the mouse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="48"/>
-        <source>Hand Tool</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="54"/>
-        <source>Note Tool</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="126"/>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="96"/>
         <source>darken</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="153"/>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="123"/>
         <source>alpha</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="175"/>
+        <source>change div ration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="178"/>
+        <source>4</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -410,47 +597,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="215"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="211"/>
         <source>Track Layout:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="237"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="233"/>
         <source>top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="267"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="266"/>
         <source>right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="300"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="302"/>
         <source>bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="333"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="338"/>
         <source>left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="415"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="406"/>
         <source>Judgeline Pos:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="503"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="477"/>
         <source>Object Scale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="513"/>
         <source>width:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="565"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
         <source>height:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -468,18 +655,66 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="69"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="73"/>
         <source>Audios</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="94"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="95"/>
         <source>Images</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="119"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="120"/>
         <source>Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="42"/>
+        <source>Open In FileBrowser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="54"/>
+        <source>Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="60"/>
+        <source>Import Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="63"/>
+        <source>Select Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="64"/>
+        <source>Map File(*.mmm *.osu *.imd)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="72"/>
+        <source>Create New Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ProjectService</name>
+    <message>
+        <location filename="../src/ui/project/ProjectService.cpp" line="42"/>
+        <source>select file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/ProjectService.cpp" line="44"/>
+        <source>Map File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/ProjectService.cpp" line="74"/>
+        <source>select project directory</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -562,42 +797,42 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>album</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>bitrate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>samplerate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>length</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>framecount</source>
         <translation type="unfinished"></translation>
     </message>

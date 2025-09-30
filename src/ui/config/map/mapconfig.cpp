@@ -296,6 +296,13 @@ void MapConfig::update_audio_tracklist(TrackManager *trackmanager) {
     auto index = find_track_indexinCombobox();
     if (index >= 0) {
         ui->audio_track_selectbox->setCurrentIndex(index);
+        // 设置选中项
+        if (auto track =
+                trackmanager
+                    ->get_track(ui->audio_track_selectbox->currentText())
+                    .lock()) {
+            selected_track = track;
+        }
     }
 }
 

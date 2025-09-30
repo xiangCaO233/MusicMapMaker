@@ -111,6 +111,9 @@
       </item>
       <item>
        <widget class="QToolButton" name="generate_divisors_toolbutton">
+        <property name="toolTip">
+         <string>change default generated divisors</string>
+        </property>
         <property name="text">
          <string/>
         </property>

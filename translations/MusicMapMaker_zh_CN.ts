@@ -131,51 +131,61 @@
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="14"/>
+        <source>HandTool</source>
+        <translation>工具手</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="17"/>
+        <source>NoteTool</source>
+        <translation>物件工具</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="23"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="17"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="26"/>
         <source>Select Page</source>
         <translation>选择整页</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="19"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="28"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="22"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="31"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="23"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="32"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="24"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="33"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="26"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="35"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="29"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="38"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="30"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="39"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="31"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="40"/>
         <source>Find</source>
         <translation>查找</translation>
     </message>
@@ -183,24 +193,20 @@
 <context>
     <name>FileActionHandler</name>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="24"/>
         <source>select file</source>
-        <translation>选择文件</translation>
+        <translation type="vanished">选择文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="25"/>
         <source>Audio File</source>
-        <translation>音频文件</translation>
+        <translation type="vanished">音频文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="26"/>
         <source>Map File</source>
-        <translation>谱面文件</translation>
+        <translation type="vanished">谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/file/FileActionHandler.cpp" line="40"/>
         <source>select project directory</source>
-        <translation>选择项目目录</translation>
+        <translation type="vanished">选择项目目录</translation>
     </message>
 </context>
 <context>
@@ -275,69 +281,268 @@
         <translation>编辑(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="54"/>
-        <location filename="../src/ui/mainwindow.ui" line="119"/>
+        <location filename="../src/ui/mainwindow.ui" line="44"/>
+        <source>Theme(&amp;T)</source>
+        <translation>主题(&amp;T)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="64"/>
         <source>Project Manager</source>
         <translation>项目管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="66"/>
-        <location filename="../src/ui/mainwindow.ui" line="108"/>
-        <source>Track Manager</source>
-        <translation>音轨管理器</translation>
+        <location filename="../src/ui/mainwindow.ui" line="97"/>
+        <source>Open Source Dark</source>
+        <translation>开源暗色</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="78"/>
+        <location filename="../src/ui/mainwindow.ui" line="102"/>
+        <source>Open Source Light</source>
+        <translation>开源浅色</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="107"/>
+        <source>Colin Dark</source>
+        <translation>Colin 暗色</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="112"/>
+        <source>Colin Light</source>
+        <translation>Colin 浅色</translation>
+    </message>
+    <message>
+        <source>Track Manager</source>
+        <translation type="vanished">音轨管理器</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindow.ui" line="73"/>
         <source>Timing Manager</source>
         <translation>时间点管理器</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.ui" line="90"/>
+        <location filename="../src/ui/mainwindow.ui" line="85"/>
         <source>Project Settings</source>
         <translation>项目设置</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="137"/>
+        <location filename="../src/ui/mainwindow.cpp" line="148"/>
         <source>MusicMapMaker--&gt;</source>
         <translation>谱面编辑器--&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/mainwindowcontrols.cpp" line="65"/>
+        <source>Switch Tool</source>
+        <translation>切换工具</translation>
     </message>
 </context>
 <context>
     <name>MapCanvas</name>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="105"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="115"/>
         <source>save as file</source>
         <translation>另存为文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="106"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="116"/>
         <source>MMM Map File</source>
         <translation>MMM谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="125"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="136"/>
         <source>mmm mapfile</source>
         <translation>MMM谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="126"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="137"/>
         <source>imd mapfile</source>
         <translation>IMD谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="127"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="138"/>
         <source>osu mapfile</source>
         <translation>OSU谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="150"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
         <source>Export As</source>
         <translation>导出为</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="150"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
         <source>File Formats:</source>
         <translation>文件格式:</translation>
+    </message>
+</context>
+<context>
+    <name>MapConfig</name>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="40"/>
+        <source>Map Config</source>
+        <translation>谱面配置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="56"/>
+        <source>Preference BPM:</source>
+        <translation>参考BPM:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="71"/>
+        <source>Audio:</source>
+        <translation>音频:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="81"/>
+        <source>Artist(Unicode):</source>
+        <translation>艺术家(Unicode):</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="130"/>
+        <source>No Audio</source>
+        <translation>无音轨</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="158"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="230"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="278"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="301"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="311"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="351"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="389"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="432"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="452"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="490"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="531"/>
+        <source>*</source>
+        <translation>*</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="191"/>
+        <source>Load</source>
+        <translation>载入</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="204"/>
+        <source>Tracks:</source>
+        <translation>音轨:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="211"/>
+        <source>Path:</source>
+        <translation>路径:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="240"/>
+        <source>Keep Blank To Auto Generate</source>
+        <translation>保持空白以自动生成谱面名称</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="247"/>
+        <source>Artist(ASCII):</source>
+        <translation>艺术家(ASCII):</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="285"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="396"/>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="497"/>
+        <source>Probe Audio</source>
+        <translation>探测音频文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="318"/>
+        <source>Title(Unicode):</source>
+        <translation>标题(Unicode):</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="328"/>
+        <source>Author:</source>
+        <translation>作者:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="338"/>
+        <source>Map Name:</source>
+        <translation>谱面名称:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="358"/>
+        <source>Title(ASCII):</source>
+        <translation>标题(ASCII):</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="409"/>
+        <source>Track Count:</source>
+        <translation>轨道数:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="419"/>
+        <source>Version:</source>
+        <translation>版本名:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="439"/>
+        <source>Cover:</source>
+        <translation>封面:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="459"/>
+        <source>Map Legnth:</source>
+        <translation>谱面长度(ms):</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="614"/>
+        <source>Confirm</source>
+        <translation>确认</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.ui" line="624"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="94"/>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="102"/>
+        <source>Only integers are allowed.</source>
+        <translation>只能输入整数.</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="112"/>
+        <source>Only decimal numbers are allowed.</source>
+        <translation>只能输入小数.</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="122"/>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="132"/>
+        <source>Only ASCII characters are allowed.</source>
+        <translation>只能输入ASCII字符.</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="189"/>
+        <source>input not compelete</source>
+        <translation>输入尚未完成</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfig.cpp" line="194"/>
+        <source>input illegal character</source>
+        <translation>输入包含无效字符</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="149"/>
+        <source>Select Audio File</source>
+        <translation>选择音频文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="150"/>
+        <source>Audio File</source>
+        <translation>音频文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="164"/>
+        <source>Select Image File</source>
+        <translation>选择图像文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/map/mapconfigcontrolls.cpp" line="165"/>
+        <source>Image File</source>
+        <translation>图像文件</translation>
     </message>
 </context>
 <context>
@@ -358,39 +563,52 @@
         <translation>背景设置</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditor.ui" line="137"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="115"/>
+        <source>change default generated divisors</source>
+        <translation>修改默认生成的分拍数</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditor.ui" line="163"/>
         <source>Enable Time Point Effect Mapping</source>
         <translation>启用时间点映射效果</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditor.ui" line="175"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="201"/>
         <source>Snap to beat lines when scrolling</source>
         <translation>滚动时吸附到分拍线</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditor.ui" line="210"/>
+        <location filename="../src/ui/edit/mapeditor.ui" line="236"/>
         <source>Make the canvas scroll with the mouse</source>
         <translation>令画布随滚轮自然滚动</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="48"/>
         <source>Hand Tool</source>
-        <translation>工具手</translation>
+        <translation type="vanished">工具手</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="54"/>
         <source>Note Tool</source>
-        <translation>编辑工具</translation>
+        <translation type="vanished">编辑工具</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="126"/>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="96"/>
         <source>darken</source>
         <translation>暗化</translation>
     </message>
     <message>
-        <location filename="../src/ui/edit/mapeditormenus.cpp" line="153"/>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="123"/>
         <source>alpha</source>
         <translation>透明</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="175"/>
+        <source>change div ration</source>
+        <translation>切换分拍倍率</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/edit/mapeditormenus.cpp" line="178"/>
+        <source>4</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -430,47 +648,47 @@
         <translation>画布配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="215"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="211"/>
         <source>Track Layout:</source>
         <translation>轨道布局:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="237"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="233"/>
         <source>top</source>
         <translation>顶部</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="267"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="266"/>
         <source>right</source>
         <translation>右侧</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="300"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="302"/>
         <source>bottom</source>
         <translation>底部</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="333"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="338"/>
         <source>left</source>
         <translation>左侧</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="415"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="406"/>
         <source>Judgeline Pos:</source>
         <translation>判定线位置:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="503"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="477"/>
         <source>Object Scale:</source>
         <translation>物件缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="513"/>
         <source>width:</source>
         <translation>宽:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="565"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
         <source>height:</source>
         <translation>高:</translation>
     </message>
@@ -540,17 +758,17 @@
         <translation>谱面</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="69"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="73"/>
         <source>Audios</source>
         <translation>音频</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="94"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="95"/>
         <source>Images</source>
         <translation>图像</translation>
     </message>
     <message>
-        <location filename="../src/ui/project/projectmanager.ui" line="119"/>
+        <location filename="../src/ui/project/projectmanager.ui" line="120"/>
         <source>Videos</source>
         <translation>视频</translation>
     </message>
@@ -561,6 +779,54 @@
     <message>
         <source>select project directory</source>
         <translation type="vanished">选择项目目录</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="42"/>
+        <source>Open In FileBrowser</source>
+        <translation>在系统文件管理器打开</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="54"/>
+        <source>Config</source>
+        <translation>配置</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="60"/>
+        <source>Import Map</source>
+        <translation>导入谱面</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="63"/>
+        <source>Select Map</source>
+        <translation>选择谱面</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="64"/>
+        <source>Map File(*.mmm *.osu *.imd)</source>
+        <translation>谱面文件(*.mmm *.osu *.imd)</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/projectmanagercontrols.cpp" line="72"/>
+        <source>Create New Map</source>
+        <translation>新建谱面</translation>
+    </message>
+</context>
+<context>
+    <name>ProjectService</name>
+    <message>
+        <location filename="../src/ui/project/ProjectService.cpp" line="42"/>
+        <source>select file</source>
+        <translation>选择文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/ProjectService.cpp" line="44"/>
+        <source>Map File</source>
+        <translation>谱面文件</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/project/ProjectService.cpp" line="74"/>
+        <source>select project directory</source>
+        <translation>选择项目目录</translation>
     </message>
 </context>
 <context>
@@ -642,42 +908,42 @@
         <translation>专辑封面</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>title</source>
         <translation>标题</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>artist</source>
         <translation>艺术家</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>album</source>
         <translation>专辑</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="20"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
         <source>bitrate</source>
         <translation>比特率</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>samplerate</source>
         <translation>采样率</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>channels</source>
         <translation>声道数</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>length</source>
         <translation>长度</translation>
     </message>
     <message>
-        <location filename="../src/ui/audio/track/trackmanager.cpp" line="21"/>
+        <location filename="../src/ui/audio/track/trackmanager.cpp" line="22"/>
         <source>framecount</source>
         <translation>帧数</translation>
     </message>

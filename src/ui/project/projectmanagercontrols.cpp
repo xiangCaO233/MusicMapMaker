@@ -61,17 +61,17 @@ void ProjectManager::on_map_listView_customContextMenuRequested(
         auto options = QFileDialog::DontUseNativeDialog;
         auto fileNames = QFileDialog::getOpenFileNames(
             this, tr("Select Map"), XLogger::last_select_directory,
-            tr("Map File(*.osu *.imd *.mc)"), nullptr, options);
+            tr("Map File(*.mmm *.osu *.imd)"), nullptr, options);
 
         // TODO: 实现项目中导入谱面
         for (auto& name : fileNames) {
-            XINFO("Selected:" + name.toStdString());
+            XINFO("TODO: Selected:" + name.toStdString());
         }
     });
 
     menu.addAction(tr("Create New Map"), [&]() {
         // 调用创建谱面函数
-        XINFO("Create New Map");
+        XINFO("TODO:Create New Map");
     });
 
     // 显示菜单
