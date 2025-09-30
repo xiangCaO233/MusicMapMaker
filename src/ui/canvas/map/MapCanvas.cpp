@@ -25,8 +25,11 @@ MapCanvas::MapCanvas() : GLCanvas() {
 
 // 析构MapCanvas
 MapCanvas::~MapCanvas() {
+    XINFO("释放工作线程");
     release_threads();
+    XINFO("释放渲染器");
     release_render();
+    XINFO("删除工具");
     qDeleteAll(tools);
 }
 

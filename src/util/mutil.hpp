@@ -481,9 +481,27 @@ inline QString getOpenFile(QWidget* parent, const QString& title,
         filterList.append("All Files (*)");
     } else {
         for (auto it = formatFilters.begin(); it != formatFilters.end(); ++it) {
-            // 格式: "描述 (*.ext1 *.ext2)"
+            QString description = it.key();
+            QString extensions = it.value();  // 例如 ".imd .mmm .osu"
+
+            // --- 核心修正逻辑 ---
+            // 1. 按空格分割扩展名
+            QStringList extParts = extensions.split(' ', Qt::SkipEmptyParts);
+
+            // 2. 为每个扩展名前面加上 "*"，确保它们都是有效的通配符模式
+            for (QString& part : extParts) {
+                if (!part.startsWith("*.")) {
+                    part.prepend("*");
+                }
+            }
+
+            // 3. 将处理后的通配符模式重新用空格连接起来
+            QString wildcardPatterns =
+                extParts.join(" ");  // 例如 "*.imd *.mmm *.osu"
+
+            // 4. 构建最终的过滤器字符串
             filterList.append(
-                QString("%1 (*%2)").arg(it.key()).arg(it.value()));
+                QString("%1 (%2)").arg(description).arg(wildcardPatterns));
         }
     }
     dialog.setNameFilters(filterList);

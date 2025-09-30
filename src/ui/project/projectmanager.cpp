@@ -106,5 +106,9 @@ void ProjectManager::onMapCanvasThreadStopped() {
 }
 
 void ProjectManager::closeEvent(QCloseEvent* e) {
+    XINFO("开始关闭项目管理器");
+    // 选择空指针谱面
     service->selectMap("", nullptr);
+    // 关闭音轨管理器
+    ui->audios_tab->close();
 }

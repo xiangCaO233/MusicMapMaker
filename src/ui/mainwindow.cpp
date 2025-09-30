@@ -12,6 +12,8 @@
 #include <mmm/obj/Note.hpp>
 #include <mmm/project/MProject.hpp>
 
+#include "colorful-log.h"
+
 // 全局样式表
 QString MainWindow::global_style_sheet;
 
@@ -148,4 +150,8 @@ void MainWindow::update_title_suffix(const QString& suffix) {
     setWindowTitle(tr("MusicMapMaker-->") + suffix);
 }
 
-void MainWindow::closeEvent(QCloseEvent* e) { ui->project_manager->close(); }
+void MainWindow::closeEvent(QCloseEvent* e) {
+    ui->editor->close();
+    ui->project_manager->close();
+    qApp->quit();
+}

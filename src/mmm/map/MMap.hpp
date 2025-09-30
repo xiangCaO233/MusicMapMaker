@@ -11,12 +11,12 @@
 #include <mmm/NoteIDManager.hpp>
 #include <mmm/map/BaseMapMeta.hpp>
 #include <mmm/map/editor/MMapEditEvent.hpp>
+#include <mmm/project/MProject.hpp>
 #include <mmm/timing/Beat.hpp>
 #include <mutex>
 #include <tool/ThreadSafeQueue.hpp>
 #include <unordered_map>
 
-class MProject;
 class MMapEditor;
 
 // map
@@ -125,6 +125,10 @@ class MMap : public QObject {
 
     void readMMM();
     void writeMMM(const std::string& desfile);
+
+    void closeConfigui();
+
+    friend void MProject::close();
 };
 
 #endif  // MMM_MMAP_HPP

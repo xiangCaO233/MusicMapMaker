@@ -38,12 +38,7 @@ MMap::MMap(TrackManager* trackmanager, std::string_view file)
     }
 }
 
-MMap::~MMap() {
-    if (!config_ui->isHidden()) {
-        config_ui->hide();
-    }
-    config_ui.reset();
-}
+MMap::~MMap() {}
 
 // 刷新配置ui
 void MMap::update_configui() {
@@ -55,6 +50,12 @@ void MMap::update_configui() {
 void MMap::show_configui() {
     update_configui();
     config_ui->show();
+}
+
+void MMap::closeConfigui() {
+    config_ui->hide();
+    config_ui->deleteLater();
+    config_ui.reset();
 }
 
 // 在对话框显示配置

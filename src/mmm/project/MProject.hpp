@@ -2,10 +2,10 @@
 #define MMM_MPROJECT_HPP
 
 #include <atomic>
+#include <filesystem>
 #include <ice/manage/AudioTrack.hpp>
 #include <map>
 #include <memory>
-#include <mmm/map/MMap.hpp>
 #include <mmm/project/AudioLoadCallback.hpp>
 #include <mmm/project/MProjectConfig.hpp>
 #include <pugixml.hpp>
@@ -13,6 +13,8 @@
 #include <string>
 
 class TextureLoadCallback;
+class MMap;
+
 class MProject {
    public:
     // 构造MProject

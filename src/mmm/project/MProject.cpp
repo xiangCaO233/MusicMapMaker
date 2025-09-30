@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <filesystem>
+#include <mmm/map/MMap.hpp>
 #include <mmm/project/MProject.hpp>
 #include <mmm/project/TextureLoadCallback.hpp>
 #include <string>
@@ -277,6 +278,10 @@ void MProject::close() {
     texcallback->need_unloadtexture_dir(project_path.generic_string());
     // 通知音频池卸载音轨
     is_closed.store(true);
+    // 关闭所有的谱面配置ui
+    for (auto& [name, map] : project_maps_table) {
+        map->closeConfigui();
+    }
     // 写出项目配置文件
     // 根据当前配置更新配置文档
     update_configdoc(true);
