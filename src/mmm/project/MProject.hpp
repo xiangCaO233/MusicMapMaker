@@ -33,6 +33,14 @@ class MProject {
 
     const std::filesystem::path& getPath() const { return project_path; }
 
+    // 添加音轨
+    void add_audio_track(const std::string& file,
+                         std::shared_ptr<ice::AudioTrack> track,
+                         bool main_track);
+
+    // 添加map
+    void add_map(std::unique_ptr<MMap> map);
+
    private:
     // 是否已经打开
     std::atomic<bool> is_opened{false};

@@ -23,7 +23,7 @@ class MMapEditor;
 class MMap : public QObject {
     Q_OBJECT
    public:
-    explicit MMap(TrackManager* trackmanager);
+    explicit MMap(TrackManager* trackmanager, QWidget* dialogParent);
     MMap(TrackManager* trackmanager, std::string_view file);
 
     virtual ~MMap();
@@ -73,6 +73,9 @@ class MMap : public QObject {
 
     // 显示配置ui
     void show_configui();
+
+    // 在对话框显示配置
+    void show_configuiInDialog(QWidget* parent);
 
    private:
     // (实际持有)

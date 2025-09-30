@@ -1,6 +1,7 @@
 #include <colorful-log.h>
 
 #include <QDebug>
+#include <QDialogButtonBox>
 #include <action/modules/canvas/EditorActionHandler.hpp>
 #include <algorithm>
 #include <memory>
@@ -8,13 +9,14 @@
 #include <mmm/map/editor/MMapEditor.hpp>
 #include <util/mutil.hpp>
 
-MMap::MMap(TrackManager* trackmanager) : trackmanager(trackmanager) {
+MMap::MMap(TrackManager* trackmanager, QWidget* dialogParent)
+    : trackmanager(trackmanager) {
     // 初始化配置ui
     config_ui = std::make_unique<MapConfig>(this);
     // 更新音轨表
     config_ui->update_audio_tracklist(trackmanager);
-    // 新建谱面时立马显示配置
-    config_ui->show();
+    // 新建谱面时立马以对话框显示配置
+    show_configuiInDialog(dialogParent);
 }
 
 MMap::MMap(TrackManager* trackmanager, std::string_view file)
@@ -46,12 +48,59 @@ MMap::~MMap() {
 // 刷新配置ui
 void MMap::update_configui() {
     config_ui->update_audio_tracklist(trackmanager);
+    config_ui->update_components_frommeta();
 }
 
 // 显示配置ui
 void MMap::show_configui() {
     update_configui();
     config_ui->show();
+}
+
+// 在对话框显示配置
+void MMap::show_configuiInDialog(QWidget* parent) {
+    QDialog dialog(parent);
+    dialog.setWindowTitle("Map Configuration");
+    dialog.setWindowFlags(dialog.windowFlags() & ~Qt::WindowCloseButtonHint);
+
+    auto* layout = new QVBoxLayout(&dialog);
+    // 只创建 OK 按钮
+    auto* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, &dialog);
+    connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+
+    // 获取对话框的 "OK" 按钮的指针
+    QPushButton* okButton = buttonBox->button(QDialogButtonBox::Ok);
+
+    // 临时隐藏配置ui中的确认和取消按钮
+    config_ui->confirmButton->setHidden(true);
+    config_ui->cancleButton->setHidden(true);
+
+    // 将配置UI的有效性信号连接到OK按钮的启用/禁用槽
+    connect(config_ui.get(), &MapConfig::validityChanged, okButton,
+            &QPushButton::setEnabled);
+
+    layout->addWidget(config_ui.get());
+    layout->addWidget(buttonBox);
+
+    // 在显示对话框前，立即检查一次初始状态
+    config_ui->update_ifcompeleted_dialog();
+
+    if (dialog.exec() == QDialog::Accepted) {
+        // 因为按钮在无效时是禁用的，所以能到这里，配置一定是完整的。
+        // 直接调用确认按钮的行为
+        config_ui->on_confirm_button_clicked();
+    }
+
+    // 回收逻辑
+    // 断开添加的连接
+    disconnect(config_ui.get(), &MapConfig::validityChanged, okButton,
+               &QPushButton::setEnabled);
+
+    layout->removeWidget(config_ui.get());
+    config_ui->confirmButton->setHidden(false);
+    config_ui->cancleButton->setHidden(false);
+    config_ui->setParent(nullptr);
+    config_ui->hide();
 }
 
 // 写出到文件

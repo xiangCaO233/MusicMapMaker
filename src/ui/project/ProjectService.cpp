@@ -7,6 +7,9 @@
 #include <mmm/project/MProject.hpp>
 #include <project/ProjectService.hpp>
 
+#include "colorful-log.h"
+#include "mmm/map/MMap.hpp"
+
 // 构造ProjectService
 ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
                                QObject* parent)
@@ -14,6 +17,21 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
     map_canvas = canvas;
     track_manager = trackmanager;
     auto service = this;
+    // 连接action的创建文件操作到此
+    connect(FileActionHandler::instance(), &FileActionHandler::newFile,
+            [trackmanager, service, parent]() {
+                // 创建谱面到当前项目中
+                auto currentproject = service->currentPorject();
+                if (currentproject) {
+                    auto newmap = std::make_unique<MMap>(
+                        trackmanager, qobject_cast<ProjectManager*>(parent));
+                    currentproject->add_map(std::move(newmap));
+                    // 激活一次确保更新项目item列表
+                    emit service->activateProject(currentproject);
+                } else {
+                    XWARN("当前没有活动的项目,请先进入一个项目");
+                }
+            });
 
     // 连接action的打开文件操作到此
     connect(
@@ -22,13 +40,20 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
             // 使用文件夹选择器选择项目的目录
             auto file = mutil::getOpenFile(
                 qobject_cast<ProjectManager*>(parent), tr("select file"),
-                {{tr("Audio File"), ".ogg .mp3 .wav"},
+                {// {tr("Audio File"), ".ogg .mp3 .wav"},
                  {tr("Map File"), ".imd .mmm .osu"}},
-                QDir::homePath());
+                XLogger::last_select_directory);
             if (!file.isEmpty()) {
                 auto file_path = std::filesystem::path(file.toStdString());
                 XINFO(std::format("打开文件:[{}]", file_path.generic_string()));
                 auto parent_dir_path = file_path.parent_path();
+
+                std::filesystem::path selectpath(parent_dir_path);
+                if (std::filesystem::exists(selectpath)) {
+                    XLogger::last_select_directory =
+                        QDir(selectpath).absolutePath();
+                }
+
                 // 将父目录作为项目打开
                 service->onOpenProject(parent_dir_path.generic_string());
                 service->selectProject(
@@ -46,10 +71,17 @@ ProjectService::ProjectService(MapCanvas* canvas, TrackManager* trackmanager,
             // 使用文件夹选择器选择项目的目录
             auto dir = mutil::getDirectory(
                 qobject_cast<ProjectManager*>(parent),
-                tr("select project directory"), QDir::homePath());
+                tr("select project directory"), XLogger::last_select_directory);
             if (!dir.isEmpty()) {
                 auto ppath = dir.toStdString();
                 XINFO(std::format("打开路径:[{}]", ppath));
+
+                std::filesystem::path selectpath(ppath);
+                if (std::filesystem::exists(selectpath)) {
+                    XLogger::last_select_directory =
+                        QDir(selectpath).absolutePath();
+                }
+
                 // 打开项目
                 service->onOpenProject(ppath);
                 service->selectProject(

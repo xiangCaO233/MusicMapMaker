@@ -18,6 +18,7 @@ void FileActionHandler::onNewProject() {
 void FileActionHandler::onNewFile() {
     //
     XINFO("触发新建文件");
+    emit newFile();
 }
 
 void FileActionHandler::onOpen() {

@@ -60,7 +60,11 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QListView" name="map_listView"/>
+          <widget class="QListView" name="map_listView">
+           <property name="contextMenuPolicy">
+            <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

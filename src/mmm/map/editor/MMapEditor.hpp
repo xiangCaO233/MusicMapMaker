@@ -13,6 +13,7 @@ class MMapEditor : public QObject {
     MMapEditor(MMap* m, ThreadSafeQueue<MMapEditEvent>& editEventQueue);
     ~MMapEditor() = default;
 
+   public:
     // 创建单键音符
     void createNoteAt(int64_t timestamp, int track);
 

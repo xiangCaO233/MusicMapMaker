@@ -36,7 +36,8 @@ void MProject::open(std::string_view project_path_str) {
         for (auto it = std::filesystem::directory_iterator(project_path);
              it != std::filesystem::directory_iterator(); ++it) {
             auto filename = it->path().generic_string();
-            if (filename.ends_with(".png") || filename.ends_with(".jpg")) {
+            if (filename.ends_with(".png") || filename.ends_with(".jpg") ||
+                filename.ends_with(".jpeg")) {
                 project_image_table.insert(filename);
             } else if (filename.ends_with(".mmm") ||
                        filename.ends_with(".imd") ||
@@ -94,7 +95,7 @@ void MProject::open(std::string_view project_path_str) {
                 project_normal_audios_table.try_emplace(filename);
                 // 直接通过音频轨道管理器回调载入音轨
                 auto track_weakptr = audiocallback->loadBack(filename);
-                project_main_audios_table[filename] = track_weakptr;
+                project_normal_audios_table[filename] = track_weakptr;
             }
         }
 
@@ -104,6 +105,53 @@ void MProject::open(std::string_view project_path_str) {
         }
         update_configdoc(false);
         is_opened.store(true);
+    }
+}
+
+// 添加音轨
+void MProject::add_audio_track(const std::string& file,
+                               std::shared_ptr<ice::AudioTrack> track,
+                               bool main_track) {
+    if (main_track) {
+        project_main_audios_table[file] = track;
+    } else {
+        project_normal_audios_table[file] = track;
+    }
+}
+
+// 添加map
+void MProject::add_map(std::unique_ptr<MMap> map) {
+    map->bind_project(this);
+    // 添加谱面到表中
+    if (map->base_metadata().name.empty()) {
+        auto& basemeta = map->base_metadata();
+        // 自动生成mapname
+        basemeta.name = "[mmm] " + basemeta.artist_unicode + "-" +
+                        basemeta.title_unicode + "(" + basemeta.author + ") [" +
+                        std::to_string(basemeta.track_count) + "k] - " +
+                        basemeta.version;
+    }
+    auto mapit = project_maps_table
+                     .try_emplace(map->base_metadata().name, std::move(map))
+                     .first;
+    auto map_maintrack_name =
+        mapit->second->base_metadata().main_audio_path.generic_string();
+
+    if (!project_main_audios_table.contains(map_maintrack_name)) {
+        // 添加谱面的主音轨
+        XINFO("新map加载需要载入音频[" + map_maintrack_name + "]");
+        // 检查是否载入过
+        auto wtrack =
+            static_cast<TrackManager*>(audiocallback)
+                ->get_track(QString::fromStdString(map_maintrack_name));
+        if (auto track = wtrack.lock()) {
+            // 载入过,只需添加映射
+            project_main_audios_table.try_emplace(map_maintrack_name, track);
+        } else {
+            project_main_audios_table.try_emplace(map_maintrack_name);
+            auto map_track = audiocallback->loadBack(map_maintrack_name, true);
+            project_main_audios_table[map_maintrack_name] = map_track;
+        }
     }
 }
 

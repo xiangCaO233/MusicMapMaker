@@ -133,7 +133,7 @@
             </item>
             <item row="0" column="1">
              <widget class="QWidget" name="audio_path_select_and_load_widget" native="true">
-              <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0,0">
                <property name="spacing">
                 <number>2</number>
                </property>
@@ -156,6 +156,32 @@
                  </property>
                  <property name="placeholderText">
                   <string>*</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="audio_file_browser_button">
+                 <property name="minimumSize">
+                  <size>
+                   <width>24</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../../../resources/glsrcs.qrc">
+                   <normaloff>:/icons/folder-open.svg</normaloff>:/icons/folder-open.svg</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -211,7 +237,7 @@
          <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
         <property name="placeholderText">
-         <string>Auto Generate</string>
+         <string>Keep Blank To Auto Generate</string>
         </property>
        </widget>
       </item>
@@ -377,16 +403,6 @@
         </layout>
        </widget>
       </item>
-      <item row="9" column="2">
-       <widget class="QLineEdit" name="cover_lineedit">
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-        <property name="placeholderText">
-         <string>*</string>
-        </property>
-       </widget>
-      </item>
       <item row="7" column="0">
        <widget class="QLabel" name="trackcount_label">
         <property name="text">
@@ -488,6 +504,63 @@
         </layout>
        </widget>
       </item>
+      <item row="9" column="2">
+       <widget class="QWidget" name="widget_3" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="cover_lineedit">
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string>*</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cover_file_browser_button">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../../resources/glsrcs.qrc">
+             <normaloff>:/icons/folder-open.svg</normaloff>:/icons/folder-open.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -560,6 +633,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../resources/glsrcs.qrc"/>
+ </resources>
  <connections/>
 </ui>

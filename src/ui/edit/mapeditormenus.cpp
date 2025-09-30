@@ -179,7 +179,7 @@ void MapEditor::initializeGenBeatDivisorsMenu() {
     div_res_label->setAlignment(Qt::AlignmentFlag::AlignCenter);
     div_multiplier_slider->setRange(1, 24);
     div_multiplier_slider->setSingleStep(1);
-    div_multiplier_slider->setPageStep(2);
+    div_multiplier_slider->setPageStep(1);
     div_multiplier_slider->setValue(2);
 
     // 初始化按钮类型尺寸

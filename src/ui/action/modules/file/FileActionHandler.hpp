@@ -18,6 +18,7 @@ class FileActionHandler : public QObject {
     ~FileActionHandler() override;
 
    signals:
+    void newFile();
     void open();
     void open_directory();
     void save();
