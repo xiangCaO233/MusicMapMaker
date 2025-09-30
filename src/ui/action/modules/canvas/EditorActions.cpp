@@ -35,6 +35,9 @@ void EditorActions::createActions() {
     action_manager->createAction("canvas.delete", tr("Delete"),
                                  QKeySequence::Delete);
 
+    action_manager->createAction("canvas.mirror", tr("Mirror"),
+                                 {QKeySequence::fromString("Ctrl+E")});
+
     action_manager->createAction("canvas.undo", tr("Undo"), QKeySequence::Undo);
     action_manager->createAction("canvas.redo", tr("Redo"), QKeySequence::Redo);
     action_manager->createAction("canvas.find", tr("Find"), QKeySequence::Find);

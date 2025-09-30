@@ -62,7 +62,7 @@ void MMapEditor::createFlickAt(int64_t timestamp, int track,
     new_note_data->set_notetype(NoteType::SLIDE);
     new_note_data->set_timestamp(timestamp);
     new_note_data->set_trackpos(track);
-    new_note_data->set_track_orbit(delta_track);
+    new_note_data->set_delta_track(delta_track);
 
     // 通过操作管理器执行命令
     operationManager.executeCommand(std::make_unique<AddNoteCommand>(
@@ -88,7 +88,7 @@ void MMapEditor::createCompositeWithAxis(std::list<MapAxis>& axis) {
             child_slide->set_notetype(NoteType::SLIDE);
             child_slide->set_timestamp(node1.time);
             child_slide->set_trackpos(node1.track);
-            child_slide->set_track_orbit(node2.track - node1.track);
+            child_slide->set_delta_track(node2.track - node1.track);
         } else if (track_same) {
             // 创建hold物件加入组合物件
             child = std::make_unique<Hold>(map);
@@ -172,6 +172,44 @@ void MMapEditor::moveNotes(
     operationManager.executeCommand(std::move(command));
 }
 
+// 镜像物件
+void MMapEditor::mirrorNote(NoteUUID uuid) {
+    NoteHandle handle = map->note_uuids().get_handle(uuid);
+    const Note* old_note_ptr = map->note_set().get_note(handle);
+    auto total_tracks = map->base_metadata().track_count;
+    // 克隆并修改，生成新数据，用于 execute
+    std::unique_ptr<Note> new_data = old_note_ptr->clone(map);
+    switch (new_data->notetype()) {
+        case NoteType::NORMAL:
+        case NoteType::HOLD: {
+            // 普通物件和长条-轨道镜像
+            new_data->set_trackpos((total_tracks - 1) - new_data->trackpos());
+            break;
+        }
+        case NoteType::SLIDE: {
+            // 滑键-轨道镜像且滑动方向反向
+            auto slideptr = static_cast<Slide*>(new_data.get());
+            slideptr->set_trackpos((total_tracks - 1) - new_data->trackpos());
+            slideptr->set_delta_track(-slideptr->delta_track());
+            break;
+        }
+        case NoteType::COMPOSITE: {
+            // 大复合键-轨道镜像且滑动方向反向
+            auto compptr = static_cast<Composite*>(new_data.get());
+            for (auto& child_note : compptr->children()) {
+                // 只有滑键和面条
+            }
+            break;
+        }
+    }
+    updateNoteData(uuid, std::move(new_data));
+}
+
+// 镜像多个物件
+void MMapEditor::mirrorNotes(const std::unordered_set<NoteUUID>& uuids) {
+    //
+}
+
 // 拷贝到指定时间位置
 void MMapEditor::copyNotesTo(const std::unordered_set<NoteUUID>& uuids_to_copy,
                              NoteUUID referenceUUID, int64_t des_time) {
@@ -238,7 +276,7 @@ void MMapEditor::updateSlide(NoteUUID uuid, int64_t delta_track) {
 
     auto new_note_data = old->clone(map);
     auto slide = static_cast<Slide*>(new_note_data.get());
-    slide->set_track_orbit(delta_track);
+    slide->set_delta_track(delta_track);
 
     updateNoteData(uuid, std::move(new_note_data));
 }

@@ -11,6 +11,7 @@
 #include <mmm/project/AudioLoadCallback.hpp>
 #include <tool/ToolInteractionState.hpp>
 #include <tool/command/ToolCommand.hpp>
+#include <unordered_set>
 #include <vector>
 
 // --- Helper for std::visit ---
@@ -161,6 +162,8 @@ class ToolCommandProcessor {
                 },
                 // 粘贴
                 [&](const PasteCommand& arg) { pasteEntities(); },
+                // 粘贴
+                [&](const MirrorCommand& arg) { mirrirEntities(); },
                 // 选中相关
                 [&](const StartSelectCommand& arg) {
                     auto timepos = glm::vec2{
@@ -450,6 +453,27 @@ class ToolCommandProcessor {
             interactionState.setClipBoard({}, true);
         }
         qDebug() << "已粘贴";
+    }
+
+    void mirrirEntities() {
+        // 镜像物件
+        auto selections = interactionState.getSelectionState();
+        auto& left_selections =
+            selections.all_selected_entities[Qt::LeftButton];
+        if (!left_selections.empty()) {
+            if (left_selections.size() == 1) {
+                auto uuid =
+                    registry.get<NoteComponent>(*left_selections.begin())
+                        .sourceUUID;
+                mapEditor.mirrorNote(uuid);
+            } else {
+                std::unordered_set<NoteUUID> uuids;
+                for (const auto& e : left_selections) {
+                    uuids.insert(registry.get<NoteComponent>(e).sourceUUID);
+                }
+                mapEditor.mirrorNotes(uuids);
+            }
+        }
     }
 
     void startDragEntities(const std::unordered_set<entt::entity>& selections,

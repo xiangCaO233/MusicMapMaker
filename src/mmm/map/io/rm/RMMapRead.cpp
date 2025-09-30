@@ -260,7 +260,7 @@ void MMap::readImd() {
                     temp_note = std::make_unique<Slide>(this);
                     auto slide = static_cast<Slide*>(temp_note.get());
                     temp_note->set_notetype(NoteType::SLIDE);
-                    slide->set_track_orbit(note_parameter);
+                    slide->set_delta_track(note_parameter);
                     break;
                 }
                 case 2: {

@@ -54,6 +54,7 @@ void MainWindow::initActions() {
     am->connectCommand("canvas.copy", editHandler, SLOT(onCopy()));
     am->connectCommand("canvas.paste", editHandler, SLOT(onPaste()));
     am->connectCommand("canvas.delete", editHandler, SLOT(onDelete()));
+    am->connectCommand("canvas.mirror", editHandler, SLOT(onMirror()));
     am->connectCommand("canvas.undo", editHandler, SLOT(onUndo()));
     am->connectCommand("canvas.redo", editHandler, SLOT(onRedo()));
     am->connectCommand("canvas.find", editHandler, SLOT(onFind()));
@@ -105,6 +106,7 @@ void MainWindow::initActions() {
     ui->menuEdit_E->addAction(am->getAction("canvas.copy"));
     ui->menuEdit_E->addAction(am->getAction("canvas.paste"));
     ui->menuEdit_E->addAction(am->getAction("canvas.delete"));
+    ui->menuEdit_E->addAction(am->getAction("canvas.mirror"));
     ui->menuEdit_E->addSeparator();
     ui->menuEdit_E->addAction(am->getAction("canvas.undo"));
     ui->menuEdit_E->addAction(am->getAction("canvas.redo"));

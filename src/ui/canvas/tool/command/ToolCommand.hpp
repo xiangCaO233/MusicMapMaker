@@ -82,6 +82,9 @@ struct CutCommand {
 // 粘贴指令
 struct PasteCommand {};
 
+// 镜像指令
+struct MirrorCommand {};
+
 // 标记删除指令
 struct MarkDeleteCommand {
     const MeshPartInfo hit_info;
@@ -99,14 +102,13 @@ struct ConfirmDeleteCommand {
 // };
 
 // 用 std::variant 将所有命令类型聚合到一个类型中
-using ToolCommand =
-    std::variant<StartDragPreviewCommand, DragPreviewUpdateCommand,
-                 EndDragPreviewCommand, StartDragCommand, StartSelectCommand,
-                 UpdateSelectAreaCommand, EndSelectCommand,
-                 StartDragSelectionCommand, EndDragCommand,
-                 ClearDragStateCommand, StartCreateNewNormalNoteCommand,
-                 StartCreateNewCompositeNoteCommand, UpdateCreateNodeCommand,
-                 ConfirmCreateNewNoteCommand, CopyCommand, CutCommand,
-                 PasteCommand, MarkDeleteCommand, ConfirmDeleteCommand>;
+using ToolCommand = std::variant<
+    StartDragPreviewCommand, DragPreviewUpdateCommand, EndDragPreviewCommand,
+    StartDragCommand, StartSelectCommand, UpdateSelectAreaCommand,
+    EndSelectCommand, StartDragSelectionCommand, EndDragCommand,
+    ClearDragStateCommand, StartCreateNewNormalNoteCommand,
+    StartCreateNewCompositeNoteCommand, UpdateCreateNodeCommand,
+    ConfirmCreateNewNoteCommand, CopyCommand, CutCommand, PasteCommand,
+    MirrorCommand, MarkDeleteCommand, ConfirmDeleteCommand>;
 
 #endif  // MMM_TOOLCOMMAND_HPP

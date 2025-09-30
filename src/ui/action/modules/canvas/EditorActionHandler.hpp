@@ -23,6 +23,7 @@ class EditorActionHandler : public QObject {
     void copy();
     void paste();
     void delete_signal();
+    void mirror();
     void undo();
     void redo();
 
@@ -39,6 +40,8 @@ class EditorActionHandler : public QObject {
     void onCopy();
     void onPaste();
     void onDelete();
+
+    void onMirror();
 
     void onUndo();
     void onRedo();

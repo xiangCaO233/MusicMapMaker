@@ -60,6 +60,11 @@ void EditorActionHandler::onDelete() {
     emit delete_signal();
     XINFO("触发删除");
 }
+void EditorActionHandler::onMirror() {
+    //
+    emit mirror();
+    XINFO("触发镜像");
+}
 void EditorActionHandler::onUndo() {
     //
     emit undo();

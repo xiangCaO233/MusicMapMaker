@@ -25,7 +25,7 @@ class Slide : public Note {
     inline int64_t delta_track() const { return dtrack; }
 
     // 设置dtrack
-    inline void set_track_orbit(int64_t delta_track) { dtrack = delta_track; }
+    inline void set_delta_track(int64_t delta_track) { dtrack = delta_track; }
 
     // json转换
     nlohmann::json toJson() const override {
@@ -43,7 +43,7 @@ class Slide : public Note {
         set_timestamp(data["time"].get<uint32_t>());
         set_trackpos(data["track"].get<uint32_t>());
         auto& notedata = data["data"];
-        set_track_orbit(notedata["delta-track"]);
+        set_delta_track(notedata["delta-track"]);
     };
 
     // 克隆物件
@@ -52,7 +52,7 @@ class Slide : public Note {
         new_note_data->set_notetype(NoteType::SLIDE);
         new_note_data->set_timestamp(timestamp());
         new_note_data->set_trackpos(trackpos());
-        new_note_data->set_track_orbit(delta_track());
+        new_note_data->set_delta_track(delta_track());
         return new_note_data;
     }
 

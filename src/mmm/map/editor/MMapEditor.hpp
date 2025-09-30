@@ -36,6 +36,12 @@ class MMapEditor : public QObject {
     void moveNotes(const std::unordered_map<NoteUUID, std::pair<int64_t, int>>&
                        notes_to_move);
 
+    // 镜像物件
+    void mirrorNote(NoteUUID uuid);
+
+    // 镜像多个物件
+    void mirrorNotes(const std::unordered_set<NoteUUID>& uuids);
+
     // 更新面条
     void updateHold(NoteUUID uuid, int64_t duration);
 

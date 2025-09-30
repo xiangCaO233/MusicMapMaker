@@ -84,6 +84,21 @@ void MapCanvas::connectActions() {
             }
         });
 
+    // 镜像action
+    connect(EditorActionHandler::instance(), &EditorActionHandler::mirror,
+            [thiscp]() {
+                auto layermanager = static_cast<MapLayerManager*>(
+                    thiscp->dataloop()->layermanager());
+                auto toolInteractionState =
+                    layermanager->get_tool_interaction_state();
+                if (toolInteractionState->hasSelected()) {
+                    // 发送镜像指令
+                    layermanager->get_tool_cmdq()->push(MirrorCommand{});
+                } else {
+                    qDebug() << "未选中任何物件";
+                }
+            });
+
     // 保存action
     connect(FileActionHandler::instance(), &FileActionHandler::save,
             [thiscp]() {
