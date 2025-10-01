@@ -174,14 +174,8 @@ void MMapEditor::moveNotes(
     operationManager.executeCommand(std::move(command));
 }
 
-// 镜像物件
-void MMapEditor::mirrorNote(NoteUUID uuid) {
-    NoteHandle handle = map->note_uuids().get_handle(uuid);
-    const Note* old_note_ptr = map->note_set().get_note(handle);
-    XINFO(std::format("OLD_NOTE:{}", old_note_ptr->toString()));
+void MMapEditor::mirror(std::unique_ptr<Note>& new_data) {
     auto total_tracks = map->base_metadata().track_count;
-    // 克隆并修改，生成新数据，用于 execute
-    std::unique_ptr<Note> new_data = old_note_ptr->clone(map);
     switch (new_data->notetype()) {
         case NoteType::NORMAL:
         case NoteType::HOLD: {
@@ -214,13 +208,66 @@ void MMapEditor::mirrorNote(NoteUUID uuid) {
             break;
         }
     }
-    XINFO(std::format("NEW_NOTE:{}", new_data->toString()));
+}
+
+// 镜像物件
+void MMapEditor::mirrorNote(NoteUUID uuid) {
+    NoteHandle handle = map->note_uuids().get_handle(uuid);
+    const Note* old_note_ptr = map->note_set().get_note(handle);
+    // XINFO(std::format("OLD_NOTE:{}", old_note_ptr->toString()));
+    // 克隆并镜像，生成新数据，用于 execute
+    std::unique_ptr<Note> new_data = old_note_ptr->clone(map);
+
+    mirror(new_data);
+
+    // XINFO(std::format("NEW_NOTE:{}", new_data->toString()));
     updateNoteData(uuid, std::move(new_data));
 }
 
 // 镜像多个物件
 void MMapEditor::mirrorNotes(const std::unordered_set<NoteUUID>& uuids) {
     //
+    if (uuids.empty()) {
+        return;
+    }
+
+    // 准备一个 vector 来存储所有 Note 的更新状态
+    std::vector<NoteUpdateState> update_states;
+    update_states.reserve(uuids.size());
+
+    // 遍历输入的 map，为每个要镜像的 Note 生成新旧数据
+    for (const auto& uuid : uuids) {
+        NoteHandle handle = map->note_uuids().get_handle(uuid);
+        const Note* old_note_ptr = map->note_set().get_note(handle);
+
+        if (!old_note_ptr) {
+            // 如果找不到原始Note，就跳过
+            continue;
+        }
+
+        // 克隆旧数据，用于 undo
+        std::unique_ptr<Note> old_data = old_note_ptr->clone(map);
+
+        // 克隆并镜像，生成新数据，用于 execute
+        std::unique_ptr<Note> new_data = old_note_ptr->clone(map);
+
+        mirror(new_data);
+
+        // 将这一对新旧状态存入 vector
+        update_states.push_back(
+            {uuid, std::move(old_data), std::move(new_data)});
+    }
+
+    // 如果没有任何有效的 Note 被处理，则不创建 Command
+    if (update_states.empty()) {
+        return;
+    }
+
+    // 创建并执行宏命令
+    auto command = std::make_unique<UpdateMultipleNotesCommand>(
+        map->note_set(), map->note_uuids(), std::move(update_states));
+
+    operationManager.executeCommand(std::move(command));
 }
 
 // 拷贝到指定时间位置
