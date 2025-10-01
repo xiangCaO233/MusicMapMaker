@@ -5,6 +5,8 @@
 #include <mmm/obj/rm/Slide.hpp>
 #include <utility>
 
+#include "colorful-log.h"
+
 MMapEditor::MMapEditor(MMap* m, ThreadSafeQueue<MMapEditEvent>& editEventQueue)
     : map(m), operationManager(editEventQueue) {}
 
@@ -176,20 +178,22 @@ void MMapEditor::moveNotes(
 void MMapEditor::mirrorNote(NoteUUID uuid) {
     NoteHandle handle = map->note_uuids().get_handle(uuid);
     const Note* old_note_ptr = map->note_set().get_note(handle);
+    XINFO(std::format("OLD_NOTE:{}", old_note_ptr->toString()));
     auto total_tracks = map->base_metadata().track_count;
     // 克隆并修改，生成新数据，用于 execute
     std::unique_ptr<Note> new_data = old_note_ptr->clone(map);
     switch (new_data->notetype()) {
         case NoteType::NORMAL:
         case NoteType::HOLD: {
-            // 普通物件和长条-轨道镜像
+            // 轨道镜像
             new_data->set_trackpos((total_tracks - 1) - new_data->trackpos());
             break;
         }
         case NoteType::SLIDE: {
             // 滑键-轨道镜像且滑动方向反向
+            // 轨道镜像
+            new_data->set_trackpos((total_tracks - 1) - new_data->trackpos());
             auto slideptr = static_cast<Slide*>(new_data.get());
-            slideptr->set_trackpos((total_tracks - 1) - new_data->trackpos());
             slideptr->set_delta_track(-slideptr->delta_track());
             break;
         }
@@ -198,10 +202,19 @@ void MMapEditor::mirrorNote(NoteUUID uuid) {
             auto compptr = static_cast<Composite*>(new_data.get());
             for (auto& child_note : compptr->children()) {
                 // 只有滑键和面条
+                if (child_note->notetype() == NoteType::SLIDE) {
+                    auto slideptr = static_cast<Slide*>(child_note.get());
+                    slideptr->set_delta_track(-slideptr->delta_track());
+                } else if (child_note->notetype() == NoteType::HOLD) {
+                }
+                child_note->set_trackpos((total_tracks - 1) -
+                                         child_note->trackpos());
             }
+            compptr->track = (total_tracks - 1) - new_data->trackpos();
             break;
         }
     }
+    XINFO(std::format("NEW_NOTE:{}", new_data->toString()));
     updateNoteData(uuid, std::move(new_data));
 }
 

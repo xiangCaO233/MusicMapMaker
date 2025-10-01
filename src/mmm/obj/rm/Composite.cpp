@@ -161,6 +161,9 @@ void Composite::set_trackpos(uint32_t o) {
 // 克隆物件
 std::unique_ptr<Note> Composite::clone(const MMap* ref) const {
     auto new_note_data = std::make_unique<Composite>(ref);
+    new_note_data->set_notetype(NoteType::COMPOSITE);
+    new_note_data->set_timestamp(timestamp());
+    new_note_data->set_trackpos(trackpos());
     auto new_composite = static_cast<Composite*>(new_note_data.get());
     for (const auto& old_child : children()) {
         std::unique_ptr<Note> new_child = old_child->clone(ref);

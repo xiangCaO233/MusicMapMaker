@@ -176,16 +176,21 @@
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="38"/>
+        <source>Mirror</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="41"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="39"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="42"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="40"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="43"/>
         <source>Find</source>
         <translation>查找</translation>
     </message>
@@ -325,12 +330,12 @@
         <translation>项目设置</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="148"/>
+        <location filename="../src/ui/mainwindow.cpp" line="150"/>
         <source>MusicMapMaker--&gt;</source>
         <translation>谱面编辑器--&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindowcontrols.cpp" line="65"/>
+        <location filename="../src/ui/mainwindowcontrols.cpp" line="66"/>
         <source>Switch Tool</source>
         <translation>切换工具</translation>
     </message>
@@ -338,37 +343,37 @@
 <context>
     <name>MapCanvas</name>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="115"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="133"/>
         <source>save as file</source>
         <translation>另存为文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="116"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="134"/>
         <source>MMM Map File</source>
         <translation>MMM谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="136"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="154"/>
         <source>mmm mapfile</source>
         <translation>MMM谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="137"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="155"/>
         <source>imd mapfile</source>
         <translation>IMD谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="138"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="156"/>
         <source>osu mapfile</source>
         <translation>OSU谱面文件</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="179"/>
         <source>Export As</source>
         <translation>导出为</translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="179"/>
         <source>File Formats:</source>
         <translation>文件格式:</translation>
     </message>

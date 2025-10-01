@@ -43,6 +43,7 @@ entt::entity updateNoteEntity(entt::registry& registry,
         }
         case NoteType::COMPOSITE: {
             auto composed_note = static_cast<const Composite*>(note);
+            XINFO("组合键更新");
             auto& [children, total_duration] =
                 registry.get<CompositeRootComponent>(note_entity);
             for (int i{0}; i < children.size(); ++i) {

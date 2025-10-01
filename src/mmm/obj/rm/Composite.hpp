@@ -51,6 +51,8 @@ class Composite : public Note {
 
     // 总持续时间
     uint32_t total_duration_time{0};
+
+    friend class MMapEditor;
 };
 
 #endif  // MMM_COMPOSITE_HPP

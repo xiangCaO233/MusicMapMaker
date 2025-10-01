@@ -176,16 +176,21 @@
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="38"/>
+        <source>Mirror</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="41"/>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="39"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="42"/>
         <source>Redo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="40"/>
+        <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="43"/>
         <source>Find</source>
         <translation type="unfinished"></translation>
     </message>
@@ -286,12 +291,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="148"/>
+        <location filename="../src/ui/mainwindow.cpp" line="150"/>
         <source>MusicMapMaker--&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindowcontrols.cpp" line="65"/>
+        <location filename="../src/ui/mainwindowcontrols.cpp" line="66"/>
         <source>Switch Tool</source>
         <translation type="unfinished"></translation>
     </message>
@@ -299,37 +304,37 @@
 <context>
     <name>MapCanvas</name>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="115"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="133"/>
         <source>save as file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="116"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="134"/>
         <source>MMM Map File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="136"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="154"/>
         <source>mmm mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="137"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="155"/>
         <source>imd mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="138"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="156"/>
         <source>osu mapfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="179"/>
         <source>Export As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="161"/>
+        <location filename="../src/ui/canvas/map/MapCanvasActions.cpp" line="179"/>
         <source>File Formats:</source>
         <translation type="unfinished"></translation>
     </message>
