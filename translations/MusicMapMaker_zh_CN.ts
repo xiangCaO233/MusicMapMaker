@@ -177,7 +177,7 @@
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="38"/>
         <source>Mirror</source>
-        <translation type="unfinished"></translation>
+        <translation>镜像</translation>
     </message>
     <message>
         <location filename="../src/ui/action/modules/canvas/EditorActions.cpp" line="41"/>
