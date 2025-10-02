@@ -137,6 +137,9 @@ struct DragState {
     MeshPartInfo drag_start_hit;
     // 实际被拖拽的实体集合
     std::unordered_map<entt::entity, MapAxis> dragged_entitiesWithRes;
+    // 被拖拽的从属实体集合(所属父实体-(子实体-位置结果))
+    std::unordered_map<entt::entity, std::unordered_map<entt::entity, MapAxis>>
+        subject_dragged_entitiesWithRes;
 };
 
 struct CreateState {
@@ -176,11 +179,17 @@ class ToolInteractionState {
 
     // 拖拽相关 (由 pretick 写入, 工作线程读取)
     void startDrag(DragMode mode, MeshPartInfo hit,
-                   const std::unordered_map<entt::entity, MapAxis>& selection);
+                   const std::unordered_map<entt::entity, MapAxis>& selection,
+                   const std::unordered_map<
+                       entt::entity, std::unordered_map<entt::entity, MapAxis>>&
+                       subject_selection);
     void endDrag();
 
     void setDragValidity(bool isValid);
     void setDragValidRes(const entt::entity& e, const MapAxis& axis);
+    void setSubjectDragValidRes(const entt::entity& parente,
+                                const entt::entity& sube,
+                                const MapAxis& subaxis);
 
     DragState getDragState() const;
 

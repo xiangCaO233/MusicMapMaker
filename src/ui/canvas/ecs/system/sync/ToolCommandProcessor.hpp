@@ -2,8 +2,10 @@
 #define MMM_TOOLCOMMANDPROCESSOR_HPP
 
 #include <colorful-log.h>
+#include <qforeach.h>
 
 #include <ecs/component/CoreComponents.hpp>
+#include <ecs/component/RelationComponents.hpp>
 #include <ecs/system/ToolSystem.hpp>
 #include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/NotePart.hpp>
@@ -481,6 +483,9 @@ class ToolCommandProcessor {
     void startDragEntities(const std::unordered_set<entt::entity>& selections,
                            MeshPartInfo part = {}, bool move_only = false) {
         std::unordered_map<entt::entity, MapAxis> selections_with_ress;
+        std::unordered_map<entt::entity,
+                           std::unordered_map<entt::entity, MapAxis>>
+            subject_selections_with_ress;
         // 获取所有选中物件的原始位置
         for (const auto& selected_entity : selections) {
             auto& [track, uuid] = registry.get<NoteComponent>(selected_entity);
@@ -492,6 +497,28 @@ class ToolCommandProcessor {
                 all_tracks_rect.x +
                 (float(source_axis.track) + 0.5f) * single_track_width;
             selections_with_ress.try_emplace(selected_entity, source_axis);
+            // 若为复合物件则放子实体坐标到从属集合中
+            if (registry.all_of<CompositeRootComponent>(selected_entity)) {
+                auto& subject_selections_with_res =
+                    subject_selections_with_ress[selected_entity];
+                auto& [children, total_duration] =
+                    registry.get<CompositeRootComponent>(selected_entity);
+                for (const auto& child_e : children) {
+                    auto& [child_track, child_uuid] =
+                        registry.get<NoteComponent>(child_e);
+                    auto& [child_time] = registry.get<TimeComponent>(child_e);
+                    MapAxis child_source_axis{child_time, child_time,
+                                              child_track};
+                    child_source_axis.y = maintrack_converter->timeToPixel(
+                        child_source_axis.time, presentation_canvas_time, info);
+                    child_source_axis.x =
+                        all_tracks_rect.x +
+                        (float(child_source_axis.track) + 0.5f) *
+                            single_track_width;
+                    subject_selections_with_res.try_emplace(child_e,
+                                                            child_source_axis);
+                }
+            }
         }
 
         // 更新 TIS 的选择集
@@ -504,7 +531,8 @@ class ToolCommandProcessor {
         // 更新 TIS 的拖拽状态
         interactionState.startDrag(DragMode::Entity, part,
                                    // 选中列表
-                                   selections_with_ress);
+                                   selections_with_ress,
+                                   subject_selections_with_ress);
 
         // 为所有被拖拽的实体附加虚影组件
         for (auto& entity : selections) {

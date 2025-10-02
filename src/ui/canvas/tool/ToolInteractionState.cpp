@@ -83,9 +83,13 @@ std::optional<MeshPartInfo> ToolInteractionState::getHover() const {
 // 拖拽相关 (由 pretick 写入, 工作线程读取)
 void ToolInteractionState::startDrag(
     DragMode mode, MeshPartInfo hit,
-    const std::unordered_map<entt::entity, MapAxis>& selection) {
+    const std::unordered_map<entt::entity, MapAxis>& selection,
+    const std::unordered_map<entt::entity,
+                             std::unordered_map<entt::entity, MapAxis>>&
+        subject_selection) {
     m_dragState.drag_start_hit = hit;
     m_dragState.dragged_entitiesWithRes = selection;
+    m_dragState.subject_dragged_entitiesWithRes = subject_selection;
     m_dragState.mode = mode;
 }
 
@@ -93,6 +97,7 @@ void ToolInteractionState::endDrag() {
     m_dragState.mode = DragMode::None;
     m_dragState.drag_start_hit = {};
     m_dragState.dragged_entitiesWithRes.clear();
+    m_dragState.subject_dragged_entitiesWithRes.clear();
     rebuildAggregatedSelection();
 }
 
@@ -105,6 +110,17 @@ void ToolInteractionState::setDragValidRes(const entt::entity& e,
     auto it = m_dragState.dragged_entitiesWithRes.find(e);
     if (it != m_dragState.dragged_entitiesWithRes.end()) {
         it->second = axis;
+    }
+}
+void ToolInteractionState::setSubjectDragValidRes(const entt::entity& parente,
+                                                  const entt::entity& sube,
+                                                  const MapAxis& subaxis) {
+    auto subressit = m_dragState.subject_dragged_entitiesWithRes.find(parente);
+    if (subressit != m_dragState.subject_dragged_entitiesWithRes.end()) {
+        auto subit = subressit->second.find(sube);
+        if (subit != subressit->second.end()) {
+            subit->second = subaxis;
+        }
     }
 }
 

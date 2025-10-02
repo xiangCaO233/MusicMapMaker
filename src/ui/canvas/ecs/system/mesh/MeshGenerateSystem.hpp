@@ -33,6 +33,8 @@ class MeshGenerateSystem {
     const entt::registry* registry;
     std::unordered_map<entt::entity, GeneratedMesh>* generated_meshes;
     MapAxis relative_delta_axis;
+    MapAxis parent_relative_delta_axis;
+    entt::entity parent_entity{entt::null};
 
     // 转化像素位置到谱面坐标系
     MapAxis getPixelMapAxis(const glm::vec2& pixel, bool is_preview) const {
@@ -259,6 +261,7 @@ class MeshGenerateSystem {
                 //                           info->realTimeInfo.current_time_info
                 //                               .presentation_canvas_time);
                 auto& drageed_entities = drag_info.dragged_entitiesWithRes;
+                // 这里不会有子物件实体被检测到
                 if (drageed_entities.size() > 1) {
                     // 拖动多个时无论何部位均为移动
                     // 计算此时鼠标最近的轨道
@@ -306,7 +309,6 @@ class MeshGenerateSystem {
                             e, MapAxis{time, time, track_index, 0, int64_t(y)});
                         // 恢复相对移动位置
                         relative_delta_axis = MapAxis{};
-                        qDebug() << "restore dragpos";
                     }
 
                 } else {
@@ -327,18 +329,44 @@ class MeshGenerateSystem {
                                         current_mouse_axis.track < track_count;
                         tool_interaction_state->setDragValidity(validity);
                         drag_info = tool_interaction_state->getDragState();
+
                         if (drag_info.is_valid) {
-                            time = current_mouse_axis.time;
-                            track_index = current_mouse_axis.track;
-                            y = current_mouse_axis.y;
+                            // 判断拖拽的是否为复合物件
+                            if (registry->all_of<CompositeRootComponent>(e)) {
+                                // 是组合键-计算出相对移动位置并记录和跟随
+                                // 计算相对位置
+                                auto& src_axis = drageed_entities[e];
+                                parent_relative_delta_axis =
+                                    current_mouse_axis - src_axis;
+                                parent_entity = e;
+                                auto res_axis =
+                                    src_axis + parent_relative_delta_axis;
+
+                                // 安全限制检查
+                                if (res_axis.time < 0) res_axis.time = 0;
+                                if (res_axis.track < 0) res_axis.track = 0;
+                                if (res_axis.track >= track_count)
+                                    res_axis.track = track_count - 1;
+
+                                // 应用位置变化到当前实体
+                                time = res_axis.time;
+                                track_index = res_axis.track;
+                                y = res_axis.y;
+                            } else {
+                                // 非组合物件拖动-正常移动-直接跟随鼠标
+                                time = current_mouse_axis.time;
+                                track_index = current_mouse_axis.track;
+                                y = current_mouse_axis.y;
+                            }
+
                             tool_interaction_state->setDragValidRes(
                                 e, current_mouse_axis);
+
                         } else {
                             // 按住右键或非法则恢复当前实体拖动结果
                             tool_interaction_state->setDragValidRes(
                                 e, MapAxis{time, time, track_index, 0,
                                            int64_t(y)});
-                            qDebug() << "restore dragpos";
                         }
                     }
                 }
@@ -487,9 +515,6 @@ class MeshGenerateSystem {
                 else
                     y = m_childy;
 
-                // qDebug() << "父物件实体:" << static_cast<uint32_t>(e)
-                //          << "递归生成子物件实体网格:"
-                //          << static_cast<uint32_t>(child_e);
                 // 填充目标网格属性
                 auto& child_mesh = (*generated_meshes)[child_e];
 
@@ -498,6 +523,41 @@ class MeshGenerateSystem {
                 child_mesh.child_entity = child_e;
                 // 跟随父物件的网格状态(如虚影)
                 child_mesh.state = entity_mesh.state;
+
+                // 更新子物件位置(根据父物件相对移动位置)
+                // else if (registry->all_of<ChildOfComponent>(e)) {
+                //                                 //
+                //                                 是组合内的子物件键-根据上面计算出的相对移动位置应用更新
+                //                                 auto& [parent, index] =
+                //                                     registry->get<ChildOfComponent>(e);
+                //                                 if (parent == parent_entity)
+                //                                 {
+                //                                     auto& src_axis =
+                //                                         drag_info
+                //                                             .subject_dragged_entitiesWithRes
+                //                                                 [parent][e];
+                //                                     auto res_axis =
+                //                                         src_axis +
+                //                                         relative_delta_axis;
+                //
+                //                                     // 安全限制检查
+                //                                     if (res_axis.time < 0)
+                //                                     res_axis.time = 0; if
+                //                                     (res_axis.track < 0)
+                //                                     res_axis.track = 0; if
+                //                                     (res_axis.track >=
+                //                                     track_count)
+                //                                         res_axis.track =
+                //                                         track_count - 1;
+                //
+                //                                     // 应用位置变化到当前实体
+                //                                     time = res_axis.time;
+                //                                     track_index =
+                //                                     res_axis.track; y =
+                //                                     res_axis.y;
+                //                                 }
+                //                             }
+
                 generateMesh(child_track_index, child_e, child_mesh, child_time,
                              y,
                              // 是否为末尾
