@@ -41,9 +41,13 @@ class ToolSystem {
             // 遍历网格中的每一个部件 (Quad)
             for (const auto& quad : mesh.mesh) {
                 // 获取指向刚刚创建的、位于内存池末尾的对象的指针
-                MeshPartInfo new_part_ptr{
-                    quad.pos,  quad.size,   entity, mesh.child_entity,
-                    quad.part, quad.zIndex, uuid};
+                MeshPartInfo new_part_ptr{quad.pos,
+                                          quad.size,
+                                          mesh.source_entity,
+                                          mesh.child_entity,
+                                          quad.part,
+                                          quad.zIndex,
+                                          uuid};
                 mesh_map.insert({mesh.child_entity != entt::null
                                      ? mesh.child_entity
                                      : mesh.source_entity,

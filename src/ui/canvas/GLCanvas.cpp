@@ -196,24 +196,6 @@ void GLCanvas::resizeGL(int w, int h) {
 void GLCanvas::paintGL() {
     auto before = std::chrono::high_resolution_clock::now().time_since_epoch();
 
-    // QuadCommand qcmd;
-    // qcmd.cmdType = CommandType::QUAD;
-    // qcmd.baseInfo.pos = {300, 300};
-    // qcmd.baseInfo.size = {100, 100};
-    // qcmd.baseInfo.color = {0, 1, 1, 1};
-
-    // PrimitiveCommand cmd;
-    // cmd.cmdType = CommandType::PRIMITIVE;
-    // cmd.baseInfo.pos = {100, 100};
-    // cmd.baseInfo.size = {100, 100};
-    // cmd.baseInfo.color = {1, 1, 0, 1};
-    // cmd.primitive = PrimitiveType::QUAD;
-
-    // render->commit(qcmd);
-    // render->commit(cmd);
-    // render->finalize();
-    // render->render();
-
     {
         MCommandCollector pc(render.get(), render_dataloop->layermanager());
 
