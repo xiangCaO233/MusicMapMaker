@@ -3,6 +3,7 @@
 
 #include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
+#include <mmm/map/MMap.hpp>
 
 /**
  * @class LinearTimeConverter
@@ -42,11 +43,13 @@ class LinearTimeConverter : public TimePixelConverter {
         const auto& base_info = m_info->baseInfo;
         const auto& editor_info = info->editorInfo;
         const float canvas_height = base_info.canvasSize.height();
-        const float judgeline_y_abs = canvas_height * editor_info.judgeline_pos;
+        auto pconfig = info->editorInfo.map->project()->cfg();
+        const float judgeline_y_abs =
+            canvas_height * (1.f - pconfig->canvas_config.judgeline_pos);
 
         return canvas_height - static_cast<float>(untranslated_y) -
                (canvas_height -
-                canvas_height * (1.f - editor_info.judgeline_pos));
+                canvas_height * pconfig->canvas_config.judgeline_pos);
     }
 
     /**
@@ -63,8 +66,10 @@ class LinearTimeConverter : public TimePixelConverter {
             return current_canvas_time;
         }
 
+        auto pconfig = m_info->editorInfo.map->project()->cfg();
         const float judgeline_y_abs =
-            base_info.canvasSize.height() * editor_info.judgeline_pos;
+            base_info.canvasSize.height() *
+            (1.f - pconfig->canvas_config.judgeline_pos);
         double untranslated_y_with_zoom = static_cast<double>(-pixel_y);
 
         double relative_pixel_offset =

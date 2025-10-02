@@ -330,7 +330,7 @@
         <translation>项目设置</translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="150"/>
+        <location filename="../src/ui/mainwindow.cpp" line="147"/>
         <source>MusicMapMaker--&gt;</source>
         <translation>谱面编辑器--&gt;</translation>
     </message>
@@ -628,72 +628,77 @@
         <translation>项目偏好</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="72"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="57"/>
         <source>Project Name:</source>
         <translation>项目名称:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="97"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="82"/>
         <source>Editor Config</source>
         <translation>编辑器配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="128"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="113"/>
         <source>Edit Mode Preference:</source>
         <translation>偏好的编辑模式:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="143"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="128"/>
         <source>more edit mode are in progress</source>
         <translation>⚡更多编辑模式开发中⚡</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="178"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="163"/>
         <source>Canvas Config</source>
         <translation>画布配置</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="211"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="338"/>
         <source>Track Layout:</source>
         <translation>轨道布局:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="233"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="211"/>
+        <source>Beatline Alpha:</source>
+        <translation>栅格线不透明度:</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="352"/>
         <source>top</source>
         <translation>顶部</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="266"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="385"/>
         <source>right</source>
         <translation>右侧</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="302"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="421"/>
         <source>bottom</source>
         <translation>底部</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="338"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="457"/>
         <source>left</source>
         <translation>左侧</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="406"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="196"/>
         <source>Judgeline Pos:</source>
         <translation>判定线位置:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="477"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="525"/>
         <source>Object Scale:</source>
         <translation>物件缩放:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="513"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="262"/>
         <source>width:</source>
         <translation>宽:</translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="252"/>
         <source>height:</source>
         <translation>高:</translation>
     </message>

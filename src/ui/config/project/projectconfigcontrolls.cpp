@@ -39,7 +39,11 @@ void ProjectConfig::on_object_height_scale_slider_valueChanged(int value) {
 }
 
 void ProjectConfig::on_judgeline_pos_slider_valueChanged(int value) {
-    config->canvas_config.judgeline_pos = double(value) / 100.0;
+    config->canvas_config.judgeline_pos = float(value) / 100.f;
     ui->judgeline_pos_value_label->setText(QString("%1%").arg(value));
-    emit judgeline_changed(config->canvas_config.judgeline_pos);
+}
+
+void ProjectConfig::on_beatline_alpha_slider_valueChanged(int value) {
+    config->canvas_config.beatline_alpha = float(value) / 100.f;
+    ui->beatline_alpha_value_label->setText(QString("%1%").arg(value));
 }

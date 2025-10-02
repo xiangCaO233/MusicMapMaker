@@ -41,7 +41,9 @@ void PreviewLayerGenerator::generateLayer(LayerManager* manager,
     if (!tool_interaction_state->isDraggingGlobalPreview()) {
         // 正在全局拖动-不绘制物件和时间线
         // 绘制时间线和timing
-        timeline_system.update(ecore, mapinfo, *converter, l, buffer, true);
+        timeline_system.update(ecore, mapinfo, *converter, l,
+                               maplayer_manager->get_tool_interaction_state(),
+                               buffer, true);
 
         // 生成预览物件网格
         std::unordered_map<entt::entity, GeneratedMesh> preview_meshs;
@@ -87,6 +89,7 @@ void PreviewLayerGenerator::generateLayer(LayerManager* manager,
         const auto& editor_info = mapinfo->editorInfo;
         const auto& base_info = mapinfo->baseInfo;
         const float canvas_height = base_info.canvasSize.height();
+        auto pconfig = editor_info.map->project()->cfg();
 
         // 预览区相对主轨道的倍率
         auto maintrackpos_inpreview_area_ratio =
@@ -106,7 +109,7 @@ void PreviewLayerGenerator::generateLayer(LayerManager* manager,
         // 主轨道判定线在预览区中的位置
         auto judgeline_pos_in_previewarea =
             maintrack_top_inpreview +
-            (1.f - editor_info.judgeline_pos) * maintrack_size_inpreview;
+            pconfig->canvas_config.judgeline_pos * maintrack_size_inpreview;
 
         PrimitiveCommand previewAreaMainTrackMaskCmd;
         previewAreaMainTrackMaskCmd.cmdType = CommandType::PRIMITIVE;

@@ -291,7 +291,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/mainwindow.cpp" line="150"/>
+        <location filename="../src/ui/mainwindow.cpp" line="147"/>
         <source>MusicMapMaker--&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -577,72 +577,77 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="72"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="57"/>
         <source>Project Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="97"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="82"/>
         <source>Editor Config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="128"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="113"/>
         <source>Edit Mode Preference:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="143"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="128"/>
         <source>more edit mode are in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="178"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="163"/>
         <source>Canvas Config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="211"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="338"/>
         <source>Track Layout:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="233"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="211"/>
+        <source>Beatline Alpha:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="352"/>
         <source>top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="266"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="385"/>
         <source>right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="302"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="421"/>
         <source>bottom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="338"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="457"/>
         <source>left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="406"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="196"/>
         <source>Judgeline Pos:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="477"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="525"/>
         <source>Object Scale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="513"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="262"/>
         <source>width:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/config/project/projectconfig.ui" line="539"/>
+        <location filename="../src/ui/config/project/projectconfig.ui" line="252"/>
         <source>height:</source>
         <translation type="unfinished"></translation>
     </message>

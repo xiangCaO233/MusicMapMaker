@@ -4,6 +4,7 @@
 #include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <mmm/DataStructures.hpp>
+#include <mmm/map/MMap.hpp>
 
 /*
  * @class PreviewEffectedTimeConverter
@@ -22,6 +23,7 @@ class PreviewEffectedTimeConverter : public TimePixelConverter {
         const auto& editor_info = info->editorInfo;
         const auto& base_info = info->baseInfo;
         const float canvas_height = base_info.canvasSize.height();
+        auto pconfig = info->editorInfo.map->project()->cfg();
 
         // 预览区相对主轨道的倍率
         auto maintrackpos_inpreview_area_ratio =
@@ -41,7 +43,7 @@ class PreviewEffectedTimeConverter : public TimePixelConverter {
         // 主轨道判定线在预览区中的位置
         judgeline_pos_in_previewarea =
             maintrack_top_inpreview +
-            (1.f - editor_info.judgeline_pos) * maintrack_size_inpreview;
+            pconfig->canvas_config.judgeline_pos * maintrack_size_inpreview;
         buildLookupTable(timings, prebpm);
     }
 

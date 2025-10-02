@@ -66,9 +66,6 @@ void MainWindow::connectAll() {
     // 连接项目配置更新的信号-轨道布局
     connect(ui->project_config, &ProjectConfig::layout_changed, canvas,
             &MapCanvas::onLayoutUpdated);
-    // 连接项目配置更新的信号-判定线位置
-    connect(ui->project_config, &ProjectConfig::judgeline_changed, canvas,
-            &MapCanvas::onJudgelinePosUpdated);
 
     // 编辑相关
     // 连接激活map事件-同步timing编辑器列表

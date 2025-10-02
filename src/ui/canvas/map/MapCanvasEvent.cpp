@@ -72,6 +72,8 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
     auto &scrollInfo = editor_info.scrollInfo;
     auto &previewInfo = editor_info.previewAreaInfo;
 
+    auto pconfig = map->project()->cfg();
+
     if (modifiers.testFlag(Qt::ShiftModifier)) {
         // 按住shift倍乘dy
         dy *= 3.f;
@@ -107,7 +109,7 @@ void MapCanvas::wheelEvent(QWheelEvent *e) {
                                     .current_pos;
                 auto mouseTime = converter->distanceToTime(
                     height() - mousePos.y -
-                        height() * mapinfo->editorInfo.judgeline_pos,
+                        height() * (1.f - pconfig->canvas_config.judgeline_pos),
                     mapinfo->realTimeInfo.current_time_info
                         .presentation_canvas_time);
                 auto beat = findBeatAtTime(mouseTime, beat_timeline, beat_info);

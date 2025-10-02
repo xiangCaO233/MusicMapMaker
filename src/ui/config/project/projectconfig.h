@@ -29,7 +29,6 @@ class ProjectConfig : public QWidget {
 
    signals:
     void layout_changed();
-    void judgeline_changed(float pos);
 
    private slots:
     void on_toppos_spinner_valueChanged(double arg1);
@@ -47,6 +46,8 @@ class ProjectConfig : public QWidget {
     void on_judgeline_pos_slider_valueChanged(int value);
 
     void on_project_name_edit_textEdited(const QString &arg1);
+
+    void on_beatline_alpha_slider_valueChanged(int value);
 
    private:
     Ui::ProjectConfig *ui;

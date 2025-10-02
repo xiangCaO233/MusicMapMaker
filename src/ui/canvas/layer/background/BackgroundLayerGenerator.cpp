@@ -22,6 +22,7 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
     if (info->editorInfo.map) {
         glm::vec2 canvas_size = {info->baseInfo.canvasSize.width(),
                                  info->baseInfo.canvasSize.height()};
+        auto pconfig = info->editorInfo.map->project()->cfg();
 
         // 获取轨道布局信息
         const glm::vec4& all_tracks_rect = info->editorInfo.track_layout;
@@ -73,7 +74,7 @@ void BackgroundLayerGenerator::generateLayer(LayerManager* manager,
             jcmd.baseInfo = {
                 {all_tracks_rect.x + (float(i) + .5f) * single_track_width -
                      judgeline_size.x / 2.f,
-                 (1.f - info->editorInfo.judgeline_pos) * canvas_size.y -
+                 pconfig->canvas_config.judgeline_pos * canvas_size.y -
                      judgeline_size.y / 2.f},
                 judgeline_size};
             jcmd.texturesInfo.texture = oribit_judge_texture;

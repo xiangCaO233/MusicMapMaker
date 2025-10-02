@@ -41,7 +41,9 @@ class ToolCommandProcessor {
         track_count = info->editorInfo.map->base_metadata().track_count;
         single_track_width = all_tracks_rect.z / float(track_count);
         canvas_height = info->baseInfo.canvasSize.height();
-        judgeline_absolute_y = canvas_height * info->editorInfo.judgeline_pos;
+        auto pconfig = map->project()->cfg();
+        judgeline_absolute_y =
+            canvas_height * (1.f - pconfig->canvas_config.judgeline_pos);
         presentation_canvas_time =
             info->realTimeInfo.current_time_info.presentation_canvas_time;
         const auto& editor_info = info->editorInfo;
@@ -66,7 +68,7 @@ class ToolCommandProcessor {
         // 主轨道判定线在预览区中的位置
         judgeline_pos_in_previewarea =
             maintrack_top_inpreview +
-            (1.f - editor_info.judgeline_pos) * maintrack_size_inpreview;
+            pconfig->canvas_config.judgeline_pos * maintrack_size_inpreview;
     }
 
     ~ToolCommandProcessor() = default;

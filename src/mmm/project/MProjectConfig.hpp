@@ -35,13 +35,19 @@ struct ProjectMapConfig {
 struct CanvasConfig {
     // top,right,bottom,left
     glm::vec4 canvas_layout{.05f, .75f, .95f, .25f};
+
     // 判定线位置
     float judgeline_pos{.8f};
+
     // 选择框宽度
     float select_border_width{4.f};
+
     // 物件缩放
     float object_width_scale{1.f};
     float object_height_scale{1.f};
+
+    // 分拍线透明度
+    float beatline_alpha{1.f};
 };
 
 struct MProjectConfig {

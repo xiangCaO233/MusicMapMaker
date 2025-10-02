@@ -65,9 +65,6 @@ struct EditorInfo {
     // 工具选择
     EditToolType currentEditTool;
 
-    // 判定线位置
-    float judgeline_pos{.2f};
-
     // 滚动是否吸附到分拍线
     bool magnet_to_divisor{false};
 

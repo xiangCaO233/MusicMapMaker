@@ -17,8 +17,9 @@ void EffectLayerGenerator::generateLayer(LayerManager* manager,
     auto l = layer<NoteLayer>();
     auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
     auto& ecore = maplayer_manager->core();
+    auto pconfig = map->project()->cfg();
     const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
-                                      (1.f - mapinfo->editorInfo.judgeline_pos);
+                                      pconfig->canvas_config.judgeline_pos;
 
     // 绘制当前时间字符串
     auto timestr = QString::number(int64_t(

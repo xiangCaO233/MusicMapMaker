@@ -93,7 +93,9 @@ class MeshGenerateSystem {
             glm::vec2{realtime_info->mousePos.x(), realtime_info->mousePos.y()};
         canvas_size = info->baseInfo.canvasSize;
         canvas_height = canvas_size.height();
-        judgeline_absolute_y = canvas_height * info->editorInfo.judgeline_pos;
+        auto pconfig = info->editorInfo.map->project()->cfg();
+        judgeline_absolute_y =
+            canvas_height * (1.f - pconfig->canvas_config.judgeline_pos);
         tool_interaction_state = toolInteractionState;
         converter = &converter_ref;
         presentation_canvas_time =
@@ -121,7 +123,7 @@ class MeshGenerateSystem {
         // 主轨道判定线在预览区中的位置
         judgeline_pos_in_previewarea =
             maintrack_top_inpreview +
-            (1.f - editor_info.judgeline_pos) * maintrack_size_inpreview;
+            pconfig->canvas_config.judgeline_pos * maintrack_size_inpreview;
 
         // 生成物件的网格组件
         // const auto& realtime_info = info->realTimeInfo;

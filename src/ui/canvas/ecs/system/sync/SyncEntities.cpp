@@ -638,10 +638,12 @@ void SyncSystem::updateEntities(ECSCore& core, const NoteCollection& notes,
     const auto& maintrack_layout = editor_info.track_layout;
 
     // 定义屏幕边界
+    auto pconfig = editor_info.map->project()->cfg();
 
     // 根据设定的坐标系 (Y=0在底部)，计算判定线的绝对像素位置。
     // 如果 judgeline_pos = 0.2f，意味着判定线在从下往上20%的高度。
-    const auto judgeline_absolute_y = canvas_height * editor_info.judgeline_pos;
+    const auto judgeline_absolute_y =
+        canvas_height * (1.f - pconfig->canvas_config.judgeline_pos);
 
     // 计算屏幕顶部和底部到判定线的“相对像素距离”。
     // 这些相对值将作为 converter 的输入。

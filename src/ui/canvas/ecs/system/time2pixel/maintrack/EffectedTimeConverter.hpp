@@ -4,6 +4,7 @@
 #include <ecs/system/time2pixel/TimePixelConverter.hpp>
 #include <info/MapCanvasInfo.hpp>
 #include <mmm/DataStructures.hpp>
+#include <mmm/map/MMap.hpp>
 
 /*
  * @class EffectedTimeConverter
@@ -31,10 +32,11 @@ class EffectedTimeConverter : public TimePixelConverter {
             pixel_at_timestamp - pixel_at_current_time;
         auto untranslated_y = static_cast<float>(relative_pixel_offset *
                                                  m_scrollInfo.timeline_zoom);
+        auto pconfig = info->editorInfo.map->project()->cfg();
         return info->baseInfo.canvasSize.height() - untranslated_y -
                (float(info->baseInfo.canvasSize.height()) -
                 info->baseInfo.canvasSize.height() *
-                    (1.f - info->editorInfo.judgeline_pos));
+                    pconfig->canvas_config.judgeline_pos);
     }
 
     int64_t distanceToTime(float pixel_y,

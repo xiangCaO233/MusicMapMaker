@@ -21,6 +21,7 @@ class EffectRenderSystem {
             info->editorInfo.map->base_metadata().track_count;
         const auto& track_layout = info->editorInfo.track_layout;
         const auto& single_track_width = track_layout.z / float(track_count);
+        auto pconfig = info->editorInfo.map->project()->cfg();
 
         auto view = registry.view<EffectComponent, TrackIdentifierComponent>();
         for (auto entity : view) {
@@ -53,7 +54,7 @@ class EffectRenderSystem {
             auto center_x = track_layout.x + single_track_width * effect.track +
                             single_track_width / 2.f;
             auto center_y = info->baseInfo.canvasSize.height() *
-                            (1.f - info->editorInfo.judgeline_pos);
+                            pconfig->canvas_config.judgeline_pos;
             PrimitiveCommand cmd;
             cmd.cmdType = CommandType::PRIMITIVE;
             cmd.primitive = PrimitiveType::QUAD;

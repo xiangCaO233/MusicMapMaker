@@ -22,6 +22,7 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     auto l = layer<NoteLayer>();
     auto mapinfo = static_cast<MapCanvasInfo*>(l->info());
     auto& ecore = maplayer_manager->core();
+    auto pconfig = map->project()->cfg();
 
     // 从管理器获取时间转换器
     auto converter =
@@ -32,8 +33,9 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
 
     // 根据设定的坐标系 (Y=0在底部)，计算判定线的绝对像素位置。
     // 如果 judgeline_pos = 0.2f，意味着判定线在从下往上20%的高度。
-    const auto judgeline_absolute_y = mapinfo->baseInfo.canvasSize.height() *
-                                      mapinfo->editorInfo.judgeline_pos;
+    const auto judgeline_absolute_y =
+        mapinfo->baseInfo.canvasSize.height() *
+        (1.f - pconfig->canvas_config.judgeline_pos);
 
     // 计算屏幕顶部和底部到判定线的“相对像素距离”。
     // 这些相对值将作为 converter 的输入。
@@ -76,7 +78,9 @@ void TimelineLayerGenerator::generateLayer(LayerManager* manager,
     buffer.add_PrimitiveCommand(end_cmd);
 
     // 生成时间线(拍线/识别分拍/小节线)
-    timeline_system.update(ecore, mapinfo, *converter, l, buffer);
+    timeline_system.update(ecore, mapinfo, *converter, l,
+                           maplayer_manager->get_tool_interaction_state(),
+                           buffer);
 
     // qDebug() << "timeline layer done";
 }
