@@ -124,14 +124,17 @@ void MProject::add_audio_track(const std::string& file,
 void MProject::add_map(std::unique_ptr<MMap> map) {
     map->bind_project(this);
     // 添加谱面到表中
+    auto& basemeta = map->base_metadata();
     if (map->base_metadata().name.empty()) {
-        auto& basemeta = map->base_metadata();
         // 自动生成mapname
         basemeta.name = "[mmm] " + basemeta.artist_unicode + "-" +
                         basemeta.title_unicode + "(" + basemeta.author + ") [" +
                         std::to_string(basemeta.track_count) + "k] - " +
                         basemeta.version;
     }
+    // 通过mapname确认谱面路径
+    basemeta.map_path = project_path / (basemeta.name + ".mmm");
+
     auto mapit = project_maps_table
                      .try_emplace(map->base_metadata().name, std::move(map))
                      .first;

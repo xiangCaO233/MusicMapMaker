@@ -125,6 +125,14 @@ struct MapAxis {
         return {time + other.time, mousetime + other.mousetime,
                 track + other.track, x + other.x, y + other.y};
     }
+
+    std::string toString() const {
+        std::ostringstream oss;
+        oss << "MapAxis { "
+            << "time: " << time << ", mousetime: " << mousetime
+            << ", track: " << track << ", x: " << x << ", y: " << y << " }";
+        return oss.str();
+    }
 };
 
 struct DragState {

@@ -1,6 +1,8 @@
 #ifndef MMM_MESHGENERATESYSTEM_HPP
 #define MMM_MESHGENERATESYSTEM_HPP
 
+#include <colorful-log.h>
+
 #include <ecs/ECSCore.hpp>
 #include <ecs/component/CoreComponents.hpp>
 #include <ecs/component/NoteComponents.hpp>
@@ -33,7 +35,6 @@ class MeshGenerateSystem {
     const entt::registry* registry;
     std::unordered_map<entt::entity, GeneratedMesh>* generated_meshes;
     MapAxis relative_delta_axis;
-    MapAxis parent_relative_delta_axis;
     entt::entity parent_entity{entt::null};
 
     // 转化像素位置到谱面坐标系
@@ -182,11 +183,13 @@ class MeshGenerateSystem {
             if (delmark) {
                 // 标记删除方式渲染
                 entity_mesh.state = MeshState::MARKDELETE;
-                generateMesh(track_index, e, entity_mesh, time, y, false, true);
+                generateMesh(track_index, e, entity_mesh, time, y, false, {},
+                             true);
             } else if (ghost) {
                 // 虚影方式渲染直接渲染
                 entity_mesh.state = MeshState::GHOST;
-                generateMesh(track_index, e, entity_mesh, time, y, false, true);
+                generateMesh(track_index, e, entity_mesh, time, y, false, {},
+                             true);
             } else {
                 // 非虚影或即将删除方式渲染
 
@@ -197,7 +200,7 @@ class MeshGenerateSystem {
                     // 使用虚影渲染
                     entity_mesh.state = MeshState::GHOST;
                     generateMesh(track_index, e, entity_mesh, time, y, false,
-                                 true);
+                                 {}, true);
                 } else {
                     // 有uuid,是真实在谱面中存在的物件-正常渲染
                     // 判断是否在选中集合内
@@ -209,7 +212,7 @@ class MeshGenerateSystem {
                             entity_mesh.state = MeshState::GLOW;
                     }
                     generateMesh(track_index, e, entity_mesh, time, y, false,
-                                 true);
+                                 {}, true);
                 }
             }
         }
@@ -261,6 +264,7 @@ class MeshGenerateSystem {
                 //                           info->realTimeInfo.current_time_info
                 //                               .presentation_canvas_time);
                 auto& drageed_entities = drag_info.dragged_entitiesWithRes;
+                MapAxis parent_relative_delta_axis{};
                 // 这里不会有子物件实体被检测到
                 if (drageed_entities.size() > 1) {
                     // 拖动多个时无论何部位均为移动
@@ -303,6 +307,7 @@ class MeshGenerateSystem {
 
                         // 更新当前实体拖动结果
                         tool_interaction_state->setDragValidRes(e, res_axis);
+
                     } else {
                         // 按住右键或非法则恢复当前实体拖动结果
                         tool_interaction_state->setDragValidRes(
@@ -342,7 +347,7 @@ class MeshGenerateSystem {
                                 auto res_axis =
                                     src_axis + parent_relative_delta_axis;
 
-                                // 安全限制检查
+                                // 安全限制
                                 if (res_axis.time < 0) res_axis.time = 0;
                                 if (res_axis.track < 0) res_axis.track = 0;
                                 if (res_axis.track >= track_count)
@@ -352,27 +357,33 @@ class MeshGenerateSystem {
                                 time = res_axis.time;
                                 track_index = res_axis.track;
                                 y = res_axis.y;
+
+                                XINFO("复合物件相对移动:" +
+                                      parent_relative_delta_axis.toString());
+                                tool_interaction_state->setDragValidRes(
+                                    e, res_axis);
                             } else {
                                 // 非组合物件拖动-正常移动-直接跟随鼠标
                                 time = current_mouse_axis.time;
                                 track_index = current_mouse_axis.track;
                                 y = current_mouse_axis.y;
+                                tool_interaction_state->setDragValidRes(
+                                    e, current_mouse_axis);
                             }
-
-                            tool_interaction_state->setDragValidRes(
-                                e, current_mouse_axis);
 
                         } else {
                             // 按住右键或非法则恢复当前实体拖动结果
                             tool_interaction_state->setDragValidRes(
                                 e, MapAxis{time, time, track_index, 0,
                                            int64_t(y)});
+                            XWARN("物件移动不可用");
                         }
                     }
                 }
                 // --------------------物件拖动移动交互--------------------------
 
-                generateMesh(track_index, e, entity_mesh, time, y);
+                generateMesh(track_index, e, entity_mesh, time, y, false,
+                             parent_relative_delta_axis);
             } else {
                 // 非虚影或即将删除方式渲染
 
@@ -423,6 +434,7 @@ class MeshGenerateSystem {
     void generateMesh(int32_t track_index, const entt::entity& e,
                       GeneratedMesh& entity_mesh, const uint32_t& time,
                       const float& y, bool child_and_end = false,
+                      MapAxis parent_delta = {},
                       bool is_preview = false) const {
         // 根据note信息生成网格
 
@@ -525,43 +537,32 @@ class MeshGenerateSystem {
                 child_mesh.state = entity_mesh.state;
 
                 // 更新子物件位置(根据父物件相对移动位置)
-                // else if (registry->all_of<ChildOfComponent>(e)) {
-                //                                 //
-                //                                 是组合内的子物件键-根据上面计算出的相对移动位置应用更新
-                //                                 auto& [parent, index] =
-                //                                     registry->get<ChildOfComponent>(e);
-                //                                 if (parent == parent_entity)
-                //                                 {
-                //                                     auto& src_axis =
-                //                                         drag_info
-                //                                             .subject_dragged_entitiesWithRes
-                //                                                 [parent][e];
-                //                                     auto res_axis =
-                //                                         src_axis +
-                //                                         relative_delta_axis;
-                //
-                //                                     // 安全限制检查
-                //                                     if (res_axis.time < 0)
-                //                                     res_axis.time = 0; if
-                //                                     (res_axis.track < 0)
-                //                                     res_axis.track = 0; if
-                //                                     (res_axis.track >=
-                //                                     track_count)
-                //                                         res_axis.track =
-                //                                         track_count - 1;
-                //
-                //                                     // 应用位置变化到当前实体
-                //                                     time = res_axis.time;
-                //                                     track_index =
-                //                                     res_axis.track; y =
-                //                                     res_axis.y;
-                //                                 }
-                //                             }
+                auto drag_info = tool_interaction_state->getDragState();
+                auto& [parent, index] =
+                    registry->get<ChildOfComponent>(child_e);
 
-                generateMesh(child_track_index, child_e, child_mesh, child_time,
-                             y,
-                             // 是否为末尾
-                             ++count == children.size(), is_preview);
+                if (parent == parent_entity) {
+                    auto& src_axis =
+                        drag_info
+                            .subject_dragged_entitiesWithRes[parent][child_e];
+                    auto res_axis = src_axis + parent_delta;
+
+                    // 安全限制检查
+                    if (res_axis.time < 0) res_axis.time = 0;
+                    if (res_axis.track < 0) res_axis.track = 0;
+                    if (res_axis.track >= track_count)
+                        res_axis.track = track_count - 1;
+
+                    // 应用位置变化到当前实体
+                    child_time = res_axis.time;
+                    child_track_index = res_axis.track;
+                    y = res_axis.y;
+                }
+
+                generateMesh(
+                    child_track_index, child_e, child_mesh, child_time, y,
+                    // 是否为末尾
+                    ++count == children.size(), parent_delta, is_preview);
             }
             // qDebug() << "共" << children.size() << "个子实体";
         }
