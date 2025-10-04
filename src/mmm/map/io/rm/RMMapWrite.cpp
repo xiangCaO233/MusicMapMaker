@@ -165,9 +165,14 @@ void MMap::writeImd(const std::string& desfile) {
     auto& timing_points = timings.get_all_timing_points();
 
     // 5~8字节:int32 图时间点数
-    int32_t timing_count = timing_points.size();
-    // int32_t timing_count = 0;
-    //
+    int32_t timing_count{0};
+    for (const auto& [time, timing_vec] : timing_points) {
+        for (const auto& timing : timing_vec) {
+            if (timing->is_base_timing) {
+                ++timing_count;
+            }
+        }
+    }
 
     // double process_time = 0;
     // double bpm = timings.begin()->get()->basebpm;
