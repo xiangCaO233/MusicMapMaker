@@ -147,6 +147,8 @@ AddTimingItem::AddTimingItem(QTableWidget *parent) : parent(parent) {
     mutil::set_button_svgcolor(insertButton, ":icons/plus.svg", color, 16, 16);
     setting_spacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding,
                                      QSizePolicy::Policy::Minimum);
+    setting_layout->setContentsMargins(0, 0, 2, 0);
+    setting_layout->setSpacing(2);
     setting_layout->addItem(setting_spacer);
     setting_layout->addWidget(insertButton);
     setting_widget->setLayout(setting_layout);
