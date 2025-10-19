@@ -358,10 +358,11 @@ class MeshGenerateSystem {
                                 track_index = res_axis.track;
                                 y = res_axis.y;
 
-                                XINFO("复合物件相对移动:" +
-                                      parent_relative_delta_axis.toString());
-                                tool_interaction_state->setDragValidRes(
-                                    e, res_axis);
+                                // XINFO("复合物件相对移动:" +
+                                //       parent_relative_delta_axis.toString());
+
+                                // tool_interaction_state->setDragValidRes(
+                                //     e, res_axis);
                             } else {
                                 // 非组合物件拖动-正常移动-直接跟随鼠标
                                 time = current_mouse_axis.time;
@@ -382,8 +383,11 @@ class MeshGenerateSystem {
                 }
                 // --------------------物件拖动移动交互--------------------------
 
+                // XINFO("--------------生成复合物件(带拖动交互)--------------");
                 generateMesh(track_index, e, entity_mesh, time, y, false,
                              parent_relative_delta_axis);
+                // XINFO(
+                //     "--------------生成复合物件(带拖动交互)完成--------------");
             } else {
                 // 非虚影或即将删除方式渲染
 
@@ -545,7 +549,13 @@ class MeshGenerateSystem {
                     auto& src_axis =
                         drag_info
                             .subject_dragged_entitiesWithRes[parent][child_e];
+                    XINFO(std::format("当前子实体[{}]",
+                                      static_cast<uint32_t>(child_e)));
                     auto res_axis = src_axis + parent_delta;
+
+                    XINFO("原始位置:" + src_axis.toString());
+                    XINFO("父相对移动位置:" + parent_delta.toString());
+                    XINFO("最终计算位置:" + res_axis.toString());
 
                     // 安全限制检查
                     if (res_axis.time < 0) res_axis.time = 0;
@@ -553,7 +563,7 @@ class MeshGenerateSystem {
                     if (res_axis.track >= track_count)
                         res_axis.track = track_count - 1;
 
-                    // 应用位置变化到当前实体
+                    // 应用位置变化到当前子实体
                     child_time = res_axis.time;
                     child_track_index = res_axis.track;
                     y = res_axis.y;

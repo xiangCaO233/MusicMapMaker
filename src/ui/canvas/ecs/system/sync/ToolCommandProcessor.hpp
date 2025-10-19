@@ -497,6 +497,7 @@ class ToolCommandProcessor {
                 all_tracks_rect.x +
                 (float(source_axis.track) + 0.5f) * single_track_width;
             selections_with_ress.try_emplace(selected_entity, source_axis);
+
             // 若为复合物件则放子实体坐标到从属集合中
             if (registry.all_of<CompositeRootComponent>(selected_entity)) {
                 auto& subject_selections_with_res =
@@ -510,14 +511,28 @@ class ToolCommandProcessor {
                     MapAxis child_source_axis{child_time, child_time,
                                               child_track};
                     child_source_axis.y = maintrack_converter->timeToPixel(
-                        child_source_axis.time, presentation_canvas_time, info);
+                        child_time, presentation_canvas_time, info);
                     child_source_axis.x =
                         all_tracks_rect.x +
-                        (float(child_source_axis.track) + 0.5f) *
-                            single_track_width;
+                        (float(child_track) + 0.5f) * single_track_width;
                     subject_selections_with_res.try_emplace(child_e,
                                                             child_source_axis);
                 }
+
+                // -----------debug-----------
+                XINFO("生成的组合键从属集合:");
+                for (const auto& [parent_e, subject_selections_with_res] :
+                     subject_selections_with_ress) {
+                    XINFO(std::format("parent:{}",
+                                      static_cast<uint32_t>(parent_e)));
+                    for (const auto& [child_e, axis] :
+                         subject_selections_with_res) {
+                        XINFO(std::format("child:{}",
+                                          static_cast<uint32_t>(child_e)) +
+                              axis.toString());
+                    }
+                }
+                // -----------debugend-----------
             }
         }
 

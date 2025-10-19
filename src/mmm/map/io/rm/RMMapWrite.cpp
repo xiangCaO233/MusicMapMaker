@@ -156,7 +156,6 @@ void MMap::writeImd(const std::string& desfile) {
     uint32_t uint_length = basemeta.map_length;
     if (uint_length >
         static_cast<uint32_t>(std::numeric_limits<int32_t>::max())) {
-        // 哎呀，值太大啦~ 抛异常或者夹到最大值，随你啦
         throw std::runtime_error("长度太大了，小笨蛋，谱面要爆炸哦~");
     }
     int32_t length = static_cast<int32_t>(uint_length);
