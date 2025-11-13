@@ -14,8 +14,6 @@ add_subdirectory(./libs/IonCachyEngine)
 
 include_directories(./ include/ ./libs/IonCachyEngine/include)
 
-link_directories(./build)
-
 # 启用自动处理 Qt 特性
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -25,6 +23,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 
 # 查找 Qt 包
 find_package(
@@ -38,6 +37,13 @@ find_package(
              Svg
              SvgWidgets)
 
+# ==================== 交叉编译修正代码 (最终方案) ====================
+if(CMAKE_CROSSCOMPILING)
+    link_directories(./build-windows-release)
+else()
+    link_directories(./build)
+endif()
+
 # 查找日志包
 find_package(spdlog REQUIRED)
 
@@ -50,7 +56,12 @@ find_package(glm REQUIRED)
 if(APPLE)
   set(FFTLIB /opt/homebrew/lib/libfftw3f.dylib /opt/homebrew/lib/libfftw3f.a)
 elseif(WIN32)
-  set(FFTLIB "G:\\coding\\vcpkg\\installed\\x64-windows\\lib\\fftw3f.lib")
+  if(CMAKE_CROSSCOMPILING)
+    set(FFTLIB "/Users/xiang2333/Documents/win-mingw64-toolchain/mingw64/lib/libfftw3f.a")
+  else()
+    set(FFTLIB "G:\\coding\\vcpkg\\installed\\x64-windows\\lib\\fftw3f.lib")
+  endif()
+
 else()
   set(FFTLIB fftw3f)
 endif()
@@ -65,6 +76,8 @@ find_package(pugixml REQUIRED)
 find_package(ICU REQUIRED COMPONENTS uc i18n data)
 
 find_package(OpenGL REQUIRED)
+
+
 
 # 设置mmm相关文件
 set(MMM_SOURCES
@@ -239,9 +252,8 @@ include_directories(
   ./src/ui/audio/graphic)
 
 # 创建可执行文件
-qt_add_executable(
+add_executable(
   MusicMapMaker
-  MANUAL_FINALIZATION
   ${MMM_SOURCES}
   ${CANVAS_SOURCES}
   ${PROJECT_SOURCES}
@@ -323,4 +335,4 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Qt6 最终化处理
-qt_finalize_executable(MusicMapMaker)
+# qt_finalize_executable(MusicMapMaker)

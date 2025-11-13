@@ -1,0 +1,57 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "macos-native-debug",
+      "displayName": "macOS Native (Debug)",
+      "description": "Build for macOS using system Clang (Debug)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-macos-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_PREFIX_PATH": "/opt/homebrew/Cellar/qt"
+      }
+    },
+    {
+      "name": "windows-cross-debug",
+      "displayName": "Windows Cross-Compile (Debug)",
+      "description": "Cross-compile for Windows using MinGW (Debug)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-windows-debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchain-macos-to-windows.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-cross-release",
+      "displayName": "Windows Cross-Compile (Release)",
+      "description": "Cross-compile for Windows using MinGW (Release)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-windows-release",
+      "toolchainFile": "${sourceDir}/cmake/toolchain-macos-to-windows.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "macos-debug",
+      "configurePreset": "macos-native-debug",
+      "displayName": "Build macOS (Debug)"
+    },
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows-cross-debug",
+      "displayName": "Build Windows (Debug)"
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-cross-release",
+      "displayName": "Build Windows (Release)"
+    }
+  ]
+}
